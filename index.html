@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="HeroDex"/>
+<meta name="theme-color" content="#FFF8F0"/>
+<title>HeroDex</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦸</text></svg>"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23FFF8F0' width='100' height='100' rx='22'/><text x='50' y='68' text-anchor='middle' font-size='52'>🦸</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800;900&family=Nunito:wght@400;600;700;800;900&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body,#root{height:100%;width:100%}
+body{background:#FFF8F0;font-family:'Nunito',sans-serif;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
+@keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes catIdle{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-3px) rotate(-2deg)}75%{transform:translateY(-3px) rotate(2deg)}}
+@keyframes celebPop{0%{transform:scale(0) translateY(0);opacity:1}50%{opacity:1}100%{transform:scale(1.5) translateY(-200px) rotate(360deg);opacity:0}}
+@keyframes celebText{0%{transform:scale(.3);opacity:0}40%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:0}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes starTwinkle{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes rewardPop{0%{transform:translateX(-50%) scale(0.5) translateY(20px);opacity:0}30%{transform:translateX(-50%) scale(1.1) translateY(0);opacity:1}50%{transform:translateX(-50%) scale(1) translateY(0);opacity:1}100%{transform:translateX(-50%) scale(0.9) translateY(-30px);opacity:0}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script type="text/babel">
+const {useState,useEffect,useCallback,useRef}=React;
+window.storage={async get(k){try{const v=localStorage.getItem(k);return v?{value:v}:null}catch(e){return null}},async set(k,v){try{localStorage.setItem(k,v);return{key:k,value:v}}catch(e){return null}},async delete(k){try{localStorage.removeItem(k);return{key:k,deleted:true}}catch(e){return null}}};
+
+
+// ═══ HERODEX v2 - Bug fixes + Rewarded Onboarding ═══
+
+const T = {
+  bg:"#FFF8F0",surface:"#FFF3E6",surfaceHigh:"#FFE8CC",
+  primary:"#6D28D9",primaryLight:"#A78BFA",primaryPale:"#EDE9FE",
+  accent:"#FCD34D",accentDark:"#F59E0B",
+  success:"#34D399",successDark:"#059669",
+  teal:"#0EA5E9",tealDark:"#0284C7",
+  danger:"#F87171",
+  textPrimary:"#1E1B4B",textSecondary:"#64748B",textLight:"#94A3B8",white:"#FFFFFF",
+};
+
+// ── Sound Engine (Web Audio API) ──
+const SFX = {
+  _ctx: null,
+  _get(){if(!this._ctx)this._ctx=new(window.AudioContext||window.webkitAudioContext)();return this._ctx;},
+  play(type){
+    try{
+      const ctx=this._get();const now=ctx.currentTime;
+      if(type==="pop"){
+        // Quest complete: bright rising pop
+        const o=ctx.createOscillator();const g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type="sine";o.frequency.setValueAtTime(600,now);o.frequency.exponentialRampToValueAtTime(1200,now+0.1);
+        g.gain.setValueAtTime(0.3,now);g.gain.exponentialRampToValueAtTime(0.01,now+0.15);
+        o.start(now);o.stop(now+0.15);
+      } else if(type==="coin"){
+        // Coin earn: metallic chime
+        [800,1000,1200].forEach((f,i)=>{
+          const o=ctx.createOscillator();const g=ctx.createGain();
+          o.connect(g);g.connect(ctx.destination);
+          o.type="triangle";o.frequency.setValueAtTime(f,now+i*0.06);
+          g.gain.setValueAtTime(0.2,now+i*0.06);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.06+0.12);
+          o.start(now+i*0.06);o.stop(now+i*0.06+0.12);
+        });
+      } else if(type==="levelup"){
+        // Level up: ascending arpeggio
+        [523,659,784,1047].forEach((f,i)=>{
+          const o=ctx.createOscillator();const g=ctx.createGain();
+          o.connect(g);g.connect(ctx.destination);
+          o.type="sine";o.frequency.setValueAtTime(f,now+i*0.1);
+          g.gain.setValueAtTime(0.25,now+i*0.1);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.1+0.2);
+          o.start(now+i*0.1);o.stop(now+i*0.1+0.2);
+        });
+      } else if(type==="celeb"){
+        // All done: celebration fanfare
+        [784,988,1175,1568,1175,1568].forEach((f,i)=>{
+          const o=ctx.createOscillator();const g=ctx.createGain();
+          o.connect(g);g.connect(ctx.destination);
+          o.type="square";o.frequency.setValueAtTime(f,now+i*0.08);
+          g.gain.setValueAtTime(0.15,now+i*0.08);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.08+0.15);
+          o.start(now+i*0.08);o.stop(now+i*0.08+0.15);
+        });
+      } else if(type==="tap"){
+        // UI tap: subtle click
+        const o=ctx.createOscillator();const g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type="sine";o.frequency.setValueAtTime(1000,now);
+        g.gain.setValueAtTime(0.1,now);g.gain.exponentialRampToValueAtTime(0.01,now+0.05);
+        o.start(now);o.stop(now+0.05);
+      } else if(type==="buy"){
+        // Shop purchase: sparkle
+        [1200,900,1400].forEach((f,i)=>{
+          const o=ctx.createOscillator();const g=ctx.createGain();
+          o.connect(g);g.connect(ctx.destination);
+          o.type="sine";o.frequency.setValueAtTime(f,now+i*0.08);
+          g.gain.setValueAtTime(0.2,now+i*0.08);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.08+0.1);
+          o.start(now+i*0.08);o.stop(now+i*0.08+0.1);
+        });
+      }
+    }catch(e){}
+  }
+};
+
+const HERO_SHAPES=["cube","circle","hex","pill"];
+const HERO_COLORS=["#6D28D9","#0EA5E9","#F97316","#EF4444","#34D399","#F59E0B","#EC4899","#475569"];
+const HERO_EYES=["round","happy","cool","big"];
+const HERO_HAIRS=["short","spiky","curly","long","cap","none"];
+const CAT_VARIANTS={
+  tiger:{name:"Tiger",col:"#F97316",ear:"#FED7AA",stripes:true,desc:"Mutig wie ein Tiger!"},
+  shadow:{name:"Schatten",col:"#475569",ear:"#94A3B8",stripes:false,desc:"Geheimnisvoll & schnell!"},
+  snow:{name:"Schnee",col:"#E2E8F0",ear:"#FCA5A5",stripes:false,desc:"Flauschig wie Schnee!"},
+  galaxy:{name:"Galaxie",col:"#7C3AED",ear:"#DDD6FE",stripes:false,desc:"Magisch & voller Kraft!"},
+  golden:{name:"Gold",col:"#F59E0B",ear:"#FEF3C7",stripes:false,desc:"Strahlt wie die Sonne!"},
+};
+const SCHOOL_QUESTS=[
+  {id:"s1",name:"Gesicht waschen",icon:"🧼",anchor:"morning",xp:10,minutes:3},
+  {id:"s2",name:"Bett machen",icon:"🛏️",anchor:"morning",xp:15,minutes:4},
+  {id:"s3",name:"Zähne putzen",icon:"🪥",anchor:"morning",xp:10,minutes:3},
+  {id:"s4",name:"Anziehen",icon:"👕",anchor:"morning",xp:10,minutes:3},
+  {id:"s5",name:"Schultasche packen",icon:"🎒",anchor:"morning",xp:15,minutes:4},
+  {id:"s6",name:"Geschirr einräumen",icon:"🍽️",anchor:"morning",xp:10,minutes:2},
+  {id:"s6b",name:"Sonnencreme auftragen",icon:"☀️",anchor:"morning",xp:10,minutes:2},
+  {id:"s7",name:"Hausaufgaben",icon:"📚",anchor:"afternoon",xp:25,minutes:8},
+  {id:"s8",name:"5 Min lesen",icon:"📖",anchor:"afternoon",xp:20,minutes:5},
+  {id:"s9",name:"Zimmer aufräumen",icon:"🧹",anchor:"afternoon",xp:20,minutes:6},
+  {id:"s10",name:"Geschirr einräumen",icon:"🍽️",anchor:"afternoon",xp:10,minutes:2},
+  {id:"s11",name:"Geschirr einräumen",icon:"🍽️",anchor:"evening",xp:10,minutes:2},
+  {id:"s12",name:"Zähne putzen",icon:"🪥",anchor:"evening",xp:10,minutes:3},
+  {id:"s13",name:"Gesicht reinigen",icon:"🧴",anchor:"evening",xp:10,minutes:3},
+  {id:"s14",name:"Creme auftragen",icon:"✨",anchor:"evening",xp:10,minutes:2},
+  {id:"s15",name:"Pyjama anziehen",icon:"🌙",anchor:"evening",xp:10,minutes:2},
+];
+const VACATION_QUESTS=[
+  {id:"v1",name:"Gesicht waschen",icon:"🧼",anchor:"morning",xp:10,minutes:3},
+  {id:"v2",name:"Bett machen",icon:"🛏️",anchor:"morning",xp:15,minutes:4},
+  {id:"v3",name:"Zähne putzen",icon:"🪥",anchor:"morning",xp:10,minutes:3},
+  {id:"v4",name:"Anziehen",icon:"👕",anchor:"morning",xp:10,minutes:3},
+  {id:"v5",name:"Geschirr einräumen",icon:"🍽️",anchor:"morning",xp:10,minutes:2},
+  {id:"v5b",name:"Sonnencreme auftragen",icon:"☀️",anchor:"morning",xp:10,minutes:2},
+  {id:"v6",name:"5 Min lesen",icon:"📖",anchor:"afternoon",xp:20,minutes:5},
+  {id:"v7",name:"Zimmer aufräumen",icon:"🧹",anchor:"afternoon",xp:15,minutes:5},
+  {id:"v8",name:"Geschirr einräumen",icon:"🍽️",anchor:"afternoon",xp:10,minutes:2},
+  {id:"v9",name:"Geschirr einräumen",icon:"🍽️",anchor:"evening",xp:10,minutes:2},
+  {id:"v10",name:"Zähne putzen",icon:"🪥",anchor:"evening",xp:10,minutes:3},
+  {id:"v11",name:"Gesicht reinigen",icon:"🧴",anchor:"evening",xp:10,minutes:3},
+  {id:"v12",name:"Creme auftragen",icon:"✨",anchor:"evening",xp:10,minutes:2},
+  {id:"v13",name:"Pyjama anziehen",icon:"🌙",anchor:"evening",xp:10,minutes:2},
+];
+const FOOTBALL={id:"ft",name:"Fußball Training",icon:"⚽",anchor:"afternoon",xp:30,minutes:10};
+const REWARDS=[{id:"r1",name:"Hörspiel hören",icon:"🎧",minutes:30},{id:"r2",name:"Videospiel spielen",icon:"🎮",minutes:15},{id:"r3",name:"Serie schauen",icon:"📺",minutes:25},{id:"r4",name:"Film schauen",icon:"🎬",minutes:60},{id:"r5",name:"Süßigkeit",icon:"🍬",minutes:40}];
+const RAINBOW=["🔴","🟠","🟡","🟢","🔵","🟣"];
+const RAINBOW_LABELS=["Rot","Orange","Gelb","Grün","Blau","Lila"];
+const RAINBOW_EXAMPLES=["Tomate, Erdbeere","Karotte, Orange","Banane, Paprika","Brokkoli, Gurke","Blaubeere","Traube, Aubergine"];
+const MOOD_EMOJIS=["😢","😕","😐","🙂","😊","🤩"];
+const SHOP_ITEMS={
+  hero:[
+    {id:"h_sunglasses",name:"Sonnenbrille",icon:"🕶️",cost:120,type:"hero"},
+    {id:"h_cape_red",name:"Roter Umhang",icon:"🦸",cost:200,type:"hero"},
+    {id:"h_headband",name:"Stirnband",icon:"🎽",cost:80,type:"hero"},
+    {id:"h_wings",name:"Flügel",icon:"🪽",cost:350,type:"hero"},
+  ],
+  cat:[
+    {id:"c_bowtie",name:"Fliege",icon:"🎀",cost:80,type:"cat"},
+    {id:"c_collar",name:"Halsband",icon:"📿",cost:100,type:"cat"},
+    {id:"c_crown",name:"Krone",icon:"👑",cost:250,type:"cat"},
+    {id:"c_scarf",name:"Schal",icon:"🧣",cost:90,type:"cat"},
+  ],
+  room:[
+    {id:"rm_poster",name:"Poster",icon:"🖼️",cost:150,type:"room"},
+    {id:"rm_plant",name:"Pflanze",icon:"🪴",cost:100,type:"room"},
+    {id:"rm_lamp",name:"Lavalampe",icon:"🪔",cost:200,type:"room"},
+    {id:"rm_rug",name:"Teppich",icon:"🟪",cost:180,type:"room"},
+    {id:"rm_trophy",name:"Pokal",icon:"🏆",cost:300,type:"room"},
+  ],
+};
+// ── Mystery Reward Pools ──
+const RARE_DROPS=[
+  {type:"coins",amount:25,label:"+25 Bonus-Münzen!",icon:"🪙"},
+  {type:"coins",amount:40,label:"+40 Bonus-Münzen!",icon:"💰"},
+  {type:"xp",amount:20,label:"+20 Bonus-XP!",icon:"⚡"},
+  {type:"xp",amount:35,label:"+35 Bonus-XP!",icon:"✨"},
+  {type:"minutes",amount:5,label:"+5 Bonus-Minuten!",icon:"⏰"},
+  {type:"emoji",label:"Seltenes Emoji: 🦄",icon:"🦄",id:"emoji_unicorn"},
+  {type:"emoji",label:"Seltenes Emoji: 🐲",icon:"🐲",id:"emoji_dragon"},
+  {type:"emoji",label:"Seltenes Emoji: 🌈",icon:"🌈",id:"emoji_rainbow"},
+];
+const CHEST_REWARDS=[
+  {type:"coins",amount:100,label:"100 Münzen!",icon:"💰"},
+  {type:"coins",amount:150,label:"150 Münzen!",icon:"🪙"},
+  {type:"xp",amount:75,label:"75 Bonus-XP!",icon:"⚡"},
+  {type:"item",id:"c_crown",label:"Katzenkrone!",icon:"👑"},
+  {type:"item",id:"h_wings",label:"Heldenflügel!",icon:"🪽"},
+  {type:"item",id:"rm_trophy",label:"Goldpokal!",icon:"🏆"},
+  {type:"minutes",amount:15,label:"+15 Bonus-Minuten!",icon:"⏰"},
+  {type:"xpboost",label:"Doppel-XP morgen!",icon:"🔥"},
+];
+const WHEEL_SEGMENTS=[
+  {type:"coins",amount:30,label:"+30 Münzen",icon:"🪙",color:"#FCD34D"},
+  {type:"xp",amount:25,label:"+25 XP",icon:"⚡",color:"#A78BFA"},
+  {type:"minutes",amount:5,label:"+5 Min",icon:"⏰",color:"#34D399"},
+  {type:"coins",amount:50,label:"+50 Münzen",icon:"💰",color:"#FB923C"},
+  {type:"xp",amount:40,label:"+40 XP",icon:"✨",color:"#60A5FA"},
+  {type:"rare",label:"Seltener Fund!",icon:"🎁",color:"#EC4899"},
+];
+const CHEST_MILESTONES=[3,7,14,21,30,50,75,100];
+const RARE_DROP_CHANCE=0.12;
+// ── Weekly Missions ──
+const WEEKLY_MISSIONS=[
+  {id:"wm1",title:"Sternenjäger",story:"Rocket hat einen Stern verloren! Schaffe 5 Tage alle Quests um ihn zu finden.",goal:"allDone5",target:5,reward:{type:"coins",amount:200},icon:"⭐"},
+  {id:"wm2",title:"Regenbogen-Woche",story:"Esse diese Woche jeden Tag alle Farben des Regenbogens!",goal:"rainbow5",target:5,reward:{type:"coins",amount:150},icon:"🌈"},
+  {id:"wm3",title:"Bücherwurm",story:"Lies diese Woche jeden Tag! Dein Held wird klüger!",goal:"read7",target:7,reward:{type:"xp",amount:100},icon:"📖"},
+  {id:"wm4",title:"Frühaufsteher",story:"Schaffe 5 Tage alle Morgen-Quests vor dem Mittagessen!",goal:"allMorning5",target:5,reward:{type:"coins",amount:175},icon:"🌅"},
+  {id:"wm5",title:"Sauberheld",story:"Schaffe 7 Tage deine Abend-Pflege komplett!",goal:"allEvening7",target:7,reward:{type:"xp",amount:80},icon:"✨"},
+  {id:"wm6",title:"Fußball-Star",story:"Geh diese Woche zu allen Trainings!",goal:"football2",target:2,reward:{type:"coins",amount:120},icon:"⚽"},
+];
+const GRADUATION_THRESHOLD=30; // days streak to graduate a quest // 12% chance per quest
+const ANCHORS={morning:{label:"Morgens",icon:"🌅",col:"#F97316"},afternoon:{label:"Nachmittags",icon:"☀️",col:"#0EA5E9"},evening:{label:"Abends",icon:"🌙",col:"#6D28D9"}};
+const LVL=[0,50,120,220,360,550,800,1100,1500,2000,2600,3300,4100,5000,6000,7200];
+function getLevel(xp){let l=1;for(let i=1;i<LVL.length;i++){if(xp>=LVL[i])l=i+1;else break;}return l;}
+function getLvlProg(xp){const l=getLevel(xp);const c=LVL[l-1]||0;const n=LVL[l]||c+500;return{cur:xp-c,need:n-c};}
+function buildDay(vac){const b=(vac?VACATION_QUESTS:SCHOOL_QUESTS).map(q=>({...q,done:false,streak:0}));const d=new Date().getDay();if((d===1||d===3)&&!vac)b.push({...FOOTBALL,done:false,streak:0});return b;}
+
+// ── Shared UI Components (OUTSIDE component to prevent re-mount) ──
+const OBWrap=({children})=><div style={{minHeight:"100vh",background:T.bg,fontFamily:"'Nunito',sans-serif",color:T.textPrimary,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,paddingTop:"env(safe-area-inset-top, 24px)"}}>{children}</div>;
+const OBTitle=({children})=><div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1.5rem",fontWeight:800,color:T.primary,textAlign:"center",marginBottom:8,textTransform:"uppercase",fontStyle:"italic",letterSpacing:"-0.02em"}}>{children}</div>;
+const OBSub=({children})=><div style={{fontSize:".85rem",color:T.textSecondary,textAlign:"center",marginBottom:24}}>{children}</div>;
+const OBBtn=({children,onClick,disabled,big})=><button onClick={onClick} disabled={disabled} style={{background:disabled?"rgba(0,0,0,0.06)":`linear-gradient(135deg,${T.primary},${T.primaryLight})`,border:"none",borderRadius:50,padding:big?"16px 48px":"12px 32px",color:disabled?T.textLight:"white",fontWeight:800,fontSize:big?"1.1rem":".9rem",cursor:disabled?"default":"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",textTransform:"uppercase",letterSpacing:".05em",boxShadow:disabled?"none":`0 8px 24px ${T.primary}40`,opacity:disabled?.5:1,transition:"all .2s"}}>{children}</button>;
+const OBGrid=({children,cols})=><div style={{display:"grid",gridTemplateColumns:`repeat(${cols},1fr)`,gap:10,width:"100%",maxWidth:340}}>{children}</div>;
+const OBChip=({selected,onClick,children})=><button onClick={onClick} style={{background:selected?"rgba(109,40,217,0.1)":"white",border:selected?`2.5px solid ${T.primary}`:"2px solid rgba(0,0,0,0.08)",borderRadius:16,padding:"12px",cursor:"pointer",transition:"all .15s",fontFamily:"'Nunito',sans-serif",fontWeight:700,fontSize:".85rem",color:T.textPrimary,textAlign:"center",boxShadow:selected?`0 4px 16px ${T.primary}20`:"0 2px 8px rgba(0,0,0,0.04)"}}>{children}</button>;
+
+// ── Reward Toast ──
+function RewardToast({show,text,icon}){
+  if(!show)return null;
+  return <div style={{position:"fixed",top:"15%",left:"50%",transform:"translateX(-50%)",zIndex:9999,animation:"rewardPop .8s ease forwards",pointerEvents:"none"}}>
+    <div style={{background:"white",borderRadius:20,padding:"16px 28px",boxShadow:"0 12px 40px rgba(109,40,217,0.25)",border:`2px solid ${T.accent}`,display:"flex",alignItems:"center",gap:10}}>
+      <span style={{fontSize:"1.8rem"}}>{icon}</span>
+      <div><div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:".9rem",color:T.primary}}>{text}</div></div>
+    </div>
+  </div>;
+}
+
+// ── Hero SVG ──
+function HeroSprite({shape,color,eyes,hair,size:s,level}){
+  const sz=s||140;const lvl=level||1;const hasCape=lvl>=5;const hasCrown=lvl>=10;const hasGlow=lvl>=15;
+  return(
+    <svg viewBox="0 0 200 240" width={sz} height={sz*1.2} style={{filter:hasGlow?`drop-shadow(0 0 20px ${color}88)`:`drop-shadow(0 6px 16px rgba(0,0,0,0.12))`}}>
+      {hasCape&&<path d="M70 120 L60 200 L100 185 L140 200 L130 120" fill={color} opacity="0.3"/>}
+      {shape==="cube"&&<rect x="55" y="100" width="90" height="90" rx="18" fill={color}/>}
+      {shape==="circle"&&<ellipse cx="100" cy="145" rx="48" ry="48" fill={color}/>}
+      {shape==="hex"&&<polygon points="100,98 148,120 148,170 100,192 52,170 52,120" fill={color}/>}
+      {shape==="pill"&&<rect x="62" y="90" width="76" height="105" rx="38" fill={color}/>}
+      <ellipse cx="85" cy="125" rx="20" ry="12" fill="white" opacity="0.2" transform="rotate(-20 85 125)"/>
+      <circle cx="100" cy="78" r="36" fill={color}/>
+      <ellipse cx="88" cy="70" rx="14" ry="8" fill="white" opacity="0.15" transform="rotate(-15 88 70)"/>
+      {eyes==="round"&&<><circle cx="87" cy="78" r="8" fill="white"/><circle cx="113" cy="78" r="8" fill="white"/><circle cx="89" cy="77" r="4.5" fill="#1E1B4B"/><circle cx="115" cy="77" r="4.5" fill="#1E1B4B"/><circle cx="91" cy="75" r="1.5" fill="white"/><circle cx="117" cy="75" r="1.5" fill="white"/></>}
+      {eyes==="happy"&&<><path d="M79 78 Q87 70 95 78" stroke="#1E1B4B" strokeWidth="3" fill="none" strokeLinecap="round"/><path d="M105 78 Q113 70 121 78" stroke="#1E1B4B" strokeWidth="3" fill="none" strokeLinecap="round"/></>}
+      {eyes==="cool"&&<><rect x="78" y="73" width="18" height="8" rx="4" fill="white"/><rect x="104" y="73" width="18" height="8" rx="4" fill="white"/><rect x="82" y="74" width="8" height="6" rx="3" fill="#1E1B4B"/><rect x="108" y="74" width="8" height="6" rx="3" fill="#1E1B4B"/></>}
+      {eyes==="big"&&<><circle cx="86" cy="78" r="10" fill="white"/><circle cx="114" cy="78" r="10" fill="white"/><circle cx="88" cy="77" r="6" fill="#1E1B4B"/><circle cx="116" cy="77" r="6" fill="#1E1B4B"/><circle cx="90" cy="74" r="2.5" fill="white"/><circle cx="118" cy="74" r="2.5" fill="white"/></>}
+      <path d="M93 92 Q100 98 107 92" stroke="#1E1B4B" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      {hair==="short"&&<path d="M66 68 Q70 42 100 40 Q130 42 134 68" fill={color} stroke={color} strokeWidth="4"/>}
+      {hair==="spiky"&&<><polygon points="80,52 85,28 95,50" fill={color}/><polygon points="95,48 100,22 108,46" fill={color}/><polygon points="108,50 115,30 120,52" fill={color}/></>}
+      {hair==="curly"&&<><circle cx="75" cy="55" r="10" fill={color}/><circle cx="90" cy="48" r="11" fill={color}/><circle cx="108" cy="47" r="11" fill={color}/><circle cx="124" cy="54" r="10" fill={color}/></>}
+      {hair==="long"&&<><path d="M64 68 Q62 45 80 38 Q100 32 120 38 Q138 45 136 68" fill={color}/><path d="M64 68 L58 120" stroke={color} strokeWidth="10" strokeLinecap="round"/><path d="M136 68 L142 120" stroke={color} strokeWidth="10" strokeLinecap="round"/></>}
+      {hair==="cap"&&<><ellipse cx="100" cy="58" rx="40" ry="18" fill="#1E293B"/><rect x="60" y="55" width="80" height="10" rx="5" fill="#1E293B"/><circle cx="100" cy="42" r="5" fill="white"/></>}
+      {hasCrown&&<g transform="translate(100,33)"><polygon points="-16,10 -11,-5 -5,5 0,-12 5,5 11,-5 16,10" fill="#FCD34D" stroke="#F59E0B" strokeWidth="1.5"/></g>}
+      <ellipse cx="82" cy="198" rx="14" ry="8" fill={color}/><ellipse cx="118" cy="198" rx="14" ry="8" fill={color}/>
+    </svg>
+  );
+}
+
+function CatSidekick({variant,mood,size:s}){
+  const c=CAT_VARIANTS[variant]||CAT_VARIANTS.galaxy;const sz=s||60;const dk=variant==="shadow";const sc=dk?"#94A3B8":"#1E1B4B";
+  return(<svg viewBox="0 0 120 140" width={sz} height={sz*1.17} style={{filter:`drop-shadow(0 4px 8px ${c.col}33)`}}>
+    <path d="M90 100 Q108 85 105 65 Q104 55 98 52" stroke={c.col} strokeWidth="6" fill="none" strokeLinecap="round"/>
+    <ellipse cx="60" cy="95" rx="30" ry="25" fill={c.col}/><ellipse cx="60" cy="99" rx="18" ry="14" fill="white" opacity="0.15"/>
+    {c.stripes&&<><line x1="42" y1="85" x2="38" y2="92" stroke="#C2410C" strokeWidth="2" opacity="0.3" strokeLinecap="round"/><line x1="78" y1="85" x2="82" y2="92" stroke="#C2410C" strokeWidth="2" opacity="0.3" strokeLinecap="round"/></>}
+    <polygon points="38,58 30,30 50,48" fill={c.col}/><polygon points="40,54 34,36 48,48" fill={c.ear}/>
+    <polygon points="82,58 90,30 70,48" fill={c.col}/><polygon points="80,54 86,36 72,48" fill={c.ear}/>
+    <circle cx="60" cy="62" r="22" fill={c.col}/>
+    {mood==="sleepy"?<><line x1="50" y1="60" x2="56" y2="60" stroke={sc} strokeWidth="2" strokeLinecap="round"/><line x1="64" y1="60" x2="70" y2="60" stroke={sc} strokeWidth="2" strokeLinecap="round"/></>:<>
+      <ellipse cx="53" cy="60" rx="4" ry="5" fill="white"/><ellipse cx="67" cy="60" rx="4" ry="5" fill="white"/>
+      <ellipse cx="53" cy="60" rx="1.8" ry="4" fill={dk?"#1E293B":"#1E1B4B"}/><ellipse cx="67" cy="60" rx="1.8" ry="4" fill={dk?"#1E293B":"#1E1B4B"}/>
+      <circle cx="54.5" cy="58" r="1" fill="white"/><circle cx="68.5" cy="58" r="1" fill="white"/></>}
+    <polygon points="60,66 57,69 63,69" fill="#FDA4AF"/>
+    <line x1="35" y1="66" x2="48" y2="67" stroke={sc} strokeWidth="1" opacity="0.3"/><line x1="35" y1="70" x2="48" y2="70" stroke={sc} strokeWidth="1" opacity="0.3"/>
+    <line x1="72" y1="67" x2="85" y2="66" stroke={sc} strokeWidth="1" opacity="0.3"/><line x1="72" y1="70" x2="85" y2="70" stroke={sc} strokeWidth="1" opacity="0.3"/>
+    {(mood==="happy"||mood==="excited")?<><path d="M56 72 Q60 76 60 72" stroke={sc} strokeWidth="1.5" fill="none"/><path d="M60 72 Q60 76 64 72" stroke={sc} strokeWidth="1.5" fill="none"/></>:<line x1="57" y1="72" x2="63" y2="72" stroke={sc} strokeWidth="1.2" opacity="0.4"/>}
+    <ellipse cx="46" cy="68" rx="4" ry="3" fill="#FDA4AF" opacity="0.3"/><ellipse cx="74" cy="68" rx="4" ry="3" fill="#FDA4AF" opacity="0.3"/>
+    <ellipse cx="48" cy="120" rx="10" ry="6" fill={c.col}/><ellipse cx="72" cy="120" rx="10" ry="6" fill={c.col}/>
+  </svg>);
+}
+
+function Celebration({active,onDone}){
+  const[p,setP]=useState([]);
+  const[msg,setMsg]=useState("");
+  const MSGS=["⭐ Super!","🔥 Mega!","💪 Stark!","🚀 Boom!","✨ Wow!","🎯 Treffer!","👏 Klasse!","⚡ Yeah!","🏆 Hammer!","🌟 Toll!","😎 Cool!","🎉 Perfekt!"];
+  useEffect(()=>{if(!active)return;setMsg(MSGS[Math.floor(Math.random()*MSGS.length)]);setP(Array.from({length:24},(_,i)=>({id:i,x:50+(Math.random()-.5)*70,y:50+(Math.random()-.5)*70,color:[T.accent,"#F472B6",T.success,"#60A5FA",T.primaryLight,T.accentDark][i%6],size:6+Math.random()*12,delay:Math.random()*.4})));const t=setTimeout(()=>{setP([]);onDone?.();},2000);return()=>clearTimeout(t);},[active]);
+  if(!p.length)return null;
+  return(<div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center"}}>{p.map(pt=><div key={pt.id} style={{position:"absolute",left:`${pt.x}%`,top:`${pt.y}%`,width:pt.size,height:pt.size,backgroundColor:pt.color,borderRadius:"50%",animation:`celebPop 1.8s ease-out ${pt.delay}s forwards`,opacity:0}}/>)}<div style={{fontSize:"3rem",animation:"celebText 1.8s ease-out forwards",zIndex:10}}>{msg}</div></div>);
+}
+
+// ── Rare Drop Toast ──
+function RareDropToast({drop,onDone}){
+  useEffect(()=>{if(drop){const t=setTimeout(onDone,2500);return()=>clearTimeout(t);}},  [drop]);
+  if(!drop)return null;
+  return <div style={{position:"fixed",top:"18%",left:"50%",transform:"translateX(-50%)",zIndex:9998,animation:"rewardPop 2.5s ease forwards",pointerEvents:"none"}}>
+    <div style={{background:"linear-gradient(135deg,#FCD34D,#F59E0B)",borderRadius:20,padding:"16px 28px",boxShadow:"0 12px 40px rgba(245,158,11,0.4)",display:"flex",alignItems:"center",gap:10,border:"3px solid white"}}>
+      <span style={{fontSize:"2rem"}}>{drop.icon}</span>
+      <div><div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:".85rem",color:"white"}}>Seltener Fund!</div><div style={{fontSize:".75rem",fontWeight:700,color:"rgba(255,255,255,0.9)"}}>{drop.label}</div></div>
+    </div>
+  </div>;
+}
+
+// ── Spin Wheel ──
+function SpinWheel({onResult,onClose}){
+  const[spinning,setSpinning]=useState(false);
+  const[angle,setAngle]=useState(0);
+  const[result,setResult]=useState(null);
+  const spin=()=>{
+    if(spinning)return;
+    SFX.play("tap");
+    setSpinning(true);
+    const idx=Math.floor(Math.random()*WHEEL_SEGMENTS.length);
+    const targetAngle=360*5+(idx*(360/WHEEL_SEGMENTS.length))+(360/WHEEL_SEGMENTS.length/2);
+    setAngle(targetAngle);
+    setTimeout(()=>{
+      SFX.play("celeb");
+      setResult(WHEEL_SEGMENTS[idx]);
+      setSpinning(false);
+    },3500);
+  };
+  const segAngle=360/WHEEL_SEGMENTS.length;
+  return <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:9990,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .3s ease"}}>
+    <div style={{background:"white",borderRadius:28,padding:24,textAlign:"center",maxWidth:320,width:"90%",boxShadow:"0 24px 64px rgba(0,0,0,0.2)"}}>
+      <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1.2rem",fontWeight:800,color:T.primary,textTransform:"uppercase",fontStyle:"italic",marginBottom:4}}>🎡 Glücksrad!</div>
+      <div style={{fontSize:".75rem",color:T.textSecondary,marginBottom:16}}>Alle Quests geschafft! Dreh das Rad!</div>
+      {/* Wheel */}
+      <div style={{position:"relative",width:220,height:220,margin:"0 auto 16px"}}>
+        {/* Pointer */}
+        <div style={{position:"absolute",top:-8,left:"50%",transform:"translateX(-50%)",zIndex:10,fontSize:"1.5rem"}}>▼</div>
+        <svg width="220" height="220" style={{transform:`rotate(${angle}deg)`,transition:spinning?"transform 3.5s cubic-bezier(0.17,0.67,0.12,0.99)":"none"}}>
+          {WHEEL_SEGMENTS.map((seg,i)=>{
+            const startA=(i*segAngle-90)*Math.PI/180;
+            const endA=((i+1)*segAngle-90)*Math.PI/180;
+            const x1=110+100*Math.cos(startA);const y1=110+100*Math.sin(startA);
+            const x2=110+100*Math.cos(endA);const y2=110+100*Math.sin(endA);
+            const midA=((i+0.5)*segAngle-90)*Math.PI/180;
+            const tx=110+60*Math.cos(midA);const ty=110+60*Math.sin(midA);
+            return <g key={i}>
+              <path d={`M110,110 L${x1},${y1} A100,100 0 0,1 ${x2},${y2} Z`} fill={seg.color} stroke="white" strokeWidth="2"/>
+              <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" fontSize="20" transform={`rotate(${(i+0.5)*segAngle},${tx},${ty})`}>{seg.icon}</text>
+            </g>;
+          })}
+          <circle cx="110" cy="110" r="20" fill="white" stroke={T.primary} strokeWidth="3"/>
+        </svg>
+      </div>
+      {!result?<button onClick={spin} disabled={spinning} style={{background:`linear-gradient(135deg,${T.primary},${T.primaryLight})`,border:"none",borderRadius:50,padding:"14px 36px",color:"white",fontWeight:800,fontSize:"1rem",cursor:spinning?"default":"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",opacity:spinning?.6:1,boxShadow:`0 8px 24px ${T.primary}40`}}>{spinning?"Dreht...":"Drehen! 🎡"}</button>
+      :<div>
+        <div style={{fontSize:"2.5rem",marginBottom:8}}>{result.icon}</div>
+        <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:"1rem",color:T.primary,marginBottom:4}}>{result.label}</div>
+        <button onClick={()=>onResult(result)} style={{background:`linear-gradient(135deg,${T.success},${T.successDark})`,border:"none",borderRadius:50,padding:"12px 32px",color:"white",fontWeight:800,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",marginTop:8}}>Einsammeln! ✨</button>
+      </div>}
+    </div>
+  </div>;
+}
+
+// ── Surprise Chest ──
+function SurpriseChest({onOpen,streakDays}){
+  const[opened,setOpened]=useState(false);
+  const[reward,setReward]=useState(null);
+  const open=()=>{
+    SFX.play("celeb");
+    const r=CHEST_REWARDS[Math.floor(Math.random()*CHEST_REWARDS.length)];
+    setReward(r);setOpened(true);
+  };
+  return <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:9990,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .3s ease"}}>
+    <div style={{background:"white",borderRadius:28,padding:28,textAlign:"center",maxWidth:300,width:"90%",boxShadow:"0 24px 64px rgba(0,0,0,0.2)"}}>
+      <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1.1rem",fontWeight:800,color:T.primary,textTransform:"uppercase",fontStyle:"italic",marginBottom:4}}>🎁 Überraschungstruhe!</div>
+      <div style={{fontSize:".75rem",color:T.textSecondary,marginBottom:16}}>{streakDays}-Tage Streak Belohnung!</div>
+      {!opened?<>
+        <div style={{fontSize:"5rem",animation:"heroFloat 1.5s ease-in-out infinite",marginBottom:16}}>🎁</div>
+        <button onClick={open} style={{background:"linear-gradient(135deg, #F59E0B, #FCD34D)",border:"none",borderRadius:50,padding:"14px 36px",color:"white",fontWeight:800,fontSize:"1rem",cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",boxShadow:"0 8px 24px rgba(245,158,11,0.4)"}}>Öffnen! 🔓</button>
+      </>:<>
+        <div style={{fontSize:"3.5rem",marginBottom:8}}>{reward.icon}</div>
+        <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:"1.1rem",color:T.primary,marginBottom:4}}>{reward.label}</div>
+        <button onClick={()=>onOpen(reward)} style={{background:`linear-gradient(135deg,${T.success},${T.successDark})`,border:"none",borderRadius:50,padding:"12px 32px",color:"white",fontWeight:800,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",marginTop:12}}>Super! ✨</button>
+      </>}
+    </div>
+  </div>;
+}
+
+function ProgressRing({progress,size,stroke,color}){
+  const r=(size-stroke)/2;const circ=2*Math.PI*r;const off=circ-(progress*circ);
+  return(<svg width={size} height={size} style={{transform:"rotate(-90deg)"}}><circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth={stroke}/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={off} style={{transition:"stroke-dashoffset 0.8s ease"}}/></svg>);
+}
+
+function getSky(done,total){const p=total>0?done/total:0;if(p>=1)return"linear-gradient(180deg, #0F172A 0%, #1E1B4B 40%, #312E81 100%)";if(p>=0.66)return"linear-gradient(180deg, #78350F 0%, #C2410C 25%, #EA580C 50%, #6D28D9 100%)";if(p>=0.33)return"linear-gradient(180deg, #0C4A6E 0%, #0369A1 40%, #0284C7 100%)";return"linear-gradient(180deg, #7C2D12 0%, #9A3412 30%, #C2410C 60%, #EA580C 100%)";}
+function getSkyStars(d,t){return t>0&&d/t>=1;}
+function getTimeLabel(d,t){const p=t>0?d/t:0;if(p>=1)return"Nacht 🌙";if(p>=0.66)return"Abend 🌅";if(p>=0.33)return"Tag ☀️";return"Morgen 🌅";}
+
+
+// ── Onboarding with Rewards ──
+// Reward schedule: each step gives XP + coins, player levels up during onboarding
+const OB_REWARDS = [
+  null, // 0: welcome
+  {xp:0,coins:50,text:"+50 Münzen!",icon:"🪙"}, // 1: shape
+  {xp:55,coins:25,text:"Level 2! +25🪙",icon:"⚡"}, // 2: color -> hits lvl 2
+  {xp:0,coins:40,text:"+40 Münzen!",icon:"🎁"}, // 3: eyes
+  {xp:70,coins:30,text:"Level 3! +30🪙",icon:"⚡"}, // 4: hair
+  {xp:0,coins:100,text:"+100 Startgeld!",icon:"💰"}, // 5: hero name
+  {xp:0,coins:0,text:"",icon:""}, // 6: cat quiz color (silent)
+  {xp:0,coins:0,text:"",icon:""}, // 7: cat quiz power (silent)
+  {xp:100,coins:50,text:"Sidekick! Level 4!",icon:"🐱"}, // 8: cat pick
+  {xp:0,coins:80,text:"+80 Münzen!",icon:"🪙"}, // 9: cat name
+];
+// Total onboarding: 225 XP (level 4), 375 coins
+
+function Onboarding({onComplete}){
+  const[step,setStep]=useState(0);
+  const[hero,setHero]=useState({shape:"cube",color:HERO_COLORS[0],eyes:"round",hair:"short",name:""});
+  const[catAnswers,setCatAnswers]=useState({});
+  const[selCat,setSelCat]=useState(null);
+  const[catName,setCatName]=useState("");
+  const[obXP,setObXP]=useState(0);
+  const[obCoins,setObCoins]=useState(0);
+  const[reward,setReward]=useState(null);
+  const nameRef=useRef(null);
+  const catNameRef=useRef(null);
+
+  const getSugg=()=>{const c=catAnswers.color,p=catAnswers.power;if(c==="orange"||p==="fire")return"tiger";if(c==="grey"||p==="invisible")return"shadow";if(c==="white"||p==="ice")return"snow";if(c==="purple"||p==="speed")return"galaxy";return"golden";};
+
+  const advanceStep=(nextStep)=>{
+    const r=OB_REWARDS[step];
+    if(r&&(r.xp>0||r.coins>0)){
+      setObXP(x=>x+r.xp);setObCoins(c=>c+r.coins);
+      setReward(r);
+      setTimeout(()=>setReward(null),1500);
+    }
+    setStep(nextStep);
+  };
+
+  // Focus inputs after render
+  useEffect(()=>{if(step===5)setTimeout(()=>nameRef.current?.focus(),100);},[step]);
+  useEffect(()=>{if(step===9)setTimeout(()=>catNameRef.current?.focus(),100);},[step]);
+
+  const totalSteps=10;
+  const obLevel=getLevel(obXP);
+
+  const Dots=()=><div style={{display:"flex",gap:5,marginBottom:16,justifyContent:"center"}}>{Array.from({length:totalSteps},(_,i)=><div key={i} style={{width:i===step?20:7,height:7,borderRadius:4,background:i<step?T.success:i===step?T.primary:"rgba(0,0,0,0.08)",transition:"all .3s"}}/>)}</div>;
+
+  // Onboarding XP/Coin display
+  const OBStats=()=><div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:16}}>
+    {obXP>0&&<div style={{background:`${T.primary}10`,borderRadius:50,padding:"4px 12px",fontSize:".75rem",fontWeight:800,color:T.primary}}>Lvl {obLevel} ⚡ {obXP} XP</div>}
+    {obCoins>0&&<div style={{background:`${T.accent}30`,borderRadius:50,padding:"4px 12px",fontSize:".75rem",fontWeight:800,color:T.accentDark}}>🪙 {obCoins}</div>}
+  </div>;
+
+  // Step 0: Welcome
+  if(step===0)return<OBWrap><div style={{fontSize:"4rem",marginBottom:16,animation:"heroFloat 3s ease-in-out infinite"}}>🦸</div><OBTitle>Willkommen bei HeroDex!</OBTitle><OBSub>Erstelle deinen Helden und verdiene dabei Belohnungen!</OBSub><OBBtn onClick={()=>setStep(1)} big>Los geht's! 🚀</OBBtn></OBWrap>;
+
+  // Step 1: Shape
+  if(step===1)return<OBWrap><Dots/><OBStats/><OBTitle>Deine Form</OBTitle><div style={{marginBottom:20}}><HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair} size={110} level={1}/></div><OBGrid cols={4}>{HERO_SHAPES.map(s=><OBChip key={s} selected={hero.shape===s} onClick={()=>setHero(h=>({...h,shape:s}))}>{s==="cube"?"🟧":s==="circle"?"🔵":s==="hex"?"⬡":"💊"}<div style={{fontSize:".55rem",marginTop:3}}>{s==="cube"?"Würfel":s==="circle"?"Kreis":s==="hex"?"Hexagon":"Pille"}</div></OBChip>)}</OBGrid><div style={{marginTop:16}}><OBBtn onClick={()=>advanceStep(2)}>Weiter →</OBBtn></div></OBWrap>;
+
+  // Step 2: Color
+  if(step===2)return<OBWrap><Dots/><OBStats/><OBTitle>Deine Farbe</OBTitle><div style={{marginBottom:20}}><HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair} size={110} level={1}/></div><OBGrid cols={4}>{HERO_COLORS.map(c=><button key={c} onClick={()=>setHero(h=>({...h,color:c}))} style={{width:48,height:48,borderRadius:14,background:c,border:hero.color===c?`3px solid ${T.textPrimary}`:"3px solid transparent",cursor:"pointer",boxShadow:hero.color===c?`0 4px 16px ${c}60`:"0 2px 6px rgba(0,0,0,0.08)",margin:"0 auto"}}/>)}</OBGrid><div style={{marginTop:16}}><OBBtn onClick={()=>advanceStep(3)}>Weiter →</OBBtn></div></OBWrap>;
+
+  // Step 3: Eyes
+  if(step===3)return<OBWrap><Dots/><OBStats/><OBTitle>Deine Augen</OBTitle><div style={{marginBottom:20}}><HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair} size={110} level={1}/></div><OBGrid cols={4}>{HERO_EYES.map(e=><OBChip key={e} selected={hero.eyes===e} onClick={()=>setHero(h=>({...h,eyes:e}))}>{e==="round"?"👀":e==="happy"?"😊":e==="cool"?"😎":"🥺"}<div style={{fontSize:".55rem",marginTop:3}}>{e==="round"?"Rund":e==="happy"?"Fröhlich":e==="cool"?"Cool":"Groß"}</div></OBChip>)}</OBGrid><div style={{marginTop:16}}><OBBtn onClick={()=>advanceStep(4)}>Weiter →</OBBtn></div></OBWrap>;
+
+  // Step 4: Hair
+  if(step===4)return<OBWrap><Dots/><OBStats/><OBTitle>Deine Frisur</OBTitle><div style={{marginBottom:20}}><HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair} size={110} level={1}/></div><OBGrid cols={3}>{HERO_HAIRS.map(h2=><OBChip key={h2} selected={hero.hair===h2} onClick={()=>setHero(h=>({...h,hair:h2}))}>{h2==="short"?"✂️":h2==="spiky"?"⚡":h2==="curly"?"🌀":h2==="long"?"💇":h2==="cap"?"🧢":"🚫"}<div style={{fontSize:".55rem",marginTop:3}}>{h2==="short"?"Kurz":h2==="spiky"?"Stachelig":h2==="curly"?"Lockig":h2==="long"?"Lang":h2==="cap"?"Kappe":"Keine"}</div></OBChip>)}</OBGrid><div style={{marginTop:16}}><OBBtn onClick={()=>advanceStep(5)}>Weiter →</OBBtn></div></OBWrap>;
+
+  // Step 5: Hero Name (with ref for focus fix)
+  if(step===5)return<OBWrap><Dots/><OBStats/><OBTitle>Dein Heldenname</OBTitle><div style={{marginBottom:16}}><HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair} size={120} level={obLevel}/></div><input ref={nameRef} value={hero.name} onChange={e=>setHero(h=>({...h,name:e.target.value}))} placeholder="Name eingeben..." style={{width:"100%",maxWidth:300,background:"white",border:`2px solid ${hero.name.trim()?T.primary:"rgba(0,0,0,0.1)"}`,borderRadius:16,padding:"14px 20px",color:T.textPrimary,fontSize:"1.1rem",fontFamily:"'Plus Jakarta Sans',sans-serif",textAlign:"center",outline:"none",fontWeight:700,boxShadow:"0 4px 16px rgba(0,0,0,0.06)"}}/><div style={{marginTop:16}}><OBBtn onClick={()=>advanceStep(6)} disabled={!hero.name.trim()}>Weiter →</OBBtn></div></OBWrap>;
+
+  // Step 6: Cat quiz - color
+  if(step===6)return<OBWrap><Dots/><OBStats/><OBTitle>Jetzt dein Sidekick! 🐱</OBTitle><OBSub>Welche Farbe magst du?</OBSub><OBGrid cols={3}>{[{l:"🧡 Orange",v:"orange"},{l:"🩶 Silber",v:"grey"},{l:"🤍 Weiß",v:"white"},{l:"💜 Lila",v:"purple"},{l:"💛 Gold",v:"gold"}].map(o=><OBChip key={o.v} selected={catAnswers.color===o.v} onClick={()=>{setCatAnswers(a=>({...a,color:o.v}));setTimeout(()=>advanceStep(7),250);}}>{o.l}</OBChip>)}</OBGrid></OBWrap>;
+
+  // Step 7: Cat quiz - power
+  if(step===7)return<OBWrap><Dots/><OBStats/><OBTitle>Welche Superkraft?</OBTitle><OBGrid cols={2}>{[{l:"⚡ Superschnell",v:"speed"},{l:"🌟 Unsichtbar",v:"invisible"},{l:"🔥 Feuer",v:"fire"},{l:"❄️ Eis & Schnee",v:"ice"}].map(o=><OBChip key={o.v} selected={catAnswers.power===o.v} onClick={()=>{setCatAnswers(a=>({...a,power:o.v}));setTimeout(()=>advanceStep(8),250);}}>{o.l}</OBChip>)}</OBGrid></OBWrap>;
+
+  // Step 8: Cat pick
+  const sugg=getSugg();
+  if(step===8)return<OBWrap><Dots/><OBStats/><OBTitle>Wähle deine Katze!</OBTitle><OBSub>Empfehlung: <span style={{color:T.accent,fontWeight:800}}>{CAT_VARIANTS[sugg]?.name}</span> ✨</OBSub><OBGrid cols={3}>{Object.entries(CAT_VARIANTS).map(([k,cv])=><OBChip key={k} selected={selCat===k} onClick={()=>setSelCat(k)}><div style={{display:"flex",justifyContent:"center"}}><CatSidekick variant={k} mood="happy" size={44}/></div><div style={{fontSize:".55rem",fontWeight:800,marginTop:3}}>{cv.name}</div></OBChip>)}</OBGrid>{selCat&&<><div style={{fontSize:".78rem",color:T.primaryLight,marginTop:10,textAlign:"center"}}>{CAT_VARIANTS[selCat].desc}</div><div style={{marginTop:12}}><OBBtn onClick={()=>advanceStep(9)}>Weiter →</OBBtn></div></>}</OBWrap>;
+
+  // Step 9: Cat name (with ref for focus fix)
+  if(step===9)return<OBWrap><Dots/><OBStats/><OBTitle>Name deiner Katze?</OBTitle><div style={{marginBottom:12}}><CatSidekick variant={selCat||sugg} mood="excited" size={72}/></div><input ref={catNameRef} value={catName} onChange={e=>setCatName(e.target.value)} placeholder="Katzenname..." style={{width:"100%",maxWidth:300,background:"white",border:`2px solid ${catName.trim()?T.primary:"rgba(0,0,0,0.1)"}`,borderRadius:16,padding:"14px 20px",color:T.textPrimary,fontSize:"1.1rem",fontFamily:"'Plus Jakarta Sans',sans-serif",textAlign:"center",outline:"none",fontWeight:700,boxShadow:"0 4px 16px rgba(0,0,0,0.06)"}}/><div style={{marginTop:16}}><OBBtn onClick={()=>{const r=OB_REWARDS[9];if(r)setObCoins(c=>c+r.coins);setStep(10);}} disabled={!catName.trim()}>Weiter →</OBBtn></div></OBWrap>;
+
+  // Step 10: Activation
+  if(step===10)return<OBWrap><div style={{marginBottom:8,display:"flex",alignItems:"flex-end",gap:8,justifyContent:"center"}}><div style={{animation:"heroFloat 3s ease-in-out infinite"}}><HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair} size={120} level={getLevel(obXP)}/></div><div style={{animation:"heroFloat 2.5s ease-in-out infinite",animationDelay:".5s"}}><CatSidekick variant={selCat||sugg} mood="excited" size={52}/></div></div><OBTitle>HeroDex aktiviert!</OBTitle><OBSub>{hero.name} & {catName} sind bereit!</OBSub><OBStats/><div style={{background:"white",borderRadius:16,padding:16,marginBottom:20,width:"100%",maxWidth:300,boxShadow:"0 4px 16px rgba(0,0,0,0.06)"}}>
+    <div style={{fontSize:".7rem",fontWeight:800,color:T.textSecondary,textTransform:"uppercase",marginBottom:8}}>Dein Startpaket</div>
+    <div style={{display:"flex",justifyContent:"space-around"}}>
+      <div style={{textAlign:"center"}}><div style={{fontSize:"1.5rem"}}>⚡</div><div style={{fontFamily:"'Fredoka',sans-serif",fontWeight:700,color:T.primary}}>{obXP} XP</div></div>
+      <div style={{textAlign:"center"}}><div style={{fontSize:"1.5rem"}}>🪙</div><div style={{fontFamily:"'Fredoka',sans-serif",fontWeight:700,color:T.accentDark}}>{obCoins}</div></div>
+      <div style={{textAlign:"center"}}><div style={{fontSize:"1.5rem"}}>📈</div><div style={{fontFamily:"'Fredoka',sans-serif",fontWeight:700,color:T.success}}>Lvl {getLevel(obXP)}</div></div>
+    </div>
+  </div><OBBtn onClick={()=>onComplete({hero:{...hero},catVariant:selCat||sugg,catName,startXP:obXP,startCoins:obCoins})} big>Abenteuer starten! 🦸🐱</OBBtn></OBWrap>;
+
+  return null;
+}
+
+
+// ── Main App ──
+function HeroDex(){
+  const[state,setState]=useState(null);
+  const[boarding,setBoarding]=useState(null);
+  const[view,setView]=useState("hub");
+  const[questOpen,setQuestOpen]=useState(false);
+  const[celeb,setCeleb]=useState(false);
+  const[pMode,setPMode]=useState(false);
+  const[pinShow,setPinShow]=useState(false);
+  const[pin,setPin]=useState("");
+  const[nq,setNq]=useState({name:"",icon:"⭐",anchor:"morning",xp:15,minutes:5});
+  const[shopTab,setShopTab]=useState("hero");
+  const[showWheel,setShowWheel]=useState(false);
+  const[showChest,setShowChest]=useState(false);
+  const[rareDrop,setRareDrop]=useState(null);
+  const nqRef=useRef(null);
+  const journalRef=useRef(null);
+
+  useEffect(()=>{(async()=>{try{const s=await window.storage.get("hdx2");if(s?.value){const p=JSON.parse(s.value);const today=new Date().toDateString();if(p.lastDate!==today){p.quests=buildDay(p.vacMode).map(q=>({...q,streak:(p.sm||{})[q.id]||0}));p.lastDate=today;p.dt=0;p.moodAM=null;p.moodPM=null;p.journal="";p.jAnswers={};p.rainbow=[false,false,false,false,false,false];p.wheelSpun=false;p.chestMilestone=null;
+    // Weekly mission rotation (new week = Monday)
+    const dayOfWeek=new Date().getDay();
+    const weekStart=p.weekStart?new Date(p.weekStart):new Date();
+    const daysSinceStart=Math.floor((new Date()-weekStart)/(1000*60*60*24));
+    if(daysSinceStart>=7||!p.weeklyMission){const wm=WEEKLY_MISSIONS[Math.floor(Math.random()*WEEKLY_MISSIONS.length)];p.weeklyMission=wm.id;p.weeklyProgress=0;p.weekStart=today;}
+    // Quest graduation check
+    if(!p.graduated)p.graduated=[];
+    Object.entries(p.sm||{}).forEach(([qid,streak])=>{if(streak>=GRADUATION_THRESHOLD&&!p.graduated.includes(qid))p.graduated.push(qid);});
+  }
+  if(!p.purchased)p.purchased=[];if(!p.rainbow)p.rainbow=[false,false,false,false,false,false];if(p.moodAM===undefined)p.moodAM=null;if(p.moodPM===undefined)p.moodPM=null;if(p.journal===undefined)p.journal="";if(!p.jAnswers)p.jAnswers={};if(p.wheelSpun===undefined)p.wheelSpun=false;if(p.xpBoost===undefined)p.xpBoost=false;if(!p.weeklyMission){const wm=WEEKLY_MISSIONS[Math.floor(Math.random()*WEEKLY_MISSIONS.length)];p.weeklyMission=wm.id;p.weeklyProgress=0;p.weekStart=new Date().toDateString();}if(!p.graduated)p.graduated=[];setState(p);setBoarding(false);return;}}catch(e){}setBoarding(true);})();},[]);
+  useEffect(()=>{if(state)try{window.storage.set("hdx2",JSON.stringify(state));}catch(e){}},[state]);
+
+  const onBoard=({hero,catVariant,catName,startXP,startCoins})=>{
+    const wm=WEEKLY_MISSIONS[Math.floor(Math.random()*WEEKLY_MISSIONS.length)];
+    setState({hero,catVariant,catName,xp:startXP||0,coins:startCoins||0,quests:buildDay(false),rewards:REWARDS,acc:[],sd:0,lastDate:new Date().toDateString(),dt:0,hist:[],vacMode:false,sm:{},roomItems:[],purchased:[],moodAM:null,moodPM:null,journal:"",jAnswers:{},rainbow:[false,false,false,false,false,false],wheelSpun:false,chestMilestone:null,xpBoost:false,weeklyMission:wm.id,weeklyProgress:0,weekStart:new Date().toDateString(),graduated:[]});setBoarding(false);};
+
+  const complete=useCallback(id=>{setState(prev=>{const q=prev.quests.find(x=>x.id===id);if(!q||q.done)return prev;setCeleb(true);SFX.play("pop");setTimeout(()=>SFX.play("coin"),200);
+    const nq2=prev.quests.map(x=>x.id===id?{...x,done:true,streak:x.streak+1}:x);
+    const all=nq2.every(x=>x.done);
+    if(all)setTimeout(()=>SFX.play("celeb"),400);
+    const xpMult=prev.xpBoost?2:1;
+    const earnedXP=(q.xp+(all?30:0))*xpMult;
+    const prevLvl=getLevel(prev.xp);const newXP=prev.xp+earnedXP;const newLvl=getLevel(newXP);
+    if(newLvl>prevLvl)setTimeout(()=>SFX.play("levelup"),300);
+    const sm={...prev.sm,[id]:(prev.sm[id]||0)+1};
+    const newSD=all?prev.sd+1:prev.sd;
+    // Rare drop check
+    const isRare=Math.random()<RARE_DROP_CHANCE;
+    if(isRare){const drop=RARE_DROPS[Math.floor(Math.random()*RARE_DROPS.length)];setTimeout(()=>setRareDrop(drop),600);}
+    // Wheel available when all done
+    if(all&&!prev.wheelSpun)setTimeout(()=>setShowWheel(true),1200);
+    // Chest milestone check
+    const chestEarned=all&&CHEST_MILESTONES.includes(newSD)&&!prev.chestMilestone;
+    if(chestEarned)setTimeout(()=>setShowChest(true),all?2500:800);
+    // Apply rare drop rewards inline
+    let bonusXP=0,bonusCoins=0,bonusMin=0;
+    if(isRare){const drop=RARE_DROPS[Math.floor(Math.random()*RARE_DROPS.length)];if(drop.type==="xp")bonusXP=drop.amount;if(drop.type==="coins")bonusCoins=drop.amount;if(drop.type==="minutes")bonusMin=drop.amount;}
+    // Weekly mission progress
+    const wm=WEEKLY_MISSIONS.find(m=>m.id===prev.weeklyMission);
+    let wp=prev.weeklyProgress||0;
+    if(wm&&all){
+      if(wm.goal==="allDone5"||wm.goal==="allDone7")wp++;
+      if(wm.goal==="allMorning5"){const morningDone=nq2.filter(q=>q.anchor==="morning").every(q=>q.done);if(morningDone)wp++;}
+      if(wm.goal==="allEvening7"){const eveningDone=nq2.filter(q=>q.anchor==="evening").every(q=>q.done);if(eveningDone)wp++;}
+    }
+    if(wm&&q.id==="ft"&&wm.goal==="football2")wp++;
+    if(wm&&q.id==="s8"&&wm.goal==="read7")wp++;
+    const wmComplete=wm&&wp>=wm.target&&(prev.weeklyProgress||0)<wm.target;
+    let wmBonusXP=0,wmBonusCoins=0;
+    if(wmComplete){if(wm.reward.type==="coins")wmBonusCoins=wm.reward.amount;if(wm.reward.type==="xp")wmBonusXP=wm.reward.amount;}
+    return{...prev,quests:nq2,xp:newXP+bonusXP+wmBonusXP,coins:prev.coins+Math.floor(q.xp/3)+(all?15:0)+bonusCoins+wmBonusCoins,dt:prev.dt+q.minutes+bonusMin,sd:newSD,hist:[...prev.hist,{id,d:Date.now()}],sm,chestMilestone:chestEarned?newSD:prev.chestMilestone,xpBoost:all?false:prev.xpBoost,weeklyProgress:wp};});},[]);
+
+  const addQuest=()=>{if(!nq.name.trim())return;setState(p=>({...p,quests:[...p.quests,{id:"c_"+Date.now(),name:nq.name.trim(),icon:nq.icon,anchor:nq.anchor,xp:nq.xp,minutes:nq.minutes,done:false,streak:0}]}));setNq(n=>({...n,name:""}));};
+  const rmQuest=id=>setState(p=>({...p,quests:p.quests.filter(q=>q.id!==id)}));
+  const togVac=()=>setState(p=>{const nv=!p.vacMode;return{...p,vacMode:nv,quests:buildDay(nv).map(q=>({...q,streak:(p.sm||{})[q.id]||0})),dt:0};});
+  const resetDay=()=>setState(p=>({...p,quests:p.quests.map(q=>({...q,done:false})),dt:0,lastDate:new Date().toDateString()}));
+  const resetAll=()=>{try{window.storage.delete("hdx2");}catch(e){}setState(null);setBoarding(true);};
+  const buyItem=(id,cost)=>{if(state.coins<cost||(state.purchased||[]).includes(id))return;SFX.play("buy");setState(p=>({...p,coins:p.coins-cost,purchased:[...(p.purchased||[]),id]}));};
+  const setMood=(period,val)=>setState(p=>({...p,[period]:val}));
+  const setJournal=(val)=>setState(p=>({...p,journal:val}));
+  const setJAnswer=(qid,val)=>setState(p=>({...p,jAnswers:{...(p.jAnswers||{}),[qid]:val}}));
+  const toggleRainbow=(idx)=>setState(p=>{const r=[...(p.rainbow||[false,false,false,false,false,false])];r[idx]=!r[idx];const allDone=r.every(Boolean);return{...p,rainbow:r,xp:allDone&&!p.rainbow.every(Boolean)?p.xp+25:p.xp,coins:allDone&&!p.rainbow.every(Boolean)?p.coins+20:p.coins};});
+  const collectWheel=(result)=>{setState(p=>{let u={...p,wheelSpun:true};if(result.type==="coins")u.coins+=result.amount;if(result.type==="xp")u.xp+=result.amount;if(result.type==="minutes")u.dt+=result.amount;if(result.type==="rare"){const r=RARE_DROPS[Math.floor(Math.random()*RARE_DROPS.length)];if(r.type==="coins")u.coins+=r.amount||30;if(r.type==="xp")u.xp+=r.amount||25;if(r.type==="minutes")u.dt+=r.amount||5;}return u;});setShowWheel(false);};
+  const collectChest=(reward)=>{setState(p=>{let u={...p,chestMilestone:null};if(reward.type==="coins")u.coins+=reward.amount;if(reward.type==="xp")u.xp+=reward.amount;if(reward.type==="minutes")u.dt+=reward.amount;if(reward.type==="item"&&!u.purchased.includes(reward.id))u.purchased=[...u.purchased,reward.id];if(reward.type==="xpboost")u.xpBoost=true;return u;});setShowChest(false);};
+  const clearRareDrop=()=>{setRareDrop(null);};
+
+  if(boarding===null)return<div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:T.bg,color:T.textPrimary,fontFamily:"'Nunito',sans-serif"}}>Laden...</div>;
+  if(boarding)return<Onboarding onComplete={onBoard}/>;
+  if(!state)return null;
+
+  const level=getLevel(state.xp);const xpP=getLvlProg(state.xp);
+  const done=state.quests.filter(q=>q.done).length;const total=state.quests.length;const allDone=done===total&&total>0;
+  const pct=total>0?done/total:0;
+  const mood=allDone?"excited":pct>0.5?"happy":pct>0?"neutral":"sleepy";
+  const dayN=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"][new Date().getDay()];
+  const byA={};state.quests.forEach(q=>{if(!byA[q.anchor])byA[q.anchor]=[];byA[q.anchor].push(q);});
+  const BADGES=[{i:"🌟",n:"Erster Tag",u:state.xp>0},{i:"🔥",n:"3-Tage",u:state.sd>=3},{i:"⚡",n:"7-Tage",u:state.sd>=7},{i:"👑",n:"Level 5",u:level>=5},{i:"🎯",n:"50 Quests",u:state.hist.length>=50},{i:"💎",n:"Level 10",u:level>=10},{i:"🏰",n:"30 Tage",u:state.sd>=30},{i:"🐉",n:"100 Quests",u:state.hist.length>=100},{i:"🐱",n:"Sammler",u:state.acc.length>0}];
+
+  return(
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800;900&family=Nunito:wght@400;600;700;800;900&family=Fredoka:wght@400;500;600;700&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+        @keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        @keyframes catIdle{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-3px) rotate(-2deg)}75%{transform:translateY(-3px) rotate(2deg)}}
+        @keyframes celebPop{0%{transform:scale(0) translateY(0);opacity:1}50%{opacity:1}100%{transform:scale(1.5) translateY(-200px) rotate(360deg);opacity:0}}
+        @keyframes celebText{0%{transform:scale(.3);opacity:0}40%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:0}}
+        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        @keyframes starTwinkle{0%,100%{opacity:.3}50%{opacity:1}}
+        @keyframes rewardPop{0%{transform:translateX(-50%) scale(0.5) translateY(20px);opacity:0}30%{transform:translateX(-50%) scale(1.1) translateY(0);opacity:1}50%{transform:translateX(-50%) scale(1) translateY(0);opacity:1}100%{transform:translateX(-50%) scale(0.9) translateY(-30px);opacity:0}}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+      `}</style>
+
+      <Celebration active={celeb} onDone={()=>setCeleb(false)}/>
+      <RareDropToast drop={rareDrop} onDone={clearRareDrop}/>
+      {showWheel&&<SpinWheel onResult={collectWheel} onClose={()=>setShowWheel(false)}/>}
+      {showChest&&<SurpriseChest onOpen={collectChest} streakDays={state.sd}/>}
+
+      {/* PIN Modal */}
+      {pinShow&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .2s ease"}} onClick={()=>{setPinShow(false);setPin("");}}>
+        <div onClick={e=>e.stopPropagation()} style={{background:"white",borderRadius:28,padding:28,textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,0.15)",minWidth:280}}>
+          <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1rem",fontWeight:800,marginBottom:16}}>Eltern-PIN</div>
+          <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:20}}>{[0,1,2,3].map(i=><div key={i} style={{width:44,height:52,borderRadius:14,background:T.bg,border:"2px solid rgba(0,0,0,0.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.5rem",fontWeight:800,color:T.primary}}>{pin[i]?"●":""}</div>)}</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,maxWidth:200,margin:"0 auto"}}>{[1,2,3,4,5,6,7,8,9,null,0,"⌫"].map((n,i)=><button key={i} onClick={()=>{if(n===null)return;if(n==="⌫"){setPin(p=>p.slice(0,-1));return;}const nx=pin+n;setPin(nx);if(nx.length===4){if(nx==="1234"){setPMode(true);setPinShow(false);}setPin("");}}} style={{background:n===null?"transparent":T.bg,border:"none",borderRadius:12,padding:"12px 0",color:T.textPrimary,fontSize:"1.2rem",fontWeight:800,cursor:n===null?"default":"pointer",visibility:n===null?"hidden":"visible"}}>{n}</button>)}</div>
+        </div>
+      </div>}
+
+      <div style={{minHeight:"100vh",background:T.bg,fontFamily:"'Nunito',sans-serif",color:T.textPrimary}}>
+
+        {/* ═══ HUB ═══ */}
+        {view==="hub"&&<div style={{minHeight:"100vh",display:"flex",flexDirection:"column"}}>
+          <div style={{background:getSky(done,total),borderRadius:"0 0 32px 32px",padding:"env(safe-area-inset-top, 12px) 20px 32px",position:"relative",overflow:"hidden",minHeight:380,display:"flex",flexDirection:"column"}}>
+            {getSkyStars(done,total)&&<>{Array.from({length:12},(_,i)=><div key={i} style={{position:"absolute",width:3,height:3,borderRadius:"50%",background:"white",top:`${10+Math.random()*40}%`,left:`${5+Math.random()*90}%`,animation:`starTwinkle ${1.5+Math.random()*2}s ease-in-out infinite`,animationDelay:`${Math.random()*2}s`}}/>)}</>}
+            {/* Header */}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:8,marginBottom:8}}>
+              <div>
+                <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1.3rem",fontWeight:900,color:"white",textTransform:"uppercase",fontStyle:"italic",letterSpacing:"-0.02em",textShadow:"0 2px 8px rgba(0,0,0,0.2)"}}>HeroDex</div>
+                <div style={{fontSize:".7rem",color:"rgba(255,255,255,0.7)",fontWeight:600}}>{dayN}{state.vacMode?" 🏖️":""}</div>
+              </div>
+              <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                <div style={{background:"rgba(255,255,255,0.2)",backdropFilter:"blur(10px)",borderRadius:50,padding:"4px 12px",fontSize:".75rem",fontWeight:800,color:"white"}}>🪙 {state.coins}</div>
+                <div style={{background:"rgba(255,255,255,0.2)",backdropFilter:"blur(10px)",borderRadius:50,padding:"4px 12px",fontSize:".75rem",fontWeight:800,color:"white"}}>Lvl {level}</div>
+                <button onClick={()=>pMode?setPMode(false):setPinShow(true)} style={{background:pMode?"rgba(255,255,255,0.35)":"rgba(255,255,255,0.15)",border:"none",borderRadius:50,padding:"4px 10px",cursor:"pointer",color:"white",fontSize:".7rem",fontWeight:700}}>{pMode?"🔓":"🔒"}</button>
+              </div>
+            </div>
+            {/* XP */}
+            <div style={{marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:".6rem",color:"rgba(255,255,255,0.6)",marginBottom:3}}><span>Level {level}</span><span>{xpP.cur}/{xpP.need} XP</span></div>
+              <div style={{background:"rgba(255,255,255,0.15)",borderRadius:50,height:8,overflow:"hidden"}}><div style={{height:"100%",borderRadius:50,width:`${Math.min(100,(xpP.cur/xpP.need)*100)}%`,background:"linear-gradient(90deg, #FCD34D, #F59E0B)",transition:"width .8s ease"}}/></div>
+            </div>
+            {/* Hero + Cat + Ring */}
+            <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
+              <div style={{position:"relative"}}>
+                <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)"}}><ProgressRing progress={pct} size={200} stroke={6} color={allDone?"#34D399":"rgba(255,255,255,0.4)"}/></div>
+                <div style={{animation:"heroFloat 3s ease-in-out infinite",cursor:"pointer",position:"relative",zIndex:2}} onClick={()=>setQuestOpen(true)}>
+                  <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={140} level={level}/>
+                </div>
+                <div style={{position:"absolute",bottom:-10,right:-40,animation:"catIdle 4s ease-in-out infinite",zIndex:3}}>
+                  <CatSidekick variant={state.catVariant} mood={mood} size={56}/>
+                </div>
+              </div>
+            </div>
+            <div style={{textAlign:"center",paddingBottom:8}}>
+              <div style={{fontSize:".75rem",color:"rgba(255,255,255,0.7)",fontWeight:600}}>{getTimeLabel(done,total)}</div>
+              <div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.1rem",fontWeight:700,color:"white"}}>{done}/{total} Quests {allDone?"🎉":""}</div>
+              <div style={{fontSize:".7rem",color:"rgba(255,255,255,0.6)",marginTop:2}}>+{state.dt} Min verdient</div>
+              {state.xpBoost&&<div style={{fontSize:".65rem",color:"#FCD34D",fontWeight:800,marginTop:4,animation:"pulse 1.5s infinite"}}>🔥 DOPPEL-XP AKTIV!</div>}
+              {(()=>{const next=CHEST_MILESTONES.find(m=>m>state.sd);return next?<div style={{fontSize:".6rem",color:"rgba(255,255,255,0.45)",marginTop:3}}>🎁 Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div>:null;})()}
+            </div>
+          </div>
+          {/* Mood Check */}
+          {state.moodAM===null&&<div style={{padding:"12px 20px 0"}}>
+            <div style={{background:"white",borderRadius:20,padding:16,boxShadow:"0 4px 16px rgba(0,0,0,0.05)",border:"2px solid rgba(0,0,0,0.04)"}}>
+              <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:".75rem",fontWeight:800,color:T.textSecondary,textTransform:"uppercase",marginBottom:10}}>Wie fühlst du dich heute? 🌅</div>
+              <div style={{display:"flex",justifyContent:"space-between",gap:4}}>{MOOD_EMOJIS.map((e,i)=><button key={i} onClick={()=>{setMood("moodAM",i);setCeleb(true);}} style={{fontSize:"1.8rem",background:"none",border:"none",cursor:"pointer",padding:"6px",borderRadius:12,transition:"all .15s"}}>{e}</button>)}</div>
+            </div>
+          </div>}
+
+          {/* Weekly Mission Card */}
+          {(()=>{const wm=WEEKLY_MISSIONS.find(m=>m.id===state.weeklyMission);if(!wm)return null;const wp=state.weeklyProgress||0;const done=wp>=wm.target;
+            return <div style={{padding:"8px 20px 0"}}><div style={{background:done?"linear-gradient(135deg, rgba(52,211,153,0.1), rgba(52,211,153,0.05))":"white",borderRadius:20,padding:14,boxShadow:"0 4px 16px rgba(0,0,0,0.05)",border:done?`2px solid ${T.success}30`:"2px solid rgba(0,0,0,0.04)"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                <span style={{fontSize:"1.4rem"}}>{wm.icon}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:".72rem",fontWeight:800,color:done?T.successDark:T.primary,textTransform:"uppercase"}}>{done?"✅ Mission geschafft!":"Wochen-Mission"}</div>
+                  <div style={{fontFamily:"'Fredoka',sans-serif",fontSize:".9rem",fontWeight:700,color:T.textPrimary}}>{wm.title}</div>
+                </div>
+                <div style={{textAlign:"right"}}><div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.1rem",fontWeight:700,color:done?T.success:T.primary}}>{Math.min(wp,wm.target)}/{wm.target}</div></div>
+              </div>
+              <div style={{fontSize:".7rem",color:T.textSecondary,marginBottom:8}}>{wm.story}</div>
+              <div style={{background:"rgba(0,0,0,0.06)",borderRadius:50,height:8,overflow:"hidden"}}><div style={{height:"100%",borderRadius:50,width:`${Math.min(100,(wp/wm.target)*100)}%`,background:done?`linear-gradient(90deg,${T.success},#6EE7B7)`:`linear-gradient(90deg,${T.primary},${T.primaryLight})`,transition:"width .6s ease"}}/></div>
+              {done&&<div style={{fontSize:".65rem",color:T.success,fontWeight:700,marginTop:6,textAlign:"center"}}>🎉 +{wm.reward.amount} {wm.reward.type==="coins"?"Münzen":"XP"} erhalten!</div>}
+            </div></div>;
+          })()}
+
+          {!questOpen&&<div style={{textAlign:"center",padding:"16px 0 8px"}}><button onClick={()=>{SFX.play("tap");setQuestOpen(true);}} style={{background:`linear-gradient(135deg,${T.primary},${T.primaryLight})`,border:"none",borderRadius:50,padding:"14px 36px",color:"white",fontWeight:800,fontSize:".9rem",cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",textTransform:"uppercase",letterSpacing:".05em",boxShadow:`0 8px 24px ${T.primary}40`}}>⚔️ Quests öffnen</button></div>}
+          <div style={{display:"flex",gap:6,padding:"8px 20px 20px",justifyContent:"center"}}>
+            {[{id:"room",l:"Zimmer",i:"🏠"},{id:"time",l:"Zeit",i:"⏰"},{id:"shop",l:"Shop",i:"🛍️"},{id:"journal",l:"Buch",i:"📓"},{id:"stats",l:"Erfolge",i:"🏆"}].map(t=><button key={t.id} onClick={()=>{SFX.play("tap");setView(t.id);}} style={{background:"white",border:"2px solid rgba(0,0,0,0.06)",borderRadius:50,padding:"7px 12px",fontWeight:800,fontSize:".64rem",cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",color:T.textSecondary,textTransform:"uppercase",letterSpacing:".03em"}}>{t.i} {t.l}</button>)}
+          </div>
+        </div>}
+
+        {/* ═══ QUEST BOARD (overlay) - FIXED: close button + backdrop ═══ */}
+        {questOpen&&<div style={{position:"fixed",inset:0,zIndex:100,display:"flex",flexDirection:"column"}}>
+          {/* Backdrop - clickable to close */}
+          <div style={{flex:"0 0 60px",background:"rgba(0,0,0,0.3)",backdropFilter:"blur(4px)",cursor:"pointer"}} onClick={()=>setQuestOpen(false)}/>
+          <div style={{flex:"1 1 auto",background:"white",borderRadius:"28px 28px 0 0",padding:"0 20px 100px",overflow:"auto",animation:"slideUp .3s ease",boxShadow:"0 -8px 40px rgba(0,0,0,0.1)",position:"relative"}}>
+            {/* Close button (visible, works on desktop) */}
+            <div style={{position:"sticky",top:0,background:"white",paddingTop:12,paddingBottom:8,zIndex:10,display:"flex",justifyContent:"space-between",alignItems:"center",borderRadius:"28px 28px 0 0"}}>
+              <div style={{width:40,height:4,borderRadius:2,background:"rgba(0,0,0,0.1)",margin:"0 auto"}}/>
+              <button onClick={()=>setQuestOpen(false)} style={{position:"absolute",right:0,top:8,background:T.bg,border:"2px solid rgba(0,0,0,0.06)",borderRadius:50,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:"1rem",fontWeight:800,color:T.textSecondary}}>✕</button>
+            </div>
+
+            {/* Progress */}
+            <div style={{background:allDone?`${T.success}15`:T.bg,borderRadius:16,padding:14,marginBottom:16,border:allDone?`2px solid ${T.success}40`:"2px solid rgba(0,0,0,0.04)"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:".8rem",fontWeight:800,color:allDone?T.successDark:T.textPrimary,textTransform:"uppercase"}}>{allDone?"🎉 Alles geschafft!":`${done}/${total} Quests`}</span>
+                <span style={{fontFamily:"'Fredoka',sans-serif",fontSize:".8rem",fontWeight:700,color:T.primary}}>+{state.dt} Min</span>
+              </div>
+              <div style={{background:"rgba(0,0,0,0.06)",borderRadius:50,height:8,overflow:"hidden"}}><div style={{height:"100%",borderRadius:50,width:`${pct*100}%`,background:allDone?`linear-gradient(90deg,${T.success},#6EE7B7)`:`linear-gradient(90deg,${T.primary},${T.primaryLight})`,transition:"width .6s ease"}}/></div>
+            </div>
+
+            {/* 🌈 Eat the Rainbow */}
+            <div style={{background:"white",borderRadius:16,padding:14,marginBottom:16,border:"2px solid rgba(0,0,0,0.04)"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:".72rem",fontWeight:800,color:T.textPrimary,textTransform:"uppercase"}}>🌈 Eat the Rainbow</span>
+                {(state.rainbow||[]).every(Boolean)&&<span style={{fontSize:".65rem",fontWeight:800,color:T.success}}>+25 XP! 🎉</span>}
+              </div>
+              <div style={{display:"flex",gap:6,justifyContent:"space-between"}}>{RAINBOW.map((emoji,i)=>{
+                const done=(state.rainbow||[])[i];
+                return <button key={i} onClick={()=>toggleRainbow(i)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"8px 4px",borderRadius:12,background:done?`${T.success}15`:"rgba(0,0,0,0.02)",border:done?`2px solid ${T.success}30`:"2px solid rgba(0,0,0,0.04)",cursor:"pointer",transition:"all .15s",opacity:done?1:0.5}}>
+                  <span style={{fontSize:"1.3rem"}}>{emoji}</span>
+                  <span style={{fontSize:".5rem",fontWeight:700,color:done?T.successDark:T.textLight}}>{RAINBOW_LABELS[i]}</span>
+                </button>;
+              })}</div>
+              <div style={{fontSize:".55rem",color:T.textLight,marginTop:6,textAlign:"center"}}>Tippe auf jede Farbe die du heute gegessen hast!</div>
+            </div>
+
+            {/* Evening mood + journal prompt */}
+            {allDone&&state.moodPM===null&&<div style={{background:`linear-gradient(135deg,${T.primary}08,${T.accent}10)`,borderRadius:16,padding:16,marginBottom:16,border:`2px solid ${T.primary}15`}}>
+              <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:".75rem",fontWeight:800,color:T.primary,textTransform:"uppercase",marginBottom:10}}>🌙 Wie war dein Tag?</div>
+              <div style={{display:"flex",justifyContent:"space-between",gap:4,marginBottom:12}}>{MOOD_EMOJIS.map((e,i)=><button key={i} onClick={()=>setMood("moodPM",i)} style={{fontSize:"1.6rem",background:state.moodPM===i?`${T.primary}15`:"none",border:state.moodPM===i?`2px solid ${T.primary}`:"none",cursor:"pointer",padding:"4px",borderRadius:10}}>{e}</button>)}</div>
+            </div>}
+
+            {/* Quest groups */}
+            {Object.entries(ANCHORS).map(([a,m])=>{const qs=byA[a]||[];if(!qs.length)return null;const secDone=qs.every(q=>q.done);
+              return(<div key={a} style={{marginBottom:20}}>
+                <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
+                  <span style={{fontSize:"1.1rem"}}>{m.icon}</span>
+                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:".72rem",fontWeight:800,textTransform:"uppercase",letterSpacing:".08em",color:m.col}}>{m.label}</span>
+                  {secDone&&<span style={{fontSize:".65rem",color:T.success,fontWeight:800}}>✓ Fertig</span>}
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  {qs.map(q=>{const grad=(state.graduated||[]).includes(q.id);return <button key={q.id} onClick={()=>!q.done&&!pMode&&complete(q.id)} disabled={q.done} style={{display:"flex",alignItems:"center",gap:12,background:grad?`${T.accent}08`:q.done?`${T.success}08`:"white",border:grad?`2px solid ${T.accent}30`:q.done?`2px solid ${T.success}20`:q.id==="ft"?`2px solid ${T.success}30`:"2px solid rgba(0,0,0,0.06)",borderRadius:16,padding:"12px 14px",cursor:q.done?"default":"pointer",width:"100%",textAlign:"left",transition:"all .15s",opacity:q.done?.55:1,fontFamily:"'Nunito',sans-serif"}}>
+                    <div style={{width:40,height:40,borderRadius:12,background:grad?`${T.accent}20`:q.done?`${T.success}20`:`${m.col}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.2rem",flexShrink:0}}>{grad?"🎓":q.done?"✅":q.icon}</div>
+                    <div style={{flex:1}}>
+                      <div style={{fontWeight:700,fontSize:".85rem",textDecoration:q.done?"line-through":"none"}}>{q.name}</div>
+                      <div style={{display:"flex",gap:6,marginTop:2}}>
+                        <span style={{fontSize:".6rem",fontWeight:700,color:T.primary}}>+{q.xp} XP</span>
+                        <span style={{fontSize:".6rem",fontWeight:700,color:T.accentDark}}>+{q.minutes} Min</span>
+                        {q.streak>0&&<span style={{fontSize:".6rem",fontWeight:700,color:"#F97316"}}>🔥{q.streak}</span>}
+                      </div>
+                    </div>
+                    {pMode&&<button onClick={e=>{e.stopPropagation();rmQuest(q.id);}} style={{background:`${T.danger}15`,border:`1.5px solid ${T.danger}40`,borderRadius:8,padding:"3px 8px",color:T.danger,cursor:"pointer",fontSize:".6rem",fontWeight:800}}>✕</button>}
+                  </button>;})}
+                </div>
+              </div>);
+            })}
+
+            {/* Parent panel */}
+            {pMode&&<div style={{background:T.bg,borderRadius:20,padding:16,border:`2px solid ${T.primary}15`,marginTop:8}}>
+              <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:".8rem",color:T.primary,marginBottom:10,textTransform:"uppercase"}}>⚙️ Eltern</div>
+              <button onClick={togVac} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:"white",border:`2px solid ${state.vacMode?T.success:"rgba(0,0,0,0.06)"}`,borderRadius:14,padding:"10px 14px",cursor:"pointer",marginBottom:12,fontFamily:"'Nunito',sans-serif"}}>
+                <span style={{fontWeight:700,fontSize:".8rem",color:state.vacMode?T.successDark:T.textPrimary}}>{state.vacMode?"🏖️ Ferienmodus":"📚 Schulmodus"}</span>
+                <div style={{width:40,height:22,borderRadius:11,background:state.vacMode?T.success:"rgba(0,0,0,0.12)",position:"relative",transition:"all .3s"}}><div style={{width:16,height:16,borderRadius:8,background:"white",position:"absolute",top:3,left:state.vacMode?21:3,transition:"all .3s",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}/></div>
+              </button>
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                <input ref={nqRef} value={nq.name} onChange={e=>setNq(n=>({...n,name:e.target.value}))} placeholder="Neue Quest..." style={{background:"white",border:"2px solid rgba(0,0,0,0.06)",borderRadius:12,padding:"8px 12px",fontSize:".8rem",fontFamily:"'Nunito',sans-serif",outline:"none",fontWeight:600}}/>
+                <div style={{display:"flex",gap:6}}>
+                  <select value={nq.anchor} onChange={e=>setNq(n=>({...n,anchor:e.target.value}))} style={{flex:1,background:"white",border:"2px solid rgba(0,0,0,0.06)",borderRadius:10,padding:"6px",fontSize:".75rem"}}><option value="morning">🌅 Morgens</option><option value="afternoon">☀️ Nachmittags</option><option value="evening">🌙 Abends</option></select>
+                  <input type="number" value={nq.xp} onChange={e=>setNq(n=>({...n,xp:+e.target.value}))} style={{width:50,background:"white",border:"2px solid rgba(0,0,0,0.06)",borderRadius:10,padding:"6px",fontSize:".75rem",textAlign:"center"}} placeholder="XP"/>
+                  <input type="number" value={nq.minutes} onChange={e=>setNq(n=>({...n,minutes:+e.target.value}))} style={{width:50,background:"white",border:"2px solid rgba(0,0,0,0.06)",borderRadius:10,padding:"6px",fontSize:".75rem",textAlign:"center"}} placeholder="Min"/>
+                </div>
+                <button onClick={addQuest} style={{background:`linear-gradient(135deg,${T.primary},${T.primaryLight})`,border:"none",borderRadius:12,padding:"10px",color:"white",fontWeight:800,cursor:"pointer",fontSize:".8rem",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Erstellen</button>
+              </div>
+              {/* Parent Weekly Summary */}
+              <div style={{background:"white",borderRadius:14,padding:12,marginTop:10,border:`2px solid ${T.primary}10`}}>
+                <div style={{fontSize:".7rem",fontWeight:800,color:T.primary,textTransform:"uppercase",marginBottom:8}}>📊 Übersicht</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+                  <div style={{background:T.bg,borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
+                    <div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.1rem",fontWeight:700,color:T.primary}}>{state.sd}</div>
+                    <div style={{fontSize:".55rem",color:T.textSecondary,fontWeight:600}}>Tage-Streak</div>
+                  </div>
+                  <div style={{background:T.bg,borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
+                    <div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.1rem",fontWeight:700,color:T.success}}>{state.hist.length}</div>
+                    <div style={{fontSize:".55rem",color:T.textSecondary,fontWeight:600}}>Quests gesamt</div>
+                  </div>
+                  <div style={{background:T.bg,borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
+                    <div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.1rem",fontWeight:700,color:T.accentDark}}>{(state.graduated||[]).length}</div>
+                    <div style={{fontSize:".55rem",color:T.textSecondary,fontWeight:600}}>Graduiert 🎓</div>
+                  </div>
+                  <div style={{background:T.bg,borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
+                    <div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.1rem",fontWeight:700,color:"#EC4899"}}>Lvl {level}</div>
+                    <div style={{fontSize:".55rem",color:T.textSecondary,fontWeight:600}}>{state.xp} XP</div>
+                  </div>
+                </div>
+                {(state.graduated||[]).length>0&&<div style={{marginTop:8,fontSize:".6rem",color:T.textSecondary}}>
+                  <span style={{fontWeight:700}}>Graduierte Quests:</span> {(state.graduated||[]).map(gid=>{const q=[...SCHOOL_QUESTS,...VACATION_QUESTS].find(x=>x.id===gid);return q?q.name:gid;}).join(", ")}
+                </div>}
+                {state.moodAM!==null&&<div style={{marginTop:6,fontSize:".6rem",color:T.textSecondary}}>Stimmung heute: {MOOD_EMOJIS[state.moodAM]} morgens{state.moodPM!==null?`, ${MOOD_EMOJIS[state.moodPM]} abends`:""}</div>}
+              </div>
+              <div style={{display:"flex",gap:6,marginTop:10}}>
+                <button onClick={resetDay} style={{flex:1,background:`${T.accent}20`,border:`1.5px solid ${T.accent}`,borderRadius:10,padding:"8px",color:T.accentDark,cursor:"pointer",fontSize:".7rem",fontWeight:800}}>🔄 Tag</button>
+                <button onClick={resetAll} style={{flex:1,background:`${T.danger}15`,border:`1.5px solid ${T.danger}`,borderRadius:10,padding:"8px",color:T.danger,cursor:"pointer",fontSize:".7rem",fontWeight:800}}>🗑️ Alles</button>
+              </div>
+            </div>}
+          </div>
+        </div>}
+
+        {/* ═══ TIME BANK ═══ */}
+        {view==="time"&&<div style={{minHeight:"100vh",padding:"env(safe-area-inset-top, 12px) 20px 100px"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,paddingTop:8}}>
+            <button onClick={()=>setView("hub")} style={{background:"white",border:"2px solid rgba(0,0,0,0.06)",borderRadius:50,padding:"8px 16px",cursor:"pointer",fontWeight:800,fontSize:".8rem"}}>← Zurück</button>
+            <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1rem",fontWeight:800,color:T.primary,textTransform:"uppercase",fontStyle:"italic"}}>Zeitbank</div>
+            <div style={{width:80}}/>
+          </div>
+          <div style={{background:`linear-gradient(135deg, ${T.primary}12, ${T.success}10)`,borderRadius:24,padding:28,textAlign:"center",marginBottom:24,border:`2px solid ${T.primary}15`}}>
+            <div style={{fontSize:".75rem",color:T.textSecondary,fontWeight:600,marginBottom:4}}>Heute verdient</div>
+            <div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"3rem",fontWeight:700,color:T.success}}>{state.dt} <span style={{fontSize:"1rem",color:T.textSecondary}}>Min</span></div>
+            <div style={{fontSize:".7rem",color:T.primaryLight,fontWeight:700,marginTop:4}}>{allDone?"🎉 Alle Quests erledigt!":`${total-done} Quests übrig`}</div>
+          </div>
+          <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:".75rem",color:T.textSecondary,textTransform:"uppercase",letterSpacing:".08em",marginBottom:12}}>Belohnungen</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {state.rewards.map(r=>{const can=state.dt>=r.minutes;return(
+              <div key={r.id} style={{display:"flex",alignItems:"center",gap:14,background:"white",border:can?`2px solid ${T.success}30`:"2px solid rgba(0,0,0,0.04)",borderRadius:18,padding:"14px 16px",opacity:can?1:.45,boxShadow:can?`0 4px 16px ${T.success}15`:"0 2px 8px rgba(0,0,0,0.03)"}}>
+                <div style={{width:48,height:48,borderRadius:14,background:can?`${T.success}15`:T.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.5rem"}}>{r.icon}</div>
+                <div style={{flex:1}}><div style={{fontWeight:700,fontSize:".9rem"}}>{r.name}</div><div style={{fontSize:".65rem",color:T.textSecondary,fontWeight:600}}>{r.minutes} Minuten</div></div>
+                <div style={{fontFamily:"'Fredoka',sans-serif",fontSize:".8rem",fontWeight:700,color:can?T.success:T.textLight}}>{can?"✓ Frei":"🔒"}</div>
+              </div>);})}
+          </div>
+        </div>}
+
+        {/* ═══ ACHIEVEMENTS ═══ */}
+        {view==="stats"&&<div style={{minHeight:"100vh",padding:"env(safe-area-inset-top, 12px) 20px 100px"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,paddingTop:8}}>
+            <button onClick={()=>setView("hub")} style={{background:"white",border:"2px solid rgba(0,0,0,0.06)",borderRadius:50,padding:"8px 16px",cursor:"pointer",fontWeight:800,fontSize:".8rem"}}>← Zurück</button>
+            <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1rem",fontWeight:800,color:T.primary,textTransform:"uppercase",fontStyle:"italic"}}>Erfolge</div>
+            <div style={{width:80}}/>
+          </div>
+          <div style={{background:"white",borderRadius:20,padding:20,display:"flex",alignItems:"center",gap:16,marginBottom:24,boxShadow:"0 4px 20px rgba(0,0,0,0.06)",border:"2px solid rgba(0,0,0,0.04)"}}>
+            <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={72} level={level}/>
+            <div>
+              <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:"1rem"}}>{state.hero.name}</div>
+              <div style={{fontSize:".7rem",color:T.textSecondary,fontWeight:600}}>Level {level} Held</div>
+              <div style={{display:"flex",gap:8,marginTop:4}}>
+                <span style={{fontSize:".65rem",fontWeight:700,color:T.primary}}>⚡{state.xp}</span>
+                <span style={{fontSize:".65rem",fontWeight:700,color:T.accentDark}}>🪙{state.coins}</span>
+                <span style={{fontSize:".65rem",fontWeight:700,color:"#F97316"}}>🔥{state.sd}d</span>
+              </div>
+            </div>
+          </div>
+          <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:".75rem",color:T.textSecondary,textTransform:"uppercase",letterSpacing:".08em",marginBottom:12}}>Badges</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:24}}>
+            {BADGES.map((b,i)=><div key={i} style={{background:b.u?"white":T.bg,border:b.u?`2px solid ${T.primary}30`:"2px solid rgba(0,0,0,0.04)",borderRadius:16,padding:"14px 8px",textAlign:"center",opacity:b.u?1:.35,boxShadow:b.u?`0 4px 12px ${T.primary}10`:"none"}}>
+              <div style={{fontSize:"1.8rem",marginBottom:4}}>{b.i}</div>
+              <div style={{fontSize:".65rem",fontWeight:800,color:b.u?T.primary:T.textLight}}>{b.n}</div>
+            </div>)}
+          </div>
+          <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:".75rem",color:T.textSecondary,textTransform:"uppercase",letterSpacing:".08em",marginBottom:12}}>Stats</div>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {[{l:"Gesamt XP",v:state.xp,i:"⚡"},{l:"Münzen",v:state.coins,i:"🪙"},{l:"Quests",v:state.hist.length,i:"⚔️"},{l:"Streak",v:state.sd+"d",i:"🔥"},{l:"Level",v:level,i:"📈"}].map((s,i)=><div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:"white",borderRadius:14,padding:"12px 16px",border:"2px solid rgba(0,0,0,0.04)"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:"1.1rem"}}>{s.i}</span><span style={{fontSize:".8rem",fontWeight:700}}>{s.l}</span></div>
+              <span style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1rem",fontWeight:700,color:T.primary}}>{s.v}</span>
+            </div>)}
+          </div>
+        </div>}
+
+        {/* ═══ ROOM ═══ */}
+        {view==="room"&&<div style={{minHeight:"100vh",padding:"env(safe-area-inset-top, 12px) 0 100px",background:"linear-gradient(180deg, #DBEAFE 0%, #BFDBFE 40%, #93C5FD 100%)"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 20px 12px"}}>
+            <button onClick={()=>{SFX.play("tap");setView("hub");}} style={{background:"rgba(255,255,255,0.8)",border:"none",borderRadius:50,padding:"8px 16px",cursor:"pointer",fontWeight:800,fontSize:".8rem",backdropFilter:"blur(8px)"}}>← Zurück</button>
+            <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1rem",fontWeight:800,color:"white",textTransform:"uppercase",fontStyle:"italic",textShadow:"0 2px 8px rgba(0,0,0,0.15)"}}>{state.hero.name}'s Zimmer</div>
+            <div style={{width:80}}/>
+          </div>
+          {/* Room Scene */}
+          <div style={{position:"relative",margin:"0 12px",height:380,borderRadius:24,overflow:"hidden",background:"linear-gradient(180deg, #FEF3C7 0%, #FDE68A 100%)",border:"3px solid rgba(255,255,255,0.4)",boxShadow:"0 12px 40px rgba(0,0,0,0.12)"}}>
+            {/* Wall */}
+            <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, #FFF8F0 0%, #FEF3C7 60%, #D4A574 60%, #C9956A 100%)"}}/>
+            {/* Window */}
+            <div style={{position:"absolute",top:30,right:30,width:80,height:80,borderRadius:16,background:"linear-gradient(180deg, #7DD3FC, #38BDF8)",border:"6px solid #D4A574",boxShadow:"inset 0 0 20px rgba(255,255,255,0.3)"}}>
+              <div style={{position:"absolute",top:"50%",left:0,right:0,height:3,background:"#D4A574"}}/><div style={{position:"absolute",left:"50%",top:0,bottom:0,width:3,background:"#D4A574"}}/>
+            </div>
+            {/* Shelf */}
+            <div style={{position:"absolute",top:40,left:20,width:100,height:8,borderRadius:4,background:"#92400E",boxShadow:"0 4px 8px rgba(0,0,0,0.1)"}}>
+              {(state.purchased||[]).includes("rm_trophy")&&<div style={{position:"absolute",bottom:8,left:35,fontSize:"1.5rem"}}>🏆</div>}
+            </div>
+            {/* Poster */}
+            {(state.purchased||[]).includes("rm_poster")&&<div style={{position:"absolute",top:25,left:140,width:50,height:60,borderRadius:8,background:"linear-gradient(135deg, #EC4899, #8B5CF6)",border:"3px solid #92400E",boxShadow:"0 2px 8px rgba(0,0,0,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.4rem"}}>⭐</div>}
+            {/* Plant */}
+            {(state.purchased||[]).includes("rm_plant")&&<div style={{position:"absolute",bottom:"42%",right:20,fontSize:"2rem"}}>🪴</div>}
+            {/* Lava lamp */}
+            {(state.purchased||[]).includes("rm_lamp")&&<div style={{position:"absolute",bottom:"42%",left:20,fontSize:"2rem"}}>🪔</div>}
+            {/* Rug */}
+            {(state.purchased||[]).includes("rm_rug")&&<div style={{position:"absolute",bottom:"6%",left:"25%",width:"50%",height:24,borderRadius:12,background:"linear-gradient(90deg, #8B5CF6, #EC4899, #8B5CF6)",opacity:0.6}}/>}
+            {/* Hero + Cat on floor */}
+            <div style={{position:"absolute",bottom:"12%",left:"50%",transform:"translateX(-50%)",display:"flex",alignItems:"flex-end",gap:6}}>
+              <div style={{animation:"heroFloat 3s ease-in-out infinite"}}><HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={100} level={level}/></div>
+              <div style={{animation:"catIdle 4s ease-in-out infinite"}}><CatSidekick variant={state.catVariant} mood={mood} size={44}/></div>
+            </div>
+          </div>
+          {/* Room items count */}
+          <div style={{padding:"16px 20px",textAlign:"center"}}>
+            <div style={{fontSize:".75rem",color:"white",fontWeight:700,textShadow:"0 1px 4px rgba(0,0,0,0.2)"}}>
+              {(state.purchased||[]).filter(id=>id.startsWith("rm_")).length} / {SHOP_ITEMS.room.length} Zimmer-Items
+            </div>
+            <button onClick={()=>{SFX.play("tap");setView("shop");setShopTab("room");}} style={{marginTop:8,background:"rgba(255,255,255,0.9)",border:"none",borderRadius:50,padding:"10px 24px",fontWeight:800,fontSize:".8rem",cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",color:T.primary,boxShadow:"0 4px 16px rgba(0,0,0,0.1)"}}>🛍️ Zimmer dekorieren</button>
+          </div>
+        </div>}
+
+        {/* ═══ SHOP ═══ */}
+        {view==="shop"&&<div style={{minHeight:"100vh",padding:"env(safe-area-inset-top, 12px) 20px 100px"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16,paddingTop:8}}>
+            <button onClick={()=>setView("hub")} style={{background:"white",border:"2px solid rgba(0,0,0,0.06)",borderRadius:50,padding:"8px 16px",cursor:"pointer",fontWeight:800,fontSize:".8rem"}}>← Zurück</button>
+            <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1rem",fontWeight:800,color:T.primary,textTransform:"uppercase",fontStyle:"italic"}}>Shop</div>
+            <div style={{background:`${T.accent}30`,borderRadius:50,padding:"4px 12px",fontSize:".8rem",fontWeight:800,color:T.accentDark}}>🪙 {state.coins}</div>
+          </div>
+          {/* Tabs */}
+          <div style={{display:"flex",gap:6,marginBottom:20}}>
+            {[{id:"hero",l:"Held",i:"🦸"},{id:"cat",l:"Katze",i:"🐱"},{id:"room",l:"Zimmer",i:"🏠"}].map(t=><button key={t.id} onClick={()=>setShopTab(t.id)} style={{flex:1,background:shopTab===t.id?`${T.primary}12`:"white",border:shopTab===t.id?`2px solid ${T.primary}30`:"2px solid rgba(0,0,0,0.06)",borderRadius:14,padding:"10px 8px",cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:".72rem",color:shopTab===t.id?T.primary:T.textSecondary,textTransform:"uppercase",textAlign:"center"}}>{t.i}<br/>{t.l}</button>)}
+          </div>
+          {/* Items */}
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {(SHOP_ITEMS[shopTab]||[]).map(item=>{
+              const owned=(state.purchased||[]).includes(item.id);
+              const canBuy=state.coins>=item.cost&&!owned;
+              return <div key={item.id} style={{display:"flex",alignItems:"center",gap:14,background:"white",border:owned?`2px solid ${T.success}30`:"2px solid rgba(0,0,0,0.04)",borderRadius:18,padding:"14px 16px",boxShadow:"0 2px 8px rgba(0,0,0,0.03)"}}>
+                <div style={{width:48,height:48,borderRadius:14,background:owned?`${T.success}15`:`${T.primary}08`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.5rem"}}>{item.icon}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,fontSize:".9rem"}}>{item.name}</div>
+                  <div style={{fontSize:".65rem",color:T.accentDark,fontWeight:700}}>🪙 {item.cost}</div>
+                </div>
+                <button onClick={()=>canBuy&&buyItem(item.id,item.cost)} disabled={!canBuy&&!owned} style={{
+                  background:owned?`${T.success}15`:canBuy?`linear-gradient(135deg,${T.primary},${T.primaryLight})`:"rgba(0,0,0,0.04)",
+                  border:"none",borderRadius:50,padding:"8px 18px",
+                  color:owned?T.successDark:canBuy?"white":T.textLight,
+                  fontWeight:800,fontSize:".75rem",cursor:canBuy?"pointer":"default",
+                  fontFamily:"'Plus Jakarta Sans',sans-serif",
+                  opacity:!owned&&!canBuy?.4:1,
+                  boxShadow:canBuy?`0 4px 12px ${T.primary}30`:"none",
+                }}>{owned?"Gekauft ✓":"Kaufen"}</button>
+              </div>;
+            })}
+          </div>
+          {(SHOP_ITEMS[shopTab]||[]).length>0&&<div style={{fontSize:".65rem",color:T.textLight,textAlign:"center",marginTop:16}}>
+            {shopTab==="room"?"Zimmer-Items werden bald sichtbar in deinem Raum! 🏠":shopTab==="hero"?"Held-Items erscheinen auf deinem Charakter! 🦸":"Katzen-Items erscheinen auf deinem Sidekick! 🐱"}
+          </div>}
+        </div>}
+
+        {/* ═══ JOURNAL ═══ */}
+        {view==="journal"&&<div style={{minHeight:"100vh",padding:"env(safe-area-inset-top, 12px) 20px 100px"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,paddingTop:8}}>
+            <button onClick={()=>setView("hub")} style={{background:"white",border:"2px solid rgba(0,0,0,0.06)",borderRadius:50,padding:"8px 16px",cursor:"pointer",fontWeight:800,fontSize:".8rem"}}>← Zurück</button>
+            <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:"1rem",fontWeight:800,color:T.primary,textTransform:"uppercase",fontStyle:"italic"}}>Tagebuch</div>
+            <div style={{width:80}}/>
+          </div>
+
+          {/* Today's date */}
+          <div style={{textAlign:"center",marginBottom:20}}>
+            <div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.2rem",fontWeight:700,color:T.textPrimary}}>{new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div>
+          </div>
+
+          {/* Mood summary */}
+          <div style={{display:"flex",gap:10,marginBottom:20}}>
+            <div style={{flex:1,background:"white",borderRadius:16,padding:14,border:"2px solid rgba(0,0,0,0.04)",textAlign:"center"}}>
+              <div style={{fontSize:".65rem",fontWeight:800,color:T.textSecondary,textTransform:"uppercase",marginBottom:6}}>🌅 Morgens</div>
+              <div style={{fontSize:"2rem"}}>{state.moodAM!==null?MOOD_EMOJIS[state.moodAM]:"—"}</div>
+            </div>
+            <div style={{flex:1,background:"white",borderRadius:16,padding:14,border:"2px solid rgba(0,0,0,0.04)",textAlign:"center"}}>
+              <div style={{fontSize:".65rem",fontWeight:800,color:T.textSecondary,textTransform:"uppercase",marginBottom:6}}>🌙 Abends</div>
+              <div style={{fontSize:"2rem"}}>{state.moodPM!==null?MOOD_EMOJIS[state.moodPM]:"—"}</div>
+              {state.moodPM===null&&<div style={{display:"flex",justifyContent:"center",gap:2,marginTop:6}}>{MOOD_EMOJIS.map((e,i)=><button key={i} onClick={()=>setMood("moodPM",i)} style={{fontSize:"1.2rem",background:"none",border:"none",cursor:"pointer",padding:"2px"}}>{e}</button>)}</div>}
+            </div>
+          </div>
+
+          {/* Rainbow summary */}
+          <div style={{background:"white",borderRadius:16,padding:14,marginBottom:20,border:"2px solid rgba(0,0,0,0.04)"}}>
+            <div style={{fontSize:".7rem",fontWeight:800,color:T.textSecondary,textTransform:"uppercase",marginBottom:8}}>🌈 Regenbogen heute</div>
+            <div style={{display:"flex",gap:8,justifyContent:"center"}}>{RAINBOW.map((e,i)=>{
+              const done=(state.rainbow||[])[i];
+              return <div key={i} style={{textAlign:"center"}}>
+                <div style={{fontSize:"1.4rem",opacity:done?1:0.25}}>{e}</div>
+                <div style={{fontSize:".5rem",fontWeight:700,color:done?T.successDark:T.textLight,marginTop:2}}>{done?"✓":RAINBOW_LABELS[i]}</div>
+              </div>;
+            })}</div>
+            {(state.rainbow||[]).every(Boolean)&&<div style={{textAlign:"center",fontSize:".7rem",fontWeight:800,color:T.success,marginTop:8}}>🎉 Alle Farben geschafft! +25 XP</div>}
+          </div>
+
+          {/* Guided Journal */}
+          {[
+            {id:"best",q:"Was war heute das Beste?",opts:[
+              {v:"school",l:"🏫 Schule"},{v:"friends",l:"👫 Freunde"},{v:"sport",l:"⚽ Sport"},
+              {v:"family",l:"👨‍👩‍👦 Familie"},{v:"play",l:"🎮 Spielen"},{v:"food",l:"🍕 Essen"},{v:"learn",l:"📚 Gelernt"},
+            ]},
+            {id:"proud",q:"Worauf bist du stolz?",opts:[
+              {v:"quests",l:"✅ Alle Quests"},{v:"helped",l:"🤝 Geholfen"},{v:"hard",l:"💪 Was Schwieriges"},
+              {v:"brave",l:"🦁 Mutig"},{v:"patient",l:"🧘 Geduldig"},{v:"new",l:"🌟 Was Neues"},
+            ]},
+            {id:"school",q:"Wie war die Schule?",opts:[
+              {v:"super",l:"🤩 Super"},{v:"good",l:"😊 Gut"},{v:"ok",l:"😐 Ok"},{v:"meh",l:"😕 Naja"},
+            ]},
+            {id:"tomorrow",q:"Was nimmst du dir morgen vor?",opts:[
+              {v:"read",l:"📖 Mehr lesen"},{v:"move",l:"🏃 Mehr bewegen"},{v:"friends",l:"👫 Freunde treffen"},
+              {v:"try",l:"🌟 Was Neues"},{v:"create",l:"🎨 Kreativ sein"},{v:"kind",l:"💛 Nett sein"},
+            ]},
+          ].map(q=>{
+            const ans=(state.jAnswers||{})[q.id];
+            return <div key={q.id} style={{background:"white",borderRadius:18,padding:14,marginBottom:12,border:"2px solid rgba(0,0,0,0.04)",boxShadow:"0 2px 8px rgba(0,0,0,0.03)"}}>
+              <div style={{fontSize:".75rem",fontWeight:800,color:T.textSecondary,textTransform:"uppercase",marginBottom:10}}>{q.q}</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                {q.opts.map(o=><button key={o.v} onClick={()=>setJAnswer(q.id,o.v)} style={{
+                  background:ans===o.v?`${T.primary}12`:"rgba(0,0,0,0.02)",
+                  border:ans===o.v?`2px solid ${T.primary}40`:"2px solid rgba(0,0,0,0.05)",
+                  borderRadius:50,padding:"6px 14px",cursor:"pointer",
+                  fontFamily:"'Nunito',sans-serif",fontWeight:700,fontSize:".75rem",
+                  color:ans===o.v?T.primary:T.textPrimary,
+                  transition:"all .15s",
+                }}>{o.l}</button>)}
+              </div>
+            </div>;
+          })}
+
+          {/* Free text */}
+          <div style={{background:"white",borderRadius:18,padding:14,border:"2px solid rgba(0,0,0,0.04)",boxShadow:"0 2px 8px rgba(0,0,0,0.03)"}}>
+            <div style={{fontSize:".75rem",fontWeight:800,color:T.textSecondary,textTransform:"uppercase",marginBottom:10}}>✏️ Noch etwas? (Optional)</div>
+            <textarea
+              ref={journalRef}
+              value={state.journal||""}
+              onChange={e=>setJournal(e.target.value)}
+              placeholder="Was dich bewegt, was passiert ist, ein Highlight..."
+              style={{
+                width:"100%",minHeight:100,background:T.bg,border:"2px solid rgba(0,0,0,0.06)",
+                borderRadius:14,padding:"12px 14px",color:T.textPrimary,fontSize:".85rem",
+                fontFamily:"'Nunito',sans-serif",outline:"none",fontWeight:600,resize:"vertical",
+                lineHeight:1.6,
+              }}
+            />
+          </div>
+
+          {/* Stats for today */}
+          <div style={{background:`${T.primary}08`,borderRadius:16,padding:14,marginTop:16,border:`2px solid ${T.primary}10`}}>
+            <div style={{fontSize:".7rem",fontWeight:800,color:T.primary,textTransform:"uppercase",marginBottom:8}}>📊 Heute</div>
+            <div style={{display:"flex",justifyContent:"space-around",textAlign:"center"}}>
+              <div><div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.2rem",fontWeight:700,color:T.primary}}>{done}/{total}</div><div style={{fontSize:".55rem",color:T.textSecondary}}>Quests</div></div>
+              <div><div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.2rem",fontWeight:700,color:T.accentDark}}>+{state.dt}min</div><div style={{fontSize:".55rem",color:T.textSecondary}}>Verdient</div></div>
+              <div><div style={{fontFamily:"'Fredoka',sans-serif",fontSize:"1.2rem",fontWeight:700,color:T.success}}>{(state.rainbow||[]).filter(Boolean).length}/6</div><div style={{fontSize:".55rem",color:T.textSecondary}}>Farben</div></div>
+            </div>
+          </div>
+        </div>}
+
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(HeroDex));
+</script>
+</body>
+</html>
