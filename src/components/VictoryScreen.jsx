@@ -3,14 +3,17 @@ import { T } from '../constants';
 import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
+import { useGame } from '../context/GameContext';
 
-export default function VictoryScreen({ state, level, done, total, onClose, onSpinWheel, onMemoryGame }) {
+export default function VictoryScreen({ onClose, onSpinWheel, onMemoryGame }) {
+  const { state, computed } = useGame();
+  const { level, done, total } = computed;
+
   const [phase, setPhase] = useState(0); // 0=burst, 1=summary, 2=ready
   const [fireworks, setFireworks] = useState([]);
 
   useEffect(() => {
     SFX.play("victory");
-    // Generate firework particles
     const fw = Array.from({ length: 40 }, (_, i) => ({
       id: i,
       x: 20 + Math.random() * 60,

@@ -2,8 +2,12 @@ import React from 'react';
 import { T, BADGES as BADGE_DEFS } from '../constants';
 import { ViewHeader } from './ui';
 import HeroSprite from './HeroSprite';
+import { useGame } from '../context/GameContext';
 
-export default function Achievements({ state, level, setView }) {
+export default function Achievements() {
+  const { state, computed, ui } = useGame();
+  const { level } = computed;
+
   const badges = BADGE_DEFS.map((b, i) => ({
     ...b,
     u: [state.xp > 0, state.sd >= 3, state.sd >= 7, level >= 5, state.hist.length >= 50, level >= 10, state.sd >= 30, state.hist.length >= 100, state.acc.length > 0][i],
@@ -11,7 +15,7 @@ export default function Achievements({ state, level, setView }) {
 
   return (
     <div className="view-enter" style={{ minHeight: "100vh", padding: "env(safe-area-inset-top, 12px) 20px 100px" }}>
-      <ViewHeader onBack={() => setView("hub")} title="Erfolge" />
+      <ViewHeader onBack={() => ui.setView("hub")} title="Erfolge" />
       <div className="game-card" style={{ padding: 20, display: "flex", alignItems: "center", gap: 16, marginBottom: 24, borderRadius: 20, boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
         <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={80} level={level} />
         <div>

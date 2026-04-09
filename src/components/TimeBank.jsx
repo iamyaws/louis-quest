@@ -1,11 +1,15 @@
 import React from 'react';
 import { T } from '../constants';
 import { ViewHeader } from './ui';
+import { useGame } from '../context/GameContext';
 
-export default function TimeBank({ state, allDone, done, total, setView }) {
+export default function TimeBank() {
+  const { state, computed, ui } = useGame();
+  const { allDone, done, total } = computed;
+
   return (
     <div className="view-enter" style={{ minHeight: "100vh", padding: "env(safe-area-inset-top, 12px) 20px 100px" }}>
-      <ViewHeader onBack={() => setView("hub")} title="Zeitbank" />
+      <ViewHeader onBack={() => ui.setView("hub")} title="Zeitbank" />
       <div style={{ background: `linear-gradient(135deg, ${T.primary}12, ${T.success}10)`, borderRadius: 24, padding: 28, textAlign: "center", marginBottom: 24, border: `2px solid ${T.primary}15` }}>
         <div style={{ fontSize: ".8rem", color: T.textSecondary, fontWeight: 600, marginBottom: 4 }}>Heute verdient</div>
         <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "3rem", fontWeight: 700, color: T.success }}>{state.dt} <span style={{ fontSize: "1rem", color: T.textSecondary }}>Min</span></div>

@@ -5,6 +5,7 @@ import { ProgressRing } from './ui';
 import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
+import { useGame } from '../context/GameContext';
 
 const CAT_MOOD_TEXT = {
   sleepy: "🐱 Deine Katze gähnt... Zeit für die erste Quest!",
@@ -13,7 +14,11 @@ const CAT_MOOD_TEXT = {
   excited: "🐱 Deine Katze feiert mit dir! Miau!",
 };
 
-export default function Hub({ state, level, xpP, done, total, allDone, pct, mood, dayN, setQuestOpen, setView, setMood, setCeleb, pMode, setPMode, setPinShow }) {
+export default function Hub() {
+  const { state, computed, actions, ui } = useGame();
+  const { level, xpP, done, total, allDone, pct, mood, dayN } = computed;
+  const { setQuestOpen, setView, setCeleb, pMode, setPMode, setPinShow } = ui;
+
   return (
     <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <div style={{ background: getSky(done, total), borderRadius: "0 0 32px 32px", padding: "env(safe-area-inset-top, 12px) 20px 32px", position: "relative", overflow: "hidden", minHeight: 380, display: "flex", flexDirection: "column" }}>
@@ -92,7 +97,7 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
       {state.moodAM === null && <div style={{ padding: "12px 20px 0" }}>
         <div className="game-card" style={{ padding: 16 }}>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>Wie startest du in den Tag? {"\u{1F305}"}</div>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => { setMood("moodAM", i); setCeleb(true); }} style={{ fontSize: "2rem", background: "none", border: "none", cursor: "pointer", padding: "8px", borderRadius: 12, transition: "all .15s", minHeight: 48, minWidth: 48 }}>{e}</button>)}</div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => { actions.setMood("moodAM", i); setCeleb(true); }} style={{ fontSize: "2rem", background: "none", border: "none", cursor: "pointer", padding: "8px", borderRadius: 12, transition: "all .15s", minHeight: 48, minWidth: 48 }}>{e}</button>)}</div>
         </div>
       </div>}
 

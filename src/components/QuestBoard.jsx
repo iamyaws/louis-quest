@@ -1,8 +1,12 @@
 import React, { useRef } from 'react';
 import { T, ANCHORS, RAINBOW, RAINBOW_LABELS, MOOD_EMOJIS, SCHOOL_QUESTS, VACATION_QUESTS } from '../constants';
 import SFX from '../utils/sfx';
+import { useGame } from '../context/GameContext';
 
-export default function QuestBoard({ state, allDone, done, total, pct, byA, pMode, complete, completeComeback, rmQuest, toggleRainbow, setMood, setQuestOpen, togVac, resetDay, resetAll, addQuest, nq, setNq, level, exportState, importState }) {
+export default function QuestBoard() {
+  const { state, computed, actions, ui } = useGame();
+  const { allDone, done, total, pct, byA, level } = computed;
+  const { pMode, setQuestOpen, nq, setNq } = ui;
   const nqRef = useRef(null);
   const fileRef = useRef(null);
 
@@ -24,7 +28,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
               <div style={{ fontSize: ".75rem", color: T.textSecondary, fontWeight: 600 }}>Deine Katze hat auf dich gewartet!</div>
             </div>
           </div>
-          <button className="btn-tap" onClick={completeComeback} style={{
+          <button className="btn-tap" onClick={actions.completeComeback} style={{
             width: "100%", marginTop: 10,
             background: "linear-gradient(135deg, #F97316, #FCD34D)",
             border: "none", borderRadius: 14, padding: "12px",
@@ -50,7 +54,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
           </div>
           <div style={{ display: "flex", gap: 6, justifyContent: "space-between" }}>{RAINBOW.map((emoji, i) => {
             const d = (state.rainbow || [])[i];
-            return <button key={i} onClick={() => toggleRainbow(i)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "10px 4px", borderRadius: 12, background: d ? `${T.success}15` : "rgba(0,0,0,0.02)", border: d ? `2px solid ${T.success}30` : "2px solid rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s", opacity: d ? 1 : 0.5, minHeight: 48 }}>
+            return <button key={i} onClick={() => actions.toggleRainbow(i)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "10px 4px", borderRadius: 12, background: d ? `${T.success}15` : "rgba(0,0,0,0.02)", border: d ? `2px solid ${T.success}30` : "2px solid rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s", opacity: d ? 1 : 0.5, minHeight: 48 }}>
               <span style={{ fontSize: "1.4rem" }}>{emoji}</span>
               <span style={{ fontSize: ".55rem", fontWeight: 700, color: d ? T.successDark : T.textLight }}>{RAINBOW_LABELS[i]}</span>
             </button>;
@@ -61,7 +65,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
         {/* Evening mood */}
         {allDone && state.moodPM === null && <div style={{ background: `linear-gradient(135deg,${T.primary}08,${T.accent}10)`, borderRadius: 16, padding: 16, marginBottom: 16, border: `2px solid ${T.primary}15` }}>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 10 }}>{"\u{1F319}"} Worauf bist du heute stolz?</div>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 4, marginBottom: 12 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => setMood("moodPM", i)} style={{ fontSize: "1.8rem", background: state.moodPM === i ? `${T.primary}15` : "none", border: state.moodPM === i ? `2px solid ${T.primary}` : "none", cursor: "pointer", padding: "6px", borderRadius: 10, minHeight: 48, minWidth: 44 }}>{e}</button>)}</div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 4, marginBottom: 12 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => actions.setMood("moodPM", i)} style={{ fontSize: "1.8rem", background: state.moodPM === i ? `${T.primary}15` : "none", border: state.moodPM === i ? `2px solid ${T.primary}` : "none", cursor: "pointer", padding: "6px", borderRadius: 10, minHeight: 48, minWidth: 44 }}>{e}</button>)}</div>
         </div>}
 
         {/* Quest groups */}
@@ -81,7 +85,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
                 {qs.map(q => {
                   const grad = (state.graduated || []).includes(q.id);
                   return (
-                    <button key={q.id} className={q.done ? "" : "btn-tap"} onClick={() => !q.done && !pMode && complete(q.id)} disabled={q.done} style={{
+                    <button key={q.id} className={q.done ? "" : "btn-tap"} onClick={() => !q.done && !pMode && actions.complete(q.id)} disabled={q.done} style={{
                       display: "flex", alignItems: "center", gap: 12,
                       background: grad ? `${T.accent}08` : q.done ? `${T.success}08` : T.card,
                       border: "none",
@@ -100,7 +104,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
                           {q.streak > 0 && <span style={{ fontSize: ".65rem", fontWeight: 700, color: "#F97316" }}>{"\u{1F525}"}{q.streak}</span>}
                         </div>
                       </div>
-                      {pMode && <button onClick={e => { e.stopPropagation(); rmQuest(q.id); }} style={{ background: `${T.danger}15`, border: `1.5px solid ${T.danger}40`, borderRadius: 8, padding: "4px 10px", color: T.danger, cursor: "pointer", fontSize: ".65rem", fontWeight: 800, minHeight: 36 }}>{"\u2715"}</button>}
+                      {pMode && <button onClick={e => { e.stopPropagation(); actions.rmQuest(q.id); }} style={{ background: `${T.danger}15`, border: `1.5px solid ${T.danger}40`, borderRadius: 8, padding: "4px 10px", color: T.danger, cursor: "pointer", fontSize: ".65rem", fontWeight: 800, minHeight: 36 }}>{"\u2715"}</button>}
                     </button>
                   );
                 })}
@@ -112,7 +116,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
         {/* Parent panel */}
         {pMode && <div style={{ background: T.bg, borderRadius: 20, padding: 16, border: `2px solid ${T.primary}15`, marginTop: 8 }}>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".85rem", color: T.primary, marginBottom: 10, textTransform: "uppercase" }}>{"\u2699\uFE0F"} Eltern</div>
-          <button onClick={togVac} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "white", border: `2px solid ${state.vacMode ? T.success : "rgba(0,0,0,0.06)"}`, borderRadius: 14, padding: "12px 14px", cursor: "pointer", marginBottom: 12, fontFamily: "'Nunito',sans-serif", minHeight: 48 }}>
+          <button onClick={actions.togVac} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "white", border: `2px solid ${state.vacMode ? T.success : "rgba(0,0,0,0.06)"}`, borderRadius: 14, padding: "12px 14px", cursor: "pointer", marginBottom: 12, fontFamily: "'Nunito',sans-serif", minHeight: 48 }}>
             <span style={{ fontWeight: 700, fontSize: ".85rem", color: state.vacMode ? T.successDark : T.textPrimary }}>{state.vacMode ? "\u{1F3D6}\uFE0F Ferienmodus" : "\u{1F4DA} Schulmodus"}</span>
             <div style={{ width: 40, height: 22, borderRadius: 11, background: state.vacMode ? T.success : "rgba(0,0,0,0.12)", position: "relative", transition: "all .3s" }}><div style={{ width: 16, height: 16, borderRadius: 8, background: "white", position: "absolute", top: 3, left: state.vacMode ? 21 : 3, transition: "all .3s", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }} /></div>
           </button>
@@ -123,7 +127,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
               <input type="number" value={nq.xp} onChange={e => setNq(n => ({ ...n, xp: +e.target.value }))} style={{ width: 55, background: "white", border: "2px solid rgba(0,0,0,0.06)", borderRadius: 10, padding: "8px", fontSize: ".8rem", textAlign: "center", minHeight: 40 }} placeholder="XP" />
               <input type="number" value={nq.minutes} onChange={e => setNq(n => ({ ...n, minutes: +e.target.value }))} style={{ width: 55, background: "white", border: "2px solid rgba(0,0,0,0.06)", borderRadius: 10, padding: "8px", fontSize: ".8rem", textAlign: "center", minHeight: 40 }} placeholder="Min" />
             </div>
-            <button onClick={addQuest} style={{ background: `linear-gradient(135deg,${T.primary},${T.primaryLight})`, border: "none", borderRadius: 12, padding: "12px", color: "white", fontWeight: 800, cursor: "pointer", fontSize: ".85rem", fontFamily: "'Plus Jakarta Sans',sans-serif", minHeight: 44 }}>Erstellen</button>
+            <button onClick={() => actions.addQuest(nq, () => setNq(n => ({ ...n, name: "" })))} style={{ background: `linear-gradient(135deg,${T.primary},${T.primaryLight})`, border: "none", borderRadius: 12, padding: "12px", color: "white", fontWeight: 800, cursor: "pointer", fontSize: ".85rem", fontFamily: "'Plus Jakarta Sans',sans-serif", minHeight: 44 }}>Erstellen</button>
           </div>
           {/* Summary */}
           <div style={{ background: "white", borderRadius: 14, padding: 12, marginTop: 10, border: `2px solid ${T.primary}10` }}>
@@ -142,13 +146,13 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
             {state.moodAM !== null && <div style={{ marginTop: 6, fontSize: ".65rem", color: T.textSecondary }}>Stimmung heute: {MOOD_EMOJIS[state.moodAM]} morgens{state.moodPM !== null ? `, ${MOOD_EMOJIS[state.moodPM]} abends` : ""}</div>}
           </div>
           <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-            <button onClick={exportState} style={{ flex: 1, background: `${T.success}15`, border: `1.5px solid ${T.success}`, borderRadius: 10, padding: "10px", color: T.successDark, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F4BE}"} Export</button>
+            <button onClick={() => actions.exportState(state)} style={{ flex: 1, background: `${T.success}15`, border: `1.5px solid ${T.success}`, borderRadius: 10, padding: "10px", color: T.successDark, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F4BE}"} Export</button>
             <button onClick={() => fileRef.current?.click()} style={{ flex: 1, background: `${T.primary}15`, border: `1.5px solid ${T.primary}`, borderRadius: 10, padding: "10px", color: T.primary, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F4C2}"} Import</button>
-            <input ref={fileRef} type="file" accept=".json" onChange={importState} style={{ display: "none" }} />
+            <input ref={fileRef} type="file" accept=".json" onChange={actions.importState} style={{ display: "none" }} />
           </div>
           <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-            <button onClick={resetDay} style={{ flex: 1, background: `${T.accent}20`, border: `1.5px solid ${T.accent}`, borderRadius: 10, padding: "10px", color: T.accentDark, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F504}"} Tag</button>
-            <button onClick={resetAll} style={{ flex: 1, background: `${T.danger}15`, border: `1.5px solid ${T.danger}`, borderRadius: 10, padding: "10px", color: T.danger, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F5D1}\uFE0F"} Alles</button>
+            <button onClick={actions.resetDay} style={{ flex: 1, background: `${T.accent}20`, border: `1.5px solid ${T.accent}`, borderRadius: 10, padding: "10px", color: T.accentDark, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F504}"} Tag</button>
+            <button onClick={actions.resetAll} style={{ flex: 1, background: `${T.danger}15`, border: `1.5px solid ${T.danger}`, borderRadius: 10, padding: "10px", color: T.danger, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F5D1}\uFE0F"} Alles</button>
           </div>
         </div>}
       </div>

@@ -3,6 +3,7 @@ import { T, SHOP_ITEMS, BADGES as BADGE_DEFS } from '../constants';
 import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
+import { useGame } from '../context/GameContext';
 
 const HERO_LINES = {
   sleepy: ["Guten Morgen! \u2600\uFE0F", "Was steht heute an?", "Bereit f\u00FCr den Tag! \u{1F4AA}"],
@@ -30,7 +31,11 @@ const getBadgeUnlocks = (state, level) => [
   state.hist.length >= 100, (state.acc || []).length > 0,
 ];
 
-export default function Room({ state, level, mood, setView, setShopTab }) {
+export default function Room() {
+  const { state, computed, ui } = useGame();
+  const { level, mood } = computed;
+  const { setView, setShopTab } = ui;
+
   const has = (id) => (state.purchased || []).includes(id);
   const roomItems = (state.purchased || []).filter(id => id.startsWith("rm_")).length;
   const badges = BADGE_DEFS.map((b, i) => ({ ...b, u: getBadgeUnlocks(state, level)[i] }));
@@ -147,7 +152,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
           <line x1="50" y1="95" x2="200" y2="20" stroke="#D4C4B0" strokeWidth="1" opacity="0.5" />
           <line x1="200" y1="20" x2="350" y2="95" stroke="#D4C4B0" strokeWidth="1" opacity="0.5" />
 
-          {/* ── Fairy Lights (purchased) ── */}
+          {/* Fairy Lights */}
           {has("rm_fairy") && (() => {
             const left = [[70,85],[100,70],[130,55],[160,40]];
             const right = [[230,35],[260,50],[290,65],[320,80]];
@@ -159,12 +164,12 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             </g>;
           })()}
 
-          {/* ── Stars on walls (purchased) ── */}
+          {/* Stars on walls */}
           {has("rm_stars") && [[75,108],[140,58],[170,38],[235,42],[315,72],[335,92]].map(([x,y],i) => (
             <text key={`st${i}`} x={x} y={y} fontSize="8" style={{ animation: `starTwinkle ${1.5 + i * 0.3}s ease-in-out infinite ${i * 0.5}s` }}>{"\u2B50"}</text>
           ))}
 
-          {/* ── Window ── */}
+          {/* Window */}
           <g onClick={() => tap("window")} style={{ cursor: "pointer" }}>
             {bounce("window")}
             <polygon points="100,160 150,135 150,88 100,113" fill="url(#windowSky)" stroke={trim} strokeWidth="3" />
@@ -173,7 +178,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
           </g>
           <polygon points="100,225 155,198 210,225 155,252" fill="url(#windowLight)" />
 
-          {/* ── Map on left wall (purchased) ── */}
+          {/* Map on left wall */}
           {has("rm_map") && <g onClick={() => tap("map")} style={{ cursor: "pointer" }}>
             {bounce("map")}
             <polygon points="65,140 90,127 90,102 65,115" fill="#DBEAFE" stroke="#93C5FD" strokeWidth="1.5" />
@@ -182,7 +187,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             <circle cx="80" cy="117" r="2" fill="#EF4444" opacity="0.7" />
           </g>}
 
-          {/* ── Poster on right wall (purchased) ── */}
+          {/* Poster on right wall */}
           {has("rm_poster") && <g onClick={() => tap("poster")} style={{ cursor: "pointer" }}>
             {bounce("poster")}
             <polygon points="315,100 338,112 338,140 315,128" fill="url(#posterGrad)" />
@@ -190,7 +195,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             <text x="326" y="124" fontSize="12" textAnchor="middle" fill="white">{"\u2B50"}</text>
           </g>}
 
-          {/* ── Badge / Trophy Shelf ── */}
+          {/* Badge / Trophy Shelf */}
           <line x1="250" y1="82" x2="310" y2="102" stroke={wood} strokeWidth="3" strokeLinecap="round" />
           <line x1="253" y1="105" x2="313" y2="125" stroke={wood} strokeWidth="3" strokeLinecap="round" />
           <line x1="253" y1="130" x2="313" y2="150" stroke={wood} strokeWidth="3" strokeLinecap="round" />
@@ -209,28 +214,28 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             );
           })}
 
-          {/* ── Trophy on shelf (purchased) ── */}
+          {/* Trophy on shelf */}
           {has("rm_trophy") && <g onClick={() => tap("trophy")} style={{ cursor: "pointer" }}>
             {bounce("trophy")}
             <text x="310" y="97" fontSize="14" textAnchor="middle">{"\u{1F3C6}"}</text>
           </g>}
 
-          {/* ── Globe on shelf (purchased) ── */}
+          {/* Globe on shelf */}
           {has("rm_globe") && <g onClick={() => tap("globe")} style={{ cursor: "pointer" }}>
             {bounce("globe")}
             <text x="250" y="78" fontSize="12" textAnchor="middle">{"\u{1F30D}"}</text>
           </g>}
 
-          {/* ── Figure on shelf (purchased) ── */}
+          {/* Figure on shelf */}
           {has("rm_figure") && <g onClick={() => tap("figure")} style={{ cursor: "pointer" }}>
             {bounce("figure")}
             <text x="310" y="120" fontSize="11" textAnchor="middle">{"\u{1F9B8}"}</text>
           </g>}
 
-          {/* ── Rug on floor (purchased) ── */}
+          {/* Rug on floor */}
           {has("rm_rug") && <ellipse cx="195" cy="258" rx="42" ry="18" fill="#8B5CF6" opacity="0.35" onClick={() => tap("rug")} style={{ cursor: "pointer" }} />}
 
-          {/* ── Nightstand ── */}
+          {/* Nightstand */}
           <g onClick={() => tap("nightstand")} style={{ cursor: "pointer" }}>
             {bounce("nightstand")}
             <polygon points="225,220 241,212 257,220 241,228" fill={wood} />
@@ -238,7 +243,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             <polygon points="241,228 241,238 257,230 257,220" fill={woodDD} />
           </g>
 
-          {/* ── Fish tank on nightstand (purchased) ── */}
+          {/* Fish tank on nightstand */}
           {has("rm_fish") && <g onClick={() => tap("fish")} style={{ cursor: "pointer" }}>
             {bounce("fish")}
             <polygon points="233,212 241,208 249,212 241,216" fill="#60A5FA" opacity="0.5" />
@@ -247,7 +252,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             <text x="241" y="210" fontSize="7" textAnchor="middle">{"\u{1F420}"}</text>
           </g>}
 
-          {/* ── Bed ── */}
+          {/* Bed */}
           <g onClick={() => tap("bed")} style={{ cursor: "pointer" }}>
             {bounce("bed")}
             <polygon points="260,210 300,190 350,210 310,230" fill="#E0E7FF" />
@@ -257,25 +262,22 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             <ellipse cx="320" cy="198" rx="12" ry="5" fill="white" opacity="0.9" transform="rotate(26, 320, 198)" />
           </g>
 
-          {/* ── Desk ── */}
+          {/* Desk */}
           <g onClick={() => tap("desk")} style={{ cursor: "pointer" }}>
             {bounce("desk")}
-            {/* Desk body */}
             <polygon points="65,218 105,200 145,218 105,236" fill={woodD} />
             <polygon points="65,218 65,232 105,250 105,236" fill={woodDD} />
             <polygon points="105,236 105,250 145,232 145,218" fill="#6B3410" />
-            {/* Pencil cup */}
             <polygon points="78,212 84,209 90,212 84,215" fill="#475569" />
             <polygon points="78,212 78,206 84,203 84,209" fill="#334155" />
             <line x1="81" y1="206" x2="80" y2="199" stroke="#FCD34D" strokeWidth="1.5" strokeLinecap="round" />
             <line x1="84" y1="204" x2="85" y2="197" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" />
-            {/* Notebook */}
             <polygon points="118,206 128,201 136,206 126,211" fill="#DBEAFE" />
             <line x1="121" y1="208" x2="130" y2="203" stroke="#93C5FD" strokeWidth="0.5" opacity="0.6" />
             <line x1="122" y1="209" x2="131" y2="204" stroke="#93C5FD" strokeWidth="0.5" opacity="0.6" />
           </g>
 
-          {/* ── Computer on desk (purchased) ── */}
+          {/* Computer on desk */}
           {has("rm_computer") && <g onClick={() => tap("computer")} style={{ cursor: "pointer" }}>
             {bounce("computer")}
             <polygon points="96,212 108,206 120,212 108,218" fill="#1E293B" />
@@ -283,13 +285,13 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             <polygon points="98,211 98,203 106,198 106,206" fill="#60A5FA" opacity="0.6" />
           </g>}
 
-          {/* ── Lamp on desk (purchased) ── */}
+          {/* Lamp on desk */}
           {has("rm_lamp") && <g onClick={() => tap("lamp")} style={{ cursor: "pointer" }}>
             {bounce("lamp")}
             <text x="140" y="210" fontSize="14" textAnchor="middle">{"\u{1FA94}"}</text>
           </g>}
 
-          {/* ── Chair ── */}
+          {/* Chair */}
           <g onClick={() => tap("chair")} style={{ cursor: "pointer" }}>
             {bounce("chair")}
             <polygon points="80,233 100,223 100,234 80,244" fill={wood} />
@@ -298,13 +300,13 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             <polygon points="100,254 100,260 120,250 120,244" fill="#6B3410" />
           </g>
 
-          {/* ── Skateboard (purchased) ── */}
+          {/* Skateboard */}
           {has("rm_skateboard") && <g onClick={() => tap("skateboard")} style={{ cursor: "pointer" }}>
             {bounce("skateboard")}
             <text x="57" y="220" fontSize="16">{"\u{1F6F9}"}</text>
           </g>}
 
-          {/* ── Plant near bed (purchased) ── */}
+          {/* Plant near bed */}
           {has("rm_plant") && <g onClick={() => tap("plant")} style={{ cursor: "pointer" }}>
             {bounce("plant")}
             <text x="340" y="218" fontSize="22">{"\u{1FAB4}"}</text>
@@ -377,7 +379,6 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
 
       {/* Room info */}
       <div style={{ padding: "12px 20px", textAlign: "center" }}>
-        {/* Room Level bar */}
         <div style={{ display: "flex", justifyContent: "center", gap: 4, marginBottom: 6 }}>
           {[1,2,3,4,5].map(l => (
             <div key={l} style={{
