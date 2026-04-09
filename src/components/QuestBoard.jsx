@@ -16,7 +16,7 @@ export default function QuestBoard() {
       <div style={{ flex: "1 1 auto", background: T.card, borderRadius: "28px 28px 0 0", padding: "0 20px 100px", overflow: "auto", animation: "slideUp .3s ease", boxShadow: "0 -8px 40px rgba(0,0,0,0.12)", position: "relative" }}>
         <div style={{ position: "sticky", top: 0, background: T.card, paddingTop: 12, paddingBottom: 8, zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", borderRadius: "28px 28px 0 0" }}>
           <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(0,0,0,0.1)", margin: "0 auto" }} />
-          <button onClick={() => setQuestOpen(false)} style={{ position: "absolute", right: 0, top: 8, background: T.bg, border: "2px solid rgba(0,0,0,0.06)", borderRadius: 50, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "1.1rem", fontWeight: 800, color: T.textSecondary }}>{"\u2715"}</button>
+          <button aria-label="Quests schließen" onClick={() => setQuestOpen(false)} style={{ position: "absolute", right: 0, top: 8, background: T.bg, border: "2px solid rgba(0,0,0,0.06)", borderRadius: 50, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "1.1rem", fontWeight: 800, color: T.textSecondary }}>{"\u2715"}</button>
         </div>
 
         {/* Comeback Quest */}
@@ -54,7 +54,7 @@ export default function QuestBoard() {
           </div>
           <div style={{ display: "flex", gap: 6, justifyContent: "space-between" }}>{RAINBOW.map((emoji, i) => {
             const d = (state.rainbow || [])[i];
-            return <button key={i} onClick={() => actions.toggleRainbow(i)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "10px 4px", borderRadius: 12, background: d ? `${T.success}15` : "rgba(0,0,0,0.02)", border: d ? `2px solid ${T.success}30` : "2px solid rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s", opacity: d ? 1 : 0.5, minHeight: 48 }}>
+            return <button key={i} aria-label={`${RAINBOW_LABELS[i]} ${d ? "gegessen" : "nicht gegessen"}`} aria-pressed={d} onClick={() => actions.toggleRainbow(i)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "10px 4px", borderRadius: 12, background: d ? `${T.success}15` : "rgba(0,0,0,0.02)", border: d ? `2px solid ${T.success}30` : "2px solid rgba(0,0,0,0.04)", cursor: "pointer", transition: "all .15s", opacity: d ? 1 : 0.5, minHeight: 48 }}>
               <span style={{ fontSize: "1.4rem" }}>{emoji}</span>
               <span style={{ fontSize: ".55rem", fontWeight: 700, color: d ? T.successDark : T.textLight }}>{RAINBOW_LABELS[i]}</span>
             </button>;
@@ -65,7 +65,7 @@ export default function QuestBoard() {
         {/* Evening mood */}
         {allDone && state.moodPM === null && <div style={{ background: `linear-gradient(135deg,${T.primary}08,${T.accent}10)`, borderRadius: 16, padding: 16, marginBottom: 16, border: `2px solid ${T.primary}15` }}>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 10 }}>{"\u{1F319}"} Worauf bist du heute stolz?</div>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 4, marginBottom: 12 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => actions.setMood("moodPM", i)} style={{ fontSize: "1.8rem", background: state.moodPM === i ? `${T.primary}15` : "none", border: state.moodPM === i ? `2px solid ${T.primary}` : "none", cursor: "pointer", padding: "6px", borderRadius: 10, minHeight: 48, minWidth: 44 }}>{e}</button>)}</div>
+          <div role="group" aria-label="Abendstimmung wählen" style={{ display: "flex", justifyContent: "space-between", gap: 4, marginBottom: 12 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} aria-label={`Stimmung ${i + 1} von 6`} onClick={() => actions.setMood("moodPM", i)} style={{ fontSize: "1.8rem", background: state.moodPM === i ? `${T.primary}15` : "none", border: state.moodPM === i ? `2px solid ${T.primary}` : "none", cursor: "pointer", padding: "6px", borderRadius: 10, minHeight: 48, minWidth: 44 }}>{e}</button>)}</div>
         </div>}
 
         {/* Quest groups */}
@@ -104,7 +104,7 @@ export default function QuestBoard() {
                           {q.streak > 0 && <span style={{ fontSize: ".65rem", fontWeight: 700, color: "#F97316" }}>{"\u{1F525}"}{q.streak}</span>}
                         </div>
                       </div>
-                      {pMode && <button onClick={e => { e.stopPropagation(); actions.rmQuest(q.id); }} style={{ background: `${T.danger}15`, border: `1.5px solid ${T.danger}40`, borderRadius: 8, padding: "4px 10px", color: T.danger, cursor: "pointer", fontSize: ".65rem", fontWeight: 800, minHeight: 36 }}>{"\u2715"}</button>}
+                      {pMode && <button aria-label={`${q.name} entfernen`} onClick={e => { e.stopPropagation(); actions.rmQuest(q.id); }} style={{ background: `${T.danger}15`, border: `1.5px solid ${T.danger}40`, borderRadius: 8, padding: "4px 10px", color: T.danger, cursor: "pointer", fontSize: ".65rem", fontWeight: 800, minHeight: 36 }}>{"\u2715"}</button>}
                     </button>
                   );
                 })}

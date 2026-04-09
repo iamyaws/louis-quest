@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS,
 } from '../constants';
 import { buildDay } from '../utils/helpers';
 import storage from '../utils/storage';
+
+const SAVE_DEBOUNCE_MS = 400;
 
 /**
  * Handles loading game state from storage, day transitions
@@ -31,9 +33,13 @@ export default function useGamePersistence() {
     });
   }, []);
 
-  // ── Auto-persist ──
+  // ── Debounced auto-persist ──
+  const saveTimer = useRef(null);
   useEffect(() => {
-    if (state) storage.save(state);
+    if (!state) return;
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => storage.save(state), SAVE_DEBOUNCE_MS);
+    return () => clearTimeout(saveTimer.current);
   }, [state]);
 
   return { state, setState, boarding, setBoarding };

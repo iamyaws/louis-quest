@@ -34,7 +34,7 @@ export default function Hub() {
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <div style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(10px)", borderRadius: 50, padding: "6px 14px", fontSize: ".8rem", fontWeight: 800, color: "white" }}>{"\u{1FA99}"} {state.coins}</div>
             <div style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(10px)", borderRadius: 50, padding: "6px 14px", fontSize: ".8rem", fontWeight: 800, color: "white" }}>Lvl {level}</div>
-            <button onClick={() => pMode ? setPMode(false) : setPinShow(true)} style={{ background: pMode ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.15)", border: "none", borderRadius: 50, padding: "6px 12px", cursor: "pointer", color: "white", fontSize: ".75rem", fontWeight: 700, minHeight: 36, minWidth: 36 }}>{pMode ? "\u{1F513}" : "\u{1F512}"}</button>
+            <button aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"} onClick={() => pMode ? setPMode(false) : setPinShow(true)} style={{ background: pMode ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.15)", border: "none", borderRadius: 50, padding: "6px 12px", cursor: "pointer", color: "white", fontSize: ".75rem", fontWeight: 700, minHeight: 36, minWidth: 36 }}>{pMode ? "\u{1F513}" : "\u{1F512}"}</button>
           </div>
         </div>
         {/* XP */}
@@ -97,7 +97,7 @@ export default function Hub() {
       {state.moodAM === null && <div style={{ padding: "12px 20px 0" }}>
         <div className="game-card" style={{ padding: 16 }}>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>Wie startest du in den Tag? {"\u{1F305}"}</div>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => { actions.setMood("moodAM", i); setCeleb(true); }} style={{ fontSize: "2rem", background: "none", border: "none", cursor: "pointer", padding: "8px", borderRadius: 12, transition: "all .15s", minHeight: 48, minWidth: 48 }}>{e}</button>)}</div>
+          <div role="group" aria-label="Morgenstimmung wählen" style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} aria-label={`Stimmung ${i + 1} von 6`} onClick={() => { actions.setMood("moodAM", i); setCeleb(true); }} style={{ fontSize: "2rem", background: "none", border: "none", cursor: "pointer", padding: "8px", borderRadius: 12, transition: "all .15s", minHeight: 48, minWidth: 48 }}>{e}</button>)}</div>
         </div>
       </div>}
 
@@ -138,13 +138,13 @@ export default function Hub() {
       </div>
 
       {/* Nav */}
-      <div style={{ display: "flex", gap: 8, padding: "8px 20px 20px", justifyContent: "center", flexWrap: "wrap" }}>
+      <nav aria-label="Navigation" style={{ display: "flex", gap: 8, padding: "8px 20px 20px", justifyContent: "center", flexWrap: "wrap" }}>
         {[{ id: "room", l: "Zimmer", i: "\u{1F3E0}", bg: "#EDE9FE", col: "#6D28D9" }, { id: "time", l: "Zeit", i: "\u23F0", bg: "#D1FAE5", col: "#059669" }, { id: "shop", l: "Shop", i: "\u{1F6CD}\uFE0F", bg: "#FEF3C7", col: "#B45309" }, { id: "journal", l: "Buch", i: "\u{1F4D3}", bg: "#DBEAFE", col: "#1D4ED8" }, { id: "stats", l: "Erfolge", i: "\u{1F3C6}", bg: "#FCE7F3", col: "#BE185D" }].map(t => (
-          <button key={t.id} className="nav-pill" onClick={() => { SFX.play("tap"); setView(t.id); }} style={{
+          <button key={t.id} aria-label={t.l} className="nav-pill" onClick={() => { SFX.play("tap"); setView(t.id); }} style={{
             background: t.bg, color: t.col,
           }}>{t.i} {t.l}</button>
         ))}
-      </div>
+      </nav>
     </div>
   );
 }

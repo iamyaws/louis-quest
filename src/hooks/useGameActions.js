@@ -210,11 +210,16 @@ export default function useGameActions(setState, uiCallbacks) {
   const importState = useCallback((e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Reject files larger than 1MB to prevent abuse
+    if (file.size > 1024 * 1024) {
+      e.target.value = "";
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
         const data = JSON.parse(ev.target.result);
-        if (data && data.hero && data.quests) {
+        if (validateImportData(data)) {
           setState(data);
         }
       } catch { /* invalid JSON ignored */ }
@@ -230,4 +235,28 @@ export default function useGameActions(setState, uiCallbacks) {
     collectWheel, collectMemory, collectChest,
     exportState, importState,
   };
+}
+
+/**
+ * Validates that imported JSON has the expected HeroDex state shape.
+ * Prevents corrupted or malicious data from crashing the app.
+ */
+export function validateImportData(data) {
+  if (!data || typeof data !== 'object') return false;
+
+  // Required top-level fields
+  if (!data.hero || typeof data.hero !== 'object') return false;
+  if (!Array.isArray(data.quests)) return false;
+
+  // Hero must have shape/color/name
+  const { hero } = data;
+  if (typeof hero.name !== 'string' || !hero.shape || !hero.color) return false;
+
+  // Numeric fields should be numbers
+  if (typeof data.xp !== 'number' || typeof data.coins !== 'number') return false;
+
+  // Quests must have valid structure
+  if (!data.quests.every(q => q && typeof q.id === 'string' && typeof q.name === 'string')) return false;
+
+  return true;
 }
