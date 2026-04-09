@@ -1,0 +1,132 @@
+/* ═══ Button variants ═══ */
+
+.btnBase {
+  border: none;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.btnBase:active {
+  transform: scale(0.96);
+}
+
+/* ── Primary CTA ── */
+.btnPrimary {
+  composes: btnBase;
+  background: linear-gradient(135deg, #6D28D9, #A78BFA);
+  border-radius: 50px;
+  padding: 16px 40px;
+  color: white;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  box-shadow: 0 8px 24px rgba(109, 40, 217, 0.25);
+  min-height: 52px;
+}
+
+/* ── Secondary / smaller ── */
+.btnSecondary {
+  composes: btnBase;
+  background: linear-gradient(135deg, #6D28D9, #A78BFA);
+  border-radius: 50px;
+  padding: 10px 20px;
+  color: white;
+  font-size: .8rem;
+  min-height: 44px;
+  box-shadow: 0 4px 12px rgba(109, 40, 217, 0.2);
+}
+
+/* ── Success ── */
+.btnSuccess {
+  composes: btnBase;
+  background: linear-gradient(135deg, #34D399, #059669);
+  border-radius: 50px;
+  padding: 14px 36px;
+  color: white;
+  min-height: 48px;
+}
+
+/* ── Accent / gold ── */
+.btnAccent {
+  composes: btnBase;
+  background: linear-gradient(135deg, #FCD34D, #F59E0B);
+  border-radius: 50px;
+  padding: 16px 36px;
+  color: white;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(252, 211, 77, 0.4);
+  min-height: 52px;
+}
+
+/* ── Ghost / transparent ── */
+.btnGhost {
+  composes: btnBase;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  padding: 10px 20px;
+  backdrop-filter: blur(8px);
+  color: white;
+  font-size: .85rem;
+  min-height: 48px;
+}
+
+/* ── Outline variants ── */
+.btnOutlineSuccess {
+  composes: btnBase;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1.5px solid #34D399;
+  border-radius: 10px;
+  padding: 10px;
+  color: #059669;
+  font-size: .75rem;
+  min-height: 44px;
+}
+
+.btnOutlinePrimary {
+  composes: btnBase;
+  background: rgba(109, 40, 217, 0.1);
+  border: 1.5px solid #6D28D9;
+  border-radius: 10px;
+  padding: 10px;
+  color: #6D28D9;
+  font-size: .75rem;
+  min-height: 44px;
+}
+
+.btnOutlineAccent {
+  composes: btnBase;
+  background: rgba(252, 211, 77, 0.15);
+  border: 1.5px solid #FCD34D;
+  border-radius: 10px;
+  padding: 10px;
+  color: #F59E0B;
+  font-size: .75rem;
+  min-height: 44px;
+}
+
+.btnOutlineDanger {
+  composes: btnBase;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1.5px solid #F87171;
+  border-radius: 10px;
+  padding: 10px;
+  color: #F87171;
+  font-size: .75rem;
+  min-height: 44px;
+}
+
+/* ── Disabled state ── */
+.btnDisabled {
+  composes: btnBase;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 50px;
+  padding: 10px 20px;
+  color: #94A3B8;
+  font-size: .8rem;
+  cursor: default;
+  opacity: 0.4;
+  min-height: 44px;
+}

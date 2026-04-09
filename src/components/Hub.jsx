@@ -6,6 +6,8 @@ import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
+import btn from '../styles/buttons.module.css';
+import shared from '../styles/shared.module.css';
 
 const CAT_MOOD_TEXT = {
   sleepy: "🐱 Deine Katze gähnt... Zeit für die erste Quest!",
@@ -119,7 +121,7 @@ export default function Hub() {
                 <div style={{ textAlign: "right" }}><div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: wmDone ? T.success : T.primary }}>{Math.min(wp, wm.target)}/{wm.target}</div></div>
               </div>
               <div style={{ fontSize: ".75rem", color: T.textSecondary, marginBottom: 8 }}>{wm.story}</div>
-              <div style={{ background: "rgba(0,0,0,0.06)", borderRadius: 50, height: 8, overflow: "hidden" }}><div style={{ height: "100%", borderRadius: 50, width: `${Math.min(100, (wp / wm.target) * 100)}%`, background: wmDone ? `linear-gradient(90deg,${T.success},#6EE7B7)` : `linear-gradient(90deg,${T.primary},${T.primaryLight})`, transition: "width .6s ease" }} /></div>
+              <div className={shared.progressTrack}><div className={wmDone ? shared.progressFillSuccess : shared.progressFillPrimary} style={{ width: `${Math.min(100, (wp / wm.target) * 100)}%` }} /></div>
               {wmDone && <div style={{ fontSize: ".7rem", color: T.success, fontWeight: 700, marginTop: 6, textAlign: "center" }}>{"\u{1F389}"} +{wm.reward.amount} {wm.reward.type === "coins" ? "M\u00FCnzen" : "XP"} erhalten!</div>}
             </div>
           </div>
@@ -128,13 +130,7 @@ export default function Hub() {
 
       {/* Quest button */}
       <div style={{ textAlign: "center", padding: "16px 0 8px" }}>
-        <button className="btn-tap" onClick={() => { SFX.play("tap"); setQuestOpen(true); }} style={{
-          background: `linear-gradient(135deg,${T.primary},${T.primaryLight})`,
-          border: "none", borderRadius: 50, padding: "16px 40px",
-          color: "white", fontWeight: 800, fontSize: "1rem", cursor: "pointer",
-          fontFamily: "'Plus Jakarta Sans',sans-serif", textTransform: "uppercase",
-          letterSpacing: ".05em", boxShadow: `0 8px 24px ${T.primary}40`, minHeight: 52,
-        }}>{"\u2694\uFE0F"} Quests öffnen</button>
+        <button className={btn.btnPrimary} onClick={() => { SFX.play("tap"); setQuestOpen(true); }}>{"\u2694\uFE0F"} Quests öffnen</button>
       </div>
 
       {/* Nav */}

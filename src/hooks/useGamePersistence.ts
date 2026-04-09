@@ -4,6 +4,7 @@ import {
 } from '../constants';
 import { buildDay } from '../utils/helpers';
 import storage from '../utils/storage';
+import type { GameState, Hero } from '../types';
 
 const SAVE_DEBOUNCE_MS = 400;
 
@@ -13,8 +14,8 @@ const SAVE_DEBOUNCE_MS = 400;
  * and auto-persisting state on change.
  */
 export default function useGamePersistence() {
-  const [state, setState] = useState(null);
-  const [boarding, setBoarding] = useState(null); // null=loading, true=onboarding, false=ready
+  const [state, setState] = useState<GameState | null>(null);
+  const [boarding, setBoarding] = useState<boolean | null>(null); // null=loading, true=onboarding, false=ready
 
   // ── Load state on mount ──
   useEffect(() => {
@@ -34,29 +35,24 @@ export default function useGamePersistence() {
   }, []);
 
   // ── Debounced auto-persist ──
-  const saveTimer = useRef(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!state) return;
-    clearTimeout(saveTimer.current);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => storage.save(state), SAVE_DEBOUNCE_MS);
-    return () => clearTimeout(saveTimer.current);
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
   }, [state]);
 
   return { state, setState, boarding, setBoarding };
 }
 
-/**
- * Handles the logic for when a new day starts:
- * streak recovery, freeze tracking, quest reset, weekly missions, graduation.
- */
-function applyDayTransition(p, today) {
+function applyDayTransition(p: GameState, today: string): void {
   const todayD = new Date();
   todayD.setHours(0, 0, 0, 0);
   const lastD = new Date(p.lastDate);
   lastD.setHours(0, 0, 0, 0);
-  const dayGap = Math.round((todayD - lastD) / (1000 * 60 * 60 * 24));
+  const dayGap = Math.round((todayD.getTime() - lastD.getTime()) / (1000 * 60 * 60 * 24));
 
-  // Monthly freeze reset
   const curMonth = `${todayD.getFullYear()}-${todayD.getMonth()}`;
   if ((p.lastFreezeMonth || "") !== curMonth) {
     p.streakFreezes = MAX_MONTHLY_FREEZES;
@@ -65,7 +61,6 @@ function applyDayTransition(p, today) {
   }
   p.freezeUsedToday = false;
 
-  // Streak recovery
   if (dayGap >= 2) {
     const missedDays = dayGap - 1;
     if ((p.sd || 0) > 0) {
@@ -90,7 +85,6 @@ function applyDayTransition(p, today) {
     p.comebackActive = false;
   }
 
-  // Reset daily state
   p.quests = buildDay(p.vacMode).map(q => ({ ...q, streak: (p.sm || {})[q.id] || 0 }));
   p.lastDate = today;
   p.dt = 0;
@@ -103,9 +97,8 @@ function applyDayTransition(p, today) {
   p.memoryPlayed = false;
   p.chestMilestone = null;
 
-  // Weekly mission rotation
   const weekStart = p.weekStart ? new Date(p.weekStart) : new Date();
-  const daysSinceStart = Math.floor((new Date() - weekStart) / (1000 * 60 * 60 * 24));
+  const daysSinceStart = Math.floor((new Date().getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
   if (daysSinceStart >= 7 || !p.weeklyMission) {
     const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
     p.weeklyMission = wm.id;
@@ -113,17 +106,13 @@ function applyDayTransition(p, today) {
     p.weekStart = today;
   }
 
-  // Graduation check
   if (!p.graduated) p.graduated = [];
   Object.entries(p.sm || {}).forEach(([qid, streak]) => {
     if (streak >= 30 && !p.graduated.includes(qid)) p.graduated.push(qid);
   });
 }
 
-/**
- * Ensures all expected fields exist with defaults (handles older save formats).
- */
-function applyDefaults(p) {
+function applyDefaults(p: GameState): void {
   if (!p.purchased) p.purchased = [];
   if (!p.rainbow) p.rainbow = [false, false, false, false, false, false];
   if (p.moodAM === undefined) p.moodAM = null;
@@ -148,10 +137,15 @@ function applyDefaults(p) {
   if (!p.graduated) p.graduated = [];
 }
 
-/**
- * Creates the initial state for a freshly onboarded user.
- */
-export function createInitialState({ hero, catVariant, catName, startXP, startCoins }) {
+interface OnboardData {
+  hero: Hero;
+  catVariant: string;
+  catName: string;
+  startXP?: number;
+  startCoins?: number;
+}
+
+export function createInitialState({ hero, catVariant, catName, startXP, startCoins }: OnboardData): GameState {
   const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
   return {
     hero, catVariant, catName, xp: startXP || 0, coins: startCoins || 0,

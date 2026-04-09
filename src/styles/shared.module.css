@@ -1,0 +1,139 @@
+/* ═══ Shared layout & typography ═══ */
+
+.viewContainer {
+  min-height: 100vh;
+  padding: env(safe-area-inset-top, 12px) 20px 100px;
+}
+
+.viewEnter {
+  animation: viewEnter 200ms ease forwards;
+}
+
+/* ── Typography ── */
+.heading {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.headingLg {
+  composes: heading;
+  font-size: 1.4rem;
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+.headingSm {
+  composes: heading;
+  font-size: .76rem;
+}
+
+.headingXs {
+  composes: heading;
+  font-size: .7rem;
+  letter-spacing: .08em;
+}
+
+.bodyFont {
+  font-family: 'Nunito', sans-serif;
+}
+
+.displayFont {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+}
+
+/* ── Section label ── */
+.sectionTitle {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: .8rem;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 12px;
+}
+
+/* ── Stat pill ── */
+.statPill {
+  border-radius: 50px;
+  padding: 6px 14px;
+  font-size: .8rem;
+  font-weight: 800;
+}
+
+.statPillGlass {
+  composes: statPill;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+}
+
+/* ── Progress bar ── */
+.progressTrack {
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 50px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 50px;
+  transition: width .6s ease;
+}
+
+.progressFillPrimary {
+  composes: progressFill;
+  background: linear-gradient(90deg, #6D28D9, #A78BFA);
+}
+
+.progressFillSuccess {
+  composes: progressFill;
+  background: linear-gradient(90deg, #34D399, #6EE7B7);
+}
+
+/* ── Overlay backdrop ── */
+.overlayBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn .3s ease;
+}
+
+.overlayCard {
+  background: white;
+  border-radius: 28px;
+  padding: 24px;
+  text-align: center;
+  max-width: 340px;
+  width: 90%;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Icon box ── */
+.iconBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.iconBoxSm {
+  composes: iconBox;
+  width: 48px;
+  height: 48px;
+  font-size: 1.3rem;
+}
+
+.iconBoxMd {
+  composes: iconBox;
+  width: 52px;
+  height: 52px;
+  font-size: 1.6rem;
+}

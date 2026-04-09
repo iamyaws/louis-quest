@@ -3,6 +3,8 @@ import { T, SHOP_ITEMS } from '../constants';
 import { ViewHeader } from './ui';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
+import btn from '../styles/buttons.module.css';
+import shared from '../styles/shared.module.css';
 
 export default function Shop() {
   const { state, actions, ui } = useGame();
@@ -35,7 +37,7 @@ export default function Shop() {
           const canBuy = state.coins >= item.cost && !owned;
           return (
             <div key={item.id} className="game-card" style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", borderColor: owned ? `${T.success}30` : undefined }}>
-              <div style={{ width: 52, height: 52, borderRadius: 14, background: owned ? `${T.success}15` : `${T.primary}08`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem" }}>{item.icon}</div>
+              <div className={shared.iconBoxMd} style={{ background: owned ? `${T.success}15` : `${T.primary}08` }}>{item.icon}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 700, fontSize: ".95rem" }}>{item.name}</div>
                 <div style={{ fontSize: ".7rem", color: T.accentDark, fontWeight: 700 }}>{"\u{1FA99}"} {item.cost}</div>

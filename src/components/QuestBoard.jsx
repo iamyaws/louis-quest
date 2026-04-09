@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import { T, ANCHORS, RAINBOW, RAINBOW_LABELS, MOOD_EMOJIS, SCHOOL_QUESTS, VACATION_QUESTS } from '../constants';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
+import btn from '../styles/buttons.module.css';
+import shared from '../styles/shared.module.css';
 
 export default function QuestBoard() {
   const { state, computed, actions, ui } = useGame();
@@ -43,7 +45,7 @@ export default function QuestBoard() {
             <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: allDone ? T.successDark : T.textPrimary, textTransform: "uppercase" }}>{allDone ? "\u{1F4AA} Durchgehalten!" : `${done}/${total} Quests`}</span>
             <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{state.dt} Min</span>
           </div>
-          <div style={{ background: "rgba(0,0,0,0.06)", borderRadius: 50, height: 8, overflow: "hidden" }}><div style={{ height: "100%", borderRadius: 50, width: `${pct * 100}%`, background: allDone ? `linear-gradient(90deg,${T.success},#6EE7B7)` : `linear-gradient(90deg,${T.primary},${T.primaryLight})`, transition: "width .6s ease" }} /></div>
+          <div className={shared.progressTrack}><div className={allDone ? shared.progressFillSuccess : shared.progressFillPrimary} style={{ width: `${pct * 100}%` }} /></div>
         </div>
 
         {/* Rainbow */}
@@ -146,13 +148,13 @@ export default function QuestBoard() {
             {state.moodAM !== null && <div style={{ marginTop: 6, fontSize: ".65rem", color: T.textSecondary }}>Stimmung heute: {MOOD_EMOJIS[state.moodAM]} morgens{state.moodPM !== null ? `, ${MOOD_EMOJIS[state.moodPM]} abends` : ""}</div>}
           </div>
           <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-            <button onClick={() => actions.exportState(state)} style={{ flex: 1, background: `${T.success}15`, border: `1.5px solid ${T.success}`, borderRadius: 10, padding: "10px", color: T.successDark, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F4BE}"} Export</button>
-            <button onClick={() => fileRef.current?.click()} style={{ flex: 1, background: `${T.primary}15`, border: `1.5px solid ${T.primary}`, borderRadius: 10, padding: "10px", color: T.primary, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F4C2}"} Import</button>
+            <button className={btn.btnOutlineSuccess} onClick={() => actions.exportState(state)} style={{ flex: 1 }}>{"\u{1F4BE}"} Export</button>
+            <button className={btn.btnOutlinePrimary} onClick={() => fileRef.current?.click()} style={{ flex: 1 }}>{"\u{1F4C2}"} Import</button>
             <input ref={fileRef} type="file" accept=".json" onChange={actions.importState} style={{ display: "none" }} />
           </div>
           <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-            <button onClick={actions.resetDay} style={{ flex: 1, background: `${T.accent}20`, border: `1.5px solid ${T.accent}`, borderRadius: 10, padding: "10px", color: T.accentDark, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F504}"} Tag</button>
-            <button onClick={actions.resetAll} style={{ flex: 1, background: `${T.danger}15`, border: `1.5px solid ${T.danger}`, borderRadius: 10, padding: "10px", color: T.danger, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F5D1}\uFE0F"} Alles</button>
+            <button className={btn.btnOutlineAccent} onClick={actions.resetDay} style={{ flex: 1 }}>{"\u{1F504}"} Tag</button>
+            <button className={btn.btnOutlineDanger} onClick={actions.resetAll} style={{ flex: 1 }}>{"\u{1F5D1}\uFE0F"} Alles</button>
           </div>
         </div>}
       </div>

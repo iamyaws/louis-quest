@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
   RARE_DROPS, RARE_DROP_CHANCE, CHEST_MILESTONES,
   WEEKLY_MISSIONS,
@@ -6,19 +6,29 @@ import {
 import { getLevel, buildDay } from '../utils/helpers';
 import storage from '../utils/storage';
 import SFX from '../utils/sfx';
+import type { GameState, RareDrop, ChestReward, WheelSegment } from '../types';
 
-/**
- * All game state mutation actions.
- * Receives setState and a bag of UI side-effect callbacks.
- */
-export default function useGameActions(setState, uiCallbacks) {
+interface UICallbacks {
+  setCeleb: Dispatch<SetStateAction<boolean>>;
+  setShowVictory: Dispatch<SetStateAction<boolean>>;
+  setShowChest: Dispatch<SetStateAction<boolean>>;
+  setRareDrop: Dispatch<SetStateAction<RareDrop | null>>;
+  setShowWheel: Dispatch<SetStateAction<boolean>>;
+  setShowMemory: Dispatch<SetStateAction<boolean>>;
+}
+
+export default function useGameActions(
+  setState: Dispatch<SetStateAction<GameState | null>>,
+  uiCallbacks: UICallbacks,
+) {
   const {
     setCeleb, setShowVictory, setShowChest, setRareDrop,
     setShowWheel, setShowMemory,
   } = uiCallbacks;
 
-  const complete = useCallback(id => {
+  const complete = useCallback((id: string) => {
     setState(prev => {
+      if (!prev) return prev;
       const q = prev.quests.find(x => x.id === id);
       if (!q || q.done) return prev;
       setCeleb(true);
@@ -41,27 +51,23 @@ export default function useGameActions(setState, uiCallbacks) {
       const newSD = all ? prev.sd + 1 : prev.sd;
       const newBest = Math.max(prev.bestStreak || 0, newSD);
 
-      // Rare drop
       const isRare = Math.random() < RARE_DROP_CHANCE;
       if (isRare) {
         const drop = RARE_DROPS[Math.floor(Math.random() * RARE_DROPS.length)];
         setTimeout(() => setRareDrop(drop), 600);
       }
 
-      // Chest milestone
-      const chestEarned = all && CHEST_MILESTONES.includes(newSD) && !prev.chestMilestone;
+      const chestEarned = all && CHEST_MILESTONES.includes(newSD as typeof CHEST_MILESTONES[number]) && !prev.chestMilestone;
       if (chestEarned) setTimeout(() => setShowChest(true), all ? 2500 : 800);
 
-      // Rare drop rewards
       let bonusXP = 0, bonusCoins = 0, bonusMin = 0;
       if (isRare) {
         const drop = RARE_DROPS[Math.floor(Math.random() * RARE_DROPS.length)];
-        if (drop.type === "xp") bonusXP = drop.amount;
-        if (drop.type === "coins") bonusCoins = drop.amount;
-        if (drop.type === "minutes") bonusMin = drop.amount;
+        if (drop.type === "xp") bonusXP = drop.amount || 0;
+        if (drop.type === "coins") bonusCoins = drop.amount || 0;
+        if (drop.type === "minutes") bonusMin = drop.amount || 0;
       }
 
-      // Weekly mission progress
       const wm = WEEKLY_MISSIONS.find(m => m.id === prev.weeklyMission);
       let wp = prev.weeklyProgress || 0;
       if (wm && all) {
@@ -91,37 +97,42 @@ export default function useGameActions(setState, uiCallbacks) {
     });
   }, [setState, setCeleb, setShowVictory, setShowChest, setRareDrop]);
 
-  const addQuest = useCallback((nq, resetName) => {
+  const addQuest = useCallback((nq: { name: string; icon: string; anchor: string; xp: number; minutes: number }, resetName: () => void) => {
     if (!nq.name.trim()) return;
-    setState(p => ({
-      ...p,
-      quests: [...p.quests, {
-        id: "c_" + Date.now(), name: nq.name.trim(), icon: nq.icon,
-        anchor: nq.anchor, xp: nq.xp, minutes: nq.minutes, done: false, streak: 0,
-      }],
-    }));
+    setState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        quests: [...prev.quests, {
+          id: "c_" + Date.now(), name: nq.name.trim(), icon: nq.icon,
+          anchor: nq.anchor as 'morning' | 'afternoon' | 'evening',
+          xp: nq.xp, minutes: nq.minutes, done: false, streak: 0,
+        }],
+      };
+    });
     resetName();
   }, [setState]);
 
   const completeComeback = useCallback(() => {
     SFX.play("celeb");
     setCeleb(true);
-    setState(p => ({ ...p, comebackActive: false, xp: p.xp + 15, coins: p.coins + 10 }));
+    setState(prev => prev ? { ...prev, comebackActive: false, xp: prev.xp + 15, coins: prev.coins + 10 } : prev);
   }, [setState, setCeleb]);
 
-  const rmQuest = useCallback(id => {
-    setState(p => ({ ...p, quests: p.quests.filter(q => q.id !== id) }));
+  const rmQuest = useCallback((id: string) => {
+    setState(prev => prev ? { ...prev, quests: prev.quests.filter(q => q.id !== id) } : prev);
   }, [setState]);
 
   const togVac = useCallback(() => {
-    setState(p => {
-      const nv = !p.vacMode;
-      return { ...p, vacMode: nv, quests: buildDay(nv).map(q => ({ ...q, streak: (p.sm || {})[q.id] || 0 })), dt: 0 };
+    setState(prev => {
+      if (!prev) return prev;
+      const nv = !prev.vacMode;
+      return { ...prev, vacMode: nv, quests: buildDay(nv).map(q => ({ ...q, streak: (prev.sm || {})[q.id] || 0 })), dt: 0 };
     });
   }, [setState]);
 
   const resetDay = useCallback(() => {
-    setState(p => ({ ...p, quests: p.quests.map(q => ({ ...q, done: false })), dt: 0, lastDate: new Date().toDateString() }));
+    setState(prev => prev ? { ...prev, quests: prev.quests.map(q => ({ ...q, done: false })), dt: 0, lastDate: new Date().toDateString() } : prev);
   }, [setState]);
 
   const resetAll = useCallback(() => {
@@ -129,45 +140,47 @@ export default function useGameActions(setState, uiCallbacks) {
     setState(null);
   }, [setState]);
 
-  const buyItem = useCallback((id, cost) => {
-    setState(p => {
-      if (p.coins < cost || (p.purchased || []).includes(id)) return p;
+  const buyItem = useCallback((id: string, cost: number) => {
+    setState(prev => {
+      if (!prev || prev.coins < cost || (prev.purchased || []).includes(id)) return prev;
       SFX.play("buy");
-      return { ...p, coins: p.coins - cost, purchased: [...(p.purchased || []), id] };
+      return { ...prev, coins: prev.coins - cost, purchased: [...(prev.purchased || []), id] };
     });
   }, [setState]);
 
-  const setMood = useCallback((period, val) => {
-    setState(p => ({ ...p, [period]: val }));
+  const setMood = useCallback((period: string, val: number) => {
+    setState(prev => prev ? { ...prev, [period]: val } : prev);
   }, [setState]);
 
-  const setJournal = useCallback((val) => {
-    setState(p => ({ ...p, journal: val }));
+  const setJournal = useCallback((val: string) => {
+    setState(prev => prev ? { ...prev, journal: val } : prev);
   }, [setState]);
 
-  const setJAnswer = useCallback((qid, val) => {
-    setState(p => ({ ...p, jAnswers: { ...(p.jAnswers || {}), [qid]: val } }));
+  const setJAnswer = useCallback((qid: string, val: string) => {
+    setState(prev => prev ? { ...prev, jAnswers: { ...(prev.jAnswers || {}), [qid]: val } } : prev);
   }, [setState]);
 
-  const toggleRainbow = useCallback((idx) => {
-    setState(p => {
-      const r = [...(p.rainbow || [false, false, false, false, false, false])];
+  const toggleRainbow = useCallback((idx: number) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const r = [...(prev.rainbow || [false, false, false, false, false, false])];
       r[idx] = !r[idx];
       const allDone = r.every(Boolean);
       return {
-        ...p, rainbow: r,
-        xp: allDone && !p.rainbow.every(Boolean) ? p.xp + 25 : p.xp,
-        coins: allDone && !p.rainbow.every(Boolean) ? p.coins + 20 : p.coins,
+        ...prev, rainbow: r,
+        xp: allDone && !prev.rainbow.every(Boolean) ? prev.xp + 25 : prev.xp,
+        coins: allDone && !prev.rainbow.every(Boolean) ? prev.coins + 20 : prev.coins,
       };
     });
   }, [setState]);
 
-  const collectWheel = useCallback((result) => {
-    setState(p => {
-      let u = { ...p, wheelSpun: true };
-      if (result.type === "coins") u.coins += result.amount;
-      if (result.type === "xp") u.xp += result.amount;
-      if (result.type === "minutes") u.dt += result.amount;
+  const collectWheel = useCallback((result: WheelSegment) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const u = { ...prev, wheelSpun: true };
+      if (result.type === "coins") u.coins += result.amount || 0;
+      if (result.type === "xp") u.xp += result.amount || 0;
+      if (result.type === "minutes") u.dt += result.amount || 0;
       if (result.type === "rare") {
         const r = RARE_DROPS[Math.floor(Math.random() * RARE_DROPS.length)];
         if (r.type === "coins") u.coins += r.amount || 30;
@@ -179,26 +192,27 @@ export default function useGameActions(setState, uiCallbacks) {
     setShowWheel(false);
   }, [setState, setShowWheel]);
 
-  const collectMemory = useCallback((reward) => {
-    setState(p => ({ ...p, xp: p.xp + reward.xp, coins: p.coins + reward.coins, memoryPlayed: true }));
+  const collectMemory = useCallback((reward: { xp: number; coins: number }) => {
+    setState(prev => prev ? { ...prev, xp: prev.xp + reward.xp, coins: prev.coins + reward.coins, memoryPlayed: true } : prev);
     setShowMemory(false);
   }, [setState, setShowMemory]);
 
-  const collectChest = useCallback((reward) => {
-    setState(p => {
-      let u = { ...p, chestMilestone: null };
-      if (reward.type === "coins") u.coins += reward.amount;
-      if (reward.type === "xp") u.xp += reward.amount;
-      if (reward.type === "minutes") u.dt += reward.amount;
-      if (reward.type === "item" && !u.purchased.includes(reward.id)) u.purchased = [...u.purchased, reward.id];
+  const collectChest = useCallback((reward: ChestReward) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const u = { ...prev, chestMilestone: null };
+      if (reward.type === "coins") u.coins += reward.amount || 0;
+      if (reward.type === "xp") u.xp += reward.amount || 0;
+      if (reward.type === "minutes") u.dt += reward.amount || 0;
+      if (reward.type === "item" && reward.id && !u.purchased.includes(reward.id)) u.purchased = [...u.purchased, reward.id];
       if (reward.type === "xpboost") u.xpBoost = true;
       return u;
     });
     setShowChest(false);
   }, [setState, setShowChest]);
 
-  const exportState = useCallback((state) => {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const exportState = useCallback((currentState: GameState) => {
+    const blob = new Blob([JSON.stringify(currentState, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -207,10 +221,9 @@ export default function useGameActions(setState, uiCallbacks) {
     URL.revokeObjectURL(url);
   }, []);
 
-  const importState = useCallback((e) => {
+  const importState = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Reject files larger than 1MB to prevent abuse
     if (file.size > 1024 * 1024) {
       e.target.value = "";
       return;
@@ -218,7 +231,7 @@ export default function useGameActions(setState, uiCallbacks) {
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const data = JSON.parse(ev.target.result);
+        const data = JSON.parse(ev.target?.result as string);
         if (validateImportData(data)) {
           setState(data);
         }
@@ -237,26 +250,24 @@ export default function useGameActions(setState, uiCallbacks) {
   };
 }
 
-/**
- * Validates that imported JSON has the expected HeroDex state shape.
- * Prevents corrupted or malicious data from crashing the app.
- */
-export function validateImportData(data) {
-  if (!data || typeof data !== 'object') return false;
+export function validateImportData(data: unknown): data is GameState {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
 
-  // Required top-level fields
-  if (!data.hero || typeof data.hero !== 'object') return false;
-  if (!Array.isArray(data.quests)) return false;
+  const d = data as Record<string, unknown>;
 
-  // Hero must have shape/color/name
-  const { hero } = data;
+  if (!d.hero || typeof d.hero !== 'object') return false;
+  if (!Array.isArray(d.quests)) return false;
+
+  const hero = d.hero as Record<string, unknown>;
   if (typeof hero.name !== 'string' || !hero.shape || !hero.color) return false;
 
-  // Numeric fields should be numbers
-  if (typeof data.xp !== 'number' || typeof data.coins !== 'number') return false;
+  if (typeof d.xp !== 'number' || typeof d.coins !== 'number') return false;
 
-  // Quests must have valid structure
-  if (!data.quests.every(q => q && typeof q.id === 'string' && typeof q.name === 'string')) return false;
+  if (!(d.quests as unknown[]).every((q: unknown) => {
+    if (!q || typeof q !== 'object') return false;
+    const quest = q as Record<string, unknown>;
+    return typeof quest.id === 'string' && typeof quest.name === 'string';
+  })) return false;
 
   return true;
 }
