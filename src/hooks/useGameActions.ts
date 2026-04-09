@@ -159,6 +159,24 @@ export default function useGameActions(
         catEvo: newCatEvo,
       };
 
+      // Egg hatching progress — each task adds ~20-25% toward hatching
+      if (result.eggType && !result.eggHatched) {
+        result.eggProgress = Math.min(100, (result.eggProgress || 0) + 20 + Math.floor(Math.random() * 10));
+        if (result.eggProgress >= 100) {
+          result.eggHatched = true;
+          // Assign random variant from the egg type
+          const variantMaps: Record<string, string[]> = {
+            dragon: ["fire", "ice", "shadow", "gold"],
+            wolf: ["forest", "snow", "night", "fire"],
+            phoenix: ["sun", "storm", "rose", "star"],
+          };
+          const variants = variantMaps[result.eggType] || ["fire"];
+          result.catVariant = variants[Math.floor(Math.random() * variants.length)];
+          result.companionType = result.eggType;
+          setTimeout(() => SFX.play("celeb"), 500);
+        }
+      }
+
       // Boss loot unlocks
       if (newUnlocksFromBoss.length > 0) {
         result.purchased = [...(result.purchased || []), ...newUnlocksFromBoss];

@@ -24,6 +24,10 @@ export const CAT_VARIANTS: Record<string, { name: string; col: string; ear: stri
   snow: { name: "Schnee", col: "#E2E8F0", ear: "#FCA5A5", stripes: false, desc: "Flauschig wie Schnee!" },
   galaxy: { name: "Galaxie", col: "#7C3AED", ear: "#DDD6FE", stripes: false, desc: "Magisch & voller Kraft!" },
   golden: { name: "Gold", col: "#F59E0B", ear: "#FEF3C7", stripes: false, desc: "Strahlt wie die Sonne!" },
+  calico: { name: "Gl\u00FCckskatze", col: "#F97316", ear: "#FED7AA", stripes: true, desc: "Bringt Gl\u00FCck!" },
+  black: { name: "Panther", col: "#1E293B", ear: "#475569", stripes: false, desc: "Elegant und geheimnisvoll!" },
+  siamese: { name: "Siam", col: "#FEF3C7", ear: "#D4A574", stripes: false, desc: "Edel und klug!" },
+  tabby: { name: "Tabby", col: "#A3724A", ear: "#D4A574", stripes: true, desc: "Gem\u00FCtlich und lieb!" },
 };
 
 export const SCHOOL_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
@@ -303,3 +307,42 @@ export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
   { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 60, active: true },
   { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 100, active: true },
 ];
+
+// ═══ Companion Types & Variants ═══
+
+export const COMPANION_TYPES: Record<string, { name: string; emoji: string; desc: string }> = {
+  cat: { name: "Katze", emoji: "\u{1F431}", desc: "Treu und verschmust!" },
+  dragon: { name: "Drache", emoji: "\u{1F409}", desc: "Mutig und feurig!" },
+  wolf: { name: "Wolf", emoji: "\u{1F43A}", desc: "Stark und klug!" },
+  phoenix: { name: "Ph\u00F6nix", emoji: "\u{1F985}", desc: "Magisch und strahlend!" },
+};
+
+export const DRAGON_VARIANTS: Record<string, { col: string; belly: string; wing: string; horn: string; name: string; desc: string }> = {
+  fire: { col: "#EF4444", belly: "#FEE2E2", wing: "#DC2626", horn: "#92400E", name: "Feuerdrache", desc: "Hei\u00DF und mutig!" },
+  ice: { col: "#38BDF8", belly: "#E0F2FE", wing: "#0284C7", horn: "#CBD5E1", name: "Eisdrache", desc: "K\u00FChl und weise!" },
+  shadow: { col: "#6D28D9", belly: "#EDE9FE", wing: "#4C1D95", horn: "#1E1B4B", name: "Schattendrache", desc: "Geheimnisvoll!" },
+  gold: { col: "#F59E0B", belly: "#FEF3C7", wing: "#D97706", horn: "#78350F", name: "Golddrache", desc: "Strahlend und edel!" },
+};
+
+export const WOLF_VARIANTS: Record<string, { col: string; belly: string; ear: string; tail: string; name: string; desc: string }> = {
+  forest: { col: "#65A30D", belly: "#ECFCCB", ear: "#A3E635", tail: "#4D7C0F", name: "Waldwolf", desc: "Flink und schlau!" },
+  snow: { col: "#E2E8F0", belly: "#F8FAFC", ear: "#CBD5E1", tail: "#94A3B8", name: "Schneewolf", desc: "Sanft wie Schnee!" },
+  night: { col: "#1E3A5F", belly: "#BFDBFE", ear: "#3B82F6", tail: "#1E40AF", name: "Nachtwolf", desc: "Stark und still!" },
+  fire: { col: "#EA580C", belly: "#FED7AA", ear: "#F97316", tail: "#C2410C", name: "Feuerwolf", desc: "Wild und warm!" },
+};
+
+export const PHOENIX_VARIANTS: Record<string, { col: string; chest: string; wing: string; tail: string; glow: string; name: string; desc: string }> = {
+  sun: { col: "#F59E0B", chest: "#FEF3C7", wing: "#DC2626", tail: "#EF4444", glow: "#FCD34D", name: "Sonnenph\u00F6nix", desc: "Warm und leuchtend!" },
+  storm: { col: "#3B82F6", chest: "#DBEAFE", wing: "#1D4ED8", tail: "#6366F1", glow: "#93C5FD", name: "Sturmph\u00F6nix", desc: "Schnell wie der Blitz!" },
+  rose: { col: "#EC4899", chest: "#FCE7F3", wing: "#DB2777", tail: "#F472B6", glow: "#FBCFE8", name: "Rosenph\u00F6nix", desc: "Anmutig und sch\u00F6n!" },
+  star: { col: "#7C3AED", chest: "#EDE9FE", wing: "#5B21B6", tail: "#8B5CF6", glow: "#C4B5FD", name: "Sternph\u00F6nix", desc: "Voller Magie!" },
+};
+
+export const SKIN_TONES = ["#FDEBD0", "#F5D0B0", "#D4A574", "#A0785A", "#6B4226"] as const;
+export const HAIR_COLORS = ["#5B3A1A", "#1E1B4B", "#F59E0B", "#DC2626", "#3B82F6", "#7C3AED", "#EC4899", "#E2E8F0"] as const;
+
+export const EGG_TYPES: Record<string, { col1: string; col2: string; pattern: string; name: string }> = {
+  dragon: { col1: "#EF4444", col2: "#FCD34D", pattern: "flame", name: "Feuer-Ei" },
+  wolf: { col1: "#64748B", col2: "#E2E8F0", pattern: "paw", name: "Mond-Ei" },
+  phoenix: { col1: "#F59E0B", col2: "#FEF3C7", pattern: "feather", name: "Sonnen-Ei" },
+};

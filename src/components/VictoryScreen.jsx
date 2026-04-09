@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { T } from '../constants';
 import HeroSprite from './HeroSprite';
-import CatSidekick from './CatSidekick';
+import Companion from './Companion';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
 
@@ -70,7 +70,7 @@ export default function VictoryScreen({ onClose, onSpinWheel, onMemoryGame }) {
           <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={140} level={level} />
         </div>
         <div style={{ animation: "catIdle 3s ease-in-out infinite" }}>
-          <CatSidekick variant={state.catVariant} mood="excited" size={64} />
+          <Companion type={state.companionType} variant={state.catVariant} mood="excited" size={64} />
         </div>
       </div>
 

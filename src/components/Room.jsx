@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { T, SHOP_ITEMS, BADGES as BADGE_DEFS } from '../constants';
 import HeroSprite from './HeroSprite';
-import CatSidekick from './CatSidekick';
+import Companion from './Companion';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
 
@@ -371,7 +371,7 @@ export default function Room() {
                 setCatBubble(catLines[Math.floor(Math.random() * catLines.length)]);
                 setTimeout(() => setCatBubble(null), 2500);
               }}>
-              <CatSidekick variant={state.catVariant} mood={mood} size={48} />
+              <Companion type={state.companionType} variant={state.catVariant} mood={mood} size={48} />
             </div>
           </div>
         </div>

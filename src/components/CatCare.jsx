@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { T, CAT_STAGES } from '../constants';
 import { getCatStage, getCatStageProg } from '../utils/helpers';
 import { ViewHeader } from './ui';
-import CatSidekick from './CatSidekick';
+import Companion from './Companion';
 import { useGame } from '../context/GameContext';
 
 const ACTIONS = [
@@ -72,7 +72,7 @@ export default function CatCare() {
         {/* Cat Display */}
         <div style={{ display: "flex", justifyContent: "center", margin: "24px 0 16px", position: "relative" }}>
           <div style={{ animation: anim ? "catBounce 0.4s ease" : "catIdle 4s ease-in-out infinite", position: "relative" }}>
-            <CatSidekick variant={state.catVariant} mood={catMood} size={140} stage={stage} />
+            <Companion type={state.companionType} variant={state.catVariant} mood={catMood} size={140} stage={stage} />
           </div>
           {msg && <div style={{
             position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",

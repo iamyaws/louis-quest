@@ -2,11 +2,12 @@ import React from 'react';
 import { T, WEEKLY_MISSIONS, CAT_STAGES, BOSSES, HERO_TIPS, MOOD_EMOJIS } from '../constants';
 import { getTimeLabel, getCatStage, getCatMood } from '../utils/helpers';
 import HeroSprite from './HeroSprite';
-import CatSidekick from './CatSidekick';
+import Companion from './Companion';
+import Egg from './Egg';
 import { useGame } from '../context/GameContext';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 
-function HeroPortrait({ shape, color, eyes, hair, level, size }) {
+function HeroPortrait({ shape, color, eyes, hair, level, size, skinTone, hairColor }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: "50%", overflow: "hidden",
@@ -14,7 +15,7 @@ function HeroPortrait({ shape, color, eyes, hair, level, size }) {
       background: `radial-gradient(circle at 50% 60%, ${color}30 0%, transparent 70%)`,
     }}>
       <div style={{ transform: "scale(1.6) translateY(18%)" }}>
-        <HeroSprite shape={shape} color={color} eyes={eyes} hair={hair} size={size * 0.7} level={level} />
+        <HeroSprite shape={shape} color={color} eyes={eyes} hair={hair} size={size * 0.7} level={level} skinTone={skinTone} hairColor={hairColor} />
       </div>
     </div>
   );
@@ -76,15 +77,20 @@ export default function Hub() {
                   background: `linear-gradient(135deg, ${state.hero.color}, ${state.hero.color}88, rgba(255,255,255,0.3))`,
                   boxShadow: `0 4px 16px ${state.hero.color}30`,
                 }}>
-                  <HeroPortrait shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} level={level} size={90} />
+                  <HeroPortrait shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} level={level} size={90} skinTone={state.hero.skinTone} hairColor={state.hero.hairColor} />
                 </div>
                 <div style={{ position: "absolute", bottom: -6, right: -18, animation: "catIdle 4s ease-in-out infinite" }}>
-                  <CatSidekick
-                    variant={state.catVariant}
-                    mood={(() => { const cm = getCatMood(state.catHunger, state.catHappy, state.catEnergy); return cm === "sleepy" ? "sleepy" : mood; })()}
-                    size={36}
-                    stage={getCatStage(state.catEvo || 0)}
-                  />
+                  {state.eggHatched ? (
+                    <Companion
+                      type={state.companionType}
+                      variant={state.catVariant}
+                      mood={(() => { const cm = getCatMood(state.catHunger, state.catHappy, state.catEnergy); return cm === "sleepy" ? "sleepy" : mood; })()}
+                      size={36}
+                      stage={getCatStage(state.catEvo || 0)}
+                    />
+                  ) : (
+                    <Egg type={state.eggType || "dragon"} progress={state.eggProgress || 0} size={36} />
+                  )}
                 </div>
               </div>
               <div style={{ textAlign: "center", maxWidth: 100 }}>

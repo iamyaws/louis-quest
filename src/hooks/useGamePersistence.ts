@@ -165,6 +165,14 @@ function applyDefaults(p: GameState): void {
   }
   if (!p.weeklyLunch) p.weeklyLunch = {};
   if (p.weeklyMissionsCompleted === undefined) p.weeklyMissionsCompleted = 0;
+  // Companion + egg migration
+  if (!p.companionType) p.companionType = "cat";
+  if (p.eggType === undefined) p.eggType = null;
+  if (p.eggProgress === undefined) p.eggProgress = 0;
+  if (p.eggHatched === undefined) p.eggHatched = true; // existing users already have companion
+  // Hero avatar migration
+  if (!p.hero.skinTone) p.hero.skinTone = "#F5D0B0";
+  if (!p.hero.hairColor) p.hero.hairColor = "#5B3A1A";
 }
 
 interface OnboardData {
@@ -173,6 +181,8 @@ interface OnboardData {
   catName: string;
   startXP?: number;
   startCoins?: number;
+  companionType?: string;
+  eggType?: string;
 }
 
 export function createInitialState({ hero, catVariant, catName, startXP, startCoins }: OnboardData): GameState {
@@ -192,6 +202,11 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     catFed: false, catPetted: false, catPlayed: false,
     boss: (() => { const b = BOSSES[Math.floor(Math.random() * BOSSES.length)]; return { id: b.id, hp: b.hp, maxHp: b.hp }; })(),
     bossTrophies: [],
+    // Companion + egg
+    companionType: data.companionType || "cat",
+    eggType: data.eggType || null,
+    eggProgress: data.eggType ? 0 : 100,
+    eggHatched: !data.eggType,
     // New v4 fields
     dailyVitaminD: false, dailyBrother: false,
     belohnungen: DEFAULT_BELOHNUNGEN,

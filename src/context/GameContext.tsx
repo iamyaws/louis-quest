@@ -9,7 +9,7 @@ interface GameContextValue {
   boarding: boolean | null;
   computed: ComputedState | null;
   actions: ReturnType<typeof useGameActions> & { resetAll: () => void };
-  onBoard: (data: { hero: Hero; catVariant: string; catName: string; startXP?: number; startCoins?: number }) => void;
+  onBoard: (data: { hero: Hero; catVariant: string; catName: string; startXP?: number; startCoins?: number; companionType?: string; eggType?: string }) => void;
   ui: {
     view: string; setView: React.Dispatch<React.SetStateAction<string>>;
     questOpen: boolean; setQuestOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -54,7 +54,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const computed = useComputedState(state);
 
-  const onBoard = (data: { hero: Hero; catVariant: string; catName: string; startXP?: number; startCoins?: number }) => {
+  const onBoard = (data: { hero: Hero; catVariant: string; catName: string; startXP?: number; startCoins?: number; companionType?: string; eggType?: string }) => {
     setState(createInitialState(data));
     setBoarding(false);
   };

@@ -6,6 +6,8 @@ export interface Hero {
   color: string;
   eyes: string;
   hair: string;
+  skinTone?: string;
+  hairColor?: string;
 }
 
 export interface Quest {
@@ -183,6 +185,12 @@ export interface GameState {
   // Boss battles
   boss: Boss | null;
   bossTrophies: string[];
+  // Companion
+  companionType: string;
+  // Egg hatching
+  eggType: string | null;
+  eggProgress: number;
+  eggHatched: boolean;
   // ── New fields ──
   dailyVitaminD: boolean;
   dailyBrother: boolean;

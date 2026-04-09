@@ -1,33 +1,192 @@
 import React from 'react';
 
-export default function HeroSprite({ shape, color, eyes, hair, size: s, level }) {
+export default function HeroSprite({ shape, color, eyes, hair, size: s, level, skinTone, hairColor }) {
   const sz = s || 140;
   const lvl = level || 1;
   const hasCape = lvl >= 5;
   const hasCrown = lvl >= 10;
   const hasGlow = lvl >= 15;
+
+  const skin = skinTone || '#F5D0B0';
+  const hColor = hairColor || '#5B3A1A';
+  const outfit = color || '#4F8DFF';
+
+  // Darken outfit color for pants
+  const pantsColor = darkenHex(outfit, 0.3);
+
   return (
-    <svg viewBox="0 0 200 240" width={sz} height={sz * 1.2} style={{ filter: hasGlow ? `drop-shadow(0 0 20px ${color}88)` : `drop-shadow(0 6px 16px rgba(0,0,0,0.12))` }}>
-      {hasCape && <path d="M70 120 L60 200 L100 185 L140 200 L130 120" fill={color} opacity="0.3" />}
-      {shape === "cube" && <rect x="55" y="100" width="90" height="90" rx="18" fill={color} />}
-      {shape === "circle" && <ellipse cx="100" cy="145" rx="48" ry="48" fill={color} />}
-      {shape === "hex" && <polygon points="100,98 148,120 148,170 100,192 52,170 52,120" fill={color} />}
-      {shape === "pill" && <rect x="62" y="90" width="76" height="105" rx="38" fill={color} />}
-      <ellipse cx="85" cy="125" rx="20" ry="12" fill="white" opacity="0.2" transform="rotate(-20 85 125)" />
-      <circle cx="100" cy="78" r="36" fill={color} />
-      <ellipse cx="88" cy="70" rx="14" ry="8" fill="white" opacity="0.15" transform="rotate(-15 88 70)" />
-      {eyes === "round" && <><circle cx="87" cy="78" r="8" fill="white" /><circle cx="113" cy="78" r="8" fill="white" /><circle cx="89" cy="77" r="4.5" fill="#1E1B4B" /><circle cx="115" cy="77" r="4.5" fill="#1E1B4B" /><circle cx="91" cy="75" r="1.5" fill="white" /><circle cx="117" cy="75" r="1.5" fill="white" /></>}
-      {eyes === "happy" && <><path d="M79 78 Q87 70 95 78" stroke="#1E1B4B" strokeWidth="3" fill="none" strokeLinecap="round" /><path d="M105 78 Q113 70 121 78" stroke="#1E1B4B" strokeWidth="3" fill="none" strokeLinecap="round" /></>}
-      {eyes === "cool" && <><rect x="78" y="73" width="18" height="8" rx="4" fill="white" /><rect x="104" y="73" width="18" height="8" rx="4" fill="white" /><rect x="82" y="74" width="8" height="6" rx="3" fill="#1E1B4B" /><rect x="108" y="74" width="8" height="6" rx="3" fill="#1E1B4B" /></>}
-      {eyes === "big" && <><circle cx="86" cy="78" r="10" fill="white" /><circle cx="114" cy="78" r="10" fill="white" /><circle cx="88" cy="77" r="6" fill="#1E1B4B" /><circle cx="116" cy="77" r="6" fill="#1E1B4B" /><circle cx="90" cy="74" r="2.5" fill="white" /><circle cx="118" cy="74" r="2.5" fill="white" /></>}
-      <path d="M93 92 Q100 98 107 92" stroke="#1E1B4B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      {hair === "short" && <path d="M66 68 Q70 42 100 40 Q130 42 134 68" fill={color} stroke={color} strokeWidth="4" />}
-      {hair === "spiky" && <><polygon points="80,52 85,28 95,50" fill={color} /><polygon points="95,48 100,22 108,46" fill={color} /><polygon points="108,50 115,30 120,52" fill={color} /></>}
-      {hair === "curly" && <><circle cx="75" cy="55" r="10" fill={color} /><circle cx="90" cy="48" r="11" fill={color} /><circle cx="108" cy="47" r="11" fill={color} /><circle cx="124" cy="54" r="10" fill={color} /></>}
-      {hair === "long" && <><path d="M64 68 Q62 45 80 38 Q100 32 120 38 Q138 45 136 68" fill={color} /><path d="M64 68 L58 120" stroke={color} strokeWidth="10" strokeLinecap="round" /><path d="M136 68 L142 120" stroke={color} strokeWidth="10" strokeLinecap="round" /></>}
-      {hair === "cap" && <><ellipse cx="100" cy="58" rx="40" ry="18" fill="#1E293B" /><rect x="60" y="55" width="80" height="10" rx="5" fill="#1E293B" /><circle cx="100" cy="42" r="5" fill="white" /></>}
-      {hasCrown && <g transform="translate(100,33)"><polygon points="-16,10 -11,-5 -5,5 0,-12 5,5 11,-5 16,10" fill="#FCD34D" stroke="#F59E0B" strokeWidth="1.5" /></g>}
-      <ellipse cx="82" cy="198" rx="14" ry="8" fill={color} /><ellipse cx="118" cy="198" rx="14" ry="8" fill={color} />
+    <svg
+      viewBox="0 0 100 140"
+      width={sz}
+      height={sz}
+      style={{
+        filter: hasGlow
+          ? `drop-shadow(0 0 14px ${outfit}88)`
+          : 'drop-shadow(0 3px 8px rgba(0,0,0,0.12))',
+      }}
+    >
+      {/* === Cape (level 5+) === */}
+      {hasCape && (
+        <path
+          d="M30 60 Q28 95 22 110 L50 100 L78 110 Q72 95 70 60"
+          fill={outfit}
+          opacity="0.3"
+        />
+      )}
+
+      {/* === Legs === */}
+      <rect x="35" y="100" width="11" height="20" rx="4" fill={pantsColor} />
+      <rect x="54" y="100" width="11" height="20" rx="4" fill={pantsColor} />
+
+      {/* === Feet === */}
+      <ellipse cx="40" cy="121" rx="8" ry="4" fill="#4A4A5A" />
+      <ellipse cx="60" cy="121" rx="8" ry="4" fill="#4A4A5A" />
+
+      {/* === Body (torso / shirt) === */}
+      <rect x="30" y="62" width="40" height="42" rx="10" fill={outfit} />
+      {/* Shirt highlight */}
+      <ellipse cx="44" cy="72" rx="10" ry="6" fill="white" opacity="0.12" transform="rotate(-15 44 72)" />
+
+      {/* === Arms === */}
+      <rect x="17" y="66" width="14" height="28" rx="7" fill={skin} />
+      <rect x="69" y="66" width="14" height="28" rx="7" fill={skin} />
+
+      {/* === Head === */}
+      <circle cx="50" cy="36" r="26" fill={skin} />
+      {/* Head highlight */}
+      <ellipse cx="42" cy="28" rx="10" ry="6" fill="white" opacity="0.12" transform="rotate(-15 42 28)" />
+
+      {/* === Hair === */}
+      {hair === 'short' && (
+        <path
+          d="M25 32 Q26 14 50 12 Q74 14 75 32 L72 28 Q70 20 50 18 Q30 20 28 28 Z"
+          fill={hColor}
+        />
+      )}
+      {hair === 'spiky' && (
+        <>
+          <path d="M25 32 Q28 16 50 14 Q72 16 75 32" fill={hColor} />
+          <polygon points="32,22 36,4 42,20" fill={hColor} />
+          <polygon points="44,18 50,0 56,18" fill={hColor} />
+          <polygon points="58,20 64,4 68,22" fill={hColor} />
+        </>
+      )}
+      {hair === 'curly' && (
+        <>
+          <circle cx="30" cy="26" r="8" fill={hColor} />
+          <circle cx="42" cy="18" r="9" fill={hColor} />
+          <circle cx="58" cy="18" r="9" fill={hColor} />
+          <circle cx="70" cy="26" r="8" fill={hColor} />
+          <circle cx="50" cy="14" r="7" fill={hColor} />
+        </>
+      )}
+      {hair === 'long' && (
+        <>
+          <path d="M24 32 Q24 14 50 12 Q76 14 76 32" fill={hColor} />
+          <path d="M24 32 L20 62" stroke={hColor} strokeWidth="8" strokeLinecap="round" />
+          <path d="M76 32 L80 62" stroke={hColor} strokeWidth="8" strokeLinecap="round" />
+        </>
+      )}
+      {hair === 'cap' && (
+        <>
+          <ellipse cx="50" cy="24" rx="28" ry="14" fill="#1E293B" />
+          <rect x="22" y="22" width="56" height="7" rx="3.5" fill="#1E293B" />
+          <rect x="22" y="26" width="18" height="5" rx="2.5" fill="#1E293B" />
+          <circle cx="50" cy="14" r="3.5" fill="white" />
+        </>
+      )}
+
+      {/* === Face === */}
+      {/* Eyes */}
+      {eyes === 'round' && (
+        <>
+          <circle cx="40" cy="36" r="5.5" fill="white" />
+          <circle cx="60" cy="36" r="5.5" fill="white" />
+          <circle cx="41.5" cy="35.5" r="3" fill="#1E1B4B" />
+          <circle cx="61.5" cy="35.5" r="3" fill="#1E1B4B" />
+          <circle cx="43" cy="34" r="1.2" fill="white" />
+          <circle cx="63" cy="34" r="1.2" fill="white" />
+        </>
+      )}
+      {eyes === 'happy' && (
+        <>
+          <path d="M35 36 Q40 30 45 36" stroke="#1E1B4B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <path d="M55 36 Q60 30 65 36" stroke="#1E1B4B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        </>
+      )}
+      {eyes === 'cool' && (
+        <>
+          {/* Sunglasses */}
+          <rect x="33" y="33" width="14" height="7" rx="3" fill="#1E1B4B" />
+          <rect x="53" y="33" width="14" height="7" rx="3" fill="#1E1B4B" />
+          <line x1="47" y1="36" x2="53" y2="36" stroke="#1E1B4B" strokeWidth="1.5" />
+          {/* Lens shine */}
+          <rect x="35" y="34.5" width="4" height="2" rx="1" fill="white" opacity="0.3" />
+          <rect x="55" y="34.5" width="4" height="2" rx="1" fill="white" opacity="0.3" />
+        </>
+      )}
+      {eyes === 'big' && (
+        <>
+          <circle cx="40" cy="36" r="7" fill="white" />
+          <circle cx="60" cy="36" r="7" fill="white" />
+          <circle cx="42" cy="35.5" r="4" fill="#1E1B4B" />
+          <circle cx="62" cy="35.5" r="4" fill="#1E1B4B" />
+          <circle cx="44" cy="33" r="1.8" fill="white" />
+          <circle cx="64" cy="33" r="1.8" fill="white" />
+        </>
+      )}
+      {/* Default eyes if none specified */}
+      {!eyes && (
+        <>
+          <circle cx="40" cy="36" r="5.5" fill="white" />
+          <circle cx="60" cy="36" r="5.5" fill="white" />
+          <circle cx="41.5" cy="35.5" r="3" fill="#1E1B4B" />
+          <circle cx="61.5" cy="35.5" r="3" fill="#1E1B4B" />
+          <circle cx="43" cy="34" r="1.2" fill="white" />
+          <circle cx="63" cy="34" r="1.2" fill="white" />
+        </>
+      )}
+
+      {/* Nose */}
+      <ellipse cx="50" cy="42" rx="1.8" ry="1.5" fill={darkenHex(skin, 0.15)} />
+
+      {/* Mouth */}
+      {eyes === 'happy' ? (
+        <path d="M44 47 Q50 53 56 47" stroke="#1E1B4B" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+      ) : (
+        <path d="M45 47 Q50 51 55 47" stroke="#1E1B4B" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+      )}
+
+      {/* Blush cheeks */}
+      <circle cx="32" cy="42" r="4" fill="#FF9999" opacity="0.25" />
+      <circle cx="68" cy="42" r="4" fill="#FF9999" opacity="0.25" />
+
+      {/* === Crown (level 10+) === */}
+      {hasCrown && (
+        <g transform="translate(50, 8)">
+          <polygon
+            points="-12,8 -8,-3 -4,4 0,-10 4,4 8,-3 12,8"
+            fill="#FCD34D"
+            stroke="#F59E0B"
+            strokeWidth="1.2"
+          />
+        </g>
+      )}
     </svg>
   );
+}
+
+/**
+ * Darken a hex color by a given factor (0-1).
+ */
+function darkenHex(hex, factor) {
+  try {
+    const h = hex.replace('#', '');
+    const r = Math.max(0, Math.round(parseInt(h.substring(0, 2), 16) * (1 - factor)));
+    const g = Math.max(0, Math.round(parseInt(h.substring(2, 4), 16) * (1 - factor)));
+    const b = Math.max(0, Math.round(parseInt(h.substring(4, 6), 16) * (1 - factor)));
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  } catch {
+    return hex;
+  }
 }
