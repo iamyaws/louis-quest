@@ -26,7 +26,7 @@ export default function SpinWheel({ onResult }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 9990, display: "flex", alignItems: "center", justifyContent: "center", animation: "fadeIn .3s ease" }}>
       <div style={{ background: "white", borderRadius: 28, padding: 24, textAlign: "center", maxWidth: 340, width: "90%", boxShadow: "0 24px 64px rgba(0,0,0,0.2)" }}>
         <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "1.3rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", fontStyle: "italic", marginBottom: 4 }}>{"\u{1F3A1}"} Glücksrad!</div>
-        <div style={{ fontSize: ".8rem", color: T.textSecondary, marginBottom: 16 }}>Alle Quests geschafft! Dreh das Rad!</div>
+        <div style={{ fontSize: ".8rem", color: T.textSecondary, marginBottom: 16 }}>Dein Einsatz hat sich gelohnt!</div>
         <div style={{ position: "relative", width: 220, height: 220, margin: "0 auto 16px" }}>
           <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10, fontSize: "1.5rem" }}>{"\u25BC"}</div>
           <svg width="220" height="220" style={{ transform: `rotate(${angle}deg)`, transition: spinning ? "transform 3.5s cubic-bezier(0.17,0.67,0.12,0.99)" : "none" }}>

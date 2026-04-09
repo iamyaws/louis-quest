@@ -46,7 +46,7 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
         </div>
         <div style={{ textAlign: "center", paddingBottom: 8, position: "relative", zIndex: 2 }}>
           <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.85)", fontWeight: 600, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>{getTimeLabel(done, total)}</div>
-          <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.3)" }}>{done}/{total} Quests {allDone ? "\u{1F389}" : ""}</div>
+          <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.3)" }}>{done}/{total} Quests {allDone ? "\u{1F4AA}" : ""}</div>
           <div style={{ fontSize: ".75rem", color: "rgba(255,255,255,0.8)", marginTop: 2, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>+{state.dt} Min verdient</div>
           {state.xpBoost && <div style={{ fontSize: ".7rem", color: "#FCD34D", fontWeight: 800, marginTop: 4, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} DOPPEL-XP AKTIV!</div>}
           {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.45)", marginTop: 3 }}>{"\u{1F381}"} Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
@@ -56,7 +56,7 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
       {/* Mood Check */}
       {state.moodAM === null && <div style={{ padding: "12px 20px 0" }}>
         <div className="game-card" style={{ padding: 16 }}>
-          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>Wie fühlst du dich heute? {"\u{1F305}"}</div>
+          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>Wie startest du in den Tag? {"\u{1F305}"}</div>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => { setMood("moodAM", i); setCeleb(true); }} style={{ fontSize: "2rem", background: "none", border: "none", cursor: "pointer", padding: "8px", borderRadius: 12, transition: "all .15s", minHeight: 48, minWidth: 48 }}>{e}</button>)}</div>
         </div>
       </div>}
@@ -73,7 +73,7 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                 <span style={{ fontSize: "1.5rem" }}>{wm.icon}</span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".76rem", fontWeight: 800, color: wmDone ? T.successDark : T.primary, textTransform: "uppercase" }}>{wmDone ? "\u2705 Mission geschafft!" : "Wochen-Mission"}</div>
+                  <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".76rem", fontWeight: 800, color: wmDone ? T.successDark : T.primary, textTransform: "uppercase" }}>{wmDone ? "\u{1F4AA} Drangeblieben — geschafft!" : "Wochen-Mission"}</div>
                   <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: T.textPrimary }}>{wm.title}</div>
                 </div>
                 <div style={{ textAlign: "right" }}><div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: wmDone ? T.success : T.primary }}>{Math.min(wp, wm.target)}/{wm.target}</div></div>

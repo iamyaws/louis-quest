@@ -5,21 +5,24 @@ import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
 
 const HERO_LINES = [
-  "Hi! Wie geht's? 😊",
-  "Heute wird super!",
-  "Schau mal mein Zimmer!",
-  "Ich bin stark! 💪",
-  "Was machen wir?",
-  "Bereit für Quests!",
+  "Heute geb ich alles! 💪",
+  "Jede Quest zählt!",
+  "Ich werde jeden Tag besser! 📈",
+  "Bereit für Abenteuer! ⚔️",
+  "Übung macht den Meister! 🎯",
+  "Schritt für Schritt! 🚀",
+  "Nicht aufgeben! 🔥",
+  "Ich schaff das! 😊",
 ];
 
 const CAT_LINES = [
-  "Miau! 😺",
-  "Schnurr... 😸",
-  "Spielen? 🐾",
-  "Ich hab Hunger!",
-  "*gähnt* 😴",
-  "Du bist toll! ⭐",
+  "Miau! Wir schaffen das! 😺",
+  "Schnurr... du machst das gut! 😸",
+  "Zusammen sind wir stark! 🐾",
+  "Ich glaub an dich! ⭐",
+  "Noch eine Quest? 💪",
+  "*schnurrt aufmunternd* 😸",
+  "Los geht's! 🎯",
 ];
 
 export default function Room({ state, level, mood, setView, setShopTab }) {

@@ -17,7 +17,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
         {/* Progress */}
         <div className="game-card" style={{ padding: 14, marginBottom: 16, background: allDone ? `${T.success}15` : undefined, borderColor: allDone ? `${T.success}40` : undefined }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-            <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: allDone ? T.successDark : T.textPrimary, textTransform: "uppercase" }}>{allDone ? "\u{1F389} Alles geschafft!" : `${done}/${total} Quests`}</span>
+            <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: allDone ? T.successDark : T.textPrimary, textTransform: "uppercase" }}>{allDone ? "\u{1F4AA} Durchgehalten!" : `${done}/${total} Quests`}</span>
             <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{state.dt} Min</span>
           </div>
           <div style={{ background: "rgba(0,0,0,0.06)", borderRadius: 50, height: 8, overflow: "hidden" }}><div style={{ height: "100%", borderRadius: 50, width: `${pct * 100}%`, background: allDone ? `linear-gradient(90deg,${T.success},#6EE7B7)` : `linear-gradient(90deg,${T.primary},${T.primaryLight})`, transition: "width .6s ease" }} /></div>
@@ -41,7 +41,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
 
         {/* Evening mood */}
         {allDone && state.moodPM === null && <div style={{ background: `linear-gradient(135deg,${T.primary}08,${T.accent}10)`, borderRadius: 16, padding: 16, marginBottom: 16, border: `2px solid ${T.primary}15` }}>
-          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 10 }}>{"\u{1F319}"} Wie war dein Tag?</div>
+          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 10 }}>{"\u{1F319}"} Worauf bist du heute stolz?</div>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 4, marginBottom: 12 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => setMood("moodPM", i)} style={{ fontSize: "1.8rem", background: state.moodPM === i ? `${T.primary}15` : "none", border: state.moodPM === i ? `2px solid ${T.primary}` : "none", cursor: "pointer", padding: "6px", borderRadius: 10, minHeight: 48, minWidth: 44 }}>{e}</button>)}</div>
         </div>}
 
@@ -56,7 +56,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
                 <span className="section-label" style={{ background: `${m.col}12`, color: m.col }}>
                   <span style={{ fontSize: "1rem" }}>{m.icon}</span> {m.label}
                 </span>
-                {secDone && <span style={{ fontSize: ".7rem", color: T.success, fontWeight: 800 }}>{"\u2713"} Fertig</span>}
+                {secDone && <span style={{ fontSize: ".7rem", color: T.success, fontWeight: 800 }}>{"\u2713"} Geschafft!</span>}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {qs.map(q => {

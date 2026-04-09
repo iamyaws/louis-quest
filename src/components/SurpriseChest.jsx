@@ -17,7 +17,7 @@ export default function SurpriseChest({ onOpen, streakDays }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 9990, display: "flex", alignItems: "center", justifyContent: "center", animation: "fadeIn .3s ease" }}>
       <div style={{ background: "white", borderRadius: 28, padding: 28, textAlign: "center", maxWidth: 320, width: "90%", boxShadow: "0 24px 64px rgba(0,0,0,0.2)" }}>
         <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "1.15rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", fontStyle: "italic", marginBottom: 4 }}>{"\u{1F381}"} Überraschungstruhe!</div>
-        <div style={{ fontSize: ".8rem", color: T.textSecondary, marginBottom: 16 }}>{streakDays}-Tage Streak Belohnung!</div>
+        <div style={{ fontSize: ".8rem", color: T.textSecondary, marginBottom: 16 }}>{streakDays} Tage am Stück drangeblieben!</div>
         {!opened ? <>
           <div style={{ fontSize: "5rem", animation: "heroFloat 1.5s ease-in-out infinite", marginBottom: 16 }}>{"\u{1F381}"}</div>
           <button onClick={open} style={{
@@ -38,7 +38,7 @@ export default function SurpriseChest({ onOpen, streakDays }) {
             color: "white", fontWeight: 800, cursor: "pointer",
             fontFamily: "'Plus Jakarta Sans',sans-serif", marginTop: 12, minHeight: 48,
           }}>
-            Super! {"\u2728"}
+            Weiter so! {"\u{1F4AA}"}
           </button>
         </>}
       </div>

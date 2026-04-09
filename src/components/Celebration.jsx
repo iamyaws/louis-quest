@@ -5,7 +5,20 @@ import { T } from '../constants';
 export default function Celebration({ active, onDone }) {
   const [p, setP] = useState([]);
   const [msg, setMsg] = useState("");
-  const MSGS = ["\u2B50 Super!", "\u{1F525} Mega!", "\u{1F4AA} Stark!", "\u{1F680} Boom!", "\u2728 Wow!", "\u{1F3AF} Treffer!", "\u{1F44F} Klasse!", "\u26A1 Yeah!", "\u{1F3C6} Hammer!", "\u{1F31F} Toll!", "\u{1F60E} Cool!", "\u{1F389} Perfekt!"];
+  const MSGS = [
+    "\u{1F4AA} Drangeblieben!",
+    "\u{1F525} Weiter so!",
+    "\u{1F680} Du gibst Gas!",
+    "\u2B50 Nicht aufgegeben!",
+    "\u{1F3AF} Ziel erreicht!",
+    "\u26A1 Du packst das!",
+    "\u{1F44F} Gut gemacht!",
+    "\u2728 Einsatz zahlt sich aus!",
+    "\u{1F31F} Jeden Tag besser!",
+    "\u{1F9E0} Klug durchgezogen!",
+    "\u{1F3C3} Voll dabei!",
+    "\u{1F389} Geschafft!",
+  ];
   useEffect(() => {
     if (!active) return;
     setMsg(MSGS[Math.floor(Math.random() * MSGS.length)]);

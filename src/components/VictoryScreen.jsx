@@ -84,12 +84,12 @@ export default function VictoryScreen({ state, level, done, total, onClose, onSp
             color: T.accent, textTransform: "uppercase", fontStyle: "italic",
             textShadow: "0 4px 16px rgba(252,211,77,0.4)", letterSpacing: "-0.02em",
           }}>
-            Alle Quests geschafft!
+            Du hast durchgehalten!
           </div>
           <span style={{ fontSize: "2rem", transform: "scaleX(-1)", display: "inline-block" }}>{"\u{1F33F}"}</span>
         </div>
         <div style={{ fontSize: ".9rem", color: "rgba(255,255,255,0.7)", fontWeight: 600, marginTop: 4 }}>
-          {state.hero.name} & {state.catName} sind Helden des Tages!
+          {state.hero.name} hat heute nicht aufgegeben — das macht echte Helden aus!
         </div>
       </div>
 
