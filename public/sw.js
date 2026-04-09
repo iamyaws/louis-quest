@@ -1,7 +1,7 @@
-const CACHE_NAME = "herodex-v1";
+const CACHE_NAME = "ronki-v1";
 const PRECACHE_URLS = [
-  "/louis-quest/",
-  "/louis-quest/index.html",
+  "/Ronki/",
+  "/Ronki/index.html",
 ];
 
 // Install: cache app shell

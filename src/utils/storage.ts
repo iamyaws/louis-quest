@@ -1,7 +1,7 @@
 // ── Ronki Storage — IndexedDB with localStorage fallback ──
 import type { GameState } from '../types';
 
-const DB_NAME = "herodex";
+const DB_NAME = "herodex"; // kept for backwards compatibility with existing user data
 const STORE = "state";
 const KEY = "hdx2";
 const LS_KEY = "hdx2";
