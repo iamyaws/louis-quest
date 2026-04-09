@@ -37,7 +37,7 @@ export default function CatCare() {
     else if (action.key === "played") actions.playCat();
     setAnim(action.key);
     setMsg(action.msg);
-    setTimeout(() => { setAnim(null); setMsg(null); }, 1500);
+    setTimeout(() => { setAnim(null); setMsg(null); }, 3000);
   };
 
   const stats = [
@@ -55,18 +55,18 @@ export default function CatCare() {
         <div className="game-card" style={{ padding: 16, marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <div>
-              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".7rem", fontWeight: 800, color: T.primary, textTransform: "uppercase" }}>Entwicklung</div>
-              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: T.textPrimary }}>{stageInfo.emoji} {stageInfo.name}</div>
+              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: T.primary, textTransform: "uppercase" }}>Entwicklung</div>
+              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: T.textPrimary }}>{stageInfo.emoji} {stageInfo.name}</div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".9rem", fontWeight: 700, color: T.accent }}>{state.catEvo || 0} EP</div>
-              {!prog.maxStage && <div style={{ fontSize: ".6rem", color: T.textLight }}>{prog.cur}/{prog.need} bis {nextStage?.name}</div>}
+              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: T.accent }}>{state.catEvo || 0} EP</div>
+              {!prog.maxStage && <div style={{ fontSize: ".8rem", color: T.textLight }}>{prog.cur}/{prog.need} bis {nextStage?.name}</div>}
             </div>
           </div>
           <div style={{ background: "rgba(0,50,150,0.06)", borderRadius: 50, height: 8, overflow: "hidden" }}>
             <div style={{ height: "100%", borderRadius: 50, width: `${prog.maxStage ? 100 : Math.min(100, (prog.cur / prog.need) * 100)}%`, background: `linear-gradient(90deg, ${T.primary}, ${T.accent})`, transition: "width .6s ease" }} />
           </div>
-          {prog.maxStage && <div style={{ fontSize: ".65rem", color: T.success, fontWeight: 800, marginTop: 4, textAlign: "center" }}>{"\u2B50"} Maximale Stufe erreicht!</div>}
+          {prog.maxStage && <div style={{ fontSize: ".85rem", color: T.success, fontWeight: 800, marginTop: 4, textAlign: "center" }}>{"\u2B50"} Maximale Stufe erreicht!</div>}
         </div>
 
         {/* Cat Display */}
@@ -76,7 +76,7 @@ export default function CatCare() {
           </div>
           {msg && <div style={{
             position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
-            background: "white", borderRadius: 16, padding: "8px 16px", fontSize: ".85rem", fontWeight: 700,
+            background: "white", borderRadius: 16, padding: "10px 20px", fontSize: "1rem", fontWeight: 700,
             color: T.textPrimary, boxShadow: "0 4px 16px rgba(0,0,0,0.1)", whiteSpace: "nowrap",
             animation: "victorySlideUp 0.3s ease",
           }}>{msg}</div>}
@@ -84,12 +84,12 @@ export default function CatCare() {
 
         {/* Stats */}
         <div className="game-card" style={{ padding: 16, marginBottom: 14 }}>
-          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".75rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>Zustand</div>
+          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".9rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>Zustand</div>
           {stats.map(s => (
             <div key={s.label} style={{ marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-                <span style={{ fontSize: ".8rem", fontWeight: 700, color: T.textPrimary }}>{s.icon} {s.label}</span>
-                <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".8rem", fontWeight: 700, color: s.value > 50 ? s.color : s.value > 25 ? T.accentDark : T.danger }}>{s.value}%</span>
+                <span style={{ fontSize: ".95rem", fontWeight: 700, color: T.textPrimary }}>{s.icon} {s.label}</span>
+                <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: s.value > 50 ? s.color : s.value > 25 ? T.accentDark : T.danger }}>{s.value}%</span>
               </div>
               <div style={{ background: "rgba(0,50,150,0.06)", borderRadius: 50, height: 10, overflow: "hidden" }}>
                 <div style={{ height: "100%", borderRadius: 50, width: `${s.value}%`, background: s.value > 50 ? s.color : s.value > 25 ? T.accentDark : T.danger, transition: "width .6s ease" }} />
@@ -97,7 +97,7 @@ export default function CatCare() {
             </div>
           ))}
           <div style={{ textAlign: "center", marginTop: 4 }}>
-            <span style={{ fontSize: ".7rem", fontWeight: 700, color: avg >= 75 ? T.success : avg >= 50 ? T.primary : avg >= 25 ? T.accentDark : T.danger }}>
+            <span style={{ fontSize: ".9rem", fontWeight: 700, color: avg >= 75 ? T.success : avg >= 50 ? T.primary : avg >= 25 ? T.accentDark : T.danger }}>
               {avg >= 75 ? "\u{1F60D} Bestens versorgt!" : avg >= 50 ? "\u{1F60A} Zufrieden" : avg >= 25 ? "\u{1F615} Braucht Aufmerksamkeit" : "\u{1F622} Bitte k\u00FCmmere dich um mich!"}
             </span>
           </div>
@@ -118,9 +118,9 @@ export default function CatCare() {
                 transition: "all .2s", boxShadow: done ? "none" : `0 4px 16px ${a.color}30`,
               }}>
                 <span style={{ fontSize: "1.8rem" }}>{a.icon}</span>
-                <span style={{ fontSize: ".8rem", fontWeight: 800 }}>{a.label}</span>
-                {done && <span style={{ fontSize: ".6rem", fontWeight: 700 }}>{"\u2705"}</span>}
-                {!done && <span style={{ fontSize: ".55rem", fontWeight: 700, opacity: 0.8 }}>+5 XP, +3 {"\u{1FA99}"}</span>}
+                <span style={{ fontSize: ".95rem", fontWeight: 800 }}>{a.label}</span>
+                {done && <span style={{ fontSize: ".8rem", fontWeight: 700 }}>{"\u2705"}</span>}
+                {!done && <span style={{ fontSize: ".75rem", fontWeight: 700, opacity: 0.8 }}>+5 XP, +3 {"\u{1FA99}"}</span>}
               </button>
             );
           })}
@@ -128,11 +128,11 @@ export default function CatCare() {
 
         {/* Stage info */}
         <div style={{ marginTop: 20, textAlign: "center" }}>
-          <div style={{ fontSize: ".7rem", color: T.textLight, fontWeight: 600, marginBottom: 8 }}>Entwicklungsstufen</div>
+          <div style={{ fontSize: ".85rem", color: T.textLight, fontWeight: 600, marginBottom: 8 }}>Entwicklungsstufen</div>
           <div style={{ display: "flex", gap: 4, justifyContent: "center", flexWrap: "wrap" }}>
             {CAT_STAGES.map((cs, i) => (
               <div key={i} style={{
-                padding: "6px 10px", borderRadius: 12, fontSize: ".65rem", fontWeight: 700,
+                padding: "6px 10px", borderRadius: 12, fontSize: ".8rem", fontWeight: 700,
                 background: i <= stage ? `${T.primary}15` : "rgba(0,50,150,0.03)",
                 color: i <= stage ? T.primary : T.textLight,
                 border: i === stage ? `2px solid ${T.primary}` : "2px solid transparent",

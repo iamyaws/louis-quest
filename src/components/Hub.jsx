@@ -97,18 +97,18 @@ export default function Hub() {
               border: "1.5px solid rgba(255,255,255,0.08)",
               borderRadius: 14, padding: "8px 6px", textAlign: "center",
             }}>
-              <div style={{ fontSize: ".5rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 3 }}>{s.label}</div>
-              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: s.color }}>{s.value}<span style={{ fontSize: ".6rem", color: "rgba(255,255,255,0.3)" }}>{s.sub}</span></div>
-              {s.progress !== null && <div style={{ height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 50, overflow: "hidden", marginTop: 4 }}><div style={{ height: "100%", borderRadius: 50, width: `${Math.min(100, s.progress * 100)}%`, background: s.barColor, transition: "width .6s ease" }} /></div>}
+              <div style={{ fontSize: ".7rem", fontWeight: 800, color: "rgba(255,255,255,0.7)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 3 }}>{s.label}</div>
+              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.05rem", fontWeight: 700, color: s.color }}>{s.value}<span style={{ fontSize: ".75rem", color: "rgba(255,255,255,0.5)" }}>{s.sub}</span></div>
+              {s.progress !== null && <div style={{ height: 4, background: "rgba(255,255,255,0.1)", borderRadius: 50, overflow: "hidden", marginTop: 4 }}><div style={{ height: "100%", borderRadius: 50, width: `${Math.min(100, s.progress * 100)}%`, background: s.barColor, transition: "width .6s ease" }} /></div>}
             </div>
           ))}
         </div>
 
         {/* Time of day + minutes */}
         <div style={{ display: "flex", justifyContent: "center", gap: 12, paddingBottom: 20, position: "relative", zIndex: 2 }}>
-          <div style={{ fontSize: ".68rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{"\u23F0"} +{state.dt} Min</div>
-          <div style={{ fontSize: ".68rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{getTimeLabel(done, total)}</div>
-          {state.xpBoost && <div style={{ fontSize: ".68rem", color: "#FCD34D", fontWeight: 800, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} 2x XP</div>}
+          <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>{"\u23F0"} +{state.dt} Min</div>
+          <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>{getTimeLabel(done, total)}</div>
+          {state.xpBoost && <div style={{ fontSize: ".8rem", color: "#FCD34D", fontWeight: 800, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} 2x XP</div>}
         </div>
       </div>
 
@@ -130,8 +130,8 @@ export default function Hub() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: "1.3rem" }}>{"\u2744\uFE0F"}</span>
             <div>
-              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".78rem", color: T.tealDark }}>Streak-Schutz eingesetzt!</div>
-              <div style={{ fontSize: ".68rem", color: T.textSecondary }}>Dein {state.sd}-Tage Streak ist sicher. Weiter so!</div>
+              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".9rem", color: T.tealDark }}>Streak-Schutz eingesetzt!</div>
+              <div style={{ fontSize: ".8rem", color: T.textSecondary }}>Dein {state.sd}-Tage Streak ist sicher. Weiter so!</div>
             </div>
           </div>
         </div>}
@@ -141,8 +141,8 @@ export default function Hub() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: "1.3rem" }}>{"\u{1F431}"}</span>
             <div>
-              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".78rem", color: "#EA580C" }}>Willkommen zurück!</div>
-              <div style={{ fontSize: ".68rem", color: T.textSecondary }}>Deine Katze hat auf dich gewartet. Öffne die Quests!</div>
+              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".9rem", color: "#EA580C" }}>Willkommen zurück!</div>
+              <div style={{ fontSize: ".8rem", color: T.textSecondary }}>Deine Katze hat auf dich gewartet. Öffne die Quests!</div>
             </div>
           </div>
         </div>}
@@ -164,16 +164,16 @@ export default function Hub() {
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                 <span style={{ fontSize: "1.4rem" }}>{wm.icon}</span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".72rem", fontWeight: 800, color: wmDone ? T.successDark : T.primary, textTransform: "uppercase" }}>{wmDone ? "\u{1F4AA} Geschafft!" : "Wochen-Mission"}</div>
+                  <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: wmDone ? T.successDark : T.primary, textTransform: "uppercase" }}>{wmDone ? "\u{1F4AA} Geschafft!" : "Wochen-Mission"}</div>
                   <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: T.textPrimary }}>{wm.title}</div>
                 </div>
                 <div className="mission-reward">
                   <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: wmDone ? T.success : T.primary }}>{Math.min(wp, wm.target)}/{wm.target}</span>
                 </div>
               </div>
-              <div style={{ fontSize: ".73rem", color: T.textSecondary, marginBottom: 8 }}>{wm.story}</div>
+              <div style={{ fontSize: ".85rem", color: T.textSecondary, marginBottom: 8 }}>{wm.story}</div>
               <div className="mission-progress-track"><div className="mission-progress-fill" style={{ width: `${Math.min(100, (wp / wm.target) * 100)}%`, background: wmDone ? `linear-gradient(90deg,${T.success},#6EE7B7)` : `linear-gradient(90deg,${T.primary},${T.primaryLight})` }} /></div>
-              {wmDone && <div style={{ fontSize: ".7rem", color: T.success, fontWeight: 700, marginTop: 6, textAlign: "center" }}>{"\u{1F389}"} +{wm.reward.amount} {wm.reward.type === "coins" ? "Münzen" : "XP"} erhalten!</div>}
+              {wmDone && <div style={{ fontSize: ".85rem", color: T.success, fontWeight: 700, marginTop: 6, textAlign: "center" }}>{"\u{1F389}"} +{wm.reward.amount} {wm.reward.type === "coins" ? "Münzen" : "XP"} erhalten!</div>}
             </div>
           );
         })()}
@@ -188,16 +188,16 @@ export default function Hub() {
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                 <span style={{ fontSize: "1.6rem", animation: "bossShake 0.6s ease-in-out infinite" }}>{bossData.icon}</span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".72rem", fontWeight: 800, color: "#DC2626", textTransform: "uppercase" }}>Wochen-Boss</div>
+                  <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: "#DC2626", textTransform: "uppercase" }}>Wochen-Boss</div>
                   <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: T.textPrimary }}>{bossData.name}</div>
                 </div>
                 <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: hpPct > 50 ? "#DC2626" : hpPct > 25 ? T.accentDark : T.success }}>{state.boss.hp}/{state.boss.maxHp} HP</div>
               </div>
-              <div style={{ fontSize: ".7rem", color: T.textSecondary, marginBottom: 8 }}>{bossData.desc}</div>
+              <div style={{ fontSize: ".85rem", color: T.textSecondary, marginBottom: 8 }}>{bossData.desc}</div>
               <div style={{ background: "rgba(239,68,68,0.08)", borderRadius: 50, height: 10, overflow: "hidden" }}>
                 <div style={{ height: "100%", borderRadius: 50, width: `${hpPct}%`, background: hpPct > 50 ? "linear-gradient(90deg, #EF4444, #F97316)" : hpPct > 25 ? "linear-gradient(90deg, #F59E0B, #FBBF24)" : "linear-gradient(90deg, #34D399, #6EE7B7)", transition: "width .6s ease" }} />
               </div>
-              <div style={{ fontSize: ".65rem", color: T.textLight, marginTop: 4, textAlign: "center" }}>Schließe Quests ab, um den Boss anzugreifen!</div>
+              <div style={{ fontSize: ".8rem", color: T.textLight, marginTop: 4, textAlign: "center" }}>Schließe Quests ab, um den Boss anzugreifen!</div>
             </div>
           );
         })()}
@@ -211,8 +211,8 @@ export default function Hub() {
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: "1.4rem" }}>{"\u{1F3C6}"}</span>
                 <div>
-                  <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".78rem", color: T.successDark, textTransform: "uppercase" }}>Boss besiegt!</div>
-                  <div style={{ fontSize: ".75rem", fontWeight: 700, color: T.textPrimary }}>{bossData.icon} {bossData.name} wurde besiegt! +{bossData.reward.xp} XP, +{bossData.reward.coins} Münzen</div>
+                  <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".9rem", color: T.successDark, textTransform: "uppercase" }}>Boss besiegt!</div>
+                  <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textPrimary }}>{bossData.icon} {bossData.name} wurde besiegt! +{bossData.reward.xp} XP, +{bossData.reward.coins} Münzen</div>
                 </div>
               </div>
             </div>
@@ -225,9 +225,9 @@ export default function Hub() {
             <CatSidekick variant={state.catVariant} mood={getCatMood(state.catHunger, state.catHappy, state.catEnergy)} size={48} stage={getCatStage(state.catEvo || 0)} />
           </div>
           <div style={{ flex: 1, textAlign: "left" }}>
-            <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".72rem", fontWeight: 800, color: T.primary, textTransform: "uppercase" }}>Katzenpflege</div>
-            <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".9rem", fontWeight: 700, color: T.textPrimary }}>{state.catName || "Katze"} — {CAT_STAGES[getCatStage(state.catEvo || 0)].name}</div>
-            <div style={{ fontSize: ".65rem", color: T.textSecondary, marginTop: 2 }}>
+            <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: T.primary, textTransform: "uppercase" }}>Katzenpflege</div>
+            <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: T.textPrimary }}>{state.catName || "Katze"} — {CAT_STAGES[getCatStage(state.catEvo || 0)].name}</div>
+            <div style={{ fontSize: ".8rem", color: T.textSecondary, marginTop: 2 }}>
               {!state.catFed && "\u{1F363}"}{!state.catPetted && "\u{1F90D}"}{!state.catPlayed && "\u{1F9F6}"}{(state.catFed && state.catPetted && state.catPlayed) ? "\u2705 Alles erledigt!" : " Noch zu tun"}
             </div>
           </div>
@@ -241,8 +241,8 @@ export default function Hub() {
         </div>
 
         {/* Hints */}
-        {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".7rem", color: "#94A3B8", textAlign: "center", marginBottom: 8 }}>{"\u{1F381}"} Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
-        {(state.streakFreezes || 0) > 0 && <div style={{ fontSize: ".7rem", color: "#94A3B8", textAlign: "center", marginBottom: 8 }}>{"\u2744\uFE0F"} {state.streakFreezes} Streak-Schutz übrig</div>}
+        {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".8rem", color: "#94A3B8", textAlign: "center", marginBottom: 8 }}>{"\u{1F381}"} Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
+        {(state.streakFreezes || 0) > 0 && <div style={{ fontSize: ".8rem", color: "#94A3B8", textAlign: "center", marginBottom: 8 }}>{"\u2744\uFE0F"} {state.streakFreezes} Streak-Schutz übrig</div>}
       </div>
     </div>
   );

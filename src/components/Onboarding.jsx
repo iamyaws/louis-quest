@@ -31,7 +31,7 @@ export default function Onboarding({ onComplete }) {
     if (r && (r.xp > 0 || r.coins > 0)) {
       setObXP(x => x + r.xp); setObCoins(c => c + r.coins);
       setReward(r);
-      setTimeout(() => setReward(null), 1500);
+      setTimeout(() => setReward(null), 3000);
     }
     setStep(nextStep);
   };
