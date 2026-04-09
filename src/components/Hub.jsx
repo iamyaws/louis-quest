@@ -1,7 +1,6 @@
 import React from 'react';
 import { T, CHEST_MILESTONES, MOOD_EMOJIS, WEEKLY_MISSIONS } from '../constants';
 import { getTimeLabel } from '../utils/helpers';
-import { ProgressRing } from './ui';
 import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
@@ -17,71 +16,100 @@ const CAT_MOOD_TEXT = {
 export default function Hub() {
   const { state, computed, actions, ui } = useGame();
   const { level, xpP, done, total, allDone, pct, mood, dayN } = computed;
-  const { setQuestOpen, setView, setCeleb, pMode, setPMode, setPinShow } = ui;
+  const { setQuestOpen, setCeleb, pMode, setPMode, setPinShow } = ui;
 
   return (
     <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
-      {/* ═══ Hero Stage ═══ */}
-      <div style={{ position: "relative", paddingBottom: 24 }}>
-        {/* Day + Lock row */}
+      {/* ═══ HERO STAGE — Brawl Stars inspired ═══ */}
+      <div style={{
+        background: "linear-gradient(180deg, #1a1145 0%, #2d1b69 40%, #3b2380 70%, #1a1145 100%)",
+        position: "relative", overflow: "hidden",
+        paddingBottom: 0,
+      }}>
+        {/* Subtle background pattern */}
+        <div style={{ position: "absolute", inset: 0, opacity: 0.06, backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+
+        {/* Top bar: day + lock */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 20px 0", position: "relative", zIndex: 2 }}>
-          <div style={{ fontSize: ".78rem", color: "rgba(255,255,255,0.75)", fontWeight: 700 }}>{dayN}{state.vacMode ? " \u{1F3D6}\uFE0F" : ""}</div>
-          <button aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"} onClick={() => pMode ? setPMode(false) : setPinShow(true)} style={{ background: pMode ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.12)", border: "2px solid rgba(255,255,255,0.2)", borderRadius: 50, padding: "6px 12px", cursor: "pointer", color: "white", fontSize: ".75rem", fontWeight: 700, minHeight: 36, minWidth: 36, backdropFilter: "blur(8px)" }}>{pMode ? "\u{1F513}" : "\u{1F512}"}</button>
+          <div style={{ fontSize: ".78rem", color: "rgba(255,255,255,0.5)", fontWeight: 700 }}>{dayN}{state.vacMode ? " \u{1F3D6}\uFE0F" : ""}</div>
+          <button aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"} onClick={() => pMode ? setPMode(false) : setPinShow(true)} style={{ background: pMode ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)", border: "2px solid rgba(255,255,255,0.12)", borderRadius: 50, padding: "6px 12px", cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: ".75rem", fontWeight: 700, minHeight: 36, minWidth: 36 }}>{pMode ? "\u{1F513}" : "\u{1F512}"}</button>
         </div>
 
-        {/* Hero platform */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 8, position: "relative", zIndex: 2 }}>
+        {/* HERO CHARACTER — large and dominant */}
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", paddingTop: 8, paddingBottom: 0, position: "relative", zIndex: 2, minHeight: 220 }}>
+          {/* Glow behind hero */}
+          <div style={{ position: "absolute", bottom: 30, left: "50%", transform: "translateX(-50%)", width: 200, height: 200, borderRadius: "50%", background: `radial-gradient(circle, ${state.hero.color}40 0%, transparent 70%)`, filter: "blur(20px)" }} />
 
-          {/* Hero + Cat on white island */}
-          <div style={{ position: "relative", marginBottom: 6 }}>
-            {/* Progress ring */}
-            <div style={{ position: "relative", width: 180, height: 180, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ position: "absolute", inset: 0 }}><ProgressRing progress={pct} size={180} stroke={7} color={allDone ? "#34D399" : "rgba(255,255,255,0.3)"} /></div>
-              <div style={{ animation: "heroFloat 3s ease-in-out infinite", cursor: "pointer" }} onClick={() => setQuestOpen(true)}>
-                <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={115} level={level} />
-              </div>
+          <div style={{ position: "relative" }}>
+            {/* Hero — BIG */}
+            <div style={{ animation: "heroFloat 3s ease-in-out infinite", cursor: "pointer" }} onClick={() => setQuestOpen(true)}>
+              <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={170} level={level} />
             </div>
-            {/* Cat */}
-            <div style={{ position: "absolute", bottom: 6, right: -16, animation: "catIdle 4s ease-in-out infinite", zIndex: 3 }}>
-              <CatSidekick variant={state.catVariant} mood={mood} size={50} />
+            {/* Ground shadow */}
+            <div style={{ width: 140, height: 12, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)", margin: "-8px auto 0" }} />
+            {/* Cat beside */}
+            <div style={{ position: "absolute", bottom: 0, right: -44, animation: "catIdle 4s ease-in-out infinite" }}>
+              <CatSidekick variant={state.catVariant} mood={mood} size={56} />
             </div>
           </div>
+        </div>
 
-          {/* White island platform */}
+        {/* NAME BANNER */}
+        <div style={{ textAlign: "center", padding: "8px 20px 12px", position: "relative", zIndex: 2 }}>
           <div style={{
-            background: "white",
-            borderRadius: 24,
-            padding: "14px 28px 16px",
-            textAlign: "center",
-            boxShadow: "0 8px 32px rgba(0,60,180,0.12)",
-            width: "85%", maxWidth: 340,
-            marginTop: -10,
-            position: "relative",
+            display: "inline-flex", alignItems: "center", gap: 8,
+            background: "rgba(0,0,0,0.35)", backdropFilter: "blur(8px)",
+            border: "2px solid rgba(255,255,255,0.1)",
+            borderRadius: 14, padding: "8px 20px",
           }}>
-            {/* Name + level badge */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 }}>
-              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "#1E1B4B" }}>{state.hero.name}</div>
-              <div style={{ background: "linear-gradient(135deg, #6D28D9, #A78BFA)", borderRadius: 50, padding: "3px 12px", fontFamily: "'Fredoka',sans-serif", fontSize: ".7rem", fontWeight: 700, color: "white" }}>Lvl {level}</div>
-            </div>
+            <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "white", letterSpacing: ".02em" }}>{state.hero.name}</span>
+            <div style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)", borderRadius: 8, padding: "2px 10px", fontFamily: "'Fredoka',sans-serif", fontSize: ".7rem", fontWeight: 700, color: "white" }}>LVL {level}</div>
+          </div>
+        </div>
 
-            {/* XP progress */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <div style={{ flex: 1, height: 10, background: "rgba(109,40,217,0.1)", borderRadius: 50, overflow: "hidden" }}>
-                <div style={{ height: "100%", borderRadius: 50, width: `${Math.min(100, (xpP.cur / xpP.need) * 100)}%`, background: "linear-gradient(90deg, #6D28D9, #A78BFA)", transition: "width .8s ease" }} />
+        {/* STATS GRID — Brawl Stars style */}
+        <div style={{ padding: "0 16px 16px", position: "relative", zIndex: 2 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+            {/* XP */}
+            <div style={{
+              background: "rgba(255,255,255,0.07)", border: "2px solid rgba(255,255,255,0.08)",
+              borderRadius: 14, padding: "10px 8px", textAlign: "center",
+            }}>
+              <div style={{ fontSize: ".55rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>XP</div>
+              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#A78BFA" }}>{xpP.cur}<span style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.3)" }}>/{xpP.need}</span></div>
+              {/* Mini progress bar */}
+              <div style={{ height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 50, overflow: "hidden", marginTop: 6 }}>
+                <div style={{ height: "100%", borderRadius: 50, width: `${Math.min(100, (xpP.cur / xpP.need) * 100)}%`, background: "linear-gradient(90deg, #7C3AED, #A78BFA)", transition: "width .8s ease" }} />
               </div>
-              <span style={{ fontSize: ".7rem", fontWeight: 800, color: "#475569", whiteSpace: "nowrap" }}>{xpP.cur}/{xpP.need}</span>
             </div>
-
-            {/* Stats row */}
-            <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-              <div style={{ background: "#FEF3C7", borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: "#92400E" }}>{"\u{1F525}"} {state.sd}d Streak</div>
-              <div style={{ background: "#EDE9FE", borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: "#6D28D9" }}>{done}/{total} Quests</div>
-              {state.xpBoost && <div style={{ background: "#FEF3C7", borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: "#92400E", animation: "pulse 1.5s infinite" }}>2x XP</div>}
+            {/* Streak */}
+            <div style={{
+              background: "rgba(255,255,255,0.07)", border: "2px solid rgba(255,255,255,0.08)",
+              borderRadius: 14, padding: "10px 8px", textAlign: "center",
+            }}>
+              <div style={{ fontSize: ".55rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>Streak</div>
+              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#F59E0B" }}>{"\u{1F525}"} {state.sd}<span style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.3)" }}>d</span></div>
             </div>
-
-            {/* Minutes earned */}
-            <div style={{ fontSize: ".7rem", color: "#94A3B8", fontWeight: 600, marginTop: 6 }}>+{state.dt} Min verdient {"\u2022"} {getTimeLabel(done, total)}</div>
+            {/* Quests */}
+            <div style={{
+              background: allDone ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.07)",
+              border: `2px solid ${allDone ? "rgba(52,211,153,0.25)" : "rgba(255,255,255,0.08)"}`,
+              borderRadius: 14, padding: "10px 8px", textAlign: "center",
+            }}>
+              <div style={{ fontSize: ".55rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>Quests</div>
+              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: allDone ? "#34D399" : "#60A5FA" }}>{done}<span style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.3)" }}>/{total}</span></div>
+              {/* Mini progress bar */}
+              <div style={{ height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 50, overflow: "hidden", marginTop: 6 }}>
+                <div style={{ height: "100%", borderRadius: 50, width: `${pct * 100}%`, background: allDone ? "linear-gradient(90deg, #34D399, #6EE7B7)" : "linear-gradient(90deg, #3B82F6, #60A5FA)", transition: "width .6s ease" }} />
+              </div>
+            </div>
+          </div>
+          {/* Second row: minutes + time of day */}
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 8 }}>
+            <div style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{"\u23F0"} +{state.dt} Min verdient</div>
+            <div style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{getTimeLabel(done, total)}</div>
+            {state.xpBoost && <div style={{ fontSize: ".7rem", color: "#FCD34D", fontWeight: 800, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} 2x XP</div>}
           </div>
         </div>
       </div>
@@ -92,6 +120,7 @@ export default function Hub() {
         background: "#EFF3FB",
         borderRadius: "28px 28px 0 0",
         padding: "20px 16px 20px",
+        marginTop: -14,
         position: "relative", zIndex: 3,
         boxShadow: "0 -4px 20px rgba(0,30,100,0.06)",
       }}>
