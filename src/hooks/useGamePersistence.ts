@@ -197,7 +197,7 @@ interface OnboardData {
   eggType?: string;
 }
 
-export function createInitialState({ hero, catVariant, catName, startXP, startCoins }: OnboardData): GameState {
+export function createInitialState({ hero, catVariant, catName, startXP, startCoins, companionType, eggType }: OnboardData): GameState {
   const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
   return {
     hero, catVariant, catName, xp: startXP || 0, coins: startCoins || 0,
@@ -215,10 +215,10 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     boss: (() => { const b = BOSSES[Math.floor(Math.random() * BOSSES.length)]; return { id: b.id, hp: b.hp, maxHp: b.hp }; })(),
     bossTrophies: [],
     // Companion + egg
-    companionType: data.companionType || "cat",
-    eggType: data.eggType || null,
-    eggProgress: data.eggType ? 0 : 100,
-    eggHatched: !data.eggType,
+    companionType: companionType || "cat",
+    eggType: eggType || null,
+    eggProgress: eggType ? 0 : 100,
+    eggHatched: !eggType,
     // New v4 fields
     dailyVitaminD: false, dailyBrother: false,
     belohnungen: DEFAULT_BELOHNUNGEN,

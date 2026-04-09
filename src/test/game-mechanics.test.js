@@ -111,7 +111,7 @@ describe('rare drops', () => {
   });
 
   it('rare drop types are valid', () => {
-    const validTypes = ['coins', 'xp', 'minutes', 'emoji'];
+    const validTypes = ['hp', 'coins', 'xp', 'minutes', 'emoji'];
     RARE_DROPS.forEach(drop => {
       expect(validTypes).toContain(drop.type);
     });
@@ -134,7 +134,7 @@ describe('weekly missions', () => {
 
   it('weekly mission reward types are valid', () => {
     WEEKLY_MISSIONS.forEach(wm => {
-      expect(['coins', 'xp']).toContain(wm.reward.type);
+      expect(['hp', 'coins', 'xp']).toContain(wm.reward.type);
     });
   });
 
@@ -155,7 +155,7 @@ describe('chest rewards', () => {
   });
 
   it('chest reward types are valid', () => {
-    const validTypes = ['coins', 'xp', 'item', 'minutes', 'xpboost'];
+    const validTypes = ['hp', 'coins', 'xp', 'item', 'minutes', 'xpboost'];
     CHEST_REWARDS.forEach(r => {
       expect(validTypes).toContain(r.type);
     });
