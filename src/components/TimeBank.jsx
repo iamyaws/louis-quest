@@ -8,14 +8,14 @@ export default function TimeBank() {
   const { allDone, done, total } = computed;
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px" }}>
-      <ViewHeader onBack={() => ui.setView("hub")} title="Zeitbank" light />
+    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
+      <ViewHeader onBack={() => ui.setView("hub")} title="Zeitbank" />
       <div className="game-card" style={{ padding: 28, textAlign: "center", marginBottom: 20 }}>
         <div style={{ fontSize: ".8rem", color: T.textSecondary, fontWeight: 600, marginBottom: 4 }}>Heute verdient</div>
         <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "3rem", fontWeight: 700, color: T.success }}>{state.dt} <span style={{ fontSize: "1rem", color: T.textSecondary }}>Min</span></div>
         <div style={{ fontSize: ".75rem", color: T.primaryLight, fontWeight: 700, marginTop: 4 }}>{allDone ? "\u{1F389} Alle Quests erledigt!" : `${total - done} Quests übrig`}</div>
       </div>
-      <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".8rem", color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>Belohnungen</div>
+      <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".8rem", color: "#64748B", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>Belohnungen</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {state.rewards.map(r => {
           const can = state.dt >= r.minutes;
