@@ -1,5 +1,7 @@
 // ═══ HERODEX v3 — Constants ═══
 
+import type { Quest, Reward, ShopItem, RareDrop, ChestReward, WheelSegment, WeeklyMission, JournalQuestion, Badge } from './types';
+
 export const T = {
   bg: "#FFF8F0", surface: "#FFF3E6", surfaceHigh: "#FFE8CC",
   card: "#FFFBF5", cardBorder: "1.5px solid rgba(0,0,0,0.05)",
@@ -9,14 +11,14 @@ export const T = {
   teal: "#0EA5E9", tealDark: "#0284C7",
   danger: "#F87171",
   textPrimary: "#1E1B4B", textSecondary: "#64748B", textLight: "#94A3B8", white: "#FFFFFF",
-};
+} as const;
 
-export const HERO_SHAPES = ["cube", "circle", "hex", "pill"];
-export const HERO_COLORS = ["#6D28D9", "#0EA5E9", "#F97316", "#EF4444", "#34D399", "#F59E0B", "#EC4899", "#475569"];
-export const HERO_EYES = ["round", "happy", "cool", "big"];
-export const HERO_HAIRS = ["short", "spiky", "curly", "long", "cap", "none"];
+export const HERO_SHAPES = ["cube", "circle", "hex", "pill"] as const;
+export const HERO_COLORS = ["#6D28D9", "#0EA5E9", "#F97316", "#EF4444", "#34D399", "#F59E0B", "#EC4899", "#475569"] as const;
+export const HERO_EYES = ["round", "happy", "cool", "big"] as const;
+export const HERO_HAIRS = ["short", "spiky", "curly", "long", "cap", "none"] as const;
 
-export const CAT_VARIANTS = {
+export const CAT_VARIANTS: Record<string, { name: string; col: string; ear: string; stripes: boolean; desc: string }> = {
   tiger: { name: "Tiger", col: "#F97316", ear: "#FED7AA", stripes: true, desc: "Mutig wie ein Tiger!" },
   shadow: { name: "Schatten", col: "#475569", ear: "#94A3B8", stripes: false, desc: "Geheimnisvoll & schnell!" },
   snow: { name: "Schnee", col: "#E2E8F0", ear: "#FCA5A5", stripes: false, desc: "Flauschig wie Schnee!" },
@@ -24,7 +26,7 @@ export const CAT_VARIANTS = {
   golden: { name: "Gold", col: "#F59E0B", ear: "#FEF3C7", stripes: false, desc: "Strahlt wie die Sonne!" },
 };
 
-export const SCHOOL_QUESTS = [
+export const SCHOOL_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "s1", name: "Gesicht waschen", icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3 },
   { id: "s2", name: "Bett machen", icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 15, minutes: 4 },
   { id: "s3", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3 },
@@ -43,7 +45,7 @@ export const SCHOOL_QUESTS = [
   { id: "s15", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2 },
 ];
 
-export const VACATION_QUESTS = [
+export const VACATION_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "v1", name: "Gesicht waschen", icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3 },
   { id: "v2", name: "Bett machen", icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 15, minutes: 4 },
   { id: "v3", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3 },
@@ -60,9 +62,9 @@ export const VACATION_QUESTS = [
   { id: "v13", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2 },
 ];
 
-export const FOOTBALL = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "afternoon", xp: 30, minutes: 10 };
+export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "afternoon", xp: 30, minutes: 10 };
 
-export const REWARDS = [
+export const REWARDS: Reward[] = [
   { id: "r1", name: "H\u00F6rspiel h\u00F6ren", icon: "\u{1F3A7}", minutes: 30 },
   { id: "r2", name: "Videospiel spielen", icon: "\u{1F3AE}", minutes: 15 },
   { id: "r3", name: "Serie schauen", icon: "\u{1F4FA}", minutes: 25 },
@@ -70,12 +72,12 @@ export const REWARDS = [
   { id: "r5", name: "S\u00FC\u00DFigkeit", icon: "\u{1F36C}", minutes: 40 },
 ];
 
-export const RAINBOW = ["\u{1F534}", "\u{1F7E0}", "\u{1F7E1}", "\u{1F7E2}", "\u{1F535}", "\u{1F7E3}"];
-export const RAINBOW_LABELS = ["Rot", "Orange", "Gelb", "Gr\u00FCn", "Blau", "Lila"];
-export const RAINBOW_EXAMPLES = ["Tomate, Erdbeere", "Karotte, Orange", "Banane, Paprika", "Brokkoli, Gurke", "Blaubeere", "Traube, Aubergine"];
-export const MOOD_EMOJIS = ["\u{1F622}", "\u{1F615}", "\u{1F610}", "\u{1F642}", "\u{1F60A}", "\u{1F929}"];
+export const RAINBOW = ["\u{1F534}", "\u{1F7E0}", "\u{1F7E1}", "\u{1F7E2}", "\u{1F535}", "\u{1F7E3}"] as const;
+export const RAINBOW_LABELS = ["Rot", "Orange", "Gelb", "Gr\u00FCn", "Blau", "Lila"] as const;
+export const RAINBOW_EXAMPLES = ["Tomate, Erdbeere", "Karotte, Orange", "Banane, Paprika", "Brokkoli, Gurke", "Blaubeere", "Traube, Aubergine"] as const;
+export const MOOD_EMOJIS = ["\u{1F622}", "\u{1F615}", "\u{1F610}", "\u{1F642}", "\u{1F60A}", "\u{1F929}"] as const;
 
-export const SHOP_ITEMS = {
+export const SHOP_ITEMS: Record<string, ShopItem[]> = {
   hero: [
     { id: "h_sunglasses", name: "Sonnenbrille", icon: "\u{1F576}\uFE0F", cost: 120, type: "hero" },
     { id: "h_cape_red", name: "Roter Umhang", icon: "\u{1F9B8}", cost: 200, type: "hero" },
@@ -105,7 +107,7 @@ export const SHOP_ITEMS = {
   ],
 };
 
-export const RARE_DROPS = [
+export const RARE_DROPS: RareDrop[] = [
   { type: "coins", amount: 25, label: "+25 Bonus-M\u00FCnzen!", icon: "\u{1FA99}" },
   { type: "coins", amount: 40, label: "+40 Bonus-M\u00FCnzen!", icon: "\u{1F4B0}" },
   { type: "xp", amount: 20, label: "+20 Bonus-XP!", icon: "\u26A1" },
@@ -116,7 +118,7 @@ export const RARE_DROPS = [
   { type: "emoji", label: "Seltenes Emoji: \u{1F308}", icon: "\u{1F308}", id: "emoji_rainbow" },
 ];
 
-export const CHEST_REWARDS = [
+export const CHEST_REWARDS: ChestReward[] = [
   { type: "coins", amount: 100, label: "100 M\u00FCnzen!", icon: "\u{1F4B0}" },
   { type: "coins", amount: 150, label: "150 M\u00FCnzen!", icon: "\u{1FA99}" },
   { type: "xp", amount: 75, label: "75 Bonus-XP!", icon: "\u26A1" },
@@ -127,7 +129,7 @@ export const CHEST_REWARDS = [
   { type: "xpboost", label: "Doppel-XP morgen!", icon: "\u{1F525}" },
 ];
 
-export const WHEEL_SEGMENTS = [
+export const WHEEL_SEGMENTS: WheelSegment[] = [
   { type: "coins", amount: 30, label: "+30 M\u00FCnzen", icon: "\u{1FA99}", color: "#FCD34D" },
   { type: "xp", amount: 25, label: "+25 XP", icon: "\u26A1", color: "#A78BFA" },
   { type: "minutes", amount: 5, label: "+5 Min", icon: "\u23F0", color: "#34D399" },
@@ -136,11 +138,11 @@ export const WHEEL_SEGMENTS = [
   { type: "rare", label: "Seltener Fund!", icon: "\u{1F381}", color: "#EC4899" },
 ];
 
-export const CHEST_MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100];
+export const CHEST_MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100] as const;
 export const RARE_DROP_CHANCE = 0.12;
 export const MAX_MONTHLY_FREEZES = 2;
 
-export const WEEKLY_MISSIONS = [
+export const WEEKLY_MISSIONS: WeeklyMission[] = [
   { id: "wm1", title: "Sternenj\u00E4ger", story: "Rocket hat einen Stern verloren! Schaffe 5 Tage alle Quests um ihn zu finden.", goal: "allDone5", target: 5, reward: { type: "coins", amount: 200 }, icon: "\u2B50" },
   { id: "wm2", title: "Regenbogen-Woche", story: "Esse diese Woche jeden Tag alle Farben des Regenbogens!", goal: "rainbow5", target: 5, reward: { type: "coins", amount: 150 }, icon: "\u{1F308}" },
   { id: "wm3", title: "B\u00FCcherwurm", story: "Lies diese Woche jeden Tag! Dein Held wird kl\u00FCger!", goal: "read7", target: 7, reward: { type: "xp", amount: 100 }, icon: "\u{1F4D6}" },
@@ -151,15 +153,15 @@ export const WEEKLY_MISSIONS = [
 
 export const GRADUATION_THRESHOLD = 30;
 
-export const ANCHORS = {
+export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {
   morning: { label: "Morgens", icon: "\u{1F305}", col: "#F97316" },
   afternoon: { label: "Nachmittags", icon: "\u2600\uFE0F", col: "#0EA5E9" },
   evening: { label: "Abends", icon: "\u{1F319}", col: "#6D28D9" },
 };
 
-export const LVL = [0, 50, 120, 220, 360, 550, 800, 1100, 1500, 2000, 2600, 3300, 4100, 5000, 6000, 7200];
+export const LVL = [0, 50, 120, 220, 360, 550, 800, 1100, 1500, 2000, 2600, 3300, 4100, 5000, 6000, 7200] as const;
 
-export const BADGES = [
+export const BADGES: Badge[] = [
   { i: "\u{1F31F}", n: "Erster Tag" },
   { i: "\u{1F525}", n: "3-Tage" },
   { i: "\u26A1", n: "7-Tage" },
@@ -182,9 +184,9 @@ export const OB_REWARDS = [
   { xp: 0, coins: 0, text: "", icon: "" },
   { xp: 100, coins: 50, text: "Sidekick! Level 4!", icon: "\u{1F431}" },
   { xp: 0, coins: 80, text: "+80 M\u00FCnzen!", icon: "\u{1FA99}" },
-];
+] as const;
 
-export const JOURNAL_QUESTIONS = [
+export const JOURNAL_QUESTIONS: JournalQuestion[] = [
   {
     id: "best", q: "Was war heute das Beste?", opts: [
       { v: "school", l: "\u{1F3EB} Schule" }, { v: "friends", l: "\u{1F46B} Freunde" }, { v: "sport", l: "\u26BD Sport" },

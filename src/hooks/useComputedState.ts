@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { getLevel, getLvlProg, getMood, getDayName } from '../utils/helpers';
+import type { GameState, ComputedState, Quest } from '../types';
 
 /**
  * Derives computed values from game state.
  * Memoized to avoid recalculation on unrelated renders.
  */
-export default function useComputedState(state) {
+export default function useComputedState(state: GameState | null): ComputedState | null {
   return useMemo(() => {
     if (!state) return null;
 
@@ -18,7 +19,7 @@ export default function useComputedState(state) {
     const mood = getMood(allDone, pct);
     const dayN = getDayName();
 
-    const byA = {};
+    const byA: Record<string, Quest[]> = {};
     state.quests.forEach(q => {
       if (!byA[q.anchor]) byA[q.anchor] = [];
       byA[q.anchor].push(q);
