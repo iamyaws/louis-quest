@@ -535,6 +535,23 @@ export default function Hub() {
           </button>
         </div>
 
+        {/* Familienregeln button */}
+        <button
+          className="btn-tap"
+          onClick={() => ui.setView("regeln")}
+          style={{
+            width: "100%", background: "linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.04))",
+            border: "2.5px solid rgba(245,158,11,0.15)",
+            borderRadius: 18, padding: "14px 12px", cursor: "pointer",
+            fontFamily: "'Fredoka',sans-serif", fontWeight: 700, fontSize: ".95rem",
+            color: "#B45309", display: "flex", alignItems: "center",
+            justifyContent: "center", gap: 8, minHeight: 52,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.04)", marginBottom: 12,
+          }}
+        >
+          {"\uD83D\uDCDC"} Familienregeln
+        </button>
+
       </div>
     </div>
   );

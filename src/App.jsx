@@ -20,6 +20,7 @@ import PinModal from './components/PinModal';
 import MemoryGame from './components/MemoryGame';
 import Weather from './components/Weather';
 import CatCare from './components/CatCare';
+import Familienregeln from './components/Familienregeln';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const TABS = [
@@ -92,6 +93,7 @@ function AppContent() {
         {ui.view === "journal" && <Journal />}
         {ui.view === "weather" && <Weather />}
         {ui.view === "cat" && <CatCare />}
+        {ui.view === "regeln" && <Familienregeln />}
         {ui.questOpen && <QuestBoard />}
       </div>
 
