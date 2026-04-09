@@ -8,14 +8,14 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", flexDirection: "column" }}>
       <div style={{ flex: "0 0 60px", background: "rgba(0,0,0,0.3)", backdropFilter: "blur(4px)", cursor: "pointer" }} onClick={() => setQuestOpen(false)} />
-      <div style={{ flex: "1 1 auto", background: "white", borderRadius: "28px 28px 0 0", padding: "0 20px 100px", overflow: "auto", animation: "slideUp .3s ease", boxShadow: "0 -8px 40px rgba(0,0,0,0.1)", position: "relative" }}>
-        <div style={{ position: "sticky", top: 0, background: "white", paddingTop: 12, paddingBottom: 8, zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", borderRadius: "28px 28px 0 0" }}>
+      <div style={{ flex: "1 1 auto", background: T.card, borderRadius: "28px 28px 0 0", padding: "0 20px 100px", overflow: "auto", animation: "slideUp .3s ease", boxShadow: "0 -8px 40px rgba(0,0,0,0.12)", position: "relative" }}>
+        <div style={{ position: "sticky", top: 0, background: T.card, paddingTop: 12, paddingBottom: 8, zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", borderRadius: "28px 28px 0 0" }}>
           <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(0,0,0,0.1)", margin: "0 auto" }} />
           <button onClick={() => setQuestOpen(false)} style={{ position: "absolute", right: 0, top: 8, background: T.bg, border: "2px solid rgba(0,0,0,0.06)", borderRadius: 50, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "1.1rem", fontWeight: 800, color: T.textSecondary }}>{"\u2715"}</button>
         </div>
 
         {/* Progress */}
-        <div style={{ background: allDone ? `${T.success}15` : T.bg, borderRadius: 16, padding: 14, marginBottom: 16, border: allDone ? `2px solid ${T.success}40` : "2px solid rgba(0,0,0,0.04)" }}>
+        <div className="game-card" style={{ padding: 14, marginBottom: 16, background: allDone ? `${T.success}15` : undefined, borderColor: allDone ? `${T.success}40` : undefined }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
             <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: allDone ? T.successDark : T.textPrimary, textTransform: "uppercase" }}>{allDone ? "\u{1F389} Alles geschafft!" : `${done}/${total} Quests`}</span>
             <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{state.dt} Min</span>
@@ -24,7 +24,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
         </div>
 
         {/* Rainbow */}
-        <div style={{ background: "white", borderRadius: 16, padding: 14, marginBottom: 16, border: "2px solid rgba(0,0,0,0.04)" }}>
+        <div className="game-card" style={{ padding: 14, marginBottom: 16 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".76rem", fontWeight: 800, color: T.textPrimary, textTransform: "uppercase" }}>{"\u{1F308}"} Eat the Rainbow</span>
             {(state.rainbow || []).every(Boolean) && <span style={{ fontSize: ".7rem", fontWeight: 800, color: T.success }}>+25 XP! {"\u{1F389}"}</span>}
@@ -52,22 +52,25 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
           const secDone = qs.every(q => q.done);
           return (
             <div key={a} style={{ marginBottom: 20 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                <span style={{ fontSize: "1.2rem" }}>{m.icon}</span>
-                <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".76rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: m.col }}>{m.label}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <span className="section-label" style={{ background: `${m.col}12`, color: m.col }}>
+                  <span style={{ fontSize: "1rem" }}>{m.icon}</span> {m.label}
+                </span>
                 {secDone && <span style={{ fontSize: ".7rem", color: T.success, fontWeight: 800 }}>{"\u2713"} Fertig</span>}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {qs.map(q => {
                   const grad = (state.graduated || []).includes(q.id);
                   return (
-                    <button key={q.id} onClick={() => !q.done && !pMode && complete(q.id)} disabled={q.done} style={{
+                    <button key={q.id} className={q.done ? "" : "btn-tap"} onClick={() => !q.done && !pMode && complete(q.id)} disabled={q.done} style={{
                       display: "flex", alignItems: "center", gap: 12,
-                      background: grad ? `${T.accent}08` : q.done ? `${T.success}08` : "white",
-                      border: grad ? `2px solid ${T.accent}30` : q.done ? `2px solid ${T.success}20` : q.id === "ft" ? `2px solid ${T.success}30` : "2px solid rgba(0,0,0,0.06)",
+                      background: grad ? `${T.accent}08` : q.done ? `${T.success}08` : T.card,
+                      border: "none",
                       borderRadius: 16, padding: "14px 16px", cursor: q.done ? "default" : "pointer",
                       width: "100%", textAlign: "left", transition: "all .15s",
                       opacity: q.done ? .55 : 1, fontFamily: "'Nunito',sans-serif", minHeight: 56,
+                      boxShadow: q.done ? "none" : "0 2px 8px rgba(0,0,0,0.04)",
+                      borderLeft: `4px solid ${grad ? T.accentDark : q.done ? T.success : m.col}`,
                     }}>
                       <div style={{ width: 48, height: 48, borderRadius: 14, background: grad ? `${T.accent}20` : q.done ? `${T.success}20` : `${m.col}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem", flexShrink: 0 }}>{grad ? "\u{1F393}" : q.done ? "\u2705" : q.icon}</div>
                       <div style={{ flex: 1 }}>

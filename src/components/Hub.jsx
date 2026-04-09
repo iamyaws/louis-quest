@@ -37,6 +37,8 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
             <div style={{ animation: "heroFloat 3s ease-in-out infinite", cursor: "pointer", position: "relative", zIndex: 2 }} onClick={() => setQuestOpen(true)}>
               <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={140} level={level} />
             </div>
+            {/* Ground shadow / platform */}
+            <div style={{ position: "absolute", bottom: -18, left: "50%", transform: "translateX(-50%)", width: 120, height: 16, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(0,0,0,0.25) 0%, transparent 70%)", zIndex: 1 }} />
             <div style={{ position: "absolute", bottom: -10, right: -40, animation: "catIdle 4s ease-in-out infinite", zIndex: 3 }}>
               <CatSidekick variant={state.catVariant} mood={mood} size={60} />
             </div>
@@ -53,7 +55,7 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
 
       {/* Mood Check */}
       {state.moodAM === null && <div style={{ padding: "12px 20px 0" }}>
-        <div style={{ background: "white", borderRadius: 20, padding: 16, boxShadow: "0 4px 16px rgba(0,0,0,0.05)", border: "2px solid rgba(0,0,0,0.04)" }}>
+        <div className="game-card" style={{ padding: 16 }}>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>Wie fühlst du dich heute? {"\u{1F305}"}</div>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => { setMood("moodAM", i); setCeleb(true); }} style={{ fontSize: "2rem", background: "none", border: "none", cursor: "pointer", padding: "8px", borderRadius: 12, transition: "all .15s", minHeight: 48, minWidth: 48 }}>{e}</button>)}</div>
         </div>
@@ -67,7 +69,7 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
         const wmDone = wp >= wm.target;
         return (
           <div style={{ padding: "8px 20px 0" }}>
-            <div style={{ background: wmDone ? "linear-gradient(135deg, rgba(52,211,153,0.1), rgba(52,211,153,0.05))" : "white", borderRadius: 20, padding: 14, boxShadow: "0 4px 16px rgba(0,0,0,0.05)", border: wmDone ? `2px solid ${T.success}30` : "2px solid rgba(0,0,0,0.04)" }}>
+            <div className="game-card" style={{ padding: 14, background: wmDone ? "linear-gradient(135deg, rgba(52,211,153,0.1), rgba(52,211,153,0.05))" : undefined, borderColor: wmDone ? `${T.success}30` : undefined }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                 <span style={{ fontSize: "1.5rem" }}>{wm.icon}</span>
                 <div style={{ flex: 1 }}>
@@ -86,7 +88,7 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
 
       {/* Quest button */}
       <div style={{ textAlign: "center", padding: "16px 0 8px" }}>
-        <button onClick={() => { SFX.play("tap"); setQuestOpen(true); }} style={{
+        <button className="btn-tap" onClick={() => { SFX.play("tap"); setQuestOpen(true); }} style={{
           background: `linear-gradient(135deg,${T.primary},${T.primaryLight})`,
           border: "none", borderRadius: 50, padding: "16px 40px",
           color: "white", fontWeight: 800, fontSize: "1rem", cursor: "pointer",
@@ -97,12 +99,9 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
 
       {/* Nav */}
       <div style={{ display: "flex", gap: 8, padding: "8px 20px 20px", justifyContent: "center", flexWrap: "wrap" }}>
-        {[{ id: "room", l: "Zimmer", i: "\u{1F3E0}" }, { id: "time", l: "Zeit", i: "\u23F0" }, { id: "shop", l: "Shop", i: "\u{1F6CD}\uFE0F" }, { id: "journal", l: "Buch", i: "\u{1F4D3}" }, { id: "stats", l: "Erfolge", i: "\u{1F3C6}" }].map(t => (
-          <button key={t.id} onClick={() => { SFX.play("tap"); setView(t.id); }} style={{
-            background: "white", border: "2px solid rgba(0,0,0,0.06)", borderRadius: 50,
-            padding: "9px 16px", fontWeight: 800, fontSize: ".72rem", cursor: "pointer",
-            fontFamily: "'Plus Jakarta Sans',sans-serif", color: T.textSecondary,
-            textTransform: "uppercase", letterSpacing: ".03em", minHeight: 44,
+        {[{ id: "room", l: "Zimmer", i: "\u{1F3E0}", bg: "#EDE9FE", col: "#6D28D9" }, { id: "time", l: "Zeit", i: "\u23F0", bg: "#D1FAE5", col: "#059669" }, { id: "shop", l: "Shop", i: "\u{1F6CD}\uFE0F", bg: "#FEF3C7", col: "#B45309" }, { id: "journal", l: "Buch", i: "\u{1F4D3}", bg: "#DBEAFE", col: "#1D4ED8" }, { id: "stats", l: "Erfolge", i: "\u{1F3C6}", bg: "#FCE7F3", col: "#BE185D" }].map(t => (
+          <button key={t.id} className="nav-pill" onClick={() => { SFX.play("tap"); setView(t.id); }} style={{
+            background: t.bg, color: t.col,
           }}>{t.i} {t.l}</button>
         ))}
       </div>

@@ -60,7 +60,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
     }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 20px 8px" }}>
-        <button onClick={() => { SFX.play("tap"); setView("hub"); }} style={{
+        <button className="btn-tap" onClick={() => { SFX.play("tap"); setView("hub"); }} style={{
           background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 50,
           padding: "10px 20px", cursor: "pointer", fontWeight: 800, fontSize: ".85rem",
           backdropFilter: "blur(8px)", minHeight: 48, color: "white",
@@ -233,7 +233,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
         <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.7)", fontWeight: 700 }}>
           {roomItems} / {SHOP_ITEMS.room.length} Zimmer-Items
         </div>
-        <button onClick={() => { SFX.play("tap"); setView("shop"); setShopTab("room"); }} style={{
+        <button className="btn-tap" onClick={() => { SFX.play("tap"); setView("shop"); setShopTab("room"); }} style={{
           marginTop: 8, background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)",
           borderRadius: 50, padding: "12px 28px", fontWeight: 800, fontSize: ".85rem",
           cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif",

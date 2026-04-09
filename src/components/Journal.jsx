@@ -15,11 +15,11 @@ export default function Journal({ state, done, total, setView, setMood, setJourn
 
       {/* Mood summary */}
       <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-        <div style={{ flex: 1, background: "white", borderRadius: 16, padding: 14, border: "2px solid rgba(0,0,0,0.04)", textAlign: "center" }}>
+        <div style={{ flex: 1, background: T.card, borderRadius: 16, padding: 14, border: T.cardBorder, textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
           <div style={{ fontSize: ".7rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 6 }}>{"\u{1F305}"} Morgens</div>
           <div style={{ fontSize: "2.2rem" }}>{state.moodAM !== null ? MOOD_EMOJIS[state.moodAM] : "\u2014"}</div>
         </div>
-        <div style={{ flex: 1, background: "white", borderRadius: 16, padding: 14, border: "2px solid rgba(0,0,0,0.04)", textAlign: "center" }}>
+        <div style={{ flex: 1, background: T.card, borderRadius: 16, padding: 14, border: T.cardBorder, textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
           <div style={{ fontSize: ".7rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 6 }}>{"\u{1F319}"} Abends</div>
           <div style={{ fontSize: "2.2rem" }}>{state.moodPM !== null ? MOOD_EMOJIS[state.moodPM] : "\u2014"}</div>
           {state.moodPM === null && <div style={{ display: "flex", justifyContent: "center", gap: 2, marginTop: 6 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => setMood("moodPM", i)} style={{ fontSize: "1.3rem", background: "none", border: "none", cursor: "pointer", padding: "3px", minHeight: 36, minWidth: 36 }}>{e}</button>)}</div>}
@@ -27,7 +27,7 @@ export default function Journal({ state, done, total, setView, setMood, setJourn
       </div>
 
       {/* Rainbow */}
-      <div style={{ background: "white", borderRadius: 16, padding: 14, marginBottom: 20, border: "2px solid rgba(0,0,0,0.04)" }}>
+      <div className="game-card" style={{ padding: 14, marginBottom: 20 }}>
         <div style={{ fontSize: ".75rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F308}"} Regenbogen heute</div>
         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>{RAINBOW.map((e, i) => {
           const d = (state.rainbow || [])[i];
@@ -43,7 +43,7 @@ export default function Journal({ state, done, total, setView, setMood, setJourn
       {JOURNAL_QUESTIONS.map(q => {
         const ans = (state.jAnswers || {})[q.id];
         return (
-          <div key={q.id} style={{ background: "white", borderRadius: 18, padding: 14, marginBottom: 12, border: "2px solid rgba(0,0,0,0.04)", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+          <div key={q.id} style={{ background: T.card, borderRadius: 18, padding: 14, marginBottom: 12, border: T.cardBorder, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
             <div style={{ fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>{q.q}</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {q.opts.map(o => (
@@ -62,7 +62,7 @@ export default function Journal({ state, done, total, setView, setMood, setJourn
       })}
 
       {/* Free text */}
-      <div style={{ background: "white", borderRadius: 18, padding: 14, border: "2px solid rgba(0,0,0,0.04)", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+      <div className="game-card" style={{ padding: 14 }}>
         <div style={{ fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>{"\u270F\uFE0F"} Noch etwas? (Optional)</div>
         <textarea
           ref={journalRef}

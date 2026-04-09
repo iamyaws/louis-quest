@@ -77,12 +77,16 @@ export default function VictoryScreen({ state, level, done, total, onClose, onSp
         opacity: phase >= 1 ? undefined : 0,
         textAlign: "center", marginBottom: 20,
       }}>
-        <div style={{
-          fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "1.8rem", fontWeight: 900,
-          color: T.accent, textTransform: "uppercase", fontStyle: "italic",
-          textShadow: "0 4px 16px rgba(252,211,77,0.4)", letterSpacing: "-0.02em",
-        }}>
-          {"\u{1F389}"} Alle Quests geschafft!
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          <span style={{ fontSize: "2rem" }}>{"\u{1F33F}"}</span>
+          <div style={{
+            fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "1.8rem", fontWeight: 900,
+            color: T.accent, textTransform: "uppercase", fontStyle: "italic",
+            textShadow: "0 4px 16px rgba(252,211,77,0.4)", letterSpacing: "-0.02em",
+          }}>
+            Alle Quests geschafft!
+          </div>
+          <span style={{ fontSize: "2rem", transform: "scaleX(-1)", display: "inline-block" }}>{"\u{1F33F}"}</span>
         </div>
         <div style={{ fontSize: ".9rem", color: "rgba(255,255,255,0.7)", fontWeight: 600, marginTop: 4 }}>
           {state.hero.name} & {state.catName} sind Helden des Tages!
@@ -122,7 +126,7 @@ export default function VictoryScreen({ state, level, done, total, onClose, onSp
       {phase >= 2 && (
         <div style={{ animation: "victorySlideUp 0.5s ease 0.2s forwards", display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 280 }}>
           {!state.wheelSpun && (
-            <button onClick={onSpinWheel} style={{
+            <button className="btn-tap" onClick={onSpinWheel} style={{
               background: `linear-gradient(135deg, ${T.accent}, ${T.accentDark})`,
               border: "none", borderRadius: 50, padding: "16px 36px",
               color: "white", fontWeight: 800, fontSize: "1.05rem", cursor: "pointer",
@@ -133,7 +137,7 @@ export default function VictoryScreen({ state, level, done, total, onClose, onSp
               {"\u{1F3A1}"} Glücksrad drehen!
             </button>
           )}
-          <button onClick={onClose} style={{
+          <button className="btn-tap" onClick={onClose} style={{
             background: state.wheelSpun ? `linear-gradient(135deg, ${T.primary}, ${T.primaryLight})` : "rgba(255,255,255,0.15)",
             border: "none", borderRadius: 50, padding: "14px 36px",
             color: "white", fontWeight: 800, fontSize: state.wheelSpun ? "1.05rem" : ".9rem",

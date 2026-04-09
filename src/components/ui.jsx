@@ -21,7 +21,7 @@ export const OBSub = ({ children }) => (
 );
 
 export const OBBtn = ({ children, onClick, disabled, big }) => (
-  <button onClick={onClick} disabled={disabled} style={{
+  <button className="btn-tap" onClick={onClick} disabled={disabled} style={{
     background: disabled ? "rgba(0,0,0,0.06)" : `linear-gradient(135deg,${T.primary},${T.primaryLight})`,
     border: "none", borderRadius: 50,
     padding: big ? "18px 52px" : "14px 36px",
@@ -45,13 +45,13 @@ export const OBGrid = ({ children, cols }) => (
 );
 
 export const OBChip = ({ selected, onClick, children }) => (
-  <button onClick={onClick} style={{
-    background: selected ? "rgba(109,40,217,0.1)" : "white",
-    border: selected ? `2.5px solid ${T.primary}` : "2px solid rgba(0,0,0,0.08)",
+  <button className="btn-tap" onClick={onClick} style={{
+    background: selected ? "rgba(109,40,217,0.1)" : T.card,
+    border: selected ? `2.5px solid ${T.primary}` : T.cardBorder,
     borderRadius: 16, padding: "14px", cursor: "pointer", transition: "all .15s",
     fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: ".9rem",
     color: T.textPrimary, textAlign: "center",
-    boxShadow: selected ? `0 4px 16px ${T.primary}20` : "0 2px 8px rgba(0,0,0,0.04)",
+    boxShadow: selected ? `0 4px 16px ${T.primary}20` : "0 2px 12px rgba(0,0,0,0.04)",
     minHeight: 48,
   }}>
     {children}
@@ -74,12 +74,13 @@ export function ProgressRing({ progress, size, stroke, color }) {
 // ── Back button (consistent, larger touch target) ──
 export function BackButton({ onClick, light }) {
   return (
-    <button onClick={onClick} style={{
-      background: light ? "rgba(255,255,255,0.8)" : "white",
-      border: light ? "none" : "2px solid rgba(0,0,0,0.06)",
+    <button className="btn-tap" onClick={onClick} style={{
+      background: light ? "rgba(255,255,255,0.8)" : T.card,
+      border: light ? "none" : T.cardBorder,
       borderRadius: 50, padding: "10px 20px", cursor: "pointer",
       fontWeight: 800, fontSize: ".85rem", minHeight: 48, minWidth: 48,
       backdropFilter: light ? "blur(8px)" : "none",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
     }}>
       ← Zurück
     </button>

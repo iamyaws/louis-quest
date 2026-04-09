@@ -16,7 +16,7 @@ export default function TimeBank({ state, allDone, done, total, setView }) {
         {state.rewards.map(r => {
           const can = state.dt >= r.minutes;
           return (
-            <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 14, background: "white", border: can ? `2px solid ${T.success}30` : "2px solid rgba(0,0,0,0.04)", borderRadius: 18, padding: "16px 18px", opacity: can ? 1 : .45, boxShadow: can ? `0 4px 16px ${T.success}15` : "0 2px 8px rgba(0,0,0,0.03)" }}>
+            <div key={r.id} className="game-card" style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", opacity: can ? 1 : .45, borderColor: can ? `${T.success}30` : undefined, boxShadow: can ? `0 4px 16px ${T.success}15` : undefined }}>
               <div style={{ width: 52, height: 52, borderRadius: 14, background: can ? `${T.success}15` : T.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem" }}>{r.icon}</div>
               <div style={{ flex: 1 }}><div style={{ fontWeight: 700, fontSize: ".95rem" }}>{r.name}</div><div style={{ fontSize: ".7rem", color: T.textSecondary, fontWeight: 600 }}>{r.minutes} Minuten</div></div>
               <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: can ? T.success : T.textLight }}>{can ? "\u2713 Frei" : "\u{1F512}"}</div>

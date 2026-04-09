@@ -2,6 +2,7 @@
 
 export const T = {
   bg: "#FFF8F0", surface: "#FFF3E6", surfaceHigh: "#FFE8CC",
+  card: "#FFFBF5", cardBorder: "1.5px solid rgba(0,0,0,0.05)",
   primary: "#6D28D9", primaryLight: "#A78BFA", primaryPale: "#EDE9FE",
   accent: "#FCD34D", accentDark: "#F59E0B",
   success: "#34D399", successDark: "#059669",
