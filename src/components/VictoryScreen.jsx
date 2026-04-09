@@ -4,7 +4,7 @@ import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
 
-export default function VictoryScreen({ state, level, done, total, onClose, onSpinWheel }) {
+export default function VictoryScreen({ state, level, done, total, onClose, onSpinWheel, onMemoryGame }) {
   const [phase, setPhase] = useState(0); // 0=burst, 1=summary, 2=ready
   const [fireworks, setFireworks] = useState([]);
 
@@ -135,6 +135,18 @@ export default function VictoryScreen({ state, level, done, total, onClose, onSp
               textTransform: "uppercase", minHeight: 52,
             }}>
               {"\u{1F3A1}"} Glücksrad drehen!
+            </button>
+          )}
+          {!state.memoryPlayed && (
+            <button className="btn-tap" onClick={onMemoryGame} style={{
+              background: `linear-gradient(135deg, #8B5CF6, #A78BFA)`,
+              border: "none", borderRadius: 50, padding: "14px 36px",
+              color: "white", fontWeight: 800, fontSize: ".95rem", cursor: "pointer",
+              fontFamily: "'Plus Jakarta Sans',sans-serif",
+              boxShadow: "0 8px 24px rgba(139,92,246,0.3)",
+              minHeight: 48,
+            }}>
+              {"\u{1F9E0}"} Memo-Spiel spielen!
             </button>
           )}
           <button className="btn-tap" onClick={onClose} style={{

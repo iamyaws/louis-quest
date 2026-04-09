@@ -39,6 +39,14 @@ const SFX = {
           g.gain.setValueAtTime(0.15, now + i * 0.08); g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.08 + 0.15);
           o.start(now + i * 0.08); o.stop(now + i * 0.08 + 0.15);
         });
+      } else if (type === "match") {
+        [880, 1175].forEach((f, i) => {
+          const o = ctx.createOscillator(); const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = "sine"; o.frequency.setValueAtTime(f, now + i * 0.1);
+          g.gain.setValueAtTime(0.25, now + i * 0.1); g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.15);
+          o.start(now + i * 0.1); o.stop(now + i * 0.1 + 0.15);
+        });
       } else if (type === "tap") {
         const o = ctx.createOscillator(); const g = ctx.createGain();
         o.connect(g); g.connect(ctx.destination);

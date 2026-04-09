@@ -2,8 +2,9 @@ import React, { useRef } from 'react';
 import { T, ANCHORS, RAINBOW, RAINBOW_LABELS, MOOD_EMOJIS, SCHOOL_QUESTS, VACATION_QUESTS } from '../constants';
 import SFX from '../utils/sfx';
 
-export default function QuestBoard({ state, allDone, done, total, pct, byA, pMode, complete, completeComeback, rmQuest, toggleRainbow, setMood, setQuestOpen, togVac, resetDay, resetAll, addQuest, nq, setNq, level }) {
+export default function QuestBoard({ state, allDone, done, total, pct, byA, pMode, complete, completeComeback, rmQuest, toggleRainbow, setMood, setQuestOpen, togVac, resetDay, resetAll, addQuest, nq, setNq, level, exportState, importState }) {
   const nqRef = useRef(null);
+  const fileRef = useRef(null);
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", flexDirection: "column" }}>
@@ -141,6 +142,11 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
             {state.moodAM !== null && <div style={{ marginTop: 6, fontSize: ".65rem", color: T.textSecondary }}>Stimmung heute: {MOOD_EMOJIS[state.moodAM]} morgens{state.moodPM !== null ? `, ${MOOD_EMOJIS[state.moodPM]} abends` : ""}</div>}
           </div>
           <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+            <button onClick={exportState} style={{ flex: 1, background: `${T.success}15`, border: `1.5px solid ${T.success}`, borderRadius: 10, padding: "10px", color: T.successDark, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F4BE}"} Export</button>
+            <button onClick={() => fileRef.current?.click()} style={{ flex: 1, background: `${T.primary}15`, border: `1.5px solid ${T.primary}`, borderRadius: 10, padding: "10px", color: T.primary, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F4C2}"} Import</button>
+            <input ref={fileRef} type="file" accept=".json" onChange={importState} style={{ display: "none" }} />
+          </div>
+          <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
             <button onClick={resetDay} style={{ flex: 1, background: `${T.accent}20`, border: `1.5px solid ${T.accent}`, borderRadius: 10, padding: "10px", color: T.accentDark, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F504}"} Tag</button>
             <button onClick={resetAll} style={{ flex: 1, background: `${T.danger}15`, border: `1.5px solid ${T.danger}`, borderRadius: 10, padding: "10px", color: T.danger, cursor: "pointer", fontSize: ".75rem", fontWeight: 800, minHeight: 44 }}>{"\u{1F5D1}\uFE0F"} Alles</button>
           </div>

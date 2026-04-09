@@ -22,6 +22,7 @@ import { RareDropToast } from './components/Celebration';
 import SpinWheel from './components/SpinWheel';
 import SurpriseChest from './components/SurpriseChest';
 import PinModal from './components/PinModal';
+import MemoryGame from './components/MemoryGame';
 
 export default function App() {
   const [state, setState] = useState(null);
@@ -38,10 +39,11 @@ export default function App() {
   const [showChest, setShowChest] = useState(false);
   const [rareDrop, setRareDrop] = useState(null);
   const [showVictory, setShowVictory] = useState(false);
+  const [showMemory, setShowMemory] = useState(false);
 
   // ── Load state ──
   useEffect(() => {
-    const p = storage.load();
+    storage.load().then(p => {
     if (p) {
       const today = new Date().toDateString();
       if (p.lastDate !== today) {
@@ -81,7 +83,7 @@ export default function App() {
         p.lastDate = today; p.dt = 0; p.moodAM = null; p.moodPM = null;
         p.journal = ""; p.jAnswers = {};
         p.rainbow = [false, false, false, false, false, false];
-        p.wheelSpun = false; p.chestMilestone = null;
+        p.wheelSpun = false; p.memoryPlayed = false; p.chestMilestone = null;
         const weekStart = p.weekStart ? new Date(p.weekStart) : new Date();
         const daysSinceStart = Math.floor((new Date() - weekStart) / (1000 * 60 * 60 * 24));
         if (daysSinceStart >= 7 || !p.weeklyMission) {
@@ -100,6 +102,7 @@ export default function App() {
       if (p.journal === undefined) p.journal = "";
       if (!p.jAnswers) p.jAnswers = {};
       if (p.wheelSpun === undefined) p.wheelSpun = false;
+      if (p.memoryPlayed === undefined) p.memoryPlayed = false;
       if (p.xpBoost === undefined) p.xpBoost = false;
       if (p.streakFreezes === undefined) p.streakFreezes = MAX_MONTHLY_FREEZES;
       if (p.freezesUsedThisMonth === undefined) p.freezesUsedThisMonth = 0;
@@ -116,6 +119,7 @@ export default function App() {
     } else {
       setBoarding(true);
     }
+    });
   }, []);
 
   // ── Persist ──
@@ -130,7 +134,7 @@ export default function App() {
       lastDate: new Date().toDateString(), dt: 0, hist: [], vacMode: false,
       sm: {}, roomItems: [], purchased: [], moodAM: null, moodPM: null,
       journal: "", jAnswers: {}, rainbow: [false, false, false, false, false, false],
-      wheelSpun: false, chestMilestone: null, xpBoost: false,
+      wheelSpun: false, memoryPlayed: false, chestMilestone: null, xpBoost: false,
       weeklyMission: wm.id, weeklyProgress: 0, weekStart: new Date().toDateString(),
       graduated: [], streakFreezes: MAX_MONTHLY_FREEZES, freezesUsedThisMonth: 0,
       lastFreezeMonth: `${new Date().getFullYear()}-${new Date().getMonth()}`,
@@ -254,6 +258,28 @@ export default function App() {
     });
     setShowWheel(false);
   };
+  const collectMemory = (reward) => {
+    setState(p => ({ ...p, xp: p.xp + reward.xp, coins: p.coins + reward.coins, memoryPlayed: true }));
+    setShowMemory(false);
+  };
+  const exportState = () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = `herodex-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click(); URL.revokeObjectURL(url);
+  };
+  const importState = (e) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data && data.hero && data.quests) { setState(data); }
+      } catch {}
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
   const collectChest = (reward) => {
     setState(p => {
       let u = { ...p, chestMilestone: null };
@@ -292,7 +318,8 @@ export default function App() {
       {showWheel && <SpinWheel onResult={collectWheel} />}
       {showChest && <SurpriseChest onOpen={collectChest} streakDays={state.sd} />}
       {pinShow && <PinModal pin={pin} setPin={setPin} onSuccess={() => { setPMode(true); setPinShow(false); }} onClose={() => { setPinShow(false); setPin(""); }} />}
-      {showVictory && <VictoryScreen state={state} level={level} done={done} total={total} onClose={() => setShowVictory(false)} onSpinWheel={() => { setShowVictory(false); setShowWheel(true); }} />}
+      {showVictory && <VictoryScreen state={state} level={level} done={done} total={total} onClose={() => setShowVictory(false)} onSpinWheel={() => { setShowVictory(false); setShowWheel(true); }} onMemoryGame={() => { setShowVictory(false); setShowMemory(true); }} />}
+      {showMemory && <MemoryGame onComplete={collectMemory} />}
 
       <div style={{ minHeight: "100vh", background: T.bg, fontFamily: "'Nunito',sans-serif", color: T.textPrimary }}>
         {view === "hub" && <Hub state={state} level={level} xpP={xpP} done={done} total={total} allDone={allDone} pct={pct} mood={mood} dayN={dayN} setQuestOpen={setQuestOpen} setView={setView} setMood={setMood} setCeleb={setCeleb} pMode={pMode} setPMode={setPMode} setPinShow={setPinShow} />}
@@ -301,7 +328,7 @@ export default function App() {
         {view === "room" && <Room state={state} level={level} mood={mood} setView={setView} setShopTab={setShopTab} />}
         {view === "shop" && <Shop state={state} shopTab={shopTab} setShopTab={setShopTab} buyItem={buyItem} setView={setView} />}
         {view === "journal" && <Journal state={state} done={done} total={total} setView={setView} setMood={setMood} setJournal={setJournal} setJAnswer={setJAnswer} />}
-        {questOpen && <QuestBoard state={state} allDone={allDone} done={done} total={total} pct={pct} byA={byA} pMode={pMode} complete={complete} completeComeback={completeComeback} rmQuest={rmQuest} toggleRainbow={toggleRainbow} setMood={setMood} setQuestOpen={setQuestOpen} togVac={togVac} resetDay={resetDay} resetAll={resetAll} addQuest={addQuest} nq={nq} setNq={setNq} level={level} />}
+        {questOpen && <QuestBoard state={state} allDone={allDone} done={done} total={total} pct={pct} byA={byA} pMode={pMode} complete={complete} completeComeback={completeComeback} rmQuest={rmQuest} toggleRainbow={toggleRainbow} setMood={setMood} setQuestOpen={setQuestOpen} togVac={togVac} resetDay={resetDay} resetAll={resetAll} addQuest={addQuest} nq={nq} setNq={setNq} level={level} exportState={exportState} importState={importState} />}
       </div>
     </>
   );
