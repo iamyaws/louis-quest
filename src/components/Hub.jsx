@@ -44,12 +44,13 @@ export default function Hub() {
   return (
     <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#FFF8F0" }}>
 
-      {/* --- 1. Top Bar (lock only) --- */}
+      {/* --- 1. Top Bar (logo + lock) --- */}
       <div style={{
         padding: "env(safe-area-inset-top, 12px) 16px 0",
-        display: "flex", justifyContent: "flex-end",
+        display: "flex", justifyContent: "space-between", alignItems: "center",
         marginBottom: 10,
       }}>
+        <img src={import.meta.env.BASE_URL + "ronki-egg.png"} alt="Ronki" style={{ height: 36, width: "auto" }} />
         <button
           aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"}
           onClick={() => pMode ? setPMode(false) : setPinShow(true)}

@@ -112,10 +112,7 @@ export default function Onboarding({ onComplete }) {
   if (step === 0) return (
     <OBWrap>
       <RewardToast />
-      <div style={{ fontSize: "4rem", marginBottom: 16, animation: "heroFloat 3s ease-in-out infinite" }}>
-        {"🦸"}
-      </div>
-      <OBTitle>Willkommen bei Ronki!</OBTitle>
+      <img src={import.meta.env.BASE_URL + "ronki-wordmark.png"} alt="Ronki" style={{ width: "min(280px, 70vw)", marginBottom: 24, animation: "heroFloat 3s ease-in-out infinite" }} />
       <OBSub>Erstelle deinen Helden und finde dein Begleiter-Ei!</OBSub>
       <OBBtn onClick={() => setStep(1)} big>Los geht's! 🚀</OBBtn>
     </OBWrap>
@@ -353,7 +350,7 @@ export default function Onboarding({ onComplete }) {
           disabled={!companionName.trim()}
           big
         >
-          Abenteuer starten! 🧑‍🦸🥚
+          Abenteuer starten! 🐉
         </OBBtn>
       </div>
     </OBWrap>
