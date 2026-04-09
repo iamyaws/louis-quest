@@ -29,8 +29,18 @@ export default function CatSidekick({ variant, mood, size: s }) {
         <path d="M56 72 Q60 76 60 72" stroke={sc} strokeWidth="1.5" fill="none" />
         <path d="M60 72 Q60 76 64 72" stroke={sc} strokeWidth="1.5" fill="none" />
       </> : <line x1="57" y1="72" x2="63" y2="72" stroke={sc} strokeWidth="1.2" opacity="0.4" />}
-      <ellipse cx="46" cy="68" rx="4" ry="3" fill="#FDA4AF" opacity="0.3" /><ellipse cx="74" cy="68" rx="4" ry="3" fill="#FDA4AF" opacity="0.3" />
+      <ellipse cx="46" cy="68" rx="4" ry="3" fill="#FDA4AF" opacity={mood === "excited" ? "0.5" : "0.3"} /><ellipse cx="74" cy="68" rx="4" ry="3" fill="#FDA4AF" opacity={mood === "excited" ? "0.5" : "0.3"} />
       <ellipse cx="48" cy="120" rx="10" ry="6" fill={c.col} /><ellipse cx="72" cy="120" rx="10" ry="6" fill={c.col} />
+      {/* Mood indicators */}
+      {mood === "sleepy" && <>
+        <text x="98" y="48" fontSize="12" opacity="0.5">z</text>
+        <text x="106" y="38" fontSize="10" opacity="0.35">z</text>
+        <text x="112" y="30" fontSize="8" opacity="0.2">z</text>
+      </>}
+      {mood === "excited" && <>
+        <text x="28" y="42" fontSize="9">✨</text>
+        <text x="82" y="38" fontSize="9">⭐</text>
+      </>}
     </svg>
   );
 }

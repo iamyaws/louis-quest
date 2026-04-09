@@ -6,6 +6,13 @@ import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
 
+const CAT_MOOD_TEXT = {
+  sleepy: "🐱 Deine Katze gähnt... Zeit für die erste Quest!",
+  neutral: "🐱 Deine Katze schaut neugierig — weiter so!",
+  happy: "🐱 Deine Katze schnurrt zufrieden!",
+  excited: "🐱 Deine Katze feiert mit dir! Miau!",
+};
+
 export default function Hub({ state, level, xpP, done, total, allDone, pct, mood, dayN, setQuestOpen, setView, setMood, setCeleb, pMode, setPMode, setPinShow }) {
   return (
     <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -48,6 +55,7 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
           <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.85)", fontWeight: 600, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>{getTimeLabel(done, total)}</div>
           <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.3)" }}>{done}/{total} Quests {allDone ? "\u{1F4AA}" : ""}</div>
           <div style={{ fontSize: ".75rem", color: "rgba(255,255,255,0.8)", marginTop: 2, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>+{state.dt} Min verdient</div>
+          <div style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.55)", marginTop: 4, fontStyle: "italic", textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>{CAT_MOOD_TEXT[mood]}</div>
           {state.xpBoost && <div style={{ fontSize: ".7rem", color: "#FCD34D", fontWeight: 800, marginTop: 4, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} DOPPEL-XP AKTIV!</div>}
           {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.45)", marginTop: 3 }}>{"\u{1F381}"} Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
         </div>

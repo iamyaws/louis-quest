@@ -4,26 +4,19 @@ import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
 
-const HERO_LINES = [
-  "Heute geb ich alles! 💪",
-  "Jede Quest zählt!",
-  "Ich werde jeden Tag besser! 📈",
-  "Bereit für Abenteuer! ⚔️",
-  "Übung macht den Meister! 🎯",
-  "Schritt für Schritt! 🚀",
-  "Nicht aufgeben! 🔥",
-  "Ich schaff das! 😊",
-];
+const HERO_LINES = {
+  sleepy: ["Guten Morgen! ☀️", "Was steht heute an?", "Bereit für den Tag! 💪"],
+  neutral: ["Weiter geht's! 🎯", "Schritt für Schritt! 🚀", "Jede Quest zählt!"],
+  happy: ["Läuft bei mir! 😊", "Ich werde jeden Tag besser! 📈", "Nicht aufgeben! 🔥"],
+  excited: ["Heute alles geschafft! 💪", "Das war mein Einsatz! 🏆", "Ich hab durchgehalten! ⭐"],
+};
 
-const CAT_LINES = [
-  "Miau! Wir schaffen das! 😺",
-  "Schnurr... du machst das gut! 😸",
-  "Zusammen sind wir stark! 🐾",
-  "Ich glaub an dich! ⭐",
-  "Noch eine Quest? 💪",
-  "*schnurrt aufmunternd* 😸",
-  "Los geht's! 🎯",
-];
+const CAT_LINES = {
+  sleepy: ["*gähnt* Morgen! 😴", "Miau... aufstehen? 🐾", "Schnurr... 5 Minuten noch..."],
+  neutral: ["Miau! Wir schaffen das! 😺", "Noch eine Quest? 💪", "Los geht's! 🎯"],
+  happy: ["Schnurr... läuft gut! 😸", "Zusammen sind wir stark! 🐾", "Ich glaub an dich! ⭐"],
+  excited: ["MIAU! Wir haben's geschafft! 🎉", "*schnurrt mega laut* 😸", "Bestes Team ever! 🐾⭐"],
+};
 
 export default function Room({ state, level, mood, setView, setShopTab }) {
   const has = (id) => (state.purchased || []).includes(id);
@@ -31,14 +24,19 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
   const [heroBubble, setHeroBubble] = useState(null);
   const [catBubble, setCatBubble] = useState(null);
 
+  const heroLines = HERO_LINES[mood] || HERO_LINES.neutral;
+  const catLines = CAT_LINES[mood] || CAT_LINES.neutral;
+
   // Show a random speech bubble on mount and periodically
   useEffect(() => {
     const showHero = () => {
-      setHeroBubble(HERO_LINES[Math.floor(Math.random() * HERO_LINES.length)]);
+      const lines = HERO_LINES[mood] || HERO_LINES.neutral;
+      setHeroBubble(lines[Math.floor(Math.random() * lines.length)]);
       setTimeout(() => setHeroBubble(null), 3000);
     };
     const showCat = () => {
-      setCatBubble(CAT_LINES[Math.floor(Math.random() * CAT_LINES.length)]);
+      const lines = CAT_LINES[mood] || CAT_LINES.neutral;
+      setCatBubble(lines[Math.floor(Math.random() * lines.length)]);
       setTimeout(() => setCatBubble(null), 2500);
     };
     // Initial bubbles
@@ -48,7 +46,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
     const heroTimer = setInterval(showHero, 8000);
     const catTimer = setInterval(showCat, 10000);
     return () => { clearInterval(heroTimer); clearInterval(catTimer); };
-  }, []);
+  }, [mood]);
 
   const wallL = "#F5EDE3";
   const wallR = "#E8DDD0";
@@ -194,7 +192,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             )}
             <div style={{ animation: "heroFloat 3s ease-in-out infinite", cursor: "pointer" }}
               onClick={() => {
-                setHeroBubble(HERO_LINES[Math.floor(Math.random() * HERO_LINES.length)]);
+                setHeroBubble(heroLines[Math.floor(Math.random() * heroLines.length)]);
                 setTimeout(() => setHeroBubble(null), 3000);
               }}>
               <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={90} level={level} />
@@ -222,7 +220,7 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
             )}
             <div style={{ animation: "catIdle 4s ease-in-out infinite", cursor: "pointer" }}
               onClick={() => {
-                setCatBubble(CAT_LINES[Math.floor(Math.random() * CAT_LINES.length)]);
+                setCatBubble(catLines[Math.floor(Math.random() * catLines.length)]);
                 setTimeout(() => setCatBubble(null), 2500);
               }}>
               <CatSidekick variant={state.catVariant} mood={mood} size={48} />
