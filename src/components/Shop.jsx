@@ -2,8 +2,12 @@ import React from 'react';
 import { T, SHOP_ITEMS } from '../constants';
 import { ViewHeader } from './ui';
 import SFX from '../utils/sfx';
+import { useGame } from '../context/GameContext';
 
-export default function Shop({ state, shopTab, setShopTab, buyItem, setView }) {
+export default function Shop() {
+  const { state, actions, ui } = useGame();
+  const { shopTab, setShopTab, setView } = ui;
+
   return (
     <div className="view-enter" style={{ minHeight: "100vh", padding: "env(safe-area-inset-top, 12px) 20px 100px" }}>
       <ViewHeader onBack={() => setView("hub")} title="Shop" right={
@@ -36,7 +40,7 @@ export default function Shop({ state, shopTab, setShopTab, buyItem, setView }) {
                 <div style={{ fontWeight: 700, fontSize: ".95rem" }}>{item.name}</div>
                 <div style={{ fontSize: ".7rem", color: T.accentDark, fontWeight: 700 }}>{"\u{1FA99}"} {item.cost}</div>
               </div>
-              <button className="btn-tap" onClick={() => canBuy && buyItem(item.id, item.cost)} disabled={!canBuy && !owned} style={{
+              <button className="btn-tap" onClick={() => canBuy && actions.buyItem(item.id, item.cost)} disabled={!canBuy && !owned} style={{
                 background: owned ? `${T.success}15` : canBuy ? `linear-gradient(135deg,${T.primary},${T.primaryLight})` : "rgba(0,0,0,0.04)",
                 border: "none", borderRadius: 50, padding: "10px 20px",
                 color: owned ? T.successDark : canBuy ? "white" : T.textLight,
