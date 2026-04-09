@@ -45,14 +45,14 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
           <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "white" }}>{done}/{total} Quests {allDone ? "\u{1F389}" : ""}</div>
           <div style={{ fontSize: ".75rem", color: "rgba(255,255,255,0.6)", marginTop: 2 }}>+{state.dt} Min verdient</div>
           {state.xpBoost && <div style={{ fontSize: ".7rem", color: "#FCD34D", fontWeight: 800, marginTop: 4, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} DOPPEL-XP AKTIV!</div>}
-          {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.45)", marginTop: 3 }}>{"\u{1F381}"} N\u00E4chste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
+          {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.45)", marginTop: 3 }}>{"\u{1F381}"} Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
         </div>
       </div>
 
       {/* Mood Check */}
       {state.moodAM === null && <div style={{ padding: "12px 20px 0" }}>
         <div style={{ background: "white", borderRadius: 20, padding: 16, boxShadow: "0 4px 16px rgba(0,0,0,0.05)", border: "2px solid rgba(0,0,0,0.04)" }}>
-          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>Wie f\u00FChlst du dich heute? {"\u{1F305}"}</div>
+          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>Wie fühlst du dich heute? {"\u{1F305}"}</div>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 4 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} onClick={() => { setMood("moodAM", i); setCeleb(true); }} style={{ fontSize: "2rem", background: "none", border: "none", cursor: "pointer", padding: "8px", borderRadius: 12, transition: "all .15s", minHeight: 48, minWidth: 48 }}>{e}</button>)}</div>
         </div>
       </div>}
@@ -90,7 +90,7 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
           color: "white", fontWeight: 800, fontSize: "1rem", cursor: "pointer",
           fontFamily: "'Plus Jakarta Sans',sans-serif", textTransform: "uppercase",
           letterSpacing: ".05em", boxShadow: `0 8px 24px ${T.primary}40`, minHeight: 52,
-        }}>{"\u2694\uFE0F"} Quests \u00F6ffnen</button>
+        }}>{"\u2694\uFE0F"} Quests öffnen</button>
       </div>
 
       {/* Nav */}

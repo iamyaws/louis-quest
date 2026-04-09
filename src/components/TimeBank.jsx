@@ -9,7 +9,7 @@ export default function TimeBank({ state, allDone, done, total, setView }) {
       <div style={{ background: `linear-gradient(135deg, ${T.primary}12, ${T.success}10)`, borderRadius: 24, padding: 28, textAlign: "center", marginBottom: 24, border: `2px solid ${T.primary}15` }}>
         <div style={{ fontSize: ".8rem", color: T.textSecondary, fontWeight: 600, marginBottom: 4 }}>Heute verdient</div>
         <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "3rem", fontWeight: 700, color: T.success }}>{state.dt} <span style={{ fontSize: "1rem", color: T.textSecondary }}>Min</span></div>
-        <div style={{ fontSize: ".75rem", color: T.primaryLight, fontWeight: 700, marginTop: 4 }}>{allDone ? "\u{1F389} Alle Quests erledigt!" : `${total - done} Quests \u00FCbrig`}</div>
+        <div style={{ fontSize: ".75rem", color: T.primaryLight, fontWeight: 700, marginTop: 4 }}>{allDone ? "\u{1F389} Alle Quests erledigt!" : `${total - done} Quests übrig`}</div>
       </div>
       <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".8rem", color: T.textSecondary, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>Belohnungen</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

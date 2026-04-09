@@ -105,7 +105,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
           </div>
           {/* Summary */}
           <div style={{ background: "white", borderRadius: 14, padding: 12, marginTop: 10, border: `2px solid ${T.primary}10` }}>
-            <div style={{ fontSize: ".75rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F4CA}"} \u00DCbersicht</div>
+            <div style={{ fontSize: ".75rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F4CA}"} Übersicht</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
               {[{ v: state.sd, l: "Tage-Streak", c: T.primary }, { v: state.hist.length, l: "Quests gesamt", c: T.success }, { v: (state.graduated || []).length, l: "Graduiert \u{1F393}", c: T.accentDark }, { v: `Lvl ${level}`, l: `${state.xp} XP`, c: "#EC4899" }].map((s, i) => (
                 <div key={i} style={{ background: T.bg, borderRadius: 10, padding: "10px", textAlign: "center" }}>

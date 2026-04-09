@@ -25,9 +25,9 @@ export function buildDay(vac) {
 export function getSky(done, total) {
   const p = total > 0 ? done / total : 0;
   if (p >= 1) return "linear-gradient(180deg, #0F172A 0%, #1E1B4B 40%, #312E81 100%)";
-  if (p >= 0.66) return "linear-gradient(180deg, #78350F 0%, #C2410C 25%, #EA580C 50%, #6D28D9 100%)";
-  if (p >= 0.33) return "linear-gradient(180deg, #0C4A6E 0%, #0369A1 40%, #0284C7 100%)";
-  return "linear-gradient(180deg, #7C2D12 0%, #9A3412 30%, #C2410C 60%, #EA580C 100%)";
+  if (p >= 0.66) return "linear-gradient(180deg, #312E81 0%, #6D28D9 20%, #C2410C 55%, #F59E0B 100%)";
+  if (p >= 0.33) return "linear-gradient(180deg, #0C4A6E 0%, #0369A1 35%, #38BDF8 70%, #7DD3FC 100%)";
+  return "linear-gradient(180deg, #1E3A5F 0%, #2563EB 25%, #60A5FA 50%, #FDE68A 80%, #F97316 100%)";
 }
 
 export function getSkyStars(d, t) { return t > 0 && d / t >= 1; }

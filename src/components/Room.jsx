@@ -5,36 +5,152 @@ import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
 
 export default function Room({ state, level, mood, setView, setShopTab }) {
+  const has = (id) => (state.purchased || []).includes(id);
+  const roomItems = (state.purchased || []).filter(id => id.startsWith("rm_")).length;
+
+  const wallL = "#F5EDE3";
+  const wallR = "#E8DDD0";
+  const floorLine = "#C49060";
+  const trim = "#B8956A";
+
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", padding: "env(safe-area-inset-top, 12px) 0 100px", background: "linear-gradient(180deg, #DBEAFE 0%, #BFDBFE 40%, #93C5FD 100%)" }}>
+    <div className="view-enter" style={{
+      minHeight: "100vh",
+      background: "linear-gradient(180deg, #1E293B 0%, #334155 40%, #475569 100%)",
+      padding: "env(safe-area-inset-top, 12px) 0 100px",
+    }}>
+      {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 20px 12px" }}>
-        <button onClick={() => { SFX.play("tap"); setView("hub"); }} style={{ background: "rgba(255,255,255,0.8)", border: "none", borderRadius: 50, padding: "10px 20px", cursor: "pointer", fontWeight: 800, fontSize: ".85rem", backdropFilter: "blur(8px)", minHeight: 48 }}>{"\u2190"} Zur\u00FCck</button>
-        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "1.1rem", fontWeight: 800, color: "white", textTransform: "uppercase", fontStyle: "italic", textShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>{state.hero.name}'s Zimmer</div>
+        <button onClick={() => { SFX.play("tap"); setView("hub"); }} style={{
+          background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 50,
+          padding: "10px 20px", cursor: "pointer", fontWeight: 800, fontSize: ".85rem",
+          backdropFilter: "blur(8px)", minHeight: 48, color: "white",
+        }}>← Zurück</button>
+        <div style={{
+          fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "1.1rem", fontWeight: 800,
+          color: "white", textTransform: "uppercase", fontStyle: "italic",
+          textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+        }}>{state.hero.name}'s Zimmer</div>
         <div style={{ width: 80 }} />
       </div>
-      {/* Room Scene */}
-      <div style={{ position: "relative", margin: "0 12px", height: 380, borderRadius: 24, overflow: "hidden", background: "linear-gradient(180deg, #FEF3C7 0%, #FDE68A 100%)", border: "3px solid rgba(255,255,255,0.4)", boxShadow: "0 12px 40px rgba(0,0,0,0.12)" }}>
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, #FFF8F0 0%, #FEF3C7 60%, #D4A574 60%, #C9956A 100%)" }} />
-        <div style={{ position: "absolute", top: 30, right: 30, width: 80, height: 80, borderRadius: 16, background: "linear-gradient(180deg, #7DD3FC, #38BDF8)", border: "6px solid #D4A574", boxShadow: "inset 0 0 20px rgba(255,255,255,0.3)" }}>
-          <div style={{ position: "absolute", top: "50%", left: 0, right: 0, height: 3, background: "#D4A574" }} /><div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 3, background: "#D4A574" }} />
-        </div>
-        <div style={{ position: "absolute", top: 40, left: 20, width: 100, height: 8, borderRadius: 4, background: "#92400E", boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}>
-          {(state.purchased || []).includes("rm_trophy") && <div style={{ position: "absolute", bottom: 8, left: 35, fontSize: "1.5rem" }}>{"\u{1F3C6}"}</div>}
-        </div>
-        {(state.purchased || []).includes("rm_poster") && <div style={{ position: "absolute", top: 25, left: 140, width: 50, height: 60, borderRadius: 8, background: "linear-gradient(135deg, #EC4899, #8B5CF6)", border: "3px solid #92400E", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem" }}>{"\u2B50"}</div>}
-        {(state.purchased || []).includes("rm_plant") && <div style={{ position: "absolute", bottom: "42%", right: 20, fontSize: "2rem" }}>{"\u{1FAB4}"}</div>}
-        {(state.purchased || []).includes("rm_lamp") && <div style={{ position: "absolute", bottom: "42%", left: 20, fontSize: "2rem" }}>{"\u{1FA94}"}</div>}
-        {(state.purchased || []).includes("rm_rug") && <div style={{ position: "absolute", bottom: "6%", left: "25%", width: "50%", height: 24, borderRadius: 12, background: "linear-gradient(90deg, #8B5CF6, #EC4899, #8B5CF6)", opacity: 0.6 }} />}
-        <div style={{ position: "absolute", bottom: "12%", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "flex-end", gap: 6 }}>
-          <div style={{ animation: "heroFloat 3s ease-in-out infinite" }}><HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={100} level={level} /></div>
-          <div style={{ animation: "catIdle 4s ease-in-out infinite" }}><CatSidekick variant={state.catVariant} mood={mood} size={48} /></div>
+
+      {/* Isometric Room */}
+      <div style={{ position: "relative", margin: "0 auto", maxWidth: 400, width: "100%", padding: "0 8px" }}>
+        <svg viewBox="0 0 400 340" style={{ width: "100%", display: "block" }}>
+          <defs>
+            <linearGradient id="floorGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#D4A06A" />
+              <stop offset="100%" stopColor="#C49060" />
+            </linearGradient>
+            <linearGradient id="windowLight" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(255,255,200,0.15)" />
+              <stop offset="100%" stopColor="rgba(255,255,200,0)" />
+            </linearGradient>
+            <linearGradient id="posterGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#EC4899" />
+              <stop offset="100%" stopColor="#8B5CF6" />
+            </linearGradient>
+            <linearGradient id="windowSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#60A5FA" />
+              <stop offset="100%" stopColor="#93C5FD" />
+            </linearGradient>
+          </defs>
+
+          {/* Left wall */}
+          <polygon points="50,95 200,20 200,150 50,225" fill={wallL} />
+
+          {/* Right wall */}
+          <polygon points="200,20 350,95 350,225 200,150" fill={wallR} />
+
+          {/* Floor */}
+          <polygon points="50,225 200,150 350,225 200,300" fill="url(#floorGrad)" />
+
+          {/* Floor plank lines */}
+          {[1,2,3,4,5,6,7].map(i => {
+            const t = i / 8;
+            return <line key={i}
+              x1={50 + t * 150} y1={225 - t * 75}
+              x2={200 + t * 150} y2={300 - t * 75}
+              stroke={floorLine} strokeWidth="1" opacity="0.25"
+            />;
+          })}
+
+          {/* Corner edge */}
+          <line x1="200" y1="20" x2="200" y2="150" stroke="#D4C4B0" strokeWidth="1.5" />
+
+          {/* Baseboard */}
+          <line x1="50" y1="225" x2="200" y2="150" stroke={trim} strokeWidth="4" />
+          <line x1="200" y1="150" x2="350" y2="225" stroke={trim} strokeWidth="4" />
+
+          {/* Ceiling edge */}
+          <line x1="50" y1="95" x2="200" y2="20" stroke="#D4C4B0" strokeWidth="1" opacity="0.5" />
+          <line x1="200" y1="20" x2="350" y2="95" stroke="#D4C4B0" strokeWidth="1" opacity="0.5" />
+
+          {/* ── Window on left wall ── */}
+          <polygon points="100,160 150,135 150,88 100,113" fill="url(#windowSky)" stroke={trim} strokeWidth="3" />
+          <line x1="125" y1="147" x2="125" y2="100" stroke={trim} strokeWidth="1.5" />
+          <line x1="100" y1="136" x2="150" y2="111" stroke={trim} strokeWidth="1.5" />
+          {/* Light beam on floor */}
+          <polygon points="100,225 155,198 210,225 155,252" fill="url(#windowLight)" />
+
+          {/* ── Bookshelf on right wall ── */}
+          <line x1="255" y1="130" x2="315" y2="150" stroke="#A0845C" strokeWidth="3" strokeLinecap="round" />
+          <line x1="255" y1="105" x2="315" y2="125" stroke="#A0845C" strokeWidth="3" strokeLinecap="round" />
+
+          {/* ── Bed (always present) ── */}
+          <polygon points="260,210 300,190 350,210 310,230" fill="#E0E7FF" />
+          <polygon points="260,210 260,222 310,242 310,230" fill="#C7D2FE" />
+          <polygon points="310,230 310,242 350,222 350,210" fill="#A5B4FC" />
+          <polygon points="300,190 300,178 350,198 350,210" fill="#7C3AED" opacity="0.3" />
+          <ellipse cx="320" cy="198" rx="12" ry="5" fill="white" opacity="0.9" transform="rotate(26, 320, 198)" />
+
+          {/* ── Desk (always present) ── */}
+          <polygon points="65,218 105,200 145,218 105,236" fill="#92400E" />
+          <polygon points="65,218 65,232 105,250 105,236" fill="#78350F" />
+          <polygon points="105,236 105,250 145,232 145,218" fill="#6B3410" />
+
+          {/* ── Purchased Items ── */}
+          {has("rm_trophy") && <text x="285" y="124" fontSize="16" textAnchor="middle">{"\u{1F3C6}"}</text>}
+
+          {has("rm_poster") && <g>
+            <polygon points="270,108 300,120 300,148 270,136" fill="url(#posterGrad)" />
+            <polygon points="270,108 300,120 300,148 270,136" fill="none" stroke="#A0845C" strokeWidth="2" />
+            <text x="285" y="132" fontSize="12" textAnchor="middle" fill="white">{"\u2B50"}</text>
+          </g>}
+
+          {has("rm_rug") && <ellipse cx="195" cy="258" rx="42" ry="18" fill="#8B5CF6" opacity="0.35" />}
+
+          {has("rm_plant") && <text x="328" y="230" fontSize="22">{"\u{1FAB4}"}</text>}
+
+          {has("rm_lamp") && <text x="72" y="210" fontSize="18">{"\u{1FA94}"}</text>}
+        </svg>
+
+        {/* Hero + Cat overlay */}
+        <div style={{
+          position: "absolute", bottom: "18%", left: "46%",
+          transform: "translateX(-50%)",
+          display: "flex", alignItems: "flex-end", gap: 4, zIndex: 2,
+        }}>
+          <div style={{ animation: "heroFloat 3s ease-in-out infinite" }}>
+            <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={80} level={level} />
+          </div>
+          <div style={{ animation: "catIdle 4s ease-in-out infinite" }}>
+            <CatSidekick variant={state.catVariant} mood={mood} size={40} />
+          </div>
         </div>
       </div>
+
+      {/* Room info */}
       <div style={{ padding: "16px 20px", textAlign: "center" }}>
-        <div style={{ fontSize: ".8rem", color: "white", fontWeight: 700, textShadow: "0 1px 4px rgba(0,0,0,0.2)" }}>
-          {(state.purchased || []).filter(id => id.startsWith("rm_")).length} / {SHOP_ITEMS.room.length} Zimmer-Items
+        <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.7)", fontWeight: 700 }}>
+          {roomItems} / {SHOP_ITEMS.room.length} Zimmer-Items
         </div>
-        <button onClick={() => { SFX.play("tap"); setView("shop"); setShopTab("room"); }} style={{ marginTop: 8, background: "rgba(255,255,255,0.9)", border: "none", borderRadius: 50, padding: "12px 28px", fontWeight: 800, fontSize: ".85rem", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", color: T.primary, boxShadow: "0 4px 16px rgba(0,0,0,0.1)", minHeight: 48 }}>{"\u{1F6CD}\uFE0F"} Zimmer dekorieren</button>
+        <button onClick={() => { SFX.play("tap"); setView("shop"); setShopTab("room"); }} style={{
+          marginTop: 8, background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)",
+          borderRadius: 50, padding: "12px 28px", fontWeight: 800, fontSize: ".85rem",
+          cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif",
+          color: "white", backdropFilter: "blur(8px)", minHeight: 48,
+        }}>{"\u{1F6CD}\uFE0F"} Zimmer dekorieren</button>
       </div>
     </div>
   );

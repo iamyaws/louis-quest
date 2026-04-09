@@ -97,7 +97,7 @@ export default function VictoryScreen({ state, level, done, total, onClose, onSp
           borderRadius: 24, padding: 20, width: "100%", maxWidth: 340,
           border: "1px solid rgba(255,255,255,0.15)", marginBottom: 24,
         }}>
-          <div style={{ fontSize: ".7rem", fontWeight: 800, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12, textAlign: "center" }}>Tages\u00FCbersicht</div>
+          <div style={{ fontSize: ".7rem", fontWeight: 800, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12, textAlign: "center" }}>Tagesübersicht</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
             {[
               { label: "Quests", value: `${done}/${total}`, icon: "\u2694\uFE0F" },
@@ -130,7 +130,7 @@ export default function VictoryScreen({ state, level, done, total, onClose, onSp
               boxShadow: "0 8px 24px rgba(252,211,77,0.4)",
               textTransform: "uppercase", minHeight: 52,
             }}>
-              {"\u{1F3A1}"} Gl\u00FCcksrad drehen!
+              {"\u{1F3A1}"} Glücksrad drehen!
             </button>
           )}
           <button onClick={onClose} style={{

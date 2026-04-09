@@ -81,7 +81,7 @@ export function BackButton({ onClick, light }) {
       fontWeight: 800, fontSize: ".85rem", minHeight: 48, minWidth: 48,
       backdropFilter: light ? "blur(8px)" : "none",
     }}>
-      \u2190 Zur\u00FCck
+      ← Zurück
     </button>
   );
 }
