@@ -202,11 +202,24 @@ body { background: #FFF8F0; font-family: 'Be Vietnam Pro', 'Nunito', sans-serif;
 @keyframes bossShake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
 @keyframes bossDefeatFade { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.5; } 100% { transform: scale(0.8); opacity: 0; } }
 
+/* ── Login bonus ── */
+@keyframes loginPulse { 0%, 100% { box-shadow: 0 0 12px rgba(245,158,11,0.4), 0 0 24px rgba(245,158,11,0.15); transform: scale(1); } 50% { box-shadow: 0 0 18px rgba(245,158,11,0.6), 0 0 32px rgba(245,158,11,0.25); transform: scale(1.04); } }
+
 /* ── Victory screen ── */
 @keyframes victoryBurst { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
 @keyframes victorySlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fireworkDot { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { opacity: 0; } }
 @keyframes fairyGlow { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* ── Boss chest overlay ── */
+@keyframes bossChestAnnounce { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes bossChestDrop { 0% { transform: translateY(-200px) scale(0.5); opacity: 0; } 60% { transform: translateY(10px) scale(1.05); opacity: 1; } 80% { transform: translateY(-5px) scale(0.98); } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes bossChestGlow { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.15); } }
+@keyframes bossChestPulse { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes bossChestLidOpen { 0% { transform: rotateX(0deg) translateY(0); } 100% { transform: rotateX(-120deg) translateY(-30px); } }
+@keyframes bossChestBurst { 0% { transform: scale(0); opacity: 0.8; } 100% { transform: scale(2); opacity: 0; } }
+@keyframes bossChestSparkle { 0% { transform: translate(0, 0) scale(0); opacity: 0; } 20% { opacity: 1; transform: translate(calc(var(--dx, 0px) * 0.3), calc(var(--dy, 0px) * 0.3)) scale(1); } 100% { transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0.3); opacity: 0; } }
+@keyframes bossChestRewardFloat { 0% { transform: translateY(30px) scale(0.7); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 
 /* ── Accessibility: respect motion preferences ── */
 @media (prefers-reduced-motion: reduce) {

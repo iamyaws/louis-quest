@@ -21,6 +21,7 @@ import MemoryGame from './components/MemoryGame';
 import Weather from './components/Weather';
 import CatCare from './components/CatCare';
 import Familienregeln from './components/Familienregeln';
+import BossChest from './components/BossChest';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const TABS = [
@@ -81,6 +82,13 @@ function AppContent() {
       {ui.pinShow && <PinModal pin={ui.pin} setPin={ui.setPin} onSuccess={() => { ui.setPMode(true); ui.setPinShow(false); }} onClose={() => { ui.setPinShow(false); ui.setPin(""); }} />}
       {ui.showVictory && <VictoryScreen onClose={() => ui.setShowVictory(false)} onSpinWheel={() => { ui.setShowVictory(false); ui.setShowWheel(true); }} onMemoryGame={() => { ui.setShowVictory(false); ui.setShowMemory(true); }} />}
       {ui.showMemory && <MemoryGame onComplete={actions.collectMemory} />}
+      {state.bossDefeatReward && <BossChest
+        bossName={state.bossDefeatReward.bossName}
+        bossIcon={state.bossDefeatReward.bossIcon}
+        hpReward={state.bossDefeatReward.hp}
+        unlockedItem={state.bossDefeatReward.item}
+        onClose={() => actions.clearBossReward()}
+      />}
 
       {/* Persistent chrome */}
 

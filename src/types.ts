@@ -199,6 +199,12 @@ export interface GameState {
   specialMissions: SpecialMission[];
   weeklyLunch: Record<string, string>;
   weeklyMissionsCompleted: number;
+  // Login bonus calendar
+  loginBonusDay: number;
+  loginBonusClaimed: boolean;
+  loginBonusStreak: number;
+  // Boss defeat reward overlay
+  bossDefeatReward: { bossName: string; bossIcon: string; hp: number; item: { name: string; icon: string } | null } | null;
 }
 
 export interface ComputedState {

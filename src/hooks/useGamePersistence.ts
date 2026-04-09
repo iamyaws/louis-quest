@@ -97,6 +97,14 @@ function applyDayTransition(p: GameState, today: string): void {
   // Daily habits reset
   p.dailyVitaminD = false;
   p.dailyBrother = false;
+  // Login bonus: reset claimed flag, advance day in cycle
+  p.loginBonusClaimed = false;
+  p.loginBonusDay = (p.loginBonusDay || 0) % 7;
+  // If they missed a day (dayGap >= 2), reset the cycle
+  if (dayGap >= 2) {
+    p.loginBonusDay = 0;
+    p.loginBonusStreak = 0;
+  }
   // Clean up completed special missions
   if (p.specialMissions) {
     p.specialMissions = p.specialMissions.filter(m => !m.done);
@@ -165,6 +173,10 @@ function applyDefaults(p: GameState): void {
   }
   if (!p.weeklyLunch) p.weeklyLunch = {};
   if (p.weeklyMissionsCompleted === undefined) p.weeklyMissionsCompleted = 0;
+  // Login bonus migration
+  if (p.loginBonusDay === undefined) p.loginBonusDay = 0;
+  if (p.loginBonusClaimed === undefined) p.loginBonusClaimed = false;
+  if (p.loginBonusStreak === undefined) p.loginBonusStreak = 0;
   // Companion + egg migration
   if (!p.companionType) p.companionType = "cat";
   if (p.eggType === undefined) p.eggType = null;
@@ -214,5 +226,9 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     specialMissions: [],
     weeklyLunch: {},
     weeklyMissionsCompleted: 0,
+    // Login bonus
+    loginBonusDay: 0, loginBonusClaimed: false, loginBonusStreak: 0,
+    // Boss defeat reward overlay
+    bossDefeatReward: null,
   };
 }

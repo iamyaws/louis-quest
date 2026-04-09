@@ -116,6 +116,7 @@ export default function useGameActions(
       let bossUpdate = prev.boss ? { ...prev.boss } : null;
       let bossRewardHP = 0;
       const newUnlocksFromBoss: string[] = [];
+      let bossDefeatData: { bossName: string; bossIcon: string; hp: number; item: { name: string; icon: string } | null } | null = null;
       const trophies = [...(prev.bossTrophies || [])];
       if (bossUpdate && bossUpdate.hp > 0) {
         const dmg = Math.max(5, Math.floor(q.xp * 0.8));
@@ -129,11 +130,20 @@ export default function useGameActions(
           // Boss loot: unlock a random locked item
           const allItems = [...(SHOP_ITEMS.hero || []), ...(SHOP_ITEMS.cat || []), ...(SHOP_ITEMS.room || [])];
           const locked = allItems.filter(item => !(prev.purchased || []).includes(item.id) && !newUnlocksFromBoss.includes(item.id));
+          let lootItem: { id: string; name: string; icon: string } | null = null;
           if (locked.length > 0) {
             const loot = locked[Math.floor(Math.random() * locked.length)];
             newUnlocksFromBoss.push(loot.id);
+            lootItem = loot;
           }
-          setTimeout(() => SFX.play("bossDefeat"), 400);
+          // Store boss defeat reward data for BossChest overlay
+          bossDefeatData = {
+            bossName: bd?.name || "Boss",
+            bossIcon: bd?.icon || "\u{1F47E}",
+            hp: bossRewardHP,
+            item: lootItem ? { name: lootItem.name, icon: lootItem.icon } : null,
+          };
+          // SFX is handled by BossChest component
         }
       }
 
@@ -157,6 +167,7 @@ export default function useGameActions(
         weeklyMissionsCompleted: wmcCount,
         boss: bossUpdate, bossTrophies: trophies,
         catEvo: newCatEvo,
+        bossDefeatReward: bossDefeatData,
       };
 
       // Egg hatching progress — each task adds ~20-25% toward hatching
@@ -397,10 +408,36 @@ export default function useGameActions(
     setState(prev => prev ? { ...prev, specialMissions: (prev.specialMissions || []).filter(m => m.id !== missionId) } : prev);
   }, [setState]);
 
+  // ── NEW: Login bonus ──
+
+  const collectLoginBonus = useCallback(() => {
+    setState(prev => {
+      if (!prev || prev.loginBonusClaimed) return prev;
+      const rewards = [10, 15, 20, 25, 30, 40, 75];
+      const day = prev.loginBonusDay || 0;
+      const amount = rewards[day] || 10;
+      SFX.play("celeb");
+      return {
+        ...prev,
+        loginBonusClaimed: true,
+        loginBonusStreak: (prev.loginBonusStreak || 0) + 1,
+        loginBonusDay: (day + 1) % 7,
+        xp: prev.xp + amount,
+        coins: prev.coins + amount,
+      };
+    });
+  }, [setState]);
+
   // ── NEW: Weekly lunch ──
 
   const updateWeeklyLunch = useCallback((lunch: Record<string, string>) => {
     setState(prev => prev ? { ...prev, weeklyLunch: lunch } : prev);
+  }, [setState]);
+
+  // ── Boss reward overlay ──
+
+  const clearBossReward = useCallback(() => {
+    setState(prev => prev ? { ...prev, bossDefeatReward: null } : prev);
   }, [setState]);
 
   // ── Export / Import ──
@@ -443,7 +480,8 @@ export default function useGameActions(
     feedCat, petCat, playCat,
     completeHabit, redeemReward, updateBelohnungen,
     addSpecialMission, completeSpecialMission, removeSpecialMission,
-    updateWeeklyLunch,
+    updateWeeklyLunch, collectLoginBonus,
+    clearBossReward,
     exportState, importState,
   };
 }

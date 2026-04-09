@@ -6,6 +6,7 @@ import Companion from './Companion';
 import Egg from './Egg';
 import { useGame } from '../context/GameContext';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
+import LoginBonus from './LoginBonus';
 
 function HeroPortrait({ shape, color, eyes, hair, level, size, skinTone, hairColor }) {
   return (
@@ -164,6 +165,15 @@ export default function Hub() {
             </div>
           </div>
         </div>
+
+        {/* --- 2b. Login Bonus Card --- */}
+        {!state.loginBonusClaimed && (
+          <LoginBonus
+            day={state.loginBonusDay || 0}
+            streak={state.loginBonusStreak || 0}
+            onCollect={() => actions.collectLoginBonus()}
+          />
+        )}
 
         {/* --- 3. Helden-Tipp Card --- */}
         {tip && (
