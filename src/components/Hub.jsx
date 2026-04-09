@@ -1,6 +1,6 @@
 import React from 'react';
 import { T, CHEST_MILESTONES, MOOD_EMOJIS, WEEKLY_MISSIONS } from '../constants';
-import { getTimeLabel } from '../utils/helpers';
+import { getSky, getSkyStars, getTimeLabel } from '../utils/helpers';
 import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
@@ -13,104 +13,102 @@ const CAT_MOOD_TEXT = {
   excited: "Deine Katze feiert mit dir! Miau!",
 };
 
+function HeroPortrait({ shape, color, eyes, hair, level, size }) {
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: "50%", overflow: "hidden",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      background: `radial-gradient(circle at 50% 60%, ${color}30 0%, transparent 70%)`,
+    }}>
+      <div style={{ transform: "scale(1.6) translateY(18%)" }}>
+        <HeroSprite shape={shape} color={color} eyes={eyes} hair={hair} size={size * 0.7} level={level} />
+      </div>
+    </div>
+  );
+}
+
 export default function Hub() {
   const { state, computed, actions, ui } = useGame();
   const { level, xpP, done, total, allDone, pct, mood, dayN } = computed;
   const { setQuestOpen, setCeleb, pMode, setPMode, setPinShow } = ui;
+  const sky = getSky(done, total);
+  const stars = getSkyStars(done, total);
 
   return (
     <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
-      {/* ═══ HERO STAGE — Brawl Stars inspired ═══ */}
+      {/* ═══ HERO STAGE — Dynamic Sky ═══ */}
       <div style={{
-        background: "linear-gradient(180deg, #1a1145 0%, #2d1b69 40%, #3b2380 70%, #1a1145 100%)",
+        background: sky,
         position: "relative", overflow: "hidden",
-        paddingBottom: 0,
+        padding: "env(safe-area-inset-top, 12px) 16px 0",
       }}>
-        {/* Subtle background pattern */}
-        <div style={{ position: "absolute", inset: 0, opacity: 0.06, backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+        {/* Stars when all done */}
+        {stars && <>{Array.from({ length: 20 }, (_, i) => <div key={i} style={{ position: "absolute", width: 2 + Math.random() * 2, height: 2 + Math.random() * 2, borderRadius: "50%", background: "white", top: `${5 + Math.random() * 50}%`, left: `${5 + Math.random() * 90}%`, animation: `starTwinkle ${1 + Math.random() * 2}s ease-in-out infinite`, animationDelay: `${Math.random() * 2}s` }} />)}</>}
 
         {/* Top bar: day + lock */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 20px 0", position: "relative", zIndex: 2 }}>
-          <div style={{ fontSize: ".78rem", color: "rgba(255,255,255,0.5)", fontWeight: 700 }}>{dayN}{state.vacMode ? " \u{1F3D6}\uFE0F" : ""}</div>
-          <button aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"} onClick={() => pMode ? setPMode(false) : setPinShow(true)} style={{ background: pMode ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)", border: "2px solid rgba(255,255,255,0.12)", borderRadius: 50, padding: "6px 12px", cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: ".75rem", fontWeight: 700, minHeight: 36, minWidth: 36 }}>{pMode ? "\u{1F513}" : "\u{1F512}"}</button>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, position: "relative", zIndex: 2 }}>
+          <div style={{ fontSize: ".78rem", color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>{dayN}{state.vacMode ? " \u{1F3D6}\uFE0F" : ""}</div>
+          <button aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"} onClick={() => pMode ? setPMode(false) : setPinShow(true)} style={{ background: pMode ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)", border: "2px solid rgba(255,255,255,0.15)", borderRadius: 50, padding: "6px 12px", cursor: "pointer", color: "rgba(255,255,255,0.7)", fontSize: ".75rem", fontWeight: 700, minHeight: 36, minWidth: 36 }}>{pMode ? "\u{1F513}" : "\u{1F512}"}</button>
         </div>
 
-        {/* HERO CHARACTER — large and dominant */}
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", paddingTop: 8, paddingBottom: 0, position: "relative", zIndex: 2, minHeight: 220 }}>
-          {/* Glow behind hero */}
-          <div style={{ position: "absolute", bottom: 30, left: "50%", transform: "translateX(-50%)", width: 200, height: 200, borderRadius: "50%", background: `radial-gradient(circle, ${state.hero.color}40 0%, transparent 70%)`, filter: "blur(20px)" }} />
-
+        {/* HERO PORTRAIT — circular headshot + cat */}
+        <div style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 2, marginBottom: 8 }}>
           <div style={{ position: "relative" }}>
-            {/* Hero — BIG */}
-            <div style={{ animation: "heroFloat 3s ease-in-out infinite", cursor: "pointer" }} onClick={() => setQuestOpen(true)}>
-              <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={170} level={level} />
+            {/* Portrait ring */}
+            <div style={{
+              width: 156, height: 156, borderRadius: "50%",
+              padding: 4,
+              background: `linear-gradient(135deg, ${state.hero.color}, ${state.hero.color}88, rgba(255,255,255,0.3))`,
+              boxShadow: `0 8px 32px ${state.hero.color}40, 0 0 60px ${state.hero.color}20`,
+            }}>
+              <HeroPortrait shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} level={level} size={148} />
             </div>
-            {/* Ground shadow */}
-            <div style={{ width: 140, height: 12, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)", margin: "-8px auto 0" }} />
-            {/* Cat beside */}
-            <div style={{ position: "absolute", bottom: 0, right: -44, animation: "catIdle 4s ease-in-out infinite" }}>
-              <CatSidekick variant={state.catVariant} mood={mood} size={56} />
+            {/* Cat peeking from side */}
+            <div style={{ position: "absolute", bottom: -4, right: -32, animation: "catIdle 4s ease-in-out infinite" }}>
+              <CatSidekick variant={state.catVariant} mood={mood} size={48} />
             </div>
           </div>
         </div>
 
         {/* NAME BANNER */}
-        <div style={{ textAlign: "center", padding: "8px 20px 12px", position: "relative", zIndex: 2 }}>
+        <div style={{ textAlign: "center", marginBottom: 12, position: "relative", zIndex: 2 }}>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8,
-            background: "rgba(0,0,0,0.35)", backdropFilter: "blur(8px)",
-            border: "2px solid rgba(255,255,255,0.1)",
-            borderRadius: 14, padding: "8px 20px",
+            background: "rgba(0,0,0,0.3)", backdropFilter: "blur(12px)",
+            border: "2px solid rgba(255,255,255,0.12)",
+            borderRadius: 50, padding: "6px 8px 6px 18px",
           }}>
-            <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "white", letterSpacing: ".02em" }}>{state.hero.name}</span>
-            <div style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)", borderRadius: 8, padding: "2px 10px", fontFamily: "'Fredoka',sans-serif", fontSize: ".7rem", fontWeight: 700, color: "white" }}>LVL {level}</div>
+            <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "white" }}>{state.hero.name}</span>
+            <div style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)", borderRadius: 50, padding: "3px 12px", fontFamily: "'Fredoka',sans-serif", fontSize: ".7rem", fontWeight: 700, color: "white" }}>LVL {level}</div>
           </div>
         </div>
 
-        {/* STATS GRID — Brawl Stars style */}
-        <div style={{ padding: "0 16px 16px", position: "relative", zIndex: 2 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-            {/* XP */}
-            <div style={{
-              background: "rgba(255,255,255,0.07)", border: "2px solid rgba(255,255,255,0.08)",
-              borderRadius: 14, padding: "10px 8px", textAlign: "center",
+        {/* STATS GRID — 4 columns */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, position: "relative", zIndex: 2, marginBottom: 8 }}>
+          {[
+            { label: "XP", value: xpP.cur, sub: `/${xpP.need}`, color: "#A78BFA", progress: xpP.cur / xpP.need, barColor: "linear-gradient(90deg, #7C3AED, #A78BFA)" },
+            { label: "Streak", value: `\u{1F525}${state.sd}`, sub: "d", color: "#FCD34D", progress: null, barColor: null },
+            { label: "Quests", value: done, sub: `/${total}`, color: allDone ? "#34D399" : "#60A5FA", progress: pct, barColor: allDone ? "linear-gradient(90deg, #34D399, #6EE7B7)" : "linear-gradient(90deg, #3B82F6, #60A5FA)" },
+            { label: "Münzen", value: state.coins.toLocaleString("de-DE"), sub: "", color: "#FCD34D", progress: null, barColor: null },
+          ].map((s, i) => (
+            <div key={i} style={{
+              background: "rgba(0,0,0,0.2)", backdropFilter: "blur(8px)",
+              border: "1.5px solid rgba(255,255,255,0.08)",
+              borderRadius: 14, padding: "8px 6px", textAlign: "center",
             }}>
-              <div style={{ fontSize: ".55rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>XP</div>
-              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#A78BFA" }}>{xpP.cur}<span style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.3)" }}>/{xpP.need}</span></div>
-              {/* Mini progress bar */}
-              <div style={{ height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 50, overflow: "hidden", marginTop: 6 }}>
-                <div style={{ height: "100%", borderRadius: 50, width: `${Math.min(100, (xpP.cur / xpP.need) * 100)}%`, background: "linear-gradient(90deg, #7C3AED, #A78BFA)", transition: "width .8s ease" }} />
-              </div>
+              <div style={{ fontSize: ".5rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 3 }}>{s.label}</div>
+              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: s.color }}>{s.value}<span style={{ fontSize: ".6rem", color: "rgba(255,255,255,0.3)" }}>{s.sub}</span></div>
+              {s.progress !== null && <div style={{ height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 50, overflow: "hidden", marginTop: 4 }}><div style={{ height: "100%", borderRadius: 50, width: `${Math.min(100, s.progress * 100)}%`, background: s.barColor, transition: "width .6s ease" }} /></div>}
             </div>
-            {/* Streak */}
-            <div style={{
-              background: "rgba(255,255,255,0.07)", border: "2px solid rgba(255,255,255,0.08)",
-              borderRadius: 14, padding: "10px 8px", textAlign: "center",
-            }}>
-              <div style={{ fontSize: ".55rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>Streak</div>
-              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#F59E0B" }}>{"\u{1F525}"} {state.sd}<span style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.3)" }}>d</span></div>
-            </div>
-            {/* Quests */}
-            <div style={{
-              background: allDone ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.07)",
-              border: `2px solid ${allDone ? "rgba(52,211,153,0.25)" : "rgba(255,255,255,0.08)"}`,
-              borderRadius: 14, padding: "10px 8px", textAlign: "center",
-            }}>
-              <div style={{ fontSize: ".55rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>Quests</div>
-              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: allDone ? "#34D399" : "#60A5FA" }}>{done}<span style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.3)" }}>/{total}</span></div>
-              {/* Mini progress bar */}
-              <div style={{ height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 50, overflow: "hidden", marginTop: 6 }}>
-                <div style={{ height: "100%", borderRadius: 50, width: `${pct * 100}%`, background: allDone ? "linear-gradient(90deg, #34D399, #6EE7B7)" : "linear-gradient(90deg, #3B82F6, #60A5FA)", transition: "width .6s ease" }} />
-              </div>
-            </div>
-          </div>
-          {/* Second row: minutes + time of day */}
-          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 8 }}>
-            <div style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{"\u23F0"} +{state.dt} Min verdient</div>
-            <div style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{getTimeLabel(done, total)}</div>
-            {state.xpBoost && <div style={{ fontSize: ".7rem", color: "#FCD34D", fontWeight: 800, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} 2x XP</div>}
-          </div>
+          ))}
+        </div>
+
+        {/* Time of day + minutes */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 12, paddingBottom: 20, position: "relative", zIndex: 2 }}>
+          <div style={{ fontSize: ".68rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{"\u23F0"} +{state.dt} Min</div>
+          <div style={{ fontSize: ".68rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>{getTimeLabel(done, total)}</div>
+          {state.xpBoost && <div style={{ fontSize: ".68rem", color: "#FCD34D", fontWeight: 800, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} 2x XP</div>}
         </div>
       </div>
 
