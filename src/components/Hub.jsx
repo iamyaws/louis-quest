@@ -61,13 +61,13 @@ export default function Hub() {
         {/* Hero Level Card */}
         <div className="hero-card" style={{ marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-            <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".8rem", color: T.primary, textTransform: "uppercase" }}>Level {level} Held</div>
-            <div style={{ fontSize: ".7rem", fontWeight: 700, color: T.textSecondary }}>{xpP.cur}/{xpP.need} XP</div>
+            <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".85rem", color: "#1E1B4B", textTransform: "uppercase" }}>Level {level} Held</div>
+            <div style={{ fontSize: ".75rem", fontWeight: 800, color: "#475569" }}>{xpP.cur}/{xpP.need} XP</div>
           </div>
           <div className="hero-xp-track"><div className="hero-xp-fill" style={{ width: `${Math.min(100, (xpP.cur / xpP.need) * 100)}%` }} /></div>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 10 }}>
-            <div style={{ background: "rgba(109,40,217,0.08)", borderRadius: 12, padding: "6px 14px", fontSize: ".7rem", fontWeight: 800, color: T.primary }}>{"\u{1F525}"} {state.sd}d Streak</div>
-            {state.xpBoost && <div style={{ background: "rgba(245,158,11,0.1)", borderRadius: 12, padding: "6px 14px", fontSize: ".7rem", fontWeight: 800, color: T.accentDark, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} 2x XP</div>}
+            <div style={{ background: "#FEF3C7", borderRadius: 12, padding: "6px 14px", fontSize: ".75rem", fontWeight: 800, color: "#92400E" }}>{"\u{1F525}"} {state.sd}d Streak</div>
+            {state.xpBoost && <div style={{ background: "#FEF3C7", borderRadius: 12, padding: "6px 14px", fontSize: ".75rem", fontWeight: 800, color: "#92400E", animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} 2x XP</div>}
           </div>
         </div>
 

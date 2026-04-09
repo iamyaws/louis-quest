@@ -208,13 +208,14 @@ body { background: #0369E8; font-family: 'Nunito', sans-serif; overscroll-behavi
 
 /* ── Hero display card ── */
 .hero-card {
-  background: linear-gradient(135deg, rgba(109,40,217,0.06), rgba(167,139,250,0.06));
-  border: 3px solid rgba(109,40,217,0.12);
+  background: white;
+  border: 3px solid rgba(0,50,150,0.08);
   border-radius: 24px;
   padding: 20px;
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,40,120,0.10);
 }
 
 .hero-level-badge {
