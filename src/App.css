@@ -1,6 +1,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body, #root { height: 100%; width: 100%; }
-body { background: #F7F3E3; font-family: 'Nunito', sans-serif; overscroll-behavior: none; -webkit-font-smoothing: antialiased; }
+body { background: #F7F3E3; font-family: 'Be Vietnam Pro', 'Nunito', sans-serif; overscroll-behavior: none; -webkit-font-smoothing: antialiased; }
 
 /* ── Tap feedback ── */
 .btn-tap { transition: transform .12s ease, box-shadow .12s ease; }

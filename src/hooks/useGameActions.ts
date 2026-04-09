@@ -1,7 +1,7 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
   RARE_DROPS, RARE_DROP_CHANCE, CHEST_MILESTONES,
-  WEEKLY_MISSIONS, BOSSES, UNLOCK_CONDITIONS,
+  WEEKLY_MISSIONS, BOSSES, UNLOCK_CONDITIONS, SHOP_ITEMS,
 } from '../constants';
 import { getLevel, buildDay, getCatStage } from '../utils/helpers';
 import storage from '../utils/storage';
@@ -115,6 +115,7 @@ export default function useGameActions(
       // Boss damage
       let bossUpdate = prev.boss ? { ...prev.boss } : null;
       let bossRewardHP = 0;
+      const newUnlocksFromBoss: string[] = [];
       const trophies = [...(prev.bossTrophies || [])];
       if (bossUpdate && bossUpdate.hp > 0) {
         const dmg = Math.max(5, Math.floor(q.xp * 0.8));
@@ -125,6 +126,13 @@ export default function useGameActions(
           const bd = BOSSES.find(b => b.id === bossUpdate!.id);
           if (bd) bossRewardHP = bd.reward.hp;
           if (!trophies.includes(bossUpdate.id)) trophies.push(bossUpdate.id);
+          // Boss loot: unlock a random locked item
+          const allItems = [...(SHOP_ITEMS.hero || []), ...(SHOP_ITEMS.cat || []), ...(SHOP_ITEMS.room || [])];
+          const locked = allItems.filter(item => !(prev.purchased || []).includes(item.id) && !newUnlocksFromBoss.includes(item.id));
+          if (locked.length > 0) {
+            const loot = locked[Math.floor(Math.random() * locked.length)];
+            newUnlocksFromBoss.push(loot.id);
+          }
           setTimeout(() => SFX.play("bossDefeat"), 400);
         }
       }
@@ -151,7 +159,12 @@ export default function useGameActions(
         catEvo: newCatEvo,
       };
 
-      // Check passive unlocks
+      // Boss loot unlocks
+      if (newUnlocksFromBoss.length > 0) {
+        result.purchased = [...(result.purchased || []), ...newUnlocksFromBoss];
+      }
+
+      // Check passive milestone unlocks
       const newUnlocks = checkUnlocks(result);
       if (newUnlocks.length > 0) {
         result.purchased = [...(result.purchased || []), ...newUnlocks];
