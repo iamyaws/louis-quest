@@ -1,6 +1,6 @@
 {
-  "name": "HeroDex — Dein Helden-Abenteuer",
-  "short_name": "HeroDex",
+  "name": "Ronki — Dein Helden-Abenteuer",
+  "short_name": "Ronki",
   "description": "Gamifizierter Aufgaben-Tracker für Kinder mit Held, Katze und täglichen Quests",
   "start_url": "/louis-quest/",
   "scope": "/louis-quest/",

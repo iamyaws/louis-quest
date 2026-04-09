@@ -1,4 +1,4 @@
-// ── HeroDex Storage — IndexedDB with localStorage fallback ──
+// ── Ronki Storage — IndexedDB with localStorage fallback ──
 import type { GameState } from '../types';
 
 const DB_NAME = "herodex";

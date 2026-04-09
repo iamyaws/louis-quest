@@ -1,4 +1,4 @@
-// ═══ HeroDex — Shared Type Definitions ═══
+// ═══ Ronki — Shared Type Definitions ═══
 
 export interface Hero {
   name: string;

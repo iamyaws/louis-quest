@@ -115,7 +115,7 @@ export default function Onboarding({ onComplete }) {
       <div style={{ fontSize: "4rem", marginBottom: 16, animation: "heroFloat 3s ease-in-out infinite" }}>
         {"🦸"}
       </div>
-      <OBTitle>Willkommen bei HeroDex!</OBTitle>
+      <OBTitle>Willkommen bei Ronki!</OBTitle>
       <OBSub>Erstelle deinen Helden und finde dein Begleiter-Ei!</OBSub>
       <OBBtn onClick={() => setStep(1)} big>Los geht's! 🚀</OBBtn>
     </OBWrap>

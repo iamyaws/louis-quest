@@ -41,7 +41,7 @@ export default function Hub() {
   const catAllDone = state.catFed && state.catPetted && state.catPlayed;
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#F7F3E3" }}>
+    <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#FFF8F0" }}>
 
       {/* --- 1. Top Bar (lock only) --- */}
       <div style={{

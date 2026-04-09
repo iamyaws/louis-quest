@@ -65,7 +65,7 @@ function BottomTabBar() {
 function AppContent() {
   const { state, boarding, computed, actions, onBoard, ui } = useGame();
 
-  if (boarding === null) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#F7F3E3", color: "#1E1B4B", fontFamily: "'Nunito',sans-serif", fontSize: "1.2rem", fontWeight: 700 }}>Laden...</div>;
+  if (boarding === null) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#FFF8F0", color: "#1E1B4B", fontFamily: "'Nunito',sans-serif", fontSize: "1.2rem", fontWeight: 700 }}>Laden...</div>;
   if (boarding) return <Onboarding onComplete={onBoard} />;
   if (!state) return null;
 
@@ -84,7 +84,7 @@ function AppContent() {
 
       {/* Persistent chrome */}
 
-      <div style={{ minHeight: "100vh", background: "#F7F3E3", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: ui.view === "hub" ? 0 : 60, paddingBottom: 80 }}>
+      <div style={{ minHeight: "100vh", background: "#FFF8F0", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: ui.view === "hub" ? 0 : 60, paddingBottom: 80 }}>
         {ui.view === "hub" && <Hub />}
         {ui.view === "time" && <TimeBank />}
         {ui.view === "stats" && <Achievements />}
