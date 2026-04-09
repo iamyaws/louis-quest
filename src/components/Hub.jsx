@@ -178,6 +178,12 @@ export default function Hub() {
           );
         })()}
 
+        {/* Quick links */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          <button className="btn-tap" onClick={() => ui.setView("journal")} style={{ flex: 1, background: "white", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 16, padding: "12px", cursor: "pointer", fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: ".8rem", color: T.textPrimary, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>{"\u{1F4D3}"} Tagebuch</button>
+          <button className="btn-tap" onClick={() => ui.setView("time")} style={{ flex: 1, background: "white", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 16, padding: "12px", cursor: "pointer", fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: ".8rem", color: T.textPrimary, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>{"\u23F0"} Zeitbank</button>
+        </div>
+
         {/* Hints */}
         {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".7rem", color: "#94A3B8", textAlign: "center", marginBottom: 8 }}>{"\u{1F381}"} Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
         {(state.streakFreezes || 0) > 0 && <div style={{ fontSize: ".7rem", color: "#94A3B8", textAlign: "center", marginBottom: 8 }}>{"\u2744\uFE0F"} {state.streakFreezes} Streak-Schutz übrig</div>}
