@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS,
+  WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES,
 } from '../constants';
 import { buildDay } from '../utils/helpers';
 import storage from '../utils/storage';
@@ -96,6 +96,11 @@ function applyDayTransition(p: GameState, today: string): void {
   p.wheelSpun = false;
   p.memoryPlayed = false;
   p.chestMilestone = null;
+  // Cat care daily reset + stat decay
+  p.catFed = false; p.catPetted = false; p.catPlayed = false;
+  p.catHunger = Math.max(0, (p.catHunger ?? 100) - 30);
+  p.catHappy = Math.max(0, (p.catHappy ?? 100) - 25);
+  p.catEnergy = Math.max(0, (p.catEnergy ?? 100) - 20);
 
   const weekStart = p.weekStart ? new Date(p.weekStart) : new Date();
   const daysSinceStart = Math.floor((new Date().getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
@@ -104,6 +109,9 @@ function applyDayTransition(p: GameState, today: string): void {
     p.weeklyMission = wm.id;
     p.weeklyProgress = 0;
     p.weekStart = today;
+    // Spawn new weekly boss
+    const b = BOSSES[Math.floor(Math.random() * BOSSES.length)];
+    p.boss = { id: b.id, hp: b.hp, maxHp: b.hp };
   }
 
   if (!p.graduated) p.graduated = [];
@@ -135,6 +143,16 @@ function applyDefaults(p: GameState): void {
     p.weekStart = new Date().toDateString();
   }
   if (!p.graduated) p.graduated = [];
+  // Cat & boss migrations
+  if (p.catEvo === undefined) p.catEvo = 0;
+  if (p.catHunger === undefined) p.catHunger = 100;
+  if (p.catHappy === undefined) p.catHappy = 100;
+  if (p.catEnergy === undefined) p.catEnergy = 100;
+  if (p.catFed === undefined) p.catFed = false;
+  if (p.catPetted === undefined) p.catPetted = false;
+  if (p.catPlayed === undefined) p.catPlayed = false;
+  if (!p.boss) { const b = BOSSES[Math.floor(Math.random() * BOSSES.length)]; p.boss = { id: b.id, hp: b.hp, maxHp: b.hp }; }
+  if (!p.bossTrophies) p.bossTrophies = [];
 }
 
 interface OnboardData {
@@ -158,5 +176,9 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     graduated: [], streakFreezes: MAX_MONTHLY_FREEZES, freezesUsedThisMonth: 0,
     lastFreezeMonth: `${new Date().getFullYear()}-${new Date().getMonth()}`,
     comebackActive: false, bestStreak: 0, freezeUsedToday: false,
+    catEvo: 0, catHunger: 100, catHappy: 100, catEnergy: 100,
+    catFed: false, catPetted: false, catPlayed: false,
+    boss: (() => { const b = BOSSES[Math.floor(Math.random() * BOSSES.length)]; return { id: b.id, hp: b.hp, maxHp: b.hp }; })(),
+    bossTrophies: [],
   };
 }

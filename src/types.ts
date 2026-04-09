@@ -81,6 +81,28 @@ export interface Badge {
 
 export type CatMood = 'sleepy' | 'neutral' | 'happy' | 'excited';
 
+export interface Boss {
+  id: string;
+  hp: number;
+  maxHp: number;
+}
+
+export interface BossTemplate {
+  id: string;
+  name: string;
+  icon: string;
+  hp: number;
+  reward: { xp: number; coins: number };
+  desc: string;
+}
+
+export interface CatStageInfo {
+  name: string;
+  threshold: number;
+  emoji: string;
+  desc: string;
+}
+
 export interface GameState {
   hero: Hero;
   catVariant: string;
@@ -117,6 +139,17 @@ export interface GameState {
   comebackActive: boolean;
   bestStreak: number;
   freezeUsedToday: boolean;
+  // Cat care / evolution
+  catEvo: number;
+  catHunger: number;
+  catHappy: number;
+  catEnergy: number;
+  catFed: boolean;
+  catPetted: boolean;
+  catPlayed: boolean;
+  // Boss battles
+  boss: Boss | null;
+  bossTrophies: string[];
 }
 
 export interface ComputedState {

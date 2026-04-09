@@ -153,6 +153,23 @@ export const WEEKLY_MISSIONS: WeeklyMission[] = [
 
 export const GRADUATION_THRESHOLD = 30;
 
+export const CAT_STAGES: import('./types').CatStageInfo[] = [
+  { name: "K\u00E4tzchen", threshold: 0, emoji: "\u{1F431}", desc: "Klein aber fein!" },
+  { name: "Jungkatze", threshold: 25, emoji: "\u{1F63A}", desc: "W\u00E4chst und gedeiht!" },
+  { name: "Katze", threshold: 75, emoji: "\u{1F638}", desc: "Stark und geschickt!" },
+  { name: "Prachtkatze", threshold: 150, emoji: "\u{1F63B}", desc: "Wundersch\u00F6n!" },
+  { name: "Legend\u00E4r", threshold: 300, emoji: "\u{1F451}", desc: "Eine Legende!" },
+];
+
+export const BOSSES: import('./types').BossTemplate[] = [
+  { id: "b1", name: "Schlaf-Drache", icon: "\u{1F409}", hp: 80, reward: { xp: 50, coins: 40 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst!" },
+  { id: "b2", name: "Chaos-Monster", icon: "\u{1F47E}", hp: 100, reward: { xp: 60, coins: 50 }, desc: "Es liebt Unordnung und Chaos!" },
+  { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 90, reward: { xp: 55, coins: 45 }, desc: "Er will, dass du nur auf dem Sofa liegst!" },
+  { id: "b4", name: "Vergesslichkeits-Geist", icon: "\u{1F47B}", hp: 110, reward: { xp: 65, coins: 55 }, desc: "Er l\u00E4sst dich alles vergessen!" },
+  { id: "b5", name: "Mecker-Goblin", icon: "\u{1F47A}", hp: 85, reward: { xp: 50, coins: 40 }, desc: "Er meckert \u00FCber alles und jeden!" },
+  { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 95, reward: { xp: 55, coins: 45 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!" },
+];
+
 export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {
   morning: { label: "Morgens", icon: "\u{1F305}", col: "#F97316" },
   afternoon: { label: "Nachmittags", icon: "\u2600\uFE0F", col: "#0EA5E9" },

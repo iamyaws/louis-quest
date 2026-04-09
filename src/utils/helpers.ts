@@ -1,4 +1,4 @@
-import { LVL, SCHOOL_QUESTS, VACATION_QUESTS, FOOTBALL } from '../constants';
+import { LVL, SCHOOL_QUESTS, VACATION_QUESTS, FOOTBALL, CAT_STAGES } from '../constants';
 import type { Quest, CatMood } from '../types';
 
 export function getLevel(xp: number): number {
@@ -50,4 +50,26 @@ export function getMood(allDone: boolean, pct: number): CatMood {
 
 export function getDayName(): string {
   return ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"][new Date().getDay()];
+}
+
+export function getCatStage(catEvo: number): number {
+  for (let i = CAT_STAGES.length - 1; i >= 0; i--) {
+    if (catEvo >= CAT_STAGES[i].threshold) return i;
+  }
+  return 0;
+}
+
+export function getCatStageProg(catEvo: number): { cur: number; need: number; stage: number; maxStage: boolean } {
+  const s = getCatStage(catEvo);
+  const cur = CAT_STAGES[s].threshold;
+  const next = CAT_STAGES[s + 1]?.threshold || cur + 100;
+  return { cur: catEvo - cur, need: next - cur, stage: s, maxStage: s >= CAT_STAGES.length - 1 };
+}
+
+export function getCatMood(hunger?: number, happy?: number, energy?: number): CatMood {
+  const avg = ((hunger ?? 100) + (happy ?? 100) + (energy ?? 100)) / 3;
+  if (avg >= 75) return "excited";
+  if (avg >= 50) return "happy";
+  if (avg >= 25) return "neutral";
+  return "sleepy";
 }

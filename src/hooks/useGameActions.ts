@@ -1,9 +1,9 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
   RARE_DROPS, RARE_DROP_CHANCE, CHEST_MILESTONES,
-  WEEKLY_MISSIONS,
+  WEEKLY_MISSIONS, BOSSES,
 } from '../constants';
-import { getLevel, buildDay } from '../utils/helpers';
+import { getLevel, buildDay, getCatStage } from '../utils/helpers';
 import storage from '../utils/storage';
 import SFX from '../utils/sfx';
 import type { GameState, RareDrop, ChestReward, WheelSegment } from '../types';
@@ -84,15 +84,41 @@ export default function useGameActions(
         if (wm.reward.type === "xp") wmBonusXP = wm.reward.amount;
       }
 
+      // Boss damage
+      let bossUpdate = prev.boss ? { ...prev.boss } : null;
+      let bossRewardXP = 0, bossRewardCoins = 0;
+      const trophies = [...(prev.bossTrophies || [])];
+      if (bossUpdate && bossUpdate.hp > 0) {
+        const dmg = Math.max(5, Math.floor(q.xp * 0.8));
+        const prevHp = bossUpdate.hp;
+        bossUpdate.hp = Math.max(0, bossUpdate.hp - dmg);
+        if (prevHp > 0) setTimeout(() => SFX.play("bossHit"), 100);
+        if (bossUpdate.hp <= 0 && prevHp > 0) {
+          const bd = BOSSES.find(b => b.id === bossUpdate!.id);
+          if (bd) { bossRewardXP = bd.reward.xp; bossRewardCoins = bd.reward.coins; }
+          if (!trophies.includes(bossUpdate.id)) trophies.push(bossUpdate.id);
+          setTimeout(() => SFX.play("bossDefeat"), 400);
+        }
+      }
+
+      // Cat evolution
+      const catEvoGain = all ? 3 : 1;
+      const newCatEvo = (prev.catEvo || 0) + catEvoGain;
+      const prevCatStage = getCatStage(prev.catEvo || 0);
+      const newCatStage = getCatStage(newCatEvo);
+      if (newCatStage > prevCatStage) setTimeout(() => SFX.play("evolve"), 800);
+
       return {
         ...prev, quests: nq2,
-        xp: newXP + bonusXP + wmBonusXP,
-        coins: prev.coins + Math.floor(q.xp / 3) + (all ? 15 : 0) + bonusCoins + wmBonusCoins,
+        xp: newXP + bonusXP + wmBonusXP + bossRewardXP,
+        coins: prev.coins + Math.floor(q.xp / 3) + (all ? 15 : 0) + bonusCoins + wmBonusCoins + bossRewardCoins,
         dt: prev.dt + q.minutes + bonusMin, sd: newSD,
         hist: [...prev.hist, { id, d: Date.now() }], sm, bestStreak: newBest,
         chestMilestone: chestEarned ? newSD : prev.chestMilestone,
         xpBoost: all ? false : prev.xpBoost,
         weeklyProgress: wp,
+        boss: bossUpdate, bossTrophies: trophies,
+        catEvo: newCatEvo,
       };
     });
   }, [setState, setCeleb, setShowVictory, setShowChest, setRareDrop]);
@@ -211,6 +237,30 @@ export default function useGameActions(
     setShowChest(false);
   }, [setState, setShowChest]);
 
+  const feedCat = useCallback(() => {
+    setState(prev => {
+      if (!prev || prev.catFed) return prev;
+      SFX.play("feed");
+      return { ...prev, catFed: true, catHunger: Math.min(100, (prev.catHunger || 0) + 40), catEvo: (prev.catEvo || 0) + 1, xp: prev.xp + 5, coins: prev.coins + 3 };
+    });
+  }, [setState]);
+
+  const petCat = useCallback(() => {
+    setState(prev => {
+      if (!prev || prev.catPetted) return prev;
+      SFX.play("purr");
+      return { ...prev, catPetted: true, catHappy: Math.min(100, (prev.catHappy || 0) + 40), catEvo: (prev.catEvo || 0) + 1, xp: prev.xp + 5, coins: prev.coins + 3 };
+    });
+  }, [setState]);
+
+  const playCat = useCallback(() => {
+    setState(prev => {
+      if (!prev || prev.catPlayed) return prev;
+      SFX.play("pop");
+      return { ...prev, catPlayed: true, catEnergy: Math.min(100, (prev.catEnergy || 0) + 40), catEvo: (prev.catEvo || 0) + 1, xp: prev.xp + 5, coins: prev.coins + 3 };
+    });
+  }, [setState]);
+
   const exportState = useCallback((currentState: GameState) => {
     const blob = new Blob([JSON.stringify(currentState, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -246,6 +296,7 @@ export default function useGameActions(
     togVac, resetDay, resetAll, buyItem,
     setMood, setJournal, setJAnswer, toggleRainbow,
     collectWheel, collectMemory, collectChest,
+    feedCat, petCat, playCat,
     exportState, importState,
   };
 }

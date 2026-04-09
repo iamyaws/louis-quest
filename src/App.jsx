@@ -19,6 +19,7 @@ import SurpriseChest from './components/SurpriseChest';
 import PinModal from './components/PinModal';
 import MemoryGame from './components/MemoryGame';
 import Weather from './components/Weather';
+import CatCare from './components/CatCare';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const TABS = [
@@ -90,6 +91,7 @@ function AppContent() {
         {ui.view === "shop" && <Shop />}
         {ui.view === "journal" && <Journal />}
         {ui.view === "weather" && <Weather />}
+        {ui.view === "cat" && <CatCare />}
         {ui.questOpen && <QuestBoard />}
       </div>
 

@@ -61,6 +61,43 @@ const SFX = {
           g.gain.setValueAtTime(0.2, now + i * 0.08); g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.08 + 0.1);
           o.start(now + i * 0.08); o.stop(now + i * 0.08 + 0.1);
         });
+      } else if (type === "purr") {
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine"; o.frequency.setValueAtTime(180, now); o.frequency.linearRampToValueAtTime(200, now + 0.3);
+        g.gain.setValueAtTime(0.15, now); g.gain.linearRampToValueAtTime(0.08, now + 0.15); g.gain.linearRampToValueAtTime(0.15, now + 0.3); g.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        o.start(now); o.stop(now + 0.5);
+      } else if (type === "feed") {
+        [600, 800, 1000, 1200].forEach((f, i) => {
+          const o = ctx.createOscillator(); const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = "sine"; o.frequency.setValueAtTime(f, now + i * 0.06);
+          g.gain.setValueAtTime(0.15, now + i * 0.06); g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.06 + 0.1);
+          o.start(now + i * 0.06); o.stop(now + i * 0.06 + 0.1);
+        });
+      } else if (type === "bossHit") {
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sawtooth"; o.frequency.setValueAtTime(200, now); o.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+        g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        o.start(now); o.stop(now + 0.2);
+      } else if (type === "bossDefeat") {
+        [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => {
+          const o = ctx.createOscillator(); const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = i < 3 ? "sine" : "square";
+          o.frequency.setValueAtTime(f, now + i * 0.1);
+          g.gain.setValueAtTime(0.2, now + i * 0.1); g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.25);
+          o.start(now + i * 0.1); o.stop(now + i * 0.1 + 0.25);
+        });
+      } else if (type === "evolve") {
+        [440, 554, 659, 880, 1047, 1319, 1568].forEach((f, i) => {
+          const o = ctx.createOscillator(); const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = "sine"; o.frequency.setValueAtTime(f, now + i * 0.09);
+          g.gain.setValueAtTime(0.18, now + i * 0.09); g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.09 + 0.2);
+          o.start(now + i * 0.09); o.stop(now + i * 0.09 + 0.2);
+        });
       } else if (type === "victory") {
         // Victory fanfare — longer celebratory sequence
         [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => {
