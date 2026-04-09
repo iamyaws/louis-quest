@@ -23,7 +23,7 @@ export default function Achievements() {
           <div style={{ fontSize: ".75rem", color: T.textSecondary, fontWeight: 600 }}>Level {level} Held</div>
           <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
             <span style={{ fontSize: ".7rem", fontWeight: 700, color: T.primary }}>{"\u26A1"}{state.xp}</span>
-            <span style={{ fontSize: ".7rem", fontWeight: 700, color: T.accentDark }}>{"\u{1FA99}"}{state.coins}</span>
+            <span style={{ fontSize: ".7rem", fontWeight: 700, color: T.accentDark }}>{"\u2B50"}{state.coins}</span>
             <span style={{ fontSize: ".7rem", fontWeight: 700, color: "#F97316" }}>{"\u{1F525}"}{state.sd}d</span>
           </div>
         </div>
@@ -39,7 +39,7 @@ export default function Achievements() {
       </div>
       <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".8rem", color: "#64748B", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>Stats</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {[{ l: "Gesamt XP", v: state.xp, i: "\u26A1" }, { l: "M\u00FCnzen", v: state.coins, i: "\u{1FA99}" }, { l: "Quests", v: state.hist.length, i: "\u2694\uFE0F" }, { l: "Streak", v: state.sd + "d", i: "\u{1F525}" }, { l: "Level", v: level, i: "\u{1F4C8}" }].map((s, i) => (
+        {[{ l: "Gesamt HP", v: state.xp, i: "\u26A1" }, { l: "Heldenpunkte", v: state.coins, i: "\u2B50" }, { l: "Aufgaben", v: state.hist.length, i: "\u2694\uFE0F" }, { l: "Streak", v: state.sd + "d", i: "\u{1F525}" }, { l: "Level", v: level, i: "\u{1F4C8}" }].map((s, i) => (
           <div key={i} className="game-card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 16, padding: "14px 18px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: "1.2rem" }}>{s.i}</span><span style={{ fontSize: ".85rem", fontWeight: 700 }}>{s.l}</span></div>
             <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.05rem", fontWeight: 700, color: T.primary }}>{s.v}</span>

@@ -107,7 +107,7 @@ export default function VictoryScreen({ onClose, onSpinWheel, onMemoryGame }) {
           <div style={{ fontSize: ".7rem", fontWeight: 800, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12, textAlign: "center" }}>Tagesübersicht</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
             {[
-              { label: "Quests", value: `${done}/${total}`, icon: "\u2694\uFE0F" },
+              { label: "Aufgaben", value: `${done}/${total}`, icon: "\u2694\uFE0F" },
               { label: "Verdient", value: `+${state.dt}min`, icon: "\u23F0" },
               { label: "Streak", value: `${state.sd}d`, icon: "\u{1F525}" },
             ].map((s, i) => (
@@ -119,8 +119,8 @@ export default function VictoryScreen({ onClose, onSpinWheel, onMemoryGame }) {
             ))}
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "center" }}>
-            <div style={{ background: `${T.primary}30`, borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: T.primaryLight }}>Lvl {level} {"\u26A1"} {state.xp} XP</div>
-            <div style={{ background: `${T.accent}30`, borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: T.accent }}>{"\u{1FA99}"} {state.coins}</div>
+            <div style={{ background: `${T.primary}30`, borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: T.primaryLight }}>Lvl {level} {"\u26A1"} {state.xp} HP</div>
+            <div style={{ background: `${T.accent}30`, borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: T.accent }}>{"\u2B50"} {state.coins}</div>
           </div>
         </div>
       )}

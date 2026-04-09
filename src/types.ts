@@ -35,7 +35,7 @@ export interface ShopItem {
 }
 
 export interface RareDrop {
-  type: 'coins' | 'xp' | 'minutes' | 'emoji';
+  type: 'hp' | 'minutes' | 'emoji';
   amount?: number;
   label: string;
   icon: string;
@@ -43,7 +43,7 @@ export interface RareDrop {
 }
 
 export interface ChestReward {
-  type: 'coins' | 'xp' | 'item' | 'minutes' | 'xpboost';
+  type: 'hp' | 'item' | 'minutes' | 'xpboost';
   amount?: number;
   id?: string;
   label: string;
@@ -51,7 +51,7 @@ export interface ChestReward {
 }
 
 export interface WheelSegment {
-  type: 'coins' | 'xp' | 'minutes' | 'rare';
+  type: 'hp' | 'minutes' | 'rare';
   amount?: number;
   label: string;
   icon: string;
@@ -64,7 +64,7 @@ export interface WeeklyMission {
   story: string;
   goal: string;
   target: number;
-  reward: { type: 'coins' | 'xp'; amount: number };
+  reward: { type: 'hp'; amount: number };
   icon: string;
 }
 
@@ -92,7 +92,7 @@ export interface BossTemplate {
   name: string;
   icon: string;
   hp: number;
-  reward: { xp: number; coins: number };
+  reward: { hp: number };
   desc: string;
 }
 
@@ -101,6 +101,39 @@ export interface CatStageInfo {
   threshold: number;
   emoji: string;
   desc: string;
+}
+
+// ── New: Belohnungsbank ──
+export interface Belohnung {
+  id: string;
+  name: string;
+  emoji: string;
+  cost: number;
+  active: boolean;
+}
+
+// ── New: Spezial-Mission ──
+export interface SpecialMission {
+  id: string;
+  name: string;
+  emoji: string;
+  hp: number;
+  done: boolean;
+}
+
+// ── New: Unlock Condition ──
+export interface UnlockCondition {
+  type: 'streak' | 'boss' | 'tasks' | 'catStage' | 'weeklyMission' | 'bossLoot';
+  value: number;
+  label: string;
+  icon: string;
+}
+
+// ── New: Hero Tip ──
+export interface HeroTip {
+  char: string;
+  emoji: string;
+  tip: string;
 }
 
 export interface GameState {
@@ -150,6 +183,14 @@ export interface GameState {
   // Boss battles
   boss: Boss | null;
   bossTrophies: string[];
+  // ── New fields ──
+  dailyVitaminD: boolean;
+  dailyBrother: boolean;
+  belohnungen: Belohnung[];
+  belohnungenLog: { id: string; date: string }[];
+  specialMissions: SpecialMission[];
+  weeklyLunch: Record<string, string>;
+  weeklyMissionsCompleted: number;
 }
 
 export interface ComputedState {

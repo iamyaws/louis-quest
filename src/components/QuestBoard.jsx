@@ -14,10 +14,13 @@ export default function QuestBoard() {
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", flexDirection: "column" }}>
       <div style={{ flex: "0 0 50px", background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", cursor: "pointer" }} onClick={() => setQuestOpen(false)} />
       <div style={{ flex: "1 1 auto", background: "linear-gradient(180deg, #F0F4FF 0%, #FFFFFF 100%)", borderRadius: "32px 32px 0 0", padding: "0 16px 100px", overflow: "auto", animation: "slideUp .3s ease", boxShadow: "0 -8px 40px rgba(0,0,0,0.15)", position: "relative" }}>
-        {/* Handle + close */}
-        <div style={{ position: "sticky", top: 0, background: "linear-gradient(180deg, #F0F4FF, rgba(240,244,255,0.95))", paddingTop: 12, paddingBottom: 8, zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", borderRadius: "32px 32px 0 0", backdropFilter: "blur(8px)" }}>
-          <div style={{ width: 44, height: 5, borderRadius: 3, background: "rgba(0,50,150,0.12)", margin: "0 auto" }} />
-          <button aria-label="Quests schließen" onClick={() => setQuestOpen(false)} style={{ position: "absolute", right: 0, top: 8, background: "white", border: "2.5px solid rgba(0,50,150,0.08)", borderRadius: 50, width: 42, height: 42, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "1.1rem", fontWeight: 800, color: T.textSecondary, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>{"\u2715"}</button>
+        {/* Handle + back button */}
+        <div style={{ position: "sticky", top: 0, background: "linear-gradient(180deg, #F0F4FF, rgba(240,244,255,0.95))", paddingTop: 12, paddingBottom: 8, zIndex: 10, borderRadius: "32px 32px 0 0", backdropFilter: "blur(8px)" }}>
+          <div style={{ width: 44, height: 5, borderRadius: 3, background: "rgba(0,50,150,0.12)", margin: "0 auto 8px" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 4px" }}>
+            <button aria-label="Aufgaben schließen" onClick={() => setQuestOpen(false)} className="btn-tap" style={{ background: "white", border: "2.5px solid rgba(0,50,150,0.08)", borderRadius: 14, padding: "8px 14px", cursor: "pointer", fontSize: ".9rem", fontWeight: 800, color: T.textSecondary, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", display: "flex", alignItems: "center", gap: 4, minHeight: 44 }}>{"\u2190"} Zurück</button>
+            <div style={{ flex: 1, fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "1rem", fontWeight: 800, color: T.primary, textTransform: "uppercase" }}>{"\u2B50"} Helden-Aufgaben</div>
+          </div>
         </div>
 
         {/* Comeback Quest */}
@@ -32,14 +35,14 @@ export default function QuestBoard() {
               border: "none", borderRadius: 14, padding: "10px",
               color: "white", fontWeight: 800, fontSize: ".8rem", cursor: "pointer",
               fontFamily: "'Plus Jakarta Sans',sans-serif", minHeight: 44,
-            }}>{"\u{1F43E}"} Ich bin wieder da! (+15 XP, +10 {"\u{1FA99}"})</button>
+            }}>{"\u{1F43E}"} Ich bin wieder da! (+15 {"\u2B50"})</button>
           </div>
         </div>}
 
         {/* Overall progress */}
         <div className="game-card" style={{ padding: 16, marginBottom: 14, background: allDone ? "linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))" : "white", borderColor: allDone ? `${T.success}40` : undefined }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: allDone ? T.successDark : T.textPrimary, textTransform: "uppercase" }}>{allDone ? "\u{1F4AA} Durchgehalten!" : `${done}/${total} Quests`}</span>
+            <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: allDone ? T.successDark : T.textPrimary, textTransform: "uppercase" }}>{allDone ? "\u{1F4AA} Durchgehalten!" : `${done}/${total} Aufgaben`}</span>
             <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{state.dt} Min</span>
           </div>
           <div className="mission-progress-track"><div className="mission-progress-fill" style={{ width: `${pct * 100}%`, background: allDone ? `linear-gradient(90deg,${T.success},#6EE7B7)` : `linear-gradient(90deg,${T.primary},${T.primaryLight})` }} /></div>
@@ -49,7 +52,7 @@ export default function QuestBoard() {
         <div className="game-card" style={{ padding: 14, marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".76rem", fontWeight: 800, color: T.textPrimary, textTransform: "uppercase" }}>{"\u{1F308}"} Eat the Rainbow</span>
-            {(state.rainbow || []).every(Boolean) && <span style={{ fontSize: ".7rem", fontWeight: 800, color: T.success }}>+25 XP! {"\u{1F389}"}</span>}
+            {(state.rainbow || []).every(Boolean) && <span style={{ fontSize: ".7rem", fontWeight: 800, color: T.success }}>+25 {"\u2B50"}! {"\u{1F389}"}</span>}
           </div>
           <div style={{ display: "flex", gap: 6, justifyContent: "space-between" }}>{RAINBOW.map((emoji, i) => {
             const d = (state.rainbow || [])[i];
@@ -97,14 +100,14 @@ export default function QuestBoard() {
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: 700, fontSize: ".88rem", textDecoration: q.done ? "line-through" : "none", color: T.textPrimary }}>{q.name}</div>
                         <div style={{ display: "flex", gap: 8, marginTop: 3 }}>
-                          <span style={{ fontSize: ".65rem", fontWeight: 700, color: T.primary }}>+{q.xp} XP</span>
+                          <span style={{ fontSize: ".65rem", fontWeight: 700, color: T.primary }}>+{q.xp} {"\u2B50"}</span>
                           <span style={{ fontSize: ".65rem", fontWeight: 700, color: T.accentDark }}>+{q.minutes} Min</span>
                           {q.streak > 0 && <span style={{ fontSize: ".65rem", fontWeight: 700, color: "#F97316" }}>{"\u{1F525}"}{q.streak}</span>}
                         </div>
                       </div>
                       {/* Reward coin stack (Paper 2 style) */}
                       {!q.done && <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, background: "rgba(252,211,77,0.1)", border: "2px solid rgba(252,211,77,0.25)", borderRadius: 12, padding: "6px 8px", minWidth: 44 }}>
-                        <span style={{ fontSize: ".9rem" }}>{"\u{1FA99}"}</span>
+                        <span style={{ fontSize: ".9rem" }}>{"\u2B50"}</span>
                         <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".65rem", fontWeight: 700, color: T.accentDark }}>+{Math.floor(q.xp / 3)}</span>
                       </div>}
                       {pMode && <button aria-label={`${q.name} entfernen`} onClick={e => { e.stopPropagation(); actions.rmQuest(q.id); }} style={{ background: `${T.danger}12`, border: `2px solid ${T.danger}30`, borderRadius: 10, padding: "4px 10px", color: T.danger, cursor: "pointer", fontSize: ".65rem", fontWeight: 800, minHeight: 36 }}>{"\u2715"}</button>}
@@ -124,10 +127,10 @@ export default function QuestBoard() {
             <div style={{ width: 44, height: 24, borderRadius: 12, background: state.vacMode ? T.success : "rgba(0,0,0,0.12)", position: "relative", transition: "all .3s" }}><div style={{ width: 18, height: 18, borderRadius: 9, background: "white", position: "absolute", top: 3, left: state.vacMode ? 23 : 3, transition: "all .3s", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }} /></div>
           </button>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <input ref={nqRef} value={nq.name} onChange={e => setNq(n => ({ ...n, name: e.target.value }))} placeholder="Neue Quest..." style={{ background: "rgba(0,50,150,0.02)", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 14, padding: "10px 14px", fontSize: ".85rem", fontFamily: "'Nunito',sans-serif", outline: "none", fontWeight: 600, minHeight: 44 }} />
+            <input ref={nqRef} value={nq.name} onChange={e => setNq(n => ({ ...n, name: e.target.value }))} placeholder="Neue Aufgabe..." style={{ background: "rgba(0,50,150,0.02)", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 14, padding: "10px 14px", fontSize: ".85rem", fontFamily: "'Nunito',sans-serif", outline: "none", fontWeight: 600, minHeight: 44 }} />
             <div style={{ display: "flex", gap: 6 }}>
               <select value={nq.anchor} onChange={e => setNq(n => ({ ...n, anchor: e.target.value }))} style={{ flex: 1, background: "rgba(0,50,150,0.02)", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 12, padding: "8px", fontSize: ".8rem", minHeight: 40 }}><option value="morning">{"\u{1F305}"} Morgens</option><option value="afternoon">{"\u2600\uFE0F"} Nachmittags</option><option value="evening">{"\u{1F319}"} Abends</option></select>
-              <input type="number" value={nq.xp} onChange={e => setNq(n => ({ ...n, xp: +e.target.value }))} style={{ width: 55, background: "rgba(0,50,150,0.02)", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 12, padding: "8px", fontSize: ".8rem", textAlign: "center", minHeight: 40 }} placeholder="XP" />
+              <input type="number" value={nq.xp} onChange={e => setNq(n => ({ ...n, xp: +e.target.value }))} style={{ width: 55, background: "rgba(0,50,150,0.02)", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 12, padding: "8px", fontSize: ".8rem", textAlign: "center", minHeight: 40 }} placeholder="HP" />
               <input type="number" value={nq.minutes} onChange={e => setNq(n => ({ ...n, minutes: +e.target.value }))} style={{ width: 55, background: "rgba(0,50,150,0.02)", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 12, padding: "8px", fontSize: ".8rem", textAlign: "center", minHeight: 40 }} placeholder="Min" />
             </div>
             <button onClick={() => actions.addQuest(nq, () => setNq(n => ({ ...n, name: "" })))} style={{ background: `linear-gradient(135deg,${T.primary},${T.primaryLight})`, border: "none", borderRadius: 14, padding: "12px", color: "white", fontWeight: 800, cursor: "pointer", fontSize: ".85rem", fontFamily: "'Plus Jakarta Sans',sans-serif", minHeight: 44 }}>Erstellen</button>
@@ -136,7 +139,7 @@ export default function QuestBoard() {
           <div style={{ background: "rgba(0,50,150,0.02)", borderRadius: 16, padding: 12, marginTop: 10, border: "2.5px solid rgba(0,50,150,0.06)" }}>
             <div style={{ fontSize: ".75rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F4CA}"} Übersicht</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-              {[{ v: state.sd, l: "Tage-Streak", c: T.primary }, { v: state.bestStreak || state.sd, l: "Bester Streak", c: "#F97316" }, { v: `\u2744\uFE0F ${state.streakFreezes || 0}`, l: "Streak-Schutz", c: T.teal }, { v: state.hist.length, l: "Quests gesamt", c: T.success }, { v: (state.graduated || []).length, l: "Graduiert \u{1F393}", c: T.accentDark }, { v: `Lvl ${level}`, l: `${state.xp} XP`, c: "#EC4899" }].map((s, i) => (
+              {[{ v: state.sd, l: "Tage-Streak", c: T.primary }, { v: state.bestStreak || state.sd, l: "Bester Streak", c: "#F97316" }, { v: `\u2744\uFE0F ${state.streakFreezes || 0}`, l: "Streak-Schutz", c: T.teal }, { v: state.hist.length, l: "Aufgaben gesamt", c: T.success }, { v: (state.graduated || []).length, l: "Gemeistert \u{1F393}", c: T.accentDark }, { v: `Lvl ${level}`, l: `${state.xp} HP`, c: "#EC4899" }].map((s, i) => (
                 <div key={i} style={{ background: "white", borderRadius: 12, padding: "10px", textAlign: "center", border: "2px solid rgba(0,50,150,0.04)" }}>
                   <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: s.c }}>{s.v}</div>
                   <div style={{ fontSize: ".6rem", color: T.textSecondary, fontWeight: 600 }}>{s.l}</div>
@@ -144,7 +147,7 @@ export default function QuestBoard() {
               ))}
             </div>
             {(state.graduated || []).length > 0 && <div style={{ marginTop: 8, fontSize: ".65rem", color: T.textSecondary }}>
-              <span style={{ fontWeight: 700 }}>Graduierte Quests:</span> {(state.graduated || []).map(gid => { const q = [...SCHOOL_QUESTS, ...VACATION_QUESTS].find(x => x.id === gid); return q ? q.name : gid; }).join(", ")}
+              <span style={{ fontWeight: 700 }}>Gemeisterte Aufgaben:</span> {(state.graduated || []).map(gid => { const q = [...SCHOOL_QUESTS, ...VACATION_QUESTS].find(x => x.id === gid); return q ? q.name : gid; }).join(", ")}
             </div>}
             {state.moodAM !== null && <div style={{ marginTop: 6, fontSize: ".65rem", color: T.textSecondary }}>Stimmung heute: {MOOD_EMOJIS[state.moodAM]} morgens{state.moodPM !== null ? `, ${MOOD_EMOJIS[state.moodPM]} abends` : ""}</div>}
           </div>

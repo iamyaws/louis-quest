@@ -110,11 +110,11 @@ export function getClothingRecs(temp: number, feelsLike: number, weatherCode: nu
     items.push({ emoji: "\u{1F97E}", name: "Winterstiefel", reason: "Füße warmhalten" });
   } else if (effective < 10) {
     items.push({ emoji: "\u{1F9E5}", name: "Jacke", reason: "Es ist kalt" });
-    items.push({ emoji: "\u{1F455}", name: "Langer Pulli", reason: "Extra Wärme" });
+    items.push({ emoji: "\u{1F9E5}", name: "Langer Pulli", reason: "Extra Wärme" });
     items.push({ emoji: "\u{1F456}", name: "Lange Hose", reason: "Beine warmhalten" });
   } else if (effective < 18) {
     items.push({ emoji: "\u{1F9E5}", name: "Leichte Jacke", reason: "Für morgens/abends" });
-    items.push({ emoji: "\u{1F455}", name: "Pulli/Hoodie", reason: "Kann kühl werden" });
+    items.push({ emoji: "\u{1F9E5}", name: "Pulli/Hoodie", reason: "Kann kühl werden" });
     items.push({ emoji: "\u{1F456}", name: "Lange Hose", reason: "Angenehm warm" });
   } else if (effective < 25) {
     items.push({ emoji: "\u{1F455}", name: "T-Shirt", reason: "Schönes Wetter!" });

@@ -7,14 +7,14 @@ import { useGame } from '../context/GameContext';
 
 const HERO_LINES = {
   sleepy: ["Guten Morgen! \u2600\uFE0F", "Was steht heute an?", "Bereit f\u00FCr den Tag! \u{1F4AA}"],
-  neutral: ["Weiter geht's! \u{1F3AF}", "Schritt f\u00FCr Schritt! \u{1F680}", "Jede Quest z\u00E4hlt!"],
+  neutral: ["Weiter geht's! \u{1F3AF}", "Schritt f\u00FCr Schritt! \u{1F680}", "Jede Aufgabe z\u00E4hlt!"],
   happy: ["L\u00E4uft bei mir! \u{1F60A}", "Ich werde jeden Tag besser! \u{1F4C8}", "Nicht aufgeben! \u{1F525}"],
   excited: ["Heute alles geschafft! \u{1F4AA}", "Das war mein Einsatz! \u{1F3C6}", "Ich hab durchgehalten! \u2B50"],
 };
 
 const CAT_LINES = {
   sleepy: ["*g\u00E4hnt* Morgen! \u{1F634}", "Miau... aufstehen? \u{1F43E}", "Schnurr... 5 Minuten noch..."],
-  neutral: ["Miau! Wir schaffen das! \u{1F63A}", "Noch eine Quest? \u{1F4AA}", "Los geht's! \u{1F3AF}"],
+  neutral: ["Miau! Wir schaffen das! \u{1F63A}", "Noch eine Aufgabe? \u{1F4AA}", "Los geht's! \u{1F3AF}"],
   happy: ["Schnurr... l\u00E4uft gut! \u{1F638}", "Zusammen sind wir stark! \u{1F43E}", "Ich glaub an dich! \u2B50"],
   excited: ["MIAU! Wir haben's geschafft! \u{1F389}", "*schnurrt mega laut* \u{1F638}", "Bestes Team ever! \u{1F43E}\u2B50"],
 };

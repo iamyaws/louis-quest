@@ -1,6 +1,6 @@
-// ═══ HERODEX v3 — Constants ═══
+// ═══ HERODEX v4 — Constants (Heldenpunkte Edition) ═══
 
-import type { Quest, Reward, ShopItem, RareDrop, ChestReward, WheelSegment, WeeklyMission, JournalQuestion, Badge } from './types';
+import type { Quest, Reward, ShopItem, RareDrop, ChestReward, WheelSegment, WeeklyMission, JournalQuestion, Badge, HeroTip, UnlockCondition, Belohnung } from './types';
 
 export const T = {
   bg: "#FFF8F0", surface: "#FFF3E6", surfaceHigh: "#FFE8CC",
@@ -107,11 +107,12 @@ export const SHOP_ITEMS: Record<string, ShopItem[]> = {
   ],
 };
 
+// ── Heldenpunkte rewards (unified — no more separate XP/coins) ──
+
 export const RARE_DROPS: RareDrop[] = [
-  { type: "coins", amount: 25, label: "+25 Bonus-M\u00FCnzen!", icon: "\u{1FA99}" },
-  { type: "coins", amount: 40, label: "+40 Bonus-M\u00FCnzen!", icon: "\u{1F4B0}" },
-  { type: "xp", amount: 20, label: "+20 Bonus-XP!", icon: "\u26A1" },
-  { type: "xp", amount: 35, label: "+35 Bonus-XP!", icon: "\u2728" },
+  { type: "hp", amount: 25, label: "+25 Bonus-HP!", icon: "\u2B50" },
+  { type: "hp", amount: 40, label: "+40 Bonus-HP!", icon: "\u{1F4AB}" },
+  { type: "hp", amount: 30, label: "+30 Bonus-HP!", icon: "\u2728" },
   { type: "minutes", amount: 5, label: "+5 Bonus-Minuten!", icon: "\u23F0" },
   { type: "emoji", label: "Seltenes Emoji: \u{1F984}", icon: "\u{1F984}", id: "emoji_unicorn" },
   { type: "emoji", label: "Seltenes Emoji: \u{1F432}", icon: "\u{1F432}", id: "emoji_dragon" },
@@ -119,22 +120,22 @@ export const RARE_DROPS: RareDrop[] = [
 ];
 
 export const CHEST_REWARDS: ChestReward[] = [
-  { type: "coins", amount: 100, label: "100 M\u00FCnzen!", icon: "\u{1F4B0}" },
-  { type: "coins", amount: 150, label: "150 M\u00FCnzen!", icon: "\u{1FA99}" },
-  { type: "xp", amount: 75, label: "75 Bonus-XP!", icon: "\u26A1" },
+  { type: "hp", amount: 100, label: "100 Heldenpunkte!", icon: "\u2B50" },
+  { type: "hp", amount: 150, label: "150 Heldenpunkte!", icon: "\u{1F4AB}" },
+  { type: "hp", amount: 75, label: "75 Bonus-HP!", icon: "\u26A1" },
   { type: "item", id: "c_crown", label: "Katzenkrone!", icon: "\u{1F451}" },
   { type: "item", id: "h_wings", label: "Heldenfl\u00FCgel!", icon: "\u{1FABD}" },
   { type: "item", id: "rm_trophy", label: "Goldpokal!", icon: "\u{1F3C6}" },
   { type: "minutes", amount: 15, label: "+15 Bonus-Minuten!", icon: "\u23F0" },
-  { type: "xpboost", label: "Doppel-XP morgen!", icon: "\u{1F525}" },
+  { type: "xpboost", label: "Doppel-Power morgen!", icon: "\u{1F525}" },
 ];
 
 export const WHEEL_SEGMENTS: WheelSegment[] = [
-  { type: "coins", amount: 30, label: "+30 M\u00FCnzen", icon: "\u{1FA99}", color: "#FCD34D" },
-  { type: "xp", amount: 25, label: "+25 XP", icon: "\u26A1", color: "#A78BFA" },
+  { type: "hp", amount: 30, label: "+30 HP", icon: "\u2B50", color: "#FCD34D" },
+  { type: "hp", amount: 25, label: "+25 HP", icon: "\u{1F4AB}", color: "#A78BFA" },
   { type: "minutes", amount: 5, label: "+5 Min", icon: "\u23F0", color: "#34D399" },
-  { type: "coins", amount: 50, label: "+50 M\u00FCnzen", icon: "\u{1F4B0}", color: "#FB923C" },
-  { type: "xp", amount: 40, label: "+40 XP", icon: "\u2728", color: "#60A5FA" },
+  { type: "hp", amount: 50, label: "+50 HP", icon: "\u{1F31F}", color: "#FB923C" },
+  { type: "hp", amount: 40, label: "+40 HP", icon: "\u26A1", color: "#60A5FA" },
   { type: "rare", label: "Seltener Fund!", icon: "\u{1F381}", color: "#EC4899" },
 ];
 
@@ -143,12 +144,12 @@ export const RARE_DROP_CHANCE = 0.12;
 export const MAX_MONTHLY_FREEZES = 2;
 
 export const WEEKLY_MISSIONS: WeeklyMission[] = [
-  { id: "wm1", title: "Sternenj\u00E4ger", story: "Rocket hat einen Stern verloren! Schaffe 5 Tage alle Quests um ihn zu finden.", goal: "allDone5", target: 5, reward: { type: "coins", amount: 200 }, icon: "\u2B50" },
-  { id: "wm2", title: "Regenbogen-Woche", story: "Esse diese Woche jeden Tag alle Farben des Regenbogens!", goal: "rainbow5", target: 5, reward: { type: "coins", amount: 150 }, icon: "\u{1F308}" },
-  { id: "wm3", title: "B\u00FCcherwurm", story: "Lies diese Woche jeden Tag! Dein Held wird kl\u00FCger!", goal: "read7", target: 7, reward: { type: "xp", amount: 100 }, icon: "\u{1F4D6}" },
-  { id: "wm4", title: "Fr\u00FChaufsteher", story: "Schaffe 5 Tage alle Morgen-Quests vor dem Mittagessen!", goal: "allMorning5", target: 5, reward: { type: "coins", amount: 175 }, icon: "\u{1F305}" },
-  { id: "wm5", title: "Sauberheld", story: "Schaffe 7 Tage deine Abend-Pflege komplett!", goal: "allEvening7", target: 7, reward: { type: "xp", amount: 80 }, icon: "\u2728" },
-  { id: "wm6", title: "Fu\u00DFball-Star", story: "Geh diese Woche zu allen Trainings!", goal: "football2", target: 2, reward: { type: "coins", amount: 120 }, icon: "\u26BD" },
+  { id: "wm1", title: "Sternenj\u00E4ger", story: "Rocket hat einen Stern verloren! Schaffe 5 Tage alle Aufgaben um ihn zu finden.", goal: "allDone5", target: 5, reward: { type: "hp", amount: 200 }, icon: "\u2B50" },
+  { id: "wm2", title: "Regenbogen-Woche", story: "Esse diese Woche jeden Tag alle Farben des Regenbogens!", goal: "rainbow5", target: 5, reward: { type: "hp", amount: 150 }, icon: "\u{1F308}" },
+  { id: "wm3", title: "B\u00FCcherwurm", story: "Lies diese Woche jeden Tag! Dein Held wird kl\u00FCger!", goal: "read7", target: 7, reward: { type: "hp", amount: 100 }, icon: "\u{1F4D6}" },
+  { id: "wm4", title: "Fr\u00FChaufsteher", story: "Schaffe 5 Tage alle Morgen-Aufgaben vor dem Mittagessen!", goal: "allMorning5", target: 5, reward: { type: "hp", amount: 175 }, icon: "\u{1F305}" },
+  { id: "wm5", title: "Sauberheld", story: "Schaffe 7 Tage deine Abend-Pflege komplett!", goal: "allEvening7", target: 7, reward: { type: "hp", amount: 80 }, icon: "\u2728" },
+  { id: "wm6", title: "Fu\u00DFball-Star", story: "Geh diese Woche zu allen Trainings!", goal: "football2", target: 2, reward: { type: "hp", amount: 120 }, icon: "\u26BD" },
 ];
 
 export const GRADUATION_THRESHOLD = 30;
@@ -162,12 +163,12 @@ export const CAT_STAGES: import('./types').CatStageInfo[] = [
 ];
 
 export const BOSSES: import('./types').BossTemplate[] = [
-  { id: "b1", name: "Schlaf-Drache", icon: "\u{1F409}", hp: 80, reward: { xp: 50, coins: 40 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst!" },
-  { id: "b2", name: "Chaos-Monster", icon: "\u{1F47E}", hp: 100, reward: { xp: 60, coins: 50 }, desc: "Es liebt Unordnung und Chaos!" },
-  { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 90, reward: { xp: 55, coins: 45 }, desc: "Er will, dass du nur auf dem Sofa liegst!" },
-  { id: "b4", name: "Vergesslichkeits-Geist", icon: "\u{1F47B}", hp: 110, reward: { xp: 65, coins: 55 }, desc: "Er l\u00E4sst dich alles vergessen!" },
-  { id: "b5", name: "Mecker-Goblin", icon: "\u{1F47A}", hp: 85, reward: { xp: 50, coins: 40 }, desc: "Er meckert \u00FCber alles und jeden!" },
-  { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 95, reward: { xp: 55, coins: 45 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!" },
+  { id: "b1", name: "Schlaf-Drache", icon: "\u{1F409}", hp: 80, reward: { hp: 50 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst!" },
+  { id: "b2", name: "Chaos-Monster", icon: "\u{1F47E}", hp: 100, reward: { hp: 60 }, desc: "Es liebt Unordnung und Chaos!" },
+  { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 90, reward: { hp: 55 }, desc: "Er will, dass du nur auf dem Sofa liegst!" },
+  { id: "b4", name: "Vergesslichkeits-Geist", icon: "\u{1F47B}", hp: 110, reward: { hp: 65 }, desc: "Er l\u00E4sst dich alles vergessen!" },
+  { id: "b5", name: "Mecker-Goblin", icon: "\u{1F47A}", hp: 85, reward: { hp: 50 }, desc: "Er meckert \u00FCber alles und jeden!" },
+  { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 95, reward: { hp: 55 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!" },
 ];
 
 export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {
@@ -183,24 +184,24 @@ export const BADGES: Badge[] = [
   { i: "\u{1F525}", n: "3-Tage" },
   { i: "\u26A1", n: "7-Tage" },
   { i: "\u{1F451}", n: "Level 5" },
-  { i: "\u{1F3AF}", n: "50 Quests" },
+  { i: "\u{1F3AF}", n: "50 Aufgaben" },
   { i: "\u{1F48E}", n: "Level 10" },
   { i: "\u{1F3F0}", n: "30 Tage" },
-  { i: "\u{1F409}", n: "100 Quests" },
+  { i: "\u{1F409}", n: "100 Aufgaben" },
   { i: "\u{1F431}", n: "Sammler" },
 ];
 
 export const OB_REWARDS = [
   null,
-  { xp: 0, coins: 50, text: "+50 M\u00FCnzen!", icon: "\u{1FA99}" },
-  { xp: 55, coins: 25, text: "Level 2! +25\u{1FA99}", icon: "\u26A1" },
-  { xp: 0, coins: 40, text: "+40 M\u00FCnzen!", icon: "\u{1F381}" },
-  { xp: 70, coins: 30, text: "Level 3! +30\u{1FA99}", icon: "\u26A1" },
-  { xp: 0, coins: 100, text: "+100 Startgeld!", icon: "\u{1F4B0}" },
-  { xp: 0, coins: 0, text: "", icon: "" },
-  { xp: 0, coins: 0, text: "", icon: "" },
-  { xp: 100, coins: 50, text: "Sidekick! Level 4!", icon: "\u{1F431}" },
-  { xp: 0, coins: 80, text: "+80 M\u00FCnzen!", icon: "\u{1FA99}" },
+  { hp: 50, text: "+50 Heldenpunkte!", icon: "\u2B50" },
+  { hp: 80, text: "Level 2! +80 HP", icon: "\u26A1" },
+  { hp: 40, text: "+40 Heldenpunkte!", icon: "\u{1F381}" },
+  { hp: 100, text: "Level 3! +100 HP", icon: "\u26A1" },
+  { hp: 100, text: "+100 Start-HP!", icon: "\u{1F4AB}" },
+  { hp: 0, text: "", icon: "" },
+  { hp: 0, text: "", icon: "" },
+  { hp: 150, text: "Sidekick! Level 4!", icon: "\u{1F431}" },
+  { hp: 80, text: "+80 Heldenpunkte!", icon: "\u2B50" },
 ] as const;
 
 export const JOURNAL_QUESTIONS: JournalQuestion[] = [
@@ -212,7 +213,7 @@ export const JOURNAL_QUESTIONS: JournalQuestion[] = [
   },
   {
     id: "proud", q: "Worauf bist du stolz?", opts: [
-      { v: "quests", l: "\u2705 Alle Quests" }, { v: "helped", l: "\u{1F91D} Geholfen" }, { v: "hard", l: "\u{1F4AA} Was Schwieriges" },
+      { v: "tasks", l: "\u2705 Alle Aufgaben" }, { v: "helped", l: "\u{1F91D} Geholfen" }, { v: "hard", l: "\u{1F4AA} Was Schwieriges" },
       { v: "brave", l: "\u{1F981} Mutig" }, { v: "patient", l: "\u{1F9D8} Geduldig" }, { v: "new", l: "\u{1F31F} Was Neues" },
     ]
   },
@@ -227,4 +228,78 @@ export const JOURNAL_QUESTIONS: JournalQuestion[] = [
       { v: "try", l: "\u{1F31F} Was Neues" }, { v: "create", l: "\u{1F3A8} Kreativ sein" }, { v: "kind", l: "\u{1F49B} Nett sein" },
     ]
   },
+];
+
+// ═══ NEW: Helden-Tipp (Daily Hero Tips) ═══
+
+export const HERO_TIPS: HeroTip[] = [
+  { char: "Sonic", emoji: "\u{1F994}", tip: "Auch wenn's schwer wird \u2014 bleib dran und gib nicht auf!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Jeder gro\u00DFe Held f\u00E4ngt mit einem kleinen Sprung an!" },
+  { char: "Ash", emoji: "\u26A1", tip: "Mit jedem Tag wirst du ein bisschen st\u00E4rker!" },
+  { char: "Goku", emoji: "\u{1F409}", tip: "\u00DCbung macht den Meister \u2014 gib immer dein Bestes!" },
+  { char: "Sonic", emoji: "\u{1F994}", tip: "Schnelligkeit allein reicht nicht \u2014 Mut z\u00E4hlt mehr!" },
+  { char: "Pikachu", emoji: "\u26A1", tip: "Kleine Schritte f\u00FChren zu gro\u00DFen Abenteuern!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Fehler machen ist okay \u2014 wichtig ist, dass du weitermachst!" },
+  { char: "Xander", emoji: "\u{1F300}", tip: "Ein echter Champion trainiert jeden Tag!" },
+  { char: "Ash", emoji: "\u26A1", tip: "Zusammen mit Freunden ist alles leichter!" },
+  { char: "Sonic", emoji: "\u{1F994}", tip: "Heute ist ein guter Tag, um etwas Tolles zu schaffen!" },
+  { char: "Link", emoji: "\u{1F5E1}\uFE0F", tip: "Mutig sein hei\u00DFt nicht, keine Angst zu haben \u2014 sondern trotzdem loszugehen!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Hilf anderen \u2014 so wirst du zum echten Helden!" },
+  { char: "Goku", emoji: "\u{1F409}", tip: "Jede Herausforderung macht dich st\u00E4rker!" },
+  { char: "Pikachu", emoji: "\u26A1", tip: "Glaub an dich \u2014 du kannst mehr als du denkst!" },
+  { char: "Xander", emoji: "\u{1F300}", tip: "Geduld ist die st\u00E4rkste Superkraft!" },
+  { char: "Ash", emoji: "\u26A1", tip: "Ein neuer Tag, ein neues Abenteuer \u2014 los geht's!" },
+  { char: "Sonic", emoji: "\u{1F994}", tip: "Sei nett zu anderen \u2014 das ist wahre St\u00E4rke!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Auch kleine Helden k\u00F6nnen Gro\u00DFes bewirken!" },
+  { char: "Link", emoji: "\u{1F5E1}\uFE0F", tip: "Jeder Held braucht auch mal eine Pause!" },
+  { char: "Goku", emoji: "\u{1F409}", tip: "Wer nie aufgibt, gewinnt am Ende immer!" },
+  { char: "Pikachu", emoji: "\u26A1", tip: "Lachen ist die beste Medizin \u2014 hab Spa\u00DF heute!" },
+  { char: "Xander", emoji: "\u{1F300}", tip: "Dein Bestes zu geben ist immer genug!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Jeder Tag ist eine Chance, besser zu werden!" },
+  { char: "Sonic", emoji: "\u{1F994}", tip: "Vergiss nicht: Du bist einzigartig und toll!" },
+  { char: "Ash", emoji: "\u26A1", tip: "Probiere heute etwas Neues aus!" },
+  { char: "Goku", emoji: "\u{1F409}", tip: "Starke Helden helfen den Schw\u00E4cheren!" },
+  { char: "Link", emoji: "\u{1F5E1}\uFE0F", tip: "Manchmal ist der mutigste Schritt der erste!" },
+  { char: "Pikachu", emoji: "\u26A1", tip: "Sei stolz auf das, was du heute geschafft hast!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Zusammen ist man weniger allein \u2014 sei ein guter Freund!" },
+  { char: "Xander", emoji: "\u{1F300}", tip: "Der Weg ist das Ziel \u2014 genie\u00DF jeden Schritt!" },
+];
+
+// ═══ NEW: Unlock Conditions (passive item unlocks) ═══
+
+export const UNLOCK_CONDITIONS: Record<string, UnlockCondition> = {
+  // Hero items
+  h_sunglasses: { type: "streak", value: 3, label: "3-Tage Streak", icon: "\u{1F525}" },
+  h_cape_red: { type: "boss", value: 1, label: "1 Boss besiegt", icon: "\u2694\uFE0F" },
+  h_headband: { type: "tasks", value: 25, label: "25 Aufgaben", icon: "\u2705" },
+  h_wings: { type: "streak", value: 30, label: "30-Tage Streak", icon: "\u{1F525}" },
+  // Cat items
+  c_bowtie: { type: "catStage", value: 1, label: "Katze: Jungkatze", icon: "\u{1F431}" },
+  c_collar: { type: "catStage", value: 2, label: "Katze: Katze", icon: "\u{1F638}" },
+  c_crown: { type: "catStage", value: 4, label: "Katze: Legend\u00E4r", icon: "\u{1F451}" },
+  c_scarf: { type: "weeklyMission", value: 3, label: "3 Wochen-Missionen", icon: "\u{1F3AF}" },
+  // Room items
+  rm_poster: { type: "tasks", value: 10, label: "10 Aufgaben", icon: "\u2705" },
+  rm_plant: { type: "streak", value: 5, label: "5-Tage Streak", icon: "\u{1F525}" },
+  rm_lamp: { type: "tasks", value: 30, label: "30 Aufgaben", icon: "\u2705" },
+  rm_rug: { type: "streak", value: 7, label: "7-Tage Streak", icon: "\u{1F525}" },
+  rm_trophy: { type: "boss", value: 3, label: "3 Bosse besiegt", icon: "\u2694\uFE0F" },
+  rm_map: { type: "tasks", value: 50, label: "50 Aufgaben", icon: "\u2705" },
+  rm_fairy: { type: "streak", value: 14, label: "14-Tage Streak", icon: "\u{1F525}" },
+  rm_computer: { type: "tasks", value: 100, label: "100 Aufgaben", icon: "\u2705" },
+  rm_globe: { type: "weeklyMission", value: 5, label: "5 Wochen-Missionen", icon: "\u{1F3AF}" },
+  rm_figure: { type: "boss", value: 2, label: "2 Bosse besiegt", icon: "\u2694\uFE0F" },
+  rm_stars: { type: "streak", value: 21, label: "21-Tage Streak", icon: "\u{1F525}" },
+  rm_skateboard: { type: "catStage", value: 3, label: "Katze: Prachtkatze", icon: "\u{1F63B}" },
+  rm_fish: { type: "weeklyMission", value: 8, label: "8 Wochen-Missionen", icon: "\u{1F3AF}" },
+};
+
+// ═══ NEW: Default Belohnungen (parent can customize) ═══
+
+export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
+  { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 30, active: true },
+  { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 40, active: true },
+  { id: "bel_candy", name: "S\u00FC\u00DFigkeit", emoji: "\u{1F36C}", cost: 15, active: true },
+  { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 60, active: true },
+  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 100, active: true },
 ];

@@ -39,7 +39,7 @@ export default function Journal() {
             <div style={{ fontSize: ".55rem", fontWeight: 700, color: d ? T.successDark : T.textLight, marginTop: 2 }}>{d ? "\u2713" : RAINBOW_LABELS[i]}</div>
           </div>;
         })}</div>
-        {(state.rainbow || []).every(Boolean) && <div style={{ textAlign: "center", fontSize: ".75rem", fontWeight: 800, color: T.success, marginTop: 8 }}>{"\u{1F389}"} Alle Farben geschafft! +25 XP</div>}
+        {(state.rainbow || []).every(Boolean) && <div style={{ textAlign: "center", fontSize: ".75rem", fontWeight: 800, color: T.success, marginTop: 8 }}>{"\u{1F389}"} Alle Farben geschafft! +25 {"\u2B50"}</div>}
       </div>
 
       {/* Guided Journal */}
@@ -80,7 +80,7 @@ export default function Journal() {
       <div className="game-card" style={{ padding: 14, marginTop: 16 }}>
         <div style={{ fontSize: ".75rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F4CA}"} Heute</div>
         <div style={{ display: "flex", justifyContent: "space-around", textAlign: "center" }}>
-          <div><div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.25rem", fontWeight: 700, color: T.primary }}>{done}/{total}</div><div style={{ fontSize: ".6rem", color: T.textSecondary }}>Quests</div></div>
+          <div><div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.25rem", fontWeight: 700, color: T.primary }}>{done}/{total}</div><div style={{ fontSize: ".6rem", color: T.textSecondary }}>Aufgaben</div></div>
           <div><div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.25rem", fontWeight: 700, color: T.accentDark }}>+{state.dt}min</div><div style={{ fontSize: ".6rem", color: T.textSecondary }}>Verdient</div></div>
           <div><div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.25rem", fontWeight: 700, color: T.success }}>{(state.rainbow || []).filter(Boolean).length}/6</div><div style={{ fontSize: ".6rem", color: T.textSecondary }}>Farben</div></div>
         </div>

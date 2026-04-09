@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES,
+  WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES, DEFAULT_BELOHNUNGEN,
 } from '../constants';
 import { buildDay } from '../utils/helpers';
 import storage from '../utils/storage';
@@ -8,16 +8,10 @@ import type { GameState, Hero } from '../types';
 
 const SAVE_DEBOUNCE_MS = 400;
 
-/**
- * Handles loading game state from storage, day transitions
- * (streak recovery, weekly missions), default field initialization,
- * and auto-persisting state on change.
- */
 export default function useGamePersistence() {
   const [state, setState] = useState<GameState | null>(null);
-  const [boarding, setBoarding] = useState<boolean | null>(null); // null=loading, true=onboarding, false=ready
+  const [boarding, setBoarding] = useState<boolean | null>(null);
 
-  // ── Load state on mount ──
   useEffect(() => {
     storage.load().then(p => {
       if (p) {
@@ -34,7 +28,6 @@ export default function useGamePersistence() {
     });
   }, []);
 
-  // ── Debounced auto-persist ──
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!state) return;
@@ -101,6 +94,13 @@ function applyDayTransition(p: GameState, today: string): void {
   p.catHunger = Math.max(0, (p.catHunger ?? 100) - 30);
   p.catHappy = Math.max(0, (p.catHappy ?? 100) - 25);
   p.catEnergy = Math.max(0, (p.catEnergy ?? 100) - 20);
+  // Daily habits reset
+  p.dailyVitaminD = false;
+  p.dailyBrother = false;
+  // Clean up completed special missions
+  if (p.specialMissions) {
+    p.specialMissions = p.specialMissions.filter(m => !m.done);
+  }
 
   const weekStart = p.weekStart ? new Date(p.weekStart) : new Date();
   const daysSinceStart = Math.floor((new Date().getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
@@ -153,6 +153,14 @@ function applyDefaults(p: GameState): void {
   if (p.catPlayed === undefined) p.catPlayed = false;
   if (!p.boss) { const b = BOSSES[Math.floor(Math.random() * BOSSES.length)]; p.boss = { id: b.id, hp: b.hp, maxHp: b.hp }; }
   if (!p.bossTrophies) p.bossTrophies = [];
+  // ── New field defaults (v4 migration) ──
+  if (p.dailyVitaminD === undefined) p.dailyVitaminD = false;
+  if (p.dailyBrother === undefined) p.dailyBrother = false;
+  if (!p.belohnungen) p.belohnungen = DEFAULT_BELOHNUNGEN;
+  if (!p.belohnungenLog) p.belohnungenLog = [];
+  if (!p.specialMissions) p.specialMissions = [];
+  if (!p.weeklyLunch) p.weeklyLunch = {};
+  if (p.weeklyMissionsCompleted === undefined) p.weeklyMissionsCompleted = 0;
 }
 
 interface OnboardData {
@@ -180,5 +188,12 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     catFed: false, catPetted: false, catPlayed: false,
     boss: (() => { const b = BOSSES[Math.floor(Math.random() * BOSSES.length)]; return { id: b.id, hp: b.hp, maxHp: b.hp }; })(),
     bossTrophies: [],
+    // New v4 fields
+    dailyVitaminD: false, dailyBrother: false,
+    belohnungen: DEFAULT_BELOHNUNGEN,
+    belohnungenLog: [],
+    specialMissions: [],
+    weeklyLunch: {},
+    weeklyMissionsCompleted: 0,
   };
 }

@@ -11,8 +11,7 @@ export default function Onboarding({ onComplete }) {
   const [catAnswers, setCatAnswers] = useState({});
   const [selCat, setSelCat] = useState(null);
   const [catName, setCatName] = useState("");
-  const [obXP, setObXP] = useState(0);
-  const [obCoins, setObCoins] = useState(0);
+  const [obHP, setObHP] = useState(0);
   const [reward, setReward] = useState(null);
   const nameRef = useRef(null);
   const catNameRef = useRef(null);
@@ -28,8 +27,8 @@ export default function Onboarding({ onComplete }) {
 
   const advanceStep = (nextStep) => {
     const r = OB_REWARDS[step];
-    if (r && (r.xp > 0 || r.coins > 0)) {
-      setObXP(x => x + r.xp); setObCoins(c => c + r.coins);
+    if (r && r.hp > 0) {
+      setObHP(h => h + r.hp);
       setReward(r);
       setTimeout(() => setReward(null), 3000);
     }
@@ -40,7 +39,7 @@ export default function Onboarding({ onComplete }) {
   useEffect(() => { if (step === 9) setTimeout(() => catNameRef.current?.focus(), 100); }, [step]);
 
   const totalSteps = 10;
-  const obLevel = getLevel(obXP);
+  const obLevel = getLevel(obHP);
 
   const Dots = () => (
     <div style={{ display: "flex", gap: 5, marginBottom: 16, justifyContent: "center" }}>
@@ -52,8 +51,7 @@ export default function Onboarding({ onComplete }) {
 
   const OBStats = () => (
     <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 16 }}>
-      {obXP > 0 && <div style={{ background: `${T.primary}10`, borderRadius: 50, padding: "6px 14px", fontSize: ".8rem", fontWeight: 800, color: T.primary }}>Lvl {obLevel} ⚡ {obXP} XP</div>}
-      {obCoins > 0 && <div style={{ background: `${T.accent}30`, borderRadius: 50, padding: "6px 14px", fontSize: ".8rem", fontWeight: 800, color: T.accentDark }}>{"\u{1FA99}"} {obCoins}</div>}
+      {obHP > 0 && <div style={{ background: `${T.accent}30`, borderRadius: 50, padding: "6px 14px", fontSize: ".8rem", fontWeight: 800, color: T.accentDark }}>{"\u2B50"} {obHP} HP</div>}
     </div>
   );
 
@@ -94,13 +92,13 @@ export default function Onboarding({ onComplete }) {
   if (step === 8) return <OBWrap><Dots /><OBStats /><OBTitle>Wähle deine Katze!</OBTitle><OBSub>Empfehlung: <span style={{ color: T.accent, fontWeight: 800 }}>{CAT_VARIANTS[sugg]?.name}</span> {"\u2728"}</OBSub><OBGrid cols={3}>{Object.entries(CAT_VARIANTS).map(([k, cv]) => <OBChip key={k} selected={selCat === k} onClick={() => setSelCat(k)}><div style={{ display: "flex", justifyContent: "center" }}><CatSidekick variant={k} mood="happy" size={48} /></div><div style={{ fontSize: ".6rem", fontWeight: 800, marginTop: 3 }}>{cv.name}</div></OBChip>)}</OBGrid>{selCat && <><div style={{ fontSize: ".82rem", color: T.primaryLight, marginTop: 10, textAlign: "center" }}>{CAT_VARIANTS[selCat].desc}</div><div style={{ marginTop: 12 }}><OBBtn onClick={() => advanceStep(9)}>Weiter →</OBBtn></div></>}</OBWrap>;
 
   // Step 9: Cat name
-  if (step === 9) return <OBWrap><Dots /><OBStats /><OBTitle>Name deiner Katze?</OBTitle><div style={{ marginBottom: 12 }}><CatSidekick variant={selCat || sugg} mood="excited" size={80} /></div><input ref={catNameRef} value={catName} onChange={e => setCatName(e.target.value)} placeholder="Katzenname..." style={{ ...inputStyle, border: `2px solid ${catName.trim() ? T.primary : "rgba(0,0,0,0.1)"}` }} /><div style={{ marginTop: 16 }}><OBBtn onClick={() => { const r = OB_REWARDS[9]; if (r) setObCoins(c => c + r.coins); setStep(10); }} disabled={!catName.trim()}>Weiter →</OBBtn></div></OBWrap>;
+  if (step === 9) return <OBWrap><Dots /><OBStats /><OBTitle>Name deiner Katze?</OBTitle><div style={{ marginBottom: 12 }}><CatSidekick variant={selCat || sugg} mood="excited" size={80} /></div><input ref={catNameRef} value={catName} onChange={e => setCatName(e.target.value)} placeholder="Katzenname..." style={{ ...inputStyle, border: `2px solid ${catName.trim() ? T.primary : "rgba(0,0,0,0.1)"}` }} /><div style={{ marginTop: 16 }}><OBBtn onClick={() => { const r = OB_REWARDS[9]; if (r && r.hp > 0) setObHP(h => h + r.hp); setStep(10); }} disabled={!catName.trim()}>Weiter →</OBBtn></div></OBWrap>;
 
   // Step 10: Activation
   if (step === 10) return (
     <OBWrap>
       <div style={{ marginBottom: 8, display: "flex", alignItems: "flex-end", gap: 8, justifyContent: "center" }}>
-        <div style={{ animation: "heroFloat 3s ease-in-out infinite" }}><HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair} size={130} level={getLevel(obXP)} /></div>
+        <div style={{ animation: "heroFloat 3s ease-in-out infinite" }}><HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair} size={130} level={getLevel(obHP)} /></div>
         <div style={{ animation: "heroFloat 2.5s ease-in-out infinite", animationDelay: ".5s" }}><CatSidekick variant={selCat || sugg} mood="excited" size={56} /></div>
       </div>
       <OBTitle>HeroDex aktiviert!</OBTitle>
@@ -109,12 +107,11 @@ export default function Onboarding({ onComplete }) {
       <div style={{ background: "white", borderRadius: 16, padding: 16, marginBottom: 20, width: "100%", maxWidth: 320, boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
         <div style={{ fontSize: ".75rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 8 }}>Dein Startpaket</div>
         <div style={{ display: "flex", justifyContent: "space-around" }}>
-          <div style={{ textAlign: "center" }}><div style={{ fontSize: "1.5rem" }}>{"\u26A1"}</div><div style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 700, color: T.primary }}>{obXP} XP</div></div>
-          <div style={{ textAlign: "center" }}><div style={{ fontSize: "1.5rem" }}>{"\u{1FA99}"}</div><div style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 700, color: T.accentDark }}>{obCoins}</div></div>
-          <div style={{ textAlign: "center" }}><div style={{ fontSize: "1.5rem" }}>{"\u{1F4C8}"}</div><div style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 700, color: T.success }}>Lvl {getLevel(obXP)}</div></div>
+          <div style={{ textAlign: "center" }}><div style={{ fontSize: "1.5rem" }}>{"\u2B50"}</div><div style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 700, color: T.accentDark }}>{obHP} HP</div></div>
+          <div style={{ textAlign: "center" }}><div style={{ fontSize: "1.5rem" }}>{"\u{1F4C8}"}</div><div style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 700, color: T.success }}>Lvl {getLevel(obHP)}</div></div>
         </div>
       </div>
-      <OBBtn onClick={() => onComplete({ hero: { ...hero }, catVariant: selCat || sugg, catName, startXP: obXP, startCoins: obCoins })} big>Abenteuer starten! {"\u{1F9B8}\u{1F431}"}</OBBtn>
+      <OBBtn onClick={() => onComplete({ hero: { ...hero }, catVariant: selCat || sugg, catName, startXP: obHP, startCoins: obHP })} big>Abenteuer starten! {"\u{1F9B8}\u{1F431}"}</OBBtn>
     </OBWrap>
   );
 

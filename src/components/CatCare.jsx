@@ -120,7 +120,7 @@ export default function CatCare() {
                 <span style={{ fontSize: "1.8rem" }}>{a.icon}</span>
                 <span style={{ fontSize: ".95rem", fontWeight: 800 }}>{a.label}</span>
                 {done && <span style={{ fontSize: ".8rem", fontWeight: 700 }}>{"\u2705"}</span>}
-                {!done && <span style={{ fontSize: ".75rem", fontWeight: 700, opacity: 0.8 }}>+5 XP, +3 {"\u{1FA99}"}</span>}
+                {!done && <span style={{ fontSize: ".75rem", fontWeight: 700, opacity: 0.8 }}>+5 {"\u2B50"}</span>}
               </button>
             );
           })}
