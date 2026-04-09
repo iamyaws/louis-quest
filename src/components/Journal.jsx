@@ -9,20 +9,20 @@ export default function Journal() {
   const journalRef = useRef(null);
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", padding: "env(safe-area-inset-top, 12px) 20px 100px" }}>
-      <ViewHeader onBack={() => ui.setView("hub")} title="Tagebuch" />
+    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px" }}>
+      <ViewHeader onBack={() => ui.setView("hub")} title="Tagebuch" light />
 
-      <div style={{ textAlign: "center", marginBottom: 20 }}>
-        <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.25rem", fontWeight: 700, color: T.textPrimary }}>{new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}</div>
+      <div style={{ textAlign: "center", marginBottom: 16 }}>
+        <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "white" }}>{new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}</div>
       </div>
 
       {/* Mood summary */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-        <div style={{ flex: 1, background: T.card, borderRadius: 16, padding: 14, border: T.cardBorder, textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
+      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+        <div className="game-card" style={{ flex: 1, padding: 14, textAlign: "center" }}>
           <div style={{ fontSize: ".7rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 6 }}>{"\u{1F305}"} Morgens</div>
           <div style={{ fontSize: "2.2rem" }}>{state.moodAM !== null ? MOOD_EMOJIS[state.moodAM] : "\u2014"}</div>
         </div>
-        <div style={{ flex: 1, background: T.card, borderRadius: 16, padding: 14, border: T.cardBorder, textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
+        <div className="game-card" style={{ flex: 1, padding: 14, textAlign: "center" }}>
           <div style={{ fontSize: ".7rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 6 }}>{"\u{1F319}"} Abends</div>
           <div style={{ fontSize: "2.2rem" }}>{state.moodPM !== null ? MOOD_EMOJIS[state.moodPM] : "\u2014"}</div>
           {state.moodPM === null && <div role="group" aria-label="Abendstimmung wählen" style={{ display: "flex", justifyContent: "center", gap: 2, marginTop: 6 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} aria-label={`Stimmung ${i + 1} von 6`} onClick={() => actions.setMood("moodPM", i)} style={{ fontSize: "1.3rem", background: "none", border: "none", cursor: "pointer", padding: "3px", minHeight: 36, minWidth: 36 }}>{e}</button>)}</div>}
@@ -30,7 +30,7 @@ export default function Journal() {
       </div>
 
       {/* Rainbow */}
-      <div className="game-card" style={{ padding: 14, marginBottom: 20 }}>
+      <div className="game-card" style={{ padding: 14, marginBottom: 16 }}>
         <div style={{ fontSize: ".75rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F308}"} Regenbogen heute</div>
         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>{RAINBOW.map((e, i) => {
           const d = (state.rainbow || [])[i];
@@ -46,13 +46,13 @@ export default function Journal() {
       {JOURNAL_QUESTIONS.map(q => {
         const ans = (state.jAnswers || {})[q.id];
         return (
-          <div key={q.id} style={{ background: T.card, borderRadius: 18, padding: 14, marginBottom: 12, border: T.cardBorder, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
+          <div key={q.id} className="game-card" style={{ padding: 14, marginBottom: 12 }}>
             <div style={{ fontSize: ".8rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>{q.q}</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {q.opts.map(o => (
                 <button key={o.v} onClick={() => actions.setJAnswer(q.id, o.v)} style={{
-                  background: ans === o.v ? `${T.primary}12` : "rgba(0,0,0,0.02)",
-                  border: ans === o.v ? `2px solid ${T.primary}40` : "2px solid rgba(0,0,0,0.05)",
+                  background: ans === o.v ? `${T.primary}10` : "rgba(0,50,150,0.02)",
+                  border: ans === o.v ? `2.5px solid ${T.primary}40` : "2.5px solid rgba(0,50,150,0.06)",
                   borderRadius: 50, padding: "8px 16px", cursor: "pointer",
                   fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: ".8rem",
                   color: ans === o.v ? T.primary : T.textPrimary,
@@ -72,12 +72,12 @@ export default function Journal() {
           value={state.journal || ""}
           onChange={e => actions.setJournal(e.target.value)}
           placeholder="Was dich bewegt, was passiert ist, ein Highlight..."
-          style={{ width: "100%", minHeight: 100, background: T.bg, border: "2px solid rgba(0,0,0,0.06)", borderRadius: 14, padding: "14px 16px", color: T.textPrimary, fontSize: ".9rem", fontFamily: "'Nunito',sans-serif", outline: "none", fontWeight: 600, resize: "vertical", lineHeight: 1.6 }}
+          style={{ width: "100%", minHeight: 100, background: "rgba(0,50,150,0.02)", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 16, padding: "14px 16px", color: T.textPrimary, fontSize: ".9rem", fontFamily: "'Nunito',sans-serif", outline: "none", fontWeight: 600, resize: "vertical", lineHeight: 1.6 }}
         />
       </div>
 
       {/* Today stats */}
-      <div style={{ background: `${T.primary}08`, borderRadius: 16, padding: 14, marginTop: 16, border: `2px solid ${T.primary}10` }}>
+      <div className="game-card" style={{ padding: 14, marginTop: 16 }}>
         <div style={{ fontSize: ".75rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F4CA}"} Heute</div>
         <div style={{ display: "flex", justifyContent: "space-around", textAlign: "center" }}>
           <div><div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.25rem", fontWeight: 700, color: T.primary }}>{done}/{total}</div><div style={{ fontSize: ".6rem", color: T.textSecondary }}>Quests</div></div>

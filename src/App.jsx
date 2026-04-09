@@ -1,6 +1,8 @@
 import React from 'react';
 import { T } from './constants';
 import { GameProvider, useGame } from './context/GameContext';
+import { getLevel } from './utils/helpers';
+import SFX from './utils/sfx';
 
 import Onboarding from './components/Onboarding';
 import Hub from './components/Hub';
@@ -19,15 +21,74 @@ import PinModal from './components/PinModal';
 import MemoryGame from './components/MemoryGame';
 import ErrorBoundary from './components/ErrorBoundary';
 
+const TABS = [
+  { id: "room", label: "Zimmer", icon: "\u{1F3E0}" },
+  { id: "stats", label: "Erfolge", icon: "\u{1F3C6}" },
+  { id: "quest", label: "", icon: "\u2694\uFE0F", isCta: true },
+  { id: "journal", label: "Buch", icon: "\u{1F4D3}" },
+  { id: "shop", label: "Shop", icon: "\u{1F6CD}\uFE0F" },
+];
+
+function CurrencyBar() {
+  const { state } = useGame();
+  if (!state) return null;
+  const level = getLevel(state.xp);
+  return (
+    <div className="currency-bar">
+      <div className="currency-pill">
+        <div className="currency-icon" style={{ background: "linear-gradient(135deg, #FCD34D, #F59E0B)" }}>{"\u{1FA99}"}</div>
+        {state.coins.toLocaleString("de-DE")}
+      </div>
+      <div className="currency-pill">
+        <div className="currency-icon" style={{ background: "linear-gradient(135deg, #A78BFA, #6D28D9)" }}>{"\u26A1"}</div>
+        {state.xp.toLocaleString("de-DE")}
+      </div>
+      <div className="currency-pill" style={{ padding: "6px 12px" }}>
+        Lvl {level}
+      </div>
+    </div>
+  );
+}
+
+function BottomTabBar() {
+  const { ui } = useGame();
+  const { view, setView, setQuestOpen } = ui;
+
+  return (
+    <div className="tab-bar">
+      {TABS.map(tab => {
+        if (tab.isCta) {
+          return (
+            <button key={tab.id} className="tab-cta" onClick={() => { SFX.play("tap"); setQuestOpen(true); }} aria-label="Quests öffnen">
+              {tab.icon}
+            </button>
+          );
+        }
+        const isActive = view === tab.id;
+        return (
+          <button
+            key={tab.id}
+            className={`tab-item ${isActive ? "tab-item-active" : ""}`}
+            onClick={() => { SFX.play("tap"); setView(tab.id); }}
+            aria-label={tab.label}
+          >
+            <div className={`tab-icon ${isActive ? "tab-icon-active" : ""}`}>{tab.icon}</div>
+            <span className={`tab-label ${isActive ? "tab-label-active" : ""}`}>{tab.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function AppContent() {
   const { state, boarding, computed, actions, onBoard, ui } = useGame();
 
-  // ── Loading / Onboarding ──
-  if (boarding === null) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: T.bg, color: T.textPrimary, fontFamily: "'Nunito',sans-serif" }}>Laden...</div>;
+  if (boarding === null) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#0369E8", color: "white", fontFamily: "'Nunito',sans-serif", fontSize: "1.2rem", fontWeight: 700 }}>Laden...</div>;
   if (boarding) return <Onboarding onComplete={onBoard} />;
   if (!state) return null;
 
-  const { level, xpP, done, total, allDone, pct, mood, dayN, byA } = computed;
+  const showChrome = !boarding && state;
 
   return (
     <>
@@ -40,7 +101,10 @@ function AppContent() {
       {ui.showVictory && <VictoryScreen onClose={() => ui.setShowVictory(false)} onSpinWheel={() => { ui.setShowVictory(false); ui.setShowWheel(true); }} onMemoryGame={() => { ui.setShowVictory(false); ui.setShowMemory(true); }} />}
       {ui.showMemory && <MemoryGame onComplete={actions.collectMemory} />}
 
-      <div style={{ minHeight: "100vh", background: T.bg, fontFamily: "'Nunito',sans-serif", color: T.textPrimary }}>
+      {/* Persistent chrome */}
+      {showChrome && <CurrencyBar />}
+
+      <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #0369E8 0%, #0350C0 50%, #0240A0 100%)", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: 60, paddingBottom: 80 }}>
         {ui.view === "hub" && <Hub />}
         {ui.view === "time" && <TimeBank />}
         {ui.view === "stats" && <Achievements />}
@@ -49,6 +113,8 @@ function AppContent() {
         {ui.view === "journal" && <Journal />}
         {ui.questOpen && <QuestBoard />}
       </div>
+
+      {showChrome && <BottomTabBar />}
     </>
   );
 }
