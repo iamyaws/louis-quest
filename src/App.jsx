@@ -104,7 +104,7 @@ function AppContent() {
       {/* Persistent chrome */}
       {showChrome && <CurrencyBar />}
 
-      <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #0369E8 0%, #0350C0 50%, #0240A0 100%)", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: 60, paddingBottom: 80 }}>
+      <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #3B9FFF 0%, #60B3FF 40%, #7DC4FF 100%)", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: 60, paddingBottom: 80 }}>
         {ui.view === "hub" && <Hub />}
         {ui.view === "time" && <TimeBank />}
         {ui.view === "stats" && <Achievements />}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { T, CHEST_MILESTONES, MOOD_EMOJIS, WEEKLY_MISSIONS } from '../constants';
-import { getSky, getSkyStars, getTimeLabel } from '../utils/helpers';
+import { getTimeLabel } from '../utils/helpers';
 import { ProgressRing } from './ui';
 import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
@@ -22,75 +22,79 @@ export default function Hub() {
   return (
     <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
-      {/* ═══ Hero Sky Area ═══ */}
-      <div style={{
-        background: getSky(done, total),
-        padding: "12px 20px 0",
-        position: "relative", overflow: "hidden",
-      }}>
-        {getSkyStars(done, total) && <>{Array.from({ length: 12 }, (_, i) => <div key={i} style={{ position: "absolute", width: 3, height: 3, borderRadius: "50%", background: "white", top: `${10 + Math.random() * 40}%`, left: `${5 + Math.random() * 90}%`, animation: `starTwinkle ${1.5 + Math.random() * 2}s ease-in-out infinite`, animationDelay: `${Math.random() * 2}s` }} />)}</>}
-
-        {/* Day + Lock */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 4, marginBottom: 4, position: "relative", zIndex: 2 }}>
-          <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.7)", fontWeight: 700 }}>{dayN}{state.vacMode ? " \u{1F3D6}\uFE0F" : ""}</div>
-          <button aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"} onClick={() => pMode ? setPMode(false) : setPinShow(true)} style={{ background: pMode ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.15)", border: "2px solid rgba(255,255,255,0.2)", borderRadius: 50, padding: "6px 12px", cursor: "pointer", color: "white", fontSize: ".75rem", fontWeight: 700, minHeight: 36, minWidth: 36, backdropFilter: "blur(8px)" }}>{pMode ? "\u{1F513}" : "\u{1F512}"}</button>
+      {/* ═══ Hero Stage ═══ */}
+      <div style={{ position: "relative", paddingBottom: 24 }}>
+        {/* Day + Lock row */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 20px 0", position: "relative", zIndex: 2 }}>
+          <div style={{ fontSize: ".78rem", color: "rgba(255,255,255,0.75)", fontWeight: 700 }}>{dayN}{state.vacMode ? " \u{1F3D6}\uFE0F" : ""}</div>
+          <button aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"} onClick={() => pMode ? setPMode(false) : setPinShow(true)} style={{ background: pMode ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.12)", border: "2px solid rgba(255,255,255,0.2)", borderRadius: 50, padding: "6px 12px", cursor: "pointer", color: "white", fontSize: ".75rem", fontWeight: 700, minHeight: 36, minWidth: 36, backdropFilter: "blur(8px)" }}>{pMode ? "\u{1F513}" : "\u{1F512}"}</button>
         </div>
 
-        {/* Hero + Cat centered on stage */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 20, position: "relative", zIndex: 2 }}>
-          {/* Hero name */}
-          <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "white", textShadow: "0 2px 8px rgba(0,0,0,0.3)", marginBottom: 4 }}>{state.hero.name}</div>
+        {/* Hero platform */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 8, position: "relative", zIndex: 2 }}>
 
-          {/* Hero + Ring + Cat composition */}
-          <div style={{ position: "relative", width: 200, height: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {/* Hero + Cat on white island */}
+          <div style={{ position: "relative", marginBottom: 6 }}>
             {/* Progress ring */}
-            <div style={{ position: "absolute", inset: 0 }}><ProgressRing progress={pct} size={200} stroke={8} color={allDone ? "#34D399" : "rgba(255,255,255,0.35)"} /></div>
-            {/* Hero */}
-            <div style={{ animation: "heroFloat 3s ease-in-out infinite", cursor: "pointer", position: "relative", zIndex: 2 }} onClick={() => setQuestOpen(true)}>
-              <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={130} level={level} />
+            <div style={{ position: "relative", width: 180, height: 180, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ position: "absolute", inset: 0 }}><ProgressRing progress={pct} size={180} stroke={7} color={allDone ? "#34D399" : "rgba(255,255,255,0.3)"} /></div>
+              <div style={{ animation: "heroFloat 3s ease-in-out infinite", cursor: "pointer" }} onClick={() => setQuestOpen(true)}>
+                <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={115} level={level} />
+              </div>
             </div>
             {/* Cat */}
-            <div style={{ position: "absolute", bottom: 8, right: -6, animation: "catIdle 4s ease-in-out infinite", zIndex: 3 }}>
-              <CatSidekick variant={state.catVariant} mood={mood} size={55} />
+            <div style={{ position: "absolute", bottom: 6, right: -16, animation: "catIdle 4s ease-in-out infinite", zIndex: 3 }}>
+              <CatSidekick variant={state.catVariant} mood={mood} size={50} />
             </div>
           </div>
 
-          {/* Platform shadow */}
-          <div style={{ width: 160, height: 14, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%)", marginTop: -6 }} />
+          {/* White island platform */}
+          <div style={{
+            background: "white",
+            borderRadius: 24,
+            padding: "14px 28px 16px",
+            textAlign: "center",
+            boxShadow: "0 8px 32px rgba(0,60,180,0.12)",
+            width: "85%", maxWidth: 340,
+            marginTop: -10,
+            position: "relative",
+          }}>
+            {/* Name + level badge */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 }}>
+              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "#1E1B4B" }}>{state.hero.name}</div>
+              <div style={{ background: "linear-gradient(135deg, #6D28D9, #A78BFA)", borderRadius: 50, padding: "3px 12px", fontFamily: "'Fredoka',sans-serif", fontSize: ".7rem", fontWeight: 700, color: "white" }}>Lvl {level}</div>
+            </div>
 
-          {/* Quest progress text */}
-          <div style={{ textAlign: "center", marginTop: 6 }}>
-            <div style={{ fontSize: ".75rem", color: "rgba(255,255,255,0.8)", fontWeight: 600, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>{getTimeLabel(done, total)}</div>
-            <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.3rem", fontWeight: 700, color: "white", textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>{done}/{total} Quests {allDone ? "\u{1F4AA}" : ""}</div>
-            <div style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.7)", marginTop: 2, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>+{state.dt} Min verdient</div>
+            {/* XP progress */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <div style={{ flex: 1, height: 10, background: "rgba(109,40,217,0.1)", borderRadius: 50, overflow: "hidden" }}>
+                <div style={{ height: "100%", borderRadius: 50, width: `${Math.min(100, (xpP.cur / xpP.need) * 100)}%`, background: "linear-gradient(90deg, #6D28D9, #A78BFA)", transition: "width .8s ease" }} />
+              </div>
+              <span style={{ fontSize: ".7rem", fontWeight: 800, color: "#475569", whiteSpace: "nowrap" }}>{xpP.cur}/{xpP.need}</span>
+            </div>
+
+            {/* Stats row */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+              <div style={{ background: "#FEF3C7", borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: "#92400E" }}>{"\u{1F525}"} {state.sd}d Streak</div>
+              <div style={{ background: "#EDE9FE", borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: "#6D28D9" }}>{done}/{total} Quests</div>
+              {state.xpBoost && <div style={{ background: "#FEF3C7", borderRadius: 50, padding: "4px 12px", fontSize: ".7rem", fontWeight: 800, color: "#92400E", animation: "pulse 1.5s infinite" }}>2x XP</div>}
+            </div>
+
+            {/* Minutes earned */}
+            <div style={{ fontSize: ".7rem", color: "#94A3B8", fontWeight: 600, marginTop: 6 }}>+{state.dt} Min verdient {"\u2022"} {getTimeLabel(done, total)}</div>
           </div>
         </div>
       </div>
 
-      {/* ═══ Content shelf (light background like Paper 2) ═══ */}
+      {/* ═══ Content shelf ═══ */}
       <div style={{
         flex: 1,
         background: "#EFF3FB",
         borderRadius: "28px 28px 0 0",
-        marginTop: -16,
         padding: "20px 16px 20px",
         position: "relative", zIndex: 3,
-        boxShadow: "0 -4px 20px rgba(0,30,100,0.08)",
+        boxShadow: "0 -4px 20px rgba(0,30,100,0.06)",
       }}>
-
-        {/* Hero Level Card */}
-        <div className="hero-card" style={{ marginBottom: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-            <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".85rem", color: "#1E1B4B", textTransform: "uppercase" }}>Level {level} Held</div>
-            <div style={{ fontSize: ".75rem", fontWeight: 800, color: "#475569" }}>{xpP.cur}/{xpP.need} XP</div>
-          </div>
-          <div className="hero-xp-track"><div className="hero-xp-fill" style={{ width: `${Math.min(100, (xpP.cur / xpP.need) * 100)}%` }} /></div>
-          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 10 }}>
-            <div style={{ background: "#FEF3C7", borderRadius: 12, padding: "6px 14px", fontSize: ".75rem", fontWeight: 800, color: "#92400E" }}>{"\u{1F525}"} {state.sd}d Streak</div>
-            {state.xpBoost && <div style={{ background: "#FEF3C7", borderRadius: 12, padding: "6px 14px", fontSize: ".75rem", fontWeight: 800, color: "#92400E", animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} 2x XP</div>}
-          </div>
-        </div>
-
         {/* Cat mood */}
         <div style={{ fontSize: ".75rem", color: "#64748B", textAlign: "center", marginBottom: 14, fontStyle: "italic" }}>{"\u{1F431}"} {CAT_MOOD_TEXT[mood]}</div>
 
