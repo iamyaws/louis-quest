@@ -130,6 +130,7 @@ export const WHEEL_SEGMENTS = [
 
 export const CHEST_MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100];
 export const RARE_DROP_CHANCE = 0.12;
+export const MAX_MONTHLY_FREEZES = 2;
 
 export const WEEKLY_MISSIONS = [
   { id: "wm1", title: "Sternenj\u00E4ger", story: "Rocket hat einen Stern verloren! Schaffe 5 Tage alle Quests um ihn zu finden.", goal: "allDone5", target: 5, reward: { type: "coins", amount: 200 }, icon: "\u2B50" },

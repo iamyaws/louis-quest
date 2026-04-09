@@ -58,8 +58,35 @@ export default function Hub({ state, level, xpP, done, total, allDone, pct, mood
           <div style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.55)", marginTop: 4, fontStyle: "italic", textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>{CAT_MOOD_TEXT[mood]}</div>
           {state.xpBoost && <div style={{ fontSize: ".7rem", color: "#FCD34D", fontWeight: 800, marginTop: 4, animation: "pulse 1.5s infinite" }}>{"\u{1F525}"} DOPPEL-XP AKTIV!</div>}
           {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.45)", marginTop: 3 }}>{"\u{1F381}"} Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
+          {(state.streakFreezes || 0) > 0 && <div style={{ fontSize: ".65rem", color: "rgba(255,255,255,0.45)", marginTop: 2 }}>{"\u2744\uFE0F"} {state.streakFreezes} Streak-Schutz</div>}
         </div>
       </div>
+
+      {/* Streak freeze notification */}
+      {state.freezeUsedToday && <div style={{ padding: "8px 20px 0" }}>
+        <div className="game-card" style={{ padding: 14, background: "linear-gradient(135deg, rgba(14,165,233,0.08), rgba(14,165,233,0.03))", borderColor: `${T.teal}30` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: "1.3rem" }}>{"\u2744\uFE0F"}</span>
+            <div>
+              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".78rem", color: T.tealDark }}>Streak-Schutz eingesetzt!</div>
+              <div style={{ fontSize: ".68rem", color: T.textSecondary }}>Dein {state.sd}-Tage Streak ist sicher. Weiter so!</div>
+            </div>
+          </div>
+        </div>
+      </div>}
+
+      {/* Comeback welcome */}
+      {state.comebackActive && <div style={{ padding: "8px 20px 0" }}>
+        <div className="game-card" style={{ padding: 14, background: "linear-gradient(135deg, rgba(249,115,22,0.08), rgba(251,191,36,0.06))", borderColor: "#F9731625" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: "1.3rem" }}>{"\u{1F431}"}</span>
+            <div>
+              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".78rem", color: "#EA580C" }}>Willkommen zurück!</div>
+              <div style={{ fontSize: ".68rem", color: T.textSecondary }}>Deine Katze hat auf dich gewartet. Öffne die Quests!</div>
+            </div>
+          </div>
+        </div>
+      </div>}
 
       {/* Mood Check */}
       {state.moodAM === null && <div style={{ padding: "12px 20px 0" }}>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   T, REWARDS, WEEKLY_MISSIONS, RARE_DROPS, RARE_DROP_CHANCE,
   CHEST_MILESTONES, CHEST_REWARDS, SCHOOL_QUESTS, VACATION_QUESTS,
+  MAX_MONTHLY_FREEZES,
 } from './constants';
 import { getLevel, getLvlProg, buildDay, getMood, getDayName } from './utils/helpers';
 import storage from './utils/storage';
@@ -44,6 +45,38 @@ export default function App() {
     if (p) {
       const today = new Date().toDateString();
       if (p.lastDate !== today) {
+        // ── Streak Recovery ──
+        const todayD = new Date(); todayD.setHours(0, 0, 0, 0);
+        const lastD = new Date(p.lastDate); lastD.setHours(0, 0, 0, 0);
+        const dayGap = Math.round((todayD - lastD) / (1000 * 60 * 60 * 24));
+        const curMonth = `${todayD.getFullYear()}-${todayD.getMonth()}`;
+        if ((p.lastFreezeMonth || "") !== curMonth) {
+          p.streakFreezes = MAX_MONTHLY_FREEZES;
+          p.freezesUsedThisMonth = 0;
+          p.lastFreezeMonth = curMonth;
+        }
+        p.freezeUsedToday = false;
+        if (dayGap >= 2) {
+          const missedDays = dayGap - 1;
+          if ((p.sd || 0) > 0) {
+            const avail = p.streakFreezes || 0;
+            if (avail >= missedDays) {
+              p.streakFreezes = avail - missedDays;
+              p.freezesUsedThisMonth = (p.freezesUsedThisMonth || 0) + missedDays;
+              p.freezeUsedToday = true;
+            } else {
+              if (avail > 0) { p.streakFreezes = 0; p.freezesUsedThisMonth = (p.freezesUsedThisMonth || 0) + avail; }
+              p.bestStreak = Math.max(p.bestStreak || 0, p.sd || 0);
+              p.sd = 0;
+              p.comebackActive = true;
+            }
+          } else {
+            p.comebackActive = true;
+          }
+        } else {
+          p.comebackActive = false;
+        }
+
         p.quests = buildDay(p.vacMode).map(q => ({ ...q, streak: (p.sm || {})[q.id] || 0 }));
         p.lastDate = today; p.dt = 0; p.moodAM = null; p.moodPM = null;
         p.journal = ""; p.jAnswers = {};
@@ -68,6 +101,12 @@ export default function App() {
       if (!p.jAnswers) p.jAnswers = {};
       if (p.wheelSpun === undefined) p.wheelSpun = false;
       if (p.xpBoost === undefined) p.xpBoost = false;
+      if (p.streakFreezes === undefined) p.streakFreezes = MAX_MONTHLY_FREEZES;
+      if (p.freezesUsedThisMonth === undefined) p.freezesUsedThisMonth = 0;
+      if (!p.lastFreezeMonth) p.lastFreezeMonth = "";
+      if (p.comebackActive === undefined) p.comebackActive = false;
+      if (p.bestStreak === undefined) p.bestStreak = p.sd || 0;
+      if (p.freezeUsedToday === undefined) p.freezeUsedToday = false;
       if (!p.weeklyMission) {
         const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
         p.weeklyMission = wm.id; p.weeklyProgress = 0; p.weekStart = new Date().toDateString();
@@ -93,7 +132,9 @@ export default function App() {
       journal: "", jAnswers: {}, rainbow: [false, false, false, false, false, false],
       wheelSpun: false, chestMilestone: null, xpBoost: false,
       weeklyMission: wm.id, weeklyProgress: 0, weekStart: new Date().toDateString(),
-      graduated: [],
+      graduated: [], streakFreezes: MAX_MONTHLY_FREEZES, freezesUsedThisMonth: 0,
+      lastFreezeMonth: `${new Date().getFullYear()}-${new Date().getMonth()}`,
+      comebackActive: false, bestStreak: 0, freezeUsedToday: false,
     });
     setBoarding(false);
   };
@@ -121,6 +162,7 @@ export default function App() {
 
       const sm = { ...prev.sm, [id]: (prev.sm[id] || 0) + 1 };
       const newSD = all ? prev.sd + 1 : prev.sd;
+      const newBest = Math.max(prev.bestStreak || 0, newSD);
 
       // Rare drop
       const isRare = Math.random() < RARE_DROP_CHANCE;
@@ -164,7 +206,7 @@ export default function App() {
         xp: newXP + bonusXP + wmBonusXP,
         coins: prev.coins + Math.floor(q.xp / 3) + (all ? 15 : 0) + bonusCoins + wmBonusCoins,
         dt: prev.dt + q.minutes + bonusMin, sd: newSD,
-        hist: [...prev.hist, { id, d: Date.now() }], sm,
+        hist: [...prev.hist, { id, d: Date.now() }], sm, bestStreak: newBest,
         chestMilestone: chestEarned ? newSD : prev.chestMilestone,
         xpBoost: all ? false : prev.xpBoost,
         weeklyProgress: wp,
@@ -178,6 +220,10 @@ export default function App() {
     setState(p => ({ ...p, quests: [...p.quests, { id: "c_" + Date.now(), name: nq.name.trim(), icon: nq.icon, anchor: nq.anchor, xp: nq.xp, minutes: nq.minutes, done: false, streak: 0 }] }));
     setNq(n => ({ ...n, name: "" }));
   };
+  const completeComeback = useCallback(() => {
+    SFX.play("celeb"); setCeleb(true);
+    setState(p => ({ ...p, comebackActive: false, xp: p.xp + 15, coins: p.coins + 10 }));
+  }, []);
   const rmQuest = id => setState(p => ({ ...p, quests: p.quests.filter(q => q.id !== id) }));
   const togVac = () => setState(p => { const nv = !p.vacMode; return { ...p, vacMode: nv, quests: buildDay(nv).map(q => ({ ...q, streak: (p.sm || {})[q.id] || 0 })), dt: 0 }; });
   const resetDay = () => setState(p => ({ ...p, quests: p.quests.map(q => ({ ...q, done: false })), dt: 0, lastDate: new Date().toDateString() }));
@@ -255,7 +301,7 @@ export default function App() {
         {view === "room" && <Room state={state} level={level} mood={mood} setView={setView} setShopTab={setShopTab} />}
         {view === "shop" && <Shop state={state} shopTab={shopTab} setShopTab={setShopTab} buyItem={buyItem} setView={setView} />}
         {view === "journal" && <Journal state={state} done={done} total={total} setView={setView} setMood={setMood} setJournal={setJournal} setJAnswer={setJAnswer} />}
-        {questOpen && <QuestBoard state={state} allDone={allDone} done={done} total={total} pct={pct} byA={byA} pMode={pMode} complete={complete} rmQuest={rmQuest} toggleRainbow={toggleRainbow} setMood={setMood} setQuestOpen={setQuestOpen} togVac={togVac} resetDay={resetDay} resetAll={resetAll} addQuest={addQuest} nq={nq} setNq={setNq} level={level} />}
+        {questOpen && <QuestBoard state={state} allDone={allDone} done={done} total={total} pct={pct} byA={byA} pMode={pMode} complete={complete} completeComeback={completeComeback} rmQuest={rmQuest} toggleRainbow={toggleRainbow} setMood={setMood} setQuestOpen={setQuestOpen} togVac={togVac} resetDay={resetDay} resetAll={resetAll} addQuest={addQuest} nq={nq} setNq={setNq} level={level} />}
       </div>
     </>
   );

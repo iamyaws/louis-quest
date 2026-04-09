@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { T, ANCHORS, RAINBOW, RAINBOW_LABELS, MOOD_EMOJIS, SCHOOL_QUESTS, VACATION_QUESTS } from '../constants';
 import SFX from '../utils/sfx';
 
-export default function QuestBoard({ state, allDone, done, total, pct, byA, pMode, complete, rmQuest, toggleRainbow, setMood, setQuestOpen, togVac, resetDay, resetAll, addQuest, nq, setNq, level }) {
+export default function QuestBoard({ state, allDone, done, total, pct, byA, pMode, complete, completeComeback, rmQuest, toggleRainbow, setMood, setQuestOpen, togVac, resetDay, resetAll, addQuest, nq, setNq, level }) {
   const nqRef = useRef(null);
 
   return (
@@ -13,6 +13,24 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
           <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(0,0,0,0.1)", margin: "0 auto" }} />
           <button onClick={() => setQuestOpen(false)} style={{ position: "absolute", right: 0, top: 8, background: T.bg, border: "2px solid rgba(0,0,0,0.06)", borderRadius: 50, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "1.1rem", fontWeight: 800, color: T.textSecondary }}>{"\u2715"}</button>
         </div>
+
+        {/* Comeback Quest */}
+        {state.comebackActive && <div className="game-card" style={{ padding: 16, marginBottom: 16, background: "linear-gradient(135deg, rgba(249,115,22,0.08), rgba(251,191,36,0.08))", borderColor: "#F9731630" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: "#FED7AA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem" }}>{"\u{1F431}"}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".8rem", fontWeight: 800, color: "#EA580C", textTransform: "uppercase" }}>Willkommen zurück!</div>
+              <div style={{ fontSize: ".75rem", color: T.textSecondary, fontWeight: 600 }}>Deine Katze hat auf dich gewartet!</div>
+            </div>
+          </div>
+          <button className="btn-tap" onClick={completeComeback} style={{
+            width: "100%", marginTop: 10,
+            background: "linear-gradient(135deg, #F97316, #FCD34D)",
+            border: "none", borderRadius: 14, padding: "12px",
+            color: "white", fontWeight: 800, fontSize: ".85rem", cursor: "pointer",
+            fontFamily: "'Plus Jakarta Sans',sans-serif", minHeight: 48,
+          }}>{"\u{1F43E}"} Ich bin wieder da! (+15 XP, +10 {"\u{1FA99}"})</button>
+        </div>}
 
         {/* Progress */}
         <div className="game-card" style={{ padding: 14, marginBottom: 16, background: allDone ? `${T.success}15` : undefined, borderColor: allDone ? `${T.success}40` : undefined }}>
@@ -110,7 +128,7 @@ export default function QuestBoard({ state, allDone, done, total, pct, byA, pMod
           <div style={{ background: "white", borderRadius: 14, padding: 12, marginTop: 10, border: `2px solid ${T.primary}10` }}>
             <div style={{ fontSize: ".75rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F4CA}"} Übersicht</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-              {[{ v: state.sd, l: "Tage-Streak", c: T.primary }, { v: state.hist.length, l: "Quests gesamt", c: T.success }, { v: (state.graduated || []).length, l: "Graduiert \u{1F393}", c: T.accentDark }, { v: `Lvl ${level}`, l: `${state.xp} XP`, c: "#EC4899" }].map((s, i) => (
+              {[{ v: state.sd, l: "Tage-Streak", c: T.primary }, { v: state.bestStreak || state.sd, l: "Bester Streak", c: "#F97316" }, { v: `\u2744\uFE0F ${state.streakFreezes || 0}`, l: "Streak-Schutz", c: T.teal }, { v: state.hist.length, l: "Quests gesamt", c: T.success }, { v: (state.graduated || []).length, l: "Graduiert \u{1F393}", c: T.accentDark }, { v: `Lvl ${level}`, l: `${state.xp} XP`, c: "#EC4899" }].map((s, i) => (
                 <div key={i} style={{ background: T.bg, borderRadius: 10, padding: "10px", textAlign: "center" }}>
                   <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: s.c }}>{s.v}</div>
                   <div style={{ fontSize: ".6rem", color: T.textSecondary, fontWeight: 600 }}>{s.l}</div>
