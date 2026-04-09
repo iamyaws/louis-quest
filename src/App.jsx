@@ -18,13 +18,14 @@ import SpinWheel from './components/SpinWheel';
 import SurpriseChest from './components/SurpriseChest';
 import PinModal from './components/PinModal';
 import MemoryGame from './components/MemoryGame';
+import Weather from './components/Weather';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const TABS = [
-  { id: "room", label: "Zimmer", icon: "\u{1F3E0}" },
+  { id: "weather", label: "Wetter", icon: "\u{1F324}\uFE0F" },
   { id: "stats", label: "Erfolge", icon: "\u{1F3C6}" },
   { id: "quest", label: "", icon: "\u2694\uFE0F", isCta: true },
-  { id: "journal", label: "Buch", icon: "\u{1F4D3}" },
+  { id: "room", label: "Zimmer", icon: "\u{1F3E0}" },
   { id: "shop", label: "Shop", icon: "\u{1F6CD}\uFE0F" },
 ];
 
@@ -88,6 +89,7 @@ function AppContent() {
         {ui.view === "room" && <Room />}
         {ui.view === "shop" && <Shop />}
         {ui.view === "journal" && <Journal />}
+        {ui.view === "weather" && <Weather />}
         {ui.questOpen && <QuestBoard />}
       </div>
 
