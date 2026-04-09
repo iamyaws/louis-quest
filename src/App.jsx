@@ -1,7 +1,6 @@
 import React from 'react';
 import { T } from './constants';
 import { GameProvider, useGame } from './context/GameContext';
-import { getLevel } from './utils/helpers';
 import SFX from './utils/sfx';
 
 import Onboarding from './components/Onboarding';
@@ -28,27 +27,6 @@ const TABS = [
   { id: "journal", label: "Buch", icon: "\u{1F4D3}" },
   { id: "shop", label: "Shop", icon: "\u{1F6CD}\uFE0F" },
 ];
-
-function CurrencyBar() {
-  const { state } = useGame();
-  if (!state) return null;
-  const level = getLevel(state.xp);
-  return (
-    <div className="currency-bar">
-      <div className="currency-pill">
-        <div className="currency-icon" style={{ background: "linear-gradient(135deg, #FCD34D, #F59E0B)" }}>{"\u{1FA99}"}</div>
-        {state.coins.toLocaleString("de-DE")}
-      </div>
-      <div className="currency-pill">
-        <div className="currency-icon" style={{ background: "linear-gradient(135deg, #A78BFA, #6D28D9)" }}>{"\u26A1"}</div>
-        {state.xp.toLocaleString("de-DE")}
-      </div>
-      <div className="currency-pill" style={{ padding: "6px 12px" }}>
-        Lvl {level}
-      </div>
-    </div>
-  );
-}
 
 function BottomTabBar() {
   const { ui } = useGame();
@@ -102,9 +80,8 @@ function AppContent() {
       {ui.showMemory && <MemoryGame onComplete={actions.collectMemory} />}
 
       {/* Persistent chrome */}
-      {showChrome && <CurrencyBar />}
 
-      <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #3B9FFF 0%, #60B3FF 40%, #7DC4FF 100%)", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: 60, paddingBottom: 80 }}>
+      <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #3B9FFF 0%, #60B3FF 40%, #7DC4FF 100%)", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: ui.view === "hub" ? 0 : 60, paddingBottom: 80 }}>
         {ui.view === "hub" && <Hub />}
         {ui.view === "time" && <TimeBank />}
         {ui.view === "stats" && <Achievements />}
