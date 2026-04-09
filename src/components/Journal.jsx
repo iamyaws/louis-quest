@@ -9,11 +9,11 @@ export default function Journal() {
   const journalRef = useRef(null);
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px" }}>
-      <ViewHeader onBack={() => ui.setView("hub")} title="Tagebuch" light />
+    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
+      <ViewHeader onBack={() => ui.setView("hub")} title="Tagebuch" />
 
       <div style={{ textAlign: "center", marginBottom: 16 }}>
-        <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "white" }}>{new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}</div>
+        <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "#1E1B4B" }}>{new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}</div>
       </div>
 
       {/* Mood summary */}

@@ -9,19 +9,19 @@ export default function Shop() {
   const { shopTab, setShopTab, setView } = ui;
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px" }}>
-      <ViewHeader onBack={() => setView("hub")} title="Shop" light right={
-        <div style={{ background: "rgba(0,20,80,0.55)", backdropFilter: "blur(12px)", border: "2px solid rgba(255,255,255,0.15)", borderRadius: 50, padding: "6px 14px", fontSize: ".85rem", fontWeight: 800, color: "white" }}>{"\u{1FA99}"} {state.coins}</div>
+    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
+      <ViewHeader onBack={() => setView("hub")} title="Shop" right={
+        <div style={{ background: `${T.accent}20`, borderRadius: 50, padding: "6px 14px", fontSize: ".85rem", fontWeight: 800, color: "#92400E" }}>{"\u{1FA99}"} {state.coins}</div>
       } />
       {/* Tabs */}
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         {[{ id: "hero", l: "Held", i: "\u{1F9B8}", col: "#6D28D9" }, { id: "cat", l: "Katze", i: "\u{1F431}", col: "#BE185D" }, { id: "room", l: "Zimmer", i: "\u{1F3E0}", col: "#B45309" }].map(t => (
           <button key={t.id} className="btn-tap" onClick={() => setShopTab(t.id)} style={{
-            flex: 1, background: shopTab === t.id ? "white" : "rgba(255,255,255,0.12)",
-            border: shopTab === t.id ? `3px solid ${t.col}30` : "3px solid transparent",
+            flex: 1, background: shopTab === t.id ? "white" : "rgba(0,50,150,0.04)",
+            border: shopTab === t.id ? `3px solid ${t.col}30` : "3px solid rgba(0,50,150,0.06)",
             borderRadius: 18, padding: "12px 8px", cursor: "pointer",
             fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800,
-            fontSize: ".76rem", color: shopTab === t.id ? t.col : "rgba(255,255,255,0.7)",
+            fontSize: ".76rem", color: shopTab === t.id ? t.col : "#64748B",
             textTransform: "uppercase", textAlign: "center", minHeight: 48,
             boxShadow: shopTab === t.id ? "0 4px 16px rgba(0,0,0,0.08)" : "none",
             transition: "all .2s ease",

@@ -22,41 +22,61 @@ export default function Hub() {
   return (
     <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
-      {/* ── Hero Sky Area ── */}
-      <div style={{ background: getSky(done, total), borderRadius: "0 0 36px 36px", padding: "12px 20px 28px", position: "relative", overflow: "hidden", minHeight: 340, display: "flex", flexDirection: "column" }}>
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "55%", background: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)", borderRadius: "0 0 36px 36px", pointerEvents: "none", zIndex: 1 }} />
+      {/* ═══ Hero Sky Area ═══ */}
+      <div style={{
+        background: getSky(done, total),
+        padding: "12px 20px 0",
+        position: "relative", overflow: "hidden",
+      }}>
         {getSkyStars(done, total) && <>{Array.from({ length: 12 }, (_, i) => <div key={i} style={{ position: "absolute", width: 3, height: 3, borderRadius: "50%", background: "white", top: `${10 + Math.random() * 40}%`, left: `${5 + Math.random() * 90}%`, animation: `starTwinkle ${1.5 + Math.random() * 2}s ease-in-out infinite`, animationDelay: `${Math.random() * 2}s` }} />)}</>}
 
         {/* Day + Lock */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 4, marginBottom: 8, position: "relative", zIndex: 2 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 4, marginBottom: 4, position: "relative", zIndex: 2 }}>
           <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.7)", fontWeight: 700 }}>{dayN}{state.vacMode ? " \u{1F3D6}\uFE0F" : ""}</div>
           <button aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"} onClick={() => pMode ? setPMode(false) : setPinShow(true)} style={{ background: pMode ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.15)", border: "2px solid rgba(255,255,255,0.2)", borderRadius: 50, padding: "6px 12px", cursor: "pointer", color: "white", fontSize: ".75rem", fontWeight: 700, minHeight: 36, minWidth: 36, backdropFilter: "blur(8px)" }}>{pMode ? "\u{1F513}" : "\u{1F512}"}</button>
         </div>
 
-        {/* Hero + Cat + Progress Ring */}
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 2 }}>
-          <div style={{ position: "relative" }}>
-            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)" }}><ProgressRing progress={pct} size={200} stroke={7} color={allDone ? "#34D399" : "rgba(255,255,255,0.4)"} /></div>
+        {/* Hero + Cat centered on stage */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 20, position: "relative", zIndex: 2 }}>
+          {/* Hero name */}
+          <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "white", textShadow: "0 2px 8px rgba(0,0,0,0.3)", marginBottom: 4 }}>{state.hero.name}</div>
+
+          {/* Hero + Ring + Cat composition */}
+          <div style={{ position: "relative", width: 200, height: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {/* Progress ring */}
+            <div style={{ position: "absolute", inset: 0 }}><ProgressRing progress={pct} size={200} stroke={8} color={allDone ? "#34D399" : "rgba(255,255,255,0.35)"} /></div>
+            {/* Hero */}
             <div style={{ animation: "heroFloat 3s ease-in-out infinite", cursor: "pointer", position: "relative", zIndex: 2 }} onClick={() => setQuestOpen(true)}>
-              <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={140} level={level} />
+              <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={130} level={level} />
             </div>
-            <div style={{ position: "absolute", bottom: -18, left: "50%", transform: "translateX(-50%)", width: 120, height: 16, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(0,0,0,0.25) 0%, transparent 70%)", zIndex: 1 }} />
-            <div style={{ position: "absolute", bottom: -10, right: -40, animation: "catIdle 4s ease-in-out infinite", zIndex: 3 }}>
-              <CatSidekick variant={state.catVariant} mood={mood} size={60} />
+            {/* Cat */}
+            <div style={{ position: "absolute", bottom: 8, right: -6, animation: "catIdle 4s ease-in-out infinite", zIndex: 3 }}>
+              <CatSidekick variant={state.catVariant} mood={mood} size={55} />
             </div>
           </div>
-        </div>
 
-        {/* Status text */}
-        <div style={{ textAlign: "center", paddingBottom: 4, position: "relative", zIndex: 2 }}>
-          <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.85)", fontWeight: 600, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>{getTimeLabel(done, total)}</div>
-          <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.3)" }}>{done}/{total} Quests {allDone ? "\u{1F4AA}" : ""}</div>
-          <div style={{ fontSize: ".75rem", color: "rgba(255,255,255,0.8)", marginTop: 2, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>+{state.dt} Min verdient</div>
+          {/* Platform shadow */}
+          <div style={{ width: 160, height: 14, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%)", marginTop: -6 }} />
+
+          {/* Quest progress text */}
+          <div style={{ textAlign: "center", marginTop: 6 }}>
+            <div style={{ fontSize: ".75rem", color: "rgba(255,255,255,0.8)", fontWeight: 600, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>{getTimeLabel(done, total)}</div>
+            <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.3rem", fontWeight: 700, color: "white", textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>{done}/{total} Quests {allDone ? "\u{1F4AA}" : ""}</div>
+            <div style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.7)", marginTop: 2, textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}>+{state.dt} Min verdient</div>
+          </div>
         </div>
       </div>
 
-      {/* ── Content area ── */}
-      <div style={{ padding: "16px 16px 0" }}>
+      {/* ═══ Content shelf (light background like Paper 2) ═══ */}
+      <div style={{
+        flex: 1,
+        background: "#EFF3FB",
+        borderRadius: "28px 28px 0 0",
+        marginTop: -16,
+        padding: "20px 16px 20px",
+        position: "relative", zIndex: 3,
+        boxShadow: "0 -4px 20px rgba(0,30,100,0.08)",
+      }}>
 
         {/* Hero Level Card */}
         <div className="hero-card" style={{ marginBottom: 14 }}>
@@ -72,7 +92,7 @@ export default function Hub() {
         </div>
 
         {/* Cat mood */}
-        <div style={{ fontSize: ".75rem", color: "rgba(255,255,255,0.6)", textAlign: "center", marginBottom: 14, fontStyle: "italic" }}>{"\u{1F431}"} {CAT_MOOD_TEXT[mood]}</div>
+        <div style={{ fontSize: ".75rem", color: "#64748B", textAlign: "center", marginBottom: 14, fontStyle: "italic" }}>{"\u{1F431}"} {CAT_MOOD_TEXT[mood]}</div>
 
         {/* Streak freeze notification */}
         {state.freezeUsedToday && <div className="game-card" style={{ padding: 14, marginBottom: 12, background: "linear-gradient(135deg, rgba(14,165,233,0.08), rgba(14,165,233,0.03))", borderColor: `${T.teal}40` }}>
@@ -127,9 +147,9 @@ export default function Hub() {
           );
         })()}
 
-        {/* Next chest hint */}
-        {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.45)", textAlign: "center", marginBottom: 8 }}>{"\u{1F381}"} Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
-        {(state.streakFreezes || 0) > 0 && <div style={{ fontSize: ".7rem", color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 8 }}>{"\u2744\uFE0F"} {state.streakFreezes} Streak-Schutz übrig</div>}
+        {/* Hints */}
+        {(() => { const next = CHEST_MILESTONES.find(m => m > state.sd); return next ? <div style={{ fontSize: ".7rem", color: "#94A3B8", textAlign: "center", marginBottom: 8 }}>{"\u{1F381}"} Nächste Truhe: {next}-Tage Streak ({state.sd}/{next})</div> : null; })()}
+        {(state.streakFreezes || 0) > 0 && <div style={{ fontSize: ".7rem", color: "#94A3B8", textAlign: "center", marginBottom: 8 }}>{"\u2744\uFE0F"} {state.streakFreezes} Streak-Schutz übrig</div>}
       </div>
     </div>
   );
