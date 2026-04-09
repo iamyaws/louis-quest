@@ -24,11 +24,11 @@ import Familienregeln from './components/Familienregeln';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const TABS = [
-  { id: "weather", label: "Wetter", icon: "\u{1F324}\uFE0F" },
+  { id: "weather", label: "Wetter", icon: "\u2600\uFE0F" },
   { id: "stats", label: "Erfolge", icon: "\u{1F3C6}" },
   { id: "quest", label: "", icon: "\u2B50", isCta: true },
   { id: "room", label: "Zimmer", icon: "\u{1F3E0}" },
-  { id: "shop", label: "Sammlung", icon: "\u{1F6CD}\uFE0F" },
+  { id: "shop", label: "Sammlung", icon: "\u{1F4E6}" },
 ];
 
 function BottomTabBar() {
@@ -65,7 +65,7 @@ function BottomTabBar() {
 function AppContent() {
   const { state, boarding, computed, actions, onBoard, ui } = useGame();
 
-  if (boarding === null) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#0369E8", color: "white", fontFamily: "'Nunito',sans-serif", fontSize: "1.2rem", fontWeight: 700 }}>Laden...</div>;
+  if (boarding === null) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#F7F3E3", color: "#1E1B4B", fontFamily: "'Nunito',sans-serif", fontSize: "1.2rem", fontWeight: 700 }}>Laden...</div>;
   if (boarding) return <Onboarding onComplete={onBoard} />;
   if (!state) return null;
 
@@ -84,7 +84,7 @@ function AppContent() {
 
       {/* Persistent chrome */}
 
-      <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #3B9FFF 0%, #60B3FF 40%, #7DC4FF 100%)", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: ui.view === "hub" ? 0 : 60, paddingBottom: 80 }}>
+      <div style={{ minHeight: "100vh", background: "#F7F3E3", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: ui.view === "hub" ? 0 : 60, paddingBottom: 80 }}>
         {ui.view === "hub" && <Hub />}
         {ui.view === "time" && <TimeBank />}
         {ui.view === "stats" && <Achievements />}

@@ -159,6 +159,10 @@ function applyDefaults(p: GameState): void {
   if (!p.belohnungen) p.belohnungen = DEFAULT_BELOHNUNGEN;
   if (!p.belohnungenLog) p.belohnungenLog = [];
   if (!p.specialMissions) p.specialMissions = [];
+  // Add Liam's birthday gift mission if not already there and date hasn't passed
+  if (!p.specialMissions.some(m => m.id === "sm_liam_bday") && new Date() < new Date("2026-04-27")) {
+    p.specialMissions.push({ id: "sm_liam_bday", name: "Geburtstagsgeschenk f\u00FCr Liam kaufen", emoji: "\uD83C\uDF81", hp: 50, done: false });
+  }
   if (!p.weeklyLunch) p.weeklyLunch = {};
   if (p.weeklyMissionsCompleted === undefined) p.weeklyMissionsCompleted = 0;
 }

@@ -1,6 +1,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body, #root { height: 100%; width: 100%; }
-body { background: #3B9FFF; font-family: 'Nunito', sans-serif; overscroll-behavior: none; -webkit-font-smoothing: antialiased; }
+body { background: #F7F3E3; font-family: 'Nunito', sans-serif; overscroll-behavior: none; -webkit-font-smoothing: antialiased; }
 
 /* ── Tap feedback ── */
 .btn-tap { transition: transform .12s ease, box-shadow .12s ease; }
@@ -9,9 +9,9 @@ body { background: #3B9FFF; font-family: 'Nunito', sans-serif; overscroll-behavi
 /* ── Card base (Paper 2 style: thick borders, bold shadows) ── */
 .game-card {
   background: #FFFFFF;
-  border: 3px solid rgba(0,50,150,0.08);
+  border: 3px solid rgba(180,120,40,0.08);
   border-radius: 22px;
-  box-shadow: 0 4px 16px rgba(0,40,120,0.10), 0 1px 3px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 16px rgba(120,80,20,0.08), 0 1px 3px rgba(0,0,0,0.04);
   transition: box-shadow .2s ease;
 }
 
@@ -56,8 +56,8 @@ body { background: #3B9FFF; font-family: 'Nunito', sans-serif; overscroll-behavi
   align-items: center;
   justify-content: space-around;
   background: rgba(255,255,255,0.97);
-  border-top: 1.5px solid rgba(0,50,150,0.06);
-  box-shadow: 0 -4px 24px rgba(0,40,120,0.08);
+  border-top: 1.5px solid rgba(180,120,40,0.08);
+  box-shadow: 0 -4px 24px rgba(120,80,20,0.06);
 }
 
 .tab-item {
@@ -83,19 +83,21 @@ body { background: #3B9FFF; font-family: 'Nunito', sans-serif; overscroll-behavi
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
   transition: all .15s ease;
-  background: rgba(0,50,150,0.04);
-  border: 1.5px solid rgba(0,50,150,0.06);
+  background: rgba(255,240,210,0.3);
+  border: 1.5px solid rgba(200,150,50,0.10);
   backdrop-filter: blur(8px);
-  box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), 0 2px 6px rgba(0,30,100,0.06);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.7), 0 2px 6px rgba(120,80,20,0.06);
+  color: #9C977E;
+  font-size: 1.3rem;
 }
 
 .tab-icon-active {
-  background: linear-gradient(135deg, rgba(109,40,217,0.10), rgba(167,139,250,0.15));
-  border-color: rgba(109,40,217,0.20);
-  box-shadow: inset 0 1px 2px rgba(255,255,255,0.8), 0 3px 12px rgba(109,40,217,0.12);
+  background: linear-gradient(135deg, rgba(252,211,77,0.25), rgba(245,158,11,0.15));
+  border-color: rgba(245,158,11,0.25);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.8), 0 3px 12px rgba(245,158,11,0.15);
   transform: scale(1.08);
+  color: #B45309;
 }
 
 .tab-label {
@@ -108,7 +110,7 @@ body { background: #3B9FFF; font-family: 'Nunito', sans-serif; overscroll-behavi
 }
 
 .tab-label-active {
-  color: #6D28D9;
+  color: #B45309;
 }
 
 /* ── Central play/quest button ── */
@@ -132,20 +134,20 @@ body { background: #3B9FFF; font-family: 'Nunito', sans-serif; overscroll-behavi
 /* ── Mission card (Paper 2 style) ── */
 .mission-card {
   background: white;
-  border: 2.5px solid rgba(0,50,150,0.06);
+  border: 2.5px solid rgba(180,120,40,0.08);
   border-radius: 18px;
   padding: 14px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 3px 12px rgba(0,40,120,0.06);
+  box-shadow: 0 3px 12px rgba(120,80,20,0.06);
   transition: all .15s ease;
 }
 
 .mission-progress-track {
   flex: 1;
   height: 10px;
-  background: rgba(0,50,150,0.06);
+  background: rgba(180,120,40,0.08);
   border-radius: 50px;
   overflow: hidden;
 }
@@ -171,13 +173,13 @@ body { background: #3B9FFF; font-family: 'Nunito', sans-serif; overscroll-behavi
 /* ── Hero display card (legacy, used by Achievements) ── */
 .hero-card {
   background: white;
-  border: 3px solid rgba(0,50,150,0.08);
+  border: 3px solid rgba(180,120,40,0.10);
   border-radius: 24px;
   padding: 20px;
   text-align: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,40,120,0.10);
+  box-shadow: 0 4px 16px rgba(120,80,20,0.08);
 }
 
 /* ══ Animations ══ */

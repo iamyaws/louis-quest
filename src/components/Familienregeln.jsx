@@ -5,72 +5,72 @@ import { useGame } from '../context/GameContext';
 
 const SECTIONS = [
   {
-    emoji: "💛",
-    title: "Die wichtigste Regel",
+    emoji: "\uD83D\uDC9B",
+    title: "Was uns als Familie gl\u00FCcklich macht",
     highlight: true,
-    content: "Geld und Technik machen dich nicht glücklich.\nLieb sein, sich Mühe geben und Zeit miteinander verbringen macht glücklich.",
+    content: "Lieb zueinander sein. Sich M\u00FChe geben. Zeit miteinander verbringen.\nDas ist wichtiger als alles andere auf der Welt.",
+    affirmation: "\u2728 Ich bin geliebt, so wie ich bin.",
   },
   {
-    emoji: "1️⃣",
-    title: "Wichtige Dinge kommen zuerst",
+    emoji: "1\uFE0F\u20E3",
+    title: "Was kommt zuerst?",
     items: [
-      { icon: "😴", text: "Gut schlafen" },
-      { icon: "🥦", text: "Gesund essen" },
-      { icon: "🏃", text: "Mit deinem Körper spielen" },
-      { icon: "📚", text: "Hausaufgaben" },
-      { icon: "🧹", text: "Im Haushalt helfen" },
+      { icon: "\uD83D\uDE34", text: "Gut schlafen \u2014 damit du Energie hast" },
+      { icon: "\uD83E\uDD66", text: "Gesund essen \u2014 damit du stark wirst" },
+      { icon: "\uD83C\uDFC3", text: "Drau\u00DFen spielen \u2014 damit dein K\u00F6rper sich freut" },
+      { icon: "\uD83D\uDCDA", text: "Lernen \u2014 damit du die Welt verstehst" },
+      { icon: "\uD83E\uDDF9", text: "Mithelfen \u2014 weil wir ein Team sind" },
     ],
-    footer: "Diese Sachen kommen immer zuerst.",
+    footer: "Wenn diese Sachen erledigt sind, kommt alles andere.",
+    affirmation: "\uD83D\uDCAA Ich schaffe das \u2014 Schritt f\u00FCr Schritt!",
   },
   {
-    emoji: "2️⃣",
-    title: "Gute Gewohnheiten = mehr Technik & Geld",
-    good: [
-      "Deine Aufgaben machst",
-      "Aufhörst, wenn die Bildschirmzeit vorbei ist",
-      "Gute Entscheidungen triffst",
-      "Kreativ bist und gut zusammenarbeitest",
-      "Ehrlich sagst, was du benutzt",
+    emoji: "2\uFE0F\u20E3",
+    title: "Was uns stolz macht",
+    wish: [
+      "Wenn du deine Aufgaben mit guter Laune machst",
+      "Wenn du aufh\u00F6rst, obwohl du gerne weitermachen w\u00FCrdest",
+      "Wenn du selbst gute Entscheidungen triffst",
+      "Wenn du kreativ bist und gut mit anderen zusammenarbeitest",
+      "Wenn du ehrlich bist \u2014 auch wenn es schwer ist",
     ],
-    bad: [
-      "Sachen heimlich machst",
-      "Wutausbrüche bekommst",
-      "Nur noch an Technik denkst",
-      "Wichtige Dinge vergisst",
+    worry: [
+      "Wenn du Sachen versteckst oder heimlich machst",
+      "Wenn Wut st\u00E4rker wird als du",
+      "Wenn du nur noch an Bildschirme denkst",
+      "Wenn du wichtige Dinge vergisst",
     ],
+    affirmation: "\uD83C\uDF1F Ich kann stolz auf mich sein!",
   },
   {
-    emoji: "3️⃣",
-    title: "Fehler sind okay — verstecken nicht",
+    emoji: "3\uFE0F\u20E3",
+    title: "Fehler geh\u00F6ren dazu",
     items: [
-      { icon: "✅", text: "Sag es uns" },
-      { icon: "✅", text: "Red mit uns darüber" },
-      { icon: "✅", text: "Versuch es nochmal" },
-      { icon: "❌", text: "Versteck es nicht und lüg nicht" },
+      { icon: "\uD83D\uDCAC", text: "Sag uns, was passiert ist" },
+      { icon: "\uD83E\uDD1D", text: "Wir reden zusammen dar\u00FCber" },
+      { icon: "\uD83D\uDD04", text: "Morgen versuchst du es nochmal" },
     ],
-    footer: "Alle machen Fehler. Ehrlichkeit bringt Vertrauen.",
+    footer: "Jeder macht Fehler \u2014 Mama und Papa auch! Wichtig ist, dass wir ehrlich zueinander sind.",
+    affirmation: "\uD83C\uDF31 Aus Fehlern wachse ich!",
   },
   {
-    emoji: "4️⃣",
-    title: "Deine Aufgabe",
-    good: [
-      "Kind sein",
-      "Lernen",
-      "Üben",
-      "Kleine Entscheidungen treffen und daraus lernen",
+    emoji: "4\uFE0F\u20E3",
+    title: "Du darfst Kind sein",
+    items: [
+      { icon: "\uD83C\uDF88", text: "Spielen, lachen, Spa\u00DF haben" },
+      { icon: "\uD83D\uDCA1", text: "Neues lernen und ausprobieren" },
+      { icon: "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1", text: "Freundschaften pflegen" },
+      { icon: "\uD83C\uDF1F", text: "Kleine Entscheidungen selber treffen" },
     ],
-    bad: [
-      "Dich um Erwachsenenprobleme kümmern",
-      "Dir Sorgen über Geld machen",
-      "Hausentscheidungen treffen",
-    ],
-    footer: "Du darfst immer deine Ideen sagen, aber Mama & Papa kümmern sich um die großen Sachen.",
+    footer: "Um die gro\u00DFen Sachen k\u00FCmmern sich Mama & Papa. Du musst dir keine Sorgen machen.",
+    affirmation: "\uD83E\uDD8B Ich bin ein Kind \u2014 und das ist wunderbar!",
   },
   {
-    emoji: "💛",
-    title: "Und denk dran",
+    emoji: "\uD83E\uDD17",
+    title: "Unser Versprechen an dich",
     highlight: true,
-    content: "Mama & Papa lieben dich und helfen dir beim Lernen und Wachsen.\nWenn du unsicher bist, frag und wir helfen dir immer weiter.",
+    content: "Wir sind immer f\u00FCr dich da \u2014 egal was passiert.\nWir helfen dir beim Lernen, Wachsen und Gro\u00DFwerden.\nWenn du unsicher bist: frag einfach. Zusammen finden wir immer einen Weg.",
+    affirmation: "\uD83D\uDC9B Ich bin nicht allein. Liam, Papa und Mama sind immer f\u00FCr mich da und lieben mich.",
   },
 ];
 
@@ -147,19 +147,19 @@ export default function Familienregeln() {
               </div>
             )}
 
-            {/* Good/bad lists */}
-            {section.good && (
-              <div style={{ marginBottom: section.bad ? 12 : 0 }}>
+            {/* Wish list (what makes us proud) */}
+            {section.wish && (
+              <div style={{ marginBottom: section.worry ? 14 : 0 }}>
                 <div style={{
-                  fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800,
+                  fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".9rem", fontWeight: 800,
                   color: "#059669", textTransform: "uppercase", marginBottom: 8,
                 }}>
-                  ✅ Du bekommst mehr, wenn du:
+                  {"\uD83D\uDE0A"} Das macht uns stolz:
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {section.good.map((item, j) => (
+                  {section.wish.map((item, j) => (
                     <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, paddingLeft: 4 }}>
-                      <span style={{ color: "#059669", fontWeight: 800, fontSize: "1rem", lineHeight: 1.4 }}>•</span>
+                      <span style={{ color: "#059669", fontWeight: 800, fontSize: "1rem", lineHeight: 1.4 }}>{"\u2714\uFE0F"}</span>
                       <span style={{
                         fontFamily: "'Nunito',sans-serif", fontSize: "1.05rem", fontWeight: 700,
                         color: T.textPrimary, lineHeight: 1.4,
@@ -171,18 +171,19 @@ export default function Familienregeln() {
                 </div>
               </div>
             )}
-            {section.bad && (
+            {/* Worry list (what concerns us) */}
+            {section.worry && (
               <div>
                 <div style={{
-                  fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800,
-                  color: "#DC2626", textTransform: "uppercase", marginBottom: 8,
+                  fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".9rem", fontWeight: 800,
+                  color: "#B45309", textTransform: "uppercase", marginBottom: 8,
                 }}>
-                  ❌ Du bekommst weniger, wenn du:
+                  {"\uD83D\uDE1F"} Das macht uns Sorgen:
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {section.bad.map((item, j) => (
+                  {section.worry.map((item, j) => (
                     <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, paddingLeft: 4 }}>
-                      <span style={{ color: "#DC2626", fontWeight: 800, fontSize: "1rem", lineHeight: 1.4 }}>•</span>
+                      <span style={{ color: "#B45309", fontWeight: 800, fontSize: "1rem", lineHeight: 1.4 }}>{"\u26A0\uFE0F"}</span>
                       <span style={{
                         fontFamily: "'Nunito',sans-serif", fontSize: "1.05rem", fontWeight: 700,
                         color: T.textPrimary, lineHeight: 1.4,
@@ -201,9 +202,22 @@ export default function Familienregeln() {
                 fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 600,
                 color: section.highlight ? "#B45309" : T.primary,
                 marginTop: 12, paddingTop: 10,
-                borderTop: "2px solid rgba(0,50,150,0.06)",
+                borderTop: "2px solid rgba(180,120,40,0.08)",
               }}>
                 {section.footer}
+              </div>
+            )}
+
+            {/* Affirmation */}
+            {section.affirmation && (
+              <div style={{
+                marginTop: 12, padding: "10px 14px",
+                background: "linear-gradient(135deg, rgba(251,191,36,0.12), rgba(255,215,0,0.08))",
+                borderRadius: 14,
+                fontFamily: "'Fredoka',sans-serif", fontSize: "1.05rem", fontWeight: 700,
+                color: "#92400E", textAlign: "center",
+              }}>
+                {section.affirmation}
               </div>
             )}
           </div>

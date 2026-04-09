@@ -20,7 +20,7 @@ function HeroPortrait({ shape, color, eyes, hair, level, size }) {
   );
 }
 
-const GERMAN_DAYS = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+const GERMAN_DAYS_SHORT = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
 const GERMAN_MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
 export default function Hub() {
@@ -31,33 +31,28 @@ export default function Hub() {
   const wInfo = weather?.current ? getWeatherInfo(weather.current.weatherCode) : null;
 
   const today = new Date();
-  const dayKey = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"][today.getDay()];
+  const dayKey = GERMAN_DAYS_SHORT[today.getDay()];
   const lunch = state.weeklyLunch?.[dayKey];
+  const todayDaily = weather?.daily?.[0];
 
   const tip = HERO_TIPS[Math.floor(Date.now() / 86400000) % HERO_TIPS.length];
 
   const catAllDone = state.catFed && state.catPetted && state.catPlayed;
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#EFF3FB" }}>
+    <div className="view-enter" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#F7F3E3" }}>
 
-      {/* --- 1. Top Bar --- */}
+      {/* --- 1. Top Bar (lock only) --- */}
       <div style={{
         padding: "env(safe-area-inset-top, 12px) 16px 0",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
+        display: "flex", justifyContent: "flex-end",
         marginBottom: 10,
       }}>
-        <div style={{
-          fontSize: "1rem", color: T.textPrimary, fontWeight: 700,
-          fontFamily: "'Fredoka',sans-serif",
-        }}>
-          {GERMAN_DAYS[today.getDay()]}{state.vacMode ? " \uD83C\uDFD6\uFE0F" : ""}
-        </div>
         <button
           aria-label={pMode ? "Elternmodus deaktivieren" : "Elternmodus aktivieren"}
           onClick={() => pMode ? setPMode(false) : setPinShow(true)}
           style={{
-            background: "rgba(0,50,150,0.06)", border: "2px solid rgba(0,50,150,0.08)",
+            background: "rgba(180,120,40,0.08)", border: "2px solid rgba(180,120,40,0.10)",
             borderRadius: 50, padding: "6px 12px", cursor: "pointer",
             color: T.textSecondary, fontSize: ".85rem", fontWeight: 700,
             minHeight: 44, minWidth: 44,
@@ -138,24 +133,26 @@ export default function Hub() {
                   <div style={{ fontSize: ".75rem", fontWeight: 700, color: T.textLight }}>Tage</div>
                 </div>
               </div>
-              {/* Weather */}
+              {/* Weather — min/max */}
               <div style={{
-                background: "#E0F2FE40", borderRadius: 14, padding: "10px 10px",
+                background: "#E0F2FE40", borderRadius: 14, padding: "8px 10px",
                 display: "flex", alignItems: "center", gap: 6,
               }}>
                 <span style={{ fontSize: "1.3rem" }}>{wInfo?.emoji || "\u2601\uFE0F"}</span>
-                <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#0284C7" }}>
-                  {weather?.current ? `${weather.current.temp}\u00B0` : "\u2022\u2022\u2022"}
-                </span>
+                <div>
+                  <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: "#0284C7" }}>
+                    {todayDaily ? `${todayDaily.tempMin}\u00B0 / ${todayDaily.tempMax}\u00B0` : weather?.current ? `${weather.current.temp}\u00B0` : "\u2022\u2022\u2022"}
+                  </div>
+                </div>
               </div>
-              {/* Date */}
+              {/* Date — Do. 9. April */}
               <div style={{
-                background: "#EDE9FE40", borderRadius: 14, padding: "10px 10px",
+                background: "#EDE9FE40", borderRadius: 14, padding: "8px 10px",
                 display: "flex", alignItems: "center", gap: 6,
               }}>
                 <span style={{ fontSize: "1.2rem" }}>{"\uD83D\uDCC5"}</span>
-                <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: "#6366F1" }}>
-                  {today.getDate()}. {GERMAN_MONTHS[today.getMonth()].slice(0, 3)}
+                <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: "#6366F1" }}>
+                  {dayKey}. {today.getDate()}. {GERMAN_MONTHS[today.getMonth()]}
                 </span>
               </div>
             </div>
@@ -197,7 +194,7 @@ export default function Hub() {
             onClick={() => { if (!state.dailyVitaminD) actions.completeHabit("vitaminD"); }}
             style={{
               flex: 1, background: state.dailyVitaminD ? "rgba(52,211,153,0.1)" : "white",
-              border: `2.5px solid ${state.dailyVitaminD ? "rgba(52,211,153,0.3)" : "rgba(0,50,150,0.08)"}`,
+              border: `2.5px solid ${state.dailyVitaminD ? "rgba(52,211,153,0.3)" : "rgba(180,120,40,0.10)"}`,
               borderRadius: 18, padding: "12px 6px", cursor: state.dailyVitaminD ? "default" : "pointer",
               display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
               minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
@@ -215,13 +212,13 @@ export default function Hub() {
             )}
           </button>
 
-          {/* Bruder */}
+          {/* Liam */}
           <button
             className="btn-tap"
             onClick={() => { if (!state.dailyBrother) actions.completeHabit("brother"); }}
             style={{
               flex: 1, background: state.dailyBrother ? "rgba(52,211,153,0.1)" : "white",
-              border: `2.5px solid ${state.dailyBrother ? "rgba(52,211,153,0.3)" : "rgba(0,50,150,0.08)"}`,
+              border: `2.5px solid ${state.dailyBrother ? "rgba(52,211,153,0.3)" : "rgba(180,120,40,0.10)"}`,
               borderRadius: 18, padding: "12px 6px", cursor: state.dailyBrother ? "default" : "pointer",
               display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
               minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
@@ -232,7 +229,7 @@ export default function Hub() {
               fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700,
               color: state.dailyBrother ? "#059669" : T.textPrimary,
             }}>
-              Bruder
+              Liam
             </span>
             {!state.dailyBrother && (
               <span style={{ fontSize: ".9rem", fontWeight: 700, color: "#D97706" }}>+10 {"\u2B50"}</span>
@@ -245,7 +242,7 @@ export default function Hub() {
             onClick={() => ui.setView("cat")}
             style={{
               flex: 1, background: catAllDone ? "rgba(52,211,153,0.1)" : "white",
-              border: `2.5px solid ${catAllDone ? "rgba(52,211,153,0.3)" : "rgba(0,50,150,0.08)"}`,
+              border: `2.5px solid ${catAllDone ? "rgba(52,211,153,0.3)" : "rgba(180,120,40,0.10)"}`,
               borderRadius: 18, padding: "12px 6px", cursor: "pointer",
               display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
               minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
@@ -509,7 +506,7 @@ export default function Hub() {
             className="btn-tap"
             onClick={() => ui.setView("journal")}
             style={{
-              flex: 1, background: "white", border: "2.5px solid rgba(0,50,150,0.06)",
+              flex: 1, background: "white", border: "2.5px solid rgba(180,120,40,0.08)",
               borderRadius: 18, padding: "14px 12px", cursor: "pointer",
               fontFamily: "'Fredoka',sans-serif", fontWeight: 700, fontSize: ".95rem",
               color: T.textPrimary, display: "flex", alignItems: "center",
@@ -523,7 +520,7 @@ export default function Hub() {
             className="btn-tap"
             onClick={() => ui.setView("time")}
             style={{
-              flex: 1, background: "white", border: "2.5px solid rgba(0,50,150,0.06)",
+              flex: 1, background: "white", border: "2.5px solid rgba(180,120,40,0.08)",
               borderRadius: 18, padding: "14px 12px", cursor: "pointer",
               fontFamily: "'Fredoka',sans-serif", fontWeight: 700, fontSize: ".95rem",
               color: T.textPrimary, display: "flex", alignItems: "center",

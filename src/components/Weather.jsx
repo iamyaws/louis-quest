@@ -66,7 +66,7 @@ export default function Weather() {
         </div>
 
         {/* Weather details row */}
-        <div style={{ display: "flex", justifyContent: "space-around", padding: "12px 16px", borderTop: "2px solid rgba(0,50,150,0.04)" }}>
+        <div style={{ display: "flex", justifyContent: "space-around", padding: "12px 16px", borderTop: "2px solid rgba(180,120,40,0.06)" }}>
           {[
             { icon: "\u{1F4A8}", value: `${current.windSpeed} km/h`, label: "Wind" },
             { icon: "\u{1F4A7}", value: `${current.humidity}%`, label: "Feuchtigkeit" },

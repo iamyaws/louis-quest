@@ -56,8 +56,8 @@ export default function Shop() {
             onClick={() => setShopTab(t.id)}
             style={{
               flex: 1,
-              background: shopTab === t.id ? 'white' : 'rgba(0,50,150,0.04)',
-              border: shopTab === t.id ? `3px solid ${t.col}30` : '3px solid rgba(0,50,150,0.06)',
+              background: shopTab === t.id ? 'white' : 'rgba(180,120,40,0.06)',
+              border: shopTab === t.id ? `3px solid ${t.col}30` : '3px solid rgba(180,120,40,0.08)',
               borderRadius: 18,
               padding: '12px 8px',
               cursor: 'pointer',
@@ -119,7 +119,7 @@ export default function Shop() {
                 width: 56,
                 height: 56,
                 borderRadius: 16,
-                background: owned ? `${T.success}15` : 'rgba(0,50,150,0.05)',
+                background: owned ? `${T.success}15` : 'rgba(180,120,40,0.07)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -164,7 +164,7 @@ export default function Shop() {
                       width: '100%',
                       height: 10,
                       borderRadius: 5,
-                      background: 'rgba(0,50,150,0.08)',
+                      background: 'rgba(180,120,40,0.10)',
                       overflow: 'hidden',
                     }}>
                       <div style={{

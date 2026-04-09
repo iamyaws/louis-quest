@@ -51,8 +51,8 @@ export default function Journal() {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {q.opts.map(o => (
                 <button key={o.v} onClick={() => actions.setJAnswer(q.id, o.v)} style={{
-                  background: ans === o.v ? `${T.primary}10` : "rgba(0,50,150,0.02)",
-                  border: ans === o.v ? `2.5px solid ${T.primary}40` : "2.5px solid rgba(0,50,150,0.06)",
+                  background: ans === o.v ? `${T.primary}10` : "rgba(180,120,40,0.04)",
+                  border: ans === o.v ? `2.5px solid ${T.primary}40` : "2.5px solid rgba(180,120,40,0.08)",
                   borderRadius: 50, padding: "8px 16px", cursor: "pointer",
                   fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: ".8rem",
                   color: ans === o.v ? T.primary : T.textPrimary,
@@ -72,7 +72,7 @@ export default function Journal() {
           value={state.journal || ""}
           onChange={e => actions.setJournal(e.target.value)}
           placeholder="Was dich bewegt, was passiert ist, ein Highlight..."
-          style={{ width: "100%", minHeight: 100, background: "rgba(0,50,150,0.02)", border: "2.5px solid rgba(0,50,150,0.06)", borderRadius: 16, padding: "14px 16px", color: T.textPrimary, fontSize: ".9rem", fontFamily: "'Nunito',sans-serif", outline: "none", fontWeight: 600, resize: "vertical", lineHeight: 1.6 }}
+          style={{ width: "100%", minHeight: 100, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 16, padding: "14px 16px", color: T.textPrimary, fontSize: ".9rem", fontFamily: "'Nunito',sans-serif", outline: "none", fontWeight: 600, resize: "vertical", lineHeight: 1.6 }}
         />
       </div>
 

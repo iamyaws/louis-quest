@@ -63,7 +63,7 @@ export default function CatCare() {
               {!prog.maxStage && <div style={{ fontSize: ".8rem", color: T.textLight }}>{prog.cur}/{prog.need} bis {nextStage?.name}</div>}
             </div>
           </div>
-          <div style={{ background: "rgba(0,50,150,0.06)", borderRadius: 50, height: 8, overflow: "hidden" }}>
+          <div style={{ background: "rgba(180,120,40,0.08)", borderRadius: 50, height: 8, overflow: "hidden" }}>
             <div style={{ height: "100%", borderRadius: 50, width: `${prog.maxStage ? 100 : Math.min(100, (prog.cur / prog.need) * 100)}%`, background: `linear-gradient(90deg, ${T.primary}, ${T.accent})`, transition: "width .6s ease" }} />
           </div>
           {prog.maxStage && <div style={{ fontSize: ".85rem", color: T.success, fontWeight: 800, marginTop: 4, textAlign: "center" }}>{"\u2B50"} Maximale Stufe erreicht!</div>}
@@ -91,7 +91,7 @@ export default function CatCare() {
                 <span style={{ fontSize: ".95rem", fontWeight: 700, color: T.textPrimary }}>{s.icon} {s.label}</span>
                 <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: s.value > 50 ? s.color : s.value > 25 ? T.accentDark : T.danger }}>{s.value}%</span>
               </div>
-              <div style={{ background: "rgba(0,50,150,0.06)", borderRadius: 50, height: 10, overflow: "hidden" }}>
+              <div style={{ background: "rgba(180,120,40,0.08)", borderRadius: 50, height: 10, overflow: "hidden" }}>
                 <div style={{ height: "100%", borderRadius: 50, width: `${s.value}%`, background: s.value > 50 ? s.color : s.value > 25 ? T.accentDark : T.danger, transition: "width .6s ease" }} />
               </div>
             </div>
@@ -133,7 +133,7 @@ export default function CatCare() {
             {CAT_STAGES.map((cs, i) => (
               <div key={i} style={{
                 padding: "6px 10px", borderRadius: 12, fontSize: ".8rem", fontWeight: 700,
-                background: i <= stage ? `${T.primary}15` : "rgba(0,50,150,0.03)",
+                background: i <= stage ? `${T.primary}15` : "rgba(180,120,40,0.05)",
                 color: i <= stage ? T.primary : T.textLight,
                 border: i === stage ? `2px solid ${T.primary}` : "2px solid transparent",
               }}>{cs.emoji} {cs.name}</div>

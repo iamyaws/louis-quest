@@ -3,14 +3,14 @@
 import type { Quest, Reward, ShopItem, RareDrop, ChestReward, WheelSegment, WeeklyMission, JournalQuestion, Badge, HeroTip, UnlockCondition, Belohnung } from './types';
 
 export const T = {
-  bg: "#FFF8F0", surface: "#FFF3E6", surfaceHigh: "#FFE8CC",
-  card: "#FFFBF5", cardBorder: "1.5px solid rgba(0,0,0,0.05)",
+  bg: "#F7F3E3", surface: "#FFF8EE", surfaceHigh: "#FFE8CC",
+  card: "#FFFFFF", cardBorder: "1.5px solid rgba(180,120,40,0.08)",
   primary: "#6D28D9", primaryLight: "#A78BFA", primaryPale: "#EDE9FE",
-  accent: "#FCD34D", accentDark: "#F59E0B",
+  accent: "#FFD700", accentDark: "#D4A000",
   success: "#34D399", successDark: "#059669",
-  teal: "#0EA5E9", tealDark: "#0284C7",
-  danger: "#F87171",
-  textPrimary: "#1E1B4B", textSecondary: "#64748B", textLight: "#94A3B8", white: "#FFFFFF",
+  teal: "#5DB1C5", tealDark: "#3D8FA3",
+  danger: "#E05A3D",
+  textPrimary: "#2D2A1E", textSecondary: "#6B6651", textLight: "#9C977E", white: "#FFFFFF",
 } as const;
 
 export const HERO_SHAPES = ["cube", "circle", "hex", "pill"] as const;

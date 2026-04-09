@@ -346,7 +346,7 @@ export default function TimeBank() {
                 <div style={{
                   width: 56, height: 56,
                   borderRadius: 16,
-                  background: canAfford ? `${T.accent}18` : "rgba(0,50,150,0.04)",
+                  background: canAfford ? `${T.accent}18` : "rgba(180,120,40,0.06)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: "1.8rem",
                   flexShrink: 0,
