@@ -1,12 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { T, SHOP_ITEMS } from '../constants';
 import HeroSprite from './HeroSprite';
 import CatSidekick from './CatSidekick';
 import SFX from '../utils/sfx';
 
+const HERO_LINES = [
+  "Hi! Wie geht's? 😊",
+  "Heute wird super!",
+  "Schau mal mein Zimmer!",
+  "Ich bin stark! 💪",
+  "Was machen wir?",
+  "Bereit für Quests!",
+];
+
+const CAT_LINES = [
+  "Miau! 😺",
+  "Schnurr... 😸",
+  "Spielen? 🐾",
+  "Ich hab Hunger!",
+  "*gähnt* 😴",
+  "Du bist toll! ⭐",
+];
+
 export default function Room({ state, level, mood, setView, setShopTab }) {
   const has = (id) => (state.purchased || []).includes(id);
   const roomItems = (state.purchased || []).filter(id => id.startsWith("rm_")).length;
+  const [heroBubble, setHeroBubble] = useState(null);
+  const [catBubble, setCatBubble] = useState(null);
+
+  // Show a random speech bubble on mount and periodically
+  useEffect(() => {
+    const showHero = () => {
+      setHeroBubble(HERO_LINES[Math.floor(Math.random() * HERO_LINES.length)]);
+      setTimeout(() => setHeroBubble(null), 3000);
+    };
+    const showCat = () => {
+      setCatBubble(CAT_LINES[Math.floor(Math.random() * CAT_LINES.length)]);
+      setTimeout(() => setCatBubble(null), 2500);
+    };
+    // Initial bubbles
+    setTimeout(showHero, 600);
+    setTimeout(showCat, 2000);
+    // Periodic bubbles
+    const heroTimer = setInterval(showHero, 8000);
+    const catTimer = setInterval(showCat, 10000);
+    return () => { clearInterval(heroTimer); clearInterval(catTimer); };
+  }, []);
 
   const wallL = "#F5EDE3";
   const wallR = "#E8DDD0";
@@ -17,10 +56,10 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
     <div className="view-enter" style={{
       minHeight: "100vh",
       background: "linear-gradient(180deg, #1E293B 0%, #334155 40%, #475569 100%)",
-      padding: "env(safe-area-inset-top, 12px) 0 100px",
+      padding: "env(safe-area-inset-top, 12px) 0 80px",
     }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 20px 12px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 20px 8px" }}>
         <button onClick={() => { SFX.play("tap"); setView("hub"); }} style={{
           background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 50,
           padding: "10px 20px", cursor: "pointer", fontWeight: 800, fontSize: ".85rem",
@@ -34,9 +73,9 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
         <div style={{ width: 80 }} />
       </div>
 
-      {/* Isometric Room */}
-      <div style={{ position: "relative", margin: "0 auto", maxWidth: 400, width: "100%", padding: "0 8px" }}>
-        <svg viewBox="0 0 400 340" style={{ width: "100%", display: "block" }}>
+      {/* Isometric Room — scaled up */}
+      <div style={{ position: "relative", margin: "0 auto", maxWidth: 460, width: "100%", padding: "0 4px" }}>
+        <svg viewBox="0 0 400 330" style={{ width: "100%", display: "block" }}>
           <defs>
             <linearGradient id="floorGrad" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#D4A06A" />
@@ -125,23 +164,72 @@ export default function Room({ state, level, mood, setView, setShopTab }) {
           {has("rm_lamp") && <text x="72" y="210" fontSize="18">{"\u{1FA94}"}</text>}
         </svg>
 
-        {/* Hero + Cat overlay */}
+        {/* Hero + Cat overlay with speech bubbles */}
         <div style={{
-          position: "absolute", bottom: "18%", left: "46%",
+          position: "absolute", bottom: "16%", left: "44%",
           transform: "translateX(-50%)",
-          display: "flex", alignItems: "flex-end", gap: 4, zIndex: 2,
+          display: "flex", alignItems: "flex-end", gap: 8, zIndex: 2,
         }}>
-          <div style={{ animation: "heroFloat 3s ease-in-out infinite" }}>
-            <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={80} level={level} />
+          {/* Hero with bubble */}
+          <div style={{ position: "relative" }}>
+            {heroBubble && (
+              <div style={{
+                position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)",
+                background: "white", borderRadius: 14, padding: "6px 12px", marginBottom: 8,
+                fontSize: ".7rem", fontWeight: 700, color: T.textPrimary, whiteSpace: "nowrap",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)", animation: "fadeIn 0.3s ease",
+                fontFamily: "'Nunito',sans-serif",
+              }}>
+                {heroBubble}
+                <div style={{
+                  position: "absolute", bottom: -6, left: "50%", transform: "translateX(-50%)",
+                  width: 0, height: 0,
+                  borderLeft: "6px solid transparent", borderRight: "6px solid transparent",
+                  borderTop: "6px solid white",
+                }} />
+              </div>
+            )}
+            <div style={{ animation: "heroFloat 3s ease-in-out infinite", cursor: "pointer" }}
+              onClick={() => {
+                setHeroBubble(HERO_LINES[Math.floor(Math.random() * HERO_LINES.length)]);
+                setTimeout(() => setHeroBubble(null), 3000);
+              }}>
+              <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={90} level={level} />
+            </div>
           </div>
-          <div style={{ animation: "catIdle 4s ease-in-out infinite" }}>
-            <CatSidekick variant={state.catVariant} mood={mood} size={40} />
+
+          {/* Cat with bubble */}
+          <div style={{ position: "relative" }}>
+            {catBubble && (
+              <div style={{
+                position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)",
+                background: "white", borderRadius: 14, padding: "5px 10px", marginBottom: 6,
+                fontSize: ".65rem", fontWeight: 700, color: T.textPrimary, whiteSpace: "nowrap",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)", animation: "fadeIn 0.3s ease",
+                fontFamily: "'Nunito',sans-serif",
+              }}>
+                {catBubble}
+                <div style={{
+                  position: "absolute", bottom: -5, left: "50%", transform: "translateX(-50%)",
+                  width: 0, height: 0,
+                  borderLeft: "5px solid transparent", borderRight: "5px solid transparent",
+                  borderTop: "5px solid white",
+                }} />
+              </div>
+            )}
+            <div style={{ animation: "catIdle 4s ease-in-out infinite", cursor: "pointer" }}
+              onClick={() => {
+                setCatBubble(CAT_LINES[Math.floor(Math.random() * CAT_LINES.length)]);
+                setTimeout(() => setCatBubble(null), 2500);
+              }}>
+              <CatSidekick variant={state.catVariant} mood={mood} size={48} />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Room info */}
-      <div style={{ padding: "16px 20px", textAlign: "center" }}>
+      <div style={{ padding: "12px 20px", textAlign: "center" }}>
         <div style={{ fontSize: ".8rem", color: "rgba(255,255,255,0.7)", fontWeight: 700 }}>
           {roomItems} / {SHOP_ITEMS.room.length} Zimmer-Items
         </div>
