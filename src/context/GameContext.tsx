@@ -33,7 +33,11 @@ const GameContext = createContext<GameContextValue | null>(null);
 export function GameProvider({ children }: { children: React.ReactNode }) {
   const { state, setState, boarding, setBoarding } = useGamePersistence();
 
-  const [view, setView] = useState("hub");
+  const [view, setViewRaw] = useState("hub");
+  const setView = (v: React.SetStateAction<string>) => {
+    setViewRaw(v);
+    window.scrollTo(0, 0);
+  };
   const [questOpen, setQuestOpen] = useState(false);
   const [celeb, setCeleb] = useState(false);
   const [pMode, setPMode] = useState(false);
