@@ -91,9 +91,17 @@ export const SHOP_ITEMS = {
   room: [
     { id: "rm_poster", name: "Poster", icon: "\u{1F5BC}\uFE0F", cost: 150, type: "room" },
     { id: "rm_plant", name: "Pflanze", icon: "\u{1FAB4}", cost: 100, type: "room" },
-    { id: "rm_lamp", name: "Lavalampe", icon: "\u{1FA94}", cost: 200, type: "room" },
+    { id: "rm_lamp", name: "Schreibtischlampe", icon: "\u{1FA94}", cost: 200, type: "room" },
     { id: "rm_rug", name: "Teppich", icon: "\u{1F7EA}", cost: 180, type: "room" },
     { id: "rm_trophy", name: "Pokal", icon: "\u{1F3C6}", cost: 300, type: "room" },
+    { id: "rm_map", name: "Weltkarte", icon: "\u{1F5FA}\uFE0F", cost: 120, type: "room" },
+    { id: "rm_fairy", name: "Lichterkette", icon: "\u2728", cost: 160, type: "room" },
+    { id: "rm_computer", name: "Computer", icon: "\u{1F4BB}", cost: 250, type: "room" },
+    { id: "rm_globe", name: "Globus", icon: "\u{1F30D}", cost: 130, type: "room" },
+    { id: "rm_figure", name: "Actionfigur", icon: "\u{1F9B8}", cost: 90, type: "room" },
+    { id: "rm_stars", name: "Leuchtsterne", icon: "\u2B50", cost: 180, type: "room" },
+    { id: "rm_skateboard", name: "Skateboard", icon: "\u{1F6F9}", cost: 110, type: "room" },
+    { id: "rm_fish", name: "Aquarium", icon: "\u{1F420}", cost: 220, type: "room" },
   ],
 };
 
