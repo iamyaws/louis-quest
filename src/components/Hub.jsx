@@ -1,5 +1,5 @@
 import React from 'react';
-import { T, WEEKLY_MISSIONS, BOSSES, HERO_TIPS, MOOD_EMOJIS } from '../constants';
+import { T, WEEKLY_MISSIONS, BOSSES, BOSS_TIERS, HERO_TIPS, MOOD_EMOJIS } from '../constants';
 import { getTimeLabel } from '../utils/helpers';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
@@ -424,6 +424,7 @@ export default function Hub() {
           const bossData = BOSSES.find(b => b.id === state.boss.id);
           if (!bossData) return null;
           const hpPct = Math.round((state.boss.hp / state.boss.maxHp) * 100);
+          const tierInfo = BOSS_TIERS?.find(t => t.id === bossData?.tier);
           return (
             <div className="game-card" style={{
               padding: 16, marginBottom: 12,
@@ -436,8 +437,20 @@ export default function Hub() {
                   <div style={{
                     fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800,
                     color: "#DC2626", textTransform: "uppercase",
+                    display: "flex", alignItems: "center", gap: 8,
                   }}>
                     Wochen-Boss
+                    {tierInfo && (
+                      <span style={{
+                        background: tierInfo.color + "20",
+                        color: tierInfo.color,
+                        borderRadius: 50, padding: "2px 10px",
+                        fontSize: ".85rem", fontWeight: 800,
+                        textTransform: "none",
+                      }}>
+                        {tierInfo.icon} {tierInfo.name}
+                      </span>
+                    )}
                   </div>
                   <div style={{
                     fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700,

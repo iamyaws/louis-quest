@@ -3,6 +3,7 @@ import { T, CAT_STAGES, COMPANION_TYPES } from '../constants';
 import { getCatStage, getCatStageProg } from '../utils/helpers';
 import { ViewHeader } from './ui';
 import Companion from './Companion';
+import EvolutionTracker from './EvolutionTracker';
 import { useGame } from '../context/GameContext';
 
 const ACTIONS = [
@@ -105,6 +106,13 @@ export default function CatCare() {
             </span>
           </div>
         </div>
+
+        {/* Evolution Tracker */}
+        <EvolutionTracker
+          catEvo={state.catEvo || 0}
+          companionType={state.companionType || "cat"}
+          currentStage={stage}
+        />
 
         {/* Actions */}
         <div style={{ display: "flex", gap: 10 }}>

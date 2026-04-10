@@ -170,13 +170,56 @@ export const CAT_STAGES: import('./types').CatStageInfo[] = [
   { name: "Legend\u00E4r", threshold: 300, emoji: "\u{1F451}", desc: "Eine Legende!" },
 ];
 
+export const COMPANION_STAGES: Record<string, { name: string; emoji: string; desc: string }[]> = {
+  cat: [
+    { name: "K\u00E4tzchen", emoji: "\u{1F431}", desc: "Klein aber fein!" },
+    { name: "Jungkatze", emoji: "\u{1F63A}", desc: "W\u00E4chst und gedeiht!" },
+    { name: "Katze", emoji: "\u{1F638}", desc: "Stark und geschickt!" },
+    { name: "Prachtkatze", emoji: "\u{1F63B}", desc: "Wundersch\u00F6n!" },
+    { name: "Legend\u00E4re Katze", emoji: "\u{1F451}", desc: "Eine Legende!" },
+  ],
+  dragon: [
+    { name: "Drachenei", emoji: "\u{1F95A}", desc: "Was schl\u00FCpft wohl?" },
+    { name: "Drachenbaby", emoji: "\u{1F432}", desc: "Neugierig und verspielt!" },
+    { name: "Jungdrache", emoji: "\u{1F409}", desc: "Mutig und stark!" },
+    { name: "Drache", emoji: "\u{1F525}", desc: "Stolz und m\u00E4chtig!" },
+    { name: "Legend\u00E4rer Drache", emoji: "\u{1F451}", desc: "Der Drache der Legenden!" },
+  ],
+  wolf: [
+    { name: "Welpe", emoji: "\u{1F43A}", desc: "Tapsig und s\u00FC\u00DF!" },
+    { name: "Jungwolf", emoji: "\u{1F43E}", desc: "Lernt schnell!" },
+    { name: "Wolf", emoji: "\u{1F43A}", desc: "Klug und wachsam!" },
+    { name: "Alphawolf", emoji: "\u{1F3AF}", desc: "F\u00FChrt das Rudel!" },
+    { name: "Legend\u00E4rer Wolf", emoji: "\u{1F451}", desc: "Der Wolf der Mythen!" },
+  ],
+  phoenix: [
+    { name: "K\u00FCken", emoji: "\u{1F423}", desc: "Ein kleiner Funke!" },
+    { name: "Jungvogel", emoji: "\u{1F426}", desc: "Fl\u00FCgel wachsen!" },
+    { name: "Ph\u00F6nix", emoji: "\u{1F985}", desc: "Fliegt und gl\u00FCht!" },
+    { name: "Flammenph\u00F6nix", emoji: "\u{1F525}", desc: "Feurige Pracht!" },
+    { name: "Legend\u00E4rer Ph\u00F6nix", emoji: "\u{1F451}", desc: "Unsterbliches Licht!" },
+  ],
+};
+
+export const BOSS_TIERS = [
+  { id: "tier1", name: "W\u00E4chter", icon: "\u{1F7E2}", minStage: 0, color: "#34D399" },
+  { id: "tier2", name: "Krieger", icon: "\u{1F7E1}", minStage: 2, color: "#F59E0B" },
+  { id: "tier3", name: "K\u00F6nig", icon: "\u{1F534}", minStage: 3, color: "#EF4444" },
+] as const;
+
 export const BOSSES: import('./types').BossTemplate[] = [
-  { id: "b1", name: "Schlaf-Drache", icon: "\u{1F409}", hp: 80, reward: { hp: 50 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst!" },
-  { id: "b2", name: "Chaos-Monster", icon: "\u{1F47E}", hp: 100, reward: { hp: 60 }, desc: "Es liebt Unordnung und Chaos!" },
-  { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 90, reward: { hp: 55 }, desc: "Er will, dass du nur auf dem Sofa liegst!" },
-  { id: "b4", name: "Vergesslichkeits-Geist", icon: "\u{1F47B}", hp: 110, reward: { hp: 65 }, desc: "Er l\u00E4sst dich alles vergessen!" },
-  { id: "b5", name: "Mecker-Goblin", icon: "\u{1F47A}", hp: 85, reward: { hp: 50 }, desc: "Er meckert \u00FCber alles und jeden!" },
-  { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 95, reward: { hp: 55 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!" },
+  // Tier 1: W\u00E4chter (Guardian) \u2014 available from start
+  { id: "b1", name: "Schlaf-Drache", icon: "\u{1F409}", hp: 80, reward: { hp: 50 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst!", tier: "tier1" },
+  { id: "b2", name: "Chaos-Monster", icon: "\u{1F47E}", hp: 90, reward: { hp: 55 }, desc: "Es liebt Unordnung und Chaos!", tier: "tier1" },
+  { id: "b5", name: "Mecker-Goblin", icon: "\u{1F47A}", hp: 85, reward: { hp: 50 }, desc: "Er meckert \u00FCber alles und jeden!", tier: "tier1" },
+  // Tier 2: Krieger (Warrior) \u2014 unlocks at companion stage 2
+  { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 130, reward: { hp: 80 }, desc: "Er will, dass du nur auf dem Sofa liegst!", tier: "tier2" },
+  { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 140, reward: { hp: 85 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!", tier: "tier2" },
+  { id: "b7", name: "Langeweile-Blob", icon: "\u{1F47D}", hp: 120, reward: { hp: 75 }, desc: "Er macht alles langweilig!", tier: "tier2" },
+  // Tier 3: K\u00F6nig (King) \u2014 unlocks at companion stage 3
+  { id: "b4", name: "Vergesslichkeits-Geist", icon: "\u{1F47B}", hp: 200, reward: { hp: 120 }, desc: "Er l\u00E4sst dich alles vergessen!", tier: "tier3" },
+  { id: "b8", name: "Angst-Schatten", icon: "\u{1F5A4}", hp: 220, reward: { hp: 130 }, desc: "Er fl\u00FCstert dir Zweifel ein!", tier: "tier3" },
+  { id: "b9", name: "Sturheit-Stein", icon: "\u{1FAA8}", hp: 250, reward: { hp: 150 }, desc: "Er will nicht, dass du dich \u00E4nderst!", tier: "tier3" },
 ];
 
 export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {

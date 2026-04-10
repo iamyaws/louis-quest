@@ -116,6 +116,7 @@ export interface BossTemplate {
   hp: number;
   reward: { hp: number };
   desc: string;
+  tier?: string;
 }
 
 export interface CatStageInfo {

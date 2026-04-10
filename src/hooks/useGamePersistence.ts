@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES, DEFAULT_BELOHNUNGEN, isSchoolVacation,
+  WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES, BOSS_TIERS, DEFAULT_BELOHNUNGEN, isSchoolVacation,
 } from '../constants';
-import { buildDay } from '../utils/helpers';
+import { buildDay, getCatStage } from '../utils/helpers';
 import storage from '../utils/storage';
 import type { GameState, Hero } from '../types';
 
@@ -121,8 +121,12 @@ function applyDayTransition(p: GameState, today: string): void {
     p.weeklyMission = wm.id;
     p.weeklyProgress = 0;
     p.weekStart = today;
-    // Spawn new weekly boss
-    const b = BOSSES[Math.floor(Math.random() * BOSSES.length)];
+    // Spawn new weekly boss (tier-aware)
+    const companionStage = getCatStage(p.catEvo || 0);
+    const availableTiers = BOSS_TIERS.filter(t => companionStage >= t.minStage);
+    const highestTier = availableTiers[availableTiers.length - 1] || BOSS_TIERS[0];
+    const tierBosses = BOSSES.filter(b => b.tier === highestTier.id);
+    const b = tierBosses[Math.floor(Math.random() * tierBosses.length)];
     p.boss = { id: b.id, hp: b.hp, maxHp: b.hp };
   }
 
