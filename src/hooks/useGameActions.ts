@@ -168,6 +168,16 @@ export default function useGameActions(
         }
       }
 
+      // Companion care through quest completion
+      // Morning tasks restore hunger, evening tasks restore energy, any task boosts happy
+      const isEvening = q.anchor === "evening";
+      const companionHungerGain = !isEvening ? 5 : 2;   // morning tasks feed more
+      const companionEnergyGain = isEvening ? 5 : 2;    // evening tasks rest more
+      const companionHappyGain = 3;                       // every task makes companion happy
+      const newHunger = Math.min(100, (prev.catHunger || 0) + companionHungerGain);
+      const newEnergy = Math.min(100, (prev.catEnergy || 0) + companionEnergyGain);
+      const newHappy = Math.min(100, (prev.catHappy || 0) + companionHappyGain);
+
       // Cat evolution
       const catEvoGain = all ? 3 : 1;
       const newCatEvo = (prev.catEvo || 0) + catEvoGain;
@@ -188,6 +198,7 @@ export default function useGameActions(
         weeklyMissionsCompleted: wmcCount,
         boss: bossUpdate, bossTrophies: trophies,
         catEvo: newCatEvo,
+        catHunger: newHunger, catHappy: newHappy, catEnergy: newEnergy,
         bossDefeatReward: bossDefeatData,
       };
 

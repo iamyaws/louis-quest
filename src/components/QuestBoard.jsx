@@ -1,8 +1,17 @@
 import React, { useRef, useState } from 'react';
-import { T, ANCHORS, RAINBOW, RAINBOW_LABELS, MOOD_EMOJIS, SCHOOL_QUESTS, VACATION_QUESTS } from '../constants';
+import { T, ANCHORS, RAINBOW, RAINBOW_LABELS, MOOD_EMOJIS, SCHOOL_QUESTS, VACATION_QUESTS, COMPANION_TYPES } from '../constants';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
+
+const COMPANION_MESSAGES = [
+  "fühlt sich stärker!",
+  "freut sich über dich!",
+  "wird glücklicher!",
+  "bekommt Energie!",
+  "ist stolz auf dich!",
+  "wächst ein bisschen!",
+];
 
 export default function QuestBoard() {
   const { state, computed, actions, ui } = useGame();
@@ -11,6 +20,16 @@ export default function QuestBoard() {
   const nqRef = useRef(null);
   const fileRef = useRef(null);
   const { weather } = useWeather();
+  const [companionMsg, setCompanionMsg] = useState(null);
+
+  const companionName = state.catName || COMPANION_TYPES[state.companionType]?.name || "Begleiter";
+
+  const handleComplete = (qId) => {
+    actions.complete(qId);
+    const msg = COMPANION_MESSAGES[Math.floor(Math.random() * COMPANION_MESSAGES.length)];
+    setCompanionMsg(`${companionName} ${msg}`);
+    setTimeout(() => setCompanionMsg(null), 2500);
+  };
 
   function getClothingHint(temp) {
     if (temp === null || temp === undefined) return null;
@@ -56,6 +75,22 @@ export default function QuestBoard() {
             </div>
           </div>
         </div>
+
+        {/* Companion feedback message */}
+        {companionMsg && (
+          <div style={{
+            padding: "12px 16px", marginBottom: 14, borderRadius: 18,
+            background: "linear-gradient(135deg, rgba(252,211,77,0.15), rgba(245,158,11,0.08))",
+            border: "2px solid rgba(245,158,11,0.2)",
+            display: "flex", alignItems: "center", gap: 10,
+            animation: "celebText 2.5s ease-out forwards",
+          }}>
+            <span style={{ fontSize: "1.3rem" }}>{COMPANION_TYPES[state.companionType]?.emoji || "\uD83D\uDC31"}</span>
+            <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: "#B45309" }}>
+              {companionMsg}
+            </span>
+          </div>
+        )}
 
         {/* Comeback Quest */}
         {state.comebackActive && <div className="mission-card" style={{ marginBottom: 14, background: "linear-gradient(135deg, #FFF7ED, #FFFBF5)", borderColor: "#F9731630" }}>
@@ -163,7 +198,7 @@ export default function QuestBoard() {
                       </div>
                       {/* Quest card */}
                       <div style={{ flex: 1, marginBottom: 8 }}>
-                        <button className={canTap ? "btn-tap" : ""} onClick={() => canTap && !pMode && actions.complete(q.id)} disabled={!canTap && !pMode} style={{
+                        <button className={canTap ? "btn-tap" : ""} onClick={() => canTap && !pMode && handleComplete(q.id)} disabled={!canTap && !pMode} style={{
                           display: "flex", alignItems: "center", gap: 12,
                           background: grad ? "linear-gradient(135deg, #FFFBEB, #FEF3C7)" : fullyDone ? "linear-gradient(135deg, #F0FDF4, #DCFCE7)" : isBonus ? "linear-gradient(135deg, #FFFBEB, #FEF9E7)" : "white",
                           border: `2.5px solid ${isNext && canTap ? m.col + "60" : grad ? T.accentDark + "30" : fullyDone ? T.success + "30" : "rgba(180,120,40,0.08)"}`,
@@ -254,7 +289,7 @@ export default function QuestBoard() {
                     <button
                       key={q.id}
                       className={canTap ? "btn-tap" : ""}
-                      onClick={() => canTap && !pMode && actions.complete(q.id)}
+                      onClick={() => canTap && !pMode && handleComplete(q.id)}
                       disabled={!canTap && !pMode}
                       style={{
                         display: "flex", alignItems: "center", gap: 12,
