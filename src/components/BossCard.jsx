@@ -11,7 +11,7 @@ export default function BossCard({ boss }) {
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: "1.4rem" }}>{"\uD83C\uDFC6"}</span>
           <div>
-            <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: "1rem", color: T.successDark, textTransform: "uppercase" }}>Boss besiegt!</div>
+            <div style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 800, fontSize: "1rem", color: T.successDark, textTransform: "uppercase" }}>Boss besiegt!</div>
             <div style={{ fontSize: "1rem", fontWeight: 700, color: T.textPrimary }}>{bossData.icon} {bossData.name} wurde besiegt!</div>
           </div>
         </div>
@@ -24,7 +24,7 @@ export default function BossCard({ boss }) {
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
         <span style={{ fontSize: "1.6rem", animation: "bossShake 0.6s ease-in-out infinite" }}>{bossData.icon}</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "1rem", fontWeight: 800, color: "#DC2626", textTransform: "uppercase" }}>Wochen-Boss</div>
+          <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 800, color: "#DC2626", textTransform: "uppercase" }}>Wochen-Boss</div>
           <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: T.textPrimary }}>{bossData.name}</div>
         </div>
         <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: hpPct > 50 ? "#DC2626" : hpPct > 25 ? T.accentDark : T.success }}>{boss.hp}/{boss.maxHp} HP</div>
@@ -33,7 +33,7 @@ export default function BossCard({ boss }) {
       <div style={{ background: "rgba(239,68,68,0.08)", borderRadius: 50, height: 10, overflow: "hidden" }}>
         <div style={{ height: "100%", borderRadius: 50, width: `${hpPct}%`, background: hpPct > 50 ? "linear-gradient(90deg, #EF4444, #F97316)" : hpPct > 25 ? "linear-gradient(90deg, #F59E0B, #FBBF24)" : "linear-gradient(90deg, #34D399, #6EE7B7)", transition: "width .6s ease" }} />
       </div>
-      <div style={{ fontSize: ".95rem", color: T.textLight, marginTop: 6, textAlign: "center" }}>Aufgaben abschlie\u00DFen, um den Boss anzugreifen!</div>
+      <div style={{ fontSize: ".95rem", color: T.textLight, marginTop: 6, textAlign: "center" }}>Aufgaben abschließen, um den Boss anzugreifen!</div>
     </div>
   );
 }

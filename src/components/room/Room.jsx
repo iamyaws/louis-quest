@@ -4,6 +4,7 @@ import SFX from '../../utils/sfx';
 import { useGame } from '../../context/GameContext';
 import { getCatStage } from '../../utils/helpers';
 import RoomSVG from './RoomSVG';
+import RoomCustomizer from './RoomCustomizer';
 
 const COMPANION_SPOTS = {
   floor: { x: 200, y: 370 },
@@ -25,6 +26,9 @@ export default function Room() {
   const badgeCount = badges.filter(b => b.u).length;
   const roomScore = roomItems + badgeCount;
   const roomLevel = roomScore >= 18 ? 5 : roomScore >= 13 ? 4 : roomScore >= 8 ? 3 : roomScore >= 4 ? 2 : roomScore >= 1 ? 1 : 0;
+
+  // Customizer panel
+  const [showCustomizer, setShowCustomizer] = useState(false);
 
   // Companion walking
   const [companionSpot, setCompanionSpot] = useState('floor');
@@ -118,12 +122,20 @@ export default function Room() {
         <div style={{ fontSize: ".85rem", color: "rgba(255,255,255,0.45)", marginTop: 2 }}>
           {roomItems} / {SHOP_ITEMS.room.length} Items {"\u00B7"} {badgeCount} / 9 Badges
         </div>
-        <button className="btn-tap" onClick={() => { setView("shop"); setShopTab("room"); }} style={{
+        <button className="btn-tap" onClick={() => setShowCustomizer(true)} style={{
           marginTop: 10, background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)",
           borderRadius: 50, padding: "12px 28px", fontWeight: 800, fontSize: ".85rem",
           cursor: "pointer", color: "white", backdropFilter: "blur(8px)", minHeight: 48,
-        }}>{"\u{1F3A8}"} Zimmer dekorieren</button>
+        }}>{"\u{1F3A8}"} Zimmer gestalten</button>
       </div>
+
+      <RoomCustomizer
+        visible={showCustomizer}
+        onClose={() => setShowCustomizer(false)}
+        roomTheme={theme}
+        roomLevel={roomLevel}
+        onSetTheme={(t) => actions.setRoomTheme(t)}
+      />
     </div>
   );
 }
