@@ -116,8 +116,9 @@ export interface Belohnung {
   emoji: string;
   cost: number;
   active: boolean;
-  availableAfter?: string;  // "16:00" — locked before this time of day
-  weekendCost?: number;     // discounted cost on Sat/Sun
+  availableAfter?: string;      // "16:00" — locked before this time on school days
+  availableAfterFree?: string;  // "10:00" — looser lock on weekends/vacations
+  weekendCost?: number;         // discounted cost on Sat/Sun/vacation days
 }
 
 // ── New: Spezial-Mission ──

@@ -23,12 +23,14 @@ export default function TimeBank() {
   const coins = state.coins || 0;
   const isPMode = ui.pMode;
 
-  // ── Weekend & time-of-day logic ──
+  // ── Weekend/vacation & time-of-day logic ──
   const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+  const isFreeDay = isWeekend || state.vacMode;
 
   function isAvailableNow(bel) {
-    if (!bel.availableAfter) return true;
-    const [h, m] = bel.availableAfter.split(":").map(Number);
+    const timeLimit = isFreeDay ? (bel.availableAfterFree || bel.availableAfter) : bel.availableAfter;
+    if (!timeLimit) return true;
+    const [h, m] = timeLimit.split(":").map(Number);
     const now = new Date();
     return now.getHours() > h || (now.getHours() === h && now.getMinutes() >= m);
   }
@@ -141,7 +143,7 @@ export default function TimeBank() {
       </div>
 
       {/* ── Weekend discount badge ── */}
-      {isWeekend && !isEditing && (
+      {isFreeDay && !isEditing && (
         <div style={{
           background: "linear-gradient(135deg, #059669, #10b981)",
           borderRadius: 14,
@@ -154,7 +156,7 @@ export default function TimeBank() {
           fontFamily: "'Fredoka', sans-serif",
           boxShadow: "0 4px 14px rgba(5,150,105,0.25)",
         }}>
-          {"\u{1F3D6}\uFE0F"} Wochenend-Rabatt!
+          {"\u{1F3D6}\uFE0F"} {state.vacMode ? "Ferien" : "Wochenend"}-Rabatt!
         </div>
       )}
 
@@ -356,7 +358,7 @@ export default function TimeBank() {
           )}
 
           {activeRewards.map(bel => {
-            const effectiveCost = (isWeekend && bel.weekendCost) ? bel.weekendCost : bel.cost;
+            const effectiveCost = (isFreeDay && bel.weekendCost) ? bel.weekendCost : bel.cost;
             const available = isAvailableNow(bel);
             const canAfford = coins >= effectiveCost;
             const canRedeem = canAfford && available;
@@ -418,7 +420,7 @@ export default function TimeBank() {
                       fontWeight: 600,
                       marginTop: 2,
                     }}>
-                      Ab {bel.availableAfter} Uhr
+                      Ab {isFreeDay ? (bel.availableAfterFree || bel.availableAfter) : bel.availableAfter} Uhr
                     </div>
                   )}
                 </div>

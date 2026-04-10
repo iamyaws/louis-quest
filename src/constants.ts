@@ -294,11 +294,11 @@ export const UNLOCK_CONDITIONS: Record<string, UnlockCondition> = {
 // ═══ NEW: Default Belohnungen (parent can customize) ═══
 
 export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
-  { id: "bel_audio", name: "H\u00F6rspiel (25-30 Min)", emoji: "\u{1F3A7}", cost: 100, active: true, availableAfter: "19:00", weekendCost: 60 },
-  { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 120, active: true, availableAfter: "16:00", weekendCost: 80 },
-  { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 150, active: true, availableAfter: "16:00", weekendCost: 100 },
+  { id: "bel_audio", name: "H\u00F6rspiel (25-30 Min)", emoji: "\u{1F3A7}", cost: 100, active: true, availableAfter: "19:00", availableAfterFree: "10:00", weekendCost: 60 },
+  { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 120, active: true, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 80 },
+  { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 150, active: true, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 100 },
   { id: "bel_candy", name: "S\u00FC\u00DFigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 30, active: true },
-  { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 200, active: true, availableAfter: "18:00", weekendCost: 150 },
+  { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 200, active: true, availableAfter: "18:00", availableAfterFree: "14:00", weekendCost: 150 },
   { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 300, active: true },
 ];
 

@@ -382,15 +382,17 @@ export default function useGameActions(
       if (!prev) return prev;
       const bel = (prev.belohnungen || []).find(b => b.id === belohnungId);
       if (!bel || !bel.active) return prev;
-      // Time-of-day lock
-      if (bel.availableAfter) {
-        const [h, m] = bel.availableAfter.split(":").map(Number);
-        const now = new Date();
+      const now = new Date();
+      const isWeekend = now.getDay() === 0 || now.getDay() === 6;
+      const isFreeDay = isWeekend || prev.vacMode;
+      // Time-of-day lock (looser on weekends/vacations)
+      const timeLimit = isFreeDay ? (bel.availableAfterFree || bel.availableAfter) : bel.availableAfter;
+      if (timeLimit) {
+        const [h, m] = timeLimit.split(":").map(Number);
         if (now.getHours() < h || (now.getHours() === h && now.getMinutes() < m)) return prev;
       }
-      // Weekend pricing
-      const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
-      const effectiveCost = (isWeekend && bel.weekendCost) ? bel.weekendCost : bel.cost;
+      // Weekend/vacation pricing
+      const effectiveCost = (isFreeDay && bel.weekendCost) ? bel.weekendCost : bel.cost;
       if (prev.coins < effectiveCost) return prev;
       SFX.play("buy");
       return {
