@@ -34,17 +34,17 @@ export default function LoginBonus({ day, streak, onCollect, claimed }) {
         <div style={{ fontSize: "1.4rem", flexShrink: 0 }}>{claimed ? "\u2705" : "\uD83C\uDF81"}</div>
         <div style={{ flex: 1 }}>
           <div style={{
-            fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".82rem", fontWeight: 800,
+            fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800,
             color: claimed ? "#059669" : "#B45309",
           }}>
             {claimed ? "Bonus abgeholt!" : `Tag ${day + 1} \u2014 +${todayReward.amount} \u2B50`}
           </div>
-          <div style={{ fontSize: ".7rem", fontWeight: 600, color: T.textLight }}>
+          <div style={{ fontSize: ".85rem", fontWeight: 600, color: T.textLight }}>
             {streak > 0 ? `\uD83D\uDD25 ${streak} Tage Streak` : "Tippe f\u00FCr Details"}
           </div>
         </div>
         <div style={{
-          fontSize: ".75rem", fontWeight: 800, color: T.textLight,
+          fontSize: ".85rem", fontWeight: 800, color: T.textLight,
           transition: "transform .2s",
         }}>{"\u25BC"}</div>
       </button>
@@ -76,14 +76,14 @@ export default function LoginBonus({ day, streak, onCollect, claimed }) {
             <div style={{
               background: "rgba(245,158,11,0.15)", borderRadius: 50,
               padding: "2px 10px", fontFamily: "'Fredoka',sans-serif",
-              fontSize: ".8rem", fontWeight: 700, color: "#D97706",
+              fontSize: ".85rem", fontWeight: 700, color: "#D97706",
             }}>
               {"\uD83D\uDD25"} {streak} Tage
             </div>
           )}
           <button onClick={() => setExpanded(false)} style={{
             background: "rgba(180,120,40,0.08)", border: "none", borderRadius: 50,
-            width: 32, height: 32, cursor: "pointer", fontSize: ".8rem",
+            width: 32, height: 32, cursor: "pointer", fontSize: ".85rem",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: T.textSecondary, fontWeight: 800,
           }}>{"\u25B2"}</button>
@@ -140,11 +140,11 @@ function RewardSlot({ reward, index, currentDay, onCollect, claimed }) {
     <div style={style} onClick={isCurrent ? onCollect : undefined}
       role={isCurrent ? "button" : undefined}
       aria-label={isCurrent ? `Tag ${reward.day} Bonus abholen: ${reward.amount} HP` : undefined}>
-      <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".7rem", fontWeight: 700, color: isClaimed ? "#92400E" : isCurrent ? "#92400E" : T.textLight, textTransform: "uppercase" }}>Tag {reward.day}</div>
+      <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: isClaimed ? "#92400E" : isCurrent ? "#92400E" : T.textLight, textTransform: "uppercase" }}>Tag {reward.day}</div>
       <div style={{ fontSize: isJackpot ? "1.5rem" : "1.2rem", lineHeight: 1, filter: isFuture ? "grayscale(0.8)" : "none" }}>{isClaimed ? "\u2705" : isFuture ? "\uD83D\uDD12" : reward.icon}</div>
       <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: isJackpot && isCurrent ? "1rem" : ".85rem", fontWeight: 700, color: isClaimed ? "#059669" : isCurrent ? "#D97706" : T.textLight }}>+{reward.amount}</div>
-      {isCurrent && <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".7rem", fontWeight: 700, color: "white", background: isJackpot ? "linear-gradient(135deg, #D97706, #B45309)" : "linear-gradient(135deg, #F59E0B, #D97706)", borderRadius: 50, padding: "2px 10px", marginTop: 2, whiteSpace: "nowrap" }}>Abholen!</div>}
-      {isJackpot && !isClaimed && <div style={{ position: "absolute", top: -6, right: -6, background: "linear-gradient(135deg, #F59E0B, #D97706)", borderRadius: 50, padding: "1px 6px", fontFamily: "'Fredoka',sans-serif", fontSize: ".55rem", fontWeight: 700, color: "white", boxShadow: "0 2px 4px rgba(217,119,6,0.3)" }}>Jackpot!</div>}
+      {isCurrent && <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: "white", background: isJackpot ? "linear-gradient(135deg, #D97706, #B45309)" : "linear-gradient(135deg, #F59E0B, #D97706)", borderRadius: 50, padding: "2px 10px", marginTop: 2, whiteSpace: "nowrap" }}>Abholen!</div>}
+      {isJackpot && !isClaimed && <div style={{ position: "absolute", top: -6, right: -6, background: "linear-gradient(135deg, #F59E0B, #D97706)", borderRadius: 50, padding: "1px 6px", fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: "white", boxShadow: "0 2px 4px rgba(217,119,6,0.3)" }}>Jackpot!</div>}
     </div>
   );
 }
