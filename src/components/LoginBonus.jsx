@@ -23,10 +23,10 @@ export default function LoginBonus({ onCollect, claimed }) {
           fontFamily: "'Fredoka',sans-serif", fontSize: "1.05rem", fontWeight: 700,
           color: "#B45309",
         }}>
-          Willkommen zur\u00FCck, Held!
+          Willkommen zurück, Held!
         </div>
         <div style={{ fontSize: ".9rem", fontWeight: 700, color: T.textSecondary, marginTop: 2 }}>
-          Tippe f\u00FCr deinen t\u00E4glichen Heldenpunkt {"\u2B50"}
+          Tippe für deinen täglichen Heldenpunkt {"\u2B50"}
         </div>
       </div>
       <div style={{

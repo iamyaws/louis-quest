@@ -20,6 +20,7 @@ import PinModal from './components/PinModal';
 import MemoryGame from './components/MemoryGame';
 import Weather from './components/Weather';
 import CatCare from './components/CatCare';
+import CompanionProfile from './components/CompanionProfile';
 import Familienregeln from './components/Familienregeln';
 import BossChest from './components/BossChest';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -35,7 +36,6 @@ const TABS = [
 function BottomTabBar() {
   const { ui } = useGame();
   const { view, setView, setQuestOpen } = ui;
-
   return (
     <div className="tab-bar">
       {TABS.map(tab => {
@@ -48,12 +48,7 @@ function BottomTabBar() {
         }
         const isActive = view === tab.id;
         return (
-          <button
-            key={tab.id}
-            className={`tab-item ${isActive ? "tab-item-active" : ""}`}
-            onClick={() => { SFX.play("tap"); setView(tab.id); }}
-            aria-label={tab.label}
-          >
+          <button key={tab.id} className={`tab-item ${isActive ? "tab-item-active" : ""}`} onClick={() => { SFX.play("tap"); setView(tab.id); }} aria-label={tab.label}>
             <div className={`tab-icon ${isActive ? "tab-icon-active" : ""}`}>{tab.icon}</div>
             <span className={`tab-label ${isActive ? "tab-label-active" : ""}`}>{tab.label}</span>
           </button>
@@ -65,16 +60,12 @@ function BottomTabBar() {
 
 function AppContent() {
   const { state, boarding, computed, actions, onBoard, ui } = useGame();
-
   if (boarding === null) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#FFF8F0", color: "#1E1B4B", fontFamily: "'Nunito',sans-serif", fontSize: "1.2rem", fontWeight: 700 }}>Laden...</div>;
   if (boarding) return <Onboarding onComplete={onBoard} />;
   if (!state) return null;
-
   const showChrome = !boarding && state;
-
   return (
     <>
-      {/* Overlays */}
       <Celebration active={ui.celeb} onDone={() => ui.setCeleb(false)} />
       <RareDropToast drop={ui.rareDrop} onDone={() => ui.setRareDrop(null)} />
       {ui.showWheel && <SpinWheel onResult={actions.collectWheel} />}
@@ -82,16 +73,7 @@ function AppContent() {
       {ui.pinShow && <PinModal pin={ui.pin} setPin={ui.setPin} onSuccess={() => { ui.setPMode(true); ui.setPinShow(false); }} onClose={() => { ui.setPinShow(false); ui.setPin(""); }} />}
       {ui.showVictory && <VictoryScreen onClose={() => ui.setShowVictory(false)} onSpinWheel={() => { ui.setShowVictory(false); ui.setShowWheel(true); }} onMemoryGame={() => { ui.setShowVictory(false); ui.setShowMemory(true); }} />}
       {ui.showMemory && <MemoryGame onComplete={actions.collectMemory} />}
-      {state.bossDefeatReward && <BossChest
-        bossName={state.bossDefeatReward.bossName}
-        bossIcon={state.bossDefeatReward.bossIcon}
-        hpReward={state.bossDefeatReward.hp}
-        unlockedItem={state.bossDefeatReward.item}
-        onClose={() => actions.clearBossReward()}
-      />}
-
-      {/* Persistent chrome */}
-
+      {state.bossDefeatReward && <BossChest bossName={state.bossDefeatReward.bossName} bossIcon={state.bossDefeatReward.bossIcon} hpReward={state.bossDefeatReward.hp} unlockedItem={state.bossDefeatReward.item} onClose={() => actions.clearBossReward()} />}
       <div style={{ minHeight: "100vh", background: "#FFF8F0", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: ui.view === "hub" ? 0 : 60, paddingBottom: 80 }}>
         {ui.view === "hub" && <Hub />}
         {ui.view === "time" && <TimeBank />}
@@ -101,10 +83,10 @@ function AppContent() {
         {ui.view === "journal" && <Journal />}
         {ui.view === "weather" && <Weather />}
         {ui.view === "cat" && <CatCare />}
+        {ui.view === "companion" && <CompanionProfile />}
         {ui.view === "regeln" && <Familienregeln />}
         {ui.questOpen && <QuestBoard />}
       </div>
-
       {showChrome && <BottomTabBar />}
     </>
   );
