@@ -96,6 +96,11 @@ export default function useGameActions(
 
       const sm = { ...prev.sm, [id]: (prev.sm[id] || 0) + 1 };
       const newSD = all ? prev.sd + 1 : prev.sd;
+      const STREAK_MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100];
+      const hitMilestone = all && prev.sd !== newSD && STREAK_MILESTONES.includes(newSD);
+      if (hitMilestone) {
+        setTimeout(() => SFX.play("celeb"), 1000);
+      }
       const newBest = Math.max(prev.bestStreak || 0, newSD);
 
       // Rare drop — single roll, reuse result for both UI toast and stat bonus

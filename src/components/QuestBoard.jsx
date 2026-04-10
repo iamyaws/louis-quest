@@ -26,6 +26,7 @@ export default function QuestBoard() {
 
   const handleComplete = (qId) => {
     actions.complete(qId);
+    if (navigator.vibrate) navigator.vibrate(80);
     const msg = COMPANION_MESSAGES[Math.floor(Math.random() * COMPANION_MESSAGES.length)];
     setCompanionMsg(`${companionName} ${msg}`);
     setTimeout(() => setCompanionMsg(null), 2500);
@@ -55,13 +56,13 @@ export default function QuestBoard() {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", flexDirection: "column" }}>
-      <div style={{ flex: "0 0 50px", background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", cursor: "pointer" }} onClick={() => setQuestOpen(false)} />
+      <div style={{ flex: "0 0 50px", background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", cursor: "pointer" }} onClick={() => { setQuestOpen(false); window.scrollTo(0, 0); }} />
       <div style={{ flex: "1 1 auto", background: "linear-gradient(180deg, #F7F3E3 0%, #FFFFFF 100%)", borderRadius: "32px 32px 0 0", padding: "0 16px 100px", overflow: "auto", animation: "slideUp .3s ease", boxShadow: "0 -8px 40px rgba(0,0,0,0.15)", position: "relative" }}>
         {/* Handle + back button */}
         <div style={{ position: "sticky", top: 0, background: "linear-gradient(180deg, #F7F3E3, rgba(247,243,227,0.95))", paddingTop: 12, paddingBottom: 8, zIndex: 10, borderRadius: "32px 32px 0 0", backdropFilter: "blur(8px)" }}>
           <div style={{ width: 44, height: 5, borderRadius: 3, background: "rgba(180,120,40,0.14)", margin: "0 auto 8px" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 4px" }}>
-            <button aria-label="Aufgaben schließen" onClick={() => setQuestOpen(false)} className="btn-tap" style={{ background: "white", border: "2.5px solid rgba(180,120,40,0.10)", borderRadius: 14, padding: "8px 14px", cursor: "pointer", fontSize: ".9rem", fontWeight: 800, color: T.textSecondary, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", display: "flex", alignItems: "center", gap: 4, minHeight: 44 }}>{"\u2190"} Zurück</button>
+            <button aria-label="Aufgaben schließen" onClick={() => { setQuestOpen(false); window.scrollTo(0, 0); }} className="btn-tap" style={{ background: "white", border: "2.5px solid rgba(180,120,40,0.10)", borderRadius: 14, padding: "8px 14px", cursor: "pointer", fontSize: ".9rem", fontWeight: 800, color: T.textSecondary, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", display: "flex", alignItems: "center", gap: 4, minHeight: 44 }}>{"\u2190"} Zurück</button>
             <div style={{ flex: 1, fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "1rem", fontWeight: 800, color: T.primary, textTransform: "uppercase" }}>{"\u2B50"} Helden-Aufgaben</div>
           </div>
         </div>
@@ -143,6 +144,21 @@ export default function QuestBoard() {
           <div className="game-card" style={{ padding: 14, marginBottom: 14, background: "linear-gradient(135deg, #FEF3C7, #FFFBEB)", borderColor: "rgba(245,158,11,0.15)" }}>
             <div style={{ textAlign: "center", fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: "#B45309" }}>
               {"Auch Mama und Papa d\u00FCrfen das Handy mal weglegen \uD83D\uDE04"}
+            </div>
+          </div>
+        )}
+
+        {/* All-done celebration */}
+        {allDone && (
+          <div style={{
+            textAlign: "center", padding: 24, marginBottom: 14,
+          }}>
+            <div style={{ fontSize: "3rem", marginBottom: 8 }}>{"\u{1F3C6}"}</div>
+            <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: T.primary }}>
+              Alle Aufgaben geschafft!
+            </div>
+            <div style={{ fontSize: ".95rem", color: T.textSecondary, marginTop: 4 }}>
+              Du bist ein wahrer Held! Genie\u00DF den Rest des Tages.
             </div>
           </div>
         )}

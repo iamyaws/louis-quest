@@ -43,12 +43,12 @@ export default function Hub() {
         )}
 
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          <button className="btn-tap" onClick={() => { if (!state.dailyVitaminD) actions.completeHabit("vitaminD"); }} style={{ flex: 1, background: state.dailyVitaminD ? "rgba(52,211,153,0.1)" : "white", border: `2.5px solid ${state.dailyVitaminD ? "rgba(52,211,153,0.3)" : "rgba(180,120,40,0.10)"}`, borderRadius: 18, padding: "12px 6px", cursor: state.dailyVitaminD ? "default" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+          <button className="btn-tap" onClick={() => { if (!state.dailyVitaminD) { actions.completeHabit("vitaminD"); if (navigator.vibrate) navigator.vibrate(50); } }} style={{ flex: 1, background: state.dailyVitaminD ? "rgba(52,211,153,0.1)" : "white", border: `2.5px solid ${state.dailyVitaminD ? "rgba(52,211,153,0.3)" : "rgba(180,120,40,0.10)"}`, borderRadius: 18, padding: "12px 6px", cursor: state.dailyVitaminD ? "default" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
             <span style={{ fontSize: "1.4rem" }}>{state.dailyVitaminD ? "\u2705" : "\uD83D\uDC8A"}</span>
             <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: state.dailyVitaminD ? "#059669" : T.textPrimary }}>Vitamin D</span>
             {!state.dailyVitaminD && <span style={{ fontSize: ".9rem", fontWeight: 700, color: "#D97706" }}>+5 {"\u2B50"}</span>}
           </button>
-          <button className="btn-tap" onClick={() => { if (!state.dailyBrother) actions.completeHabit("brother"); }} style={{ flex: 1, background: state.dailyBrother ? "rgba(52,211,153,0.1)" : "white", border: `2.5px solid ${state.dailyBrother ? "rgba(52,211,153,0.3)" : "rgba(180,120,40,0.10)"}`, borderRadius: 18, padding: "12px 6px", cursor: state.dailyBrother ? "default" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+          <button className="btn-tap" onClick={() => { if (!state.dailyBrother) { actions.completeHabit("brother"); if (navigator.vibrate) navigator.vibrate(50); } }} style={{ flex: 1, background: state.dailyBrother ? "rgba(52,211,153,0.1)" : "white", border: `2.5px solid ${state.dailyBrother ? "rgba(52,211,153,0.3)" : "rgba(180,120,40,0.10)"}`, borderRadius: 18, padding: "12px 6px", cursor: state.dailyBrother ? "default" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
             <span style={{ fontSize: "1.4rem" }}>{state.dailyBrother ? "\u2705" : "\uD83D\uDC76"}</span>
             <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: state.dailyBrother ? "#059669" : T.textPrimary }}>Liam</span>
             {!state.dailyBrother && <span style={{ fontSize: ".9rem", fontWeight: 700, color: "#D97706" }}>+10 {"\u2B50"}</span>}
@@ -60,6 +60,20 @@ export default function Hub() {
             {!catAllDone && <span style={{ fontSize: ".9rem", fontWeight: 700, color: T.textLight }}>{[!state.catFed && "\uD83C\uDF63", !state.catPetted && "\uD83E\uDD0D", !state.catPlayed && "\uD83E\uDDF6"].filter(Boolean).join(" ")}</span>}
           </button>
         </div>
+
+        {state.dailyVitaminD && state.dailyBrother && state.catFed && state.catPetted && state.catPlayed && (
+          <div className="game-card" style={{
+            padding: 14, marginBottom: 12,
+            background: "linear-gradient(135deg, rgba(52,211,153,0.12), rgba(52,211,153,0.06))",
+            borderColor: "rgba(52,211,153,0.25)",
+            textAlign: "center",
+          }}>
+            <span style={{ fontSize: "1.4rem" }}>{"\u{1F389}"}</span>
+            <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: "#059669", marginTop: 4 }}>
+              Alle Gewohnheiten erledigt! Super gemacht!
+            </div>
+          </div>
+        )}
 
         <button className="btn-tap" onClick={() => ui.setView("regeln")} style={{ width: "100%", background: "linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.04))", border: "2.5px solid rgba(245,158,11,0.15)", borderRadius: 18, padding: "14px 12px", cursor: "pointer", fontFamily: "'Fredoka',sans-serif", fontWeight: 700, fontSize: ".95rem", color: "#B45309", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 52, boxShadow: "0 2px 8px rgba(0,0,0,0.04)", marginBottom: 12 }}>{"\uD83D\uDEE1\uFE0F"} Helden-Kodex</button>
 
