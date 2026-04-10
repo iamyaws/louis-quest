@@ -23,6 +23,16 @@ export default function TimeBank() {
   const coins = state.coins || 0;
   const isPMode = ui.pMode;
 
+  // ── Weekend & time-of-day logic ──
+  const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+
+  function isAvailableNow(bel) {
+    if (!bel.availableAfter) return true;
+    const [h, m] = bel.availableAfter.split(":").map(Number);
+    const now = new Date();
+    return now.getHours() > h || (now.getHours() === h && now.getMinutes() >= m);
+  }
+
   // ── Parent edit state ──
   const [editDraft, setEditDraft] = useState(null); // null = not editing, array = working copy
   const [emojiPicker, setEmojiPicker] = useState(null); // id of reward showing picker
@@ -129,6 +139,24 @@ export default function TimeBank() {
           Heldenpunkte
         </div>
       </div>
+
+      {/* ── Weekend discount badge ── */}
+      {isWeekend && !isEditing && (
+        <div style={{
+          background: "linear-gradient(135deg, #059669, #10b981)",
+          borderRadius: 14,
+          padding: "10px 18px",
+          marginBottom: 12,
+          textAlign: "center",
+          color: "white",
+          fontWeight: 800,
+          fontSize: "1rem",
+          fontFamily: "'Fredoka', sans-serif",
+          boxShadow: "0 4px 14px rgba(5,150,105,0.25)",
+        }}>
+          {"\u{1F3D6}\uFE0F"} Wochenend-Rabatt!
+        </div>
+      )}
 
       {/* ── Section label ── */}
       <div style={{
@@ -328,7 +356,10 @@ export default function TimeBank() {
           )}
 
           {activeRewards.map(bel => {
-            const canAfford = coins >= bel.cost;
+            const effectiveCost = (isWeekend && bel.weekendCost) ? bel.weekendCost : bel.cost;
+            const available = isAvailableNow(bel);
+            const canAfford = coins >= effectiveCost;
+            const canRedeem = canAfford && available;
             const isConfirming = confirmRedeem === bel.id;
 
             return (
@@ -337,16 +368,16 @@ export default function TimeBank() {
                 alignItems: "center",
                 gap: 14,
                 padding: "16px 18px",
-                opacity: canAfford ? 1 : 0.5,
-                borderColor: canAfford ? `${T.accent}40` : undefined,
-                boxShadow: canAfford ? `0 4px 16px ${T.accent}12` : undefined,
+                opacity: !available ? 0.7 : canAfford ? 1 : 0.5,
+                borderColor: canRedeem ? `${T.accent}40` : undefined,
+                boxShadow: canRedeem ? `0 4px 16px ${T.accent}12` : undefined,
                 transition: "all .25s ease",
               }}>
                 {/* Emoji icon */}
                 <div style={{
                   width: 56, height: 56,
                   borderRadius: 16,
-                  background: canAfford ? `${T.accent}18` : "rgba(180,120,40,0.06)",
+                  background: canRedeem ? `${T.accent}18` : "rgba(180,120,40,0.06)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: "1.8rem",
                   flexShrink: 0,
@@ -369,8 +400,27 @@ export default function TimeBank() {
                     color: canAfford ? T.accentDark : T.textLight,
                     fontWeight: 700,
                   }}>
-                    {"\u2B50"} {bel.cost} HP
+                    {"\u2B50"}{" "}
+                    {isWeekend && bel.weekendCost && bel.weekendCost < bel.cost ? (
+                      <>
+                        <span style={{ textDecoration: "line-through", opacity: 0.5, marginRight: 4 }}>{bel.cost}</span>
+                        <span style={{ color: "#059669", fontWeight: 800 }}>{bel.weekendCost} {"\u2B50"}</span>
+                      </>
+                    ) : (
+                      <span>{effectiveCost} HP</span>
+                    )}
+                    {!available && " \u{1F512}"}
                   </div>
+                  {!available && bel.availableAfter && (
+                    <div style={{
+                      fontSize: ".78rem",
+                      color: T.textLight,
+                      fontWeight: 600,
+                      marginTop: 2,
+                    }}>
+                      Ab {bel.availableAfter} Uhr
+                    </div>
+                  )}
                 </div>
 
                 {/* Redeem button / lock icon */}
@@ -403,10 +453,10 @@ export default function TimeBank() {
                 ) : (
                   <button
                     className="btn-tap"
-                    onClick={() => canAfford && !isPMode && setConfirmRedeem(bel.id)}
-                    disabled={!canAfford || isPMode}
+                    onClick={() => canRedeem && !isPMode && setConfirmRedeem(bel.id)}
+                    disabled={!canRedeem || isPMode}
                     style={{
-                      background: canAfford && !isPMode
+                      background: canRedeem && !isPMode
                         ? `linear-gradient(135deg, ${T.primary}, ${T.primaryLight})`
                         : "rgba(0,0,0,0.04)",
                       border: "none",
@@ -414,16 +464,16 @@ export default function TimeBank() {
                       padding: "10px 20px",
                       fontSize: ".85rem",
                       fontWeight: 800,
-                      color: canAfford && !isPMode ? "white" : T.textLight,
-                      cursor: canAfford && !isPMode ? "pointer" : "default",
+                      color: canRedeem && !isPMode ? "white" : T.textLight,
+                      cursor: canRedeem && !isPMode ? "pointer" : "default",
                       fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      opacity: !canAfford ? 0.5 : 1,
-                      boxShadow: canAfford && !isPMode ? `0 4px 12px ${T.primary}30` : "none",
+                      opacity: !canRedeem ? 0.5 : 1,
+                      boxShadow: canRedeem && !isPMode ? `0 4px 12px ${T.primary}30` : "none",
                       minHeight: 48,
                       flexShrink: 0,
                     }}
                   >
-                    {canAfford ? "Einl\u00F6sen" : "\u{1F512}"}
+                    {canRedeem ? "Einl\u00F6sen" : "\u{1F512}"}
                   </button>
                 )}
               </div>

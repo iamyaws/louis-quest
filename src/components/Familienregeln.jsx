@@ -79,22 +79,22 @@ export default function Familienregeln() {
 
   return (
     <div className="view-enter" style={{ minHeight: "100vh" }}>
-      <ViewHeader title="Familienregeln" icon="📜" onBack={() => ui.setView("hub")} />
+      <ViewHeader title="Helden-Kodex" icon="🛡️" onBack={() => ui.setView("hub")} />
 
       <div style={{ padding: "0 16px 100px" }}>
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 20, padding: "0 8px" }}>
-          <div style={{ fontSize: "2.5rem", marginBottom: 8 }}>👨‍👩‍👦‍👦</div>
+          <div style={{ fontSize: "2.5rem", marginBottom: 8 }}>🛡️</div>
           <div style={{
             fontFamily: "'Fredoka',sans-serif", fontSize: "1.3rem", fontWeight: 700,
             color: T.textPrimary, lineHeight: 1.3,
           }}>
-            Unsere Familienregeln
+            Helden-Kodex
           </div>
           <div style={{
             fontSize: "1rem", color: T.textSecondary, fontWeight: 600, marginTop: 4,
           }}>
-            Darauf haben wir uns alle geeinigt
+            Der Kodex eines wahren Helden
           </div>
         </div>
 

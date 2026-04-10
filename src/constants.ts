@@ -294,12 +294,39 @@ export const UNLOCK_CONDITIONS: Record<string, UnlockCondition> = {
 // ═══ NEW: Default Belohnungen (parent can customize) ═══
 
 export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
-  { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 30, active: true },
-  { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 40, active: true },
-  { id: "bel_candy", name: "S\u00FC\u00DFigkeit", emoji: "\u{1F36C}", cost: 15, active: true },
-  { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 60, active: true },
-  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 100, active: true },
+  { id: "bel_audio", name: "H\u00F6rspiel (25-30 Min)", emoji: "\u{1F3A7}", cost: 100, active: true, availableAfter: "19:00", weekendCost: 60 },
+  { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 120, active: true, availableAfter: "16:00", weekendCost: 80 },
+  { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 150, active: true, availableAfter: "16:00", weekendCost: 100 },
+  { id: "bel_candy", name: "S\u00FC\u00DFigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 30, active: true },
+  { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 200, active: true, availableAfter: "18:00", weekendCost: 150 },
+  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 300, active: true },
 ];
+
+// ═══ Bavaria School Vacations ═══
+
+export const BAVARIA_VACATIONS = [
+  // 2025/2026
+  { start: "2025-12-23", end: "2026-01-05", name: "Weihnachtsferien" },
+  { start: "2026-02-16", end: "2026-02-20", name: "Winterferien" },
+  { start: "2026-03-30", end: "2026-04-13", name: "Osterferien" },
+  { start: "2026-06-01", end: "2026-06-12", name: "Pfingstferien" },
+  { start: "2026-07-30", end: "2026-09-14", name: "Sommerferien" },
+  // 2026/2027
+  { start: "2026-11-02", end: "2026-11-06", name: "Herbstferien" },
+  { start: "2026-12-23", end: "2027-01-05", name: "Weihnachtsferien" },
+  { start: "2027-02-15", end: "2027-02-19", name: "Winterferien" },
+  { start: "2027-03-29", end: "2027-04-12", name: "Osterferien" },
+  { start: "2027-05-25", end: "2027-06-04", name: "Pfingstferien" },
+  { start: "2027-07-29", end: "2027-09-13", name: "Sommerferien" },
+] as const;
+
+export function isSchoolVacation(date: Date = new Date()): { isVacation: boolean; name?: string } {
+  const d = date.toISOString().slice(0, 10);
+  for (const v of BAVARIA_VACATIONS) {
+    if (d >= v.start && d <= v.end) return { isVacation: true, name: v.name };
+  }
+  return { isVacation: false };
+}
 
 // ═══ Companion Types & Variants ═══
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES, DEFAULT_BELOHNUNGEN,
+  WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES, DEFAULT_BELOHNUNGEN, isSchoolVacation,
 } from '../constants';
 import { buildDay } from '../utils/helpers';
 import storage from '../utils/storage';
@@ -77,6 +77,10 @@ function applyDayTransition(p: GameState, today: string): void {
   } else {
     p.comebackActive = false;
   }
+
+  // Auto-detect Bavaria school vacations
+  const vacCheck = isSchoolVacation(new Date());
+  p.vacMode = vacCheck.isVacation;
 
   p.quests = buildDay(p.vacMode).map(q => ({ ...q, streak: (p.sm || {})[q.id] || 0 }));
   p.lastDate = today;

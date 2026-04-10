@@ -381,11 +381,21 @@ export default function useGameActions(
     setState(prev => {
       if (!prev) return prev;
       const bel = (prev.belohnungen || []).find(b => b.id === belohnungId);
-      if (!bel || !bel.active || prev.coins < bel.cost) return prev;
+      if (!bel || !bel.active) return prev;
+      // Time-of-day lock
+      if (bel.availableAfter) {
+        const [h, m] = bel.availableAfter.split(":").map(Number);
+        const now = new Date();
+        if (now.getHours() < h || (now.getHours() === h && now.getMinutes() < m)) return prev;
+      }
+      // Weekend pricing
+      const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+      const effectiveCost = (isWeekend && bel.weekendCost) ? bel.weekendCost : bel.cost;
+      if (prev.coins < effectiveCost) return prev;
       SFX.play("buy");
       return {
         ...prev,
-        coins: prev.coins - bel.cost,
+        coins: prev.coins - effectiveCost,
         belohnungenLog: [...(prev.belohnungenLog || []), { id: belohnungId, date: new Date().toISOString() }],
       };
     });
