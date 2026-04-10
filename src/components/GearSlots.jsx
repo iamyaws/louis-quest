@@ -82,7 +82,7 @@ export default function GearSlots({ equippedGear, purchased, onEquip, onUnequip 
               fontSize: ".9rem",
               color: T.textLight,
             }}>
-              Noch keine Items - besuche den Shop!
+              Erledige Aufgaben, um Items freizuschalten!
             </div>
           );
         }
