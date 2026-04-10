@@ -23,6 +23,7 @@ import CatCare from './components/CatCare';
 import CompanionProfile from './components/CompanionProfile';
 import Familienregeln from './components/Familienregeln';
 import BossChest from './components/BossChest';
+import EvolutionCelebration from './components/EvolutionCelebration';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const TABS = [
@@ -74,6 +75,15 @@ function AppContent() {
       {ui.showVictory && <VictoryScreen onClose={() => ui.setShowVictory(false)} onSpinWheel={() => { ui.setShowVictory(false); ui.setShowWheel(true); }} onMemoryGame={() => { ui.setShowVictory(false); ui.setShowMemory(true); }} />}
       {ui.showMemory && <MemoryGame onComplete={actions.collectMemory} />}
       {state.bossDefeatReward && <BossChest bossName={state.bossDefeatReward.bossName} bossIcon={state.bossDefeatReward.bossIcon} hpReward={state.bossDefeatReward.hp} unlockedItem={state.bossDefeatReward.item} onClose={() => actions.clearBossReward()} />}
+      {state.evolutionEvent && (
+        <EvolutionCelebration
+          companionType={state.companionType || "cat"}
+          companionVariant={state.catVariant}
+          oldStage={state.evolutionEvent.oldStage}
+          newStage={state.evolutionEvent.newStage}
+          onClose={() => actions.clearEvolution()}
+        />
+      )}
       <div style={{ minHeight: "100vh", background: "#FFF8F0", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: ui.view === "hub" ? 0 : 60, paddingBottom: 80 }}>
         {ui.view === "hub" && <Hub />}
         {ui.view === "time" && <TimeBank />}

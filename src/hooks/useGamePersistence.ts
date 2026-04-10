@@ -210,6 +210,8 @@ function applyDefaults(p: GameState): void {
   // Hero avatar migration
   if (!p.hero.skinTone) p.hero.skinTone = "#F5D0B0";
   if (!p.hero.hairColor) p.hero.hairColor = "#5B3A1A";
+  // Evolution celebration
+  if (p.evolutionEvent === undefined) p.evolutionEvent = null;
 }
 
 interface OnboardData {
@@ -259,5 +261,7 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     questChains: [],
     // Gear
     equippedGear: {},
+    // Evolution celebration
+    evolutionEvent: null,
   };
 }

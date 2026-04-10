@@ -233,6 +233,8 @@ export interface GameState {
   questChains: QuestChain[];
   // Companion gear
   equippedGear: { head?: string; body?: string; accessory?: string };
+  // Evolution celebration overlay
+  evolutionEvent: { oldStage: number; newStage: number } | null;
 }
 
 export interface ComputedState {

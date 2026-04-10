@@ -185,6 +185,11 @@ export default function useGameActions(
       const newCatStage = getCatStage(newCatEvo);
       if (newCatStage > prevCatStage) setTimeout(() => SFX.play("evolve"), 800);
 
+      // Evolution event for celebration overlay
+      const evolutionEvent = newCatStage > prevCatStage
+        ? { oldStage: prevCatStage, newStage: newCatStage }
+        : null;
+
       const totalHP = earned + bonusHP + wmBonusHP + bossRewardHP;
       const result: GameState = {
         ...prev, quests: nq2,
@@ -200,6 +205,7 @@ export default function useGameActions(
         catEvo: newCatEvo,
         catHunger: newHunger, catHappy: newHappy, catEnergy: newEnergy,
         bossDefeatReward: bossDefeatData,
+        evolutionEvent,
       };
 
       // Egg hatching progress — each task adds ~20-25% toward hatching
@@ -482,6 +488,12 @@ export default function useGameActions(
     setState(prev => prev ? { ...prev, bossDefeatReward: null } : prev);
   }, [setState]);
 
+  // ── Evolution celebration overlay ──
+
+  const clearEvolution = useCallback(() => {
+    setState(prev => prev ? { ...prev, evolutionEvent: null } : prev);
+  }, [setState]);
+
   // ── NEW: Quest Chains ──
 
   const completeChainStep = useCallback((chainId: string, stepId: string) => {
@@ -585,7 +597,7 @@ export default function useGameActions(
     completeHabit, redeemReward, updateBelohnungen,
     addSpecialMission, completeSpecialMission, removeSpecialMission,
     updateWeeklyLunch, collectLoginBonus,
-    clearBossReward,
+    clearBossReward, clearEvolution,
     completeChainStep, addQuestChain, removeQuestChain,
     equipGear, unequipGear,
     exportState, importState,
