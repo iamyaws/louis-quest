@@ -129,6 +129,15 @@ function applyDayTransition(p: GameState, today: string): void {
 }
 
 function applyDefaults(p: GameState): void {
+  // v5 migration: migrate afternoon anchor to morning, add completions
+  if (p.quests) {
+    p.quests = p.quests.map(q => ({
+      ...q,
+      anchor: (q.anchor as string) === 'afternoon' ? 'morning' as const : q.anchor,
+      completions: q.completions ?? (q.done ? (q.target || 1) : 0),
+      order: q.order ?? 0,
+    }));
+  }
   if (!p.purchased) p.purchased = [];
   if (!p.rainbow) p.rainbow = [false, false, false, false, false, false];
   if (p.moodAM === undefined) p.moodAM = null;

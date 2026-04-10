@@ -30,43 +30,47 @@ export const CAT_VARIANTS: Record<string, { name: string; col: string; ear: stri
   tabby: { name: "Tabby", col: "#A3724A", ear: "#D4A574", stripes: true, desc: "Gem\u00FCtlich und lieb!" },
 };
 
+// ── Questlines: sequential morning + evening routines, all 10 HP ──
+
 export const SCHOOL_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
-  { id: "s1", name: "Gesicht waschen", icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3 },
-  { id: "s2", name: "Bett machen", icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 15, minutes: 4 },
-  { id: "s3", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3 },
-  { id: "s4", name: "Anziehen", icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3 },
-  { id: "s5", name: "Schultasche packen", icon: "\u{1F392}", anchor: "morning", xp: 15, minutes: 4 },
-  { id: "s6", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "morning", xp: 10, minutes: 2 },
-  { id: "s6b", name: "Sonnencreme auftragen", icon: "\u2600\uFE0F", anchor: "morning", xp: 10, minutes: 2 },
-  { id: "s7", name: "Hausaufgaben", icon: "\u{1F4DA}", anchor: "afternoon", xp: 25, minutes: 8 },
-  { id: "s8", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "afternoon", xp: 20, minutes: 5 },
-  { id: "s9", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "afternoon", xp: 20, minutes: 6 },
-  { id: "s10", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "afternoon", xp: 10, minutes: 2 },
-  { id: "s11", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "evening", xp: 10, minutes: 2 },
-  { id: "s12", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "evening", xp: 10, minutes: 3 },
-  { id: "s13", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "evening", xp: 10, minutes: 3 },
-  { id: "s14", name: "Creme auftragen", icon: "\u2728", anchor: "evening", xp: 10, minutes: 2 },
-  { id: "s15", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2 },
+  // Morning: "Bereit f\u00FCr den Tag"
+  { id: "s1", name: "Gesicht waschen", icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3, order: 1 },
+  { id: "s3", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3, order: 2 },
+  { id: "s4", name: "Anziehen", icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3, order: 3 },
+  { id: "s2", name: "Bett machen", icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 10, minutes: 4, order: 4 },
+  { id: "s5", name: "Schultasche packen", icon: "\u{1F392}", anchor: "morning", xp: 10, minutes: 4, order: 5 },
+  { id: "s6b", name: "Sonnencreme auftragen", icon: "\u2600\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 6 },
+  // Evening: "Gute Nacht Routine"
+  { id: "s7", name: "Hausaufgaben", icon: "\u{1F4DA}", anchor: "evening", xp: 10, minutes: 8, order: 1 },
+  { id: "s8", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "evening", xp: 10, minutes: 5, order: 2 },
+  { id: "s9", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "evening", xp: 10, minutes: 6, order: 3 },
+  { id: "s12", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "evening", xp: 10, minutes: 3, order: 4 },
+  { id: "s13", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "evening", xp: 10, minutes: 3, order: 5 },
+  { id: "s14", name: "Creme auftragen", icon: "\u2728", anchor: "evening", xp: 10, minutes: 2, order: 6 },
+  { id: "s15", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2, order: 7 },
+  // Repeatable: Geschirr (2x required, 3rd optional bonus)
+  { id: "geschirr", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 99, target: 2, bonus: 3 },
 ];
 
 export const VACATION_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
-  { id: "v1", name: "Gesicht waschen", icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3 },
-  { id: "v2", name: "Bett machen", icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 15, minutes: 4 },
-  { id: "v3", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3 },
-  { id: "v4", name: "Anziehen", icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3 },
-  { id: "v5", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "morning", xp: 10, minutes: 2 },
-  { id: "v5b", name: "Sonnencreme auftragen", icon: "\u2600\uFE0F", anchor: "morning", xp: 10, minutes: 2 },
-  { id: "v6", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "afternoon", xp: 20, minutes: 5 },
-  { id: "v7", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "afternoon", xp: 15, minutes: 5 },
-  { id: "v8", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "afternoon", xp: 10, minutes: 2 },
-  { id: "v9", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "evening", xp: 10, minutes: 2 },
-  { id: "v10", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "evening", xp: 10, minutes: 3 },
-  { id: "v11", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "evening", xp: 10, minutes: 3 },
-  { id: "v12", name: "Creme auftragen", icon: "\u2728", anchor: "evening", xp: 10, minutes: 2 },
-  { id: "v13", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2 },
+  // Morning
+  { id: "v1", name: "Gesicht waschen", icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3, order: 1 },
+  { id: "v3", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3, order: 2 },
+  { id: "v4", name: "Anziehen", icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3, order: 3 },
+  { id: "v2", name: "Bett machen", icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 10, minutes: 4, order: 4 },
+  { id: "v5b", name: "Sonnencreme auftragen", icon: "\u2600\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 5 },
+  // Evening
+  { id: "v6", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "evening", xp: 10, minutes: 5, order: 1 },
+  { id: "v7", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "evening", xp: 10, minutes: 5, order: 2 },
+  { id: "v10", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "evening", xp: 10, minutes: 3, order: 3 },
+  { id: "v11", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "evening", xp: 10, minutes: 3, order: 4 },
+  { id: "v12", name: "Creme auftragen", icon: "\u2728", anchor: "evening", xp: 10, minutes: 2, order: 5 },
+  { id: "v13", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2, order: 6 },
+  // Repeatable: Geschirr
+  { id: "geschirr", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 99, target: 2, bonus: 3 },
 ];
 
-export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "afternoon", xp: 30, minutes: 10 };
+export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "evening", xp: 10, minutes: 10, order: 0 };
 
 export const REWARDS: Reward[] = [
   { id: "r1", name: "H\u00F6rspiel h\u00F6ren", icon: "\u{1F3A7}", minutes: 30 },
@@ -176,9 +180,8 @@ export const BOSSES: import('./types').BossTemplate[] = [
 ];
 
 export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {
-  morning: { label: "Morgens", icon: "\u{1F305}", col: "#F97316" },
-  afternoon: { label: "Nachmittags", icon: "\u2600\uFE0F", col: "#0EA5E9" },
-  evening: { label: "Abends", icon: "\u{1F319}", col: "#6D28D9" },
+  morning: { label: "Bereit f\u00FCr den Tag", icon: "\u{1F305}", col: "#F97316" },
+  evening: { label: "Gute Nacht Routine", icon: "\u{1F319}", col: "#6D28D9" },
 };
 
 export const LVL = [0, 50, 120, 220, 360, 550, 800, 1100, 1500, 2000, 2600, 3300, 4100, 5000, 6000, 7200] as const;
@@ -195,18 +198,8 @@ export const BADGES: Badge[] = [
   { i: "\u{1F431}", n: "Sammler" },
 ];
 
-export const OB_REWARDS = [
-  null,
-  { hp: 50, text: "+50 Heldenpunkte!", icon: "\u2B50" },
-  { hp: 80, text: "Level 2! +80 HP", icon: "\u26A1" },
-  { hp: 40, text: "+40 Heldenpunkte!", icon: "\u{1F381}" },
-  { hp: 100, text: "Level 3! +100 HP", icon: "\u26A1" },
-  { hp: 100, text: "+100 Start-HP!", icon: "\u{1F4AB}" },
-  { hp: 0, text: "", icon: "" },
-  { hp: 0, text: "", icon: "" },
-  { hp: 150, text: "Sidekick! Level 4!", icon: "\u{1F431}" },
-  { hp: 80, text: "+80 Heldenpunkte!", icon: "\u2B50" },
-] as const;
+// Onboarding gives NO HP during steps — only a single chest at the end
+export const OB_CHEST_REWARD = { hp: 1, text: "Dein erster Heldenpunkt!", icon: "\u{1F381}" };
 
 export const JOURNAL_QUESTIONS: JournalQuestion[] = [
   {

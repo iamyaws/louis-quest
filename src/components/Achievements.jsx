@@ -28,6 +28,19 @@ export default function Achievements() {
           </div>
         </div>
       </div>
+      <div className="game-card" style={{ padding: 18, marginBottom: 14, background: "linear-gradient(135deg, rgba(251,191,36,0.10), rgba(245,158,11,0.05))", borderColor: "rgba(245,158,11,0.2)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <span style={{ fontSize: "2rem" }}>{"\uD83D\uDD25"}</span>
+          <div>
+            <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.4rem", fontWeight: 700, color: "#EA580C" }}>
+              {state.sd || 0} Tage Streak
+            </div>
+            <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary }}>
+              Bester: {state.bestStreak || 0} Tage
+            </div>
+          </div>
+        </div>
+      </div>
       <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".85rem", color: "#64748B", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>Badges</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 24 }}>
         {badges.map((b, i) => (

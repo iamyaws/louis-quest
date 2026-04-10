@@ -114,10 +114,11 @@ export default function Hub() {
               </div>
             </div>
 
-            {/* RIGHT: 2x2 grid — HP, Streak, Weather, Date */}
+            {/* RIGHT: grid — HP (full width), Weather + Date */}
             <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {/* Heldenpunkte */}
+              {/* HP — full width */}
               <div style={{
+                gridColumn: "1 / -1",
                 background: "#FEF3C720", borderRadius: 14, padding: "10px 10px",
                 display: "flex", alignItems: "center", gap: 6,
               }}>
@@ -127,19 +128,6 @@ export default function Hub() {
                     {(state.coins || 0).toLocaleString("de-DE")}
                   </div>
                   <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textLight }}>HP</div>
-                </div>
-              </div>
-              {/* Streak */}
-              <div style={{
-                background: "#FEF3C720", borderRadius: 14, padding: "10px 10px",
-                display: "flex", alignItems: "center", gap: 6,
-              }}>
-                <span style={{ fontSize: "1.4rem" }}>{"\uD83D\uDD25"}</span>
-                <div>
-                  <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "#EA580C" }}>
-                    {state.sd || 0}
-                  </div>
-                  <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textLight }}>Tage</div>
                 </div>
               </div>
               {/* Weather — min/max */}

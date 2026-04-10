@@ -14,16 +14,25 @@ export default function useComputedState(state: GameState | null): ComputedState
     const xpP = getLvlProg(state.xp);
     const done = state.quests.filter(q => q.done).length;
     const total = state.quests.length;
-    const allDone = done === total && total > 0;
+    const allDone = state.quests.every(q => q.done) && total > 0;
     const pct = total > 0 ? done / total : 0;
     const mood = getMood(allDone, pct);
     const dayN = getDayName();
 
+    // For repeatable quests, count as done when completions >= target
+    const done2 = state.quests.filter(q => {
+      if (q.target && q.target > 1) return (q.completions || 0) >= q.target;
+      return q.done;
+    }).length;
+
     const byA: Record<string, Quest[]> = {};
     state.quests.forEach(q => {
-      if (!byA[q.anchor]) byA[q.anchor] = [];
-      byA[q.anchor].push(q);
+      const anchor = (q.anchor === 'afternoon' as string) ? 'morning' : q.anchor;
+      if (!byA[anchor]) byA[anchor] = [];
+      byA[anchor].push(q);
     });
+    // Sort each group by order
+    Object.values(byA).forEach(arr => arr.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)));
 
     return { level, xpP, done, total, allDone, pct, mood, dayN, byA };
   }, [state]);

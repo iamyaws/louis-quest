@@ -54,12 +54,32 @@ export default function useGameActions(
     setState(prev => {
       if (!prev) return prev;
       const q = prev.quests.find(x => x.id === id);
-      if (!q || q.done) return prev;
+      if (!q) return prev;
+
+      // Repeatable quest logic
+      const target = q.target || 1;
+      const bonus = q.bonus || target;
+      const curCompletions = q.completions || 0;
+
+      // Already fully done (including bonus)
+      if (q.done && curCompletions >= bonus) return prev;
+      // For non-repeatable: skip if done
+      if (q.done && target <= 1) return prev;
+
       setCeleb(true);
       SFX.play("pop");
       setTimeout(() => SFX.play("coin"), 200);
 
-      const nq2 = prev.quests.map(x => x.id === id ? { ...x, done: true, streak: x.streak + 1 } : x);
+      const newCompletions = curCompletions + 1;
+      const isDone = newCompletions >= target;
+      const isBonus = curCompletions >= target; // this tap is a bonus tap
+
+      const nq2 = prev.quests.map(x => x.id === id ? {
+        ...x,
+        done: isDone,
+        streak: isDone && !q.done ? x.streak + 1 : x.streak,
+        completions: newCompletions,
+      } : x);
       const all = nq2.every(x => x.done);
 
       if (all) setTimeout(() => { SFX.play("celeb"); setShowVictory(true); }, 600);

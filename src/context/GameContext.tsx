@@ -43,7 +43,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const [pMode, setPMode] = useState(false);
   const [pinShow, setPinShow] = useState(false);
   const [pin, setPin] = useState("");
-  const [nq, setNq] = useState({ name: "", icon: "\u2B50", anchor: "morning", xp: 15, minutes: 5 });
+  const [nq, setNq] = useState({ name: "", icon: "\u2B50", anchor: "morning", xp: 10, minutes: 5 });
   const [shopTab, setShopTab] = useState("hero");
   const [showWheel, setShowWheel] = useState(false);
   const [showChest, setShowChest] = useState(false);

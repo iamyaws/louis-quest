@@ -17,9 +17,11 @@ export function getLvlProg(xp: number): { cur: number; need: number } {
 }
 
 export function buildDay(vac: boolean): Quest[] {
-  const b: Quest[] = (vac ? VACATION_QUESTS : SCHOOL_QUESTS).map(q => ({ ...q, done: false, streak: 0 }));
+  const b: Quest[] = (vac ? VACATION_QUESTS : SCHOOL_QUESTS).map(q => ({
+    ...q, done: false, streak: 0, completions: 0,
+  }));
   const d = new Date().getDay();
-  if ((d === 1 || d === 3) && !vac) b.push({ ...FOOTBALL, done: false, streak: 0 });
+  if ((d === 1 || d === 3) && !vac) b.push({ ...FOOTBALL, done: false, streak: 0, completions: 0 });
   return b;
 }
 

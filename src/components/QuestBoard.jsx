@@ -36,6 +36,16 @@ export default function QuestBoard() {
           </div>
         </div>
 
+        {/* Phone-free reminder */}
+        <div className="game-card" style={{ padding: 14, marginBottom: 14, background: "linear-gradient(135deg, #EDE9FE, #F3E8FF)", borderColor: "rgba(109,40,217,0.15)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: "1.4rem" }}>{"\uD83E\uDDB8"}</span>
+            <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: "#6D28D9" }}>
+              {"H\u00E4nde frei! Schau dir deine Aufgaben an und leg das Handy weg."}
+            </div>
+          </div>
+        </div>
+
         {/* Comeback Quest */}
         {state.comebackActive && <div className="mission-card" style={{ marginBottom: 14, background: "linear-gradient(135deg, #FFF7ED, #FFFBF5)", borderColor: "#F9731630" }}>
           <div style={{ width: 48, height: 48, borderRadius: 14, background: "#FED7AA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", flexShrink: 0 }}>{"\u{1F431}"}</div>
@@ -82,11 +92,22 @@ export default function QuestBoard() {
           <div role="group" aria-label="Abendstimmung wählen" style={{ display: "flex", justifyContent: "space-between", gap: 4, marginBottom: 12 }}>{MOOD_EMOJIS.map((e, i) => <button key={i} aria-label={`Stimmung ${i + 1} von 6`} onClick={() => actions.setMood("moodPM", i)} style={{ fontSize: "1.8rem", background: state.moodPM === i ? `${T.primary}15` : "none", border: state.moodPM === i ? `2px solid ${T.primary}` : "none", cursor: "pointer", padding: "6px", borderRadius: 10, minHeight: 48, minWidth: 44 }}>{e}</button>)}</div>
         </div>}
 
-        {/* ── Quest groups (Paper 2 mission card style) ── */}
+        {/* Parent nudge when all done */}
+        {allDone && (
+          <div className="game-card" style={{ padding: 14, marginBottom: 14, background: "linear-gradient(135deg, #FEF3C7, #FFFBEB)", borderColor: "rgba(245,158,11,0.15)" }}>
+            <div style={{ textAlign: "center", fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: "#B45309" }}>
+              {"Auch Mama und Papa d\u00FCrfen das Handy mal weglegen \uD83D\uDE04"}
+            </div>
+          </div>
+        )}
+
+        {/* ── Quest groups (sequential questline) ── */}
         {Object.entries(ANCHORS).map(([a, m]) => {
           const qs = byA[a] || [];
           if (!qs.length) return null;
           const secDone = qs.every(q => q.done);
+          // Find the first undone quest index for "next step" highlight
+          const firstUndoneIdx = qs.findIndex(q => !q.done);
           return (
             <div key={a} style={{ marginBottom: 18 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
@@ -96,35 +117,88 @@ export default function QuestBoard() {
                 </div>
                 {secDone && <span style={{ fontSize: ".85rem", color: T.success, fontWeight: 800 }}>{"\u2713"} Geschafft!</span>}
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {qs.map(q => {
+              <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                {qs.map((q, idx) => {
                   const grad = (state.graduated || []).includes(q.id);
+                  const isLast = idx === qs.length - 1;
+                  const isNext = idx === firstUndoneIdx;
+                  const stepNumber = idx + 1;
+                  // Repeatable quest logic
+                  const isRepeatable = q.target && q.target > 1;
+                  const curCompletions = q.completions || 0;
+                  const maxTaps = isRepeatable ? (q.bonus || q.target) : 1;
+                  const fullyDone = isRepeatable ? curCompletions >= maxTaps : q.done;
+                  const atTarget = isRepeatable && curCompletions >= q.target;
+                  const isBonus = isRepeatable && curCompletions >= q.target && curCompletions < maxTaps;
+                  // Can this quest be tapped?
+                  const canTap = isRepeatable
+                    ? curCompletions < maxTaps
+                    : !q.done;
                   return (
-                    <button key={q.id} className={q.done ? "" : "btn-tap"} onClick={() => !q.done && !pMode && actions.complete(q.id)} disabled={q.done} style={{
-                      display: "flex", alignItems: "center", gap: 12,
-                      background: grad ? "linear-gradient(135deg, #FFFBEB, #FEF3C7)" : q.done ? "linear-gradient(135deg, #F0FDF4, #DCFCE7)" : "white",
-                      border: `2.5px solid ${grad ? T.accentDark + "30" : q.done ? T.success + "30" : "rgba(180,120,40,0.08)"}`,
-                      borderRadius: 18, padding: "12px 14px", cursor: q.done ? "default" : "pointer",
-                      width: "100%", textAlign: "left", transition: "all .15s",
-                      opacity: q.done ? .7 : 1, fontFamily: "'Nunito',sans-serif", minHeight: 56,
-                      boxShadow: q.done ? "none" : "0 3px 12px rgba(120,80,20,0.06)",
-                    }}>
-                      <div style={{ width: 46, height: 46, borderRadius: 14, background: grad ? `${T.accent}20` : q.done ? `${T.success}15` : `${m.col}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem", flexShrink: 0 }}>{grad ? "\u{1F393}" : q.done ? "\u2705" : q.icon}</div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 700, fontSize: ".88rem", textDecoration: q.done ? "line-through" : "none", color: T.textPrimary }}>{q.name}</div>
-                        <div style={{ display: "flex", gap: 8, marginTop: 3 }}>
-                          <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{q.xp} {"\u2B50"}</span>
-                          <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.accentDark }}>+{q.minutes} Min</span>
-                          {q.streak > 0 && <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#F97316" }}>{"\u{1F525}"}{q.streak}</span>}
+                    <div key={q.id} style={{ display: "flex", gap: 12, position: "relative" }}>
+                      {/* Step number + connector line */}
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 32 }}>
+                        <div style={{
+                          width: 28, height: 28, borderRadius: "50%", display: "flex",
+                          alignItems: "center", justifyContent: "center",
+                          background: fullyDone ? "#34D399" : isNext ? "#FCD34D" : "#E5E7EB",
+                          color: fullyDone ? "white" : "#1E1B4B", fontWeight: 800, fontSize: ".85rem",
+                          boxShadow: isNext ? "0 0 0 3px rgba(252,211,77,0.4)" : "none",
+                          transition: "all .2s",
+                        }}>
+                          {fullyDone ? "\u2713" : stepNumber}
                         </div>
+                        {!isLast && <div style={{ flex: 1, width: 2, background: fullyDone ? "#34D399" : "#E5E7EB", marginTop: 4 }} />}
                       </div>
-                      {/* Reward coin stack (Paper 2 style) */}
-                      {!q.done && <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, background: "rgba(252,211,77,0.1)", border: "2px solid rgba(252,211,77,0.25)", borderRadius: 12, padding: "6px 8px", minWidth: 44 }}>
-                        <span style={{ fontSize: ".9rem" }}>{"\u2B50"}</span>
-                        <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: T.accentDark }}>+{Math.floor(q.xp / 3)}</span>
-                      </div>}
-                      {pMode && <button aria-label={`${q.name} entfernen`} onClick={e => { e.stopPropagation(); actions.rmQuest(q.id); }} style={{ background: `${T.danger}12`, border: `2px solid ${T.danger}30`, borderRadius: 10, padding: "4px 10px", color: T.danger, cursor: "pointer", fontSize: ".85rem", fontWeight: 800, minHeight: 36 }}>{"\u2715"}</button>}
-                    </button>
+                      {/* Quest card */}
+                      <div style={{ flex: 1, marginBottom: 8 }}>
+                        <button className={canTap ? "btn-tap" : ""} onClick={() => canTap && !pMode && actions.complete(q.id)} disabled={!canTap && !pMode} style={{
+                          display: "flex", alignItems: "center", gap: 12,
+                          background: grad ? "linear-gradient(135deg, #FFFBEB, #FEF3C7)" : fullyDone ? "linear-gradient(135deg, #F0FDF4, #DCFCE7)" : isBonus ? "linear-gradient(135deg, #FFFBEB, #FEF9E7)" : "white",
+                          border: `2.5px solid ${isNext && canTap ? m.col + "60" : grad ? T.accentDark + "30" : fullyDone ? T.success + "30" : "rgba(180,120,40,0.08)"}`,
+                          borderRadius: 18, padding: "12px 14px", cursor: canTap ? "pointer" : "default",
+                          width: "100%", textAlign: "left", transition: "all .15s",
+                          opacity: fullyDone ? .7 : 1, fontFamily: "'Nunito',sans-serif", minHeight: 56,
+                          boxShadow: isNext && canTap ? `0 3px 16px ${m.col}20` : fullyDone ? "none" : "0 3px 12px rgba(120,80,20,0.06)",
+                        }}>
+                          <div style={{ width: 46, height: 46, borderRadius: 14, background: grad ? `${T.accent}20` : fullyDone ? `${T.success}15` : `${m.col}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem", flexShrink: 0 }}>{grad ? "\u{1F393}" : fullyDone ? "\u2705" : q.icon}</div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 700, fontSize: ".88rem", textDecoration: fullyDone ? "line-through" : "none", color: T.textPrimary }}>{q.name}</div>
+                            <div style={{ display: "flex", gap: 8, marginTop: 3, alignItems: "center" }}>
+                              <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{q.xp} {"\u2B50"}</span>
+                              <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.accentDark }}>+{q.minutes} Min</span>
+                              {q.streak > 0 && <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#F97316" }}>{"\u{1F525}"}{q.streak}</span>}
+                              {/* Repeatable counter */}
+                              {isRepeatable && (
+                                <span style={{
+                                  fontSize: ".8rem", fontWeight: 800, borderRadius: 8, padding: "1px 7px",
+                                  background: atTarget ? `${T.success}18` : `${T.primary}12`,
+                                  color: atTarget ? T.successDark : T.primary,
+                                }}>
+                                  {curCompletions}/{q.target}{atTarget ? " \u2705" : ""}
+                                </span>
+                              )}
+                              {/* Bonus badge */}
+                              {isRepeatable && isBonus && (
+                                <span style={{
+                                  fontSize: ".75rem", fontWeight: 800, borderRadius: 8, padding: "1px 7px",
+                                  background: "linear-gradient(135deg, #FCD34D, #F59E0B)",
+                                  color: "white",
+                                }}>
+                                  +1 Bonus!
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {/* Reward coin stack */}
+                          {canTap && <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, background: "rgba(252,211,77,0.1)", border: "2px solid rgba(252,211,77,0.25)", borderRadius: 12, padding: "6px 8px", minWidth: 44 }}>
+                            <span style={{ fontSize: ".9rem" }}>{"\u2B50"}</span>
+                            <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: T.accentDark }}>+{Math.floor(q.xp / 3)}</span>
+                          </div>}
+                          {pMode && <button aria-label={`${q.name} entfernen`} onClick={e => { e.stopPropagation(); actions.rmQuest(q.id); }} style={{ background: `${T.danger}12`, border: `2px solid ${T.danger}30`, borderRadius: 10, padding: "4px 10px", color: T.danger, cursor: "pointer", fontSize: ".85rem", fontWeight: 800, minHeight: 36 }}>{"\u2715"}</button>}
+                        </button>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -142,7 +216,7 @@ export default function QuestBoard() {
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <input ref={nqRef} value={nq.name} onChange={e => setNq(n => ({ ...n, name: e.target.value }))} placeholder="Neue Aufgabe..." style={{ background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 14, padding: "10px 14px", fontSize: ".85rem", fontFamily: "'Nunito',sans-serif", outline: "none", fontWeight: 600, minHeight: 44 }} />
             <div style={{ display: "flex", gap: 6 }}>
-              <select value={nq.anchor} onChange={e => setNq(n => ({ ...n, anchor: e.target.value }))} style={{ flex: 1, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 12, padding: "8px", fontSize: ".85rem", minHeight: 40 }}><option value="morning">{"\u{1F305}"} Morgens</option><option value="afternoon">{"\u2600\uFE0F"} Nachmittags</option><option value="evening">{"\u{1F319}"} Abends</option></select>
+              <select value={nq.anchor} onChange={e => setNq(n => ({ ...n, anchor: e.target.value }))} style={{ flex: 1, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 12, padding: "8px", fontSize: ".85rem", minHeight: 40 }}><option value="morning">{"\u{1F305}"} Morgens</option><option value="evening">{"\u{1F319}"} Abends</option></select>
               <input type="number" value={nq.xp} onChange={e => setNq(n => ({ ...n, xp: +e.target.value }))} style={{ width: 55, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 12, padding: "8px", fontSize: ".85rem", textAlign: "center", minHeight: 40 }} placeholder="HP" />
               <input type="number" value={nq.minutes} onChange={e => setNq(n => ({ ...n, minutes: +e.target.value }))} style={{ width: 55, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 12, padding: "8px", fontSize: ".85rem", textAlign: "center", minHeight: 40 }} placeholder="Min" />
             </div>

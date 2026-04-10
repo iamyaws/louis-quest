@@ -14,11 +14,15 @@ export interface Quest {
   id: string;
   name: string;
   icon: string;
-  anchor: 'morning' | 'afternoon' | 'evening';
+  anchor: 'morning' | 'evening';
   xp: number;
   minutes: number;
   done: boolean;
   streak: number;
+  order?: number;
+  target?: number;
+  bonus?: number;
+  completions?: number;
 }
 
 export interface Reward {

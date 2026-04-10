@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { T, HERO_COLORS, HERO_EYES, HERO_HAIRS, SKIN_TONES, HAIR_COLORS, COMPANION_TYPES, EGG_TYPES, OB_REWARDS } from '../constants';
-import { getLevel } from '../utils/helpers';
+import { T, HERO_COLORS, HERO_EYES, HERO_HAIRS, SKIN_TONES, HAIR_COLORS, COMPANION_TYPES, EGG_TYPES, OB_CHEST_REWARD } from '../constants';
 import { OBWrap, OBTitle, OBSub, OBBtn, OBGrid, OBChip } from './ui';
 import HeroSprite from './HeroSprite';
 import Egg from './Egg';
@@ -13,18 +12,10 @@ export default function Onboarding({ onComplete }) {
   });
   const [selectedEgg, setSelectedEgg] = useState(null); // "dragon" | "wolf" | "phoenix"
   const [companionName, setCompanionName] = useState("");
-  const [obHP, setObHP] = useState(0);
-  const [reward, setReward] = useState(null);
   const nameRef = useRef(null);
   const companionNameRef = useRef(null);
 
   const advanceStep = (nextStep) => {
-    const r = OB_REWARDS[step];
-    if (r && r.hp > 0) {
-      setObHP(h => h + r.hp);
-      setReward(r);
-      setTimeout(() => setReward(null), 3000);
-    }
     setStep(nextStep);
   };
 
@@ -32,7 +23,6 @@ export default function Onboarding({ onComplete }) {
   useEffect(() => { if (step === 7) setTimeout(() => companionNameRef.current?.focus(), 100); }, [step]);
 
   const totalSteps = 8;
-  const obLevel = getLevel(obHP);
 
   // ── Progress dots (8 dots, gold active) ──
   const Dots = () => (
@@ -46,33 +36,6 @@ export default function Onboarding({ onComplete }) {
       ))}
     </div>
   );
-
-  // ── HP display ──
-  const OBStats = () => (
-    <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 16 }}>
-      {obHP > 0 && (
-        <div style={{
-          background: "#FFD70030", borderRadius: 50, padding: "6px 14px",
-          fontSize: ".8rem", fontWeight: 800, color: "#D4A000",
-        }}>
-          {"⭐"} {obHP} HP
-        </div>
-      )}
-    </div>
-  );
-
-  // ── Reward toast ──
-  const RewardToast = () => reward ? (
-    <div style={{
-      position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)",
-      background: "linear-gradient(135deg, #FFD700, #F59E0B)", color: "#2D2A1E",
-      padding: "12px 24px", borderRadius: 50, fontWeight: 800, fontSize: ".95rem",
-      boxShadow: "0 8px 32px rgba(245,158,11,0.3)", zIndex: 999,
-      animation: "heroFloat 1s ease-in-out",
-    }}>
-      {reward.icon} {reward.text}
-    </div>
-  ) : null;
 
   // ── Shared input style ──
   const inputStyle = {
@@ -111,7 +74,6 @@ export default function Onboarding({ onComplete }) {
   // ═══ Step 0: Welcome ═══
   if (step === 0) return (
     <OBWrap>
-      <RewardToast />
       <img src={import.meta.env.BASE_URL + "ronki-wordmark.png"} alt="Ronki" style={{ width: "min(280px, 70vw)", marginBottom: 24, animation: "heroFloat 3s ease-in-out infinite" }} />
       <OBSub>Erstelle deinen Helden und finde dein Begleiter-Ei!</OBSub>
       <OBBtn onClick={() => setStep(1)} big>Los geht's! 🚀</OBBtn>
@@ -121,8 +83,7 @@ export default function Onboarding({ onComplete }) {
   // ═══ Step 1: Skin Tone ═══
   if (step === 1) return (
     <OBWrap>
-      <RewardToast />
-      <Dots /><OBStats />
+      <Dots />
       <OBTitle>Deine Hautfarbe</OBTitle>
       <div style={{ marginBottom: 20 }}>
         <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
@@ -141,8 +102,7 @@ export default function Onboarding({ onComplete }) {
   // ═══ Step 2: Hair Style + Color ═══
   if (step === 2) return (
     <OBWrap>
-      <RewardToast />
-      <Dots /><OBStats />
+      <Dots />
       <OBTitle>Deine Frisur</OBTitle>
       <div style={{ marginBottom: 20 }}>
         <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
@@ -178,8 +138,7 @@ export default function Onboarding({ onComplete }) {
   // ═══ Step 3: Eyes ═══
   if (step === 3) return (
     <OBWrap>
-      <RewardToast />
-      <Dots /><OBStats />
+      <Dots />
       <OBTitle>Deine Augen</OBTitle>
       <div style={{ marginBottom: 20 }}>
         <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
@@ -203,8 +162,7 @@ export default function Onboarding({ onComplete }) {
   // ═══ Step 4: Outfit Color ═══
   if (step === 4) return (
     <OBWrap>
-      <RewardToast />
-      <Dots /><OBStats />
+      <Dots />
       <OBTitle>Dein Outfit</OBTitle>
       <div style={{ marginBottom: 20 }}>
         <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
@@ -225,12 +183,11 @@ export default function Onboarding({ onComplete }) {
   // ═══ Step 5: Hero Name ═══
   if (step === 5) return (
     <OBWrap>
-      <RewardToast />
-      <Dots /><OBStats />
+      <Dots />
       <OBTitle>Dein Heldenname</OBTitle>
       <div style={{ marginBottom: 16 }}>
         <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
-          size={150} level={obLevel} skinTone={hero.skinTone} hairColor={hero.hairColor} />
+          size={150} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
       </div>
       <input ref={nameRef} value={hero.name}
         onChange={e => setHero(h => ({ ...h, name: e.target.value }))}
@@ -253,8 +210,7 @@ export default function Onboarding({ onComplete }) {
 
     return (
       <OBWrap>
-        <RewardToast />
-        <Dots /><OBStats />
+        <Dots />
         <OBTitle>Wähle dein Begleiter-Ei! 🥚</OBTitle>
         <OBSub>Dein Begleiter wartet darauf zu schlüpfen!</OBSub>
 
@@ -308,8 +264,7 @@ export default function Onboarding({ onComplete }) {
   // ═══ Step 7: Companion Name + Activation ═══
   if (step === 7) return (
     <OBWrap>
-      <RewardToast />
-      <Dots /><OBStats />
+      <Dots />
       <OBTitle>Name für deinen Begleiter?</OBTitle>
 
       {/* Selected egg with subtle glow */}
@@ -325,24 +280,27 @@ export default function Onboarding({ onComplete }) {
         style={{ ...inputStyle, border: `2px solid ${companionName.trim() ? "#FFD700" : "rgba(0,0,0,0.1)"}` }}
       />
 
+      {/* Chest reward teaser */}
       <div style={{
-        fontSize: ".85rem", color: T.textSecondary, marginTop: 16,
-        textAlign: "center", maxWidth: 300, lineHeight: 1.5,
+        background: "#FFD70015", borderRadius: 16, padding: "14px 20px",
+        marginTop: 16, textAlign: "center", maxWidth: 320,
       }}>
-        Dein Ei wird schlüpfen, sobald du deine ersten Aufgaben erledigst! 🎉
+        <div style={{ fontSize: "2rem", marginBottom: 4 }}>{OB_CHEST_REWARD.icon}</div>
+        <div style={{ fontSize: ".95rem", fontWeight: 800, color: T.primary }}>{OB_CHEST_REWARD.text}</div>
+        <div style={{ fontSize: ".85rem", color: T.textSecondary, marginTop: 6, lineHeight: 1.5 }}>
+          Sammle Heldenpunkte durch deine täglichen Aufgaben!
+        </div>
       </div>
 
       <div style={{ marginTop: 20 }}>
         <OBBtn
           onClick={() => {
-            const r = OB_REWARDS[7];
-            if (r && r.hp > 0) setObHP(h => h + r.hp);
             onComplete({
               hero: { ...hero, skinTone: hero.skinTone, hairColor: hero.hairColor },
               catVariant: "tiger",
               catName: companionName,
-              startXP: obHP,
-              startCoins: obHP,
+              startXP: 1,
+              startCoins: 1,
               companionType: selectedEgg,
               eggType: selectedEgg,
             });
