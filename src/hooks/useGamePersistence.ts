@@ -44,3 +44,220 @@ export default function useGamePersistence() {
 
   return { state, setState, boarding, setBoarding };
 }
+
+function applyDayTransition(p: GameState, today: string): void {
+  const todayD = new Date();
+  todayD.setHours(0, 0, 0, 0);
+  const lastD = new Date(p.lastDate);
+  lastD.setHours(0, 0, 0, 0);
+  const dayGap = Math.round((todayD.getTime() - lastD.getTime()) / (1000 * 60 * 60 * 24));
+
+  const curMonth = `${todayD.getFullYear()}-${todayD.getMonth()}`;
+  if ((p.lastFreezeMonth || "") !== curMonth) {
+    p.streakFreezes = MAX_MONTHLY_FREEZES;
+    p.freezesUsedThisMonth = 0;
+    p.lastFreezeMonth = curMonth;
+  }
+  p.freezeUsedToday = false;
+
+  if (dayGap >= 2) {
+    const missedDays = dayGap - 1;
+    if ((p.sd || 0) > 0) {
+      const avail = p.streakFreezes || 0;
+      if (avail >= missedDays) {
+        p.streakFreezes = avail - missedDays;
+        p.freezesUsedThisMonth = (p.freezesUsedThisMonth || 0) + missedDays;
+        p.freezeUsedToday = true;
+      } else {
+        if (avail > 0) {
+          p.streakFreezes = 0;
+          p.freezesUsedThisMonth = (p.freezesUsedThisMonth || 0) + avail;
+        }
+        p.bestStreak = Math.max(p.bestStreak || 0, p.sd || 0);
+        p.sd = 0;
+        p.comebackActive = true;
+      }
+    } else {
+      p.comebackActive = true;
+    }
+  } else {
+    p.comebackActive = false;
+  }
+
+  // Auto-detect Bavaria school vacations
+  const vacCheck = isSchoolVacation(new Date());
+  p.vacMode = vacCheck.isVacation;
+
+  p.quests = buildDay(p.vacMode).map(q => ({ ...q, streak: (p.sm || {})[q.id] || 0 }));
+  p.lastDate = today;
+  p.dt = 0;
+  p.moodAM = null;
+  p.moodPM = null;
+  p.journal = "";
+  p.jAnswers = {};
+  p.rainbow = [false, false, false, false, false, false];
+  p.wheelSpun = false;
+  p.memoryPlayed = false;
+  p.chestMilestone = null;
+  // Cat care daily reset + stat decay
+  p.catFed = false; p.catPetted = false; p.catPlayed = false;
+  p.catHunger = Math.max(0, (p.catHunger ?? 100) - 30);
+  p.catHappy = Math.max(0, (p.catHappy ?? 100) - 25);
+  p.catEnergy = Math.max(0, (p.catEnergy ?? 100) - 20);
+  // Daily habits reset
+  p.dailyVitaminD = false;
+  p.dailyBrother = false;
+  // Login bonus: reset claimed flag, advance day in cycle
+  p.loginBonusClaimed = false;
+  p.loginBonusDay = (p.loginBonusDay || 0) % 7;
+  // If they missed a day (dayGap >= 2), reset the cycle
+  if (dayGap >= 2) {
+    p.loginBonusDay = 0;
+    p.loginBonusStreak = 0;
+  }
+  // Clean up completed special missions
+  if (p.specialMissions) {
+    p.specialMissions = p.specialMissions.filter(m => !m.done);
+  }
+
+  const weekStart = p.weekStart ? new Date(p.weekStart) : new Date();
+  const daysSinceStart = Math.floor((new Date().getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
+  if (daysSinceStart >= 7 || !p.weeklyMission) {
+    const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
+    p.weeklyMission = wm.id;
+    p.weeklyProgress = 0;
+    p.weekStart = today;
+    // Spawn new weekly boss (tier-aware)
+    const companionStage = getCatStage(p.catEvo || 0);
+    const availableTiers = BOSS_TIERS.filter(t => companionStage >= t.minStage);
+    const highestTier = availableTiers[availableTiers.length - 1] || BOSS_TIERS[0];
+    const tierBosses = BOSSES.filter(b => b.tier === highestTier.id);
+    const b = tierBosses[Math.floor(Math.random() * tierBosses.length)];
+    p.boss = { id: b.id, hp: b.hp, maxHp: b.hp };
+  }
+
+  if (!p.graduated) p.graduated = [];
+  Object.entries(p.sm || {}).forEach(([qid, streak]) => {
+    if (streak >= 30 && !p.graduated.includes(qid)) p.graduated.push(qid);
+  });
+}
+
+function applyDefaults(p: GameState): void {
+  // v5 migration: migrate afternoon anchor to morning, add completions
+  if (p.quests) {
+    p.quests = p.quests.map(q => ({
+      ...q,
+      anchor: (q.anchor as string) === 'afternoon' ? 'morning' as const : q.anchor,
+      completions: q.completions ?? (q.done ? (q.target || 1) : 0),
+      order: q.order ?? 0,
+    }));
+  }
+  if (!p.purchased) p.purchased = [];
+  if (!p.rainbow) p.rainbow = [false, false, false, false, false, false];
+  if (p.moodAM === undefined) p.moodAM = null;
+  if (p.moodPM === undefined) p.moodPM = null;
+  if (p.journal === undefined) p.journal = "";
+  if (!p.jAnswers) p.jAnswers = {};
+  if (p.wheelSpun === undefined) p.wheelSpun = false;
+  if (p.memoryPlayed === undefined) p.memoryPlayed = false;
+  if (p.xpBoost === undefined) p.xpBoost = false;
+  if (p.streakFreezes === undefined) p.streakFreezes = MAX_MONTHLY_FREEZES;
+  if (p.freezesUsedThisMonth === undefined) p.freezesUsedThisMonth = 0;
+  if (!p.lastFreezeMonth) p.lastFreezeMonth = "";
+  if (p.comebackActive === undefined) p.comebackActive = false;
+  if (p.bestStreak === undefined) p.bestStreak = p.sd || 0;
+  if (p.freezeUsedToday === undefined) p.freezeUsedToday = false;
+  if (!p.weeklyMission) {
+    const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
+    p.weeklyMission = wm.id;
+    p.weeklyProgress = 0;
+    p.weekStart = new Date().toDateString();
+  }
+  if (!p.graduated) p.graduated = [];
+  // Cat & boss migrations
+  if (p.catEvo === undefined) p.catEvo = 0;
+  if (p.catHunger === undefined) p.catHunger = 100;
+  if (p.catHappy === undefined) p.catHappy = 100;
+  if (p.catEnergy === undefined) p.catEnergy = 100;
+  if (p.catFed === undefined) p.catFed = false;
+  if (p.catPetted === undefined) p.catPetted = false;
+  if (p.catPlayed === undefined) p.catPlayed = false;
+  if (!p.boss) { const b = BOSSES[Math.floor(Math.random() * BOSSES.length)]; p.boss = { id: b.id, hp: b.hp, maxHp: b.hp }; }
+  if (!p.bossTrophies) p.bossTrophies = [];
+  // ── New field defaults (v4 migration) ──
+  if (p.dailyVitaminD === undefined) p.dailyVitaminD = false;
+  if (p.dailyBrother === undefined) p.dailyBrother = false;
+  if (!p.belohnungen) p.belohnungen = DEFAULT_BELOHNUNGEN;
+  if (!p.belohnungenLog) p.belohnungenLog = [];
+  if (!p.specialMissions) p.specialMissions = [];
+  // Add Liam's birthday gift mission if not already there and date hasn't passed
+  if (!p.specialMissions.some(m => m.id === "sm_liam_bday") && new Date() < new Date("2026-04-27")) {
+    p.specialMissions.push({ id: "sm_liam_bday", name: "Geburtstagsgeschenk f\u00FCr Liam kaufen", emoji: "\uD83C\uDF81", hp: 50, done: false });
+  }
+  if (!p.weeklyLunch) p.weeklyLunch = {};
+  if (p.weeklyMissionsCompleted === undefined) p.weeklyMissionsCompleted = 0;
+  // Login bonus migration
+  if (p.loginBonusDay === undefined) p.loginBonusDay = 0;
+  if (p.loginBonusClaimed === undefined) p.loginBonusClaimed = false;
+  if (p.loginBonusStreak === undefined) p.loginBonusStreak = 0;
+  // Companion + egg migration
+  if (!p.equippedGear) p.equippedGear = {};
+  if (!p.questChains) p.questChains = [];
+  if (!p.companionType) p.companionType = "cat";
+  if (p.eggType === undefined) p.eggType = null;
+  if (p.eggProgress === undefined) p.eggProgress = 0;
+  if (p.eggHatched === undefined) p.eggHatched = true; // existing users already have companion
+  // Hero avatar migration
+  if (!p.hero.skinTone) p.hero.skinTone = "#F5D0B0";
+  if (!p.hero.hairColor) p.hero.hairColor = "#5B3A1A";
+}
+
+interface OnboardData {
+  hero: Hero;
+  catVariant: string;
+  catName: string;
+  startXP?: number;
+  startCoins?: number;
+  companionType?: string;
+  eggType?: string;
+}
+
+export function createInitialState({ hero, catVariant, catName, startXP, startCoins, companionType, eggType }: OnboardData): GameState {
+  const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
+  return {
+    hero, catVariant, catName, xp: startXP || 0, coins: startCoins || 0,
+    quests: buildDay(false), rewards: REWARDS, acc: [], sd: 0,
+    lastDate: new Date().toDateString(), dt: 0, hist: [], vacMode: false,
+    sm: {}, roomItems: [], purchased: [], moodAM: null, moodPM: null,
+    journal: "", jAnswers: {}, rainbow: [false, false, false, false, false, false],
+    wheelSpun: false, memoryPlayed: false, chestMilestone: null, xpBoost: false,
+    weeklyMission: wm.id, weeklyProgress: 0, weekStart: new Date().toDateString(),
+    graduated: [], streakFreezes: MAX_MONTHLY_FREEZES, freezesUsedThisMonth: 0,
+    lastFreezeMonth: `${new Date().getFullYear()}-${new Date().getMonth()}`,
+    comebackActive: false, bestStreak: 0, freezeUsedToday: false,
+    catEvo: 0, catHunger: 100, catHappy: 100, catEnergy: 100,
+    catFed: false, catPetted: false, catPlayed: false,
+    boss: (() => { const b = BOSSES[Math.floor(Math.random() * BOSSES.length)]; return { id: b.id, hp: b.hp, maxHp: b.hp }; })(),
+    bossTrophies: [],
+    // Companion + egg
+    companionType: companionType || "cat",
+    eggType: eggType || null,
+    eggProgress: eggType ? 0 : 100,
+    eggHatched: !eggType,
+    // New v4 fields
+    dailyVitaminD: false, dailyBrother: false,
+    belohnungen: DEFAULT_BELOHNUNGEN,
+    belohnungenLog: [],
+    specialMissions: [],
+    weeklyLunch: {},
+    weeklyMissionsCompleted: 0,
+    // Login bonus
+    loginBonusDay: 0, loginBonusClaimed: false, loginBonusStreak: 0,
+    // Boss defeat reward overlay
+    bossDefeatReward: null,
+    // Quest chains
+    questChains: [],
+    // Gear
+    equippedGear: {},
+  };
+}
