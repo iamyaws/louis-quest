@@ -395,13 +395,16 @@ export default function useGameActions(
       const effectiveCost = (isFreeDay && bel.weekendCost) ? bel.weekendCost : bel.cost;
       if (prev.coins < effectiveCost) return prev;
       SFX.play("buy");
+      // Launch mini-games
+      if (belohnungId === "bel_memory") setTimeout(() => setShowMemory(true), 300);
+      if (belohnungId === "bel_wheel") setTimeout(() => setShowWheel(true), 300);
       return {
         ...prev,
         coins: prev.coins - effectiveCost,
         belohnungenLog: [...(prev.belohnungenLog || []), { id: belohnungId, date: new Date().toISOString() }],
       };
     });
-  }, [setState]);
+  }, [setState, setShowMemory, setShowWheel]);
 
   const updateBelohnungen = useCallback((belohnungen: import('../types').Belohnung[]) => {
     setState(prev => prev ? { ...prev, belohnungen } : prev);

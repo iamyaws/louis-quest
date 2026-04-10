@@ -294,6 +294,10 @@ export const UNLOCK_CONDITIONS: Record<string, UnlockCondition> = {
 // ═══ NEW: Default Belohnungen (parent can customize) ═══
 
 export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
+  // Mini-games (cheap, fun, anytime)
+  { id: "bel_memory", name: "Memory-Spiel", emoji: "\u{1F0CF}", cost: 10, active: true },
+  { id: "bel_wheel", name: "Gl\u00FCcksrad drehen", emoji: "\u{1F3B0}", cost: 15, active: true },
+  // Real-world rewards
   { id: "bel_audio", name: "H\u00F6rspiel (25-30 Min)", emoji: "\u{1F3A7}", cost: 100, active: true, availableAfter: "19:00", availableAfterFree: "10:00", weekendCost: 60 },
   { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 120, active: true, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 80 },
   { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 150, active: true, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 100 },
