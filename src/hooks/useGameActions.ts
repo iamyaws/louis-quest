@@ -509,6 +509,30 @@ export default function useGameActions(
     setState(prev => prev ? { ...prev, questChains: (prev.questChains || []).filter(c => c.id !== chainId) } : prev);
   }, [setState]);
 
+  // ── Gear ──
+
+  const equipGear = useCallback((slot: string, itemId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      // Must own the item
+      if (!(prev.purchased || []).includes(itemId)) return prev;
+      SFX.play("pop");
+      return {
+        ...prev,
+        equippedGear: { ...(prev.equippedGear || {}), [slot]: itemId },
+      };
+    });
+  }, [setState]);
+
+  const unequipGear = useCallback((slot: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const gear = { ...(prev.equippedGear || {}) };
+      delete gear[slot as keyof typeof gear];
+      return { ...prev, equippedGear: gear };
+    });
+  }, [setState]);
+
   // ── Export / Import ──
 
   const exportState = useCallback((currentState: GameState) => {
@@ -552,6 +576,7 @@ export default function useGameActions(
     updateWeeklyLunch, collectLoginBonus,
     clearBossReward,
     completeChainStep, addQuestChain, removeQuestChain,
+    equipGear, unequipGear,
     exportState, importState,
   };
 }

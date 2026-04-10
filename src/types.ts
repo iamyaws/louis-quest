@@ -230,6 +230,8 @@ export interface GameState {
   bossDefeatReward: { bossName: string; bossIcon: string; hp: number; item: { name: string; icon: string } | null } | null;
   // Quest chains
   questChains: QuestChain[];
+  // Companion gear
+  equippedGear: { head?: string; body?: string; accessory?: string };
 }
 
 export interface ComputedState {

@@ -3,6 +3,7 @@ import { T, SHOP_ITEMS, UNLOCK_CONDITIONS } from '../constants';
 import { ViewHeader } from './ui';
 import { getCatStage } from '../utils/helpers';
 import { useGame } from '../context/GameContext';
+import GearSlots from './GearSlots';
 
 function getProgress(cond, state) {
   switch (cond.type) {
@@ -22,16 +23,16 @@ function getProgress(cond, state) {
 }
 
 export default function Shop() {
-  const { state, ui } = useGame();
+  const { state, actions, ui } = useGame();
   const { shopTab, setShopTab, setView } = ui;
 
   const items = SHOP_ITEMS[shopTab] || [];
   const unlocked = items.filter(it => (state.purchased || []).includes(it.id));
 
   const tabs = [
-    { id: 'hero', l: 'Held',   i: '\u{1F9B8}', col: '#6D28D9' },
-    { id: 'cat',  l: 'Katze',  i: '\u{1F431}', col: '#BE185D' },
-    { id: 'room', l: 'Zimmer', i: '\u{1F3E0}', col: '#B45309' },
+    { id: 'hero', l: 'Ausrüstung', i: '🎩', col: '#6D28D9' },
+    { id: 'cat',  l: 'Begleiter',  i: '🐱', col: '#BE185D' },
+    { id: 'room', l: 'Zimmer',     i: '🏠', col: '#B45309' },
   ];
 
   const activeCol = tabs.find(t => t.id === shopTab)?.col || T.primary;
@@ -91,6 +92,26 @@ export default function Shop() {
       }}>
         {unlocked.length} / {items.length} freigeschaltet
       </div>
+
+      {/* ── Gear Slots (Ausrüstung tab only) ── */}
+      {shopTab === 'hero' && (
+        <div style={{ padding: "0 4px", marginBottom: 16 }}>
+          <div style={{ textAlign: "center", marginBottom: 16 }}>
+            <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: T.primary }}>
+              Rüste deinen Begleiter aus!
+            </div>
+            <div style={{ fontSize: ".85rem", color: T.textSecondary, marginTop: 4 }}>
+              Schalte Gegenstände frei und rüste sie aus.
+            </div>
+          </div>
+          <GearSlots
+            equippedGear={state.equippedGear || {}}
+            purchased={state.purchased || []}
+            onEquip={(slot, id) => actions.equipGear(slot, id)}
+            onUnequip={(slot) => actions.unequipGear(slot)}
+          />
+        </div>
+      )}
 
       {/* ── Item cards ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

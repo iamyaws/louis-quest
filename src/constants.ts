@@ -291,6 +291,12 @@ export const UNLOCK_CONDITIONS: Record<string, UnlockCondition> = {
   rm_fish: { type: "weeklyMission", value: 8, label: "8 Wochen-Missionen", icon: "\u{1F3AF}" },
 };
 
+export const GEAR_SLOTS: Record<string, { label: string; icon: string; items: string[] }> = {
+  head: { label: "Kopf", icon: "\u{1F3A9}", items: ["c_crown", "h_headband", "h_sunglasses"] },
+  body: { label: "K\u00F6rper", icon: "\u{1F9E5}", items: ["h_cape_red", "c_scarf", "c_bowtie"] },
+  accessory: { label: "Accessoire", icon: "\u2728", items: ["h_wings", "c_collar"] },
+};
+
 // ═══ NEW: Default Belohnungen (parent can customize) ═══
 
 export const DEFAULT_BELOHNUNGEN: Belohnung[] = [

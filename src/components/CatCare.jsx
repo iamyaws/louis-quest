@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { T, CAT_STAGES } from '../constants';
+import { T, CAT_STAGES, COMPANION_TYPES } from '../constants';
 import { getCatStage, getCatStageProg } from '../utils/helpers';
 import { ViewHeader } from './ui';
 import Companion from './Companion';
@@ -17,6 +17,9 @@ export default function CatCare() {
   const [msg, setMsg] = useState(null);
 
   if (!state) return null;
+
+  const companionName = COMPANION_TYPES[state.companionType]?.name || "Katze";
+  const careTitle = `${companionName}npflege`;
 
   const stage = getCatStage(state.catEvo || 0);
   const prog = getCatStageProg(state.catEvo || 0);
@@ -48,7 +51,7 @@ export default function CatCare() {
 
   return (
     <div className="view-enter" style={{ minHeight: "100vh" }}>
-      <ViewHeader title={`${state.catName || "Katze"}`} icon={stageInfo.emoji} onBack={() => ui.setView("hub")} />
+      <ViewHeader title={careTitle} icon={stageInfo.emoji} onBack={() => ui.setView("hub")} />
 
       <div style={{ padding: "0 16px 100px" }}>
         {/* Evolution Card */}

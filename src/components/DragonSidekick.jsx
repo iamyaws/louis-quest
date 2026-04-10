@@ -439,7 +439,7 @@ function NguyenDragon({ c, mood, sc }) {
 /*  Main component                                                    */
 /* ================================================================== */
 
-export default function DragonSidekick({ variant, mood, size: s, stage }) {
+export default function DragonSidekick({ variant, mood, size: s, stage, gear }) {
   const c = (typeof DRAGON_VARIANTS !== 'undefined' && DRAGON_VARIANTS[variant]) || FALLBACK;
   const stg = stage || 0;
   const baseSize = s || 60;
@@ -466,6 +466,63 @@ export default function DragonSidekick({ variant, mood, size: s, stage }) {
         : stg >= 1 ? <LyDragon c={c} mood={mood} sc={sc} />
         : <BabyDragon c={c} mood={mood} sc={sc} />
       }
+
+      {/* ── Equipped Gear Overlays ── */}
+      {gear?.head === "c_crown" && (
+        <g>
+          <polygon points="46,22 50,12 54,20 58,8 62,20 66,12 70,22" fill="#FCD34D" stroke="#F59E0B" strokeWidth="1.5" />
+          <circle cx="58" cy="14" r="2.5" fill="#EF4444" />
+          <circle cx="50" cy="18" r="1.5" fill="#3B82F6" />
+          <circle cx="66" cy="18" r="1.5" fill="#34D399" />
+        </g>
+      )}
+      {gear?.head === "h_headband" && (
+        <g>
+          <path d="M36 46 Q60 38 84 46" stroke="#EF4444" strokeWidth="4" fill="none" strokeLinecap="round" />
+          <circle cx="78" cy="44" r="3" fill="#EF4444" />
+        </g>
+      )}
+      {gear?.head === "h_sunglasses" && (
+        <g>
+          <rect x="42" y="50" width="14" height="10" rx="3" fill="#1E293B" opacity="0.85" />
+          <rect x="62" y="50" width="14" height="10" rx="3" fill="#1E293B" opacity="0.85" />
+          <line x1="56" y1="54" x2="62" y2="54" stroke="#1E293B" strokeWidth="2" />
+          <line x1="42" y1="54" x2="36" y2="50" stroke="#1E293B" strokeWidth="1.5" />
+          <line x1="76" y1="54" x2="82" y2="50" stroke="#1E293B" strokeWidth="1.5" />
+        </g>
+      )}
+      {gear?.body === "h_cape_red" && (
+        <g>
+          <path d="M36 68 Q24 88 20 115 Q30 112 40 115 L46 85 Z" fill="#DC2626" opacity="0.8" />
+          <path d="M84 68 Q96 88 100 115 Q90 112 80 115 L74 85 Z" fill="#DC2626" opacity="0.8" />
+        </g>
+      )}
+      {gear?.body === "c_scarf" && (
+        <g>
+          <path d="M40 68 Q60 74 80 68" stroke="#3B82F6" strokeWidth="5" fill="none" strokeLinecap="round" />
+          <path d="M44 70 L40 88" stroke="#3B82F6" strokeWidth="4" fill="none" strokeLinecap="round" />
+          <path d="M42 88 L46 80" stroke="#2563EB" strokeWidth="3" fill="none" strokeLinecap="round" />
+        </g>
+      )}
+      {gear?.body === "c_bowtie" && (
+        <g>
+          <polygon points="50,68 58,64 58,72" fill="#EC4899" />
+          <polygon points="66,68 58,64 58,72" fill="#EC4899" />
+          <circle cx="58" cy="68" r="3" fill="#DB2777" />
+        </g>
+      )}
+      {gear?.accessory === "h_wings" && (
+        <g>
+          <path d="M28 78 Q8 58 2 38 Q12 54 22 66 Q10 48 6 32 Q18 52 28 68" fill="#A78BFA" opacity="0.7" stroke="#7C3AED" strokeWidth="1" />
+          <path d="M92 78 Q112 58 118 38 Q108 54 98 66 Q110 48 114 32 Q102 52 92 68" fill="#A78BFA" opacity="0.7" stroke="#7C3AED" strokeWidth="1" />
+        </g>
+      )}
+      {gear?.accessory === "c_collar" && (
+        <g>
+          <ellipse cx="60" cy="70" rx="20" ry="4" fill="none" stroke="#F59E0B" strokeWidth="3" />
+          <circle cx="60" cy="74" r="3" fill="#FCD34D" stroke="#F59E0B" strokeWidth="1" />
+        </g>
+      )}
 
       {/* Shared overlays */}
       <Particles stage={stg} c={c} />

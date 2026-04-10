@@ -1,30 +1,13 @@
 import React from 'react';
-import { T, WEEKLY_MISSIONS, CAT_STAGES, BOSSES, HERO_TIPS, MOOD_EMOJIS } from '../constants';
-import { getTimeLabel, getCatStage, getCatMood } from '../utils/helpers';
-import HeroSprite from './HeroSprite';
-import Companion from './Companion';
-import Egg from './Egg';
+import { T, WEEKLY_MISSIONS, BOSSES, HERO_TIPS, MOOD_EMOJIS } from '../constants';
+import { getTimeLabel } from '../utils/helpers';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 import LoginBonus from './LoginBonus';
-
-function HeroPortrait({ shape, color, eyes, hair, level, size, skinTone, hairColor }) {
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: "50%", overflow: "hidden",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      background: `radial-gradient(circle at 50% 60%, ${color}30 0%, transparent 70%)`,
-    }}>
-      <div style={{ transform: "scale(1.6) translateY(18%)" }}>
-        <HeroSprite shape={shape} color={color} eyes={eyes} hair={hair} size={size * 0.7} level={level} skinTone={skinTone} hairColor={hairColor} />
-      </div>
-    </div>
-  );
-}
+import ProfileCard from './ProfileCard';
 
 const GERMAN_DAYS_SHORT = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
-const GERMAN_MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
 export default function Hub() {
   const { state, computed, actions, ui } = useGame();
@@ -70,91 +53,15 @@ export default function Hub() {
       <div style={{ flex: 1, padding: "0 16px 20px" }}>
 
         {/* --- 2. Profile Card --- */}
-        <div className="game-card" style={{ padding: 14, marginBottom: 12 }}>
-          <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-            {/* LEFT: Portrait + Cat + Name + Level */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, gap: 4 }}>
-              <div style={{ position: "relative", marginBottom: 4 }}>
-                <div style={{
-                  width: 96, height: 96, borderRadius: "50%", padding: 3,
-                  background: `linear-gradient(135deg, ${state.hero.color}, ${state.hero.color}88, rgba(255,255,255,0.3))`,
-                  boxShadow: `0 4px 16px ${state.hero.color}30`,
-                }}>
-                  <HeroPortrait shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} level={level} size={90} skinTone={state.hero.skinTone} hairColor={state.hero.hairColor} />
-                </div>
-                <div style={{ position: "absolute", bottom: -6, right: -18, animation: "catIdle 4s ease-in-out infinite" }}>
-                  {state.eggHatched ? (
-                    <Companion
-                      type={state.companionType}
-                      variant={state.catVariant}
-                      mood={(() => { const cm = getCatMood(state.catHunger, state.catHappy, state.catEnergy); return cm === "sleepy" ? "sleepy" : mood; })()}
-                      size={36}
-                      stage={getCatStage(state.catEvo || 0)}
-                    />
-                  ) : (
-                    <Egg type={state.eggType || "dragon"} progress={state.eggProgress || 0} size={36} />
-                  )}
-                </div>
-              </div>
-              <div style={{ textAlign: "center", maxWidth: 100 }}>
-                <div style={{
-                  fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700,
-                  color: T.textPrimary, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                }}>
-                  {state.hero.name}
-                </div>
-                <div style={{
-                  background: "linear-gradient(135deg, #A78BFA, #7C3AED)", borderRadius: 50,
-                  padding: "2px 10px", fontFamily: "'Fredoka',sans-serif",
-                  fontSize: ".85rem", fontWeight: 700, color: "white",
-                  display: "inline-block", marginTop: 2,
-                }}>
-                  LVL {level}
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT: grid — HP (full width), Weather + Date */}
-            <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {/* HP — full width */}
-              <div style={{
-                gridColumn: "1 / -1",
-                background: "#FEF3C720", borderRadius: 14, padding: "10px 10px",
-                display: "flex", alignItems: "center", gap: 6,
-              }}>
-                <span style={{ fontSize: "1.4rem" }}>{"\u2B50"}</span>
-                <div>
-                  <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "#D97706" }}>
-                    {(state.coins || 0).toLocaleString("de-DE")}
-                  </div>
-                  <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textLight }}>HP</div>
-                </div>
-              </div>
-              {/* Weather — min/max */}
-              <div style={{
-                background: "#E0F2FE40", borderRadius: 14, padding: "8px 10px",
-                display: "flex", alignItems: "center", gap: 6,
-              }}>
-                <span style={{ fontSize: "1.3rem" }}>{wInfo?.emoji || "\u2601\uFE0F"}</span>
-                <div>
-                  <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: "#0284C7" }}>
-                    {todayDaily ? `${todayDaily.tempMin}\u00B0 / ${todayDaily.tempMax}\u00B0` : weather?.current ? `${weather.current.temp}\u00B0` : "\u2022\u2022\u2022"}
-                  </div>
-                </div>
-              </div>
-              {/* Date — Do. 9. April */}
-              <div style={{
-                background: "#EDE9FE40", borderRadius: 14, padding: "8px 10px",
-                display: "flex", alignItems: "center", gap: 6,
-              }}>
-                <span style={{ fontSize: "1.2rem" }}>{"\uD83D\uDCC5"}</span>
-                <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: "#6366F1" }}>
-                  {dayKey}. {today.getDate()}. {GERMAN_MONTHS[today.getMonth()]}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ProfileCard
+          state={state}
+          level={level}
+          mood={mood}
+          weather={weather}
+          wInfo={wInfo}
+          todayDaily={todayDaily}
+          actions={actions}
+        />
 
         {/* --- 2b. Daily Welcome --- */}
         <LoginBonus
