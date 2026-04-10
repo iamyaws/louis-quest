@@ -1,16 +1,13 @@
 import React from 'react';
-import { T, CAT_STAGES } from '../constants';
-
-// Stage thresholds from CAT_STAGES used for all companion types
-const STAGE_LABELS = CAT_STAGES.map(s => s.name);
-const STAGE_EMOJIS = CAT_STAGES.map(s => s.emoji);
+import { T, CAT_STAGES, COMPANION_STAGES } from '../constants';
 
 export default function EvolutionTracker({ catEvo = 0, companionType = "cat", currentStage = 0 }) {
-  const totalStages = CAT_STAGES.length;
+  const stages = COMPANION_STAGES[companionType] || COMPANION_STAGES.cat || CAT_STAGES;
+  const totalStages = stages.length;
 
   // Compute progress within current stage toward next
-  const curThreshold = CAT_STAGES[currentStage]?.threshold || 0;
-  const nextThreshold = CAT_STAGES[currentStage + 1]?.threshold;
+  const curThreshold = stages[currentStage]?.threshold || 0;
+  const nextThreshold = stages[currentStage + 1]?.threshold;
   const isMaxStage = currentStage >= totalStages - 1;
   const progressInStage = nextThreshold
     ? Math.min(1, (catEvo - curThreshold) / (nextThreshold - curThreshold))
@@ -18,8 +15,8 @@ export default function EvolutionTracker({ catEvo = 0, companionType = "cat", cu
   const curEpInStage = catEvo - curThreshold;
   const neededEp = nextThreshold ? nextThreshold - curThreshold : 0;
 
-  const currentName = STAGE_LABELS[currentStage] || "???";
-  const nextName = STAGE_LABELS[currentStage + 1];
+  const currentName = stages[currentStage]?.name || "???";
+  const nextName = stages[currentStage + 1]?.name;
 
   return (
     <div className="game-card" style={{ padding: 16, marginBottom: 14 }}>
@@ -88,7 +85,7 @@ export default function EvolutionTracker({ catEvo = 0, companionType = "cat", cu
                   transition: "all .3s ease",
                   animation: isCurrent ? "pulseGlow 2s ease-in-out infinite" : "none",
                 }}>
-                  {isCompleted ? "\u2713" : isCurrent ? STAGE_EMOJIS[i] : "\uD83D\uDD12"}
+                  {isCompleted ? "\u2713" : isCurrent ? stages[i]?.emoji : "\uD83D\uDD12"}
                 </div>
               </div>
             </React.Fragment>
@@ -113,7 +110,7 @@ export default function EvolutionTracker({ catEvo = 0, companionType = "cat", cu
               color: isCompleted ? "#D97706" : isCurrent ? T.primary : T.textLight,
               lineHeight: 1.2, minWidth: 0,
             }}>
-              {STAGE_LABELS[i]}
+              {stages[i]?.name}
               {isCurrent && (
                 <div style={{
                   fontSize: ".6rem", fontWeight: 600,

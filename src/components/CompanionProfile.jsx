@@ -100,7 +100,7 @@ export default function CompanionProfile() {
           ))}
         </div>
         <div style={{ marginTop: 12, padding: "10px 14px", background: "linear-gradient(135deg, rgba(109,40,217,0.06), rgba(167,139,250,0.04))", borderRadius: 14, border: "1.5px solid rgba(109,40,217,0.1)", fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 600, color: T.primary, fontStyle: "italic", textAlign: "center" }}>
-          \"{facts.motto}\"
+          {"\u201E"}{facts.motto}{"\u201C"}
         </div>
       </div>
 
@@ -122,7 +122,7 @@ export default function CompanionProfile() {
       </div>
 
       <div className="game-card" style={{ padding: 16, marginBottom: 14 }}>
-        <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".9rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 12 }}>Ausr\u00fcstung</div>
+        <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".9rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 12 }}>Ausrüstung</div>
         <GearSlots equippedGear={state.equippedGear || {}} purchased={state.purchased || []} onEquip={(slot, id) => actions.equipGear(slot, id)} onUnequip={(slot) => actions.unequipGear(slot)} />
       </div>
 

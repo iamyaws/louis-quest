@@ -339,16 +339,15 @@ export const HERO_TIPS: HeroTip[] = [
 // ═══ NEW: Unlock Conditions (passive item unlocks) ═══
 
 export const UNLOCK_CONDITIONS: Record<string, UnlockCondition> = {
-  // Hero items
-  h_sunglasses: { type: "streak", value: 3, label: "3-Tage Streak", icon: "\u{1F525}" },
+  // Gear items — calibrated so Louis gets one every ~1-2 days early on
+  c_bowtie: { type: "tasks", value: 3, label: "3 Aufgaben", icon: "\u2705" },
+  h_headband: { type: "tasks", value: 8, label: "8 Aufgaben", icon: "\u2705" },
+  h_sunglasses: { type: "streak", value: 2, label: "2-Tage Streak", icon: "\u{1F525}" },
   h_cape_red: { type: "boss", value: 1, label: "1 Boss besiegt", icon: "\u2694\uFE0F" },
-  h_headband: { type: "tasks", value: 25, label: "25 Aufgaben", icon: "\u2705" },
-  h_wings: { type: "streak", value: 30, label: "30-Tage Streak", icon: "\u{1F525}" },
-  // Cat items
-  c_bowtie: { type: "catStage", value: 1, label: "Katze: Jungkatze", icon: "\u{1F431}" },
-  c_collar: { type: "catStage", value: 2, label: "Katze: Katze", icon: "\u{1F638}" },
-  c_crown: { type: "catStage", value: 4, label: "Katze: Legend\u00E4r", icon: "\u{1F451}" },
-  c_scarf: { type: "weeklyMission", value: 3, label: "3 Wochen-Missionen", icon: "\u{1F3AF}" },
+  c_collar: { type: "tasks", value: 15, label: "15 Aufgaben", icon: "\u2705" },
+  c_scarf: { type: "streak", value: 5, label: "5-Tage Streak", icon: "\u{1F525}" },
+  c_crown: { type: "tasks", value: 40, label: "40 Aufgaben", icon: "\u2705" },
+  h_wings: { type: "streak", value: 14, label: "14-Tage Streak", icon: "\u{1F525}" },
   // Room items
   rm_poster: { type: "tasks", value: 10, label: "10 Aufgaben", icon: "\u2705" },
   rm_plant: { type: "streak", value: 5, label: "5-Tage Streak", icon: "\u{1F525}" },
@@ -449,16 +448,16 @@ export const HAIR_COLORS = ["#5B3A1A", "#1E1B4B", "#F59E0B", "#DC2626", "#3B82F6
 
 export const WALL_COLORS = [
   { id: "cream", color: "#F5EDE3", name: "Creme", unlock: 0 },
-  { id: "sky", color: "#DBEAFE", name: "Himmelblau", unlock: 2 },
-  { id: "mint", color: "#D1FAE5", name: "Minze", unlock: 3 },
-  { id: "sunset", color: "#FECACA", name: "Sonnenuntergang", unlock: 4 },
-  { id: "lavender", color: "#EDE9FE", name: "Lavendel", unlock: 5 },
+  { id: "sky", color: "#DBEAFE", name: "Himmelblau", unlock: 0 },
+  { id: "mint", color: "#D1FAE5", name: "Minze", unlock: 0 },
+  { id: "sunset", color: "#FECACA", name: "Sonnenuntergang", unlock: 0 },
+  { id: "lavender", color: "#EDE9FE", name: "Lavendel", unlock: 0 },
 ] as const;
 
 export const FLOOR_TYPES = [
   { id: "wood", name: "Holz", color1: "#D4A06A", color2: "#C49060", unlock: 0 },
-  { id: "carpet", name: "Teppich", color1: "#8B5CF6", color2: "#7C3AED", unlock: 3 },
-  { id: "stone", name: "Stein", color1: "#94A3B8", color2: "#64748B", unlock: 5 },
+  { id: "carpet", name: "Teppich", color1: "#8B5CF6", color2: "#7C3AED", unlock: 0 },
+  { id: "stone", name: "Stein", color1: "#94A3B8", color2: "#64748B", unlock: 0 },
 ] as const;
 
 export const EGG_TYPES: Record<string, { col1: string; col2: string; pattern: string; name: string }> = {

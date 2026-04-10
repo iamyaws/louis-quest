@@ -76,7 +76,7 @@ export default function Room() {
           background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 50,
           padding: "10px 20px", cursor: "pointer", fontWeight: 800, fontSize: ".85rem",
           backdropFilter: "blur(8px)", minHeight: 48, color: "white",
-        }}>{"\u2190"} Zur\u00FCck</button>
+        }}>{"\u2190 Zur\u00FCck"}</button>
         <div style={{
           fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700,
           color: "white", textShadow: "0 2px 8px rgba(0,0,0,0.3)",

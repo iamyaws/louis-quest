@@ -158,7 +158,7 @@ export default function QuestBoard() {
               Alle Aufgaben geschafft!
             </div>
             <div style={{ fontSize: ".95rem", color: T.textSecondary, marginTop: 4 }}>
-              Du bist ein wahrer Held! Genie\u00DF den Rest des Tages.
+              {"Du bist ein wahrer Held! Genie\u00DF den Rest des Tages."}
             </div>
           </div>
         )}

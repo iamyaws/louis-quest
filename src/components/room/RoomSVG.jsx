@@ -97,7 +97,7 @@ export default function RoomSVG({
   const cPos = companionSpots[companionSpot] || companionSpots.floor;
 
   return (
-    <div style={{ position: "relative", margin: "0 auto", maxWidth: 460, width: "100%", padding: "0 4px" }}>
+    <div style={{ position: "relative", margin: "0 auto", width: "100%", padding: "0 4px" }}>
       <svg viewBox="0 0 400 480" style={{ width: "100%", display: "block" }}>
         <defs>
           <linearGradient id="floorGrad" x1="0" y1="0" x2="1" y2="1">
