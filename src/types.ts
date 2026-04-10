@@ -134,9 +134,10 @@ export interface Belohnung {
   emoji: string;
   cost: number;
   active: boolean;
-  availableAfter?: string;      // "16:00" — locked before this time on school days
-  availableAfterFree?: string;  // "10:00" — looser lock on weekends/vacations
-  weekendCost?: number;         // discounted cost on Sat/Sun/vacation days
+  currency?: 'hp' | 'eggs';  // which currency this costs (default: 'hp')
+  availableAfter?: string;
+  availableAfterFree?: string;
+  weekendCost?: number;
 }
 
 // ── New: Spezial-Mission ──
@@ -169,6 +170,7 @@ export interface GameState {
   catName: string;
   xp: number;
   coins: number;
+  drachenEier: number;  // dragon eggs — scarce media/screen time currency
   quests: Quest[];
   rewards: Reward[];
   acc: string[];

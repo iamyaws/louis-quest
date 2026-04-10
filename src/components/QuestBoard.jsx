@@ -245,6 +245,7 @@ export default function QuestBoard() {
                             })()}
                             <div style={{ display: "flex", gap: 8, marginTop: 3, alignItems: "center" }}>
                               <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{q.xp} {"\u2B50"}</span>
+                              <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#92400E" }}>+1 {"\u{1F95A}"}</span>
                               <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.accentDark }}>+{q.minutes} Min</span>
                               {q.streak > 0 && <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#F97316" }}>{"\u{1F525}"}{q.streak}</span>}
                               {/* Repeatable counter */}
@@ -335,6 +336,7 @@ export default function QuestBoard() {
                         </div>
                         <div style={{ display: "flex", gap: 8, marginTop: 3, alignItems: "center" }}>
                           <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#D97706" }}>+{q.xp} {"\u2B50"}</span>
+                          <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#92400E" }}>+1 {"\u{1F95A}"}</span>
                           <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.accentDark }}>+{q.minutes} Min</span>
                         </div>
                       </div>

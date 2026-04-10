@@ -373,16 +373,21 @@ export const GEAR_SLOTS: Record<string, { label: string; icon: string; items: st
 // ═══ NEW: Default Belohnungen (parent can customize) ═══
 
 export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
-  // Mini-games (cheap, fun, anytime)
-  { id: "bel_memory", name: "Memory-Spiel", emoji: "\u{1F0CF}", cost: 10, active: true },
-  { id: "bel_wheel", name: "Gl\u00FCcksrad drehen", emoji: "\u{1F3B0}", cost: 15, active: true },
-  // Real-world rewards
-  { id: "bel_audio", name: "H\u00F6rspiel (25-30 Min)", emoji: "\u{1F3A7}", cost: 100, active: true, availableAfter: "19:00", availableAfterFree: "10:00", weekendCost: 60 },
-  { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 120, active: true, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 80 },
-  { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 150, active: true, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 100 },
-  { id: "bel_candy", name: "S\u00FC\u00DFigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 30, active: true },
-  { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 200, active: true, availableAfter: "18:00", availableAfterFree: "14:00", weekendCost: 150 },
-  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 300, active: true },
+  // Mini-games (HP, 1 each, anytime)
+  { id: "bel_memory", name: "Memory-Spiel", emoji: "\u{1F0CF}", cost: 1, active: true, currency: "hp" },
+  { id: "bel_wheel", name: "Gl\u00FCcksrad drehen", emoji: "\u{1F3B0}", cost: 1, active: true, currency: "hp" },
+  // Media rewards (Drachen-Eier — scarce, ~60 min max on weekends)
+  // Weekday: ~13 eggs/day → audio(5) or game(6) but not both = ~20-30 min
+  // Weekend: saved eggs → audio(3)+game(4)+TV(5) = ~60 min for 12 eggs
+  { id: "bel_audio", name: "H\u00F6rspiel (25 Min)", emoji: "\u{1F3A7}", cost: 5, active: true, currency: "eggs", availableAfter: "19:00", availableAfterFree: "10:00", weekendCost: 3 },
+  { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 6, active: true, currency: "eggs", availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 4 },
+  { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 8, active: true, currency: "eggs", availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 5 },
+  { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 12, active: true, currency: "eggs", availableAfter: "18:00", availableAfterFree: "14:00", weekendCost: 8 },
+  // Fun rewards (HP — generous family currency)
+  { id: "bel_candy", name: "S\u00FC\u00DFigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 30, active: true, currency: "hp" },
+  { id: "bel_vote", name: "Lieblingsessen w\u00E4hlen", emoji: "\u{1F355}", cost: 50, active: true, currency: "hp" },
+  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 200, active: true, currency: "hp" },
+  { id: "bel_surprise", name: "\u00DCberraschung", emoji: "\u{1F381}", cost: 100, active: true, currency: "hp" },
 ];
 
 // ═══ Bavaria School Vacations ═══

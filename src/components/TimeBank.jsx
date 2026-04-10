@@ -114,31 +114,60 @@ export default function TimeBank() {
       />
 
       {/* ── Balance display ── */}
-      <div className="game-card" style={{
-        padding: "24px 28px",
-        textAlign: "center",
-        marginBottom: 24,
-        background: `linear-gradient(135deg, ${T.accent}18, ${T.accent}08)`,
-        borderColor: `${T.accent}40`,
-      }}>
-        <div style={{ fontSize: "2.4rem", marginBottom: 4 }}>{"\u2B50"}</div>
-        <div style={{
-          fontFamily: "'Fredoka', sans-serif",
-          fontSize: "2.8rem",
-          fontWeight: 700,
-          color: T.accentDark,
-          lineHeight: 1.1,
+      <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
+        <div className="game-card" style={{
+          flex: 1,
+          padding: "20px 16px",
+          textAlign: "center",
+          background: `linear-gradient(135deg, ${T.accent}18, ${T.accent}08)`,
+          borderColor: `${T.accent}40`,
         }}>
-          {coins}
+          <div style={{ fontSize: "2rem", marginBottom: 4 }}>{"\u2B50"}</div>
+          <div style={{
+            fontFamily: "'Fredoka', sans-serif",
+            fontSize: "2.2rem",
+            fontWeight: 700,
+            color: T.accentDark,
+            lineHeight: 1.1,
+          }}>
+            {coins}
+          </div>
+          <div style={{
+            fontSize: ".85rem",
+            color: T.textSecondary,
+            fontWeight: 700,
+            marginTop: 4,
+            letterSpacing: ".02em",
+          }}>
+            Heldenpunkte
+          </div>
         </div>
-        <div style={{
-          fontSize: ".95rem",
-          color: T.textSecondary,
-          fontWeight: 700,
-          marginTop: 4,
-          letterSpacing: ".02em",
+        <div className="game-card" style={{
+          flex: 1,
+          padding: "20px 16px",
+          textAlign: "center",
+          background: "linear-gradient(135deg, rgba(146,64,14,0.08), rgba(146,64,14,0.03))",
+          borderColor: "rgba(146,64,14,0.2)",
         }}>
-          Heldenpunkte
+          <div style={{ fontSize: "2rem", marginBottom: 4 }}>{"\u{1F95A}"}</div>
+          <div style={{
+            fontFamily: "'Fredoka', sans-serif",
+            fontSize: "2.2rem",
+            fontWeight: 700,
+            color: "#92400E",
+            lineHeight: 1.1,
+          }}>
+            {state.drachenEier || 0}
+          </div>
+          <div style={{
+            fontSize: ".85rem",
+            color: T.textSecondary,
+            fontWeight: 700,
+            marginTop: 4,
+            letterSpacing: ".02em",
+          }}>
+            Drachen-Eier
+          </div>
         </div>
       </div>
 
@@ -360,7 +389,9 @@ export default function TimeBank() {
           {activeRewards.map(bel => {
             const effectiveCost = (isFreeDay && bel.weekendCost) ? bel.weekendCost : bel.cost;
             const available = isAvailableNow(bel);
-            const canAfford = coins >= effectiveCost;
+            const currencyEmoji = bel.currency === "eggs" ? "\u{1F95A}" : "\u2B50";
+            const balance = bel.currency === "eggs" ? (state.drachenEier || 0) : coins;
+            const canAfford = balance >= effectiveCost;
             const canRedeem = canAfford && available;
             const isConfirming = confirmRedeem === bel.id;
 
@@ -399,17 +430,17 @@ export default function TimeBank() {
                   </div>
                   <div style={{
                     fontSize: ".85rem",
-                    color: canAfford ? T.accentDark : T.textLight,
+                    color: canAfford ? (bel.currency === "eggs" ? "#92400E" : T.accentDark) : T.textLight,
                     fontWeight: 700,
                   }}>
-                    {"\u2B50"}{" "}
+                    {currencyEmoji}{" "}
                     {isFreeDay && bel.weekendCost && bel.weekendCost < bel.cost ? (
                       <>
                         <span style={{ textDecoration: "line-through", opacity: 0.5, marginRight: 4 }}>{bel.cost}</span>
-                        <span style={{ color: "#DC2626", fontWeight: 800 }}>{bel.weekendCost} HP</span>
+                        <span style={{ color: "#DC2626", fontWeight: 800 }}>{bel.weekendCost} {bel.currency === "eggs" ? "Eier" : "HP"}</span>
                       </>
                     ) : (
-                      <span>{effectiveCost} HP</span>
+                      <span>{effectiveCost} {bel.currency === "eggs" ? "Eier" : "HP"}</span>
                     )}
                     {!available && " \u{1F512}"}
                   </div>

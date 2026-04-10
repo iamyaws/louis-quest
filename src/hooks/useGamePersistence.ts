@@ -191,13 +191,12 @@ function applyDefaults(p: GameState): void {
   if (p.dailyVitaminD === undefined) p.dailyVitaminD = false;
   if (p.dailyBrother === undefined) p.dailyBrother = false;
   if (!p.belohnungen) p.belohnungen = DEFAULT_BELOHNUNGEN;
-  // Inject mini-games if missing from existing user's rewards
-  if (p.belohnungen && !p.belohnungen.some((b: any) => b.id === "bel_memory")) {
-    p.belohnungen.unshift(
-      { id: "bel_memory", name: "Memory-Spiel", emoji: "\u{1F0CF}", cost: 10, active: true },
-      { id: "bel_wheel", name: "Gl\u00FCcksrad drehen", emoji: "\u{1F3B0}", cost: 15, active: true },
-    );
+  // Migration: replace old belohnungen with new two-currency version
+  if (p.belohnungen && !p.belohnungen.some((b: any) => b.currency)) {
+    p.belohnungen = DEFAULT_BELOHNUNGEN;
   }
+  // Dragon eggs currency
+  if (p.drachenEier === undefined) p.drachenEier = 0;
   if (!p.belohnungenLog) p.belohnungenLog = [];
   if (!p.specialMissions) p.specialMissions = [];
   // Add Liam's birthday gift mission if not already there and date hasn't passed
@@ -243,7 +242,7 @@ interface OnboardData {
 export function createInitialState({ hero, catVariant, catName, startXP, startCoins, companionType, eggType }: OnboardData): GameState {
   const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
   return {
-    hero, catVariant, catName, xp: startXP || 0, coins: startCoins || 0,
+    hero, catVariant, catName, xp: startXP || 0, coins: startCoins || 0, drachenEier: 0,
     quests: buildDay(false), rewards: REWARDS, acc: [], sd: 0,
     lastDate: new Date().toDateString(), dt: 0, hist: [], vacMode: false,
     sm: {}, roomItems: [], purchased: [], moodAM: null, moodPM: null,

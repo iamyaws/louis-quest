@@ -36,11 +36,18 @@ export default function ProfileCard({ state, level, mood, weather, wInfo, todayD
           <div style={{ background: "linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))", border: "1.5px solid rgba(245,158,11,0.15)", borderRadius: 50, padding: "2px 10px", fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: "#B45309", display: "inline-flex", alignItems: "center", gap: 4 }}>{stageInfo?.emoji} {stageInfo?.name}</div>
         </div>
         <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-          <div style={{ gridColumn: "1 / -1", background: "#FEF3C720", borderRadius: 14, padding: "10px 10px", display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ background: "#FEF3C720", borderRadius: 14, padding: "10px 10px", display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: "1.4rem" }}>{"\u2B50"}</span>
             <div>
               <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "#D97706" }}>{(state.coins || 0).toLocaleString("de-DE")}</div>
               <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textLight }}>HP</div>
+            </div>
+          </div>
+          <div style={{ background: "#FEF3C720", borderRadius: 14, padding: "10px 10px", display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: "1.4rem" }}>{"\u{1F95A}"}</span>
+            <div>
+              <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "#92400E" }}>{(state.drachenEier || 0).toLocaleString("de-DE")}</div>
+              <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textLight }}>Eier</div>
             </div>
           </div>
           <div style={{ background: "#E0F2FE40", borderRadius: 14, padding: "8px 10px", display: "flex", alignItems: "center", gap: 6 }}>

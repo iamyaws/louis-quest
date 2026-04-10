@@ -198,10 +198,13 @@ export default function useGameActions(
         : null;
 
       const totalHP = earned + bonusHP + wmBonusHP + bossRewardHP;
+      // Dragon eggs: 1 per task, +3 bonus for all-done, boss gives extra
+      const eggsEarned = 1 + (all ? 3 : 0) + (bossRewardHP > 0 ? 5 : 0);
       const result: GameState = {
         ...prev, quests: nq2,
         xp: prev.xp + totalHP,
         coins: prev.coins + totalHP,
+        drachenEier: (prev.drachenEier || 0) + eggsEarned,
         dt: prev.dt + q.minutes + bonusMin, sd: newSD,
         hist: [...prev.hist, { id, d: Date.now() }], sm, bestStreak: newBest,
         chestMilestone: chestEarned ? newSD : prev.chestMilestone,
@@ -418,14 +421,17 @@ export default function useGameActions(
       }
       // Weekend/vacation pricing
       const effectiveCost = (isFreeDay && bel.weekendCost) ? bel.weekendCost : bel.cost;
-      if (prev.coins < effectiveCost) return prev;
+      const isEggs = bel.currency === "eggs";
+      const balance = isEggs ? (prev.drachenEier || 0) : prev.coins;
+      if (balance < effectiveCost) return prev;
       SFX.play("buy");
       // Launch mini-games
       if (belohnungId === "bel_memory") setTimeout(() => setShowMemory(true), 300);
       if (belohnungId === "bel_wheel") setTimeout(() => setShowWheel(true), 300);
       return {
         ...prev,
-        coins: prev.coins - effectiveCost,
+        coins: isEggs ? prev.coins : prev.coins - effectiveCost,
+        drachenEier: isEggs ? (prev.drachenEier || 0) - effectiveCost : (prev.drachenEier || 0),
         belohnungenLog: [...(prev.belohnungenLog || []), { id: belohnungId, date: new Date().toISOString() }],
       };
     });
