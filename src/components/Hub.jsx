@@ -156,14 +156,11 @@ export default function Hub() {
           </div>
         </div>
 
-        {/* --- 2b. Login Bonus Card --- */}
-        {!state.loginBonusClaimed && (
-          <LoginBonus
-            day={state.loginBonusDay || 0}
-            streak={state.loginBonusStreak || 0}
-            onCollect={() => actions.collectLoginBonus()}
-          />
-        )}
+        {/* --- 2b. Daily Welcome --- */}
+        <LoginBonus
+          claimed={state.loginBonusClaimed}
+          onCollect={() => actions.collectLoginBonus()}
+        />
 
         {/* --- 3. Helden-Tipp Card --- */}
         {tip && (

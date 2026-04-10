@@ -445,17 +445,12 @@ export default function useGameActions(
   const collectLoginBonus = useCallback(() => {
     setState(prev => {
       if (!prev || prev.loginBonusClaimed) return prev;
-      const rewards = [10, 15, 20, 25, 30, 40, 75];
-      const day = prev.loginBonusDay || 0;
-      const amount = rewards[day] || 10;
-      SFX.play("celeb");
+      SFX.play("pop");
       return {
         ...prev,
         loginBonusClaimed: true,
-        loginBonusStreak: (prev.loginBonusStreak || 0) + 1,
-        loginBonusDay: (day + 1) % 7,
-        xp: prev.xp + amount,
-        coins: prev.coins + amount,
+        xp: prev.xp + 5,
+        coins: prev.coins + 5,
       };
     });
   }, [setState]);
