@@ -191,6 +191,7 @@ function applyDefaults(p: GameState): void {
   if (p.loginBonusClaimed === undefined) p.loginBonusClaimed = false;
   if (p.loginBonusStreak === undefined) p.loginBonusStreak = 0;
   // Companion + egg migration
+  if (!p.questChains) p.questChains = [];
   if (!p.companionType) p.companionType = "cat";
   if (p.eggType === undefined) p.eggType = null;
   if (p.eggProgress === undefined) p.eggProgress = 0;
@@ -243,5 +244,7 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     loginBonusDay: 0, loginBonusClaimed: false, loginBonusStreak: 0,
     // Boss defeat reward overlay
     bossDefeatReward: null,
+    // Quest chains
+    questChains: [],
   };
 }

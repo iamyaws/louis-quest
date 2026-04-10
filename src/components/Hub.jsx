@@ -382,6 +382,136 @@ export default function Hub() {
           </button>
         ))}
 
+        {/* --- 7b. Quest Chains --- */}
+        {(state.questChains || []).map(chain => {
+          if (chain.completed) {
+            return (
+              <div key={chain.id} className="game-card" style={{
+                padding: 14, marginBottom: 12,
+                background: "linear-gradient(135deg, rgba(52,211,153,0.08), rgba(52,211,153,0.03))",
+                borderColor: "rgba(52,211,153,0.3)",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: "1.4rem" }}>{chain.emoji}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800,
+                      color: "#059669", textTransform: "uppercase",
+                    }}>
+                      {"\uD83C\uDF89"} Geschafft!
+                    </div>
+                    <div style={{
+                      fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700,
+                      color: T.textPrimary,
+                    }}>
+                      {chain.name}
+                    </div>
+                  </div>
+                  <div style={{
+                    background: "linear-gradient(135deg, #34D399, #6EE7B7)", borderRadius: 50,
+                    padding: "4px 12px", fontFamily: "'Fredoka',sans-serif",
+                    fontSize: ".85rem", fontWeight: 700, color: "white",
+                  }}>
+                    +{chain.hp} {"\u2B50"}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+          const doneSteps = chain.steps.filter(s => s.done).length;
+          const totalSteps = chain.steps.length;
+          const progressPct = totalSteps > 0 ? (doneSteps / totalSteps) * 100 : 0;
+          const firstUndoneIdx = chain.steps.findIndex(s => !s.done);
+          return (
+            <div key={chain.id} className="game-card" style={{
+              padding: 16, marginBottom: 12,
+              background: "linear-gradient(135deg, rgba(109,40,217,0.04), rgba(252,211,77,0.04))",
+              borderColor: "rgba(109,40,217,0.15)",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                <span style={{ fontSize: "1.4rem" }}>{chain.emoji}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800,
+                    color: T.primary, textTransform: "uppercase",
+                  }}>
+                    Abenteuer-Kette
+                  </div>
+                  <div style={{
+                    fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700,
+                    color: T.textPrimary,
+                  }}>
+                    {chain.name}
+                  </div>
+                </div>
+                <div style={{
+                  background: "linear-gradient(135deg, #FCD34D, #F59E0B)", borderRadius: 50,
+                  padding: "4px 12px", fontFamily: "'Fredoka',sans-serif",
+                  fontSize: ".85rem", fontWeight: 700, color: "white",
+                }}>
+                  +{chain.hp} {"\u2B50"}
+                </div>
+              </div>
+              {/* Progress bar */}
+              <div style={{
+                background: "rgba(109,40,217,0.08)", borderRadius: 50, height: 8,
+                overflow: "hidden", marginBottom: 12,
+              }}>
+                <div style={{
+                  height: "100%", borderRadius: 50, width: `${progressPct}%`,
+                  background: "linear-gradient(90deg, #A78BFA, #7C3AED)",
+                  transition: "width .4s ease",
+                }} />
+              </div>
+              <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, marginBottom: 8 }}>
+                {doneSteps}/{totalSteps} Schritte
+              </div>
+              {/* Steps list */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {chain.steps.map((step, idx) => {
+                  const isCurrent = idx === firstUndoneIdx;
+                  return (
+                    <button
+                      key={step.id}
+                      className={!step.done && isCurrent ? "btn-tap" : ""}
+                      onClick={() => !step.done && actions.completeChainStep(chain.id, step.id)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        background: step.done ? "rgba(52,211,153,0.06)" : isCurrent ? "rgba(252,211,77,0.1)" : "rgba(0,0,0,0.02)",
+                        border: `2px solid ${step.done ? "rgba(52,211,153,0.2)" : isCurrent ? "rgba(252,211,77,0.4)" : "rgba(0,0,0,0.05)"}`,
+                        borderRadius: 14, padding: "10px 12px",
+                        cursor: step.done ? "default" : "pointer",
+                        width: "100%", textAlign: "left",
+                        opacity: step.done ? 0.7 : !isCurrent ? 0.5 : 1,
+                        transition: "all .15s",
+                        boxShadow: isCurrent ? "0 2px 8px rgba(252,211,77,0.2)" : "none",
+                        minHeight: 44,
+                      }}
+                    >
+                      <div style={{
+                        width: 24, height: 24, borderRadius: "50%",
+                        background: step.done ? "#34D399" : isCurrent ? "#FCD34D" : "#E5E7EB",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: ".75rem", fontWeight: 800, color: step.done ? "white" : "#1E1B4B",
+                        flexShrink: 0,
+                      }}>
+                        {step.done ? "\u2713" : idx + 1}
+                      </div>
+                      <span style={{
+                        fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700,
+                        color: step.done ? "#059669" : T.textPrimary,
+                        textDecoration: step.done ? "line-through" : "none",
+                      }}>
+                        {step.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+
         {/* --- 8. Boss Card (active) --- */}
         {state.boss && state.boss.hp > 0 && (() => {
           const bossData = BOSSES.find(b => b.id === state.boss.id);

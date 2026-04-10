@@ -12,9 +12,10 @@ export default function useComputedState(state: GameState | null): ComputedState
 
     const level = getLevel(state.xp);
     const xpP = getLvlProg(state.xp);
-    const done = state.quests.filter(q => q.done).length;
-    const total = state.quests.length;
-    const allDone = state.quests.every(q => q.done) && total > 0;
+    const mainQuests = state.quests.filter(q => !q.sideQuest);
+    const done = mainQuests.filter(q => q.done).length;
+    const total = mainQuests.length;
+    const allDone = mainQuests.every(q => q.done) && total > 0;
     const pct = total > 0 ? done / total : 0;
     const mood = getMood(allDone, pct);
     const dayN = getDayName();

@@ -23,6 +23,22 @@ export interface Quest {
   target?: number;
   bonus?: number;
   completions?: number;
+  sideQuest?: boolean;
+}
+
+export interface QuestChain {
+  id: string;
+  name: string;
+  emoji: string;
+  steps: QuestChainStep[];
+  hp: number;
+  completed: boolean;
+}
+
+export interface QuestChainStep {
+  id: string;
+  name: string;
+  done: boolean;
 }
 
 export interface Reward {
@@ -212,6 +228,8 @@ export interface GameState {
   loginBonusStreak: number;
   // Boss defeat reward overlay
   bossDefeatReward: { bossName: string; bossIcon: string; hp: number; item: { name: string; icon: string } | null } | null;
+  // Quest chains
+  questChains: QuestChain[];
 }
 
 export interface ComputedState {

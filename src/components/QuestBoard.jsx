@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { T, ANCHORS, RAINBOW, RAINBOW_LABELS, MOOD_EMOJIS, SCHOOL_QUESTS, VACATION_QUESTS } from '../constants';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
+import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 
 export default function QuestBoard() {
   const { state, computed, actions, ui } = useGame();
@@ -9,6 +10,16 @@ export default function QuestBoard() {
   const { pMode, setQuestOpen, nq, setNq } = ui;
   const nqRef = useRef(null);
   const fileRef = useRef(null);
+  const { weather } = useWeather();
+
+  function getClothingHint(temp) {
+    if (temp === null || temp === undefined) return null;
+    if (temp < 0) return { text: "Brr! Winterjacke + Mütze!", emoji: "🧥" };
+    if (temp < 10) return { text: "Jacke + langer Pulli!", emoji: "🧥" };
+    if (temp < 18) return { text: "Leichte Jacke mitnehmen!", emoji: "🧤" };
+    if (temp < 25) return { text: "T-Shirt reicht!", emoji: "👕" };
+    return { text: "Kurze Hose! Sonnencreme!", emoji: "☀️" };
+  }
 
   // Weekly lunch local state
   const DAYS = ["Mo", "Di", "Mi", "Do", "Fr"];
@@ -103,7 +114,7 @@ export default function QuestBoard() {
 
         {/* ── Quest groups (sequential questline) ── */}
         {Object.entries(ANCHORS).map(([a, m]) => {
-          const qs = byA[a] || [];
+          const qs = (byA[a] || []).filter(q => !q.sideQuest);
           if (!qs.length) return null;
           const secDone = qs.every(q => q.done);
           // Find the first undone quest index for "next step" highlight
@@ -164,6 +175,23 @@ export default function QuestBoard() {
                           <div style={{ width: 46, height: 46, borderRadius: 14, background: grad ? `${T.accent}20` : fullyDone ? `${T.success}15` : `${m.col}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem", flexShrink: 0 }}>{grad ? "\u{1F393}" : fullyDone ? "\u2705" : q.icon}</div>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontWeight: 700, fontSize: ".88rem", textDecoration: fullyDone ? "line-through" : "none", color: T.textPrimary }}>{q.name}</div>
+                            {/* Weather hint for Anziehen quest */}
+                            {(q.id === "s4" || q.id === "v4") && !q.done && weather?.daily?.[0] && (() => {
+                              const hint = getClothingHint(weather.daily[0].tempMax);
+                              if (!hint) return null;
+                              return (
+                                <div style={{
+                                  display: "flex", alignItems: "center", gap: 6,
+                                  background: "rgba(14,165,233,0.08)", borderRadius: 10,
+                                  padding: "4px 10px", marginTop: 4, marginBottom: 2,
+                                }}>
+                                  <span style={{ fontSize: ".95rem" }}>{hint.emoji}</span>
+                                  <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#0284C7" }}>
+                                    {weather.daily[0].tempMin}°/{weather.daily[0].tempMax}° — {hint.text}
+                                  </span>
+                                </div>
+                              );
+                            })()}
                             <div style={{ display: "flex", gap: 8, marginTop: 3, alignItems: "center" }}>
                               <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{q.xp} {"\u2B50"}</span>
                               <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.accentDark }}>+{q.minutes} Min</span>
@@ -205,6 +233,113 @@ export default function QuestBoard() {
             </div>
           );
         })}
+
+        {/* ── Side-Quests (Bonus-Aufgaben) ── */}
+        {(() => {
+          const sideQuests = state.quests.filter(q => q.sideQuest);
+          if (!sideQuests.length) return null;
+          return (
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <div style={{ background: "rgba(245,158,11,0.12)", borderRadius: 50, padding: "5px 14px", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: "1rem" }}>{"\u2B50"}</span>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: ".85rem", fontWeight: 800, color: "#D97706", textTransform: "uppercase", letterSpacing: ".06em" }}>Bonus-Aufgaben</span>
+                </div>
+                <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.textLight }}>Optional</span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {sideQuests.map(q => {
+                  const canTap = !q.done;
+                  return (
+                    <button
+                      key={q.id}
+                      className={canTap ? "btn-tap" : ""}
+                      onClick={() => canTap && !pMode && actions.complete(q.id)}
+                      disabled={!canTap && !pMode}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 12,
+                        background: q.done ? "linear-gradient(135deg, #FFFBEB, #FEF3C7)" : "white",
+                        border: `2.5px solid ${q.done ? "rgba(245,158,11,0.25)" : "rgba(245,158,11,0.15)"}`,
+                        borderRadius: 18, padding: "12px 14px", cursor: canTap ? "pointer" : "default",
+                        width: "100%", textAlign: "left", transition: "all .15s",
+                        opacity: q.done ? 0.7 : 1, fontFamily: "'Nunito',sans-serif", minHeight: 56,
+                        boxShadow: canTap ? "0 3px 12px rgba(245,158,11,0.1)" : "none",
+                      }}
+                    >
+                      <div style={{
+                        width: 46, height: 46, borderRadius: 14,
+                        background: q.done ? "rgba(245,158,11,0.15)" : "rgba(245,158,11,0.1)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: "1.3rem", flexShrink: 0,
+                      }}>
+                        {q.done ? "\u2705" : q.icon}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          fontWeight: 700, fontSize: ".88rem",
+                          textDecoration: q.done ? "line-through" : "none",
+                          color: T.textPrimary,
+                        }}>
+                          {q.name}
+                        </div>
+                        <div style={{ display: "flex", gap: 8, marginTop: 3, alignItems: "center" }}>
+                          <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#D97706" }}>+{q.xp} {"\u2B50"}</span>
+                          <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.accentDark }}>+{q.minutes} Min</span>
+                        </div>
+                      </div>
+                      {canTap && (
+                        <div style={{
+                          display: "flex", flexDirection: "column", alignItems: "center", gap: 1,
+                          background: "rgba(245,158,11,0.1)", border: "2px solid rgba(245,158,11,0.25)",
+                          borderRadius: 12, padding: "6px 8px", minWidth: 44,
+                        }}>
+                          <span style={{ fontSize: ".9rem" }}>{"\u2B50"}</span>
+                          <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: "#D97706" }}>+{Math.floor(q.xp / 3)}</span>
+                        </div>
+                      )}
+                      {pMode && (
+                        <button
+                          aria-label={`${q.name} entfernen`}
+                          onClick={e => { e.stopPropagation(); actions.rmQuest(q.id); }}
+                          style={{
+                            background: `${T.danger}12`, border: `2px solid ${T.danger}30`,
+                            borderRadius: 10, padding: "4px 10px", color: T.danger,
+                            cursor: "pointer", fontSize: ".85rem", fontWeight: 800, minHeight: 36,
+                          }}
+                        >
+                          {"\u2715"}
+                        </button>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* ── Quest Chain Creator + Manager (parent mode) ── */}
+        {pMode && (state.questChains || []).length > 0 && (
+          <div className="game-card" style={{ padding: 16, marginBottom: 14, border: "2.5px solid rgba(109,40,217,0.12)", background: "linear-gradient(135deg, #F9F5FF, #FFFFFF)" }}>
+            <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: ".85rem", color: T.primary, marginBottom: 10, textTransform: "uppercase" }}>{"\uD83D\uDD17"} Abenteuer-Ketten</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {(state.questChains || []).map(c => (
+                <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, background: c.completed ? `${T.success}08` : "rgba(180,120,40,0.04)", border: `2px solid ${c.completed ? T.success + "30" : "rgba(180,120,40,0.08)"}`, borderRadius: 14, padding: "10px 12px" }}>
+                  <span style={{ fontSize: "1.2rem" }}>{c.emoji}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: ".85rem", color: T.textPrimary, textDecoration: c.completed ? "line-through" : "none" }}>{c.name}</div>
+                    <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.primary }}>{c.steps.filter(s => s.done).length}/{c.steps.length} Schritte &middot; +{c.hp} HP</div>
+                  </div>
+                  <button
+                    onClick={() => actions.removeQuestChain(c.id)}
+                    aria-label={`${c.name} entfernen`}
+                    style={{ background: `${T.danger}12`, border: `2px solid ${T.danger}30`, borderRadius: 10, padding: "4px 10px", color: T.danger, cursor: "pointer", fontSize: ".85rem", fontWeight: 800, minHeight: 36 }}
+                  >{"\u274C"}</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Parent panel */}
         {pMode && <div style={{ background: "white", borderRadius: 22, padding: 16, border: `3px solid rgba(109,40,217,0.1)`, marginTop: 8, boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>

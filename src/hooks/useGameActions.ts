@@ -80,7 +80,8 @@ export default function useGameActions(
         streak: isDone && !q.done ? x.streak + 1 : x.streak,
         completions: newCompletions,
       } : x);
-      const all = nq2.every(x => x.done);
+      const mainQuests = nq2.filter(x => !x.sideQuest);
+      const all = mainQuests.every(x => x.done) && mainQuests.length > 0;
 
       if (all) setTimeout(() => { SFX.play("celeb"); setShowVictory(true); }, 600);
 
@@ -470,6 +471,44 @@ export default function useGameActions(
     setState(prev => prev ? { ...prev, bossDefeatReward: null } : prev);
   }, [setState]);
 
+  // ── NEW: Quest Chains ──
+
+  const completeChainStep = useCallback((chainId: string, stepId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const chains = (prev.questChains || []).map(c => {
+        if (c.id !== chainId) return c;
+        const steps = c.steps.map(s => s.id === stepId ? { ...s, done: true } : s);
+        const allDone = steps.every(s => s.done);
+        if (allDone && !c.completed) {
+          SFX.play("celeb");
+          setCeleb(true);
+          return { ...c, steps, completed: true };
+        }
+        SFX.play("pop");
+        return { ...c, steps };
+      });
+      // Award HP if chain just completed
+      const chain = chains.find(c => c.id === chainId);
+      const wasCompleted = (prev.questChains || []).find(c => c.id === chainId)?.completed;
+      const justCompleted = chain?.completed && !wasCompleted;
+      return {
+        ...prev,
+        questChains: chains,
+        xp: justCompleted ? prev.xp + (chain?.hp || 0) : prev.xp,
+        coins: justCompleted ? prev.coins + (chain?.hp || 0) : prev.coins,
+      };
+    });
+  }, [setState, setCeleb]);
+
+  const addQuestChain = useCallback((chain: import('../types').QuestChain) => {
+    setState(prev => prev ? { ...prev, questChains: [...(prev.questChains || []), chain] } : prev);
+  }, [setState]);
+
+  const removeQuestChain = useCallback((chainId: string) => {
+    setState(prev => prev ? { ...prev, questChains: (prev.questChains || []).filter(c => c.id !== chainId) } : prev);
+  }, [setState]);
+
   // ── Export / Import ──
 
   const exportState = useCallback((currentState: GameState) => {
@@ -512,6 +551,7 @@ export default function useGameActions(
     addSpecialMission, completeSpecialMission, removeSpecialMission,
     updateWeeklyLunch, collectLoginBonus,
     clearBossReward,
+    completeChainStep, addQuestChain, removeQuestChain,
     exportState, importState,
   };
 }

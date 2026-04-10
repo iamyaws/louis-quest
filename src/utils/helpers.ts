@@ -1,4 +1,4 @@
-import { LVL, SCHOOL_QUESTS, VACATION_QUESTS, FOOTBALL, CAT_STAGES } from '../constants';
+import { LVL, SCHOOL_QUESTS, VACATION_QUESTS, FOOTBALL, CAT_STAGES, SIDE_QUESTS } from '../constants';
 import type { Quest, CatMood } from '../types';
 
 export function getLevel(xp: number): number {
@@ -22,6 +22,10 @@ export function buildDay(vac: boolean): Quest[] {
   }));
   const d = new Date().getDay();
   if ((d === 1 || d === 3) && !vac) b.push({ ...FOOTBALL, done: false, streak: 0, completions: 0 });
+  // Pick 2 random side-quests for the day
+  const shuffled = [...SIDE_QUESTS].sort(() => Math.random() - 0.5);
+  const dailySides = shuffled.slice(0, 2).map(q => ({ ...q, done: false, streak: 0, completions: 0, sideQuest: true }));
+  b.push(...dailySides);
   return b;
 }
 

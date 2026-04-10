@@ -1,6 +1,6 @@
 // ═══ RONKI v1 — Constants (Heldenpunkte Edition) ═══
 
-import type { Quest, Reward, ShopItem, RareDrop, ChestReward, WheelSegment, WeeklyMission, JournalQuestion, Badge, HeroTip, UnlockCondition, Belohnung } from './types';
+import type { Quest, Reward, ShopItem, RareDrop, ChestReward, WheelSegment, WeeklyMission, JournalQuestion, Badge, HeroTip, UnlockCondition, Belohnung, QuestChain } from './types';
 
 export const T = {
   bg: "#FFF8F0", surface: "#FFF3E6", surfaceHigh: "#FFE8CC",
@@ -370,3 +370,30 @@ export const EGG_TYPES: Record<string, { col1: string; col2: string; pattern: st
   wolf: { col1: "#64748B", col2: "#E2E8F0", pattern: "paw", name: "Mond-Ei" },
   phoenix: { col1: "#F59E0B", col2: "#FEF3C7", pattern: "feather", name: "Sonnen-Ei" },
 };
+
+// ═══ Quest Chains (multi-step quests) ═══
+
+export const BIRTHDAY_QUEST_CHAIN: QuestChain = {
+  id: "qc_liam_bday",
+  name: "Geburtstagsgeschenk f\u00FCr Liam",
+  emoji: "\uD83C\uDF81",
+  steps: [
+    { id: "qcs1", name: "Geschenkidee \u00FCberlegen", done: false },
+    { id: "qcs2", name: "Geburtstagskarte basteln", done: false },
+    { id: "qcs3", name: "Mit Mama/Papa einkaufen gehen", done: false },
+    { id: "qcs4", name: "Geschenk einpacken", done: false },
+  ],
+  hp: 100,
+  completed: false,
+};
+
+// ═══ Side-Quests (optional bonus quests) ═══
+
+export const SIDE_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
+  { id: "sq1", name: "Liam eine Geschichte vorlesen", icon: "\uD83D\uDCD6", anchor: "evening", xp: 15, minutes: 10, order: 90 },
+  { id: "sq2", name: "Etwas Kreatives machen", icon: "\uD83C\uDFA8", anchor: "evening", xp: 15, minutes: 15, order: 91 },
+  { id: "sq3", name: "Jemandem helfen", icon: "\uD83E\uDD1D", anchor: "morning", xp: 15, minutes: 5, order: 91 },
+  { id: "sq4", name: "Drau\u00DFen spielen", icon: "\u26BD", anchor: "morning", xp: 15, minutes: 15, order: 92 },
+  { id: "sq5", name: "Etwas Neues lernen", icon: "\uD83D\uDCA1", anchor: "evening", xp: 15, minutes: 10, order: 93 },
+  { id: "sq6", name: "Zimmer extra aufr\u00E4umen", icon: "\u2728", anchor: "evening", xp: 20, minutes: 10, order: 94 },
+];
