@@ -191,6 +191,13 @@ function applyDefaults(p: GameState): void {
   if (p.dailyVitaminD === undefined) p.dailyVitaminD = false;
   if (p.dailyBrother === undefined) p.dailyBrother = false;
   if (!p.belohnungen) p.belohnungen = DEFAULT_BELOHNUNGEN;
+  // Inject mini-games if missing from existing user's rewards
+  if (p.belohnungen && !p.belohnungen.some((b: any) => b.id === "bel_memory")) {
+    p.belohnungen.unshift(
+      { id: "bel_memory", name: "Memory-Spiel", emoji: "\u{1F0CF}", cost: 10, active: true },
+      { id: "bel_wheel", name: "Gl\u00FCcksrad drehen", emoji: "\u{1F3B0}", cost: 15, active: true },
+    );
+  }
   if (!p.belohnungenLog) p.belohnungenLog = [];
   if (!p.specialMissions) p.specialMissions = [];
   // Add Liam's birthday gift mission if not already there and date hasn't passed

@@ -20,7 +20,7 @@ export default function Familienregeln() {
         }}>
           <div style={{ fontSize: "3rem", marginBottom: 8 }}>{"\uD83D\uDC9B"}</div>
           <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.3rem", fontWeight: 700, color: "#B45309", marginBottom: 12 }}>
-            Lieb sein. Sich M\u00FChe geben. Zusammen sein.
+            {"Lieb sein. Sich M\u00FChe geben. Zusammen sein."}
           </div>
           <div style={{
             fontFamily: "'Fredoka',sans-serif", fontSize: "1.1rem", fontWeight: 700,
@@ -64,7 +64,7 @@ export default function Familienregeln() {
         }}>
           <div style={{ fontSize: "2.5rem", marginBottom: 8 }}>{"\uD83E\uDD17"}</div>
           <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: T.textPrimary, lineHeight: 1.5, marginBottom: 12 }}>
-            Fehler sind okay.{"\n"}Mama & Papa sind immer f\u00FCr dich da.
+            {"Fehler sind okay. Mama & Papa sind immer f\u00FCr dich da."}
           </div>
           <div style={{
             fontFamily: "'Fredoka',sans-serif", fontSize: "1.05rem", fontWeight: 700,

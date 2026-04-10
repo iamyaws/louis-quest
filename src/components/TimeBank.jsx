@@ -403,10 +403,10 @@ export default function TimeBank() {
                     fontWeight: 700,
                   }}>
                     {"\u2B50"}{" "}
-                    {isWeekend && bel.weekendCost && bel.weekendCost < bel.cost ? (
+                    {isFreeDay && bel.weekendCost && bel.weekendCost < bel.cost ? (
                       <>
                         <span style={{ textDecoration: "line-through", opacity: 0.5, marginRight: 4 }}>{bel.cost}</span>
-                        <span style={{ color: "#059669", fontWeight: 800 }}>{bel.weekendCost} {"\u2B50"}</span>
+                        <span style={{ color: "#DC2626", fontWeight: 800 }}>{bel.weekendCost} HP</span>
                       </>
                     ) : (
                       <span>{effectiveCost} HP</span>
