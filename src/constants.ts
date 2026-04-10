@@ -445,6 +445,22 @@ export const PHOENIX_VARIANTS: Record<string, { col: string; chest: string; wing
 export const SKIN_TONES = ["#FDEBD0", "#F5D0B0", "#D4A574", "#A0785A", "#6B4226"] as const;
 export const HAIR_COLORS = ["#5B3A1A", "#1E1B4B", "#F59E0B", "#DC2626", "#3B82F6", "#7C3AED", "#EC4899", "#E2E8F0"] as const;
 
+// ═══ Room Customization ═══
+
+export const WALL_COLORS = [
+  { id: "cream", color: "#F5EDE3", name: "Creme", unlock: 0 },
+  { id: "sky", color: "#DBEAFE", name: "Himmelblau", unlock: 2 },
+  { id: "mint", color: "#D1FAE5", name: "Minze", unlock: 3 },
+  { id: "sunset", color: "#FECACA", name: "Sonnenuntergang", unlock: 4 },
+  { id: "lavender", color: "#EDE9FE", name: "Lavendel", unlock: 5 },
+] as const;
+
+export const FLOOR_TYPES = [
+  { id: "wood", name: "Holz", color1: "#D4A06A", color2: "#C49060", unlock: 0 },
+  { id: "carpet", name: "Teppich", color1: "#8B5CF6", color2: "#7C3AED", unlock: 3 },
+  { id: "stone", name: "Stein", color1: "#94A3B8", color2: "#64748B", unlock: 5 },
+] as const;
+
 export const EGG_TYPES: Record<string, { col1: string; col2: string; pattern: string; name: string }> = {
   dragon: { col1: "#EF4444", col2: "#FCD34D", pattern: "flame", name: "Feuer-Ei" },
   wolf: { col1: "#64748B", col2: "#E2E8F0", pattern: "paw", name: "Mond-Ei" },

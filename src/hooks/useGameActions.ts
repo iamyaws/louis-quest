@@ -563,6 +563,12 @@ export default function useGameActions(
     });
   }, [setState]);
 
+  // ── Room Customization ──
+
+  const setRoomTheme = useCallback((theme: Partial<{ wallColor: string; floorType: string; windowStyle: string }>) => {
+    setState(prev => prev ? { ...prev, roomTheme: { ...(prev.roomTheme || { wallColor: "#F5EDE3", floorType: "wood", windowStyle: "standard" }), ...theme } } : prev);
+  }, [setState]);
+
   // ── Export / Import ──
 
   const exportState = useCallback((currentState: GameState) => {
@@ -607,6 +613,7 @@ export default function useGameActions(
     clearBossReward, clearEvolution,
     completeChainStep, addQuestChain, removeQuestChain,
     equipGear, unequipGear,
+    setRoomTheme,
     exportState, importState,
   };
 }

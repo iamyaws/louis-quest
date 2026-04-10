@@ -219,6 +219,8 @@ function applyDefaults(p: GameState): void {
   if (!p.hero.hairColor) p.hero.hairColor = "#5B3A1A";
   // Evolution celebration
   if (p.evolutionEvent === undefined) p.evolutionEvent = null;
+  // Room customization
+  if (!p.roomTheme) p.roomTheme = { wallColor: "#F5EDE3", floorType: "wood", windowStyle: "standard" };
 }
 
 interface OnboardData {
@@ -270,5 +272,7 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     equippedGear: {},
     // Evolution celebration
     evolutionEvent: null,
+    // Room customization
+    roomTheme: { wallColor: "#F5EDE3", floorType: "wood", windowStyle: "standard" },
   };
 }

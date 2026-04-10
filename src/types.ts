@@ -236,6 +236,8 @@ export interface GameState {
   equippedGear: { head?: string; body?: string; accessory?: string };
   // Evolution celebration overlay
   evolutionEvent: { oldStage: number; newStage: number; newBossTier?: string } | null;
+  // Room customization
+  roomTheme: { wallColor: string; floorType: string; windowStyle: string };
 }
 
 export interface ComputedState {
