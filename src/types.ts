@@ -33,6 +33,7 @@ export interface QuestChain {
   steps: QuestChainStep[];
   hp: number;
   completed: boolean;
+  deadline?: string;  // ISO date string e.g. "2026-04-26"
 }
 
 export interface QuestChainStep {
@@ -234,7 +235,7 @@ export interface GameState {
   // Companion gear
   equippedGear: { head?: string; body?: string; accessory?: string };
   // Evolution celebration overlay
-  evolutionEvent: { oldStage: number; newStage: number } | null;
+  evolutionEvent: { oldStage: number; newStage: number; newBossTier?: string } | null;
 }
 
 export interface ComputedState {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES, BOSS_TIERS, DEFAULT_BELOHNUNGEN, isSchoolVacation,
+  BIRTHDAY_QUEST_CHAIN,
 } from '../constants';
 import { buildDay, getCatStage } from '../utils/helpers';
 import storage from '../utils/storage';
@@ -203,6 +204,10 @@ function applyDefaults(p: GameState): void {
   // Companion + egg migration
   if (!p.equippedGear) p.equippedGear = {};
   if (!p.questChains) p.questChains = [];
+  // Auto-add Liam birthday quest chain if not present and deadline not passed
+  if (!(p.questChains || []).some(c => c.id === "qc_liam_bday") && new Date() < new Date("2026-04-26")) {
+    p.questChains.push({ ...BIRTHDAY_QUEST_CHAIN });
+  }
   if (!p.companionType) p.companionType = "cat";
   if (p.eggType === undefined) p.eggType = null;
   if (p.eggProgress === undefined) p.eggProgress = 0;

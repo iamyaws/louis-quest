@@ -81,6 +81,7 @@ function AppContent() {
           companionVariant={state.catVariant}
           oldStage={state.evolutionEvent.oldStage}
           newStage={state.evolutionEvent.newStage}
+          newBossTier={state.evolutionEvent.newBossTier}
           onClose={() => actions.clearEvolution()}
         />
       )}

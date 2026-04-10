@@ -24,6 +24,7 @@ export default function EvolutionCelebration({
   oldStage,
   newStage,
   stageName: stageNameProp,
+  newBossTier,
   onClose,
 }) {
   const [phase, setPhase] = useState(1);
@@ -242,13 +243,32 @@ export default function EvolutionCelebration({
               fontSize: "1rem",
               color: "rgba(255,255,255,0.7)",
               textAlign: "center",
-              marginBottom: 32,
+              marginBottom: newBossTier ? 16 : 32,
               animation: "evo-name-in 0.5s 0.15s ease-out both",
             }}>
               {COMPANION_STAGES[companionType]?.[newStage]?.desc
                 || CAT_STAGES[newStage]?.desc
                 || "Eine neue Stufe!"}
             </div>
+
+            {/* Boss tier unlock notification */}
+            {newBossTier && (
+              <div style={{
+                background: "linear-gradient(135deg, rgba(245,158,11,0.25), rgba(239,68,68,0.25))",
+                border: "2px solid #F59E0B",
+                borderRadius: 14,
+                padding: "10px 24px",
+                fontSize: "1.05rem",
+                fontWeight: 700,
+                color: "#FCD34D",
+                textAlign: "center",
+                marginBottom: 32,
+                animation: "evo-name-in 0.6s 0.3s ease-out both",
+                textShadow: "0 0 12px rgba(245,158,11,0.5)",
+              }}>
+                {"\u2694\uFE0F"} Neue Bosse freigeschaltet: {newBossTier}!
+              </div>
+            )}
 
             {/* Weiter button */}
             <button

@@ -1,7 +1,7 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
   RARE_DROPS, RARE_DROP_CHANCE, CHEST_MILESTONES,
-  WEEKLY_MISSIONS, BOSSES, UNLOCK_CONDITIONS, SHOP_ITEMS,
+  WEEKLY_MISSIONS, BOSSES, UNLOCK_CONDITIONS, SHOP_ITEMS, BOSS_TIERS,
 } from '../constants';
 import { getLevel, buildDay, getCatStage } from '../utils/helpers';
 import storage from '../utils/storage';
@@ -186,8 +186,13 @@ export default function useGameActions(
       if (newCatStage > prevCatStage) setTimeout(() => SFX.play("evolve"), 800);
 
       // Evolution event for celebration overlay
+      // Check if a new boss tier unlocked with this evolution
+      const prevMaxTier = BOSS_TIERS.filter(t => prevCatStage >= t.minStage).pop();
+      const newMaxTier = BOSS_TIERS.filter(t => newCatStage >= t.minStage).pop();
+      const bossUnlock = newMaxTier?.id !== prevMaxTier?.id ? newMaxTier?.name : undefined;
+
       const evolutionEvent = newCatStage > prevCatStage
-        ? { oldStage: prevCatStage, newStage: newCatStage }
+        ? { oldStage: prevCatStage, newStage: newCatStage, newBossTier: bossUnlock }
         : null;
 
       const totalHP = earned + bonusHP + wmBonusHP + bossRewardHP;

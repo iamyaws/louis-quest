@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { T, HERO_COLORS, HERO_EYES, HERO_HAIRS, SKIN_TONES, HAIR_COLORS, COMPANION_TYPES, EGG_TYPES, OB_CHEST_REWARD } from '../constants';
+import { T, HERO_COLORS, HERO_HAIRS, SKIN_TONES, HAIR_COLORS, COMPANION_TYPES, OB_CHEST_REWARD } from '../constants';
 import { OBWrap, OBTitle, OBSub, OBBtn, OBGrid, OBChip } from './ui';
 import HeroSprite from './HeroSprite';
 import Egg from './Egg';
@@ -19,12 +19,12 @@ export default function Onboarding({ onComplete }) {
     setStep(nextStep);
   };
 
-  useEffect(() => { if (step === 5) setTimeout(() => nameRef.current?.focus(), 100); }, [step]);
-  useEffect(() => { if (step === 7) setTimeout(() => companionNameRef.current?.focus(), 100); }, [step]);
+  useEffect(() => { if (step === 2) setTimeout(() => nameRef.current?.focus(), 100); }, [step]);
+  useEffect(() => { if (step === 4) setTimeout(() => companionNameRef.current?.focus(), 100); }, [step]);
 
-  const totalSteps = 8;
+  const totalSteps = 6;
 
-  // ── Progress dots (8 dots, gold active) ──
+  // ── Progress dots (6 dots, gold active) ──
   const Dots = () => (
     <div style={{ display: "flex", gap: 5, marginBottom: 16, justifyContent: "center" }}>
       {Array.from({ length: totalSteps }, (_, i) => (
@@ -52,13 +52,9 @@ export default function Onboarding({ onComplete }) {
     long: "Lang", cap: "Kappe", none: "Keine",
   };
   const hairIcons = {
-    short: "✂️", spiky: "⚡", curly: "🌀",
-    long: "💇", cap: "🧢", none: "🚫",
+    short: "\u2702\uFE0F", spiky: "\u26A1", curly: "\uD83C\uDF00",
+    long: "\uD83D\uDC87", cap: "\uD83E\uDDE2", none: "\uD83D\uDEAB",
   };
-
-  // ── Eye style labels ──
-  const eyeLabels = { round: "Rund", happy: "Fröhlich", cool: "Cool", big: "Groß" };
-  const eyeIcons = { round: "👀", happy: "😊", cool: "😎", big: "🥺" };
 
   // ── Swatch button helper ──
   const Swatch = ({ color, selected, onClick, size = 48 }) => (
@@ -80,108 +76,63 @@ export default function Onboarding({ onComplete }) {
     </OBWrap>
   );
 
-  // ═══ Step 1: Skin Tone ═══
+  // ═══ Step 1: Combined Avatar Builder ═══
   if (step === 1) return (
     <OBWrap>
       <Dots />
-      <OBTitle>Deine Hautfarbe</OBTitle>
-      <div style={{ marginBottom: 20 }}>
+      <OBTitle>Erstelle deinen Helden!</OBTitle>
+
+      {/* Live hero preview */}
+      <div style={{ marginBottom: 20, animation: "heroFloat 3s ease-in-out infinite" }}>
         <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
-          size={140} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
+          size={150} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
       </div>
-      <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
+
+      {/* Skin tone */}
+      <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, marginBottom: 6, textAlign: "center" }}>Hautfarbe</div>
+      <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: 14 }}>
         {SKIN_TONES.map(tone => (
           <Swatch key={tone} color={tone} selected={hero.skinTone === tone}
-            onClick={() => setHero(h => ({ ...h, skinTone: tone }))} size={52} />
+            onClick={() => setHero(h => ({ ...h, skinTone: tone }))} />
         ))}
       </div>
-      <OBBtn onClick={() => advanceStep(2)}>Weiter →</OBBtn>
-    </OBWrap>
-  );
 
-  // ═══ Step 2: Hair Style + Color ═══
-  if (step === 2) return (
-    <OBWrap>
-      <Dots />
-      <OBTitle>Deine Frisur</OBTitle>
-      <div style={{ marginBottom: 20 }}>
-        <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
-          size={140} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
-      </div>
-      {/* Hair style chips */}
-      <div style={{ fontSize: ".75rem", fontWeight: 700, color: T.textSecondary, marginBottom: 8, textAlign: "center" }}>
-        Frisur
-      </div>
+      {/* Hair style */}
+      <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, marginBottom: 6, textAlign: "center" }}>Frisur</div>
       <OBGrid cols={3}>
         {HERO_HAIRS.map(h2 => (
           <OBChip key={h2} selected={hero.hair === h2}
             onClick={() => setHero(h => ({ ...h, hair: h2 }))}>
             {hairIcons[h2]}
-            <div style={{ fontSize: ".7rem", marginTop: 3 }}>{hairLabels[h2]}</div>
+            <div style={{ fontSize: ".7rem", marginTop: 2 }}>{hairLabels[h2]}</div>
           </OBChip>
         ))}
       </OBGrid>
-      {/* Hair color swatches */}
-      <div style={{ fontSize: ".75rem", fontWeight: 700, color: T.textSecondary, marginTop: 16, marginBottom: 8, textAlign: "center" }}>
-        Haarfarbe
-      </div>
-      <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", maxWidth: 360, marginBottom: 16 }}>
+
+      {/* Hair color */}
+      <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, marginTop: 14, marginBottom: 6, textAlign: "center" }}>Haarfarbe</div>
+      <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 14 }}>
         {HAIR_COLORS.map(c => (
           <Swatch key={c} color={c} selected={hero.hairColor === c}
-            onClick={() => setHero(h => ({ ...h, hairColor: c }))} size={42} />
+            onClick={() => setHero(h => ({ ...h, hairColor: c }))} />
         ))}
       </div>
-      <OBBtn onClick={() => advanceStep(3)}>Weiter →</OBBtn>
-    </OBWrap>
-  );
 
-  // ═══ Step 3: Eyes ═══
-  if (step === 3) return (
-    <OBWrap>
-      <Dots />
-      <OBTitle>Deine Augen</OBTitle>
-      <div style={{ marginBottom: 20 }}>
-        <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
-          size={140} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
-      </div>
-      <OBGrid cols={4}>
-        {HERO_EYES.map(e => (
-          <OBChip key={e} selected={hero.eyes === e}
-            onClick={() => setHero(h => ({ ...h, eyes: e }))}>
-            {eyeIcons[e]}
-            <div style={{ fontSize: ".7rem", marginTop: 3 }}>{eyeLabels[e]}</div>
-          </OBChip>
-        ))}
-      </OBGrid>
-      <div style={{ marginTop: 16 }}>
-        <OBBtn onClick={() => advanceStep(4)}>Weiter →</OBBtn>
-      </div>
-    </OBWrap>
-  );
-
-  // ═══ Step 4: Outfit Color ═══
-  if (step === 4) return (
-    <OBWrap>
-      <Dots />
-      <OBTitle>Dein Outfit</OBTitle>
-      <div style={{ marginBottom: 20 }}>
-        <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
-          size={140} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
-      </div>
-      <OBGrid cols={4}>
+      {/* Outfit color */}
+      <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, marginBottom: 6, textAlign: "center" }}>Outfit</div>
+      <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
         {HERO_COLORS.map(c => (
           <Swatch key={c} color={c} selected={hero.color === c}
-            onClick={() => setHero(h => ({ ...h, color: c }))} size={52} />
+            onClick={() => setHero(h => ({ ...h, color: c }))} />
         ))}
-      </OBGrid>
-      <div style={{ marginTop: 16 }}>
-        <OBBtn onClick={() => advanceStep(5)}>Weiter →</OBBtn>
       </div>
+
+      <OBBtn onClick={() => advanceStep(2)}>Weiter →</OBBtn>
     </OBWrap>
   );
 
-  // ═══ Step 5: Hero Name ═══
-  if (step === 5) return (
+  // ═══ Step 2: Hero Name ═══
+  if (step === 2) return (
     <OBWrap>
       <Dots />
       <OBTitle>Dein Heldenname</OBTitle>
@@ -195,13 +146,13 @@ export default function Onboarding({ onComplete }) {
         style={{ ...inputStyle, border: `2px solid ${hero.name.trim() ? "#FFD700" : "rgba(0,0,0,0.1)"}` }}
       />
       <div style={{ marginTop: 16 }}>
-        <OBBtn onClick={() => advanceStep(6)} disabled={!hero.name.trim()}>Weiter →</OBBtn>
+        <OBBtn onClick={() => advanceStep(3)} disabled={!hero.name.trim()}>Weiter →</OBBtn>
       </div>
     </OBWrap>
   );
 
-  // ═══ Step 6: Egg Selection ═══
-  if (step === 6) {
+  // ═══ Step 3: Egg Selection ═══
+  if (step === 3) {
     const eggs = [
       { type: "dragon", label: "Feuer-Ei 🔥" },
       { type: "wolf", label: "Mond-Ei 🌙" },
@@ -256,13 +207,13 @@ export default function Onboarding({ onComplete }) {
           </div>
         )}
 
-        <OBBtn onClick={() => advanceStep(7)} disabled={!selectedEgg}>Weiter →</OBBtn>
+        <OBBtn onClick={() => advanceStep(4)} disabled={!selectedEgg}>Weiter →</OBBtn>
       </OBWrap>
     );
   }
 
-  // ═══ Step 7: Companion Name + Activation ═══
-  if (step === 7) return (
+  // ═══ Step 4: Companion Name ═══
+  if (step === 4) return (
     <OBWrap>
       <Dots />
       <OBTitle>Name für deinen Begleiter?</OBTitle>
@@ -280,10 +231,33 @@ export default function Onboarding({ onComplete }) {
         style={{ ...inputStyle, border: `2px solid ${companionName.trim() ? "#FFD700" : "rgba(0,0,0,0.1)"}` }}
       />
 
-      {/* Chest reward teaser */}
+      <div style={{ marginTop: 16 }}>
+        <OBBtn onClick={() => advanceStep(5)} disabled={!companionName.trim()}>Weiter →</OBBtn>
+      </div>
+    </OBWrap>
+  );
+
+  // ═══ Step 5: Activate ═══
+  if (step === 5) return (
+    <OBWrap>
+      <Dots />
+      <OBTitle>Bereit für dein Abenteuer!</OBTitle>
+
+      {/* Hero + egg together */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, marginBottom: 20 }}>
+        <div style={{ animation: "heroFloat 3s ease-in-out infinite" }}>
+          <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
+            size={120} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
+        </div>
+        <div style={{ filter: "drop-shadow(0 0 12px rgba(255,215,0,0.4))" }}>
+          <Egg type={selectedEgg || "dragon"} size={80} progress={0} />
+        </div>
+      </div>
+
+      {/* Chest reward */}
       <div style={{
         background: "#FFD70015", borderRadius: 16, padding: "14px 20px",
-        marginTop: 16, textAlign: "center", maxWidth: 320,
+        marginBottom: 20, textAlign: "center", maxWidth: 320,
       }}>
         <div style={{ fontSize: "2rem", marginBottom: 4 }}>{OB_CHEST_REWARD.icon}</div>
         <div style={{ fontSize: ".95rem", fontWeight: 800, color: T.primary }}>{OB_CHEST_REWARD.text}</div>
@@ -292,25 +266,22 @@ export default function Onboarding({ onComplete }) {
         </div>
       </div>
 
-      <div style={{ marginTop: 20 }}>
-        <OBBtn
-          onClick={() => {
-            onComplete({
-              hero: { ...hero, skinTone: hero.skinTone, hairColor: hero.hairColor },
-              catVariant: "tiger",
-              catName: companionName,
-              startXP: 1,
-              startCoins: 1,
-              companionType: selectedEgg,
-              eggType: selectedEgg,
-            });
-          }}
-          disabled={!companionName.trim()}
-          big
-        >
-          Abenteuer starten! 🐉
-        </OBBtn>
-      </div>
+      <OBBtn
+        onClick={() => {
+          onComplete({
+            hero: { ...hero, skinTone: hero.skinTone, hairColor: hero.hairColor },
+            catVariant: "tiger",
+            catName: companionName,
+            startXP: 1,
+            startCoins: 1,
+            companionType: selectedEgg,
+            eggType: selectedEgg,
+          });
+        }}
+        big
+      >
+        Abenteuer starten! 🐉
+      </OBBtn>
     </OBWrap>
   );
 

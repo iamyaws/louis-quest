@@ -303,6 +303,37 @@ export const HERO_TIPS: HeroTip[] = [
   { char: "Pikachu", emoji: "\u26A1", tip: "Sei stolz auf das, was du heute geschafft hast!" },
   { char: "Mario", emoji: "\u{1F344}", tip: "Zusammen ist man weniger allein \u2014 sei ein guter Freund!" },
   { char: "Xander", emoji: "\u{1F300}", tip: "Der Weg ist das Ziel \u2014 genie\u00DF jeden Schritt!" },
+  // Additional tips for 2-month rotation
+  { char: "Sonic", emoji: "\u{1F994}", tip: "Ein wahrer Held hilft auch dann, wenn es keiner sieht!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Nach jedem Sturz stehst du wieder auf \u2014 das macht dich stark!" },
+  { char: "Ash", emoji: "\u26A1", tip: "Dein Team braucht dich \u2014 gib dein Bestes!" },
+  { char: "Pikachu", emoji: "\u26A1", tip: "Ein L\u00E4cheln macht jeden Tag besser!" },
+  { char: "Goku", emoji: "\u{1F409}", tip: "Wer trainiert, wird belohnt \u2014 bleib dran!" },
+  { char: "Link", emoji: "\u{1F5E1}\uFE0F", tip: "Jedes Abenteuer beginnt mit dem ersten Schritt!" },
+  { char: "Xander", emoji: "\u{1F300}", tip: "Zusammenhalten ist die gr\u00F6\u00DFte Kraft!" },
+  { char: "Sonic", emoji: "\u{1F994}", tip: "Langsam und stetig gewinnt auch \u2014 nicht nur schnell!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Teile deine Fr\u00F6hlichkeit mit anderen!" },
+  { char: "Ash", emoji: "\u26A1", tip: "Jeder Fehler ist ein Schritt zum Ziel!" },
+  { char: "Goku", emoji: "\u{1F409}", tip: "H\u00F6r auf dein Herz \u2014 es kennt den Weg!" },
+  { char: "Pikachu", emoji: "\u26A1", tip: "Freunde machen alles leichter!" },
+  { char: "Link", emoji: "\u{1F5E1}\uFE0F", tip: "Auch Helden brauchen mal Hilfe \u2014 frag einfach!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Sei mutig, auch wenn du Angst hast!" },
+  { char: "Xander", emoji: "\u{1F300}", tip: "Was du heute lernst, hilft dir morgen!" },
+  { char: "Sonic", emoji: "\u{1F994}", tip: "Mach dir keine Sorgen \u2014 du schaffst das!" },
+  { char: "Goku", emoji: "\u{1F409}", tip: "Respekt zeigen macht dich zum wahren Champion!" },
+  { char: "Ash", emoji: "\u26A1", tip: "Glaub an deine Freunde, wie sie an dich glauben!" },
+  { char: "Link", emoji: "\u{1F5E1}\uFE0F", tip: "Geduld ist die Waffe eines klugen Helden!" },
+  { char: "Pikachu", emoji: "\u26A1", tip: "Heute ist ein perfekter Tag f\u00FCr etwas Gutes!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Nicht aufgeben \u2014 der n\u00E4chste Level wartet!" },
+  { char: "Goku", emoji: "\u{1F409}", tip: "Echte St\u00E4rke kommt von innen!" },
+  { char: "Xander", emoji: "\u{1F300}", tip: "Sei der Held, den du dir selbst w\u00FCnschst!" },
+  { char: "Sonic", emoji: "\u{1F994}", tip: "Jeder Tag ist eine neue Chance!" },
+  { char: "Ash", emoji: "\u26A1", tip: "Du bist st\u00E4rker als du denkst!" },
+  { char: "Link", emoji: "\u{1F5E1}\uFE0F", tip: "Ein Held h\u00F6rt zu, bevor er handelt!" },
+  { char: "Mario", emoji: "\u{1F344}", tip: "Lachen ist die beste Superkraft!" },
+  { char: "Pikachu", emoji: "\u26A1", tip: "Mach anderen eine Freude \u2014 es kommt zur\u00FCck!" },
+  { char: "Goku", emoji: "\u{1F409}", tip: "Auch kleine Taten k\u00F6nnen Gro\u00DFes bewirken!" },
+  { char: "Xander", emoji: "\u{1F300}", tip: "Vertraue dem Weg \u2014 du bist auf dem richtigen!" },
 ];
 
 // ═══ NEW: Unlock Conditions (passive item unlocks) ═══
@@ -424,16 +455,18 @@ export const EGG_TYPES: Record<string, { col1: string; col2: string; pattern: st
 
 export const BIRTHDAY_QUEST_CHAIN: QuestChain = {
   id: "qc_liam_bday",
-  name: "Geburtstagsgeschenk f\u00FCr Liam",
-  emoji: "\uD83C\uDF81",
+  name: "Liams Geburtstag",
+  emoji: "\uD83C\uDF82",
   steps: [
     { id: "qcs1", name: "Geschenkidee \u00FCberlegen", done: false },
     { id: "qcs2", name: "Geburtstagskarte basteln", done: false },
     { id: "qcs3", name: "Mit Mama/Papa einkaufen gehen", done: false },
     { id: "qcs4", name: "Geschenk einpacken", done: false },
+    { id: "qcs5", name: "Liam zum Geburtstag gratulieren", done: false },
   ],
-  hp: 100,
+  hp: 150,
   completed: false,
+  deadline: "2026-04-26",
 };
 
 // ═══ Side-Quests (optional bonus quests) ═══

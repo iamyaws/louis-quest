@@ -103,6 +103,7 @@ export default function Hub() {
           const doneSteps = chain.steps.filter(s => s.done).length;
           const totalSteps = chain.steps.length;
           const firstUndoneIdx = chain.steps.findIndex(s => !s.done);
+          const daysLeft = chain.deadline ? Math.ceil((new Date(chain.deadline) - new Date()) / (1000 * 60 * 60 * 24)) : null;
           return (
             <div key={chain.id} className="game-card" style={{ padding: 16, marginBottom: 12, background: "linear-gradient(135deg, rgba(109,40,217,0.04), rgba(252,211,77,0.04))", borderColor: "rgba(109,40,217,0.15)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
@@ -113,6 +114,14 @@ export default function Hub() {
                 </div>
                 <div style={{ background: "linear-gradient(135deg, #FCD34D, #F59E0B)", borderRadius: 50, padding: "4px 12px", fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: "white" }}>+{chain.hp} {"\u2B50"}</div>
               </div>
+              {daysLeft !== null && (
+                <div style={{
+                  fontSize: ".85rem", fontWeight: 800, marginBottom: 8,
+                  color: daysLeft <= 5 ? "#DC2626" : daysLeft <= 10 ? "#F59E0B" : T.textSecondary,
+                }}>
+                  {"\uD83D\uDCC5"} {daysLeft > 0 ? `Noch ${daysLeft} Tage!` : daysLeft === 0 ? "Heute!" : "Abgelaufen"}
+                </div>
+              )}
               <div style={{ background: "rgba(109,40,217,0.08)", borderRadius: 50, height: 8, overflow: "hidden", marginBottom: 12 }}>
                 <div style={{ height: "100%", borderRadius: 50, width: `${(doneSteps / totalSteps) * 100}%`, background: "linear-gradient(90deg, #A78BFA, #7C3AED)", transition: "width .4s ease" }} />
               </div>
