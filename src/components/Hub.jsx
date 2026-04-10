@@ -1,13 +1,11 @@
 import React from 'react';
 import { T, WEEKLY_MISSIONS, BOSSES, BOSS_TIERS, HERO_TIPS, MOOD_EMOJIS } from '../constants';
-import { getTimeLabel } from '../utils/helpers';
+import { getTimeLabel, GERMAN_DAYS_SHORT } from '../utils/helpers';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 import LoginBonus from './LoginBonus';
 import ProfileCard from './ProfileCard';
-
-const GERMAN_DAYS_SHORT = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
 
 export default function Hub() {
   const { state, computed, actions, ui } = useGame();

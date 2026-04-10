@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Companion from './Companion';
 import { T, COMPANION_STAGES, CAT_STAGES } from '../constants';
+import { getCompanionStageName } from '../utils/helpers';
 
 /**
  * EvolutionCelebration -- Full-screen overlay when a companion evolves.
@@ -30,14 +31,21 @@ export default function EvolutionCelebration({
   const [phase, setPhase] = useState(1);
 
   // Resolve stage name from props or constants
-  const resolvedName = stageNameProp
-    || COMPANION_STAGES[companionType]?.[newStage]?.name
-    || CAT_STAGES[newStage]?.name
-    || "Neue Stufe";
+  const stageInfo = getCompanionStageName(companionType, newStage);
+  const resolvedName = stageNameProp || stageInfo.name;
+  const stageEmoji = stageInfo.emoji;
 
-  const stageEmoji = COMPANION_STAGES[companionType]?.[newStage]?.emoji
-    || CAT_STAGES[newStage]?.emoji
-    || "";
+  // Stable particle positions (won't jitter on re-render)
+  const particles = useMemo(() => Array.from({ length: 16 }, (_, i) => {
+    const angle = (i / 16) * Math.PI * 2;
+    const dist = 60 + Math.random() * 80;
+    const size = 4 + Math.random() * 8;
+    return {
+      px: Math.cos(angle) * dist, py: Math.sin(angle) * dist,
+      size, delay: Math.random() * 0.4,
+      color: `hsl(${40 + Math.random() * 20}, 95%, ${55 + Math.random() * 20}%)`,
+    };
+  }), []);
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase(2), 1500);
@@ -145,31 +153,19 @@ export default function EvolutionCelebration({
               pointerEvents: "none",
             }} />
 
-            {/* Golden particles */}
-            {Array.from({ length: 16 }).map((_, i) => {
-              const angle = (i / 16) * Math.PI * 2;
-              const dist = 60 + Math.random() * 80;
-              const px = Math.cos(angle) * dist;
-              const py = Math.sin(angle) * dist;
-              const size = 4 + Math.random() * 8;
-              const delay = Math.random() * 0.4;
-              return (
-                <div key={i} style={{
-                  position: "absolute",
-                  width: size, height: size,
-                  borderRadius: "50%",
-                  background: `hsl(${40 + Math.random() * 20}, 95%, ${55 + Math.random() * 20}%)`,
-                  boxShadow: "0 0 6px rgba(251,191,36,0.8)",
-                  "--px": `${px}px`,
-                  "--py": `${py}px`,
-                  animation: `evo-particle 1.2s ${delay}s ease-out forwards`,
-                  zIndex: 202,
-                  top: "50%", left: "50%",
-                  marginTop: -size / 2, marginLeft: -size / 2,
-                  pointerEvents: "none",
-                }} />
-              );
-            })}
+            {/* Golden particles (memoized to prevent jitter on re-render) */}
+            {particles.map((pt, i) => (
+              <div key={i} style={{
+                position: "absolute", width: pt.size, height: pt.size,
+                borderRadius: "50%", background: pt.color,
+                boxShadow: "0 0 6px rgba(251,191,36,0.8)",
+                "--px": `${pt.px}px`, "--py": `${pt.py}px`,
+                animation: `evo-particle 1.2s ${pt.delay}s ease-out forwards`,
+                zIndex: 202, top: "50%", left: "50%",
+                marginTop: -pt.size / 2, marginLeft: -pt.size / 2,
+                pointerEvents: "none",
+              }} />
+            ))}
 
             {/* New companion (morphed) */}
             <div style={{

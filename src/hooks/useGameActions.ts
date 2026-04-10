@@ -1,9 +1,9 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
   RARE_DROPS, RARE_DROP_CHANCE, CHEST_MILESTONES,
-  WEEKLY_MISSIONS, BOSSES, UNLOCK_CONDITIONS, SHOP_ITEMS, BOSS_TIERS,
+  WEEKLY_MISSIONS, BOSSES, UNLOCK_CONDITIONS, SHOP_ITEMS,
 } from '../constants';
-import { getLevel, buildDay, getCatStage } from '../utils/helpers';
+import { getLevel, buildDay, getCatStage, getTierForStage } from '../utils/helpers';
 import storage from '../utils/storage';
 import SFX from '../utils/sfx';
 import type { GameState, RareDrop, ChestReward, WheelSegment } from '../types';
@@ -98,21 +98,18 @@ export default function useGameActions(
       const newSD = all ? prev.sd + 1 : prev.sd;
       const newBest = Math.max(prev.bestStreak || 0, newSD);
 
+      // Rare drop — single roll, reuse result for both UI toast and stat bonus
       const isRare = Math.random() < RARE_DROP_CHANCE;
-      if (isRare) {
-        const drop = RARE_DROPS[Math.floor(Math.random() * RARE_DROPS.length)];
-        setTimeout(() => setRareDrop(drop), 600);
-      }
+      const rareDrop = isRare ? RARE_DROPS[Math.floor(Math.random() * RARE_DROPS.length)] : null;
+      if (rareDrop) setTimeout(() => setRareDrop(rareDrop), 600);
 
       const chestEarned = all && CHEST_MILESTONES.includes(newSD as typeof CHEST_MILESTONES[number]) && !prev.chestMilestone;
       if (chestEarned) setTimeout(() => setShowChest(true), all ? 2500 : 800);
 
-      // Rare drop bonus — unified HP
       let bonusHP = 0, bonusMin = 0;
-      if (isRare) {
-        const drop = RARE_DROPS[Math.floor(Math.random() * RARE_DROPS.length)];
-        if (drop.type === "hp") bonusHP = drop.amount || 0;
-        if (drop.type === "minutes") bonusMin = drop.amount || 0;
+      if (rareDrop) {
+        if (rareDrop.type === "hp") bonusHP = rareDrop.amount || 0;
+        if (rareDrop.type === "minutes") bonusMin = rareDrop.amount || 0;
       }
 
       // Weekly mission progress
@@ -187,8 +184,8 @@ export default function useGameActions(
 
       // Evolution event for celebration overlay
       // Check if a new boss tier unlocked with this evolution
-      const prevMaxTier = BOSS_TIERS.filter(t => prevCatStage >= t.minStage).pop();
-      const newMaxTier = BOSS_TIERS.filter(t => newCatStage >= t.minStage).pop();
+      const prevMaxTier = getTierForStage(prevCatStage);
+      const newMaxTier = getTierForStage(newCatStage);
       const bossUnlock = newMaxTier?.id !== prevMaxTier?.id ? newMaxTier?.name : undefined;
 
       const evolutionEvent = newCatStage > prevCatStage

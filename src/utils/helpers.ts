@@ -1,5 +1,5 @@
-import { LVL, SCHOOL_QUESTS, VACATION_QUESTS, FOOTBALL, CAT_STAGES, SIDE_QUESTS } from '../constants';
-import type { Quest, CatMood } from '../types';
+import { LVL, SCHOOL_QUESTS, VACATION_QUESTS, FOOTBALL, CAT_STAGES, SIDE_QUESTS, SHOP_ITEMS, COMPANION_STAGES, BOSS_TIERS } from '../constants';
+import type { Quest, CatMood, ShopItem } from '../types';
 
 export function getLevel(xp: number): number {
   let l = 1;
@@ -79,3 +79,25 @@ export function getCatMood(hunger?: number, happy?: number, energy?: number): Ca
   if (avg >= 25) return "neutral";
   return "sleepy";
 }
+
+/** Find a shop item by ID across all categories */
+export function findShopItem(id: string): ShopItem | null {
+  for (const cat of Object.values(SHOP_ITEMS)) {
+    const item = cat.find((i: ShopItem) => i.id === id);
+    if (item) return item;
+  }
+  return null;
+}
+
+/** Get companion stage name with fallback to CAT_STAGES */
+export function getCompanionStageName(type: string, stage: number): { name: string; emoji: string; desc: string } {
+  return COMPANION_STAGES[type]?.[stage] || CAT_STAGES[stage] || { name: "Neue Stufe", emoji: "", desc: "" };
+}
+
+/** Get the highest boss tier available for a given companion stage */
+export function getTierForStage(companionStage: number): typeof BOSS_TIERS[number] {
+  const available = BOSS_TIERS.filter(t => companionStage >= t.minStage);
+  return available[available.length - 1] || BOSS_TIERS[0];
+}
+
+export const GERMAN_DAYS_SHORT = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] as const;

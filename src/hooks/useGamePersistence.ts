@@ -21,11 +21,13 @@ export default function useGamePersistence() {
           applyDayTransition(p, today);
         }
         applyDefaults(p);
-        // Always check vacation status on load (not just day transition)
-        const vacNow = isSchoolVacation(new Date());
-        if (p.vacMode !== vacNow.isVacation) {
-          p.vacMode = vacNow.isVacation;
-          p.quests = buildDay(p.vacMode).map(q => ({ ...q, done: false, streak: (p.sm || {})[q.id] || 0 }));
+        // Vacation check only needed when day transition didn't run (same-day reload)
+        if (p.lastDate === new Date().toDateString()) {
+          const vacNow = isSchoolVacation(new Date());
+          if (p.vacMode !== vacNow.isVacation) {
+            p.vacMode = vacNow.isVacation;
+            p.quests = buildDay(p.vacMode).map(q => ({ ...q, done: false, streak: (p.sm || {})[q.id] || 0 }));
+          }
         }
         setState(p);
         setBoarding(false);

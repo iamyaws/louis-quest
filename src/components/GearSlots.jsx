@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
-import { T, GEAR_SLOTS, SHOP_ITEMS } from '../constants';
-
-function findItem(id) {
-  for (const cat of Object.values(SHOP_ITEMS)) {
-    const item = cat.find(i => i.id === id);
-    if (item) return item;
-  }
-  return null;
-}
+import { T, GEAR_SLOTS } from '../constants';
+import { findShopItem } from '../utils/helpers';
 
 const SLOT_KEYS = ["head", "body", "accessory"];
 
@@ -23,7 +16,7 @@ export default function GearSlots({ equippedGear, purchased, onEquip, onUnequip 
     if (!slotDef) return [];
     return slotDef.items
       .filter(id => purchased.includes(id))
-      .map(id => ({ ...findItem(id), id }))
+      .map(id => ({ ...findShopItem(id), id }))
       .filter(Boolean);
   };
 
@@ -36,7 +29,7 @@ export default function GearSlots({ equippedGear, purchased, onEquip, onUnequip 
         {SLOT_KEYS.map(slot => {
           const slotDef = GEAR_SLOTS[slot];
           const equippedId = equippedGear[slot];
-          const equippedItem = equippedId ? findItem(equippedId) : null;
+          const equippedItem = equippedId ? findShopItem(equippedId) : null;
           const isOpen = openSlot === slot;
           const hasGear = !!equippedItem;
 

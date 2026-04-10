@@ -3,9 +3,7 @@ import Companion from './Companion';
 import Egg from './Egg';
 import HeroSprite from './HeroSprite';
 import { T, CAT_STAGES, COMPANION_TYPES } from '../constants';
-import { getCatStage, getCatMood } from '../utils/helpers';
-
-const GERMAN_DAYS_SHORT = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+import { getCatStage, getCatMood, GERMAN_DAYS_SHORT } from '../utils/helpers';
 const GERMAN_MONTHS = ["Januar", "Februar", "M\u00e4rz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
 export default function ProfileCard({ state, level, mood, weather, wInfo, todayDaily, actions, onCompanionTap }) {

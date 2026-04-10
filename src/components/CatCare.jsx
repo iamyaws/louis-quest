@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { T, CAT_STAGES, COMPANION_TYPES } from '../constants';
-import { getCatStage, getCatStageProg } from '../utils/helpers';
+import { getCatStage, getCatStageProg, getCatMood } from '../utils/helpers';
 import { ViewHeader } from './ui';
 import Companion from './Companion';
 import EvolutionTracker from './EvolutionTracker';
@@ -31,7 +31,7 @@ export default function CatCare() {
   const happy = state.catHappy ?? 100;
   const energy = state.catEnergy ?? 100;
   const avg = Math.round((hunger + happy + energy) / 3);
-  const catMood = avg >= 75 ? "excited" : avg >= 50 ? "happy" : avg >= 25 ? "neutral" : "sleepy";
+  const catMood = getCatMood(hunger, happy, energy);
 
   const doAction = (action) => {
     const doneKey = `cat${action.key.charAt(0).toUpperCase() + action.key.slice(1)}`;
