@@ -177,6 +177,7 @@ export default function TaskList() {
                       const isNext = idx === firstUndoneIdx;
                       const isLast = idx === quests.length - 1;
                       const hint = TASK_HINTS[q.id];
+                      const isAnziehen = q.id === 's4' || q.id === 'v4';
 
                       return (
                         <div key={q.id} className="flex gap-3 relative">
@@ -199,16 +200,31 @@ export default function TaskList() {
                           <div className="flex-1 mb-3">
                             {fullyDone ? (
                               /* ── Done task ── */
-                              <div className="flex items-center gap-3 p-4 rounded-xl opacity-60"
+                              <div className={`rounded-xl p-4 ${isAnziehen && todayWeather ? '' : 'opacity-60'}`}
                                    style={{ background: 'rgba(249,243,235,0.5)' }}>
-                                <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-                                     style={{ background: 'rgba(52,211,153,0.15)' }}>
-                                  <span className="text-lg">{q.icon}</span>
+                                <div className="flex items-center gap-3">
+                                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+                                       style={{ background: 'rgba(52,211,153,0.15)' }}>
+                                    <span className="text-lg">{q.icon}</span>
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="font-bold font-label line-through text-on-surface/50">{q.name}</p>
+                                  </div>
+                                  <span className="font-bold font-label text-xs" style={{ color: '#34d399' }}>+{q.xp} XP</span>
                                 </div>
-                                <div className="flex-1">
-                                  <p className="font-bold font-label line-through text-on-surface/50">{q.name}</p>
-                                </div>
-                                <span className="font-bold font-label text-xs" style={{ color: '#34d399' }}>+{q.xp} XP</span>
+                                {/* Weather hint persists after completion */}
+                                {isAnziehen && todayWeather && weatherInfo && (
+                                  <button
+                                    className="flex items-center gap-1.5 mt-2 ml-14 px-2 py-1 rounded-lg transition-all text-left"
+                                    style={{ background: 'rgba(2,132,199,0.08)' }}
+                                    onClick={() => setShowWeather(true)}
+                                  >
+                                    <span className="text-sm">{weatherInfo.emoji}</span>
+                                    <span className="text-xs font-bold" style={{ color: '#0284C7' }}>
+                                      {todayWeather.tempMin}°/{todayWeather.tempMax}° — Outfit ansehen
+                                    </span>
+                                  </button>
+                                )}
                               </div>
                             ) : (
                               /* ── Active task ── */
@@ -227,8 +243,7 @@ export default function TaskList() {
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-bold font-label text-on-surface">{q.name}</p>
-                                  {/* Weather hint for Anziehen */}
-                                  {(q.id === 's4' || q.id === 'v4') && todayWeather && weatherInfo ? (
+                                  {isAnziehen && todayWeather && weatherInfo ? (
                                     <button
                                       className="flex items-center gap-1.5 mt-1 px-2 py-1 rounded-lg transition-all text-left"
                                       style={{ background: 'rgba(2,132,199,0.08)' }}
