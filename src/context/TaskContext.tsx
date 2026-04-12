@@ -22,6 +22,11 @@ interface TaskState {
   dailyWaterCount: number;
   boss: Boss | null;
   bossTrophies: string[];
+  catFed: boolean;
+  catPetted: boolean;
+  catPlayed: boolean;
+  catEvo: number;
+  loginBonusClaimed: boolean;
 }
 
 interface TaskComputed {
@@ -36,6 +41,10 @@ interface TaskActions {
   complete: (id: string) => void;
   setMood: (period: string, val: number) => void;
   drinkWater: () => void;
+  feedCompanion: () => void;
+  petCompanion: () => void;
+  playCompanion: () => void;
+  collectLoginBonus: () => void;
 }
 
 interface TaskContextValue {
@@ -91,6 +100,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           dailyWaterCount: raw.dailyWaterCount || 0,
           boss: raw.boss || null,
           bossTrophies: raw.bossTrophies || [],
+          catFed: raw.catFed || false,
+          catPetted: raw.catPetted || false,
+          catPlayed: raw.catPlayed || false,
+          catEvo: raw.catEvo || 0,
+          loginBonusClaimed: raw.loginBonusClaimed || false,
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -119,6 +133,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           dailyWaterCount: 0,
           boss: assignBoss(),
           bossTrophies: [],
+          catFed: false,
+          catPetted: false,
+          catPlayed: false,
+          catEvo: 0,
+          loginBonusClaimed: false,
         });
       }
       setLoading(false);
@@ -172,6 +191,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       moodPM: null,
       dailyWaterCount: 0,
       boss: assignBoss(),
+      catFed: false,
+      catPetted: false,
+      catPlayed: false,
+      loginBonusClaimed: false,
     };
   }
 
@@ -224,6 +247,36 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Companion care ──
+  const feedCompanion = useCallback(() => {
+    setState(prev => {
+      if (!prev || prev.catFed) return prev;
+      return { ...prev, catFed: true, hp: (prev.hp || 0) + 5, catEvo: (prev.catEvo || 0) + 1 };
+    });
+  }, []);
+
+  const petCompanion = useCallback(() => {
+    setState(prev => {
+      if (!prev || prev.catPetted) return prev;
+      return { ...prev, catPetted: true, hp: (prev.hp || 0) + 3, catEvo: (prev.catEvo || 0) + 1 };
+    });
+  }, []);
+
+  const playCompanion = useCallback(() => {
+    setState(prev => {
+      if (!prev || prev.catPlayed) return prev;
+      return { ...prev, catPlayed: true, hp: (prev.hp || 0) + 8, catEvo: (prev.catEvo || 0) + 1 };
+    });
+  }, []);
+
+  // ── Login bonus ──
+  const collectLoginBonus = useCallback(() => {
+    setState(prev => {
+      if (!prev || prev.loginBonusClaimed) return prev;
+      return { ...prev, loginBonusClaimed: true, hp: (prev.hp || 0) + 5 };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -245,7 +298,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater }, loading }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus }, loading }}>
       {children}
     </TaskContext.Provider>
   );

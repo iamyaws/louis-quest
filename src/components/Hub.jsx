@@ -71,6 +71,23 @@ export default function Hub() {
           </div>
         </div>
 
+        {/* ── Login Bonus ── */}
+        {!state.loginBonusClaimed && (
+          <button
+            className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+            style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}
+            onClick={() => { SFX.play('pop'); actions.collectLoginBonus(); }}
+          >
+            <span className="text-3xl">👋</span>
+            <div className="flex-1">
+              <p className="font-headline font-bold text-base text-secondary">Willkommen zurück!</p>
+              <p className="font-body text-sm text-on-surface-variant">Tippe für deinen täglichen Heldenpunkt</p>
+            </div>
+            <span className="px-3 py-1.5 rounded-full font-label font-bold text-xs"
+                  style={{ background: '#fcd34d', color: '#725b00' }}>+5 HP</span>
+          </button>
+        )}
+
         {/* ── Daily Summary Card ── */}
         <div className="p-6 rounded-2xl relative overflow-hidden"
              style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>

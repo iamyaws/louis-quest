@@ -5,6 +5,7 @@ import NavBar from './components/NavBar';
 import TaskList from './components/TaskList';
 import Belohnungsbank from './components/Belohnungsbank';
 import Hub from './components/Hub';
+import Sanctuary from './components/Sanctuary';
 
 function AppContent() {
   const { loading } = useTask();
@@ -20,18 +21,13 @@ function AppContent() {
 
   return (
     <>
-      {view !== 'hub' && <TopBar />}
-      <div className={`min-h-screen max-w-lg mx-auto ${view === 'hub' ? '' : 'bg-surface'}`}
-           style={{ paddingTop: view === 'hub' ? 0 : 72, paddingBottom: 96 }}>
+      {(view !== 'hub' && view !== 'care') && <TopBar />}
+      <div className={`min-h-screen max-w-lg mx-auto ${(view === 'hub' || view === 'care') ? '' : 'bg-surface'}`}
+           style={{ paddingTop: (view === 'hub' || view === 'care') ? 0 : 72, paddingBottom: 96 }}>
         {view === 'quests' && <TaskList />}
         {view === 'shop' && <Belohnungsbank />}
         {view === 'hub' && <Hub />}
-        {view === 'room' && (
-          <div className="px-6 pt-8 text-center">
-            <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">potted_plant</span>
-            <p className="font-headline text-xl text-on-surface-variant">Zimmer — Coming Soon</p>
-          </div>
-        )}
+        {view === 'care' && <Sanctuary />}
         {view === 'journal' && (
           <div className="px-6 pt-8 text-center">
             <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">menu_book</span>

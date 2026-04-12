@@ -3,7 +3,7 @@ import React from 'react';
 const TABS = [
   { id: 'hub',     label: 'Hub',     icon: 'home' },
   { id: 'quests',  label: 'Quests',  icon: 'military_tech' },
-  { id: 'room',    label: 'Room',    icon: 'bedroom_parent' },
+  { id: 'care',    label: 'Care',    icon: 'favorite' },
   { id: 'shop',    label: 'Shop',    icon: 'shopping_bag' },
   { id: 'journal', label: 'Journal', icon: 'auto_stories' },
 ];
