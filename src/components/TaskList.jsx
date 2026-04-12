@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ANCHORS } from '../constants';
 import { useTask } from '../context/TaskContext';
+import useWeather, { getWeatherInfo, getClothingRecs } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
 
 const ANCHOR_META = {
@@ -16,8 +17,10 @@ const TASK_HINTS = {
   s2: 'Kissen glatt, Decke drauf!',
   s5: 'Bücher und Pausenbrot einpacken',
   s6b: 'Schutz für sonnige Tage',
-  s_lunchbox: 'Brotdose ausspülen nicht vergessen',
-  s_packcheck: 'Alles drin für morgen?',
+  s_lunchbox: 'Ausspülen und trocknen lassen',
+  s_water: 'Frisches Wasser für morgen',
+  s_packcheck: 'Hefte, Bücher, Mäppchen — alles drin?',
+  s_signature: 'Mama/Papa müssen noch unterschreiben?',
   s7: 'Erst die Arbeit, dann das Spiel',
   s8: 'Abenteuer im Kopf erleben',
   s9: 'Alles hat seinen Platz',
@@ -25,7 +28,8 @@ const TASK_HINTS = {
   s13: 'Gesicht sauber machen',
   s14: 'Pflege für deine Haut',
   s15: 'Ab in die Schlafklamotten',
-  geschirr: 'Teller & Gläser einräumen',
+  sq_geschirr: 'Teller & Gläser einräumen',
+  sq_zimmer: 'Alles hat seinen Platz',
   ft: 'Volle Power auf dem Platz!',
   v1: 'Frisches Gesicht, frischer Start!',
   v3: '3 Minuten glänzen lassen',
@@ -43,8 +47,18 @@ const TASK_HINTS = {
 export default function TaskList() {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct, byGroup } = computed;
+  const { weather } = useWeather();
+  const [showWeather, setShowWeather] = useState(false);
 
   if (!state) return null;
+
+  // Weather data for clothing hints
+  const todayWeather = weather?.daily?.[0];
+  const currentWeather = weather?.current;
+  const weatherInfo = currentWeather ? getWeatherInfo(currentWeather.weatherCode) : null;
+  const clothingRecs = currentWeather
+    ? getClothingRecs(currentWeather.temp, currentWeather.feelsLike, currentWeather.weatherCode, currentWeather.windSpeed)
+    : [];
 
   const handleComplete = (id) => {
     actions.complete(id);
@@ -198,8 +212,8 @@ export default function TaskList() {
                               </div>
                             ) : (
                               /* ── Active task ── */
-                              <button
-                                className="w-full flex items-center gap-3 p-4 rounded-xl transition-all text-left active:scale-[0.98]"
+                              <div
+                                className="w-full flex items-center gap-3 p-4 rounded-xl transition-all text-left cursor-pointer active:scale-[0.98]"
                                 style={{
                                   background: '#ffffff',
                                   border: isNext ? '1.5px solid rgba(83,0,183,0.1)' : '1px solid rgba(0,0,0,0.06)',
@@ -213,9 +227,21 @@ export default function TaskList() {
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-bold font-label text-on-surface">{q.name}</p>
-                                  {hint && (
+                                  {/* Weather hint for Anziehen */}
+                                  {(q.id === 's4' || q.id === 'v4') && todayWeather && weatherInfo ? (
+                                    <button
+                                      className="flex items-center gap-1.5 mt-1 px-2 py-1 rounded-lg transition-all text-left"
+                                      style={{ background: 'rgba(2,132,199,0.08)' }}
+                                      onClick={(e) => { e.stopPropagation(); setShowWeather(true); }}
+                                    >
+                                      <span className="text-sm">{weatherInfo.emoji}</span>
+                                      <span className="text-xs font-bold" style={{ color: '#0284C7' }}>
+                                        {todayWeather.tempMin}°/{todayWeather.tempMax}° — Tippe für Outfit-Tipp!
+                                      </span>
+                                    </button>
+                                  ) : hint ? (
                                     <p className="text-xs font-body text-on-surface/60 mt-0.5">{hint}</p>
-                                  )}
+                                  ) : null}
                                   {isRepeatable && (
                                     <p className="text-xs font-body text-on-surface/60 mt-0.5">
                                       {curCompletions}/{q.target} erledigt
@@ -223,7 +249,7 @@ export default function TaskList() {
                                   )}
                                 </div>
                                 <span className="font-bold font-label text-xs text-primary">+{q.xp} XP</span>
-                              </button>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -332,6 +358,62 @@ export default function TaskList() {
           <span className="material-symbols-outlined text-3xl">add</span>
         </button>
       </div>
+
+      {/* ── Weather Outfit Modal ── */}
+      {showWeather && currentWeather && (
+        <div className="fixed inset-0 z-[200] flex items-end justify-center"
+             onClick={() => setShowWeather(false)}>
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+
+          {/* Sheet */}
+          <div className="relative w-full max-w-lg rounded-t-[2rem] pb-10 pt-6 px-6 overflow-auto"
+               style={{ background: '#fff8f1', maxHeight: '80vh', animation: 'slideUp 0.3s ease' }}
+               onClick={e => e.stopPropagation()}>
+
+            {/* Handle */}
+            <div className="w-11 h-1.5 rounded-full mx-auto mb-6" style={{ background: 'rgba(0,0,0,0.12)' }} />
+
+            {/* Weather header */}
+            <div className="text-center mb-6">
+              <div className="text-5xl mb-2">{weatherInfo?.emoji}</div>
+              <h2 className="font-headline text-2xl text-on-surface">Heute anziehen</h2>
+              <p className="font-body text-on-surface-variant mt-1">
+                {weatherInfo?.label} · {currentWeather.temp}° (fühlt sich an wie {currentWeather.feelsLike}°)
+              </p>
+              {todayWeather && (
+                <p className="font-label text-sm text-on-surface-variant mt-1">
+                  {todayWeather.tempMin}° — {todayWeather.tempMax}°
+                  {todayWeather.precipProb > 20 && ` · ${todayWeather.precipProb}% Regen`}
+                </p>
+              )}
+            </div>
+
+            {/* Clothing recommendations */}
+            <div className="flex flex-col gap-3 mb-6">
+              {clothingRecs.map((item, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 rounded-xl"
+                     style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)' }}>
+                  <span className="text-3xl shrink-0">{item.emoji}</span>
+                  <div className="flex-1">
+                    <p className="font-label font-bold text-on-surface">{item.name}</p>
+                    <p className="font-body text-sm text-on-surface-variant">{item.reason}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Close */}
+            <button
+              className="w-full py-4 rounded-full font-label font-bold text-lg transition-all active:scale-95"
+              style={{ background: '#fcd34d', color: '#725b00' }}
+              onClick={() => setShowWeather(false)}
+            >
+              Verstanden!
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
