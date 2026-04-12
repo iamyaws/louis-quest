@@ -7,9 +7,7 @@ export default function TopBar() {
         {/* Left: Avatar + Brand */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
-            <span className="material-symbols-outlined text-white text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-              person
-            </span>
+            <img src={import.meta.env.BASE_URL + 'art/dragon-baby.webp'} alt="Avatar" className="w-full h-full object-cover" />
           </div>
           <span className="font-headline text-2xl font-bold text-primary">Ronki</span>
         </div>
