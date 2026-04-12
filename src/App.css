@@ -115,21 +115,21 @@ body { background: #FFF8F0; font-family: 'Nunito', sans-serif; overscroll-behavi
   color: #B45309;
 }
 
-/* ── Central play/quest button ── */
+/* ── Central task button (same size as other tabs) ── */
 .tab-cta {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FCD34D, #F59E0B);
-  border: 5px solid #F59E0B;
-  box-shadow: 0 8px 32px rgba(245,158,11,0.45), 0 2px 8px rgba(0,0,0,0.10);
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6D28D9, #7C3AED);
+  border: 2px solid rgba(109,40,217,0.3);
+  box-shadow: 0 4px 16px rgba(109,40,217,0.25);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-top: -44px;
   transition: transform .12s ease;
   color: white;
+  font-size: 1.5rem;
 }
 .tab-cta:active { transform: scale(0.93); }
 

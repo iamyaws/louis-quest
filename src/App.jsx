@@ -62,8 +62,9 @@ function BottomTabBar() {
       {TABS.map(tab => {
         if (tab.isCta) {
           return (
-            <button key={tab.id} className="tab-cta" onClick={() => { SFX.play("tap"); setQuestOpen(true); }} aria-label="Aufgaben öffnen">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <button key={tab.id} className="tab-item" onClick={() => { SFX.play("tap"); setQuestOpen(true); }} aria-label="Aufgaben öffnen">
+              <div className="tab-icon" style={{ background: "linear-gradient(135deg, #6D28D9, #7C3AED)", color: "white", border: "2px solid rgba(109,40,217,0.3)", boxShadow: "0 3px 12px rgba(109,40,217,0.2)" }}><span style={{ fontSize: "1.3rem" }}>{"\u{1F4CB}"}</span></div>
+              <span className="tab-label" style={{ color: "#6D28D9", fontWeight: 800 }}>Aufgaben</span>
             </button>
           );
         }
