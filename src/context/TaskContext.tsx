@@ -1,21 +1,27 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import type { Quest, GameState } from '../types';
+import type { Quest, GameState, Boss } from '../types';
 import { buildDay } from '../utils/helpers';
+import { BOSSES } from '../constants';
 import storage from '../utils/storage';
 
 // ── Minimal state shape for the task list ──
 interface TaskState {
   quests: Quest[];
-  sm: Record<string, number>;  // streak map
-  sd: number;                   // streak days
+  sm: Record<string, number>;
+  sd: number;
   lastDate: string;
   vacMode: boolean;
-  dt: number;                   // earned minutes today
-  hp: number;                   // heldenpunkte balance
-  drachenEier: number;          // dragon egg currency
+  dt: number;
+  hp: number;
+  drachenEier: number;
   eggType: string | null;
   eggProgress: number;
   eggHatched: boolean;
+  moodAM: number | null;
+  moodPM: number | null;
+  dailyWaterCount: number;
+  boss: Boss | null;
+  bossTrophies: string[];
 }
 
 interface TaskComputed {
@@ -28,6 +34,8 @@ interface TaskComputed {
 
 interface TaskActions {
   complete: (id: string) => void;
+  setMood: (period: string, val: number) => void;
+  drinkWater: () => void;
 }
 
 interface TaskContextValue {
@@ -35,6 +43,13 @@ interface TaskContextValue {
   computed: TaskComputed;
   actions: TaskActions;
   loading: boolean;
+}
+
+function assignBoss(): Boss {
+  // Tier 1 bosses for now (tier system can expand later)
+  const tier1 = BOSSES.filter(b => b.tier === 'tier1');
+  const b = tier1[Math.floor(Math.random() * tier1.length)];
+  return { id: b.id, hp: b.hp, maxHp: b.hp };
 }
 
 const TaskContext = createContext<TaskContextValue | null>(null);
@@ -71,11 +86,18 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           eggType: raw.eggType || 'dragon',
           eggProgress: raw.eggProgress || 0,
           eggHatched: raw.eggHatched || false,
+          moodAM: raw.moodAM ?? null,
+          moodPM: raw.moodPM ?? null,
+          dailyWaterCount: raw.dailyWaterCount || 0,
+          boss: raw.boss || null,
+          bossTrophies: raw.bossTrophies || [],
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
           s = applyDayTransition(s);
         }
+        // Ensure boss exists
+        if (!s.boss) s.boss = assignBoss();
         setState(s);
       } else {
         // Fresh start
@@ -92,6 +114,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           eggType: 'dragon',
           eggProgress: 0,
           eggHatched: false,
+          moodAM: null,
+          moodPM: null,
+          dailyWaterCount: 0,
+          boss: assignBoss(),
+          bossTrophies: [],
         });
       }
       setLoading(false);
@@ -141,6 +168,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       sd: newSd,
       lastDate: today(),
       dt: 0,
+      moodAM: null,
+      moodPM: null,
+      dailyWaterCount: 0,
+      boss: assignBoss(),
     };
   }
 
@@ -148,15 +179,48 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const complete = useCallback((id: string) => {
     setState(prev => {
       if (!prev) return prev;
-      const quests = prev.quests.map(q => {
-        if (q.id !== id) return q;
-        const completions = (q.completions || 0) + 1;
-        const target = q.target || 1;
+      const q = prev.quests.find(q => q.id === id);
+      if (!q) return prev;
+
+      const quests = prev.quests.map(quest => {
+        if (quest.id !== id) return quest;
+        const completions = (quest.completions || 0) + 1;
+        const target = quest.target || 1;
         const done = completions >= target;
-        return { ...q, completions, done };
+        return { ...quest, completions, done };
       });
-      const dt = prev.dt + (prev.quests.find(q => q.id === id)?.minutes || 0);
-      return { ...prev, quests, dt };
+
+      const dt = prev.dt + (q.minutes || 0);
+      const hpGain = q.xp; // 1:1 XP to HP
+      let hp = (prev.hp || 0) + hpGain;
+
+      // Boss damage
+      let boss = prev.boss ? { ...prev.boss } : null;
+      let bossTrophies = [...(prev.bossTrophies || [])];
+      if (boss && boss.hp > 0) {
+        const dmg = Math.max(5, Math.floor(q.xp * 0.8));
+        boss.hp = Math.max(0, boss.hp - dmg);
+        if (boss.hp <= 0) {
+          const bd = BOSSES.find(b => b.id === boss!.id);
+          if (bd) hp += bd.reward.hp;
+          if (!bossTrophies.includes(boss.id)) bossTrophies.push(boss.id);
+        }
+      }
+
+      return { ...prev, quests, dt, hp, boss, bossTrophies };
+    });
+  }, []);
+
+  // ── Set mood ──
+  const setMood = useCallback((period: string, val: number) => {
+    setState(prev => prev ? { ...prev, [period]: val } : prev);
+  }, []);
+
+  // ── Drink water ──
+  const drinkWater = useCallback(() => {
+    setState(prev => {
+      if (!prev || (prev.dailyWaterCount || 0) >= 6) return prev;
+      return { ...prev, dailyWaterCount: (prev.dailyWaterCount || 0) + 1, hp: (prev.hp || 0) + 2 };
     });
   }, []);
 
@@ -181,7 +245,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete }, loading }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater }, loading }}>
       {children}
     </TaskContext.Provider>
   );

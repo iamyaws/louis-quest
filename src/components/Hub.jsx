@@ -1,5 +1,5 @@
 import React from 'react';
-import { WEEKLY_MISSIONS, MOOD_EMOJIS } from '../constants';
+import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES } from '../constants';
 import { useTask } from '../context/TaskContext';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
@@ -24,22 +24,21 @@ export default function Hub() {
       </div>
       <div className="fixed inset-0 -z-10" style={{ background: 'rgba(255,248,241,0.45)' }} />
 
-      {/* ── Hero Header ── */}
-      <header className="flex flex-col items-center pt-8 pb-4"
+      {/* ── Minimal Top Bar ── */}
+      <header className="flex justify-between items-center px-6 pt-6 pb-2"
               style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}>
-        <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-white shadow-xl"
-             style={{ background: '#ebddff' }}>
-          <img src={base + 'art/dragon-baby.webp'} alt="Avatar" className="w-full h-full object-cover" />
-        </div>
-        <span className="text-2xl font-headline font-bold text-primary mt-2" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
-          Hero
-        </span>
-        <span className="text-[10px] font-bold font-label text-primary/80 uppercase tracking-[0.2em]">Level 1</span>
-        <div className="mt-3 px-5 py-1.5 rounded-full flex items-center gap-2"
-             style={{ background: 'rgba(83,0,183,0.1)', backdropFilter: 'blur(20px)', border: '1px solid rgba(83,0,183,0.2)' }}>
-          <span className="font-bold text-[11px] font-label text-primary">
-            {state.hp || 0} HP
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg"
+               style={{ background: '#ebddff' }}>
+            <img src={base + 'art/dragon-baby.webp'} alt="Avatar" className="w-full h-full object-cover" />
+          </div>
+          <span className="text-xl font-headline font-bold text-primary" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
+            Ronki
           </span>
+        </div>
+        <div className="px-4 py-1.5 rounded-full flex items-center gap-2"
+             style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.5)' }}>
+          <span className="font-bold text-[11px] font-label text-primary">Lv. 1 · {state.hp || 0} HP</span>
         </div>
       </header>
 
@@ -151,28 +150,44 @@ export default function Hub() {
         </div>
 
         {/* ── Boss Card ── */}
-        {state.boss && (
-          <div className="p-5 rounded-2xl"
-               style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center"
-                   style={{ background: 'rgba(186,26,26,0.1)', border: '1px solid rgba(186,26,26,0.2)' }}>
-                <span className="text-2xl">🐙</span>
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <p className="font-bold text-[10px] font-label text-error uppercase tracking-widest">Boss-Kampf</p>
-                  <p className="font-bold text-xs font-label text-error">{state.boss.hp}/{state.boss.maxHp} HP</p>
+        {state.boss && (() => {
+          const bd = BOSSES.find(b => b.id === state.boss.id);
+          if (!bd) return null;
+          const defeated = state.boss.hp <= 0;
+          return (
+            <div className="p-5 rounded-2xl"
+                 style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
+              {defeated ? (
+                <div className="text-center py-2">
+                  <span className="text-4xl">🏆</span>
+                  <h4 className="font-headline font-bold text-lg text-primary-container mt-2">Boss besiegt!</h4>
+                  <p className="text-sm text-on-surface-variant font-body">{bd.icon} {bd.name} wurde besiegt!</p>
                 </div>
-                <h4 className="font-headline font-bold text-lg text-primary-container">Bildschirm-Krake</h4>
-              </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                         style={{ background: 'rgba(186,26,26,0.1)', border: '1px solid rgba(186,26,26,0.2)' }}>
+                      <span className="text-2xl">{bd.icon}</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <p className="font-bold text-[10px] font-label text-error uppercase tracking-widest">Boss-Kampf</p>
+                        <p className="font-bold text-xs font-label text-error">{state.boss.hp}/{state.boss.maxHp} HP</p>
+                      </div>
+                      <h4 className="font-headline font-bold text-lg text-primary-container">{bd.name}</h4>
+                    </div>
+                  </div>
+                  <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: 'rgba(232,225,218,0.5)' }}>
+                    <div className="h-full bg-error rounded-full transition-all duration-500"
+                         style={{ width: `${(state.boss.hp / state.boss.maxHp) * 100}%` }} />
+                  </div>
+                  <p className="text-[11px] text-on-surface-variant font-body italic mt-1.5">{bd.desc}</p>
+                </>
+              )}
             </div>
-            <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: 'rgba(232,225,218,0.5)' }}>
-              <div className="h-full bg-error rounded-full" style={{ width: `${(state.boss.hp / state.boss.maxHp) * 100}%` }} />
-            </div>
-            <p className="text-[11px] text-on-surface-variant font-body italic mt-1.5">Will dich den ganzen Tag am Bildschirm festhalten!</p>
-          </div>
-        )}
+          );
+        })()}
 
         {/* ── Side Quests ── */}
         {(() => {

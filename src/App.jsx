@@ -20,7 +20,7 @@ function AppContent() {
 
   return (
     <>
-      <TopBar />
+      {view !== 'hub' && <TopBar />}
       <div className={`min-h-screen max-w-lg mx-auto ${view === 'hub' ? '' : 'bg-surface'}`}
            style={{ paddingTop: view === 'hub' ? 0 : 72, paddingBottom: 96 }}>
         {view === 'quests' && <TaskList />}
