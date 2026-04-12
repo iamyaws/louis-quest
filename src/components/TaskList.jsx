@@ -95,9 +95,10 @@ export default function TaskList() {
 
                   return (
                     <div key={q.id}
-                      className={`bg-surface-container-lowest rounded-lg p-6 relative overflow-hidden group transition-all shadow-sm ${
-                        fullyDone ? 'opacity-50' : 'hover:shadow-md'
+                      className={`rounded-2xl p-5 relative overflow-hidden group transition-all ${
+                        fullyDone ? 'opacity-50' : ''
                       }`}
+                      style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
                     >
                       {/* Lotus motif decoration */}
                       <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-on-surface/[0.03] pointer-events-none"
@@ -112,7 +113,7 @@ export default function TaskList() {
                       <div className="flex items-center justify-between relative z-10">
                         <div className="flex items-center gap-5">
                           {/* Icon circle */}
-                          <div className="w-14 h-14 rounded-full bg-primary-fixed/40 flex items-center justify-center shrink-0">
+                          <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 bg-[#e8d5ff]">
                             <span className="material-symbols-outlined text-3xl text-primary">{matIcon}</span>
                           </div>
                           {/* Task info */}
@@ -121,7 +122,7 @@ export default function TaskList() {
                               {q.name}
                             </h3>
                             <div className="flex gap-3 mt-1.5">
-                              <span className="text-secondary font-bold text-sm bg-secondary-container/20 px-2 py-0.5 rounded-md flex items-center gap-1">
+                              <span className="text-secondary font-bold text-sm bg-[#fff4d6] px-2 py-0.5 rounded-md flex items-center gap-1">
                                 <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
                                 +{q.xp} XP
                               </span>
@@ -174,17 +175,18 @@ export default function TaskList() {
                   const matIcon = ICON_MAP[q.icon] || 'auto_awesome';
                   return (
                     <div key={q.id}
-                      className={`bg-surface-container-lowest rounded-lg p-6 group transition-all shadow-sm ${q.done ? 'opacity-50' : 'hover:shadow-md'}`}
+                      className={`rounded-2xl p-5 group transition-all ${q.done ? 'opacity-50' : ''}`}
+                      style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-5">
-                          <div className="w-14 h-14 rounded-full bg-secondary-fixed/40 flex items-center justify-center shrink-0">
+                          <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 bg-[#fff0c8]">
                             <span className="material-symbols-outlined text-3xl text-secondary">{matIcon}</span>
                           </div>
                           <div>
                             <h3 className={`font-label font-bold text-lg ${q.done ? 'line-through text-on-surface/40' : 'text-on-surface'}`}>{q.name}</h3>
                             <div className="flex gap-3 mt-1.5">
-                              <span className="text-secondary font-bold text-sm bg-secondary-container/20 px-2 py-0.5 rounded-md flex items-center gap-1">
+                              <span className="text-secondary font-bold text-sm bg-[#fff4d6] px-2 py-0.5 rounded-md flex items-center gap-1">
                                 <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
                                 +{q.xp} XP
                               </span>

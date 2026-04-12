@@ -73,23 +73,21 @@
 }
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
-html, body, #root {
-  height: 100%;
-  width: 100%;
-}
-
-body {
-  background: #fff8f1;
-  font-family: "Nunito", sans-serif;
-  color: #1e1b17;
-  overscroll-behavior: none;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+  }
+  body {
+    background: #fff8f1;
+    font-family: "Nunito", sans-serif;
+    color: #1e1b17;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
 /* ============================================================
