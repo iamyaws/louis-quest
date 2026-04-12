@@ -1,6 +1,11 @@
 import React from 'react';
+import { useTask } from '../context/TaskContext';
+import { Pearl } from './CurrencyIcons';
 
 export default function TopBar() {
+  const { state } = useTask();
+  const hp = state?.hp || 0;
+
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl">
       <div className="flex justify-between items-center px-6 py-4 w-full max-w-lg mx-auto">
@@ -12,9 +17,11 @@ export default function TopBar() {
           <span className="font-headline text-2xl font-bold text-primary">Ronki</span>
         </div>
 
-        {/* Right: Level pill */}
-        <div className="bg-surface-container-low px-4 py-1.5 rounded-full">
-          <span className="text-primary font-bold text-lg font-label">Lv. 1</span>
+        {/* Right: HP pill with Pearl icon */}
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
+             style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
+          <Pearl size={20} />
+          <span className="text-primary font-bold text-sm font-label">{hp}</span>
         </div>
       </div>
     </header>

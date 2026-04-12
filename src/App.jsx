@@ -7,6 +7,8 @@ import Belohnungsbank from './components/Belohnungsbank';
 import Hub from './components/Hub';
 import Sanctuary from './components/Sanctuary';
 import Journal from './components/Journal';
+import HeldenKodex from './components/HeldenKodex';
+import HeroCreator from './components/HeroCreator';
 
 function AppContent() {
   const { loading } = useTask();
@@ -22,16 +24,23 @@ function AppContent() {
 
   return (
     <>
-      {(view !== 'hub' && view !== 'care') && <TopBar />}
-      <div className={`min-h-screen max-w-lg mx-auto ${(view === 'hub' || view === 'care') ? '' : 'bg-surface'}`}
-           style={{ paddingTop: (view === 'hub' || view === 'care') ? 0 : 72, paddingBottom: 96 }}>
-        {view === 'quests' && <TaskList />}
-        {view === 'shop' && <Belohnungsbank />}
-        {view === 'hub' && <Hub />}
-        {view === 'care' && <Sanctuary />}
-        {view === 'journal' && <Journal />}
-      </div>
-      <NavBar active={view} onNavigate={setView} />
+      {view === 'hero-creator' ? (
+        <HeroCreator onComplete={(cfg) => { console.log('Hero config:', cfg); setView('hub'); }} />
+      ) : (
+        <>
+          {!['hub', 'care'].includes(view) && <TopBar />}
+          <div className={`min-h-screen max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
+               style={{ paddingTop: ['hub', 'care'].includes(view) ? 0 : 72, paddingBottom: 96 }}>
+            {view === 'quests' && <TaskList />}
+            {view === 'shop' && <Belohnungsbank />}
+            {view === 'hub' && <Hub onNavigate={setView} />}
+            {view === 'care' && <Sanctuary />}
+            {view === 'journal' && <Journal />}
+            {view === 'kodex' && <HeldenKodex />}
+          </div>
+          <NavBar active={view} onNavigate={setView} />
+        </>
+      )}
     </>
   );
 }

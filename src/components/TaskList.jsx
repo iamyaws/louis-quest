@@ -96,54 +96,46 @@ export default function TaskList() {
           return (
             <details key={anchor} className="group overflow-hidden" open={!secDone && !isEvening}
               style={{
-                background: isEvening && !secDone ? '#f9f3eb' : '#ffffff',
+                background: '#ffffff',
                 borderRadius: '1.25rem',
-                border: isEvening && !secDone ? 'none' : '1px solid rgba(83,0,183,0.05)',
-                boxShadow: isEvening && !secDone ? 'none' : '0 2px 8px rgba(0,0,0,0.04)',
+                border: '1px solid rgba(83,0,183,0.05)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
               }}
             >
               {/* ── Epic Header (Summary) ── */}
-              <summary className="p-6 cursor-pointer lotus-pattern" style={{ opacity: isEvening && !secDone ? 0.7 : 1 }}>
+              <summary className="p-6 cursor-pointer lotus-pattern">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                         style={{ background: isEvening && !secDone ? 'rgba(74,68,85,0.05)' : `${meta.col}15` }}>
+                         style={{ background: `${meta.col}15` }}>
                       <span className="material-symbols-outlined text-3xl"
-                            style={{ color: isEvening && !secDone ? '#4a4455' : meta.col }}>
+                            style={{ color: meta.col }}>
                         {meta.icon}
                       </span>
                     </div>
                     <div>
                       <h3 className="text-xl font-bold font-headline text-on-surface">{meta.label}</h3>
                       <p className="text-sm font-medium font-label text-on-surface/60">
-                        {secDone ? 'Geschafft!' : isEvening && !secDone ? 'Gesperrt bis 18:00 Uhr' : `Noch ${quests.length - doneCount} Aufgaben`}
+                        {secDone ? 'Geschafft!' : `Noch ${quests.length - doneCount} Aufgaben`}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {/* Progress ring or badge */}
-                    {isEvening && !secDone ? (
-                      <div className="px-3 py-1 rounded-full text-[10px] font-bold font-label uppercase"
-                           style={{ background: '#e8e1da' }}>
-                        {quests.length} Aufgaben
-                      </div>
-                    ) : (
-                      <div className="relative w-12 h-12 flex items-center justify-center">
-                        <svg className="w-full h-full -rotate-90">
-                          <circle cx="24" cy="24" fill="transparent" r="20"
-                                  stroke="rgba(204,195,215,0.2)" strokeWidth="4" />
-                          <circle cx="24" cy="24" fill="transparent" r="20"
-                                  stroke={secDone ? '#34d399' : '#fcd34d'}
-                                  strokeWidth="4" strokeLinecap="round"
-                                  strokeDasharray="125.6"
-                                  strokeDashoffset={125.6 - (doneCount / quests.length) * 125.6} />
-                        </svg>
-                        <span className="absolute text-[10px] font-bold font-label">
-                          {doneCount}/{quests.length}
-                        </span>
-                      </div>
-                    )}
+                    <div className="relative w-12 h-12 flex items-center justify-center">
+                      <svg className="w-full h-full -rotate-90">
+                        <circle cx="24" cy="24" fill="transparent" r="20"
+                                stroke="rgba(204,195,215,0.2)" strokeWidth="4" />
+                        <circle cx="24" cy="24" fill="transparent" r="20"
+                                stroke={secDone ? '#34d399' : '#fcd34d'}
+                                strokeWidth="4" strokeLinecap="round"
+                                strokeDasharray="125.6"
+                                strokeDashoffset={125.6 - (doneCount / quests.length) * 125.6} />
+                      </svg>
+                      <span className="absolute text-[10px] font-bold font-label">
+                        {doneCount}/{quests.length}
+                      </span>
+                    </div>
                     <span className="material-symbols-outlined text-on-surface/40 group-open:rotate-180 transition-transform">
                       expand_more
                     </span>
@@ -152,11 +144,7 @@ export default function TaskList() {
               </summary>
 
               {/* ── Task Items ── */}
-              {isEvening && !secDone && doneCount === 0 ? (
-                <div className="px-6 pb-6 pt-2 text-center text-sm font-medium font-label text-on-surface/40">
-                  Schalte diese Quest am Abend frei, um Belohnungen zu sammeln!
-                </div>
-              ) : (
+              {(
                 <div className="px-6 pb-6 pt-2">
                   {/* Section label */}
                   <div className="flex items-center gap-3 mb-4">

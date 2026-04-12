@@ -4,6 +4,7 @@ import { useTask } from '../context/TaskContext';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
 import Egg from './Egg';
+import { Pearl } from './CurrencyIcons';
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 
@@ -13,7 +14,7 @@ const BOSS_ART = {
   flimmerfux:   { full: 'art/boss-flimmerfux_the-flicker-fox-fullpower.webp', defeated: 'art/boss-flimmerfux_the-flicker-fox-defeated.webp' },
 };
 
-export default function Hub() {
+export default function Hub({ onNavigate }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct } = computed;
   const { weather } = useWeather();
@@ -74,7 +75,7 @@ export default function Hub() {
         <div className="flex justify-center">
           <div className="flex items-center gap-2 px-6 py-3 rounded-full"
                style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(16px)', border: '1px solid white', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
-            <span className="material-symbols-outlined text-secondary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>monetization_on</span>
+            <Pearl size={24} />
             <span className="font-extrabold font-label text-sm text-primary-container">{state.hp || 0} Heldenpunkte</span>
           </div>
         </div>
@@ -301,6 +302,24 @@ export default function Hub() {
             </div>
           );
         })()}
+
+        {/* ── Helden-Kodex Card ── */}
+        <button
+          className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+          style={{ background: 'rgba(83,0,183,0.05)', border: '1px solid rgba(83,0,183,0.1)' }}
+          onClick={() => onNavigate?.('kodex')}
+        >
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+               style={{ background: 'rgba(83,0,183,0.1)' }}>
+            <span className="material-symbols-outlined text-primary text-2xl"
+                  style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+          </div>
+          <div className="flex-1">
+            <p className="font-headline font-bold text-base text-primary">Helden-Kodex</p>
+            <p className="font-body text-sm text-on-surface-variant">Unsere Familien-Werte</p>
+          </div>
+          <span className="material-symbols-outlined text-primary/40">chevron_right</span>
+        </button>
 
         {/* ── Bodhi leaf ── */}
         <div className="flex justify-center py-2 opacity-20">

@@ -110,8 +110,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         if (s.lastDate !== today()) {
           s = applyDayTransition(s);
         }
-        // Ensure boss exists
-        if (!s.boss) s.boss = assignBoss();
+        // Ensure boss exists and has art (migrate old tier2/3 bosses)
+        const tier1Ids = BOSSES.filter(b => b.tier === 'tier1').map(b => b.id);
+        if (!s.boss || !tier1Ids.includes(s.boss.id)) s.boss = assignBoss();
         setState(s);
       } else {
         // Fresh start

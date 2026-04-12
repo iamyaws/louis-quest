@@ -1,6 +1,7 @@
 import React from 'react';
 import { DEFAULT_BELOHNUNGEN } from '../constants';
 import { useTask } from '../context/TaskContext';
+import { Pearl, Hourglass } from './CurrencyIcons';
 
 const ICON_MAP = {
   '🃏': 'playing_cards', '🎧': 'headphones', '🎮': 'sports_esports',
@@ -30,25 +31,33 @@ export default function Belohnungsbank() {
         {/* HP Balance */}
         <div className="p-6 rounded-2xl relative overflow-hidden shadow-lg"
              style={{ background: 'linear-gradient(135deg, #5300b7, #6d28d9)' }}>
-          <p className="font-label font-bold uppercase tracking-widest text-[10px] text-white/60 mb-1">Heldenpunkte</p>
+          <div className="flex items-center gap-2 mb-2">
+            <Pearl size={20} dark />
+            <p className="font-label font-bold uppercase tracking-widest text-[10px] text-white/60">Heldenpunkte</p>
+          </div>
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-headline font-bold text-white">{hp}</span>
             <span className="text-sm font-label font-bold text-white/80">HP</span>
           </div>
-          <span className="absolute -bottom-2 -right-2 material-symbols-outlined text-6xl text-white/10"
-                style={{ fontVariationSettings: "'FILL' 1" }}>military_tech</span>
+          <div className="absolute -bottom-3 -right-3 opacity-10">
+            <Pearl size={64} dark />
+          </div>
         </div>
 
         {/* Screen Minutes Balance */}
         <div className="p-6 rounded-2xl relative overflow-hidden shadow-lg"
              style={{ background: 'linear-gradient(135deg, #00b4d8, #00CEC9)' }}>
-          <p className="font-label font-bold uppercase tracking-widest text-[10px] text-white/70 mb-1">Screen-Minuten</p>
+          <div className="flex items-center gap-2 mb-2">
+            <Hourglass size={20} dark />
+            <p className="font-label font-bold uppercase tracking-widest text-[10px] text-white/70">Screen-Minuten</p>
+          </div>
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-headline font-bold text-white">{screenMin}</span>
             <span className="text-sm font-label font-bold text-white/80">MIN</span>
           </div>
-          <span className="absolute -bottom-2 -right-2 material-symbols-outlined text-6xl text-white/10"
-                style={{ fontVariationSettings: "'FILL' 1" }}>schedule</span>
+          <div className="absolute -bottom-3 -right-3 opacity-10">
+            <Hourglass size={64} dark />
+          </div>
         </div>
       </div>
 
@@ -78,7 +87,7 @@ export default function Belohnungsbank() {
                   </div>
                   <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid #f4ede5' }}>
                     <div className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-sm" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>stars</span>
+                      <Pearl size={16} />
                       <span className="text-on-surface font-bold font-label">{reward.cost} HP</span>
                     </div>
                     <button
@@ -124,7 +133,7 @@ export default function Belohnungsbank() {
                   </div>
                   <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid #f4ede5' }}>
                     <div className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-sm" style={{ color: '#00CEC9', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                      <Hourglass size={16} />
                       <span className="text-on-surface font-bold font-label">{reward.cost} Min.</span>
                     </div>
                     <button

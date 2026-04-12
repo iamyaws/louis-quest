@@ -24,6 +24,11 @@ jobs:
       - name: Build with /Ronki/dev/ base path
         run: npx vite build --base /Ronki/dev/ --outDir dist-dev
 
+      - name: Patch manifest & SW for /dev/ path
+        run: |
+          sed -i 's|"/Ronki/"|"/Ronki/dev/"|g' dist-dev/manifest.json
+          sed -i 's|/Ronki/|/Ronki/dev/|g' dist-dev/sw.js
+
       - name: Deploy to gh-pages /dev/ subfolder
         uses: peaceiris/actions-gh-pages@v4
         with:
