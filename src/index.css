@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Ronki "Mystic Meadow" Design System — Tailwind v4 Theme
+   Material Design 3 inspired tokens
+   ============================================================ */
+
+@theme {
+  /* ── Primary ── */
+  --color-primary: #5300b7;
+  --color-primary-container: #6d28d9;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #dac5ff;
+  --color-primary-fixed: #ebddff;
+
+  /* ── Secondary ── */
+  --color-secondary: #735c00;
+  --color-secondary-container: #fcd34d;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #725b00;
+  --color-secondary-fixed: #ffe086;
+
+  /* ── Tertiary ── */
+  --color-tertiary: #6b3000;
+  --color-tertiary-container: #8f4200;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-fixed: #ffdbc8;
+
+  /* ── Error ── */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+
+  /* ── Neutral / Surface ── */
+  --color-surface: #fff8f1;
+  --color-on-surface: #1e1b17;
+  --color-on-surface-variant: #4a4455;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f9f3eb;
+  --color-surface-container: #f4ede5;
+  --color-surface-container-high: #eee7df;
+  --color-surface-container-highest: #e8e1da;
+  --color-surface-variant: #e8e1da;
+  --color-outline: #7b7486;
+  --color-outline-variant: #ccc3d7;
+  --color-inverse-surface: #33302b;
+  --color-inverse-on-surface: #f7f0e8;
+
+  /* ── Semantic ── */
+  --color-emerald: #34d399;
+  --color-emerald-dark: #059669;
+
+  /* ── Border Radius ── */
+  --radius-DEFAULT: 1rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+
+  /* ── Fonts ── */
+  --font-headline: "Fredoka", sans-serif;
+  --font-body: "Nunito", sans-serif;
+  --font-label: "Plus Jakarta Sans", sans-serif;
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background: #fff8f1;
+  font-family: "Nunito", sans-serif;
+  color: #1e1b17;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   Card Components
+   ============================================================ */
+
+.mm-card {
+  background: #ffffff;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.mm-card-elevated {
+  background: #ffffff;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10), 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* ============================================================
+   Interaction
+   ============================================================ */
+
+.btn-tap {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-tap:active {
+  transform: scale(0.96);
+}
+
+/* ============================================================
+   Decorative
+   ============================================================ */
+
+.lotus-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5c-5 10-15 15-15 25s10 15 15 25c5-10 15-15 15-25s-10-15-15-25z' fill='%231e1b17' fill-opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes celebText {
+  0% { opacity: 0; transform: translateY(8px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}

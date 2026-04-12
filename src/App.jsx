@@ -1,144 +1,68 @@
 import React from 'react';
-import { T } from './constants';
-import { GameProvider, useGame } from './context/GameContext';
-import SFX from './utils/sfx';
+import { TaskProvider, useTask } from './context/TaskContext';
+import TopBar from './components/TopBar';
+import NavBar from './components/NavBar';
+import TaskList from './components/TaskList';
 
-import Onboarding from './components/Onboarding';
-import Hub from './components/Hub';
-import QuestBoard from './components/QuestBoard';
-import TimeBank from './components/TimeBank';
-import Achievements from './components/Achievements';
-import Room from './components/Room';
-import Shop from './components/Shop';
-import Journal from './components/Journal';
-import VictoryScreen from './components/VictoryScreen';
-import Celebration from './components/Celebration';
-import SurpriseChest from './components/SurpriseChest';
-import PinModal from './components/PinModal';
-import MemoryGame from './components/MemoryGame';
-import Weather from './components/Weather';
-import CatCare from './components/CatCare';
-import CompanionProfile from './components/CompanionProfile';
-import Familienregeln from './components/Familienregeln';
-import BossChest from './components/BossChest';
-import EvolutionCelebration from './components/EvolutionCelebration';
-import ErrorBoundary from './components/ErrorBoundary';
+function AppContent() {
+  const { loading } = useTask();
 
-// ── SVG Tab Icons (consistent, themeable, cross-platform) ──
-const TabIconWeather = ({ active }) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#B45309" : "#9C977E"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/>
-  </svg>
-);
-const TabIconTrophy = ({ active }) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#B45309" : "#9C977E"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6m12 5h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22m10 0c0-2-.85-3.25-2.03-3.79A1.07 1.07 0 0 1 14 17v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-  </svg>
-);
-const TabIconHome = ({ active }) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#B45309" : "#9C977E"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-  </svg>
-);
-const TabIconBox = ({ active }) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#B45309" : "#9C977E"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
-  </svg>
-);
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-surface">
+        <p className="font-headline text-xl font-bold text-primary">Laden...</p>
+      </div>
+    );
+  }
 
-const TABS = [
-  { id: "hub", label: "Home", icon: "\u{1F3E0}" },
-  { id: "quest", label: "", icon: "\u2B50", isCta: true },
-  { id: "companion", label: "Begleiter", icon: "\u{1F43E}" },
-  { id: "room", label: "Zimmer", icon: "\u{1F6CF}\uFE0F" },
-  { id: "rewards", label: "Belohnung", icon: "\u{1F381}" },
-];
-
-function BottomTabBar() {
-  const { ui } = useGame();
-  const { view, setView, setQuestOpen } = ui;
   return (
-    <div className="tab-bar">
-      {TABS.map(tab => {
-        if (tab.isCta) {
-          return (
-            <button key={tab.id} className="tab-item" onClick={() => { SFX.play("tap"); setQuestOpen(true); }} aria-label="Aufgaben öffnen">
-              <div className="tab-icon" style={{ background: "linear-gradient(135deg, #6D28D9, #7C3AED)", color: "white", border: "2px solid rgba(109,40,217,0.3)", boxShadow: "0 3px 12px rgba(109,40,217,0.2)" }}><span style={{ fontSize: "1.3rem" }}>{"\u{1F4CB}"}</span></div>
-              <span className="tab-label" style={{ color: "#6D28D9", fontWeight: 800 }}>Aufgaben</span>
-            </button>
-          );
-        }
-        const isActive = tab.id === "hub" ? view === "hub"
-          : tab.id === "companion" ? view === "companion"
-          : tab.id === "rewards" ? view === "time"
-          : view === tab.id;
-        const handleClick = () => {
-          SFX.play("tap");
-          if (tab.id === "hub") setView("hub");
-          else if (tab.id === "companion") setView("companion");
-          else if (tab.id === "rewards") setView("time");
-          else setView(tab.id);
-        };
-        return (
-          <button key={tab.id} className={`tab-item ${isActive ? "tab-item-active" : ""}`} onClick={handleClick} aria-label={tab.label}>
-            <div className={`tab-icon ${isActive ? "tab-icon-active" : ""}`}><span style={{ fontSize: "1.3rem" }}>{tab.icon}</span></div>
-            <span className={`tab-label ${isActive ? "tab-label-active" : ""}`}>{tab.label}</span>
-          </button>
-        );
-      })}
-    </div>
+    <>
+      <TopBar />
+      <div className="min-h-screen bg-surface max-w-lg mx-auto" style={{ paddingTop: 72, paddingBottom: 96 }}>
+        <TaskList />
+      </div>
+      <NavBar active="quests" />
+    </>
   );
 }
 
-function AppContent() {
-  const { state, boarding, computed, actions, onBoard, ui } = useGame();
-  if (boarding === null) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#FFF8F0", color: "#1E1B4B", fontFamily: "'Nunito',sans-serif", fontSize: "1.2rem", fontWeight: 700 }}>Laden...</div>;
-  if (boarding) return <Onboarding onComplete={onBoard} />;
-  if (!state) return null;
-  const showChrome = !boarding && state;
-  return (
-    <>
-      <Celebration active={ui.celeb} onDone={() => ui.setCeleb(false)} />
-
-      {ui.showChest && <SurpriseChest onOpen={actions.collectChest} streakDays={state.sd} />}
-      {ui.pinShow && <PinModal pin={ui.pin} setPin={ui.setPin} onSuccess={() => { ui.setPMode(true); ui.setPinShow(false); }} onClose={() => { ui.setPinShow(false); ui.setPin(""); }} />}
-      {ui.showVictory && <VictoryScreen onClose={() => ui.setShowVictory(false)} onMemoryGame={() => { ui.setShowVictory(false); ui.setShowMemory(true); }} />}
-      {ui.showMemory && <MemoryGame onComplete={actions.collectMemory} />}
-      {state.bossDefeatReward && <BossChest bossName={state.bossDefeatReward.bossName} bossIcon={state.bossDefeatReward.bossIcon} hpReward={state.bossDefeatReward.hp} unlockedItem={state.bossDefeatReward.item} onClose={() => actions.clearBossReward()} />}
-      {state.evolutionEvent && (
-        <EvolutionCelebration
-          companionType={state.companionType || "cat"}
-          companionVariant={state.catVariant}
-          oldStage={state.evolutionEvent.oldStage}
-          newStage={state.evolutionEvent.newStage}
-          newBossTier={state.evolutionEvent.newBossTier}
-          onClose={() => actions.clearEvolution()}
-        />
-      )}
-      <div style={{ minHeight: "100vh", background: "#FFF8F0", fontFamily: "'Nunito',sans-serif", color: T.textPrimary, paddingTop: ui.view === "hub" ? 0 : 60, paddingBottom: 80 }}>
-        {ui.view === "hub" && <Hub />}
-        {ui.view === "time" && <TimeBank />}
-        {ui.view === "stats" && <Achievements />}
-        {ui.view === "room" && <Room />}
-        {ui.view === "shop" && <Shop />}
-        {ui.view === "journal" && <Journal />}
-        {ui.view === "weather" && <Weather />}
-        {ui.view === "cat" && <CatCare />}
-        {ui.view === "companion" && <CompanionProfile />}
-        {ui.view === "regeln" && <Familienregeln />}
-        {ui.questOpen && <QuestBoard />}
+function ErrorBoundary({ children }) {
+  const [error, setError] = React.useState(null);
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-surface px-6 text-center">
+        <div className="text-5xl mb-4">😿</div>
+        <h2 className="font-headline text-xl font-bold text-error mb-2">Ups! Da ist etwas schiefgelaufen.</h2>
+        <p className="font-body text-on-surface-variant mb-6">Keine Sorge, deine Daten sind sicher gespeichert.</p>
+        <button
+          onClick={() => { setError(null); window.location.reload(); }}
+          className="bg-primary-container text-white px-8 py-3 rounded-full font-label font-bold"
+        >
+          Nochmal versuchen
+        </button>
       </div>
-      {showChrome && <BottomTabBar />}
-    </>
+    );
+  }
+  return (
+    <ErrorBoundaryInner onError={setError}>
+      {children}
+    </ErrorBoundaryInner>
   );
+}
+
+class ErrorBoundaryInner extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError(e) { return { hasError: true, error: e }; }
+  componentDidCatch(e) { this.props.onError(e); }
+  render() { return this.state.hasError ? null : this.props.children; }
 }
 
 export default function App() {
   return (
     <ErrorBoundary>
-      <GameProvider>
+      <TaskProvider>
         <AppContent />
-      </GameProvider>
+      </TaskProvider>
     </ErrorBoundary>
   );
 }
