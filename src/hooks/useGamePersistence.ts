@@ -3,7 +3,7 @@ import {
   WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES, BOSS_TIERS, DEFAULT_BELOHNUNGEN, isSchoolVacation,
   BIRTHDAY_QUEST_CHAIN,
 } from '../constants';
-import { buildDay, getCatStage } from '../utils/helpers';
+import { buildDay, getCatStage, getTierForStage } from '../utils/helpers';
 import storage from '../utils/storage';
 import type { GameState, Hero } from '../types';
 
@@ -64,25 +64,9 @@ function applyDayTransition(p: GameState, today: string): void {
   p.freezeUsedToday = false;
 
   if (dayGap >= 2) {
-    const missedDays = dayGap - 1;
-    if ((p.sd || 0) > 0) {
-      const avail = p.streakFreezes || 0;
-      if (avail >= missedDays) {
-        p.streakFreezes = avail - missedDays;
-        p.freezesUsedThisMonth = (p.freezesUsedThisMonth || 0) + missedDays;
-        p.freezeUsedToday = true;
-      } else {
-        if (avail > 0) {
-          p.streakFreezes = 0;
-          p.freezesUsedThisMonth = (p.freezesUsedThisMonth || 0) + avail;
-        }
-        p.bestStreak = Math.max(p.bestStreak || 0, p.sd || 0);
-        p.sd = 0;
-        p.comebackActive = true;
-      }
-    } else {
-      p.comebackActive = true;
-    }
+    // No streak reset — streaks never break. Just show welcome-back message.
+    p.comebackActive = true;
+    p.totalTaskDays = (p.totalTaskDays || 0);
   } else {
     p.comebackActive = false;
   }
@@ -102,14 +86,18 @@ function applyDayTransition(p: GameState, today: string): void {
   p.wheelSpun = false;
   p.memoryPlayed = false;
   p.chestMilestone = null;
-  // Cat care daily reset + stat decay
+  p.bossDefeatReward = null;
+  // Cat care daily reset (no stat decay — stats only increase from care actions)
   p.catFed = false; p.catPetted = false; p.catPlayed = false;
-  p.catHunger = Math.max(0, (p.catHunger ?? 100) - 30);
-  p.catHappy = Math.max(0, (p.catHappy ?? 100) - 25);
-  p.catEnergy = Math.max(0, (p.catEnergy ?? 100) - 20);
   // Daily habits reset
   p.dailyVitaminD = false;
   p.dailyBrother = false;
+  // Daily game redemption + water reset
+  p.dailyGameRedemptions = 0;
+  p.dailyWaterCount = 0;
+  // Journal commitment: move today's commitment to yesterday
+  p.yesterdayCommitment = p.tomorrowCommitment;
+  p.tomorrowCommitment = null;
   // Login bonus: reset claimed flag, advance day in cycle
   p.loginBonusClaimed = false;
   p.loginBonusDay = (p.loginBonusDay || 0) % 7;
@@ -130,14 +118,14 @@ function applyDayTransition(p: GameState, today: string): void {
     p.weeklyMission = wm.id;
     p.weeklyProgress = 0;
     p.weekStart = today;
-    // Spawn new weekly boss (tier-aware)
-    const companionStage = getCatStage(p.catEvo || 0);
-    const availableTiers = BOSS_TIERS.filter(t => companionStage >= t.minStage);
-    const highestTier = availableTiers[availableTiers.length - 1] || BOSS_TIERS[0];
-    const tierBosses = BOSSES.filter(b => b.tier === highestTier.id);
-    const b = tierBosses[Math.floor(Math.random() * tierBosses.length)];
-    p.boss = { id: b.id, hp: b.hp, maxHp: b.hp };
   }
+
+  // Daily boss — fresh boss every day
+  const companionStage = getCatStage(p.catEvo || 0);
+  const highestTier = getTierForStage(companionStage);
+  const tierBosses = BOSSES.filter(b => b.tier === highestTier.id);
+  const b = tierBosses[Math.floor(Math.random() * tierBosses.length)];
+  p.boss = { id: b.id, hp: b.hp, maxHp: b.hp };
 
   if (!p.graduated) p.graduated = [];
   Object.entries(p.sm || {}).forEach(([qid, streak]) => {
@@ -227,6 +215,15 @@ function applyDefaults(p: GameState): void {
   if (p.evolutionEvent === undefined) p.evolutionEvent = null;
   // Room customization
   if (!p.roomTheme) p.roomTheme = { wallColor: "#F5EDE3", floorType: "wood", windowStyle: "standard" };
+  // Daily game redemption limit
+  if (p.dailyGameRedemptions === undefined) p.dailyGameRedemptions = 0;
+  // Journal tomorrow commitment
+  if (p.tomorrowCommitment === undefined) p.tomorrowCommitment = null;
+  if (p.yesterdayCommitment === undefined) p.yesterdayCommitment = null;
+  // Water drinking tracker
+  if (p.dailyWaterCount === undefined) p.dailyWaterCount = 0;
+  // Total task days migration (from streak)
+  if (p.totalTaskDays === undefined) p.totalTaskDays = p.sd || 0;
 }
 
 interface OnboardData {
@@ -280,5 +277,14 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     evolutionEvent: null,
     // Room customization
     roomTheme: { wallColor: "#F5EDE3", floorType: "wood", windowStyle: "standard" },
+    // Daily game redemption limit
+    dailyGameRedemptions: 0,
+    // Journal tomorrow commitment
+    tomorrowCommitment: null,
+    yesterdayCommitment: null,
+    // Water drinking tracker
+    dailyWaterCount: 0,
+    // Total task days (never resets)
+    totalTaskDays: 0,
   };
 }

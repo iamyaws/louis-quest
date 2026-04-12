@@ -73,13 +73,7 @@ export interface ChestReward {
   icon: string;
 }
 
-export interface WheelSegment {
-  type: 'hp' | 'minutes' | 'rare';
-  amount?: number;
-  label: string;
-  icon: string;
-  color: string;
-}
+
 
 export interface WeeklyMission {
   id: string;
@@ -240,6 +234,15 @@ export interface GameState {
   evolutionEvent: { oldStage: number; newStage: number; newBossTier?: string } | null;
   // Room customization
   roomTheme: { wallColor: string; floorType: string; windowStyle: string };
+  // Daily game redemption limit
+  dailyGameRedemptions: number;
+  // Journal tomorrow commitment
+  tomorrowCommitment: { type: string; text: string } | null;
+  yesterdayCommitment: { type: string; text: string } | null;
+  // Water drinking tracker
+  dailyWaterCount: number;
+  // Total task days (never resets)
+  totalTaskDays: number;
 }
 
 export interface ComputedState {

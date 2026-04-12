@@ -1,6 +1,6 @@
 // ═══ RONKI v1 — Constants (Heldenpunkte Edition) ═══
 
-import type { Quest, Reward, ShopItem, RareDrop, ChestReward, WheelSegment, WeeklyMission, JournalQuestion, Badge, HeroTip, UnlockCondition, Belohnung, QuestChain } from './types';
+import type { Quest, Reward, ShopItem, WeeklyMission, JournalQuestion, Badge, HeroTip, UnlockCondition, Belohnung, QuestChain } from './types';
 
 export const T = {
   bg: "#FFF8F0", surface: "#FFF3E6", surfaceHigh: "#FFE8CC",
@@ -40,14 +40,16 @@ export const SCHOOL_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "s2", name: "Bett machen", icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 10, minutes: 4, order: 4 },
   { id: "s5", name: "Schultasche packen", icon: "\u{1F392}", anchor: "morning", xp: 10, minutes: 4, order: 5 },
   { id: "s6b", name: "Sonnencreme auftragen", icon: "\u2600\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 6 },
-  // Evening: "Gute Nacht Routine"
-  { id: "s7", name: "Hausaufgaben", icon: "\u{1F4DA}", anchor: "evening", xp: 10, minutes: 8, order: 1 },
-  { id: "s8", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "evening", xp: 10, minutes: 5, order: 2 },
-  { id: "s9", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "evening", xp: 10, minutes: 6, order: 3 },
-  { id: "s12", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "evening", xp: 10, minutes: 3, order: 4 },
-  { id: "s13", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "evening", xp: 10, minutes: 3, order: 5 },
-  { id: "s14", name: "Creme auftragen", icon: "\u2728", anchor: "evening", xp: 10, minutes: 2, order: 6 },
-  { id: "s15", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2, order: 7 },
+  // Evening: "Gute Nacht Routine" (school prep + hygiene)
+  { id: "s_lunchbox", name: "Brotdose auswaschen", icon: "\u{1F371}", anchor: "evening", xp: 10, minutes: 3, order: 0 },
+  { id: "s_packcheck", name: "Schultasche checken", icon: "\u{1F392}", anchor: "evening", xp: 10, minutes: 3, order: 0 },
+  { id: "s7", name: "Hausaufgaben", icon: "\u{1F4DA}", anchor: "evening", xp: 10, minutes: 8, order: 2 },
+  { id: "s8", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "evening", xp: 10, minutes: 5, order: 3 },
+  { id: "s9", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "evening", xp: 10, minutes: 6, order: 4 },
+  { id: "s12", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "evening", xp: 10, minutes: 3, order: 5 },
+  { id: "s13", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "evening", xp: 10, minutes: 3, order: 6 },
+  { id: "s14", name: "Creme auftragen", icon: "\u2728", anchor: "evening", xp: 10, minutes: 2, order: 7 },
+  { id: "s15", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2, order: 8 },
   // Repeatable: Geschirr (2x required, 3rd optional bonus)
   { id: "geschirr", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 99, target: 2, bonus: 3 },
 ];
@@ -70,7 +72,7 @@ export const VACATION_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "geschirr", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 99, target: 2, bonus: 3 },
 ];
 
-export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "evening", xp: 10, minutes: 10, order: 0 };
+export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "evening", xp: 10, minutes: 10, order: 0, target: 2 };
 
 export const REWARDS: Reward[] = [
   { id: "r1", name: "H\u00F6rspiel h\u00F6ren", icon: "\u{1F3A7}", minutes: 30 },
@@ -117,38 +119,18 @@ export const SHOP_ITEMS: Record<string, ShopItem[]> = {
 
 // ── Heldenpunkte rewards (unified — no more separate XP/coins) ──
 
-export const RARE_DROPS: RareDrop[] = [
-  { type: "hp", amount: 25, label: "+25 Bonus-HP!", icon: "\u2B50" },
-  { type: "hp", amount: 40, label: "+40 Bonus-HP!", icon: "\u{1F4AB}" },
-  { type: "hp", amount: 30, label: "+30 Bonus-HP!", icon: "\u2728" },
-  { type: "minutes", amount: 5, label: "+5 Bonus-Minuten!", icon: "\u23F0" },
-  { type: "emoji", label: "Seltenes Emoji: \u{1F984}", icon: "\u{1F984}", id: "emoji_unicorn" },
-  { type: "emoji", label: "Seltenes Emoji: \u{1F432}", icon: "\u{1F432}", id: "emoji_dragon" },
-  { type: "emoji", label: "Seltenes Emoji: \u{1F308}", icon: "\u{1F308}", id: "emoji_rainbow" },
-];
 
-export const CHEST_REWARDS: ChestReward[] = [
-  { type: "hp", amount: 100, label: "100 Heldenpunkte!", icon: "\u2B50" },
-  { type: "hp", amount: 150, label: "150 Heldenpunkte!", icon: "\u{1F4AB}" },
-  { type: "hp", amount: 75, label: "75 Bonus-HP!", icon: "\u26A1" },
-  { type: "item", id: "c_crown", label: "Katzenkrone!", icon: "\u{1F451}" },
-  { type: "item", id: "h_wings", label: "Heldenfl\u00FCgel!", icon: "\u{1FABD}" },
-  { type: "item", id: "rm_trophy", label: "Goldpokal!", icon: "\u{1F3C6}" },
-  { type: "minutes", amount: 15, label: "+15 Bonus-Minuten!", icon: "\u23F0" },
-  { type: "xpboost", label: "Doppel-Power morgen!", icon: "\u{1F525}" },
-];
+export const MILESTONE_REWARDS: Record<number, { itemId: string; label: string; icon: string }> = {
+  3: { itemId: "c_bowtie", label: "Fliege", icon: "\u{1F380}" },
+  7: { itemId: "h_sunglasses", label: "Sonnenbrille", icon: "\u{1F576}\uFE0F" },
+  14: { itemId: "h_cape_red", label: "Roter Umhang", icon: "\u{1F9B8}" },
+  21: { itemId: "c_collar", label: "Halsband", icon: "\u{1F4FF}" },
+  30: { itemId: "h_wings", label: "Fl\u00FCgel", icon: "\u{1FABD}" },
+  50: { itemId: "c_crown", label: "Krone", icon: "\u{1F451}" },
+};
 
-export const WHEEL_SEGMENTS: WheelSegment[] = [
-  { type: "hp", amount: 30, label: "+30 HP", icon: "\u2B50", color: "#FCD34D" },
-  { type: "hp", amount: 25, label: "+25 HP", icon: "\u{1F4AB}", color: "#A78BFA" },
-  { type: "minutes", amount: 5, label: "+5 Min", icon: "\u23F0", color: "#34D399" },
-  { type: "hp", amount: 50, label: "+50 HP", icon: "\u{1F31F}", color: "#FB923C" },
-  { type: "hp", amount: 40, label: "+40 HP", icon: "\u26A1", color: "#60A5FA" },
-  { type: "rare", label: "Seltener Fund!", icon: "\u{1F381}", color: "#EC4899" },
-];
 
 export const CHEST_MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100] as const;
-export const RARE_DROP_CHANCE = 0.12;
 export const MAX_MONTHLY_FREEZES = 2;
 
 export const WEEKLY_MISSIONS: WeeklyMission[] = [
@@ -208,18 +190,18 @@ export const BOSS_TIERS = [
 ] as const;
 
 export const BOSSES: import('./types').BossTemplate[] = [
-  // Tier 1: W\u00E4chter (Guardian) \u2014 available from start
-  { id: "b1", name: "Schlaf-Drache", icon: "\u{1F409}", hp: 80, reward: { hp: 50 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst!", tier: "tier1" },
-  { id: "b2", name: "Chaos-Monster", icon: "\u{1F47E}", hp: 90, reward: { hp: 55 }, desc: "Es liebt Unordnung und Chaos!", tier: "tier1" },
-  { id: "b5", name: "Mecker-Goblin", icon: "\u{1F47A}", hp: 85, reward: { hp: 50 }, desc: "Er meckert \u00FCber alles und jeden!", tier: "tier1" },
+  // Tier 1: W\u00E4chter (Guardian) \u2014 available from start (daily: ~8-13 tasks to defeat)
+  { id: "b1", name: "Schlaf-Drache", icon: "\u{1F409}", hp: 60, reward: { hp: 50 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst!", tier: "tier1" },
+  { id: "b2", name: "Chaos-Monster", icon: "\u{1F47E}", hp: 80, reward: { hp: 55 }, desc: "Es liebt Unordnung und Chaos!", tier: "tier1" },
+  { id: "b5", name: "Mecker-Goblin", icon: "\u{1F47A}", hp: 70, reward: { hp: 50 }, desc: "Er meckert \u00FCber alles und jeden!", tier: "tier1" },
   // Tier 2: Krieger (Warrior) \u2014 unlocks at companion stage 2
-  { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 130, reward: { hp: 80 }, desc: "Er will, dass du nur auf dem Sofa liegst!", tier: "tier2" },
-  { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 140, reward: { hp: 85 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!", tier: "tier2" },
-  { id: "b7", name: "Langeweile-Blob", icon: "\u{1F47D}", hp: 120, reward: { hp: 75 }, desc: "Er macht alles langweilig!", tier: "tier2" },
+  { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 100, reward: { hp: 80 }, desc: "Er will, dass du nur auf dem Sofa liegst!", tier: "tier2" },
+  { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 110, reward: { hp: 85 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!", tier: "tier2" },
+  { id: "b7", name: "Langeweile-Blob", icon: "\u{1F47D}", hp: 90, reward: { hp: 75 }, desc: "Er macht alles langweilig!", tier: "tier2" },
   // Tier 3: K\u00F6nig (King) \u2014 unlocks at companion stage 3
-  { id: "b4", name: "Vergesslichkeits-Geist", icon: "\u{1F47B}", hp: 200, reward: { hp: 120 }, desc: "Er l\u00E4sst dich alles vergessen!", tier: "tier3" },
-  { id: "b8", name: "Angst-Schatten", icon: "\u{1F5A4}", hp: 220, reward: { hp: 130 }, desc: "Er fl\u00FCstert dir Zweifel ein!", tier: "tier3" },
-  { id: "b9", name: "Sturheit-Stein", icon: "\u{1FAA8}", hp: 250, reward: { hp: 150 }, desc: "Er will nicht, dass du dich \u00E4nderst!", tier: "tier3" },
+  { id: "b4", name: "Vergesslichkeits-Geist", icon: "\u{1F47B}", hp: 130, reward: { hp: 120 }, desc: "Er l\u00E4sst dich alles vergessen!", tier: "tier3" },
+  { id: "b8", name: "Angst-Schatten", icon: "\u{1F5A4}", hp: 150, reward: { hp: 130 }, desc: "Er fl\u00FCstert dir Zweifel ein!", tier: "tier3" },
+  { id: "b9", name: "Sturheit-Stein", icon: "\u{1FAA8}", hp: 160, reward: { hp: 150 }, desc: "Er will nicht, dass du dich \u00E4nderst!", tier: "tier3" },
 ];
 
 export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {
@@ -375,7 +357,6 @@ export const GEAR_SLOTS: Record<string, { label: string; icon: string; items: st
 export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
   // Mini-games (HP, 1 each, anytime)
   { id: "bel_memory", name: "Memory-Spiel", emoji: "\u{1F0CF}", cost: 1, active: true, currency: "hp" },
-  { id: "bel_wheel", name: "Gl\u00FCcksrad drehen", emoji: "\u{1F3B0}", cost: 1, active: true, currency: "hp" },
   // Media rewards (Drachen-Eier — scarce, ~60 min max on weekends)
   // Weekday: ~13 eggs/day → audio(5) or game(6) but not both = ~20-30 min
   // Weekend: saved eggs → audio(3)+game(4)+TV(5) = ~60 min for 12 eggs
@@ -387,7 +368,7 @@ export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
   { id: "bel_candy", name: "S\u00FC\u00DFigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 30, active: true, currency: "hp" },
   { id: "bel_vote", name: "Lieblingsessen w\u00E4hlen", emoji: "\u{1F355}", cost: 50, active: true, currency: "hp" },
   { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 200, active: true, currency: "hp" },
-  { id: "bel_surprise", name: "\u00DCberraschung", emoji: "\u{1F381}", cost: 100, active: true, currency: "hp" },
+  { id: "bel_evoboost", name: "Begleiter-Boost (+5 EP)", emoji: "\u{1F4AA}", cost: 80, active: true, currency: "hp" },
 ];
 
 // ═══ Bavaria School Vacations ═══

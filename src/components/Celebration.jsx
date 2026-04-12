@@ -55,19 +55,3 @@ export function RewardToast({ show, text, icon }) {
   );
 }
 
-// ── Rare Drop Toast ──
-export function RareDropToast({ drop, onDone }) {
-  useEffect(() => { if (drop) { const t = setTimeout(onDone, 2500); return () => clearTimeout(t); } }, [drop]);
-  if (!drop) return null;
-  return (
-    <div style={{ position: "fixed", top: "18%", left: "50%", transform: "translateX(-50%)", zIndex: 9998, animation: "rewardPop 2.5s ease forwards", pointerEvents: "none" }}>
-      <div style={{ background: "linear-gradient(135deg,#FCD34D,#F59E0B)", borderRadius: 20, padding: "16px 28px", boxShadow: "0 12px 40px rgba(245,158,11,0.4)", display: "flex", alignItems: "center", gap: 10, border: "3px solid white" }}>
-        <span style={{ fontSize: "2rem" }}>{drop.icon}</span>
-        <div>
-          <div style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 800, fontSize: ".9rem", color: "white" }}>Seltener Fund!</div>
-          <div style={{ fontSize: ".8rem", fontWeight: 700, color: "rgba(255,255,255,0.9)" }}>{drop.label}</div>
-        </div>
-      </div>
-    </div>
-  );
-}

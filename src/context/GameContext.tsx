@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 import useGamePersistence, { createInitialState } from '../hooks/useGamePersistence';
 import useGameActions from '../hooks/useGameActions';
 import useComputedState from '../hooks/useComputedState';
-import type { GameState, ComputedState, RareDrop, Hero } from '../types';
+import type { GameState, ComputedState, Hero } from '../types';
 
 interface GameContextValue {
   state: GameState | null;
@@ -20,9 +20,7 @@ interface GameContextValue {
     nq: { name: string; icon: string; anchor: string; xp: number; minutes: number };
     setNq: React.Dispatch<React.SetStateAction<{ name: string; icon: string; anchor: string; xp: number; minutes: number }>>;
     shopTab: string; setShopTab: React.Dispatch<React.SetStateAction<string>>;
-    showWheel: boolean; setShowWheel: React.Dispatch<React.SetStateAction<boolean>>;
     showChest: boolean; setShowChest: React.Dispatch<React.SetStateAction<boolean>>;
-    rareDrop: RareDrop | null; setRareDrop: React.Dispatch<React.SetStateAction<RareDrop | null>>;
     showVictory: boolean; setShowVictory: React.Dispatch<React.SetStateAction<boolean>>;
     showMemory: boolean; setShowMemory: React.Dispatch<React.SetStateAction<boolean>>;
   };
@@ -45,15 +43,13 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const [pin, setPin] = useState("");
   const [nq, setNq] = useState({ name: "", icon: "\u2B50", anchor: "morning", xp: 10, minutes: 5 });
   const [shopTab, setShopTab] = useState("hero");
-  const [showWheel, setShowWheel] = useState(false);
   const [showChest, setShowChest] = useState(false);
-  const [rareDrop, setRareDrop] = useState<RareDrop | null>(null);
   const [showVictory, setShowVictory] = useState(false);
   const [showMemory, setShowMemory] = useState(false);
 
   const actions = useGameActions(setState, {
-    setCeleb, setShowVictory, setShowChest, setRareDrop,
-    setShowWheel, setShowMemory,
+    setCeleb, setShowVictory, setShowChest,
+    setShowMemory,
   });
 
   const computed = useComputedState(state);
@@ -79,8 +75,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       celeb, setCeleb, pMode, setPMode,
       pinShow, setPinShow, pin, setPin,
       nq, setNq, shopTab, setShopTab,
-      showWheel, setShowWheel, showChest, setShowChest,
-      rareDrop, setRareDrop, showVictory, setShowVictory,
+      showChest, setShowChest,
+      showVictory, setShowVictory,
       showMemory, setShowMemory,
     },
   };

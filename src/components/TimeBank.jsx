@@ -392,7 +392,9 @@ export default function TimeBank() {
             const currencyEmoji = bel.currency === "eggs" ? "\u{1F95A}" : "\u2B50";
             const balance = bel.currency === "eggs" ? (state.drachenEier || 0) : coins;
             const canAfford = balance >= effectiveCost;
-            const canRedeem = canAfford && available;
+            const gameRemaining = bel.id === "bel_game20" ? Math.max(0, 2 - (state.dailyGameRedemptions || 0)) : null;
+            const gameLocked = bel.id === "bel_game20" && gameRemaining === 0;
+            const canRedeem = canAfford && available && !gameLocked;
             const isConfirming = confirmRedeem === bel.id;
 
             return (
@@ -452,6 +454,16 @@ export default function TimeBank() {
                       marginTop: 2,
                     }}>
                       Ab {isFreeDay ? (bel.availableAfterFree || bel.availableAfter) : bel.availableAfter} Uhr
+                    </div>
+                  )}
+                  {gameRemaining !== null && (
+                    <div style={{
+                      fontSize: ".78rem",
+                      color: gameLocked ? T.danger : T.success,
+                      fontWeight: 700,
+                      marginTop: 2,
+                    }}>
+                      {gameLocked ? "\u{1F512} Heute ausgesch\u00F6pft" : `Noch ${gameRemaining} \u00FCbrig`}
                     </div>
                   )}
                 </div>

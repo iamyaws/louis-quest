@@ -1,19 +1,17 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
-  RARE_DROPS, RARE_DROP_CHANCE, CHEST_MILESTONES,
+  CHEST_MILESTONES, MILESTONE_REWARDS,
   WEEKLY_MISSIONS, BOSSES, UNLOCK_CONDITIONS, SHOP_ITEMS,
 } from '../constants';
 import { getLevel, buildDay, getCatStage, getTierForStage } from '../utils/helpers';
 import storage from '../utils/storage';
 import SFX from '../utils/sfx';
-import type { GameState, RareDrop, ChestReward, WheelSegment } from '../types';
+import type { GameState } from '../types';
 
 interface UICallbacks {
   setCeleb: Dispatch<SetStateAction<boolean>>;
   setShowVictory: Dispatch<SetStateAction<boolean>>;
   setShowChest: Dispatch<SetStateAction<boolean>>;
-  setRareDrop: Dispatch<SetStateAction<RareDrop | null>>;
-  setShowWheel: Dispatch<SetStateAction<boolean>>;
   setShowMemory: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -46,8 +44,8 @@ export default function useGameActions(
   uiCallbacks: UICallbacks,
 ) {
   const {
-    setCeleb, setShowVictory, setShowChest, setRareDrop,
-    setShowWheel, setShowMemory,
+    setCeleb, setShowVictory, setShowChest,
+    setShowMemory,
   } = uiCallbacks;
 
   const complete = useCallback((id: string) => {
@@ -102,20 +100,15 @@ export default function useGameActions(
         setTimeout(() => SFX.play("celeb"), 1000);
       }
       const newBest = Math.max(prev.bestStreak || 0, newSD);
+      const newTotalDays = all && prev.sd !== newSD ? (prev.totalTaskDays || 0) + 1 : (prev.totalTaskDays || 0);
 
-      // Rare drop — single roll, reuse result for both UI toast and stat bonus
-      const isRare = Math.random() < RARE_DROP_CHANCE;
-      const rareDrop = isRare ? RARE_DROPS[Math.floor(Math.random() * RARE_DROPS.length)] : null;
-      if (rareDrop) setTimeout(() => setRareDrop(rareDrop), 600);
+      // Every 8th task gives a guaranteed bonus
+      const taskCount = prev.hist.length + 1;
+      const bonusHP = (taskCount % 8 === 0) ? 20 : 0;
+      const bonusMin = 0;
 
       const chestEarned = all && CHEST_MILESTONES.includes(newSD as typeof CHEST_MILESTONES[number]) && !prev.chestMilestone;
       if (chestEarned) setTimeout(() => setShowChest(true), all ? 2500 : 800);
-
-      let bonusHP = 0, bonusMin = 0;
-      if (rareDrop) {
-        if (rareDrop.type === "hp") bonusHP = rareDrop.amount || 0;
-        if (rareDrop.type === "minutes") bonusMin = rareDrop.amount || 0;
-      }
 
       // Weekly mission progress
       const wm = WEEKLY_MISSIONS.find(m => m.id === prev.weeklyMission);
@@ -150,12 +143,13 @@ export default function useGameActions(
           const bd = BOSSES.find(b => b.id === bossUpdate!.id);
           if (bd) bossRewardHP = bd.reward.hp;
           if (!trophies.includes(bossUpdate.id)) trophies.push(bossUpdate.id);
-          // Boss loot: unlock a random locked item
+          // Boss loot: deterministic rotation based on trophies count
           const allItems = [...(SHOP_ITEMS.hero || []), ...(SHOP_ITEMS.cat || []), ...(SHOP_ITEMS.room || [])];
           const locked = allItems.filter(item => !(prev.purchased || []).includes(item.id) && !newUnlocksFromBoss.includes(item.id));
           let lootItem: { id: string; name: string; icon: string } | null = null;
           if (locked.length > 0) {
-            const loot = locked[Math.floor(Math.random() * locked.length)];
+            const lootIdx = (prev.bossTrophies || []).length % locked.length;
+            const loot = locked[lootIdx];
             newUnlocksFromBoss.push(loot.id);
             lootItem = loot;
           }
@@ -216,21 +210,22 @@ export default function useGameActions(
         catHunger: newHunger, catHappy: newHappy, catEnergy: newEnergy,
         bossDefeatReward: bossDefeatData,
         evolutionEvent,
+        totalTaskDays: newTotalDays,
       };
 
-      // Egg hatching progress — each task adds ~20-25% toward hatching
+      // Egg hatching progress — each task adds fixed +25 toward hatching
       if (result.eggType && !result.eggHatched) {
-        result.eggProgress = Math.min(100, (result.eggProgress || 0) + 20 + Math.floor(Math.random() * 10));
+        result.eggProgress = Math.min(100, (result.eggProgress || 0) + 25);
         if (result.eggProgress >= 100) {
           result.eggHatched = true;
-          // Assign random variant from the egg type
+          // Deterministic variant from the egg type based on task count
           const variantMaps: Record<string, string[]> = {
             dragon: ["fire", "ice", "shadow", "gold"],
             wolf: ["forest", "snow", "night", "fire"],
             phoenix: ["sun", "storm", "rose", "star"],
           };
           const variants = variantMaps[result.eggType] || ["fire"];
-          result.catVariant = variants[Math.floor(Math.random() * variants.length)];
+          result.catVariant = variants[prev.hist.length % variants.length];
           result.companionType = result.eggType;
           setTimeout(() => SFX.play("celeb"), 500);
         }
@@ -249,7 +244,7 @@ export default function useGameActions(
 
       return result;
     });
-  }, [setState, setCeleb, setShowVictory, setShowChest, setRareDrop]);
+  }, [setState, setCeleb, setShowVictory, setShowChest]);
 
   const addQuest = useCallback((nq: { name: string; icon: string; anchor: string; xp: number; minutes: number }, resetName: () => void) => {
     if (!nq.name.trim()) return;
@@ -324,37 +319,21 @@ export default function useGameActions(
     });
   }, [setState]);
 
-  const collectWheel = useCallback((result: WheelSegment) => {
-    setState(prev => {
-      if (!prev) return prev;
-      const u = { ...prev, wheelSpun: true };
-      if (result.type === "hp") { u.xp += result.amount || 0; u.coins += result.amount || 0; }
-      if (result.type === "minutes") u.dt += result.amount || 0;
-      if (result.type === "rare") {
-        const r = RARE_DROPS[Math.floor(Math.random() * RARE_DROPS.length)];
-        if (r.type === "hp") { u.xp += r.amount || 30; u.coins += r.amount || 30; }
-        if (r.type === "minutes") u.dt += r.amount || 5;
-      }
-      return u;
-    });
-    setShowWheel(false);
-  }, [setState, setShowWheel]);
 
   const collectMemory = useCallback((reward: { xp: number; coins: number }) => {
-    // Legacy: add same amount to both
-    const amt = reward.xp + reward.coins;
-    setState(prev => prev ? { ...prev, xp: prev.xp + amt, coins: prev.coins + amt, memoryPlayed: true } : prev);
+    setState(prev => prev ? { ...prev, xp: prev.xp + 5, coins: prev.coins + 5, memoryPlayed: true } : prev);
     setShowMemory(false);
   }, [setState, setShowMemory]);
 
-  const collectChest = useCallback((reward: ChestReward) => {
+  const collectChest = useCallback(() => {
     setState(prev => {
       if (!prev) return prev;
+      const streakDays = prev.sd || 0;
+      const milestone = MILESTONE_REWARDS[streakDays];
       const u = { ...prev, chestMilestone: null };
-      if (reward.type === "hp") { u.xp += reward.amount || 0; u.coins += reward.amount || 0; }
-      if (reward.type === "minutes") u.dt += reward.amount || 0;
-      if (reward.type === "item" && reward.id && !u.purchased.includes(reward.id)) u.purchased = [...u.purchased, reward.id];
-      if (reward.type === "xpboost") u.xpBoost = true;
+      if (milestone && !u.purchased.includes(milestone.itemId)) {
+        u.purchased = [...u.purchased, milestone.itemId];
+      }
       return u;
     });
     setShowChest(false);
@@ -410,6 +389,8 @@ export default function useGameActions(
       if (!prev) return prev;
       const bel = (prev.belohnungen || []).find(b => b.id === belohnungId);
       if (!bel || !bel.active) return prev;
+      // Daily game limit: max 2 per day
+      if (belohnungId === "bel_game20" && (prev.dailyGameRedemptions || 0) >= 2) return prev;
       const now = new Date();
       const isWeekend = now.getDay() === 0 || now.getDay() === 6;
       const isFreeDay = isWeekend || prev.vacMode;
@@ -427,15 +408,24 @@ export default function useGameActions(
       SFX.play("buy");
       // Launch mini-games
       if (belohnungId === "bel_memory") setTimeout(() => setShowMemory(true), 300);
-      if (belohnungId === "bel_wheel") setTimeout(() => setShowWheel(true), 300);
+      // Evo boost: add +5 to catEvo
+      if (belohnungId === "bel_evoboost") {
+        return {
+          ...prev,
+          coins: prev.coins - effectiveCost,
+          catEvo: (prev.catEvo || 0) + 5,
+          belohnungenLog: [...(prev.belohnungenLog || []), { id: belohnungId, date: new Date().toISOString() }],
+        };
+      }
       return {
         ...prev,
         coins: isEggs ? prev.coins : prev.coins - effectiveCost,
         drachenEier: isEggs ? (prev.drachenEier || 0) - effectiveCost : (prev.drachenEier || 0),
+        dailyGameRedemptions: belohnungId === "bel_game20" ? (prev.dailyGameRedemptions || 0) + 1 : (prev.dailyGameRedemptions || 0),
         belohnungenLog: [...(prev.belohnungenLog || []), { id: belohnungId, date: new Date().toISOString() }],
       };
     });
-  }, [setState, setShowMemory, setShowWheel]);
+  }, [setState, setShowMemory]);
 
   const updateBelohnungen = useCallback((belohnungen: import('../types').Belohnung[]) => {
     setState(prev => prev ? { ...prev, belohnungen } : prev);
@@ -607,11 +597,27 @@ export default function useGameActions(
     e.target.value = "";
   }, [setState]);
 
+  // ── NEW: Journal tomorrow commitment ──
+
+  const commitTomorrow = useCallback((commitment: { type: string; text: string }) => {
+    setState(prev => prev ? { ...prev, tomorrowCommitment: commitment } : prev);
+  }, [setState]);
+
+  // ── NEW: Water drinking tracker ──
+
+  const drinkWater = useCallback(() => {
+    setState(prev => {
+      if (!prev || (prev.dailyWaterCount || 0) >= 6) return prev;
+      SFX.play("pop");
+      return { ...prev, dailyWaterCount: (prev.dailyWaterCount || 0) + 1, ...addHP(prev, 2) };
+    });
+  }, [setState]);
+
   return {
     complete, addQuest, completeComeback, rmQuest,
     togVac, resetDay, resetAll,
     setMood, setJournal, setJAnswer, toggleRainbow,
-    collectWheel, collectMemory, collectChest,
+    collectMemory, collectChest,
     feedCat, petCat, playCat,
     completeHabit, redeemReward, updateBelohnungen,
     addSpecialMission, completeSpecialMission, removeSpecialMission,
@@ -621,6 +627,7 @@ export default function useGameActions(
     equipGear, unequipGear,
     setRoomTheme,
     exportState, importState,
+    commitTomorrow, drinkWater,
   };
 }
 

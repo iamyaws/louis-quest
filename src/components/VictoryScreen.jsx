@@ -5,7 +5,7 @@ import Companion from './Companion';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
 
-export default function VictoryScreen({ onClose, onSpinWheel, onMemoryGame }) {
+export default function VictoryScreen({ onClose, onMemoryGame }) {
   const { state, computed } = useGame();
   const { level, done, total } = computed;
 
@@ -128,18 +128,6 @@ export default function VictoryScreen({ onClose, onSpinWheel, onMemoryGame }) {
       {/* Buttons */}
       {phase >= 2 && (
         <div style={{ animation: "victorySlideUp 0.5s ease 0.2s forwards", display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 280 }}>
-          {!state.wheelSpun && (
-            <button className="btn-tap" onClick={onSpinWheel} style={{
-              background: `linear-gradient(135deg, ${T.accent}, ${T.accentDark})`,
-              border: "none", borderRadius: 50, padding: "16px 36px",
-              color: "white", fontWeight: 800, fontSize: "1.05rem", cursor: "pointer",
-              fontFamily: "'Fredoka',sans-serif",
-              boxShadow: "0 8px 24px rgba(252,211,77,0.4)",
-              textTransform: "uppercase", minHeight: 52,
-            }}>
-              {"\u{1F3A1}"} Glücksrad drehen!
-            </button>
-          )}
           {!state.memoryPlayed && (
             <button className="btn-tap" onClick={onMemoryGame} style={{
               background: `linear-gradient(135deg, #8B5CF6, #A78BFA)`,
@@ -153,11 +141,11 @@ export default function VictoryScreen({ onClose, onSpinWheel, onMemoryGame }) {
             </button>
           )}
           <button className="btn-tap" onClick={onClose} style={{
-            background: state.wheelSpun ? `linear-gradient(135deg, ${T.primary}, ${T.primaryLight})` : "rgba(255,255,255,0.15)",
+            background: `linear-gradient(135deg, ${T.primary}, ${T.primaryLight})`,
             border: "none", borderRadius: 50, padding: "14px 36px",
-            color: "white", fontWeight: 800, fontSize: state.wheelSpun ? "1.05rem" : ".9rem",
+            color: "white", fontWeight: 800, fontSize: "1.05rem",
             cursor: "pointer", fontFamily: "'Fredoka',sans-serif",
-            boxShadow: state.wheelSpun ? `0 8px 24px ${T.primary}40` : "none",
+            boxShadow: `0 8px 24px ${T.primary}40`,
             minHeight: 48,
           }}>
             Gute Nacht! {"\u{1F319}"}

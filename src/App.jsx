@@ -13,8 +13,6 @@ import Shop from './components/Shop';
 import Journal from './components/Journal';
 import VictoryScreen from './components/VictoryScreen';
 import Celebration from './components/Celebration';
-import { RareDropToast } from './components/Celebration';
-import SpinWheel from './components/SpinWheel';
 import SurpriseChest from './components/SurpriseChest';
 import PinModal from './components/PinModal';
 import MemoryGame from './components/MemoryGame';
@@ -49,11 +47,11 @@ const TabIconBox = ({ active }) => (
 );
 
 const TABS = [
-  { id: "weather", label: "Wetter", Icon: TabIconWeather },
-  { id: "stats", label: "Erfolge", Icon: TabIconTrophy },
-  { id: "quest", label: "", icon: null, isCta: true },
-  { id: "room", label: "Zimmer", Icon: TabIconHome },
-  { id: "shop", label: "Sammlung", Icon: TabIconBox },
+  { id: "hub", label: "Home", icon: "\u{1F3E0}" },
+  { id: "quest", label: "", icon: "\u2B50", isCta: true },
+  { id: "companion", label: "Begleiter", icon: "\u{1F43E}" },
+  { id: "room", label: "Zimmer", icon: "\u{1F6CF}\uFE0F" },
+  { id: "rewards", label: "Belohnung", icon: "\u{1F381}" },
 ];
 
 function BottomTabBar() {
@@ -69,10 +67,20 @@ function BottomTabBar() {
             </button>
           );
         }
-        const isActive = view === tab.id;
+        const isActive = tab.id === "hub" ? view === "hub"
+          : tab.id === "companion" ? view === "companion"
+          : tab.id === "rewards" ? view === "time"
+          : view === tab.id;
+        const handleClick = () => {
+          SFX.play("tap");
+          if (tab.id === "hub") setView("hub");
+          else if (tab.id === "companion") setView("companion");
+          else if (tab.id === "rewards") setView("time");
+          else setView(tab.id);
+        };
         return (
-          <button key={tab.id} className={`tab-item ${isActive ? "tab-item-active" : ""}`} onClick={() => { SFX.play("tap"); setView(tab.id); }} aria-label={tab.label}>
-            <div className={`tab-icon ${isActive ? "tab-icon-active" : ""}`}><tab.Icon active={isActive} /></div>
+          <button key={tab.id} className={`tab-item ${isActive ? "tab-item-active" : ""}`} onClick={handleClick} aria-label={tab.label}>
+            <div className={`tab-icon ${isActive ? "tab-icon-active" : ""}`}><span style={{ fontSize: "1.3rem" }}>{tab.icon}</span></div>
             <span className={`tab-label ${isActive ? "tab-label-active" : ""}`}>{tab.label}</span>
           </button>
         );
@@ -90,11 +98,10 @@ function AppContent() {
   return (
     <>
       <Celebration active={ui.celeb} onDone={() => ui.setCeleb(false)} />
-      <RareDropToast drop={ui.rareDrop} onDone={() => ui.setRareDrop(null)} />
-      {ui.showWheel && <SpinWheel onResult={actions.collectWheel} />}
+
       {ui.showChest && <SurpriseChest onOpen={actions.collectChest} streakDays={state.sd} />}
       {ui.pinShow && <PinModal pin={ui.pin} setPin={ui.setPin} onSuccess={() => { ui.setPMode(true); ui.setPinShow(false); }} onClose={() => { ui.setPinShow(false); ui.setPin(""); }} />}
-      {ui.showVictory && <VictoryScreen onClose={() => ui.setShowVictory(false)} onSpinWheel={() => { ui.setShowVictory(false); ui.setShowWheel(true); }} onMemoryGame={() => { ui.setShowVictory(false); ui.setShowMemory(true); }} />}
+      {ui.showVictory && <VictoryScreen onClose={() => ui.setShowVictory(false)} onMemoryGame={() => { ui.setShowVictory(false); ui.setShowMemory(true); }} />}
       {ui.showMemory && <MemoryGame onComplete={actions.collectMemory} />}
       {state.bossDefeatReward && <BossChest bossName={state.bossDefeatReward.bossName} bossIcon={state.bossDefeatReward.bossIcon} hpReward={state.bossDefeatReward.hp} unlockedItem={state.bossDefeatReward.item} onClose={() => actions.clearBossReward()} />}
       {state.evolutionEvent && (

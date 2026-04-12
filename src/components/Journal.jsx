@@ -50,7 +50,7 @@ export default function Journal() {
             <div style={{ fontSize: ".85rem", fontWeight: 800, color: T.textSecondary, textTransform: "uppercase", marginBottom: 10 }}>{q.q}</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {q.opts.map(o => (
-                <button key={o.v} onClick={() => actions.setJAnswer(q.id, o.v)} style={{
+                <button key={o.v} onClick={() => { actions.setJAnswer(q.id, o.v); if (q.id === "tomorrow") actions.commitTomorrow({ type: o.v, text: o.l }); }} style={{
                   background: ans === o.v ? `${T.primary}10` : "rgba(180,120,40,0.04)",
                   border: ans === o.v ? `2.5px solid ${T.primary}40` : "2.5px solid rgba(180,120,40,0.08)",
                   borderRadius: 50, padding: "8px 16px", cursor: "pointer",

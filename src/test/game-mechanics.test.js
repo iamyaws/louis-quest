@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { getLevel } from '../utils/helpers';
 import {
-  LVL, RARE_DROPS, RARE_DROP_CHANCE, CHEST_MILESTONES, CHEST_REWARDS,
+  LVL, CHEST_MILESTONES, MILESTONE_REWARDS,
   WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, SCHOOL_QUESTS, VACATION_QUESTS,
-  REWARDS, SHOP_ITEMS, WHEEL_SEGMENTS, GRADUATION_THRESHOLD,
+  REWARDS, SHOP_ITEMS, GRADUATION_THRESHOLD,
 } from '../constants';
 
 describe('game balance - level thresholds', () => {
@@ -97,23 +97,19 @@ describe('streak system', () => {
   });
 });
 
-describe('rare drops', () => {
-  it('rare drop chance is 12%', () => {
-    expect(RARE_DROP_CHANCE).toBe(0.12);
-  });
-
-  it('all rare drops have type and label', () => {
-    RARE_DROPS.forEach(drop => {
-      expect(drop).toHaveProperty('type');
-      expect(drop).toHaveProperty('label');
-      expect(drop).toHaveProperty('icon');
+describe('milestone rewards', () => {
+  it('all milestone rewards have required fields', () => {
+    Object.values(MILESTONE_REWARDS).forEach(r => {
+      expect(r).toHaveProperty('itemId');
+      expect(r).toHaveProperty('label');
+      expect(r).toHaveProperty('icon');
     });
   });
 
-  it('rare drop types are valid', () => {
-    const validTypes = ['hp', 'coins', 'xp', 'minutes', 'emoji'];
-    RARE_DROPS.forEach(drop => {
-      expect(validTypes).toContain(drop.type);
+  it('milestone days match chest milestones', () => {
+    const milestoneDays = Object.keys(MILESTONE_REWARDS).map(Number);
+    milestoneDays.forEach(d => {
+      expect(CHEST_MILESTONES).toContain(d);
     });
   });
 });
@@ -145,35 +141,17 @@ describe('weekly missions', () => {
   });
 });
 
-describe('chest rewards', () => {
-  it('all chest rewards have required fields', () => {
-    CHEST_REWARDS.forEach(r => {
-      expect(r).toHaveProperty('type');
-      expect(r).toHaveProperty('label');
-      expect(r).toHaveProperty('icon');
-    });
-  });
-
-  it('chest reward types are valid', () => {
-    const validTypes = ['hp', 'coins', 'xp', 'item', 'minutes', 'xpboost'];
-    CHEST_REWARDS.forEach(r => {
-      expect(validTypes).toContain(r.type);
-    });
-  });
-});
 
 describe('quest structure', () => {
-  it('school quests cover all anchors', () => {
+  it('school quests cover morning and evening anchors', () => {
     const anchors = new Set(SCHOOL_QUESTS.map(q => q.anchor));
     expect(anchors.has('morning')).toBe(true);
-    expect(anchors.has('afternoon')).toBe(true);
     expect(anchors.has('evening')).toBe(true);
   });
 
-  it('vacation quests cover all anchors', () => {
+  it('vacation quests cover morning and evening anchors', () => {
     const anchors = new Set(VACATION_QUESTS.map(q => q.anchor));
     expect(anchors.has('morning')).toBe(true);
-    expect(anchors.has('afternoon')).toBe(true);
     expect(anchors.has('evening')).toBe(true);
   });
 
@@ -200,13 +178,3 @@ describe('quest structure', () => {
   });
 });
 
-describe('wheel segments', () => {
-  it('all segments have required fields', () => {
-    WHEEL_SEGMENTS.forEach(s => {
-      expect(s).toHaveProperty('type');
-      expect(s).toHaveProperty('label');
-      expect(s).toHaveProperty('icon');
-      expect(s).toHaveProperty('color');
-    });
-  });
-});

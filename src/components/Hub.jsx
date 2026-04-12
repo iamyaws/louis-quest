@@ -42,6 +42,18 @@ export default function Hub() {
           </div>
         )}
 
+        {state.yesterdayCommitment && (
+          <div className="game-card" style={{ padding: 14, marginBottom: 12, background: "linear-gradient(135deg, rgba(109,40,217,0.06), rgba(167,139,250,0.04))" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: "1.3rem" }}>{"\uD83D\uDCCB"}</span>
+              <div>
+                <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".9rem", fontWeight: 700, color: T.primary }}>Gestern vorgenommen:</div>
+                <div style={{ fontSize: "1rem", fontWeight: 700, color: T.textPrimary }}>{state.yesterdayCommitment.text}</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           <button className="btn-tap" onClick={() => { if (!state.dailyVitaminD) { actions.completeHabit("vitaminD"); if (navigator.vibrate) navigator.vibrate(50); } }} style={{ flex: 1, background: state.dailyVitaminD ? "rgba(52,211,153,0.1)" : "white", border: `2.5px solid ${state.dailyVitaminD ? "rgba(52,211,153,0.3)" : "rgba(180,120,40,0.10)"}`, borderRadius: 18, padding: "12px 6px", cursor: state.dailyVitaminD ? "default" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
             <span style={{ fontSize: "1.4rem" }}>{state.dailyVitaminD ? "\u2705" : "\uD83D\uDC8A"}</span>
@@ -74,6 +86,32 @@ export default function Hub() {
             </div>
           </div>
         )}
+
+        {/* Water tracker */}
+        <div className="game-card" style={{ padding: 12, marginBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            <span style={{ fontSize: "1.2rem" }}>{"\uD83D\uDCA7"}</span>
+            <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: T.primary }}>
+              Wasser trinken ({state.dailyWaterCount || 0}/6)
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {[0,1,2,3,4,5].map(i => (
+              <button key={i} className="btn-tap" onClick={() => i === (state.dailyWaterCount || 0) && actions.drinkWater()}
+                style={{
+                  flex: 1, height: 36, borderRadius: 10, border: "2px solid rgba(59,130,246,0.15)",
+                  background: i < (state.dailyWaterCount || 0) ? "linear-gradient(180deg, #3B82F6, #60A5FA)" : "rgba(59,130,246,0.06)",
+                  cursor: i === (state.dailyWaterCount || 0) ? "pointer" : "default",
+                  opacity: i < (state.dailyWaterCount || 0) ? 1 : i === (state.dailyWaterCount || 0) ? 0.7 : 0.3,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: i < (state.dailyWaterCount || 0) ? "1rem" : ".85rem",
+                  transition: "all .2s",
+                }}>
+                {i < (state.dailyWaterCount || 0) ? "\uD83D\uDCA7" : ""}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <button className="btn-tap" onClick={() => ui.setView("regeln")} style={{ width: "100%", background: "linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.04))", border: "2.5px solid rgba(245,158,11,0.15)", borderRadius: 18, padding: "14px 12px", cursor: "pointer", fontFamily: "'Fredoka',sans-serif", fontWeight: 700, fontSize: ".95rem", color: "#B45309", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 52, boxShadow: "0 2px 8px rgba(0,0,0,0.04)", marginBottom: 12 }}>{"\uD83D\uDEE1\uFE0F"} Helden-Kodex</button>
 
@@ -164,7 +202,7 @@ export default function Hub() {
                 <span style={{ fontSize: "1.6rem", animation: "bossShake 0.6s ease-in-out infinite" }}>{bossData.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 800, color: "#DC2626", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
-                    Wochen-Boss
+                    Tages-Boss
                     {tierInfo && <span style={{ background: tierInfo.color + "20", color: tierInfo.color, borderRadius: 50, padding: "2px 10px", fontSize: ".95rem", fontWeight: 800, textTransform: "none" }}>{tierInfo.icon} {tierInfo.name}</span>}
                   </div>
                   <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: T.textPrimary }}>{bossData.name}</div>
@@ -184,12 +222,15 @@ export default function Hub() {
           const bossData = BOSSES.find(b => b.id === state.boss.id);
           if (!bossData) return null;
           return (
-            <div className="game-card" style={{ padding: 16, marginBottom: 12, background: "linear-gradient(135deg, rgba(52,211,153,0.08), rgba(52,211,153,0.03))", borderColor: `${T.success}40` }}>
+            <div className="game-card" style={{ padding: 16, marginBottom: 12, background: "linear-gradient(135deg, rgba(52,211,153,0.08), rgba(252,211,77,0.06))", borderColor: `${T.success}40` }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: "1.4rem" }}>{"\uD83C\uDFC6"}</span>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 800, fontSize: ".9rem", color: T.successDark, textTransform: "uppercase" }}>Boss besiegt!</div>
                   <div style={{ fontSize: ".9rem", fontWeight: 700, color: T.textPrimary }}>{bossData.icon} {bossData.name} wurde besiegt!</div>
+                </div>
+                <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".85rem", fontWeight: 700, color: T.primary, background: `${T.primaryPale}`, borderRadius: 50, padding: "4px 12px" }}>
+                  Neuer Boss morgen! {"\uD83D\uDD50"}
                 </div>
               </div>
             </div>
