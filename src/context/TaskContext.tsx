@@ -27,6 +27,7 @@ interface TaskState {
   catPlayed: boolean;
   catEvo: number;
   loginBonusClaimed: boolean;
+  onboardingDone: boolean;
 }
 
 interface TaskComputed {
@@ -45,6 +46,7 @@ interface TaskActions {
   petCompanion: () => void;
   playCompanion: () => void;
   collectLoginBonus: () => void;
+  completeOnboarding: () => void;
 }
 
 interface TaskContextValue {
@@ -105,6 +107,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           catPlayed: raw.catPlayed || false,
           catEvo: raw.catEvo || 0,
           loginBonusClaimed: raw.loginBonusClaimed || false,
+          onboardingDone: raw.onboardingDone || false,
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -139,6 +142,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           catPlayed: false,
           catEvo: 0,
           loginBonusClaimed: false,
+          onboardingDone: false,
         });
       }
       setLoading(false);
@@ -278,6 +282,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const completeOnboarding = useCallback(() => {
+    setState(prev => prev ? { ...prev, onboardingDone: true } : prev);
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -299,7 +307,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus }, loading }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding }, loading }}>
       {children}
     </TaskContext.Provider>
   );

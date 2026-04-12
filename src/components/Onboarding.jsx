@@ -1,289 +1,188 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { T, HERO_COLORS, HERO_HAIRS, SKIN_TONES, HAIR_COLORS, COMPANION_TYPES, OB_CHEST_REWARD } from '../constants';
-import { OBWrap, OBTitle, OBSub, OBBtn, OBGrid, OBChip } from './ui';
-import HeroSprite from './HeroSprite';
-import Egg from './Egg';
+import React, { useState } from 'react';
+import HeroCreator from './HeroCreator';
+
+const base = import.meta.env.BASE_URL;
+
+const SLIDES = [
+  {
+    // 1. Welcome
+    bg: 'hero-entrance.webp',
+    overlay: 'from-black/40 via-transparent to-black/60',
+    topContent: (
+      <div className="relative w-32 h-32 rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20">
+        <img src={base + 'art/dragon-baby.webp'} alt="Ronki" className="w-full h-full object-cover" />
+      </div>
+    ),
+    title: 'Willkommen bei Ronki!',
+    body: 'Dein Abenteuer beginnt hier. Begleite uns in ein Reich der Achtsamkeit und Freude.',
+    cta: "Los geht's!",
+    ctaStyle: 'white',
+  },
+  {
+    // 2. Der Anfang
+    bg: 'hero-entrance.webp',
+    overlay: 'from-black/30 via-black/10 to-black/70',
+    badge: 'Der Anfang',
+    title: 'Tief im alten Wald von Ronki schläft ein Geheimnis...',
+    body: 'Spürst du das ferne Leuchten?\nEs ruft ganz leise nach dir.',
+    cta: 'Dem Licht folgen',
+    ctaStyle: 'gold',
+    skip: true,
+  },
+  {
+    // 3. Die Legende
+    bg: 'egg-chamber.webp',
+    overlay: 'from-black/20 via-transparent to-black/60',
+    badge: 'Die Legende',
+    title: 'Ein Drache, ein Kind, ein Band für immer.',
+    body: 'Jede deiner guten Taten schenkt deinem Drachen neue Kraft. In der Wärme des geheimen Waldes beginnt eure magische Reise – Hand in Pfote, Herz an Herz.',
+    cta: 'Werde zum Helden',
+    ctaStyle: 'gold',
+  },
+  {
+    // 4. Das Erwachen
+    bg: 'egg-glow.webp',
+    overlay: 'from-black/30 via-transparent to-black/50',
+    badge: 'Akt II: Das Erwachen',
+    title: 'Nur ein Herz voller Mut kann die Drachen wecken.',
+    body: 'Spürst du das goldene Leuchten? Die Schatten tanzen davon, denn in deiner Hand hältst du den Schlüssel zum Licht.',
+    cta: 'Ich bin bereit!',
+    ctaStyle: 'gold',
+    glow: true,
+  },
+];
 
 export default function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0);
-  const [hero, setHero] = useState({
-    shape: "circle", color: HERO_COLORS[0], eyes: "round", hair: "short",
-    name: "", skinTone: SKIN_TONES[1], hairColor: HAIR_COLORS[0],
-  });
-  const [selectedEgg, setSelectedEgg] = useState(null); // "dragon" | "wolf" | "phoenix"
-  const [companionName, setCompanionName] = useState("");
-  const nameRef = useRef(null);
-  const companionNameRef = useRef(null);
+  const [showCreator, setShowCreator] = useState(false);
 
-  const advanceStep = (nextStep) => {
-    setStep(nextStep);
-  };
-
-  useEffect(() => { if (step === 2) setTimeout(() => nameRef.current?.focus(), 100); }, [step]);
-  useEffect(() => { if (step === 4) setTimeout(() => companionNameRef.current?.focus(), 100); }, [step]);
-
-  const totalSteps = 6;
-
-  // ── Progress dots (6 dots, gold active) ──
-  const Dots = () => (
-    <div style={{ display: "flex", gap: 5, marginBottom: 16, justifyContent: "center" }}>
-      {Array.from({ length: totalSteps }, (_, i) => (
-        <div key={i} style={{
-          width: i === step ? 20 : 7, height: 7, borderRadius: 4,
-          background: i < step ? "#FFD700" : i === step ? "#FFD700" : "rgba(0,0,0,0.08)",
-          transition: "all .3s",
-        }} />
-      ))}
-    </div>
-  );
-
-  // ── Shared input style ──
-  const inputStyle = {
-    width: "100%", maxWidth: 320, background: "white", borderRadius: 16,
-    padding: "16px 20px", color: T.textPrimary, fontSize: "1.15rem",
-    fontFamily: "'Fredoka',sans-serif", textAlign: "center",
-    outline: "none", fontWeight: 700, boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
-    minHeight: 48,
-  };
-
-  // ── Hair style labels ──
-  const hairLabels = {
-    short: "Kurz", spiky: "Stachelig", curly: "Lockig",
-    long: "Lang", cap: "Kappe", none: "Keine",
-  };
-  const hairIcons = {
-    short: "\u2702\uFE0F", spiky: "\u26A1", curly: "\uD83C\uDF00",
-    long: "\uD83D\uDC87", cap: "\uD83E\uDDE2", none: "\uD83D\uDEAB",
-  };
-
-  // ── Swatch button helper ──
-  const Swatch = ({ color, selected, onClick, size = 48 }) => (
-    <button onClick={onClick} style={{
-      width: size, height: size, borderRadius: 14, background: color,
-      border: selected ? "3px solid #2D2A1E" : "3px solid transparent",
-      cursor: "pointer", margin: "0 auto",
-      boxShadow: selected ? `0 4px 16px ${color}60` : "0 2px 6px rgba(0,0,0,0.08)",
-      transition: "all .15s", minHeight: 48, minWidth: 48,
-    }} />
-  );
-
-  // ═══ Step 0: Welcome ═══
-  if (step === 0) return (
-    <OBWrap>
-      <img src={import.meta.env.BASE_URL + "ronki-wordmark.png"} alt="Ronki" style={{ width: "min(280px, 70vw)", marginBottom: 24, animation: "heroFloat 3s ease-in-out infinite" }} />
-      <OBSub>Erstelle deinen Helden und finde dein Begleiter-Ei!</OBSub>
-      <OBBtn onClick={() => setStep(1)} big>Los geht's! 🚀</OBBtn>
-    </OBWrap>
-  );
-
-  // ═══ Step 1: Combined Avatar Builder ═══
-  if (step === 1) return (
-    <OBWrap>
-      <Dots />
-      <OBTitle>Erstelle deinen Helden!</OBTitle>
-
-      {/* Live hero preview */}
-      <div style={{ marginBottom: 20, animation: "heroFloat 3s ease-in-out infinite" }}>
-        <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
-          size={150} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
-      </div>
-
-      {/* Skin tone */}
-      <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, marginBottom: 6, textAlign: "center" }}>Hautfarbe</div>
-      <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: 14 }}>
-        {SKIN_TONES.map(tone => (
-          <Swatch key={tone} color={tone} selected={hero.skinTone === tone}
-            onClick={() => setHero(h => ({ ...h, skinTone: tone }))} />
-        ))}
-      </div>
-
-      {/* Hair style */}
-      <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, marginBottom: 6, textAlign: "center" }}>Frisur</div>
-      <OBGrid cols={3}>
-        {HERO_HAIRS.map(h2 => (
-          <OBChip key={h2} selected={hero.hair === h2}
-            onClick={() => setHero(h => ({ ...h, hair: h2 }))}>
-            {hairIcons[h2]}
-            <div style={{ fontSize: ".7rem", marginTop: 2 }}>{hairLabels[h2]}</div>
-          </OBChip>
-        ))}
-      </OBGrid>
-
-      {/* Hair color */}
-      <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, marginTop: 14, marginBottom: 6, textAlign: "center" }}>Haarfarbe</div>
-      <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 14 }}>
-        {HAIR_COLORS.map(c => (
-          <Swatch key={c} color={c} selected={hero.hairColor === c}
-            onClick={() => setHero(h => ({ ...h, hairColor: c }))} />
-        ))}
-      </div>
-
-      {/* Outfit color */}
-      <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, marginBottom: 6, textAlign: "center" }}>Outfit</div>
-      <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
-        {HERO_COLORS.map(c => (
-          <Swatch key={c} color={c} selected={hero.color === c}
-            onClick={() => setHero(h => ({ ...h, color: c }))} />
-        ))}
-      </div>
-
-      <OBBtn onClick={() => advanceStep(2)}>Weiter →</OBBtn>
-    </OBWrap>
-  );
-
-  // ═══ Step 2: Hero Name ═══
-  if (step === 2) return (
-    <OBWrap>
-      <Dots />
-      <OBTitle>Dein Heldenname</OBTitle>
-      <div style={{ marginBottom: 16 }}>
-        <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
-          size={150} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
-      </div>
-      <input ref={nameRef} value={hero.name}
-        onChange={e => setHero(h => ({ ...h, name: e.target.value }))}
-        placeholder="Name eingeben..."
-        style={{ ...inputStyle, border: `2px solid ${hero.name.trim() ? "#FFD700" : "rgba(0,0,0,0.1)"}` }}
-      />
-      <div style={{ marginTop: 16 }}>
-        <OBBtn onClick={() => advanceStep(3)} disabled={!hero.name.trim()}>Weiter →</OBBtn>
-      </div>
-    </OBWrap>
-  );
-
-  // ═══ Step 3: Egg Selection ═══
-  if (step === 3) {
-    const eggs = [
-      { type: "dragon", label: "Feuer-Ei 🔥" },
-      { type: "wolf", label: "Mond-Ei 🌙" },
-      { type: "phoenix", label: "Sonnen-Ei ☀️" },
-    ];
-
-    return (
-      <OBWrap>
-        <Dots />
-        <OBTitle>Wähle dein Begleiter-Ei! 🥚</OBTitle>
-        <OBSub>Dein Begleiter wartet darauf zu schlüpfen!</OBSub>
-
-        <div style={{
-          display: "flex", gap: 16, justifyContent: "center",
-          alignItems: "center", marginBottom: 20, flexWrap: "wrap",
-        }}>
-          {eggs.map(egg => (
-            <button key={egg.type} onClick={() => setSelectedEgg(egg.type)}
-              style={{
-                background: selectedEgg === egg.type ? "#FFD70020" : T.card,
-                border: selectedEgg === egg.type ? "3px solid #FFD700" : "3px solid transparent",
-                borderRadius: 20, padding: "16px 12px", cursor: "pointer",
-                transition: "all .2s", textAlign: "center", minWidth: 100,
-                boxShadow: selectedEgg === egg.type
-                  ? "0 6px 24px rgba(255,215,0,0.3)"
-                  : "0 2px 12px rgba(0,0,0,0.06)",
-              }}>
-              <Egg type={egg.type} size={90} progress={0} />
-              <div style={{
-                fontSize: ".8rem", fontWeight: 800, marginTop: 8,
-                color: T.textPrimary, fontFamily: "'Nunito',sans-serif",
-              }}>
-                {egg.label}
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Companion info for selected egg */}
-        {selectedEgg && COMPANION_TYPES[selectedEgg] && (
-          <div style={{
-            background: "white", borderRadius: 16, padding: "12px 20px",
-            marginBottom: 16, textAlign: "center", maxWidth: 320,
-            boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
-          }}>
-            <div style={{ fontSize: "1.1rem", fontWeight: 800, color: T.primary }}>
-              {COMPANION_TYPES[selectedEgg].emoji} {COMPANION_TYPES[selectedEgg].name}
-            </div>
-            <div style={{ fontSize: ".85rem", color: T.textSecondary, marginTop: 4 }}>
-              {COMPANION_TYPES[selectedEgg].desc}
-            </div>
-          </div>
-        )}
-
-        <OBBtn onClick={() => advanceStep(4)} disabled={!selectedEgg}>Weiter →</OBBtn>
-      </OBWrap>
-    );
+  if (showCreator) {
+    return <HeroCreator onComplete={(cfg) => onComplete(cfg)} />;
   }
 
-  // ═══ Step 4: Companion Name ═══
-  if (step === 4) return (
-    <OBWrap>
-      <Dots />
-      <OBTitle>Name für deinen Begleiter?</OBTitle>
+  const slide = SLIDES[step];
 
-      {/* Selected egg with subtle glow */}
-      <div style={{
-        marginBottom: 16, filter: "drop-shadow(0 0 12px rgba(255,215,0,0.4))",
-      }}>
-        <Egg type={selectedEgg || "dragon"} size={100} progress={0} />
+  const advance = () => {
+    if (step < SLIDES.length - 1) {
+      setStep(step + 1);
+    } else {
+      setShowCreator(true);
+    }
+  };
+
+  const ctaClasses = slide.ctaStyle === 'white'
+    ? 'bg-white text-[#5300b7] shadow-[0_8px_30px_rgba(255,255,255,0.3)]'
+    : 'bg-[#fcd34d] text-[#725b00] shadow-[0_0_20px_rgba(252,211,77,0.3)]';
+
+  return (
+    <div className="fixed inset-0 flex flex-col text-white overflow-hidden font-body">
+      {/* Background */}
+      <div className="absolute inset-0 z-0">
+        <img src={base + 'art/' + slide.bg} alt="" className="w-full h-full object-cover" />
+        <div className={`absolute inset-0 bg-gradient-to-b ${slide.overlay}`} />
       </div>
 
-      <input ref={companionNameRef} value={companionName}
-        onChange={e => setCompanionName(e.target.value)}
-        placeholder="Name eingeben..."
-        style={{ ...inputStyle, border: `2px solid ${companionName.trim() ? "#FFD700" : "rgba(0,0,0,0.1)"}` }}
-      />
+      {/* Content */}
+      <div className="relative z-10 flex flex-col h-full">
 
-      <div style={{ marginTop: 16 }}>
-        <OBBtn onClick={() => advanceStep(5)} disabled={!companionName.trim()}>Weiter →</OBBtn>
+        {/* Top area */}
+        <div className="flex-none px-6 pt-14 flex justify-center">
+          {slide.topContent ? slide.topContent : slide.badge ? (
+            <span className="font-label font-bold tracking-[0.2em] text-white/70 text-[10px] uppercase px-4 py-2 rounded-full border border-white/10"
+                  style={{ background: 'rgba(0,0,0,0.2)', backdropFilter: 'blur(8px)' }}>
+              {slide.badge}
+            </span>
+          ) : null}
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Bottom content */}
+        <div className="px-6 pb-16 max-w-lg mx-auto w-full">
+
+          {step === 0 ? (
+            /* Welcome — open layout, no glass card */
+            <div className="text-center space-y-8 mb-4">
+              <div className="space-y-3">
+                <h1 className="text-4xl font-bold font-headline leading-tight"
+                    style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                  {slide.title}
+                </h1>
+                <p className="text-lg text-white/90 max-w-sm mx-auto leading-relaxed"
+                   style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                  {slide.body}
+                </p>
+              </div>
+              <button onClick={advance}
+                className={`w-full py-5 rounded-full font-label font-extrabold text-xl flex items-center justify-center gap-3 active:scale-95 transition-all ${ctaClasses}`}>
+                {slide.cta}
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          ) : (
+            /* Lore slides — glass card */
+            <div className="rounded-[2.5rem] p-8 border border-white/10 shadow-2xl mb-4"
+                 style={{ background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)' }}>
+
+              {slide.badge && step >= 2 && (
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="h-0.5 w-6 rounded-full bg-[#fcd34d]" />
+                  <span className="font-label font-bold text-xs tracking-[0.3em] text-[#fcd34d] uppercase">
+                    {slide.badge}
+                  </span>
+                </div>
+              )}
+
+              <h1 className="font-headline text-3xl font-bold leading-tight mb-4"
+                  style={{ textShadow: '0 0 15px rgba(255,255,255,0.15)' }}>
+                {slide.title}
+              </h1>
+
+              <p className="text-white/90 text-lg leading-relaxed mb-8" style={{ whiteSpace: 'pre-line' }}>
+                {slide.body}
+              </p>
+
+              <button onClick={advance}
+                className={`w-full py-5 rounded-full font-label font-extrabold text-lg flex items-center justify-center gap-3 active:scale-95 transition-all ${ctaClasses}`}
+                style={slide.glow ? { boxShadow: '0 0 20px rgba(252,211,77,0.4)' } : undefined}>
+                {slide.cta}
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          )}
+
+          {/* Skip */}
+          {slide.skip && (
+            <button onClick={() => setShowCreator(true)}
+              className="w-full text-center text-white/40 font-label font-semibold text-xs tracking-wide py-2">
+              Erzählung überspringen
+            </button>
+          )}
+
+          {/* Page dots */}
+          <div className="flex justify-center items-center gap-3 mt-6">
+            {SLIDES.map((_, i) => (
+              <div key={i}
+                className="rounded-full transition-all duration-300"
+                style={{
+                  width: i === step ? 40 : 8,
+                  height: i === step ? 6 : 8,
+                  background: i === step ? '#fcd34d' : 'rgba(255,255,255,0.2)',
+                  boxShadow: i === step ? '0 0 10px rgba(252,211,77,0.5)' : 'none',
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
-    </OBWrap>
+
+      {/* Bottom progress bar */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-32 h-1 rounded-full overflow-hidden z-20"
+           style={{ background: 'rgba(255,255,255,0.1)' }}>
+        <div className="h-full rounded-full transition-all duration-500"
+             style={{ width: `${((step + 1) / SLIDES.length) * 100}%`, background: 'rgba(252,211,77,0.8)' }} />
+      </div>
+    </div>
   );
-
-  // ═══ Step 5: Activate ═══
-  if (step === 5) return (
-    <OBWrap>
-      <Dots />
-      <OBTitle>Bereit für dein Abenteuer!</OBTitle>
-
-      {/* Hero + egg together */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, marginBottom: 20 }}>
-        <div style={{ animation: "heroFloat 3s ease-in-out infinite" }}>
-          <HeroSprite shape={hero.shape} color={hero.color} eyes={hero.eyes} hair={hero.hair}
-            size={120} level={1} skinTone={hero.skinTone} hairColor={hero.hairColor} />
-        </div>
-        <div style={{ filter: "drop-shadow(0 0 12px rgba(255,215,0,0.4))" }}>
-          <Egg type={selectedEgg || "dragon"} size={80} progress={0} />
-        </div>
-      </div>
-
-      {/* Chest reward */}
-      <div style={{
-        background: "#FFD70015", borderRadius: 16, padding: "14px 20px",
-        marginBottom: 20, textAlign: "center", maxWidth: 320,
-      }}>
-        <div style={{ fontSize: "2rem", marginBottom: 4 }}>{OB_CHEST_REWARD.icon}</div>
-        <div style={{ fontSize: ".95rem", fontWeight: 800, color: T.primary }}>{OB_CHEST_REWARD.text}</div>
-        <div style={{ fontSize: ".85rem", color: T.textSecondary, marginTop: 6, lineHeight: 1.5 }}>
-          Sammle Heldenpunkte durch deine täglichen Aufgaben!
-        </div>
-      </div>
-
-      <OBBtn
-        onClick={() => {
-          onComplete({
-            hero: { ...hero, skinTone: hero.skinTone, hairColor: hero.hairColor },
-            catVariant: "tiger",
-            catName: companionName,
-            startXP: 1,
-            startCoins: 1,
-            companionType: selectedEgg,
-            eggType: selectedEgg,
-          });
-        }}
-        big
-      >
-        Abenteuer starten! 🐉
-      </OBBtn>
-    </OBWrap>
-  );
-
-  return null;
 }
