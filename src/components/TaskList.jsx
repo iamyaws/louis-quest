@@ -95,7 +95,7 @@ export default function TaskList() {
 
                   return (
                     <div key={q.id}
-                      className={`bg-surface-container-lowest rounded-lg p-6 relative overflow-hidden group transition-all ${
+                      className={`bg-surface-container-lowest rounded-lg p-6 relative overflow-hidden group transition-all shadow-sm ${
                         fullyDone ? 'opacity-50' : 'hover:shadow-md'
                       }`}
                     >
@@ -174,7 +174,7 @@ export default function TaskList() {
                   const matIcon = ICON_MAP[q.icon] || 'auto_awesome';
                   return (
                     <div key={q.id}
-                      className={`bg-surface-container-lowest rounded-lg p-6 group transition-all ${q.done ? 'opacity-50' : 'hover:shadow-md'}`}
+                      className={`bg-surface-container-lowest rounded-lg p-6 group transition-all shadow-sm ${q.done ? 'opacity-50' : 'hover:shadow-md'}`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-5">
