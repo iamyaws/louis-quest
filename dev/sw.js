@@ -1,7 +1,7 @@
 const CACHE_NAME = "ronki-v1";
 const PRECACHE_URLS = [
-  "/Ronki/",
-  "/Ronki/index.html",
+  "/Ronki/dev/",
+  "/Ronki/dev/index.html",
 ];
 
 // Install: cache app shell
