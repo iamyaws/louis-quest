@@ -6,6 +6,7 @@ import TaskList from './components/TaskList';
 import Belohnungsbank from './components/Belohnungsbank';
 import Hub from './components/Hub';
 import Sanctuary from './components/Sanctuary';
+import Journal from './components/Journal';
 
 function AppContent() {
   const { loading } = useTask();
@@ -28,12 +29,7 @@ function AppContent() {
         {view === 'shop' && <Belohnungsbank />}
         {view === 'hub' && <Hub />}
         {view === 'care' && <Sanctuary />}
-        {view === 'journal' && (
-          <div className="px-6 pt-8 text-center">
-            <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">menu_book</span>
-            <p className="font-headline text-xl text-on-surface-variant">Journal — Coming Soon</p>
-          </div>
-        )}
+        {view === 'journal' && <Journal />}
       </div>
       <NavBar active={view} onNavigate={setView} />
     </>

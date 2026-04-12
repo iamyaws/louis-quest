@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES } from '../constants';
 import { useTask } from '../context/TaskContext';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
@@ -19,6 +19,8 @@ export default function Hub() {
   const { weather } = useWeather();
   const base = import.meta.env.BASE_URL;
   const remaining = total - done;
+
+  const [showBossDetail, setShowBossDetail] = useState(false);
 
   if (!state) return null;
 
@@ -172,51 +174,84 @@ export default function Hub() {
           </div>
         </div>
 
-        {/* ── Boss Card ── */}
+        {/* ── Boss Card (compact with tappable portrait) ── */}
         {state.boss && (() => {
           const bd = BOSSES.find(b => b.id === state.boss.id);
           if (!bd) return null;
           const defeated = state.boss.hp <= 0;
           const art = BOSS_ART[bd.id];
           const artSrc = art ? base + (defeated ? art.defeated : art.full) : null;
+          const hpPct = state.boss.maxHp > 0 ? (state.boss.hp / state.boss.maxHp) * 100 : 0;
           return (
-            <div className="rounded-2xl overflow-hidden"
-                 style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
-              {/* Boss illustration */}
-              {artSrc && (
-                <div className="w-full h-40 overflow-hidden relative">
-                  <img src={artSrc} alt={bd.name} className="w-full h-full object-cover object-top" />
-                  {defeated && (
-                    <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(52,211,153,0.3)' }}>
-                      <span className="text-5xl">🏆</span>
-                    </div>
+            <>
+              <div className="p-5 rounded-2xl flex items-center gap-4"
+                   style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}
+                   onClick={() => setShowBossDetail(true)}>
+                {/* Round portrait */}
+                <div className="w-16 h-16 rounded-full overflow-hidden shrink-0 cursor-pointer shadow-lg"
+                     style={{ border: defeated ? '3px solid #34d399' : '3px solid rgba(186,26,26,0.3)' }}>
+                  {artSrc ? (
+                    <img src={artSrc} alt={bd.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-2xl" style={{ background: 'rgba(186,26,26,0.1)' }}>{bd.icon}</div>
                   )}
                 </div>
-              )}
-              <div className="p-5">
-                {defeated ? (
-                  <div className="text-center">
-                    <h4 className="font-headline font-bold text-lg" style={{ color: '#059669' }}>Boss besiegt!</h4>
-                    <p className="text-sm text-on-surface-variant font-body mt-1">{bd.name} wurde besiegt!</p>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex justify-between items-center mb-3">
-                      <div>
+                {/* Stats */}
+                <div className="flex-1">
+                  {defeated ? (
+                    <>
+                      <p className="font-bold text-[10px] font-label uppercase tracking-widest" style={{ color: '#059669' }}>Boss besiegt!</p>
+                      <h4 className="font-headline font-bold text-lg text-on-surface">{bd.name}</h4>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center">
                         <p className="font-bold text-[10px] font-label text-error uppercase tracking-widest">Boss-Kampf</p>
-                        <h4 className="font-headline font-bold text-xl text-on-surface">{bd.name}</h4>
+                        <p className="font-bold text-xs font-label text-error">{state.boss.hp}/{state.boss.maxHp} HP</p>
                       </div>
-                      <p className="font-bold text-sm font-label text-error">{state.boss.hp}/{state.boss.maxHp} HP</p>
-                    </div>
-                    <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: 'rgba(232,225,218,0.5)' }}>
-                      <div className="h-full bg-error rounded-full transition-all duration-500"
-                           style={{ width: `${(state.boss.hp / state.boss.maxHp) * 100}%` }} />
-                    </div>
-                    <p className="text-xs text-on-surface-variant font-body italic mt-2">{bd.desc}</p>
-                  </>
-                )}
+                      <h4 className="font-headline font-bold text-lg text-on-surface">{bd.name}</h4>
+                      <div className="w-full h-2 rounded-full overflow-hidden mt-2" style={{ background: 'rgba(232,225,218,0.5)' }}>
+                        <div className="h-full bg-error rounded-full transition-all duration-500" style={{ width: `${hpPct}%` }} />
+                      </div>
+                    </>
+                  )}
+                </div>
+                <span className="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
               </div>
-            </div>
+
+              {/* Boss detail popup */}
+              {showBossDetail && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center px-6" onClick={() => setShowBossDetail(false)}>
+                  <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+                  <div className="relative rounded-2xl overflow-hidden max-w-sm w-full" onClick={e => e.stopPropagation()}
+                       style={{ background: '#fff8f1', boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}>
+                    {artSrc && <img src={artSrc} alt={bd.name} className="w-full h-56 object-cover" />}
+                    <div className="p-6">
+                      <p className="font-bold text-[10px] font-label text-error uppercase tracking-widest">{defeated ? 'Besiegt!' : 'Tages-Boss'}</p>
+                      <h3 className="font-headline font-bold text-2xl text-on-surface mt-1">{bd.name}</h3>
+                      <p className="font-body text-on-surface-variant mt-2">{bd.desc}</p>
+                      {!defeated && (
+                        <div className="mt-4">
+                          <div className="flex justify-between text-sm font-label font-bold mb-1">
+                            <span className="text-error">Lebensenergie</span>
+                            <span className="text-error">{state.boss.hp}/{state.boss.maxHp}</span>
+                          </div>
+                          <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: '#e8e1da' }}>
+                            <div className="h-full bg-error rounded-full" style={{ width: `${hpPct}%` }} />
+                          </div>
+                          <p className="font-body text-xs text-on-surface-variant italic mt-2">Erledige Quests, um Schaden zu verursachen!</p>
+                        </div>
+                      )}
+                      <button className="w-full mt-5 py-3 rounded-full font-label font-bold text-base"
+                              style={{ background: '#fcd34d', color: '#725b00' }}
+                              onClick={() => setShowBossDetail(false)}>
+                        {defeated ? 'Super gemacht!' : 'Verstanden!'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           );
         })()}
 
