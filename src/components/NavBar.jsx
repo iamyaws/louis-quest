@@ -1,11 +1,11 @@
 import React from 'react';
 
 const TABS = [
-  { id: 'hub',     label: 'Hub',     icon: 'grid_view' },
-  { id: 'quests',  label: 'Quests',  icon: 'map' },
-  { id: 'room',    label: 'Room',    icon: 'bedroom_child' },
+  { id: 'hub',     label: 'Hub',     icon: 'home' },
+  { id: 'quests',  label: 'Quests',  icon: 'military_tech' },
+  { id: 'room',    label: 'Room',    icon: 'bedroom_parent' },
   { id: 'shop',    label: 'Shop',    icon: 'shopping_bag' },
-  { id: 'journal', label: 'Journal', icon: 'menu_book' },
+  { id: 'journal', label: 'Journal', icon: 'auto_stories' },
 ];
 
 export default function NavBar({ active = 'quests', onNavigate }) {
@@ -21,8 +21,8 @@ export default function NavBar({ active = 'quests', onNavigate }) {
               onClick={() => onNavigate?.(tab.id)}
               className={`flex flex-col items-center justify-center px-5 py-2 transition-all duration-300 ${
                 isActive
-                  ? 'bg-secondary-container text-on-secondary-container rounded-full scale-90'
-                  : 'text-on-surface/50 hover:scale-110'
+                  ? 'bg-primary text-white rounded-full shadow-lg'
+                  : 'text-on-surface-variant hover:text-primary'
               }`}
             >
               <span

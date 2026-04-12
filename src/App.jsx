@@ -4,7 +4,7 @@ import TopBar from './components/TopBar';
 import NavBar from './components/NavBar';
 import TaskList from './components/TaskList';
 import Belohnungsbank from './components/Belohnungsbank';
-import EggProfile from './components/EggProfile';
+import Hub from './components/Hub';
 
 function AppContent() {
   const { loading } = useTask();
@@ -21,10 +21,11 @@ function AppContent() {
   return (
     <>
       <TopBar />
-      <div className="min-h-screen bg-surface max-w-lg mx-auto" style={{ paddingTop: 72, paddingBottom: 96 }}>
+      <div className={`min-h-screen max-w-lg mx-auto ${view === 'hub' ? '' : 'bg-surface'}`}
+           style={{ paddingTop: view === 'hub' ? 0 : 72, paddingBottom: 96 }}>
         {view === 'quests' && <TaskList />}
         {view === 'shop' && <Belohnungsbank />}
-        {view === 'hub' && <EggProfile />}
+        {view === 'hub' && <Hub />}
         {view === 'room' && (
           <div className="px-6 pt-8 text-center">
             <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">potted_plant</span>
