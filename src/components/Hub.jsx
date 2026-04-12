@@ -7,6 +7,12 @@ import Egg from './Egg';
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 
+const BOSS_ART = {
+  schnarchling: { full: 'art/boss-schnarchling_the-snorer-fullpower.webp', defeated: 'art/boss-schnarchling_the-snorer-defeated.webp' },
+  wusselwicht:  { full: 'art/boss-wusselwicht-the-chaos-imp-fullpower.webp', defeated: 'art/boss-wusselwicht-the-chaos-imp-defeated.webp' },
+  flimmerfux:   { full: 'art/boss-flimmerfux_the-flicker-fox-fullpower.webp', defeated: 'art/boss-flimmerfux_the-flicker-fox-defeated.webp' },
+};
+
 export default function Hub() {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct } = computed;
@@ -171,37 +177,45 @@ export default function Hub() {
           const bd = BOSSES.find(b => b.id === state.boss.id);
           if (!bd) return null;
           const defeated = state.boss.hp <= 0;
+          const art = BOSS_ART[bd.id];
+          const artSrc = art ? base + (defeated ? art.defeated : art.full) : null;
           return (
-            <div className="p-5 rounded-2xl"
-                 style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
-              {defeated ? (
-                <div className="text-center py-2">
-                  <span className="text-4xl">🏆</span>
-                  <h4 className="font-headline font-bold text-lg text-primary-container mt-2">Boss besiegt!</h4>
-                  <p className="text-sm text-on-surface-variant font-body">{bd.icon} {bd.name} wurde besiegt!</p>
+            <div className="rounded-2xl overflow-hidden"
+                 style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
+              {/* Boss illustration */}
+              {artSrc && (
+                <div className="w-full h-40 overflow-hidden relative">
+                  <img src={artSrc} alt={bd.name} className="w-full h-full object-cover object-top" />
+                  {defeated && (
+                    <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(52,211,153,0.3)' }}>
+                      <span className="text-5xl">🏆</span>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center"
-                         style={{ background: 'rgba(186,26,26,0.1)', border: '1px solid rgba(186,26,26,0.2)' }}>
-                      <span className="text-2xl">{bd.icon}</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center">
-                        <p className="font-bold text-[10px] font-label text-error uppercase tracking-widest">Boss-Kampf</p>
-                        <p className="font-bold text-xs font-label text-error">{state.boss.hp}/{state.boss.maxHp} HP</p>
-                      </div>
-                      <h4 className="font-headline font-bold text-lg text-primary-container">{bd.name}</h4>
-                    </div>
-                  </div>
-                  <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: 'rgba(232,225,218,0.5)' }}>
-                    <div className="h-full bg-error rounded-full transition-all duration-500"
-                         style={{ width: `${(state.boss.hp / state.boss.maxHp) * 100}%` }} />
-                  </div>
-                  <p className="text-[11px] text-on-surface-variant font-body italic mt-1.5">{bd.desc}</p>
-                </>
               )}
+              <div className="p-5">
+                {defeated ? (
+                  <div className="text-center">
+                    <h4 className="font-headline font-bold text-lg" style={{ color: '#059669' }}>Boss besiegt!</h4>
+                    <p className="text-sm text-on-surface-variant font-body mt-1">{bd.name} wurde besiegt!</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex justify-between items-center mb-3">
+                      <div>
+                        <p className="font-bold text-[10px] font-label text-error uppercase tracking-widest">Boss-Kampf</p>
+                        <h4 className="font-headline font-bold text-xl text-on-surface">{bd.name}</h4>
+                      </div>
+                      <p className="font-bold text-sm font-label text-error">{state.boss.hp}/{state.boss.maxHp} HP</p>
+                    </div>
+                    <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: 'rgba(232,225,218,0.5)' }}>
+                      <div className="h-full bg-error rounded-full transition-all duration-500"
+                           style={{ width: `${(state.boss.hp / state.boss.maxHp) * 100}%` }} />
+                    </div>
+                    <p className="text-xs text-on-surface-variant font-body italic mt-2">{bd.desc}</p>
+                  </>
+                )}
+              </div>
             </div>
           );
         })()}

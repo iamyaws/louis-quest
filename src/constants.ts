@@ -190,10 +190,10 @@ export const BOSS_TIERS = [
 ] as const;
 
 export const BOSSES: import('./types').BossTemplate[] = [
-  // Tier 1: W\u00E4chter (Guardian) \u2014 available from start (daily: ~8-13 tasks to defeat)
-  { id: "b1", name: "Schlaf-Drache", icon: "\u{1F409}", hp: 60, reward: { hp: 50 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst!", tier: "tier1" },
-  { id: "b2", name: "Chaos-Monster", icon: "\u{1F47E}", hp: 80, reward: { hp: 55 }, desc: "Es liebt Unordnung und Chaos!", tier: "tier1" },
-  { id: "b5", name: "Mecker-Goblin", icon: "\u{1F47A}", hp: 70, reward: { hp: 50 }, desc: "Er meckert \u00FCber alles und jeden!", tier: "tier1" },
+  // Tier 1: W\u00E4chter (Guardian) \u2014 available from start
+  { id: "schnarchling", name: "Schnarchling", icon: "\u{1F634}", hp: 60, reward: { hp: 50 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst und faulenzt!", tier: "tier1" },
+  { id: "wusselwicht", name: "Wusselwicht", icon: "\u{1F47E}", hp: 80, reward: { hp: 55 }, desc: "Er liebt Unordnung und wirft alles durcheinander!", tier: "tier1" },
+  { id: "flimmerfux", name: "Flimmerfux", icon: "\u{1F98A}", hp: 70, reward: { hp: 50 }, desc: "Er lockt dich mit bunten Bildschirmen!", tier: "tier1" },
   // Tier 2: Krieger (Warrior) \u2014 unlocks at companion stage 2
   { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 100, reward: { hp: 80 }, desc: "Er will, dass du nur auf dem Sofa liegst!", tier: "tier2" },
   { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 110, reward: { hp: 85 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!", tier: "tier2" },
