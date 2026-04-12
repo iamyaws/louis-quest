@@ -10,7 +10,7 @@ const ICON_MAP = {
 };
 
 export default function Belohnungsbank() {
-  const { state } = useTask();
+  const { state, actions } = useTask();
   const hp = state?.hp || 0;
   const screenMin = state?.drachenEier || 0; // Screen minutes (repurposed from eggs)
 
@@ -96,6 +96,7 @@ export default function Belohnungsbank() {
                       }`}
                       style={{ background: canAfford ? '#fcd34d' : '#e8e1da', color: canAfford ? '#725b00' : '#7b7486' }}
                       disabled={!canAfford}
+                      onClick={() => { if (canAfford) actions.redeemReward('hp', reward.cost); }}
                     >
                       {canAfford ? 'Einlösen' : 'Zu wenig'}
                     </button>
@@ -142,6 +143,7 @@ export default function Belohnungsbank() {
                       }`}
                       style={{ background: canAfford ? '#00CEC9' : '#e8e1da', color: canAfford ? 'white' : '#7b7486' }}
                       disabled={!canAfford}
+                      onClick={() => { if (canAfford) actions.redeemReward('eggs', reward.cost); }}
                     >
                       {canAfford ? 'Einlösen' : 'Zu wenig'}
                     </button>

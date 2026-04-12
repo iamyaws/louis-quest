@@ -1,11 +1,11 @@
 import React from 'react';
 
 const TABS = [
-  { id: 'hub',     label: 'Hub',     icon: 'home' },
-  { id: 'quests',  label: 'Quests',  icon: 'military_tech' },
-  { id: 'care',    label: 'Care',    icon: 'favorite' },
-  { id: 'shop',    label: 'Shop',    icon: 'shopping_bag' },
-  { id: 'journal', label: 'Journal', icon: 'auto_stories' },
+  { id: 'hub',     label: 'Start',     icon: 'home' },
+  { id: 'quests',  label: 'Aufgaben',  icon: 'military_tech' },
+  { id: 'care',    label: 'Pflege',    icon: 'favorite' },
+  { id: 'shop',    label: 'Laden',     icon: 'shopping_bag' },
+  { id: 'journal', label: 'Buch',      icon: 'auto_stories' },
 ];
 
 export default function NavBar({ active = 'quests', onNavigate }) {

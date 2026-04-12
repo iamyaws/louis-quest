@@ -28,6 +28,11 @@ interface TaskState {
   catEvo: number;
   loginBonusClaimed: boolean;
   onboardingDone: boolean;
+  journalMemory: string;
+  journalGratitude: string[];
+  journalDayEmoji: number | null;
+  journalAchievements: string[];
+  bossDmgToday: number;
 }
 
 interface TaskComputed {
@@ -46,7 +51,9 @@ interface TaskActions {
   petCompanion: () => void;
   playCompanion: () => void;
   collectLoginBonus: () => void;
-  completeOnboarding: () => void;
+  completeOnboarding: (cfg?: { eggType?: string }) => void;
+  saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
+  redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
 }
 
 interface TaskContextValue {
@@ -108,6 +115,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           catEvo: raw.catEvo || 0,
           loginBonusClaimed: raw.loginBonusClaimed || false,
           onboardingDone: raw.onboardingDone || false,
+          journalMemory: raw.journalMemory || '',
+          journalGratitude: raw.journalGratitude || [],
+          journalDayEmoji: raw.journalDayEmoji ?? null,
+          journalAchievements: raw.journalAchievements || [],
+          bossDmgToday: raw.bossDmgToday || 0,
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -143,6 +155,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           catEvo: 0,
           loginBonusClaimed: false,
           onboardingDone: false,
+          journalMemory: '',
+          journalGratitude: [],
+          journalDayEmoji: null,
+          journalAchievements: [],
+          bossDmgToday: 0,
         });
       }
       setLoading(false);
@@ -200,6 +217,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       catPetted: false,
       catPlayed: false,
       loginBonusClaimed: false,
+      journalMemory: '',
+      journalGratitude: [],
+      journalDayEmoji: null,
+      journalAchievements: [],
+      bossDmgToday: 0,
     };
   }
 
@@ -225,9 +247,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       // Boss damage
       let boss = prev.boss ? { ...prev.boss } : null;
       let bossTrophies = [...(prev.bossTrophies || [])];
+      let bossDmgToday = prev.bossDmgToday || 0;
       if (boss && boss.hp > 0) {
         const dmg = Math.max(5, Math.floor(q.xp * 0.8));
         boss.hp = Math.max(0, boss.hp - dmg);
+        bossDmgToday += dmg;
         if (boss.hp <= 0) {
           const bd = BOSSES.find(b => b.id === boss!.id);
           if (bd) hp += bd.reward.hp;
@@ -235,7 +259,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      return { ...prev, quests, dt, hp, boss, bossTrophies };
+      return { ...prev, quests, dt, hp, boss, bossTrophies, bossDmgToday };
     });
   }, []);
 
@@ -282,8 +306,33 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const completeOnboarding = useCallback(() => {
-    setState(prev => prev ? { ...prev, onboardingDone: true } : prev);
+  const completeOnboarding = useCallback((cfg?: { eggType?: string }) => {
+    setState(prev => prev ? { ...prev, onboardingDone: true, eggType: cfg?.eggType || prev.eggType } : prev);
+  }, []);
+
+  // ── Save journal ──
+  const saveJournal = useCallback((data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => {
+    setState(prev => prev ? {
+      ...prev,
+      journalMemory: data.memory,
+      journalGratitude: data.gratitude,
+      journalDayEmoji: data.dayEmoji,
+      journalAchievements: data.achievements,
+    } : prev);
+  }, []);
+
+  // ── Redeem reward ──
+  const redeemReward = useCallback((currency: 'hp' | 'eggs', cost: number) => {
+    setState(prev => {
+      if (!prev) return prev;
+      if (currency === 'hp') {
+        if ((prev.hp || 0) < cost) return prev;
+        return { ...prev, hp: prev.hp - cost };
+      } else {
+        if ((prev.drachenEier || 0) < cost) return prev;
+        return { ...prev, drachenEier: prev.drachenEier - cost };
+      }
+    });
   }, []);
 
   // ── Computed values ──
@@ -307,7 +356,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding }, loading }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward }, loading }}>
       {children}
     </TaskContext.Provider>
   );

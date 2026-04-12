@@ -27,7 +27,7 @@ function AppContent() {
     return (
       <Onboarding onComplete={(cfg) => {
         console.log('Onboarding config:', cfg);
-        actions.completeOnboarding();
+        actions.completeOnboarding(cfg);
       }} />
     );
   }

@@ -35,10 +35,11 @@ function getDailyIndex(arr) {
 
 export default function Journal() {
   const { state, actions } = useTask();
-  const [gratitude, setGratitude] = useState([]);
-  const [dayEmoji, setDayEmoji] = useState(null);
-  const [achievements, setAchievements] = useState([]);
-  const [memory, setMemory] = useState('');
+  const [gratitude, setGratitude] = useState(state?.journalGratitude || []);
+  const [dayEmoji, setDayEmoji] = useState(state?.journalDayEmoji ?? null);
+  const [achievements, setAchievements] = useState(state?.journalAchievements || []);
+  const [memory, setMemory] = useState(state?.journalMemory || '');
+  const [saved, setSaved] = useState(false);
 
   if (!state) return null;
 
@@ -204,9 +205,14 @@ export default function Journal() {
         <div className="flex justify-center mt-6">
           <button className="px-12 py-4 rounded-full font-label font-black text-lg flex items-center gap-3 transition-all active:scale-95"
                   style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 12px 24px rgba(252,211,77,0.4)' }}
-                  onClick={() => SFX.play('pop')}>
-            Speichern
-            <span className="material-symbols-outlined text-2xl">auto_awesome</span>
+                  onClick={() => {
+                    SFX.play('pop');
+                    actions.saveJournal({ memory, gratitude, dayEmoji, achievements });
+                    setSaved(true);
+                    setTimeout(() => setSaved(false), 2000);
+                  }}>
+            {saved ? 'Gespeichert!' : 'Speichern'}
+            <span className="material-symbols-outlined text-2xl">{saved ? 'check_circle' : 'auto_awesome'}</span>
           </button>
         </div>
       </section>

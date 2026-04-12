@@ -214,6 +214,11 @@ export default function Hub({ onNavigate }) {
                       <div className="w-full h-2 rounded-full overflow-hidden mt-2" style={{ background: 'rgba(232,225,218,0.5)' }}>
                         <div className="h-full bg-error rounded-full transition-all duration-500" style={{ width: `${hpPct}%` }} />
                       </div>
+                      {(state.bossDmgToday || 0) > 0 && (
+                        <p className="font-label font-bold text-xs mt-1" style={{ color: '#059669' }}>
+                          Heute: -{state.bossDmgToday} Schaden!
+                        </p>
+                      )}
                     </>
                   )}
                 </div>
