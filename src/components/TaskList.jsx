@@ -42,7 +42,7 @@ export default function TaskList() {
   };
 
   return (
-    <div className="px-6 pb-8">
+    <div className="px-6 pb-32">
 
       {/* ── Screen Title ── */}
       <header className="mb-8">
@@ -112,7 +112,7 @@ export default function TaskList() {
                       <div className="flex items-center justify-between relative z-10">
                         <div className="flex items-center gap-5">
                           {/* Icon circle */}
-                          <div className="w-14 h-14 rounded-full bg-primary/5 flex items-center justify-center shrink-0">
+                          <div className="w-14 h-14 rounded-full bg-primary-fixed/40 flex items-center justify-center shrink-0">
                             <span className="material-symbols-outlined text-3xl text-primary">{matIcon}</span>
                           </div>
                           {/* Task info */}
@@ -178,7 +178,7 @@ export default function TaskList() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-5">
-                          <div className="w-14 h-14 rounded-full bg-secondary/5 flex items-center justify-center shrink-0">
+                          <div className="w-14 h-14 rounded-full bg-secondary-fixed/40 flex items-center justify-center shrink-0">
                             <span className="material-symbols-outlined text-3xl text-secondary">{matIcon}</span>
                           </div>
                           <div>

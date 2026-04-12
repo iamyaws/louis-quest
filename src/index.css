@@ -12,6 +12,7 @@
   --color-on-primary: #ffffff;
   --color-on-primary-container: #dac5ff;
   --color-primary-fixed: #ebddff;
+  --color-primary-fixed-dim: #d3bbff;
 
   /* ── Secondary ── */
   --color-secondary: #735c00;
@@ -19,6 +20,7 @@
   --color-on-secondary: #ffffff;
   --color-on-secondary-container: #725b00;
   --color-secondary-fixed: #ffe086;
+  --color-secondary-fixed-dim: #eac33e;
 
   /* ── Tertiary ── */
   --color-tertiary: #6b3000;
