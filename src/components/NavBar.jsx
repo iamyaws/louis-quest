@@ -8,7 +8,7 @@ const TABS = [
   { id: 'journal', label: 'Journal', icon: 'menu_book' },
 ];
 
-export default function NavBar({ active = 'quests' }) {
+export default function NavBar({ active = 'quests', onNavigate }) {
   return (
     <nav className="fixed bottom-0 left-0 w-full z-50 bg-surface/80 backdrop-blur-xl rounded-t-[2rem] shadow-[0_-8px_24px_rgba(30,27,23,0.06)]">
       <div className="flex justify-around items-center px-4 pb-8 pt-4 max-w-lg mx-auto">
@@ -18,6 +18,7 @@ export default function NavBar({ active = 'quests' }) {
             <button
               key={tab.id}
               aria-label={tab.label}
+              onClick={() => onNavigate?.(tab.id)}
               className={`flex flex-col items-center justify-center px-5 py-2 transition-all duration-300 ${
                 isActive
                   ? 'bg-secondary-container text-on-secondary-container rounded-full scale-90'

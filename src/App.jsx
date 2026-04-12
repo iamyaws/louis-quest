@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TaskProvider, useTask } from './context/TaskContext';
 import TopBar from './components/TopBar';
 import NavBar from './components/NavBar';
 import TaskList from './components/TaskList';
+import Belohnungsbank from './components/Belohnungsbank';
+import EggProfile from './components/EggProfile';
 
 function AppContent() {
   const { loading } = useTask();
+  const [view, setView] = useState('quests');
 
   if (loading) {
     return (
@@ -19,9 +22,23 @@ function AppContent() {
     <>
       <TopBar />
       <div className="min-h-screen bg-surface max-w-lg mx-auto" style={{ paddingTop: 72, paddingBottom: 96 }}>
-        <TaskList />
+        {view === 'quests' && <TaskList />}
+        {view === 'shop' && <Belohnungsbank />}
+        {view === 'hub' && <EggProfile />}
+        {view === 'room' && (
+          <div className="px-6 pt-8 text-center">
+            <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">potted_plant</span>
+            <p className="font-headline text-xl text-on-surface-variant">Zimmer — Coming Soon</p>
+          </div>
+        )}
+        {view === 'journal' && (
+          <div className="px-6 pt-8 text-center">
+            <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">menu_book</span>
+            <p className="font-headline text-xl text-on-surface-variant">Journal — Coming Soon</p>
+          </div>
+        )}
       </div>
-      <NavBar active="quests" />
+      <NavBar active={view} onNavigate={setView} />
     </>
   );
 }

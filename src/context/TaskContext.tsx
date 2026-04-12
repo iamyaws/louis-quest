@@ -11,6 +11,11 @@ interface TaskState {
   lastDate: string;
   vacMode: boolean;
   dt: number;                   // earned minutes today
+  hp: number;                   // heldenpunkte balance
+  drachenEier: number;          // dragon egg currency
+  eggType: string | null;
+  eggProgress: number;
+  eggHatched: boolean;
 }
 
 interface TaskComputed {
@@ -61,6 +66,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           lastDate: raw.lastDate || '',
           vacMode: raw.vacMode || false,
           dt: raw.dt || 0,
+          hp: raw.coins || raw.hp || 0,
+          drachenEier: raw.drachenEier || 0,
+          eggType: raw.eggType || 'dragon',
+          eggProgress: raw.eggProgress || 0,
+          eggHatched: raw.eggHatched || false,
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -77,6 +87,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           lastDate: today(),
           vacMode: false,
           dt: 0,
+          hp: 0,
+          drachenEier: 0,
+          eggType: 'dragon',
+          eggProgress: 0,
+          eggHatched: false,
         });
       }
       setLoading(false);
