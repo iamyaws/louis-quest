@@ -335,11 +335,12 @@ export default function TaskList() {
           <div className="rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden"
                style={{ background: '#fcd34d', color: '#725b00', minHeight: 160 }}>
             <div className="relative z-10">
-              <p className="font-label text-sm uppercase tracking-wider opacity-80">Strähne</p>
-              <h4 className="font-headline text-2xl mt-1">{state.sd} Tage</h4>
+              <p className="font-label text-sm uppercase tracking-wider opacity-80">Begleiter</p>
+              <h4 className="font-headline text-2xl mt-1">{done} Schritte</h4>
+              <p className="font-body text-xs mt-1 opacity-70">Jede Aufgabe hilft deinem Ei!</p>
             </div>
-            <span className="material-symbols-outlined text-5xl relative z-10"
-                  style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
+            <span className="material-symbols-outlined text-4xl relative z-10"
+                  style={{ fontVariationSettings: "'FILL' 1" }}>egg</span>
           </div>
         </div>
       </div>
