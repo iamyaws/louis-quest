@@ -113,12 +113,12 @@ export default function Hub() {
               </>
             ) : (
               <>
-                <p className="font-bold text-[10px] font-label text-on-surface-variant uppercase tracking-widest">Stimmung</p>
-                <div className="flex gap-1 flex-wrap justify-center">
-                  {MOOD_EMOJIS.slice(0, 5).map((e, i) => (
-                    <button key={i} onClick={() => { SFX.play("pop"); actions.setMood?.("moodAM", i); }}
-                      className="text-2xl p-1 rounded-full hover:bg-white/50 transition-all active:scale-90"
-                      style={{ minWidth: 36, minHeight: 36 }}>{e}</button>
+                <p className="font-bold text-[10px] font-label text-on-surface-variant uppercase tracking-widest mb-1">Wie geht's dir?</p>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {MOOD_EMOJIS.map((e, i) => (
+                    <button key={i} onClick={() => { SFX.play("pop"); actions.setMood("moodAM", i); }}
+                      className="text-2xl p-1.5 rounded-xl hover:bg-white/50 transition-all active:scale-90 flex items-center justify-center"
+                      style={{ minHeight: 40 }}>{e}</button>
                   ))}
                 </div>
               </>
