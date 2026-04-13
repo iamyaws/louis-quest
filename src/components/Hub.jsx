@@ -36,7 +36,7 @@ export default function Hub({ onNavigate }) {
       {/* ── Minimal Top Bar ── */}
       <header className="flex justify-between items-center px-6 pb-2"
               style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))', background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}>
-        <div className="flex items-center gap-3">
+        <button onClick={() => onNavigate?.('hero')} className="flex items-center gap-3 active:scale-95 transition-all">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg"
                style={{ background: '#a2d0d4' }}>
             <img src={base + 'art/dragon-baby.webp'} alt="Avatar" className="w-full h-full object-cover" />
@@ -44,11 +44,13 @@ export default function Hub({ onNavigate }) {
           <span className="text-xl font-headline font-bold text-primary" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
             Ronki
           </span>
-        </div>
-        <div className="px-4 py-1.5 rounded-full flex items-center gap-2"
-             style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.5)' }}>
-          <span className="font-bold text-[11px] font-label text-primary">Lv. 1</span>
-        </div>
+        </button>
+        <button onClick={() => onNavigate?.('hero')}
+          className="px-4 py-1.5 rounded-full flex items-center gap-2 active:scale-95 transition-all"
+          style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.5)' }}>
+          <span className="material-symbols-outlined text-primary" style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }}>shield</span>
+          <span className="font-bold text-[11px] font-label text-primary">Profil</span>
+        </button>
       </header>
 
       <main className="px-6 max-w-lg mx-auto flex flex-col gap-6">
