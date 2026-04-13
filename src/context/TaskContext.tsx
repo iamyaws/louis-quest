@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import type { Quest, GameState, Boss } from '../types';
+import type { FamilyConfig } from '../types/familyConfig';
+import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CHEST_MILESTONES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
 import storage from '../utils/storage';
@@ -44,6 +46,7 @@ interface TaskState {
   unlockedBadges: string[];
   totalTasksDone: number;
   birthdayEpic: { done: string[]; completed: boolean };
+  familyConfig: FamilyConfig;
 }
 
 interface TaskComputed {
@@ -74,6 +77,7 @@ interface TaskActions {
   equipGear: (gearId: string) => void;
   unequipGear: (slot: 'head' | 'back' | 'neck') => void;
   updateBirthdayEpic: (data: { done: string[]; completed: boolean }) => void;
+  updateFamilyConfig: (config: FamilyConfig) => void;
 }
 
 interface CelebrationEvent {
@@ -186,6 +190,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           unlockedBadges: raw.unlockedBadges || [],
           totalTasksDone: raw.totalTasksDone || 0,
           birthdayEpic: raw.birthdayEpic || { done: [], completed: false },
+          familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -236,6 +241,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           unlockedBadges: [],
           totalTasksDone: 0,
           birthdayEpic: { done: [], completed: false },
+          familyConfig: DEFAULT_FAMILY_CONFIG,
         });
       }
       setLoading(false);
@@ -630,6 +636,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, birthdayEpic: data } : prev);
   }, []);
 
+  const updateFamilyConfig = useCallback((config: FamilyConfig) => {
+    setState(prev => prev ? { ...prev, familyConfig: config } : prev);
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -653,7 +663,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, equipGear, unequipGear, updateBirthdayEpic }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
