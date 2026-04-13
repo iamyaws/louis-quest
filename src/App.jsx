@@ -15,9 +15,10 @@ import EpicMissions from './components/EpicMissions';
 import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
+import CompanionToast from './components/CompanionToast';
 
 function AppContent() {
-  const { state, actions, loading } = useTask();
+  const { state, actions, loading, toastTrigger } = useTask();
   const [view, setView] = useState('quests');
   const [showParental, setShowParental] = useState(false);
   const longPressTimer = useRef(null);
@@ -78,6 +79,7 @@ function AppContent() {
         if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
         setView('games');
       }} />}
+      <CompanionToast trigger={toastTrigger} />
       <Celebration />
     </>
   );

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import type { Quest, GameState, Boss } from '../types';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
-import { BOSSES, CHEST_MILESTONES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS } from '../constants';
+import { BOSSES, CHEST_MILESTONES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
 import storage from '../utils/storage';
 
 // ── Minimal state shape for the task list ──
@@ -40,6 +40,8 @@ interface TaskState {
   completedMissions: string[];
   gearInventory: string[];
   equippedGear: { head?: string; back?: string; neck?: string };
+  unlockedBadges: string[];
+  totalTasksDone: number;
 }
 
 interface TaskComputed {
@@ -82,12 +84,17 @@ interface TaskContextValue {
   actions: TaskActions;
   loading: boolean;
   celebration: CelebrationEvent | null;
+  toastTrigger: number;
 }
 
-function assignBoss(): Boss {
-  // Tier 1 bosses for now (tier system can expand later)
-  const tier1 = BOSSES.filter(b => b.tier === 'tier1');
-  const b = tier1[Math.floor(Math.random() * tier1.length)];
+function assignBoss(catEvo: number = 0): Boss {
+  const stage = getCatStage(catEvo);
+  // Tier pool grows with companion evolution
+  const allowedTiers = ['tier1'];
+  if (stage >= 2) allowedTiers.push('tier2');
+  if (stage >= 3) allowedTiers.push('tier3');
+  const pool = BOSSES.filter(b => allowedTiers.includes(b.tier));
+  const b = pool[Math.floor(Math.random() * pool.length)];
   return { id: b.id, hp: b.hp, maxHp: b.hp };
 }
 
@@ -107,6 +114,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<TaskState | null>(null);
   const [loading, setLoading] = useState(true);
   const [celebration, setCelebration] = useState<CelebrationEvent | null>(null);
+  const [toastTrigger, setToastTrigger] = useState(0);
   const celebQueue = useRef<CelebrationEvent[]>([]);
   const [celebTick, setCelebTick] = useState(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -167,14 +175,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           completedMissions: raw.completedMissions || [],
           gearInventory: raw.gearInventory || [],
           equippedGear: raw.equippedGear || {},
+          unlockedBadges: raw.unlockedBadges || [],
+          totalTasksDone: raw.totalTasksDone || 0,
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
           s = applyDayTransition(s);
         }
-        // Ensure boss exists and has art (migrate old tier2/3 bosses)
-        const tier1Ids = BOSSES.filter(b => b.tier === 'tier1').map(b => b.id);
-        if (!s.boss || !tier1Ids.includes(s.boss.id)) s.boss = assignBoss();
+        // Ensure boss exists
+        const allBossIds = BOSSES.map(b => b.id);
+        if (!s.boss || !allBossIds.includes(s.boss.id)) s.boss = assignBoss(s.catEvo || 0);
         setState(s);
       } else {
         // Fresh start
@@ -194,7 +204,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           moodAM: null,
           moodPM: null,
           dailyWaterCount: 0,
-          boss: assignBoss(),
+          boss: assignBoss(0),
           bossTrophies: [],
           catFed: false,
           catPetted: false,
@@ -214,6 +224,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           completedMissions: [],
           gearInventory: [],
           equippedGear: {},
+          unlockedBadges: [],
+          totalTasksDone: 0,
         });
       }
       setLoading(false);
@@ -319,7 +331,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       moodAM: null,
       moodPM: null,
       dailyWaterCount: 0,
-      boss: assignBoss(),
+      boss: assignBoss(s?.catEvo || 0),
       catFed: false,
       catPetted: false,
       catPlayed: false,
@@ -402,8 +414,32 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         queueCelebration({ type: 'victory' });
       }
 
-      return { ...prev, quests, dt, hp, xp: newXp, boss, bossTrophies, bossDmgToday, orbs };
+      // Track total tasks done
+      const totalTasksDone = (prev.totalTasksDone || 0) + 1;
+
+      // Badge checking
+      const unlockedBadges = [...(prev.unlockedBadges || [])];
+      const sd = prev.sd || 0;
+      const checkVals: Record<string, boolean> = {
+        sd1: sd >= 1 || totalTasksDone >= 1,
+        sd3: sd >= 3,
+        sd7: sd >= 7,
+        sd30: sd >= 30,
+        lvl5: getLevel(newXp) >= 5,
+        lvl10: getLevel(newXp) >= 10,
+        tasks50: totalTasksDone >= 50,
+        tasks100: totalTasksDone >= 100,
+        gear3: (prev.gearInventory || []).length >= 3,
+      };
+      for (const badge of BADGES) {
+        if (!unlockedBadges.includes(badge.id) && checkVals[badge.check]) {
+          unlockedBadges.push(badge.id);
+        }
+      }
+
+      return { ...prev, quests, dt, hp, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, totalTasksDone, unlockedBadges };
     });
+    setToastTrigger(t => t + 1);
   }, []);
 
   // ── Set mood ──
@@ -589,7 +625,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, equipGear, unequipGear }, loading, celebration }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, equipGear, unequipGear }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

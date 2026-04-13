@@ -5,6 +5,7 @@ import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
 import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
+import BadgeGrid from './BadgeGrid';
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 
@@ -436,6 +437,9 @@ export default function Hub({ onNavigate }) {
           </div>
           <span className="material-symbols-outlined text-primary/40">chevron_right</span>
         </button>
+
+        {/* ── Badge Grid ── */}
+        <BadgeGrid />
 
         {/* ── Helden-Kodex Card ── */}
         <button

@@ -96,8 +96,11 @@ export interface JournalQuestion {
 }
 
 export interface Badge {
+  id: string;
   i: string;
   n: string;
+  desc: string;
+  check: string;
 }
 
 export type CatMood = 'sleepy' | 'neutral' | 'happy' | 'excited';

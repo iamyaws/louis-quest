@@ -148,3 +148,11 @@
   20% { opacity: 1; transform: translateY(-20vh) translateX(var(--drift, 0px)) scale(1); }
   100% { opacity: 0; transform: translateY(-100vh) translateX(var(--drift, 0px)) scale(0.5); }
 }
+
+@keyframes slide-in-toast {
+  0% { opacity: 0; transform: translateY(-16px) scale(0.95); }
+  15% { opacity: 1; transform: translateY(0) scale(1); }
+  85% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-8px) scale(0.98); }
+}
+.animate-slide-in-toast { animation: slide-in-toast 2.2s ease-out forwards; }
