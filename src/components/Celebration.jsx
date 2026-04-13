@@ -322,7 +322,8 @@ export default function Celebration() {
            transform: visible ? 'translateY(0)' : 'translateY(20px)',
          }}>
       {/* Top bar */}
-      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 h-16">
+      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 h-16"
+              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <button onClick={handleDismiss} className="material-symbols-outlined text-primary hover:opacity-80 transition-opacity">close</button>
         <h1 className="font-headline font-bold text-2xl text-primary">Quest Complete!</h1>
         <div className="w-6" />

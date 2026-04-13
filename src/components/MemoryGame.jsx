@@ -91,7 +91,8 @@ export default function MemoryGame({ onComplete }) {
       </div>
 
       {/* Top bar */}
-      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 py-4">
+      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 py-4"
+              style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-primary text-2xl">egg</span>
           <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Ronki</h1>

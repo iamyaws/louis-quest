@@ -59,7 +59,10 @@ function AppContent() {
         </div>
       )}
       <div className={`min-h-screen max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
-           style={{ paddingTop: ['hub', 'care'].includes(view) ? 0 : 72, paddingBottom: 96 }}>
+           style={{
+             paddingTop: ['hub', 'care'].includes(view) ? 0 : 'calc(72px + env(safe-area-inset-top, 0px))',
+             paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
+           }}>
         {view === 'quests' && <TaskList />}
         {view === 'shop' && <Belohnungsbank onNavigate={setView} />}
         {view === 'hub' && <Hub onNavigate={setView} />}

@@ -35,8 +35,8 @@ export default function Hub({ onNavigate }) {
       <div className="fixed inset-0 -z-10" style={{ background: 'rgba(255,248,241,0.45)' }} />
 
       {/* ── Minimal Top Bar ── */}
-      <header className="flex justify-between items-center px-6 pt-6 pb-2"
-              style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}>
+      <header className="flex justify-between items-center px-6 pb-2"
+              style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))', background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg"
                style={{ background: '#a2d0d4' }}>

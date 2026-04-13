@@ -134,7 +134,8 @@ export default function Onboarding({ onComplete }) {
 
         <div className="relative z-10 flex flex-col h-full">
           {/* Top area */}
-          <div className="flex-none px-6 pt-14 flex justify-center">
+          <div className="flex-none px-6 flex justify-center"
+               style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))' }}>
             {slide.topContent ? slide.topContent : slide.badge ? (
               <span className="font-label font-bold tracking-[0.2em] text-white/70 text-[10px] uppercase px-4 py-2 rounded-full border border-white/10"
                     style={{ background: 'rgba(0,0,0,0.2)', backdropFilter: 'blur(8px)' }}>
@@ -331,7 +332,7 @@ export default function Onboarding({ onComplete }) {
       </div>
 
       {/* Scrollable content */}
-      <div className="relative z-10 flex-1 overflow-y-auto pt-14 pb-36 px-6" style={{ scrollbarWidth: 'none' }}>
+      <div className="relative z-10 flex-1 overflow-y-auto pb-36 px-6" style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))', scrollbarWidth: 'none' }}>
         <div className="max-w-lg mx-auto flex flex-col items-center gap-8">
           {/* Headline */}
           <div className="text-center space-y-4">

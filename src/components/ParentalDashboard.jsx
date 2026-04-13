@@ -123,8 +123,8 @@ export default function ParentalDashboard({ onClose }) {
       <div className="fixed inset-0 pointer-events-none" style={{ background: 'rgba(255,248,241,0.5)' }} />
 
       {/* Header */}
-      <header className="relative z-10 flex justify-between items-center px-6 pt-6 pb-2"
-              style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}>
+      <header className="relative z-10 flex justify-between items-center px-6 pb-2"
+              style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))', background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center"
                style={{ background: 'rgba(18,67,70,0.08)' }}>
