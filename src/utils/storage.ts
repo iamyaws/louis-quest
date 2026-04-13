@@ -1,7 +1,8 @@
-// ── Ronki Storage — IndexedDB with localStorage fallback ──
+// ── Ronki Storage — IndexedDB local + Supabase cloud sync ──
 import type { GameState } from '../types';
+import { supabase } from '../lib/supabase';
 
-const DB_NAME = "herodex"; // kept for backwards compatibility with existing user data
+const DB_NAME = "herodex";
 const STORE = "state";
 const KEY = "hdx2";
 const LS_KEY = "hdx2";
@@ -16,9 +17,9 @@ function openDB(): Promise<IDBDatabase> {
 }
 
 const storage = {
+  // ── Local (IndexedDB with localStorage fallback) ──
   async load(): Promise<GameState | null> {
     try {
-      // One-time migration from localStorage → IndexedDB
       const ls = localStorage.getItem(LS_KEY);
       if (ls) {
         const data = JSON.parse(ls) as GameState;
@@ -34,13 +35,13 @@ const storage = {
         req.onerror = () => resolve(null);
       });
     } catch {
-      // Fallback to localStorage if IndexedDB unavailable
       try {
         const v = localStorage.getItem(LS_KEY);
         return v ? (JSON.parse(v) as GameState) : null;
       } catch { return null; }
     }
   },
+
   async save(state: GameState): Promise<void> {
     try {
       const db = await openDB();
@@ -50,6 +51,7 @@ const storage = {
       try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch { /* storage full */ }
     }
   },
+
   async clear(): Promise<void> {
     try {
       const db = await openDB();
@@ -57,6 +59,71 @@ const storage = {
       tx.objectStore(STORE).delete(KEY);
     } catch { /* ignore */ }
     try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
+  },
+
+  // ── Cloud (Supabase) ──
+  async cloudLoad(userId: string): Promise<GameState | null> {
+    try {
+      const { data, error } = await supabase
+        .from('game_state')
+        .select('state')
+        .eq('user_id', userId)
+        .single();
+      if (error || !data) return null;
+      return data.state as GameState;
+    } catch {
+      return null;
+    }
+  },
+
+  async cloudSave(userId: string, state: GameState): Promise<void> {
+    try {
+      await supabase
+        .from('game_state')
+        .upsert({
+          user_id: userId,
+          state,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+    } catch {
+      // Silent fail — local IndexedDB is the fallback
+    }
+  },
+
+  // ── Sync: resolve local vs cloud, return best state ──
+  async syncLoad(userId: string): Promise<GameState | null> {
+    const [local, cloud] = await Promise.all([
+      this.load(),
+      this.cloudLoad(userId),
+    ]);
+
+    if (cloud && local) {
+      // Pick whichever has the more recent date, fallback to cloud
+      const cloudDate = (cloud as any).lastDate || '';
+      const localDate = (local as any).lastDate || '';
+      if (localDate > cloudDate) {
+        // Local is newer — push to cloud
+        this.cloudSave(userId, local);
+        return local;
+      }
+      // Cloud wins — cache locally
+      this.save(cloud);
+      return cloud;
+    }
+
+    if (local && !cloud) {
+      // First login with existing local data — migrate to cloud
+      this.cloudSave(userId, local);
+      return local;
+    }
+
+    if (cloud && !local) {
+      // New device — cache cloud data locally
+      this.save(cloud);
+      return cloud;
+    }
+
+    return null; // Fresh user, no data anywhere
   },
 };
 

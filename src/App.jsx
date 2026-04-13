@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { AuthProvider, useAuth, LoginScreen } from './context/AuthContext';
 import { TaskProvider, useTask } from './context/TaskContext';
 import TopBar from './components/TopBar';
 import NavBar from './components/NavBar';
@@ -85,6 +86,31 @@ function AppContent() {
   );
 }
 
+function AuthGate() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-surface">
+        <div className="text-center">
+          <img src={`${import.meta.env.BASE_URL}art/ronki-egg-logo.svg`} alt="Ronki" className="w-20 h-auto mx-auto mb-4 drop-shadow-lg" />
+          <p className="font-headline text-xl font-bold text-primary">Laden...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginScreen />;
+  }
+
+  return (
+    <TaskProvider>
+      <AppContent />
+    </TaskProvider>
+  );
+}
+
 function ErrorBoundary({ children }) {
   const [error, setError] = React.useState(null);
   if (error) {
@@ -119,9 +145,9 @@ class ErrorBoundaryInner extends React.Component {
 export default function App() {
   return (
     <ErrorBoundary>
-      <TaskProvider>
-        <AppContent />
-      </TaskProvider>
+      <AuthProvider>
+        <AuthGate />
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

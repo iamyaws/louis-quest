@@ -3,6 +3,7 @@ import type { Quest, GameState, Boss } from '../types';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CHEST_MILESTONES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
 import storage from '../utils/storage';
+import { useAuth } from './AuthContext';
 
 // ── Minimal state shape for the task list ──
 interface TaskState {
@@ -113,6 +114,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const emptyComputed: TaskComputed = { done: 0, total: 0, allDone: false, pct: 0, byGroup: {}, level: 1, xpProgress: { cur: 0, need: 50 } };
 
 export function TaskProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
   const [state, setState] = useState<TaskState | null>(null);
   const [loading, setLoading] = useState(true);
   const [celebration, setCelebration] = useState<CelebrationEvent | null>(null);
@@ -120,6 +122,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const celebQueue = useRef<CelebrationEvent[]>([]);
   const [celebTick, setCelebTick] = useState(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
+  const cloudTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const queueCelebration = useCallback((evt: CelebrationEvent) => {
     celebQueue.current.push(evt);
@@ -137,10 +140,13 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setCelebration(null);
   }, []);
 
-  // ── Load on mount ──
+  // ── Load on mount (cloud-aware) ──
   useEffect(() => {
     (async () => {
-      const raw = await storage.load() as (GameState & TaskState) | null;
+      const raw = (user
+        ? await storage.syncLoad(user.id)
+        : await storage.load()
+      ) as (GameState & TaskState) | null;
       if (raw && raw.quests) {
         let s: TaskState = {
           quests: raw.quests,
@@ -236,7 +242,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
-  // ── Save on state change (debounced) ──
+  // ── Save on state change (debounced local + cloud) ──
   useEffect(() => {
     if (!state) return;
     clearTimeout(saveTimer.current);
@@ -246,8 +252,22 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const merged = { ...(raw || {}), ...state } as GameState;
       await storage.save(merged);
     }, 400);
-    return () => clearTimeout(saveTimer.current);
-  }, [state]);
+
+    // Cloud sync (debounced, slightly longer)
+    if (user) {
+      clearTimeout(cloudTimer.current);
+      cloudTimer.current = setTimeout(async () => {
+        const raw = await storage.load() as GameState | null;
+        const merged = { ...(raw || {}), ...state } as GameState;
+        await storage.cloudSave(user.id, merged);
+      }, 1500);
+    }
+
+    return () => {
+      clearTimeout(saveTimer.current);
+      clearTimeout(cloudTimer.current);
+    };
+  }, [state, user]);
 
   // ── Day transition ──
   function applyDayTransition(s: TaskState): TaskState {
