@@ -71,11 +71,10 @@ export default function Onboarding({ onComplete }) {
   // ══════════════════════════════════════════
   if (step === 0) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-hidden font-body bg-background">
+      <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
         {/* Background */}
         <div className="fixed inset-0 z-0">
-          <img src={base + 'art/hero-entrance.webp'} alt="" className="w-full h-full object-cover opacity-60" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background" />
+          <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
         <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center">
@@ -83,15 +82,15 @@ export default function Onboarding({ onComplete }) {
 
           {/* Lantern motif */}
           <div className="mb-10 relative">
-            <div className="absolute inset-0 bg-secondary-container/30 blur-3xl rounded-full scale-150" />
+            <div className="absolute inset-0 blur-3xl rounded-full scale-150" style={{ background: 'rgba(252,211,77,0.15)' }} />
             <div className="relative p-8 rounded-xl"
-                 style={{ background: 'rgba(232,225,218,0.4)', backdropFilter: 'blur(12px)' }}>
+                 style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)' }}>
               <div className="w-28 h-28 flex items-center justify-center rounded-full mx-auto"
                    style={{ background: '#fcd34d', filter: 'drop-shadow(0 0 15px rgba(252,211,77,0.6))' }}>
-                <span className="material-symbols-outlined text-primary text-6xl"
-                      style={{ fontVariationSettings: "'FILL' 1" }}>temp_preferences_custom</span>
+                <span className="material-symbols-outlined text-6xl"
+                      style={{ color: '#124346', fontVariationSettings: "'FILL' 1" }}>temp_preferences_custom</span>
               </div>
-              <div className="absolute -top-4 -right-4 opacity-20 text-primary">
+              <div className="absolute -top-4 -right-4 opacity-30 text-white">
                 <span className="material-symbols-outlined text-4xl">eco</span>
               </div>
             </div>
@@ -99,11 +98,11 @@ export default function Onboarding({ onComplete }) {
 
           {/* Text */}
           <div className="max-w-md space-y-5">
-            <h1 className="font-display text-4xl font-bold text-primary tracking-tight leading-tight"
-                style={{ fontFamily: 'Fredoka, sans-serif' }}>
+            <h1 className="font-display text-4xl font-bold text-white tracking-tight leading-tight"
+                style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
               Willkommen in Thang Long
             </h1>
-            <p className="text-on-surface-variant text-lg leading-relaxed px-4">
+            <p className="text-white/75 text-lg leading-relaxed px-4">
               Der Nebel macht unseren Wald schläfrig. Nur du kannst das Licht zurückbringen.
             </p>
           </div>
@@ -118,7 +117,7 @@ export default function Onboarding({ onComplete }) {
 
           {/* Decorative */}
           <div className="absolute bottom-16 opacity-10 pointer-events-none">
-            <span className="material-symbols-outlined text-primary" style={{ fontSize: '120px' }}>eco</span>
+            <span className="material-symbols-outlined text-white" style={{ fontSize: '120px' }}>eco</span>
           </div>
         </main>
       </div>
@@ -130,11 +129,10 @@ export default function Onboarding({ onComplete }) {
   // ══════════════════════════════════════════
   if (step === 1) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-hidden font-body bg-background">
+      <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
         {/* Background */}
         <div className="fixed inset-0 z-0">
-          <img src={base + 'art/bg-golden.webp'} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/40 to-background/90 z-10" />
+          <img src={base + 'art/bg-gold-dust.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
         <main className="relative z-20 flex-1 flex flex-col items-center justify-between px-8 py-12">
@@ -209,8 +207,7 @@ export default function Onboarding({ onComplete }) {
     return (
       <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
         <div className="absolute inset-0 z-0">
-          <img src={base + 'art/egg-chamber.webp'} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(255,248,241,0.5), transparent 30%, rgba(255,248,241,1))' }} />
+          <img src={base + 'art/bg-purple-depth.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
         <div className="relative z-10 flex-1 overflow-y-auto pb-40 px-8"
@@ -219,9 +216,9 @@ export default function Onboarding({ onComplete }) {
             <ProgressBar />
 
             <div className="text-center space-y-3">
-              <h2 className="text-4xl font-bold text-primary"
-                  style={{ fontFamily: 'Fredoka, sans-serif' }}>Wähle dein Ei</h2>
-              <p className="text-on-surface-variant text-lg leading-relaxed">
+              <h2 className="text-4xl font-bold text-white"
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>Wähle dein Ei</h2>
+              <p className="text-white/75 text-lg leading-relaxed">
                 Welches Geheimnis verbirgt sich darin?
               </p>
             </div>
@@ -260,7 +257,7 @@ export default function Onboarding({ onComplete }) {
         </div>
 
         {/* Bottom nav */}
-        <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-8" style={{ background: 'linear-gradient(to top, #fff8f2 60%, transparent)' }}>
+        <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-8" style={{ background: 'linear-gradient(to top, rgba(60,20,120,0.95) 40%, transparent)' }}>
           <div className="max-w-xs mx-auto flex flex-col gap-3">
             <PrimaryButton onClick={() => setStep(3)}>
               {EGGS[selectedEgg].name} wählen
@@ -277,11 +274,10 @@ export default function Onboarding({ onComplete }) {
   // ══════════════════════════════════════════
   if (step === 3) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-hidden font-body bg-background">
+      <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
         {/* Background */}
         <div className="fixed inset-0 z-0">
-          <img src={base + 'art/bg-golden.webp'} alt="" className="w-full h-full object-cover opacity-60" />
-          <div className="absolute inset-0 bg-background/40" style={{ backdropFilter: 'blur(2px)' }} />
+          <img src={base + 'art/bg-warm-cream.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
         <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center">
@@ -345,7 +341,7 @@ export default function Onboarding({ onComplete }) {
   // ══════════════════════════════════════════
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden font-body bg-background">
-      <img src={base + 'art/bg-parchment.png'} alt="" className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-30" style={{ zIndex: 0 }} />
+      <img src={base + 'art/bg-parchment.webp'} alt="" className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-30" style={{ zIndex: 0 }} />
 
       <div className="relative z-10 flex-1 overflow-y-auto pb-40 px-8"
            style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))', scrollbarWidth: 'none' }}>

@@ -30,9 +30,8 @@ export default function Hub({ onNavigate }) {
     <div className="relative min-h-screen pb-32">
       {/* ── Background: time-of-day sky ── */}
       <div className="fixed inset-0 -z-20">
-        <img src={base + 'art/bg-golden.webp'} alt="" className="w-full h-full object-cover" />
+        <img src={base + 'art/bg-warm-cream.webp'} alt="" className="w-full h-full object-cover" />
       </div>
-      <div className="fixed inset-0 -z-10" style={{ background: 'rgba(255,248,241,0.45)' }} />
 
       {/* ── Minimal Top Bar ── */}
       <header className="flex justify-between items-center px-6 pb-2"
