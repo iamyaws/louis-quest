@@ -50,8 +50,12 @@ export default function Journal() {
   const todayPrompt = DAILY_PROMPTS[getDailyIndex(DAILY_PROMPTS)];
   const todayAffirmation = AFFIRMATIONS[getDailyIndex(AFFIRMATIONS)];
 
+  const base = import.meta.env.BASE_URL;
+
   return (
-    <div className="px-6 pb-32">
+    <div className="relative px-6 pb-32">
+      {/* Background texture */}
+      <img src={base + 'art/bg-navy-night.png'} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none opacity-20" />
 
       {/* ── Header ── */}
       <section className="mb-8">

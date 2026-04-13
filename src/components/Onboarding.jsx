@@ -232,6 +232,8 @@ export default function Onboarding({ onComplete }) {
     const page = LORE_PAGES[loreIndex];
     return (
       <div className="fixed inset-0 flex flex-col bg-surface overflow-hidden font-body">
+        {/* Parchment texture layer */}
+        <img src={base + 'art/bg-parchment.png'} alt="" className="fixed inset-0 w-full h-full object-cover pointer-events-none" style={{ zIndex: 0, opacity: 0.35 }} />
         {/* Bodhi motifs */}
         <div className="absolute top-20 right-[-5%] w-64 h-64 opacity-[0.03] text-on-surface pointer-events-none" style={{ transform: 'rotate(12deg)' }}>
           <svg fill="currentColor" viewBox="0 0 100 100"><path d="M50 10 C60 40 90 50 90 50 C90 50 60 60 50 90 C40 60 10 50 10 50 C10 50 40 40 50 10" /></svg>

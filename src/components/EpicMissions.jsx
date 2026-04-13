@@ -142,7 +142,8 @@ export default function EpicMissions() {
   }
 
   return (
-    <div className="px-6 pt-4 pb-8">
+    <div className="px-6 pt-4 pb-8 relative">
+      <img src={import.meta.env.BASE_URL + 'art/bg-purple-depth.png'} alt="" className="fixed inset-0 w-full h-full object-cover opacity-10 -z-10 pointer-events-none" />
       {/* Header */}
       <section className="mb-8">
         <h2 className="font-headline text-3xl font-bold text-on-surface mb-2">Epische Missionen</h2>

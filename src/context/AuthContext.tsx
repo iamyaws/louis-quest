@@ -115,7 +115,9 @@ export function LoginScreen() {
   // ── Login / Signup form ──
   return (
     <div className="flex items-center justify-center min-h-screen bg-background px-6 relative overflow-hidden">
-      {/* Subtle background */}
+      {/* Cream brush texture */}
+      <img src={`${import.meta.env.BASE_URL}art/bg-cream-brush.png`} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" />
+      {/* Subtle gradient overlays */}
       <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-full h-1/3 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
 

@@ -5,6 +5,8 @@ import { useTask } from '../context/TaskContext';
 function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
   return (
     <main className="relative flex flex-col items-center justify-center min-h-screen px-6 pt-16 pb-24 text-center">
+      {/* Gold dust texture */}
+      <img src={import.meta.env.BASE_URL + 'art/bg-gold-dust.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
       {/* Background motifs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-10 -left-10 opacity-5">
@@ -87,6 +89,8 @@ function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
 function LevelUpCelebration({ level, onDismiss }) {
   return (
     <main className="flex-grow w-full max-w-2xl px-6 pt-24 pb-32 flex flex-col items-center justify-center relative overflow-hidden mx-auto">
+      {/* Gold dust texture */}
+      <img src={import.meta.env.BASE_URL + 'art/bg-gold-dust.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" />
       {/* Ambient blurs */}
       <div className="absolute -top-12 -left-12 w-64 h-64 rounded-full blur-3xl" style={{ background: 'rgba(252,211,77,0.1)' }} />
       <div className="absolute bottom-24 -right-12 w-48 h-48 rounded-full blur-2xl" style={{ background: 'rgba(18,67,70,0.05)' }} />

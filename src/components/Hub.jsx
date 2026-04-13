@@ -230,7 +230,9 @@ export default function Hub({ onNavigate }) {
 
               {/* Full-screen Boss Battle Detail */}
               {showBossDetail && (
-                <div className="fixed inset-0 z-[200] flex flex-col bg-on-surface overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+                <div className="fixed inset-0 z-[200] flex flex-col overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+                  {/* Background texture */}
+                  <img src={base + 'art/bg-emerald-mist.png'} alt="" className="fixed inset-0 w-full h-full object-cover pointer-events-none" style={{ zIndex: -1 }} />
                   {/* Close button */}
                   <button onClick={() => setShowBossDetail(false)}
                     className="fixed top-5 right-5 z-50 w-10 h-10 rounded-full flex items-center justify-center"

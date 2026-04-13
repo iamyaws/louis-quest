@@ -35,9 +35,9 @@ export default function Sanctuary() {
   return (
     <div className="relative min-h-screen pb-32">
       <div className="fixed inset-0 -z-20">
-        <img src={base + 'art/bg-golden.webp'} alt="" className="w-full h-full object-cover" />
+        <img src={base + 'art/bg-teal-soft.png'} alt="" className="w-full h-full object-cover" />
       </div>
-      <div className="fixed inset-0 -z-10" style={{ background: 'rgba(255,248,241,0.35)' }} />
+      <div className="fixed inset-0 -z-10" style={{ background: 'rgba(255,248,241,0.55)' }} />
 
       <main className="px-5 max-w-lg mx-auto pt-6">
 
