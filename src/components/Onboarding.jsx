@@ -125,9 +125,9 @@ export default function Onboarding({ onComplete }) {
   if (step === 1) {
     return (
       <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
-        {/* Background */}
+        {/* Background — same teal as welcome for cohesion */}
         <div className="fixed inset-0 z-0">
-          <img src={base + 'art/bg-gold-dust.webp'} alt="" className="w-full h-full object-cover" />
+          <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
         <main className="relative z-20 flex-1 flex flex-col items-center justify-between px-8 py-12">
@@ -135,11 +135,11 @@ export default function Onboarding({ onComplete }) {
 
           {/* Title */}
           <header className="space-y-4 text-center">
-            <h1 className="text-4xl font-bold text-primary leading-tight"
-                style={{ fontFamily: 'Fredoka, sans-serif' }}>
+            <h1 className="text-4xl font-bold text-white leading-tight"
+                style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
               Deine Helden-Aufgaben
             </h1>
-            <p className="text-on-surface/80 max-w-sm mx-auto text-lg leading-relaxed">
+            <p className="text-white/75 max-w-sm mx-auto text-lg leading-relaxed">
               Jede erledigte Aufgabe schenkt deinem Ronki Energie und verjagt den Nebel.
             </p>
           </header>
@@ -150,7 +150,7 @@ export default function Onboarding({ onComplete }) {
                  style={{ background: 'rgba(252,211,77,0.4)' }} />
             <img src={base + 'art/onboarding/path-fog.webp'} alt="Der Pfad"
                  className="relative z-10 w-full h-auto rounded-2xl"
-                 style={{ filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.15))' }} />
+                 style={{ filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.25))' }} />
           </div>
 
           {/* CTA */}
@@ -159,7 +159,7 @@ export default function Onboarding({ onComplete }) {
               Weiter
               <span className="material-symbols-outlined">arrow_forward</span>
             </PrimaryButton>
-            <div className="flex items-center justify-center gap-2 text-primary/50 font-label text-sm">
+            <div className="flex items-center justify-center gap-2 text-white/40 font-label text-sm">
               <span className="material-symbols-outlined text-base">verified_user</span>
               Sichere Umgebung für Helden
             </div>
@@ -177,23 +177,30 @@ export default function Onboarding({ onComplete }) {
     return (
       <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
         <div className="absolute inset-0 z-0">
-          <img src={base + 'art/bg-purple-depth.webp'} alt="" className="w-full h-full object-cover" />
+          <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
         <div className="relative z-10 flex-1 overflow-y-auto pb-40 px-8"
              style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))', scrollbarWidth: 'none' }}>
-          <div className="max-w-lg mx-auto flex flex-col items-center gap-6">
+          <div className="max-w-lg mx-auto flex flex-col items-center gap-5">
             <ProgressBar />
 
-            <div className="text-center space-y-3">
-              <h2 className="text-4xl font-bold text-white"
+            {/* Three eggs overview illustration */}
+            <div className="relative w-full max-w-xs">
+              <img src={base + 'art/onboarding/three-eggs.webp'} alt="Drei Eier"
+                   className="w-full h-auto rounded-2xl"
+                   style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.25))' }} />
+            </div>
+
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-bold text-white"
                   style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>Wähle dein Ei</h2>
-              <p className="text-white/75 text-lg leading-relaxed">
-                Welches Geheimnis verbirgt sich darin?
+              <p className="text-white/75 text-base leading-relaxed">
+                Drei Eier warten im Wald. Welches ruft nach dir?
               </p>
             </div>
 
-            <div className="flex flex-col gap-4 w-full">
+            <div className="flex flex-col gap-3 w-full">
               {EGGS.map((egg, i) => {
                 const selected = i === selectedEgg;
                 return (
@@ -224,7 +231,7 @@ export default function Onboarding({ onComplete }) {
         </div>
 
         {/* Bottom nav */}
-        <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-8" style={{ background: 'linear-gradient(to top, rgba(60,20,120,0.95) 40%, transparent)' }}>
+        <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-8" style={{ background: 'linear-gradient(to top, rgba(12,50,54,0.95) 40%, transparent)' }}>
           <div className="max-w-xs mx-auto flex flex-col gap-3">
             <PrimaryButton onClick={() => setStep(3)}>
               {EGGS[selectedEgg].name} wählen
@@ -244,7 +251,7 @@ export default function Onboarding({ onComplete }) {
       <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
         {/* Background */}
         <div className="fixed inset-0 z-0">
-          <img src={base + 'art/bg-warm-cream.webp'} alt="" className="w-full h-full object-cover" />
+          <img src={base + 'art/bg-cream-brush.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
         <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center">
