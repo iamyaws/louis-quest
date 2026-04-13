@@ -19,14 +19,12 @@ import PotionGame from './components/PotionGame';
 import CloudJumpGame from './components/CloudJumpGame';
 import StarCatcherGame from './components/StarCatcherGame';
 import CompanionToast from './components/CompanionToast';
-import WelcomeTour from './components/WelcomeTour';
 import ScreenTimer from './components/ScreenTimer';
 
 function AppContent() {
   const { state, actions, loading, toastTrigger } = useTask();
   const [view, setView] = useState('hub');
   const [showParental, setShowParental] = useState(false);
-  const [showTour, setShowTour] = useState(() => !localStorage.getItem('ronki_tour_done'));
   const longPressTimer = useRef(null);
   const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
 
@@ -121,12 +119,6 @@ function AppContent() {
           }}
           onDismiss={() => setScreenTimer(null)}
         />
-      )}
-      {showTour && (
-        <WelcomeTour onDone={() => {
-          localStorage.setItem('ronki_tour_done', '1');
-          setShowTour(false);
-        }} />
       )}
     </>
   );
