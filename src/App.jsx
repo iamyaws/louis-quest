@@ -17,6 +17,7 @@ import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
 import CloudJumpGame from './components/CloudJumpGame';
+import StarCatcherGame from './components/StarCatcherGame';
 import CompanionToast from './components/CompanionToast';
 import WelcomeTour from './components/WelcomeTour';
 import ScreenTimer from './components/ScreenTimer';
@@ -85,6 +86,7 @@ function AppContent() {
           if (id === 'memory') setView('memory');
           if (id === 'potion') setView('potion');
           if (id === 'clouds') setView('clouds');
+          if (id === 'starfall') setView('starfall');
         }} />}
       </div>
       <NavBar active={view} onNavigate={setView} />
@@ -98,6 +100,10 @@ function AppContent() {
         setView('games');
       }} />}
       {view === 'clouds' && <CloudJumpGame onComplete={(reward) => {
+        if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
+        setView('games');
+      }} />}
+      {view === 'starfall' && <StarCatcherGame onComplete={(reward) => {
         if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
         setView('games');
       }} />}

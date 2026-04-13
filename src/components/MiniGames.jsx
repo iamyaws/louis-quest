@@ -23,7 +23,7 @@ const GAMES = [
     iconColor: '#5300b7',
     visualBg: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(83,0,183,0.05))',
     visualColor: '#fcd34d',
-    ready: false,
+    ready: true,
   },
   {
     id: 'potion',
