@@ -97,7 +97,7 @@ export default function ParentalDashboard({ onClose }) {
     <div className="fixed inset-0 z-[300] bg-surface overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
       {/* Header */}
       <header className="flex justify-between items-center px-6 pt-6 pb-4"
-              style={{ background: 'linear-gradient(to bottom, #fff8f1, transparent)' }}>
+              style={{ background: 'linear-gradient(to bottom, #fff8f2, transparent)' }}>
         <div>
           <h1 className="font-headline font-bold text-2xl text-on-surface">Eltern-Bereich</h1>
           <p className="font-label text-xs text-on-surface-variant">

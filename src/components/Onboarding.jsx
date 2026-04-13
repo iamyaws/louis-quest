@@ -288,7 +288,7 @@ export default function Onboarding({ onComplete }) {
         </div>
 
         {/* Bottom nav */}
-        <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-6" style={{ background: 'linear-gradient(to top, #fff8f1 60%, transparent)' }}>
+        <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-6" style={{ background: 'linear-gradient(to top, #fff8f2 60%, transparent)' }}>
           <div className="max-w-lg mx-auto flex justify-between items-center">
             <button onClick={goBack}
               className="flex flex-col items-center justify-center px-6 py-4 active:scale-95 transition-transform" style={{ color: '#5300b7' }}>
@@ -378,7 +378,7 @@ export default function Onboarding({ onComplete }) {
       </div>
 
       {/* Bottom nav */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-6" style={{ background: 'linear-gradient(to top, #fff8f1 60%, transparent)' }}>
+      <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-6" style={{ background: 'linear-gradient(to top, #fff8f2 60%, transparent)' }}>
         <div className="max-w-lg mx-auto flex justify-between items-center">
           <button onClick={goBack}
             className="flex flex-col items-center justify-center px-6 py-4 active:scale-95 transition-transform" style={{ color: '#5300b7' }}>

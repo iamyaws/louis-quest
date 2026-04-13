@@ -45,7 +45,7 @@ export default function Sanctuary() {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg"
-                 style={{ background: '#ccfbf1' }}>
+                 style={{ background: '#a2d0d4' }}>
               <img src={base + (currentStage === 0 ? 'art/egg-glow.webp' : 'art/dragon-baby.webp')} alt="" className="w-full h-full object-cover" />
             </div>
             <span className="text-xl font-headline font-bold text-primary" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
@@ -53,7 +53,7 @@ export default function Sanctuary() {
             </span>
           </div>
           <span className="material-symbols-outlined text-2xl"
-                style={{ color: 'rgba(15,118,110,0.6)', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                style={{ color: 'rgba(18,67,70,0.6)', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
         </div>
 
         {/* Companion Hero */}
@@ -83,7 +83,7 @@ export default function Sanctuary() {
               <p className="text-xs font-label text-outline uppercase" style={{ letterSpacing: '0.2em' }}>Mystic Companion</p>
               <div className="h-3 w-full rounded-full overflow-hidden shadow-inner mt-3"
                    style={{ background: 'rgba(255,255,255,0.5)' }}>
-                <div className="h-full rounded-full" style={{ width: progressPct + '%', background: 'linear-gradient(90deg, #0f766e, #0d9488)' }} />
+                <div className="h-full rounded-full" style={{ width: progressPct + '%', background: 'linear-gradient(90deg, #124346, #2d5a5e)' }} />
               </div>
               {nextStage && (
                 <p className="text-xs font-label text-on-surface-variant mt-2">
@@ -97,7 +97,7 @@ export default function Sanctuary() {
         {/* Tamagotchi Stat Meters */}
         <section className="grid grid-cols-3 gap-3 mb-6">
           {/* Hunger */}
-          <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(15,118,110,0.05)' }}>
+          <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>restaurant</span>
               <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '10px', letterSpacing: '0.15em' }}>Hunger</span>
@@ -107,7 +107,7 @@ export default function Sanctuary() {
             </div>
           </div>
           {/* Glück */}
-          <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(15,118,110,0.05)' }}>
+          <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#ba1a1a', fontVariationSettings: "'FILL' 1" }}>favorite</span>
               <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '10px', letterSpacing: '0.15em' }}>Glück</span>
@@ -117,13 +117,13 @@ export default function Sanctuary() {
             </div>
           </div>
           {/* Energie */}
-          <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(15,118,110,0.05)' }}>
+          <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
             <div className="flex items-center gap-1.5 mb-2">
-              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#0f766e', fontVariationSettings: "'FILL' 1" }}>bolt</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#124346', fontVariationSettings: "'FILL' 1" }}>bolt</span>
               <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '10px', letterSpacing: '0.15em' }}>Energie</span>
             </div>
-            <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(15,118,110,0.1)' }}>
-              <div className="h-full rounded-full transition-all duration-500" style={{ width: state.catPlayed ? '60%' : '30%', background: '#0f766e' }} />
+            <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
+              <div className="h-full rounded-full transition-all duration-500" style={{ width: state.catPlayed ? '60%' : '30%', background: '#124346' }} />
             </div>
           </div>
         </section>
@@ -135,9 +135,9 @@ export default function Sanctuary() {
             onClick={() => !state.catFed && handleCare(actions.feedCompanion)}
             disabled={state.catFed}>
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
-                 style={{ background: state.catFed ? '#d1fae5' : '#ffffff', border: state.catFed ? '2px solid #34d399' : '1px solid rgba(15,118,110,0.05)' }}>
+                 style={{ background: state.catFed ? '#d1fae5' : '#ffffff', border: state.catFed ? '2px solid #34d399' : '1px solid rgba(18,67,70,0.05)' }}>
               <span className="material-symbols-outlined text-4xl"
-                    style={{ color: state.catFed ? '#059669' : '#0f766e', fontVariationSettings: "'FILL' 1" }}>
+                    style={{ color: state.catFed ? '#059669' : '#124346', fontVariationSettings: "'FILL' 1" }}>
                 {state.catFed ? 'check_circle' : 'cookie'}
               </span>
             </div>
@@ -175,9 +175,9 @@ export default function Sanctuary() {
             onClick={() => !state.catPlayed && handleCare(actions.playCompanion)}
             disabled={state.catPlayed}>
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
-                 style={{ background: state.catPlayed ? '#d1fae5' : '#ffffff', border: state.catPlayed ? '2px solid #34d399' : '1px solid rgba(15,118,110,0.05)' }}>
+                 style={{ background: state.catPlayed ? '#d1fae5' : '#ffffff', border: state.catPlayed ? '2px solid #34d399' : '1px solid rgba(18,67,70,0.05)' }}>
               <span className="material-symbols-outlined text-4xl"
-                    style={{ color: state.catPlayed ? '#059669' : '#0f766e', fontVariationSettings: "'FILL' 1" }}>
+                    style={{ color: state.catPlayed ? '#059669' : '#124346', fontVariationSettings: "'FILL' 1" }}>
                 {state.catPlayed ? 'check_circle' : 'sports_baseball'}
               </span>
             </div>
@@ -232,7 +232,7 @@ export default function Sanctuary() {
             {[
               { key: 'vitality', name: 'Vitalität', icon: 'favorite', color: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.3)' },
               { key: 'radiance', name: 'Leuchten', icon: 'light_mode', color: '#fcd34d', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.4)' },
-              { key: 'patience', name: 'Geduld', icon: 'self_improvement', color: '#0f766e', bg: 'rgba(15,118,110,0.06)', border: 'rgba(15,118,110,0.15)' },
+              { key: 'patience', name: 'Geduld', icon: 'self_improvement', color: '#124346', bg: 'rgba(18,67,70,0.06)', border: 'rgba(18,67,70,0.15)' },
               { key: 'wisdom', name: 'Weisheit', icon: 'psychology', color: '#00CEC9', bg: 'rgba(0,206,201,0.1)', border: 'rgba(0,206,201,0.3)' },
             ].map(orb => {
               const count = (state.orbs || {})[orb.key] || 0;
@@ -273,8 +273,8 @@ export default function Sanctuary() {
                  style={{ background: 'rgba(249,243,235,0.8)', border: '1px solid white' }}>
               <div className="relative w-16 h-16 shrink-0">
                 <svg className="w-full h-full -rotate-90">
-                  <circle cx="32" cy="32" r="27" fill="transparent" stroke="rgba(15,118,110,0.1)" strokeWidth="5" />
-                  <circle cx="32" cy="32" r="27" fill="transparent" stroke="#0d9488"
+                  <circle cx="32" cy="32" r="27" fill="transparent" stroke="rgba(18,67,70,0.1)" strokeWidth="5" />
+                  <circle cx="32" cy="32" r="27" fill="transparent" stroke="#2d5a5e"
                     strokeWidth="5" strokeLinecap="round"
                     strokeDasharray="170" strokeDashoffset={170 - (progressPct / 100) * 170} />
                 </svg>

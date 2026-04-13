@@ -19,7 +19,7 @@ export default function EggProfile() {
         />
         {/* Gradient overlay for text readability */}
         <div className="absolute inset-0" style={{
-          background: 'linear-gradient(to bottom, transparent 40%, rgba(255,248,241,0.6) 70%, #fff8f1 100%)'
+          background: 'linear-gradient(to bottom, transparent 40%, rgba(255,248,241,0.6) 70%, #fff8f2 100%)'
         }} />
         {/* Progress ring overlay */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-20 h-20">
@@ -112,7 +112,7 @@ export default function EggProfile() {
         {/* Bodhi leaf */}
         <div className="flex justify-center py-4 opacity-10">
           <svg width="40" height="40" viewBox="0 0 120 120" fill="none">
-            <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#0f766e" />
+            <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#124346" />
           </svg>
         </div>
       </div>

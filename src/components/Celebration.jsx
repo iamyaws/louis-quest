@@ -89,7 +89,7 @@ function LevelUpCelebration({ level, onDismiss }) {
     <main className="flex-grow w-full max-w-2xl px-6 pt-24 pb-32 flex flex-col items-center justify-center relative overflow-hidden mx-auto">
       {/* Ambient blurs */}
       <div className="absolute -top-12 -left-12 w-64 h-64 rounded-full blur-3xl" style={{ background: 'rgba(252,211,77,0.1)' }} />
-      <div className="absolute bottom-24 -right-12 w-48 h-48 rounded-full blur-2xl" style={{ background: 'rgba(15,118,110,0.05)' }} />
+      <div className="absolute bottom-24 -right-12 w-48 h-48 rounded-full blur-2xl" style={{ background: 'rgba(18,67,70,0.05)' }} />
 
       <div className="relative z-10 w-full flex flex-col items-center text-center">
         {/* Sparkle checkmark */}
@@ -112,7 +112,7 @@ function LevelUpCelebration({ level, onDismiss }) {
 
         {/* Reward card */}
         <div className="rounded-2xl p-8 w-full max-w-sm mb-12 flex flex-col items-center relative"
-             style={{ background: '#f9f3eb', boxShadow: '0 8px 24px rgba(30,27,23,0.06)' }}>
+             style={{ background: '#f9f2ec', boxShadow: '0 8px 24px rgba(30,27,23,0.06)' }}>
           <div className="absolute bottom-2 right-2 opacity-5 pointer-events-none">
             <span className="material-symbols-outlined" style={{ fontSize: '60px' }}>filter_vintage</span>
           </div>
@@ -129,7 +129,7 @@ function LevelUpCelebration({ level, onDismiss }) {
         <div className="flex flex-col gap-4 w-full max-w-xs">
           <button onClick={onDismiss}
             className="bg-primary-container text-white font-headline font-bold text-xl px-8 py-5 rounded-full active:scale-95 transition-all"
-            style={{ boxShadow: '0 8px 24px rgba(15,118,110,0.2)' }}>
+            style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
             Stark!
           </button>
         </div>
@@ -192,7 +192,7 @@ function VictoryCelebration({ onDismiss }) {
         {/* Quest log summary */}
         <div className="w-full mb-10">
           <h3 className="font-headline font-bold text-2xl text-on-surface mb-6 text-center">Heutige Taten</h3>
-          <div className="rounded-2xl p-6 space-y-3" style={{ background: '#f9f3eb' }}>
+          <div className="rounded-2xl p-6 space-y-3" style={{ background: '#f9f2ec' }}>
             {(state?.quests || []).filter(q => q.done && !q.sideQuest).slice(0, 5).map(q => (
               <div key={q.id} className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(52,211,153,0.15)' }}>
@@ -215,7 +215,7 @@ function VictoryCelebration({ onDismiss }) {
         <div className="w-full max-w-sm space-y-4">
           <button onClick={onDismiss}
             className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full active:scale-95 transition-all flex items-center justify-center gap-3"
-            style={{ boxShadow: '0 8px 24px rgba(15,118,110,0.2)' }}>
+            style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
             Weiter!
           </button>
@@ -282,7 +282,7 @@ function ChestCelebration({ milestone, reward, onDismiss }) {
         <div className="w-full max-w-sm">
           <button onClick={onDismiss}
             className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full active:scale-95 transition-all flex items-center justify-center gap-3"
-            style={{ boxShadow: '0 8px 24px rgba(15,118,110,0.2)' }}>
+            style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
             Einsammeln!
           </button>

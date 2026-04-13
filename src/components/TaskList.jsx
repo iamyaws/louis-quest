@@ -6,7 +6,7 @@ import SFX from '../utils/sfx';
 
 const ANCHOR_META = {
   morning: { label: 'Morgen-Routine', sublabel: 'Morgen-Aufgaben', icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)' },
-  evening: { label: 'Schul-Vorbereitung', vacLabel: 'Abend-Routine', sublabel: 'Schul-Aufgaben', vacSublabel: 'Abend-Aufgaben', icon: 'backpack', vacIcon: 'dark_mode', col: '#0d9488', bg: '#f0fdfa', border: 'rgba(13,148,136,0.1)' },
+  evening: { label: 'Schul-Vorbereitung', vacLabel: 'Abend-Routine', sublabel: 'Schul-Aufgaben', vacSublabel: 'Abend-Aufgaben', icon: 'backpack', vacIcon: 'dark_mode', col: '#2d5a5e', bg: '#f0fdfa', border: 'rgba(45,90,94,0.1)' },
   bedtime: { label: 'Gute Nacht', sublabel: 'Schlafens-Zeit', icon: 'bedtime', col: '#4338ca', bg: '#eef2ff', border: 'rgba(67,56,202,0.1)' },
 };
 
@@ -237,8 +237,8 @@ export default function TaskList() {
                                 className="w-full flex items-center gap-3 p-4 rounded-xl transition-all text-left cursor-pointer active:scale-[0.98]"
                                 style={{
                                   background: '#ffffff',
-                                  border: isNext ? '1.5px solid rgba(15,118,110,0.15)' : '1px solid rgba(0,0,0,0.06)',
-                                  boxShadow: isNext ? '0 2px 12px rgba(15,118,110,0.08)' : '0 1px 4px rgba(0,0,0,0.04)',
+                                  border: isNext ? '1.5px solid rgba(18,67,70,0.15)' : '1px solid rgba(0,0,0,0.06)',
+                                  boxShadow: isNext ? '0 2px 12px rgba(18,67,70,0.08)' : '0 1px 4px rgba(0,0,0,0.04)',
                                 }}
                                 onClick={() => canTap && handleComplete(q.id)}
                               >
@@ -339,7 +339,7 @@ export default function TaskList() {
         {/* ── Bento Stats Grid ── */}
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div className="rounded-2xl p-6 text-white flex flex-col justify-between relative overflow-hidden"
-               style={{ background: 'linear-gradient(135deg, #0f766e, #0d9488)', minHeight: 160 }}>
+               style={{ background: 'linear-gradient(135deg, #124346, #2d5a5e)', minHeight: 160 }}>
             <div className="relative z-10">
               <p className="font-label text-sm uppercase tracking-wider opacity-80">Tagesziel</p>
               <h4 className="font-headline text-2xl mt-1">{Math.round(pct * 100)}% Bereit</h4>
@@ -368,7 +368,7 @@ export default function TaskList() {
       {/* ── Bodhi leaf ── */}
       <div className="flex justify-center py-6 opacity-10">
         <svg width="40" height="40" viewBox="0 0 120 120" fill="none">
-          <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#0f766e" />
+          <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#124346" />
         </svg>
       </div>
 
@@ -381,7 +381,7 @@ export default function TaskList() {
 
           {/* Sheet */}
           <div className="relative w-full max-w-lg rounded-t-[2rem] pb-10 pt-6 px-6 overflow-auto"
-               style={{ background: '#fff8f1', maxHeight: '80vh', animation: 'slideUp 0.3s ease' }}
+               style={{ background: '#fff8f2', maxHeight: '80vh', animation: 'slideUp 0.3s ease' }}
                onClick={e => e.stopPropagation()}>
 
             {/* Handle */}

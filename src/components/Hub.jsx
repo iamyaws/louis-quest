@@ -39,7 +39,7 @@ export default function Hub({ onNavigate }) {
               style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg"
-               style={{ background: '#ccfbf1' }}>
+               style={{ background: '#a2d0d4' }}>
             <img src={base + 'art/dragon-baby.webp'} alt="Avatar" className="w-full h-full object-cover" />
           </div>
           <span className="text-xl font-headline font-bold text-primary" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
@@ -112,7 +112,7 @@ export default function Hub({ onNavigate }) {
             </div>
             <div className="relative w-16 h-16 shrink-0">
               <svg className="w-full h-full -rotate-90">
-                <circle cx="32" cy="32" r="28" fill="transparent" stroke="rgba(15,118,110,0.1)" strokeWidth="5" />
+                <circle cx="32" cy="32" r="28" fill="transparent" stroke="rgba(18,67,70,0.1)" strokeWidth="5" />
                 <circle cx="32" cy="32" r="28" fill="transparent" stroke="#fcd34d"
                   strokeWidth="5" strokeLinecap="round"
                   strokeDasharray="176" strokeDashoffset={176 - pct * 176} />
@@ -165,7 +165,7 @@ export default function Hub({ onNavigate }) {
                   className={`w-5 h-5 rounded-full border-2 transition-all ${
                     i < (state.dailyWaterCount || 0) ? 'bg-primary border-primary' : 'border-primary/20'
                   }`}
-                  style={{ background: i < (state.dailyWaterCount || 0) ? undefined : 'rgba(15,118,110,0.05)' }}
+                  style={{ background: i < (state.dailyWaterCount || 0) ? undefined : 'rgba(18,67,70,0.05)' }}
                   onClick={() => i === (state.dailyWaterCount || 0) && actions.drinkWater?.()}
                 />
               ))}
@@ -272,7 +272,7 @@ export default function Hub({ onNavigate }) {
 
                   {/* Content */}
                   <div className="flex-1 rounded-t-[2rem] -mt-4 relative z-10 px-6 pt-8 pb-36"
-                       style={{ background: '#fff8f1' }}>
+                       style={{ background: '#fff8f2' }}>
 
                     {/* HP Bar */}
                     {!defeated ? (
@@ -359,7 +359,7 @@ export default function Hub({ onNavigate }) {
                         <h4 className="font-label font-bold text-xs uppercase tracking-widest text-outline mb-3">Beute erhalten</h4>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="p-4 rounded-2xl text-center"
-                               style={{ background: 'rgba(15,118,110,0.05)', border: '1px solid rgba(15,118,110,0.1)' }}>
+                               style={{ background: 'rgba(18,67,70,0.05)', border: '1px solid rgba(18,67,70,0.1)' }}>
                             <span className="material-symbols-outlined text-2xl text-primary mb-1 block"
                                   style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
                             <p className="font-label font-bold text-lg text-primary">+{bd.reward.hp}</p>
@@ -379,7 +379,7 @@ export default function Hub({ onNavigate }) {
 
                   {/* Bottom CTA */}
                   <div className="fixed bottom-0 left-0 w-full z-50 p-6"
-                       style={{ background: 'linear-gradient(to top, #fff8f1 70%, transparent)' }}>
+                       style={{ background: 'linear-gradient(to top, #fff8f2 70%, transparent)' }}>
                     <button onClick={() => setShowBossDetail(false)}
                       className="w-full max-w-lg mx-auto block py-4 rounded-full font-label font-extrabold text-lg active:scale-95 transition-all"
                       style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 8px 24px rgba(252,211,77,0.4), 0 4px 0 #d4a830' }}>
@@ -407,7 +407,7 @@ export default function Hub({ onNavigate }) {
                 {sideQuests.slice(0, 3).map(q => (
                   <div key={q.id} className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                         style={{ background: 'rgba(15,118,110,0.05)' }}>
+                         style={{ background: 'rgba(18,67,70,0.05)' }}>
                       <span className="text-xl">{q.icon}</span>
                     </div>
                     <p className="font-body text-xs text-on-surface font-semibold flex-1">{q.name}</p>
@@ -468,7 +468,7 @@ export default function Hub({ onNavigate }) {
         {/* ── Bodhi leaf ── */}
         <div className="flex justify-center py-2 opacity-20">
           <svg width="40" height="40" viewBox="0 0 120 120" fill="none">
-            <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#0f766e" />
+            <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#124346" />
           </svg>
         </div>
       </main>

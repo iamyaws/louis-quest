@@ -224,7 +224,7 @@ export default function PotionGame({ onComplete }) {
             <div className="flex gap-3 w-full max-w-xs">
               <button onClick={reset}
                 className="flex-1 py-4 rounded-full font-headline font-bold text-lg active:scale-95 transition-all flex items-center justify-center gap-2"
-                style={{ background: 'rgba(232,225,218,0.6)', color: '#4a4455' }}>
+                style={{ background: 'rgba(232,225,218,0.6)', color: '#404849' }}>
                 <span className="material-symbols-outlined">refresh</span>
                 Nochmal
               </button>

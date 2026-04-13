@@ -12,7 +12,7 @@ const BIRTHDAY_TASKS = [
 ];
 
 const REWARDS = [
-  { label: '+500 Heldenpunkte', icon: 'diamond', bg: '#0d9488', color: '#ccfbf1' },
+  { label: '+500 Heldenpunkte', icon: 'diamond', bg: '#2d5a5e', color: '#a2d0d4' },
   { label: 'Super-Bruder Abzeichen', icon: 'military_tech', bg: '#fcd34d', color: '#725b00', emoji: '🎖️' },
   { label: 'Magischer Geburtstagskuchen', icon: 'cake', bg: '#ffdbc8', color: '#6b3000', emoji: '🎂' },
 ];
@@ -64,7 +64,7 @@ export default function BirthdayEpic({ onBack }) {
         <div className="relative w-full aspect-square max-h-[45vh] overflow-hidden">
           <img src={base + 'art/birthday-celebration.png'} alt="Feier"
                className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #fff8f1 0%, transparent 50%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #fff8f2 0%, transparent 50%)' }} />
         </div>
 
         {/* Success message */}
@@ -99,7 +99,7 @@ export default function BirthdayEpic({ onBack }) {
 
         {/* Bottom CTA */}
         <div className="fixed bottom-0 left-0 w-full z-50 p-6"
-             style={{ background: 'linear-gradient(to top, #fff8f1 70%, transparent)' }}>
+             style={{ background: 'linear-gradient(to top, #fff8f2 70%, transparent)' }}>
           <button onClick={onBack}
             className="w-full max-w-lg mx-auto block py-4 rounded-full font-label font-extrabold text-lg active:scale-95 transition-all"
             style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 8px 24px rgba(252,211,77,0.4), 0 4px 0 #d4a830' }}>
@@ -118,7 +118,7 @@ export default function BirthdayEpic({ onBack }) {
         <img src={base + 'art/birthday-prep.png'} alt="Geburtstags-Vorbereitung"
              className="w-full h-full object-cover" />
         <div className="absolute inset-0"
-             style={{ background: 'linear-gradient(to top, #fff8f1 0%, rgba(255,248,241,0.3) 40%, transparent 60%)' }} />
+             style={{ background: 'linear-gradient(to top, #fff8f2 0%, rgba(255,248,241,0.3) 40%, transparent 60%)' }} />
 
         {/* Back button */}
         <button onClick={onBack}
@@ -155,11 +155,11 @@ export default function BirthdayEpic({ onBack }) {
             <span className="font-label font-bold text-sm text-primary">Gesamtfortschritt</span>
             <span className="font-headline font-bold text-xl text-primary">{Math.round(pct * 100)}%</span>
           </div>
-          <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: 'rgba(15,118,110,0.1)' }}>
+          <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
             <div className="h-full rounded-full transition-all duration-500"
                  style={{ width: `${pct * 100}%`, background: '#fcd34d' }} />
           </div>
-          <div className="flex items-center gap-3 mt-3 p-3 rounded-xl" style={{ background: '#f9f3eb' }}>
+          <div className="flex items-center gap-3 mt-3 p-3 rounded-xl" style={{ background: '#f9f2ec' }}>
             <div className="w-10 h-10 rounded-full flex items-center justify-center"
                  style={{ background: 'rgba(252,211,77,0.2)' }}>
               <span className="material-symbols-outlined text-lg" style={{ color: '#d97706', fontVariationSettings: "'FILL' 1" }}>stars</span>
@@ -234,8 +234,8 @@ export default function BirthdayEpic({ onBack }) {
                       className="w-full rounded-xl p-4 text-left transition-all active:scale-[0.98]"
                       style={{
                         background: '#ffffff',
-                        border: '1.5px solid rgba(15,118,110,0.15)',
-                        boxShadow: '0 2px 12px rgba(15,118,110,0.08)',
+                        border: '1.5px solid rgba(18,67,70,0.15)',
+                        boxShadow: '0 2px 12px rgba(18,67,70,0.08)',
                       }}
                       onClick={() => handleComplete(task.id)}
                     >
