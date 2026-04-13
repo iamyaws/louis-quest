@@ -73,7 +73,7 @@ export const VACATION_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "v13", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "bedtime", xp: 10, minutes: 2, order: 4 },
 ];
 
-export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "evening", xp: 10, minutes: 10, order: 0, target: 2 };
+export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "hobby", xp: 10, minutes: 10, order: 1, target: 2 };
 
 export const REWARDS: Reward[] = [
   { id: "r1", name: "H\u00F6rspiel h\u00F6ren", icon: "\u{1F3A7}", minutes: 30 },
@@ -250,6 +250,7 @@ export const BOSSES: import('./types').BossTemplate[] = [
 export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {
   morning: { label: "Bereit f\u00FCr den Tag", icon: "\u{1F305}", col: "#F97316" },
   evening: { label: "Schul-Vorbereitung", icon: "\u{1F392}", col: "#6D28D9" },
+  hobby: { label: "Hobbys", icon: "\u26BD", col: "#059669" },
   bedtime: { label: "Gute Nacht", icon: "\u{1F319}", col: "#6d28d9" },
 };
 

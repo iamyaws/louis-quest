@@ -440,7 +440,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         s_water: 'patience', s_packcheck: 'patience', v2: 'patience', v4: 'patience',
         v7: 'patience', sq_geschirr: 'patience', sq_zimmer: 'patience',
         // Leuchten — physical & outdoors
-        sq_draussen: 'radiance', sq_fussball: 'radiance',
+        sq_draussen: 'radiance', sq_fussball: 'radiance', ft: 'radiance',
       };
       const orbKey = orbMap[id] || (['vitality', 'radiance', 'patience', 'wisdom'] as const)[Math.floor(Math.random() * 4)];
       const orbs = { ...(prev.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 }) };

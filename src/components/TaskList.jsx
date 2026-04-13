@@ -7,6 +7,7 @@ import SFX from '../utils/sfx';
 const ANCHOR_META = {
   morning: { label: 'Morgen-Routine', sublabel: 'Morgen-Aufgaben', icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)' },
   evening: { label: 'Schul-Vorbereitung', vacLabel: 'Abend-Routine', sublabel: 'Schul-Aufgaben', vacSublabel: 'Abend-Aufgaben', icon: 'backpack', vacIcon: 'dark_mode', col: '#2d5a5e', bg: '#f0fdfa', border: 'rgba(45,90,94,0.1)' },
+  hobby: { label: 'Hobbys', sublabel: 'Freizeit-Aktivitäten', icon: 'sports_soccer', col: '#059669', bg: '#ecfdf5', border: 'rgba(5,150,105,0.1)' },
   bedtime: { label: 'Gute Nacht', sublabel: 'Schlafens-Zeit', icon: 'bedtime', col: '#4338ca', bg: '#eef2ff', border: 'rgba(67,56,202,0.1)' },
 };
 
@@ -53,14 +54,20 @@ export default function TaskList() {
 
   if (!state) return null;
 
-  // Remap old stored quests that still have anchor:"evening" but belong to bedtime
+  // Remap old stored quests that still have anchor:"evening" but belong to bedtime or hobby
   const BEDTIME_IDS = new Set(['s8', 's12', 's13', 's14', 's15', 'v10', 'v11', 'v12', 'v13']);
+  const HOBBY_IDS = new Set(['ft']);
   const groups = { ...byGroup };
   if (groups.evening) {
     const fromEvening = groups.evening.filter(q => BEDTIME_IDS.has(q.id));
     if (fromEvening.length) {
       groups.evening = groups.evening.filter(q => !BEDTIME_IDS.has(q.id));
       groups.bedtime = [...(groups.bedtime || []), ...fromEvening].sort((a, b) => (a.order || 0) - (b.order || 0));
+    }
+    const fromHobby = groups.evening.filter(q => HOBBY_IDS.has(q.id));
+    if (fromHobby.length) {
+      groups.evening = groups.evening.filter(q => !HOBBY_IDS.has(q.id));
+      groups.hobby = [...(groups.hobby || []), ...fromHobby].sort((a, b) => (a.order || 0) - (b.order || 0));
     }
   }
 
@@ -95,7 +102,7 @@ export default function TaskList() {
       {/* ── Epic Quest Groups ── */}
       <div className="flex flex-col gap-5">
 
-        {['morning', 'evening', 'bedtime'].map(anchor => {
+        {['morning', 'evening', 'hobby', 'bedtime'].map(anchor => {
           const meta = ANCHOR_META[anchor];
           const quests = (groups[anchor] || []).filter(q => !q.sideQuest);
           if (!quests.length) return null;
