@@ -1,10 +1,10 @@
-const CACHE_NAME = "ronki-v1";
+const CACHE_NAME = "ronki-v3";
 const PRECACHE_URLS = [
   "/Ronki/",
   "/Ronki/index.html",
 ];
 
-// Install: cache app shell
+// Install: cache app shell, skip waiting immediately
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
@@ -12,7 +12,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// Activate: clean old caches
+// Activate: delete ALL old caches, claim clients
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -22,40 +22,19 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: network-first for API, cache-first for assets
+// Fetch: network-first for everything (fresh deploys always win)
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
-
-  // Skip non-GET and cross-origin (except fonts/API)
   if (event.request.method !== "GET") return;
 
-  // Network-first for API calls (weather)
-  if (url.hostname === "api.open-meteo.com") {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // Cache-first for same-origin assets
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      caches.match(event.request).then((cached) => {
-        if (cached) return cached;
-        return fetch(event.request).then((response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        });
+        }
+        return response;
       })
-    );
-  }
+      .catch(() => caches.match(event.request))
+  );
 });
