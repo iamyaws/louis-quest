@@ -1,25 +1,37 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
 import SFX from '../utils/sfx';
+import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 
-const BIRTHDAY_TASKS = [
-  { id: 'qcs1', name: 'Geschenkidee überlegen',          icon: '💡', xp: 30,  hint: 'Was wünscht sich dein Bruder am meisten?' },
-  { id: 'qcs2', name: 'Geburtstagskarte basteln',        icon: '✂️', xp: 75,  hint: 'Etwas Selbstgemachtes ist immer besonders!' },
-  { id: 'qcs3', name: 'Mit Mama/Papa einkaufen gehen',   icon: '🛒', xp: 40,  hint: 'Zusammen das perfekte Geschenk finden!' },
-  { id: 'qcs4', name: 'Geschenk einpacken',              icon: '🎁', xp: 50,  hint: 'Schönes Papier und eine Schleife!' },
-  { id: 'qcs5', name: 'Versteck finden',                 icon: '🔍', xp: 20,  hint: 'Wo sucht er bestimmt nicht?' },
-  { id: 'qcs6', name: 'Geschenk überreichen & feiern!',  icon: '🎂', xp: 100, hint: 'Liam zum Geburtstag gratulieren!' },
-];
+function buildBirthdayTasks(siblingName) {
+  return [
+    { id: 'qcs1', name: 'Geschenkidee überlegen',          icon: '💡', xp: 30,  hint: 'Was wünscht sich dein Geschwisterchen am meisten?' },
+    { id: 'qcs2', name: 'Geburtstagskarte basteln',        icon: '✂️', xp: 75,  hint: 'Etwas Selbstgemachtes ist immer besonders!' },
+    { id: 'qcs3', name: 'Mit Mama/Papa einkaufen gehen',   icon: '🛒', xp: 40,  hint: 'Zusammen das perfekte Geschenk finden!' },
+    { id: 'qcs4', name: 'Geschenk einpacken',              icon: '🎁', xp: 50,  hint: 'Schönes Papier und eine Schleife!' },
+    { id: 'qcs5', name: 'Versteck finden',                 icon: '🔍', xp: 20,  hint: 'Wo sucht er/sie bestimmt nicht?' },
+    { id: 'qcs6', name: 'Geschenk überreichen & feiern!',  icon: '🎂', xp: 100, hint: `${siblingName} zum Geburtstag gratulieren!` },
+  ];
+}
 
-const REWARDS = [
-  { label: '+500 Heldenpunkte', icon: 'diamond', bg: '#2d5a5e', color: '#a2d0d4' },
-  { label: 'Super-Bruder Abzeichen', icon: 'military_tech', bg: '#fcd34d', color: '#725b00', emoji: '🎖️' },
-  { label: 'Magischer Geburtstagskuchen', icon: 'cake', bg: '#ffdbc8', color: '#6b3000', emoji: '🎂' },
-];
+function buildRewards(relationship) {
+  const badge = relationship === 'Schwester' ? 'Super-Schwester Abzeichen' : 'Super-Geschwister Abzeichen';
+  return [
+    { label: '+500 Heldenpunkte', icon: 'diamond', bg: '#2d5a5e', color: '#a2d0d4' },
+    { label: relationship === 'Bruder' ? 'Super-Bruder Abzeichen' : badge, icon: 'military_tech', bg: '#fcd34d', color: '#725b00', emoji: '🎖️' },
+    { label: 'Magischer Geburtstagskuchen', icon: 'cake', bg: '#ffdbc8', color: '#6b3000', emoji: '🎂' },
+  ];
+}
 
 export default function BirthdayEpic({ onBack }) {
   const { state, actions } = useTask();
   const base = import.meta.env.BASE_URL;
+
+  // Family config
+  const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
+  const sibling = config.siblings?.[0] || { name: 'Liam', relationship: 'Bruder' };
+  const BIRTHDAY_TASKS = buildBirthdayTasks(sibling.name);
+  const REWARDS = buildRewards(sibling.relationship);
 
   // Birthday epic state stored in main state
   const bdState = state?.birthdayEpic || { done: [], completed: false };
@@ -73,7 +85,7 @@ export default function BirthdayEpic({ onBack }) {
             Mission erfüllt!
           </h1>
           <p className="font-headline text-xl font-bold text-on-surface mt-2">
-            Du bist ein echter Super-Bruder!
+            {`Du bist ein echtes Super-${sibling.relationship === 'Bruder' ? 'Bruder' : 'Geschwister'}!`}
           </p>
         </div>
 
@@ -142,7 +154,7 @@ export default function BirthdayEpic({ onBack }) {
             Mission: Geburtstags-Überraschung
           </h1>
           <p className="font-body text-on-surface-variant mt-1">
-            Bereite das beste Geschenk für deinen kleinen Bruder vor!
+            {`Bereite das beste Geschenk für ${sibling.name} vor!`}
           </p>
         </div>
       </div>
@@ -266,7 +278,7 @@ export default function BirthdayEpic({ onBack }) {
             <h3 className="font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">Tipp für die Karte</h3>
           </div>
           <p className="font-body text-on-surface-variant italic leading-relaxed">
-            "Male oder schreib etwas über euren allerschönsten Moment zusammen – als Liam zum ersten Mal gelacht hat, oder als ihr zusammen gespielt habt. Das wird sein liebstes Geschenk!"
+            "Male oder schreib etwas über euren allerschönsten Moment zusammen – {`als ${sibling.name} zum ersten Mal gelacht hat, oder als ihr zusammen gespielt habt`}. Das wird sein liebstes Geschenk!"
           </p>
           <div className="flex items-center gap-2 mt-3">
             <span className="text-xs font-label font-bold text-on-surface-variant">Von Mama &amp; Papa empfohlen</span>

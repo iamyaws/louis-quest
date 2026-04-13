@@ -1,5 +1,7 @@
 import React from 'react';
 import BadgeGrid from './BadgeGrid';
+import { useTask } from '../context/TaskContext';
+import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 
 const TRAITS = [
   { emoji: '💪', label: 'Gibt sein Bestes' },
@@ -11,6 +13,10 @@ const TRAITS = [
 ];
 
 export default function HeldenKodex() {
+  const { state } = useTask();
+  const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
+  const msg = config.parentMessage;
+
   return (
     <div className="min-h-screen bg-surface px-6 pb-32">
 
@@ -33,7 +39,7 @@ export default function HeldenKodex() {
 
         {/* Title motto */}
         <h1 className="text-2xl font-extrabold text-primary leading-relaxed font-headline">
-          Lieb sein. Sich Mühe geben.{'\u00A0'}Zusammen sein.
+          {config.familyMotto}
         </h1>
 
         {/* Affirmation badge */}
@@ -44,7 +50,7 @@ export default function HeldenKodex() {
           >
             auto_awesome
           </span>
-          Ich bin geliebt, so wie ich bin.
+          {config.affirmation}
         </div>
       </section>
 
@@ -106,19 +112,19 @@ export default function HeldenKodex() {
             </span>
           </div>
           <div>
-            <div className="font-bold font-headline text-sm">Botschaft für Louis</div>
+            <div className="font-bold font-headline text-sm">{msg.title}</div>
             <div className="text-xs text-on-surface-variant font-body">Gerade eben von Mama &amp; Papa</div>
           </div>
         </div>
 
         {/* Message */}
         <p className="text-lg font-semibold leading-relaxed font-body mb-4">
-          Fehler sind okay. Mama &amp; Papa sind immer für dich da. 🧡
+          {msg.body}
         </p>
 
         {/* Quote */}
         <p className="italic font-medium font-body text-primary">
-          Louis, Papa und Mama lieben dich.
+          {msg.signature}
         </p>
 
         {/* Decorative lotus icon */}

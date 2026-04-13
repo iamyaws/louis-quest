@@ -370,15 +370,24 @@ export default function useGameActions(
   const completeHabit = useCallback((habitId: string) => {
     setState(prev => {
       if (!prev) return prev;
-      if (habitId === "vitaminD" && !prev.dailyVitaminD) {
-        SFX.play("pop");
-        return { ...prev, dailyVitaminD: true, ...addHP(prev, 5) };
-      }
-      if (habitId === "brother" && !prev.dailyBrother) {
-        SFX.play("pop");
-        return { ...prev, dailyBrother: true, ...addHP(prev, 10) };
-      }
-      return prev;
+      const habits = prev.dailyHabits || {};
+      if (habits[habitId]) return prev; // already done
+
+      // Look up reward from config
+      const cfg = prev.familyConfig || { dailyHabits: [
+        { id: 'habit_vitaminD', xp: 5 },
+        { id: 'habit_sibling', xp: 10 },
+      ] };
+      // Support both old IDs ("vitaminD"/"brother") and new IDs ("habit_vitaminD"/"habit_sibling")
+      const habitDef = (cfg.dailyHabits || []).find(h => h.id === habitId);
+      const reward = habitDef?.xp || 5;
+
+      SFX.play("pop");
+      return {
+        ...prev,
+        dailyHabits: { ...habits, [habitId]: true },
+        ...addHP(prev, reward),
+      };
     });
   }, [setState]);
 

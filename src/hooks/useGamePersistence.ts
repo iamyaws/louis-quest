@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   WEEKLY_MISSIONS, MAX_MONTHLY_FREEZES, REWARDS, BOSSES, BOSS_TIERS, DEFAULT_BELOHNUNGEN, isSchoolVacation,
-  BIRTHDAY_QUEST_CHAIN,
+  BIRTHDAY_QUEST_CHAIN, buildBirthdayQuestChain,
 } from '../constants';
 import { buildDay, getCatStage, getTierForStage } from '../utils/helpers';
 import storage from '../utils/storage';
 import type { GameState, Hero } from '../types';
+import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 
 const SAVE_DEBOUNCE_MS = 400;
 
@@ -89,7 +90,8 @@ function applyDayTransition(p: GameState, today: string): void {
   p.bossDefeatReward = null;
   // Cat care daily reset (no stat decay — stats only increase from care actions)
   p.catFed = false; p.catPetted = false; p.catPlayed = false;
-  // Daily habits reset
+  // Daily habits reset (dynamic)
+  p.dailyHabits = {};
   p.dailyVitaminD = false;
   p.dailyBrother = false;
   // Daily game redemption + water reset
@@ -175,7 +177,11 @@ function applyDefaults(p: GameState): void {
   if (p.catPlayed === undefined) p.catPlayed = false;
   if (!p.boss) { const b = BOSSES[Math.floor(Math.random() * BOSSES.length)]; p.boss = { id: b.id, hp: b.hp, maxHp: b.hp }; }
   if (!p.bossTrophies) p.bossTrophies = [];
-  // ── New field defaults (v4 migration) ──
+  // ── Daily habits migration ──
+  if (!p.dailyHabits) p.dailyHabits = {};
+  // Migrate legacy booleans into dynamic map
+  if (p.dailyVitaminD) p.dailyHabits['habit_vitaminD'] = true;
+  if (p.dailyBrother) p.dailyHabits['habit_sibling'] = true;
   if (p.dailyVitaminD === undefined) p.dailyVitaminD = false;
   if (p.dailyBrother === undefined) p.dailyBrother = false;
   if (!p.belohnungen) p.belohnungen = DEFAULT_BELOHNUNGEN;
@@ -187,9 +193,16 @@ function applyDefaults(p: GameState): void {
   if (p.drachenEier === undefined) p.drachenEier = 0;
   if (!p.belohnungenLog) p.belohnungenLog = [];
   if (!p.specialMissions) p.specialMissions = [];
-  // Add Liam's birthday gift mission if not already there and date hasn't passed
-  if (!p.specialMissions.some(m => m.id === "sm_liam_bday") && new Date() < new Date("2026-04-27")) {
-    p.specialMissions.push({ id: "sm_liam_bday", name: "Geburtstagsgeschenk f\u00FCr Liam kaufen", emoji: "\uD83C\uDF81", hp: 50, done: false });
+  // Auto-add birthday gift mission for each sibling with a birthday
+  const cfg = p.familyConfig || DEFAULT_FAMILY_CONFIG;
+  for (const sib of cfg.siblings || []) {
+    if (!sib.birthday) continue;
+    const missionId = `sm_${sib.name.toLowerCase()}_bday`;
+    const dayAfter = new Date(sib.birthday);
+    dayAfter.setDate(dayAfter.getDate() + 1);
+    if (!p.specialMissions.some(m => m.id === missionId) && new Date() < dayAfter) {
+      p.specialMissions.push({ id: missionId, name: `Geburtstagsgeschenk f\u00FCr ${sib.name} kaufen`, emoji: "\uD83C\uDF81", hp: 50, done: false });
+    }
   }
   if (!p.weeklyLunch) p.weeklyLunch = {};
   if (p.weeklyMissionsCompleted === undefined) p.weeklyMissionsCompleted = 0;
@@ -200,9 +213,13 @@ function applyDefaults(p: GameState): void {
   // Companion + egg migration
   if (!p.equippedGear) p.equippedGear = {};
   if (!p.questChains) p.questChains = [];
-  // Auto-add Liam birthday quest chain if not present and deadline not passed
-  if (!(p.questChains || []).some(c => c.id === "qc_liam_bday") && new Date() < new Date("2026-04-26")) {
-    p.questChains.push({ ...BIRTHDAY_QUEST_CHAIN });
+  // Auto-add birthday quest chains for siblings with birthdays
+  for (const sib of (cfg.siblings || [])) {
+    if (!sib.birthday) continue;
+    const chainId = `qc_${sib.name.toLowerCase()}_bday`;
+    if (!(p.questChains || []).some(c => c.id === chainId) && new Date() < new Date(sib.birthday)) {
+      p.questChains.push(buildBirthdayQuestChain(sib.name, sib.birthday));
+    }
   }
   if (!p.companionType) p.companionType = "cat";
   if (p.eggType === undefined) p.eggType = null;
@@ -258,7 +275,8 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
     eggType: eggType || null,
     eggProgress: eggType ? 0 : 100,
     eggHatched: !eggType,
-    // New v4 fields
+    // Daily habits (dynamic)
+    dailyHabits: {},
     dailyVitaminD: false, dailyBrother: false,
     belohnungen: DEFAULT_BELOHNUNGEN,
     belohnungenLog: [],

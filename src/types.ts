@@ -1,4 +1,5 @@
 // ═══ Ronki — Shared Type Definitions ═══
+import type { FamilyConfig } from './types/familyConfig';
 
 export interface Hero {
   name: string;
@@ -166,6 +167,8 @@ export interface HeroTip {
 }
 
 export interface GameState {
+  // ── Family config ──
+  familyConfig?: FamilyConfig;
   hero: Hero;
   catVariant: string;
   catName: string;
@@ -219,9 +222,11 @@ export interface GameState {
   eggType: string | null;
   eggProgress: number;
   eggHatched: boolean;
-  // ── New fields ──
-  dailyVitaminD: boolean;
-  dailyBrother: boolean;
+  // ── Daily habits (dynamic, keyed by habit id) ──
+  dailyHabits: Record<string, boolean>;
+  // Legacy compat — migrated on load
+  dailyVitaminD?: boolean;
+  dailyBrother?: boolean;
   belohnungen: Belohnung[];
   belohnungenLog: { id: string; date: string }[];
   specialMissions: SpecialMission[];

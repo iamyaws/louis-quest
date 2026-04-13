@@ -498,28 +498,34 @@ export const EGG_TYPES: Record<string, { col1: string; col2: string; pattern: st
 
 // ═══ Quest Chains (multi-step quests) ═══
 
-export const BIRTHDAY_QUEST_CHAIN: QuestChain = {
-  id: "qc_liam_bday",
-  name: "Liams Geburtstag",
-  emoji: "\uD83C\uDF82",
-  steps: [
-    { id: "qcs1", name: "Geschenkidee \u00FCberlegen", done: false },
-    { id: "qcs2", name: "Geburtstagskarte basteln", done: false },
-    { id: "qcs3", name: "Mit Mama/Papa einkaufen gehen", done: false },
-    { id: "qcs4", name: "Geschenk einpacken", done: false },
-    { id: "qcs5", name: "Liam zum Geburtstag gratulieren", done: false },
-  ],
-  hp: 150,
-  completed: false,
-  deadline: "2026-04-26",
-};
+// Factory: build birthday quest chain from sibling config
+export function buildBirthdayQuestChain(siblingName: string, birthday: string): QuestChain {
+  return {
+    id: `qc_${siblingName.toLowerCase()}_bday`,
+    name: `${siblingName}s Geburtstag`,
+    emoji: "\uD83C\uDF82",
+    steps: [
+      { id: "qcs1", name: "Geschenkidee \u00FCberlegen", done: false },
+      { id: "qcs2", name: "Geburtstagskarte basteln", done: false },
+      { id: "qcs3", name: "Mit Mama/Papa einkaufen gehen", done: false },
+      { id: "qcs4", name: "Geschenk einpacken", done: false },
+      { id: "qcs5", name: `${siblingName} zum Geburtstag gratulieren`, done: false },
+    ],
+    hp: 150,
+    completed: false,
+    deadline: birthday,
+  };
+}
+
+// Legacy compat — default chain for Louis's family
+export const BIRTHDAY_QUEST_CHAIN: QuestChain = buildBirthdayQuestChain("Liam", "2026-04-26");
 
 // ═══ Side-Quests (optional bonus quests) ═══
 
 export const SIDE_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "sq_geschirr", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 90, target: 2, bonus: 3 },
   { id: "sq_zimmer", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "evening", xp: 15, minutes: 6, order: 91 },
-  { id: "sq1", name: "Liam eine Geschichte vorlesen", icon: "\uD83D\uDCD6", anchor: "evening", xp: 15, minutes: 10, order: 92 },
+  { id: "sq1", name: "Geschwistern eine Geschichte vorlesen", icon: "\uD83D\uDCD6", anchor: "evening", xp: 15, minutes: 10, order: 92 },
   { id: "sq2", name: "Etwas Kreatives machen", icon: "\uD83C\uDFA8", anchor: "evening", xp: 15, minutes: 15, order: 93 },
   { id: "sq3", name: "Jemandem helfen", icon: "\uD83E\uDD1D", anchor: "morning", xp: 15, minutes: 5, order: 94 },
   { id: "sq4", name: "Drau\u00DFen spielen", icon: "\u26BD", anchor: "morning", xp: 15, minutes: 15, order: 95 },
