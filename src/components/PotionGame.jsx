@@ -9,12 +9,12 @@ const INGREDIENTS = [
 ];
 
 const RECIPES = [
-  { combo: ['bloom', 'dew'], name: 'Wachstums-Elixier', desc: 'Lässt deinen Ronki doppelt so schnell wachsen.', badge: '2x EP', badgeBg: '#fcd34d', badgeText: '#725b00', icon: 'eco', reward: { xp: 30, hp: 20 } },
-  { combo: ['root', 'fern'], name: 'Stärke-Trank', desc: 'Erhöht Angriffskraft kurzzeitig für Bosskämpfe.', badge: '+20% DMG', badgeBg: '#fecaca', badgeText: '#991b1b', icon: 'bolt', reward: { xp: 25, hp: 25 } },
-  { combo: ['bloom', 'fern'], name: 'Nacht-Nektar', desc: 'Gibt deinem Begleiter ruhige Träume und Energie.', badge: '+15 HP', badgeBg: '#d3bbff', badgeText: '#5300b7', icon: 'bedtime', reward: { xp: 20, hp: 30 } },
-  { combo: ['dew', 'root'], name: 'Erd-Essenz', desc: 'Stärkt die Verbindung zur Natur und heilt sanft.', badge: 'Heilung', badgeBg: '#a7f3d0', badgeText: '#065f46', icon: 'spa', reward: { xp: 20, hp: 25 } },
-  { combo: ['bloom', 'root'], name: 'Wurzel-Blüte', desc: 'Ein seltenes Gebräu aus Erde und Licht.', badge: 'Selten', badgeBg: '#fcd34d', badgeText: '#725b00', icon: 'auto_awesome', reward: { xp: 35, hp: 15 } },
-  { combo: ['dew', 'fern'], name: 'Mond-Tropfen', desc: 'Glitzert im Mondlicht und gibt magische Kraft.', badge: 'Magie', badgeBg: '#d3bbff', badgeText: '#5300b7', icon: 'stars', reward: { xp: 25, hp: 20 } },
+  { combo: ['bloom', 'dew'], name: 'Wachstums-Elixier', desc: 'Lässt deinen Ronki doppelt so schnell wachsen.', badge: '2x EP', badgeBg: '#fcd34d', badgeText: '#725b00', icon: 'eco', reward: { xp: 0, hp: 6 } },
+  { combo: ['root', 'fern'], name: 'Stärke-Trank', desc: 'Erhöht Angriffskraft kurzzeitig für Bosskämpfe.', badge: '+20% DMG', badgeBg: '#fecaca', badgeText: '#991b1b', icon: 'bolt', reward: { xp: 0, hp: 5 } },
+  { combo: ['bloom', 'fern'], name: 'Nacht-Nektar', desc: 'Gibt deinem Begleiter ruhige Träume und Energie.', badge: '+15 HP', badgeBg: '#d3bbff', badgeText: '#5300b7', icon: 'bedtime', reward: { xp: 0, hp: 8 } },
+  { combo: ['dew', 'root'], name: 'Erd-Essenz', desc: 'Stärkt die Verbindung zur Natur und heilt sanft.', badge: 'Heilung', badgeBg: '#a7f3d0', badgeText: '#065f46', icon: 'spa', reward: { xp: 0, hp: 5 } },
+  { combo: ['bloom', 'root'], name: 'Wurzel-Blüte', desc: 'Ein seltenes Gebräu aus Erde und Licht.', badge: 'Selten', badgeBg: '#fcd34d', badgeText: '#725b00', icon: 'auto_awesome', reward: { xp: 0, hp: 4 } },
+  { combo: ['dew', 'fern'], name: 'Mond-Tropfen', desc: 'Glitzert im Mondlicht und gibt magische Kraft.', badge: 'Magie', badgeBg: '#d3bbff', badgeText: '#5300b7', icon: 'stars', reward: { xp: 0, hp: 5 } },
 ];
 
 function findRecipe(selected) {
@@ -163,7 +163,7 @@ export default function PotionGame({ onComplete }) {
                           {ing.icon}
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold uppercase text-on-surface-variant">{ing.name}</span>
+                      <span className="text-xs font-bold uppercase text-on-surface-variant">{ing.name}</span>
                     </button>
                   );
                 })}
@@ -215,11 +215,11 @@ export default function PotionGame({ onComplete }) {
             <div className="flex gap-4 mb-8">
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(83,0,183,0.06)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold text-primary">+{reward.xp}</p>
-                <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">XP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mt-1">XP</p>
               </div>
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(252,211,77,0.15)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold" style={{ color: '#735c00' }}>+{reward.hp}</p>
-                <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">HP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mt-1">HP</p>
               </div>
             </div>
 

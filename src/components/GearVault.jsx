@@ -98,11 +98,11 @@ export default function GearVault() {
                   </span>
                 )}
               </div>
-              <span className="font-label font-bold text-[10px] uppercase tracking-widest text-on-surface-variant">
+              <span className="font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
                 {meta.label}
               </span>
               {gear && (
-                <span className="text-[9px] font-label font-bold px-2 py-0.5 rounded-full"
+                <span className="text-xs font-label font-bold px-2 py-0.5 rounded-full"
                       style={{ background: rarity.bg, color: rarity.color }}>
                   {gear.name.split(' ')[0]}
                 </span>
@@ -121,7 +121,7 @@ export default function GearVault() {
                    style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
                 <span className="material-symbols-outlined text-lg" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
                 <div>
-                  <p className="font-label font-bold text-[10px] text-on-surface-variant uppercase">Mut</p>
+                  <p className="font-label font-bold text-xs text-on-surface-variant uppercase">Mut</p>
                   <p className="font-headline font-bold text-lg" style={{ color: '#b45309' }}>+{totalStats.courage}</p>
                 </div>
               </div>
@@ -131,7 +131,7 @@ export default function GearVault() {
                    style={{ background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.15)' }}>
                 <span className="material-symbols-outlined text-lg" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>shield</span>
                 <div>
-                  <p className="font-label font-bold text-[10px] text-on-surface-variant uppercase">Schutz</p>
+                  <p className="font-label font-bold text-xs text-on-surface-variant uppercase">Schutz</p>
                   <p className="font-headline font-bold text-lg" style={{ color: '#059669' }}>+{totalStats.defense}</p>
                 </div>
               </div>
@@ -139,7 +139,7 @@ export default function GearVault() {
           </div>
           <div className="flex items-start gap-2 px-2">
             <span className="material-symbols-outlined text-sm text-on-surface-variant/50 mt-0.5">info</span>
-            <p className="font-label text-[10px] text-on-surface-variant leading-relaxed">
+            <p className="font-label text-xs text-on-surface-variant leading-relaxed">
               Mut erhöht den Schaden gegen Bosse. Schutz gibt extra Heldenpunkte beim Sieg.
             </p>
           </div>
@@ -185,11 +185,11 @@ export default function GearVault() {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[8px] font-label font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider"
+                        <span className="text-xs font-label font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider"
                               style={{ background: rarity.bg, color: rarity.color }}>
                           {rarity.label}
                         </span>
-                        <span className="font-label text-[10px] text-on-surface-variant uppercase tracking-wider">
+                        <span className="font-label text-xs text-on-surface-variant uppercase tracking-wider">
                           {SLOT_META[gear.slot]?.label}
                         </span>
                       </div>
@@ -197,10 +197,10 @@ export default function GearVault() {
                     {/* Stats */}
                     <div className="flex flex-col items-end gap-0.5 shrink-0">
                       {gear.stats.courage > 0 && (
-                        <span className="font-label font-bold text-[10px]" style={{ color: '#f59e0b' }}>⚡ +{gear.stats.courage}</span>
+                        <span className="font-label font-bold text-xs" style={{ color: '#f59e0b' }}>⚡ +{gear.stats.courage}</span>
                       )}
                       {gear.stats.defense > 0 && (
-                        <span className="font-label font-bold text-[10px]" style={{ color: '#059669' }}>🛡 +{gear.stats.defense}</span>
+                        <span className="font-label font-bold text-xs" style={{ color: '#059669' }}>🛡 +{gear.stats.defense}</span>
                       )}
                     </div>
                   </button>

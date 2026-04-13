@@ -42,7 +42,7 @@ export default function WelcomeTour({ onDone }) {
           </div>
 
           {/* Tab label chip */}
-          <span className="font-label font-bold text-[10px] tracking-[0.2em] uppercase text-primary/50 bg-primary/5 px-3 py-1 rounded-full mb-3">
+          <span className="font-label font-bold text-xs tracking-[0.2em] uppercase text-primary/50 bg-primary/5 px-3 py-1 rounded-full mb-3">
             {current.tab}
           </span>
 

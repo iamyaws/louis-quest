@@ -101,7 +101,7 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
         <div className="mb-3 rounded-2xl p-4 shadow-xl w-56"
              style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
           {/* Reward label */}
-          <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3 text-center">
+          <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3 text-center">
             {rewardName}
           </p>
 
@@ -136,7 +136,7 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
 
           {/* Refund preview */}
           {remaining < totalSeconds && (
-            <p className="text-center text-[10px] text-on-surface-variant mt-2 font-label">
+            <p className="text-center text-xs text-on-surface-variant mt-2 font-label">
               Sparen gibt {Math.floor((remaining / totalSeconds) * cost)} Min. zurück
             </p>
           )}

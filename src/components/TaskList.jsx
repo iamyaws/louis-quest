@@ -169,7 +169,7 @@ export default function TaskList() {
                                 strokeDasharray="125.6"
                                 strokeDashoffset={125.6 - (doneCount / quests.length) * 125.6} />
                       </svg>
-                      <span className={`absolute text-[10px] font-bold font-label ${secDone ? 'text-emerald-dark' : ''}`}>
+                      <span className={`absolute text-xs font-bold font-label ${secDone ? 'text-emerald-dark' : ''}`}>
                         {secDone ? (
                           <span className="material-symbols-outlined text-base text-emerald-dark" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
                         ) : `${doneCount}/${quests.length}`}

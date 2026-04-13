@@ -102,7 +102,7 @@ export default function Sanctuary() {
           <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>restaurant</span>
-              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '10px', letterSpacing: '0.15em' }}>Hunger</span>
+              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>Hunger</span>
             </div>
             <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(252,211,77,0.2)' }}>
               <div className="h-full rounded-full transition-all duration-500" style={{ width: state.catFed ? '85%' : '40%', background: '#fcd34d' }} />
@@ -112,7 +112,7 @@ export default function Sanctuary() {
           <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#ba1a1a', fontVariationSettings: "'FILL' 1" }}>favorite</span>
-              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '10px', letterSpacing: '0.15em' }}>Glück</span>
+              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>Glück</span>
             </div>
             <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(186,26,26,0.1)' }}>
               <div className="h-full rounded-full transition-all duration-500" style={{ width: (allCareDone ? 95 : Math.min(95, careDoneCount * 30 + 5)) + '%', background: '#ba1a1a' }} />
@@ -122,7 +122,7 @@ export default function Sanctuary() {
           <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#124346', fontVariationSettings: "'FILL' 1" }}>bolt</span>
-              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '10px', letterSpacing: '0.15em' }}>Energie</span>
+              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>Energie</span>
             </div>
             <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
               <div className="h-full rounded-full transition-all duration-500" style={{ width: state.catPlayed ? '60%' : '30%', background: '#124346' }} />
@@ -258,11 +258,11 @@ export default function Sanctuary() {
                     {/* Badge */}
                     {isCompleted && (
                       <span className="absolute -top-3 left-1/2 font-black font-label px-2 py-0.5 rounded-full z-20 shadow-sm whitespace-nowrap"
-                            style={{ background: '#059669', color: 'white', transform: 'translateX(-50%)', fontSize: '8px', letterSpacing: '0.1em' }}>FERTIG</span>
+                            style={{ background: '#059669', color: 'white', transform: 'translateX(-50%)', fontSize: '12px', letterSpacing: '0.1em' }}>FERTIG</span>
                     )}
                     {isCurrent && (
                       <span className="absolute -top-3 left-1/2 font-black font-label px-2 py-0.5 rounded-full z-20 shadow-sm whitespace-nowrap animate-pulse"
-                            style={{ background: '#735c00', color: 'white', transform: 'translateX(-50%)', fontSize: '8px', letterSpacing: '0.1em' }}>AKTUELL</span>
+                            style={{ background: '#735c00', color: 'white', transform: 'translateX(-50%)', fontSize: '12px', letterSpacing: '0.1em' }}>AKTUELL</span>
                     )}
 
                     <div className={'rounded-full flex items-center justify-center transition-all duration-300'
@@ -332,7 +332,7 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
              style={{ background: 'rgba(18,67,70,0.06)', border: '1px solid rgba(18,67,70,0.1)' }}>
           <span className="material-symbols-outlined text-lg text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
           <span className="font-headline font-bold text-lg text-primary">{totalOrbs}</span>
-          <span className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">Gesamt</span>
+          <span className="font-label text-xs text-on-surface-variant uppercase tracking-widest">Gesamt</span>
         </div>
       </div>
 
@@ -378,13 +378,13 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
                   <div className="flex items-center gap-2">
                     <p className="font-headline font-bold text-sm text-on-surface">{orb.name}</p>
                     {currentMilestone && (
-                      <span className="px-2 py-0.5 rounded-full text-[8px] font-label font-bold uppercase tracking-wider text-white"
+                      <span className="px-2 py-0.5 rounded-full text-xs font-label font-bold uppercase tracking-wider text-white"
                             style={{ background: orb.color }}>
                         {currentMilestone.title}
                       </span>
                     )}
                   </div>
-                  <p className="font-label text-[10px] text-on-surface-variant">{orb.desc}</p>
+                  <p className="font-label text-xs text-on-surface-variant">{orb.desc}</p>
                 </div>
 
                 <span className="font-headline font-bold text-2xl" style={{ color: collected ? orb.color : '#c0c8c9' }}>
@@ -418,11 +418,11 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-center mb-1">
-                            <span className="font-label font-bold text-[10px] uppercase tracking-widest"
+                            <span className="font-label font-bold text-xs uppercase tracking-widest"
                                   style={{ color: reached ? orb.color : '#707979' }}>
                               {ms.title} — {ms.threshold} Orbs
                             </span>
-                            <span className="font-label text-[9px] font-bold" style={{ color: '#fcd34d' }}>
+                            <span className="font-label text-xs font-bold" style={{ color: '#fcd34d' }}>
                               +{ms.reward} HP
                             </span>
                           </div>
@@ -457,7 +457,7 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
             </div>
           </div>
           <div>
-            <p className="font-label font-bold text-[10px] text-outline uppercase tracking-widest">Nächste Stufe</p>
+            <p className="font-label font-bold text-xs text-outline uppercase tracking-widest">Nächste Stufe</p>
             <p className="font-headline font-bold text-lg text-primary">{nextStage.name}</p>
             <p className="text-xs font-label text-on-surface-variant">Noch {nextStage.threshold - evo} Schritte</p>
           </div>

@@ -28,6 +28,7 @@ interface TaskState {
   hp: number;
   drachenEier: number;
   eggType: string | null;
+  heroGender: string | null;
   eggProgress: number;
   eggHatched: boolean;
   moodAM: number | null;
@@ -49,6 +50,7 @@ interface TaskState {
   journalSaved: boolean;
   bossDmgToday: number;
   orbs: { vitality: number; radiance: number; patience: number; wisdom: number };
+  heroStats: { mut: number; fokus: number; ordnung: number };
   xp: number;
   chestsClaimed: number[];
   activeMissions: { id: string; progress: number; startDate: string }[];
@@ -57,8 +59,10 @@ interface TaskState {
   equippedGear: { head?: string; back?: string; neck?: string };
   unlockedBadges: string[];
   totalTasksDone: number;
+  gamesPlayedToday: string[];
   birthdayEpic: { done: string[]; completed: boolean };
   familyConfig: FamilyConfig;
+  _v2_economy_reset?: boolean;
 }
 
 interface TaskComputed {
@@ -79,13 +83,14 @@ interface TaskActions {
   petCompanion: () => void;
   playCompanion: () => void;
   collectLoginBonus: () => void;
-  completeOnboarding: (cfg?: { eggType?: string }) => void;
+  completeOnboarding: (cfg?: { eggType?: string; heroName?: string; heroGender?: string }) => void;
   saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
   redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
   dismissCelebration: () => void;
   startMission: (id: string) => void;
   abandonMission: (id: string) => void;
   addHP: (amount: number) => void;
+  claimGameReward: (gameId: string) => void;
   addScreenMinutes: (amount: number) => void;
   equipGear: (gearId: string) => void;
   unequipGear: (slot: 'head' | 'back' | 'neck') => void;
@@ -175,6 +180,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           hp: raw.coins || raw.hp || 0,
           drachenEier: raw.drachenEier || 0,
           eggType: raw.eggType || 'dragon',
+          heroGender: raw.heroGender || null,
           eggProgress: raw.eggProgress || 0,
           eggHatched: raw.eggHatched || false,
           moodAM: raw.moodAM ?? null,
@@ -196,6 +202,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           journalSaved: raw.journalSaved || false,
           bossDmgToday: raw.bossDmgToday || 0,
           orbs: raw.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
+          heroStats: raw.heroStats || { mut: 0, fokus: 0, ordnung: 0 },
           xp: raw.xp || raw.coins || 0,
           chestsClaimed: raw.chestsClaimed || [],
           activeMissions: raw.activeMissions || [],
@@ -204,9 +211,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           equippedGear: raw.equippedGear || {},
           unlockedBadges: raw.unlockedBadges || [],
           totalTasksDone: raw.totalTasksDone || 0,
+          gamesPlayedToday: raw.gamesPlayedToday || [],
           birthdayEpic: raw.birthdayEpic || { done: [], completed: false },
           familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
         };
+        // One-time migration: reset inflated HP from old economy
+        if (!raw._v2_economy_reset) {
+          s.hp = Math.min(s.hp, 50); // cap at 50 from pre-rebalance inflation
+          s.heroStats = s.heroStats || { mut: 0, fokus: 0, ordnung: 0 };
+          s._v2_economy_reset = true;
+        }
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
           s = applyDayTransition(s);
@@ -228,6 +242,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           hp: 0,
           drachenEier: 0,
           eggType: 'dragon',
+          heroGender: null,
           eggProgress: 0,
           eggHatched: false,
           moodAM: null,
@@ -249,6 +264,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           journalSaved: false,
           bossDmgToday: 0,
           orbs: { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
+          heroStats: { mut: 0, fokus: 0, ordnung: 0 },
           xp: 0,
           chestsClaimed: [],
           activeMissions: [],
@@ -257,6 +273,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           equippedGear: {},
           unlockedBadges: [],
           totalTasksDone: 0,
+          gamesPlayedToday: [],
           birthdayEpic: { done: [], completed: false },
           familyConfig: DEFAULT_FAMILY_CONFIG,
         });
@@ -406,6 +423,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       journalHistory,
       journalSaved: false,
       bossDmgToday: 0,
+      gamesPlayedToday: [],
     };
   }
 
@@ -427,6 +445,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const dt = prev.dt + (q.minutes || 0);
       const hpGain = q.xp; // 1:1 XP to HP
       let hp = (prev.hp || 0) + hpGain;
+      let screenMin = (prev.drachenEier || 0) + 1; // +1 screen minute per quest
       const prevXp = prev.xp || 0;
       const newXp = prevXp + q.xp;
 
@@ -457,6 +476,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // Defense bonus: extra HP on defeat (1 per 5 defense)
           const defenseBonus = Math.floor(gearDefense / 5);
           if (bd) hp += bd.reward.hp + defenseBonus;
+          screenMin += 3; // bonus screen minutes on boss defeat
           if (!bossTrophies.includes(boss.id)) bossTrophies.push(boss.id);
         }
       }
@@ -480,6 +500,14 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const orbs = { ...(prev.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 }) };
       orbs[orbKey] += 1;
 
+      // Accumulate hero stats (long-term progression)
+      const heroStats = { ...(prev.heroStats || { mut: 0, fokus: 0, ordnung: 0 }) };
+      const anchor = q.anchor || '';
+      if (anchor === 'morning' || anchor === 'bedtime') heroStats.ordnung += 1;
+      else if (anchor === 'evening') heroStats.fokus += 1;
+      if (q.sideQuest || anchor === 'hobby') heroStats.mut += 2;
+      if (boss && boss.hp <= 0 && prev.boss && prev.boss.hp > 0) heroStats.mut += 3; // boss defeat bonus
+
       // Level-up detection
       const prevLevel = getLevel(prevXp);
       const newLevel = getLevel(newXp);
@@ -493,6 +521,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const wasDone = prev.quests.filter(qq => !qq.sideQuest).every(qq => qq.done);
       if (allDone && !wasDone) {
         queueCelebration({ type: 'victory' });
+        screenMin += 3; // bonus screen minutes for completing all quests
       }
 
       // Track total tasks done
@@ -518,7 +547,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      return { ...prev, quests, dt, hp, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, totalTasksDone, unlockedBadges };
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges };
     });
     setToastTrigger(t => t + 1);
   }, []);
@@ -578,7 +607,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (!prev || prev.catFed) return prev;
       const newEvo = (prev.catEvo || 0) + 1;
       evolveCheck(prev.catEvo || 0, newEvo);
-      return { ...prev, catFed: true, hp: (prev.hp || 0) + 5, catEvo: newEvo };
+      return { ...prev, catFed: true, hp: (prev.hp || 0) + 3, catEvo: newEvo };
     });
   }, [evolveCheck]);
 
@@ -587,7 +616,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (!prev || prev.catPetted) return prev;
       const newEvo = (prev.catEvo || 0) + 1;
       evolveCheck(prev.catEvo || 0, newEvo);
-      return { ...prev, catPetted: true, hp: (prev.hp || 0) + 3, catEvo: newEvo };
+      return { ...prev, catPetted: true, hp: (prev.hp || 0) + 2, catEvo: newEvo };
     });
   }, [evolveCheck]);
 
@@ -596,7 +625,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (!prev || prev.catPlayed) return prev;
       const newEvo = (prev.catEvo || 0) + 1;
       evolveCheck(prev.catEvo || 0, newEvo);
-      return { ...prev, catPlayed: true, hp: (prev.hp || 0) + 8, catEvo: newEvo };
+      return { ...prev, catPlayed: true, hp: (prev.hp || 0) + 5, catEvo: newEvo };
     });
   }, [evolveCheck]);
 
@@ -608,8 +637,20 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const completeOnboarding = useCallback((cfg?: { eggType?: string }) => {
-    setState(prev => prev ? { ...prev, onboardingDone: true, eggType: cfg?.eggType || prev.eggType } : prev);
+  const completeOnboarding = useCallback((cfg?: { eggType?: string; heroName?: string; heroGender?: string }) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const updated = {
+        ...prev,
+        onboardingDone: true,
+        eggType: cfg?.eggType || prev.eggType,
+        heroGender: cfg?.heroGender || prev.heroGender || null,
+      };
+      if (cfg?.heroName) {
+        updated.familyConfig = { ...prev.familyConfig, childName: cfg.heroName };
+      }
+      return updated;
+    });
   }, []);
 
   // ── Save journal (also archives to history) ──
@@ -677,9 +718,23 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  // ── Add HP (for mini-game rewards etc.) ──
+  // ── Add HP (used by birthday epic etc. — NOT for mini-games) ──
   const addHP = useCallback((amount: number) => {
     setState(prev => prev ? { ...prev, hp: (prev.hp || 0) + amount } : prev);
+  }, []);
+
+  // ── Mini-game reward: +1 screen minute per unique game per day (max 4) ──
+  const claimGameReward = useCallback((gameId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const played = prev.gamesPlayedToday || [];
+      if (played.includes(gameId)) return prev; // already claimed today
+      return {
+        ...prev,
+        drachenEier: (prev.drachenEier || 0) + 1,
+        gamesPlayedToday: [...played, gameId],
+      };
+    });
   }, []);
 
   // ── Add screen minutes (refund unused timer time) ──
@@ -736,7 +791,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

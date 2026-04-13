@@ -38,11 +38,13 @@ const EGGS = [
   },
 ];
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 export default function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0);
   const [selectedEgg, setSelectedEgg] = useState(1);
+  const [heroName, setHeroName] = useState('');
+  const [heroGender, setHeroGender] = useState('boy'); // 'boy' | 'girl'
 
   // ── Progress bar (top) ──
   const ProgressBar = () => (
@@ -58,12 +60,13 @@ export default function Onboarding({ onComplete }) {
   );
 
   // ── Gradient CTA button ──
-  const PrimaryButton = ({ children, onClick }) => (
+  const PrimaryButton = ({ children, onClick, disabled }) => (
     <button onClick={onClick}
-      className="w-full py-5 px-8 rounded-full font-headline text-xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-all"
+      disabled={disabled}
+      className={`w-full py-5 px-8 rounded-full font-headline text-xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-all ${disabled ? 'opacity-50' : ''}`}
       style={{
         background: 'linear-gradient(135deg, #124346, #2d5a5e)',
-        boxShadow: '0 12px 30px rgba(18,67,70,0.25)',
+        boxShadow: disabled ? 'none' : '0 12px 30px rgba(18,67,70,0.25)',
       }}>
       {children}
     </button>
@@ -171,9 +174,129 @@ export default function Onboarding({ onComplete }) {
   }
 
   // ══════════════════════════════════════════
-  // Step 2: Egg selection
+  // Step 2: Hero creation — name + gender
   // ══════════════════════════════════════════
   if (step === 2) {
+    const canProceed = heroName.trim().length >= 1;
+    return (
+      <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
+        <div className="fixed inset-0 z-0">
+          <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
+        </div>
+
+        <div className="relative z-10 flex-1 overflow-y-auto pb-40 px-8"
+             style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))', scrollbarWidth: 'none' }}>
+          <div className="max-w-lg mx-auto flex flex-col items-center gap-6">
+            <ProgressBar />
+
+            {/* Hero illustration */}
+            <div className="relative w-full max-w-xs">
+              <div className="absolute inset-0 blur-3xl rounded-full scale-110 opacity-25"
+                   style={{ background: 'rgba(252,211,77,0.4)' }} />
+              <img src={base + 'art/onboarding/hero-select.webp'} alt="Held erstellen"
+                   className="relative z-10 w-full h-auto rounded-2xl"
+                   style={{ filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.25))' }} />
+            </div>
+
+            {/* Title */}
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-bold text-white"
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
+                Erstelle deinen Helden
+              </h2>
+              <p className="text-white/70 text-base leading-relaxed">
+                Wie heißt du, tapferer Held?
+              </p>
+            </div>
+
+            {/* Name input */}
+            <div className="w-full max-w-sm">
+              <label className="block font-label font-bold text-xs uppercase tracking-widest text-white/60 mb-2 px-1">
+                Dein Heldenname
+              </label>
+              <input
+                type="text"
+                value={heroName}
+                onChange={(e) => setHeroName(e.target.value)}
+                placeholder="Name eingeben..."
+                maxLength={20}
+                className="w-full px-6 py-4 rounded-2xl text-xl font-headline font-bold text-on-surface placeholder:text-on-surface/30 outline-none transition-all"
+                style={{
+                  background: 'rgba(255,255,255,0.95)',
+                  border: heroName.trim() ? '2.5px solid #fcd34d' : '2px solid rgba(255,255,255,0.3)',
+                  boxShadow: heroName.trim() ? '0 0 20px rgba(252,211,77,0.2)' : '0 2px 8px rgba(0,0,0,0.08)',
+                }}
+                autoFocus
+              />
+            </div>
+
+            {/* Gender selection */}
+            <div className="w-full max-w-sm">
+              <label className="block font-label font-bold text-xs uppercase tracking-widest text-white/60 mb-3 px-1">
+                Dein Held
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                {/* Boy */}
+                <button
+                  onClick={() => setHeroGender('boy')}
+                  className="relative rounded-2xl p-4 flex flex-col items-center gap-3 active:scale-[0.97] transition-all"
+                  style={{
+                    background: heroGender === 'boy' ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.6)',
+                    border: heroGender === 'boy' ? '2.5px solid #fcd34d' : '2px solid rgba(255,255,255,0.2)',
+                    boxShadow: heroGender === 'boy' ? '0 0 24px rgba(252,211,77,0.25)' : '0 2px 8px rgba(0,0,0,0.06)',
+                  }}>
+                  <div className="w-20 h-20 rounded-full overflow-hidden shadow-md"
+                       style={{ border: heroGender === 'boy' ? '3px solid #fcd34d' : '3px solid rgba(0,0,0,0.08)' }}>
+                    <img src={base + 'art/hero-default.webp'} alt="Junge" className="w-full h-full object-cover" />
+                  </div>
+                  <span className="font-headline font-bold text-lg text-on-surface">Junge</span>
+                  {heroGender === 'boy' && (
+                    <span className="absolute top-3 right-3 material-symbols-outlined text-lg"
+                          style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                  )}
+                </button>
+
+                {/* Girl */}
+                <button
+                  onClick={() => setHeroGender('girl')}
+                  className="relative rounded-2xl p-4 flex flex-col items-center gap-3 active:scale-[0.97] transition-all"
+                  style={{
+                    background: heroGender === 'girl' ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.6)',
+                    border: heroGender === 'girl' ? '2.5px solid #fcd34d' : '2px solid rgba(255,255,255,0.2)',
+                    boxShadow: heroGender === 'girl' ? '0 0 24px rgba(252,211,77,0.25)' : '0 2px 8px rgba(0,0,0,0.06)',
+                  }}>
+                  <div className="w-20 h-20 rounded-full overflow-hidden shadow-md"
+                       style={{ border: heroGender === 'girl' ? '3px solid #fcd34d' : '3px solid rgba(0,0,0,0.08)' }}>
+                    <img src={base + 'art/hero-default-girl.webp'} alt="Mädchen" className="w-full h-full object-cover" />
+                  </div>
+                  <span className="font-headline font-bold text-lg text-on-surface">Mädchen</span>
+                  {heroGender === 'girl' && (
+                    <span className="absolute top-3 right-3 material-symbols-outlined text-lg"
+                          style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom nav */}
+        <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-8" style={{ background: 'linear-gradient(to top, rgba(12,50,54,0.95) 40%, transparent)' }}>
+          <div className="max-w-xs mx-auto flex flex-col gap-3">
+            <PrimaryButton onClick={() => setStep(3)} disabled={!canProceed}>
+              Weiter
+              <span className="material-symbols-outlined">arrow_forward</span>
+            </PrimaryButton>
+          </div>
+        </nav>
+      </div>
+    );
+  }
+
+  // ══════════════════════════════════════════
+  // Step 3: Egg selection (was step 2)
+  // ══════════════════════════════════════════
+  if (step === 3) {
     return (
       <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
         <div className="absolute inset-0 z-0">
@@ -233,7 +356,7 @@ export default function Onboarding({ onComplete }) {
         {/* Bottom nav */}
         <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-8" style={{ background: 'linear-gradient(to top, rgba(12,50,54,0.95) 40%, transparent)' }}>
           <div className="max-w-xs mx-auto flex flex-col gap-3">
-            <PrimaryButton onClick={() => setStep(3)}>
+            <PrimaryButton onClick={() => setStep(4)}>
               {EGGS[selectedEgg].name} wählen
               <span className="material-symbols-outlined">arrow_forward</span>
             </PrimaryButton>
@@ -244,9 +367,9 @@ export default function Onboarding({ onComplete }) {
   }
 
   // ══════════════════════════════════════════
-  // Step 3: Wachse zusammen (companion growth)
+  // Step 4: Wachse zusammen (was step 3)
   // ══════════════════════════════════════════
-  if (step === 3) {
+  if (step === 4) {
     return (
       <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
         {/* Background */}
@@ -279,7 +402,7 @@ export default function Onboarding({ onComplete }) {
 
           {/* CTA */}
           <div className="mt-12 w-full max-w-xs">
-            <PrimaryButton onClick={() => setStep(4)}>
+            <PrimaryButton onClick={() => setStep(5)}>
               Weiter
               <span className="material-symbols-outlined">arrow_forward</span>
             </PrimaryButton>
@@ -295,7 +418,7 @@ export default function Onboarding({ onComplete }) {
   }
 
   // ══════════════════════════════════════════
-  // Step 4: Quick guide + launch
+  // Step 5: Quick guide + launch (was step 4)
   // ══════════════════════════════════════════
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden font-body bg-background">
@@ -321,7 +444,7 @@ export default function Onboarding({ onComplete }) {
             </div>
             <h2 className="text-3xl font-bold text-on-surface"
                 style={{ fontFamily: 'Fredoka, sans-serif' }}>
-              Dein {EGGS[selectedEgg].name}!
+              {heroName.trim() ? `${heroName.trim()}'s` : 'Dein'} {EGGS[selectedEgg].name}!
             </h2>
             <p className="text-on-surface-variant text-base leading-relaxed max-w-xs mx-auto">
               Dein Abenteuer in Thang Long beginnt jetzt.
@@ -359,7 +482,11 @@ export default function Onboarding({ onComplete }) {
         <div className="max-w-xs mx-auto">
           <button onClick={() => {
               localStorage.setItem('ronki_tour_done', '1');
-              onComplete({ eggType: EGGS[selectedEgg].id });
+              onComplete({
+                eggType: EGGS[selectedEgg].id,
+                heroName: heroName.trim() || undefined,
+                heroGender,
+              });
             }}
             className="w-full py-5 rounded-full font-headline text-xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-all"
             style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 12px 24px rgba(252,211,77,0.4), 0 4px 0 #d4a830' }}>

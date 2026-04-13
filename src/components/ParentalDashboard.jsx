@@ -109,7 +109,7 @@ export default function ParentalDashboard({ onClose }) {
             })}
           </div>
 
-          <p className="text-[10px] font-label text-on-surface-variant/40 mt-6 uppercase tracking-widest">Standard-PIN: 1234</p>
+          <p className="text-xs font-label text-on-surface-variant/40 mt-6 uppercase tracking-widest">Standard-PIN: 1234</p>
         </div>
       </div>
     );
@@ -135,7 +135,7 @@ export default function ParentalDashboard({ onClose }) {
           <div>
             <h1 className="font-headline font-bold text-xl text-primary"
                 style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>Eltern-Bereich</h1>
-            <p className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">
+            <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest">
               {new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
             </p>
           </div>
@@ -196,7 +196,7 @@ function OverviewTab({ state }) {
         {/* Completion Rate — Hero Card */}
         <div className="p-5 rounded-2xl relative overflow-hidden"
              style={{ background: 'linear-gradient(135deg, #124346, #2d5a5e)', boxShadow: '0 8px 24px rgba(18,67,70,0.25)' }}>
-          <p className="font-label font-bold text-[10px] text-white/50 uppercase tracking-widest">Abschlussrate</p>
+          <p className="font-label font-bold text-xs text-white/50 uppercase tracking-widest">Abschlussrate</p>
           <p className="font-headline font-bold text-4xl text-white mt-1">{completionPct}%</p>
           <p className="font-label text-xs text-white/60 mt-1">{completedToday}/{totalToday} heute</p>
         </div>
@@ -220,7 +220,7 @@ function OverviewTab({ state }) {
               </div>
               <div>
                 <p className="font-headline font-bold text-base text-on-surface">{MOOD_LABELS[state.moodAM]}</p>
-                <p className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">Eingetragen im Journal</p>
+                <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest">Eingetragen im Journal</p>
               </div>
             </>
           ) : (
@@ -241,7 +241,7 @@ function OverviewTab({ state }) {
           )}
           {(state.journalGratitude || []).length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
-              <span className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest self-center">Dankbar für:</span>
+              <span className="font-label text-xs text-on-surface-variant uppercase tracking-widest self-center">Dankbar für:</span>
               {state.journalGratitude.map(g => (
                 <span key={g} className="px-3 py-1 rounded-full font-label text-xs font-bold"
                       style={{ background: '#fcd34d', color: '#725b00' }}>{g}</span>
@@ -266,7 +266,7 @@ function OverviewTab({ state }) {
               <span className={'font-body text-sm flex-1' + (q.done ? ' line-through text-on-surface-variant/60' : ' text-on-surface')}>
                 {q.name}
               </span>
-              <span className="font-label text-[10px] font-bold uppercase tracking-wider"
+              <span className="font-label text-xs font-bold uppercase tracking-wider"
                     style={{ color: q.done ? '#059669' : '#707979' }}>{q.xp} XP</span>
             </div>
           ))}
@@ -291,7 +291,7 @@ function OverviewTab({ state }) {
                     style={{ color: c.done ? '#059669' : '#c0c8c9', fontVariationSettings: "'FILL' 1" }}>
                 {c.done ? 'check_circle' : c.icon}
               </span>
-              <p className="font-label font-bold text-[10px] uppercase tracking-widest"
+              <p className="font-label font-bold text-xs uppercase tracking-widest"
                  style={{ color: c.done ? '#059669' : '#707979' }}>
                 {c.label}
               </p>
@@ -411,7 +411,7 @@ function FamilyTab({ state, actions }) {
           {draft.siblings.map((sib, i) => (
             <div key={i} className="p-4 rounded-xl space-y-3" style={{ background: 'rgba(255,255,255,0.5)', border: '1.5px solid rgba(0,0,0,0.08)' }}>
               <div className="flex justify-between items-center">
-                <span className="font-label font-bold text-[10px] uppercase tracking-widest text-outline">
+                <span className="font-label font-bold text-xs uppercase tracking-widest text-outline">
                   Geschwister {i + 1}
                 </span>
                 <DeleteBtn onClick={() => { const n = [...draft.siblings]; n.splice(i, 1); update('siblings', n); }} />
@@ -443,7 +443,7 @@ function FamilyTab({ state, actions }) {
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{habit.icon}</span>
-                  <span className="font-label font-bold text-[10px] uppercase tracking-widest text-outline">
+                  <span className="font-label font-bold text-xs uppercase tracking-widest text-outline">
                     Gewohnheit {i + 1}
                   </span>
                 </div>
@@ -456,13 +456,13 @@ function FamilyTab({ state, actions }) {
                     onChange={e => { const n = [...draft.dailyHabits]; n[i] = { ...n[i], xp: parseInt(e.target.value) || 5 }; update('dailyHabits', n); }}
                     className="w-16 h-12 px-2 rounded-xl font-body text-on-surface text-sm text-center outline-none transition-all"
                     style={{ background: 'rgba(255,255,255,0.6)', border: '1.5px solid rgba(0,0,0,0.12)' }} />
-                  <span className="font-label text-[10px] text-outline uppercase tracking-widest">XP</span>
+                  <span className="font-label text-xs text-outline uppercase tracking-widest">XP</span>
                 </div>
               </div>
               <div className="flex gap-3 items-center">
-                <span className="font-label text-[10px] text-outline uppercase tracking-widest">Icon:</span>
+                <span className="font-label text-xs text-outline uppercase tracking-widest">Icon:</span>
                 <EmojiInput value={habit.icon} onChange={v => { const n = [...draft.dailyHabits]; n[i] = { ...n[i], icon: v }; update('dailyHabits', n); }} />
-                <span className="font-label text-[10px] text-outline uppercase tracking-widest ml-2">Erledigt:</span>
+                <span className="font-label text-xs text-outline uppercase tracking-widest ml-2">Erledigt:</span>
                 <EmojiInput value={habit.iconDone} onChange={v => { const n = [...draft.dailyHabits]; n[i] = { ...n[i], iconDone: v }; update('dailyHabits', n); }} />
               </div>
             </div>
@@ -483,7 +483,7 @@ function FamilyTab({ state, actions }) {
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{act.icon}</span>
-                  <span className="font-label font-bold text-[10px] uppercase tracking-widest text-outline">
+                  <span className="font-label font-bold text-xs uppercase tracking-widest text-outline">
                     {act.name || `Aktivität ${i + 1}`}
                   </span>
                 </div>
@@ -495,7 +495,7 @@ function FamilyTab({ state, actions }) {
               </div>
               {/* Day picker */}
               <div className="space-y-1.5">
-                <span className="font-label text-[10px] text-outline uppercase tracking-widest">Wochentage:</span>
+                <span className="font-label text-xs text-outline uppercase tracking-widest">Wochentage:</span>
                 <div className="flex gap-1.5">
                   {DAY_LABELS.map((label, dayIdx) => (
                     <button key={dayIdx}
@@ -526,14 +526,14 @@ function FamilyTab({ state, actions }) {
                     onChange={e => { const n = [...draft.recurringActivities]; n[i] = { ...n[i], xp: parseInt(e.target.value) || 5 }; update('recurringActivities', n); }}
                     className="w-16 h-11 px-2 rounded-xl font-body text-on-surface text-sm text-center outline-none transition-all"
                     style={{ background: 'rgba(255,255,255,0.6)', border: '1.5px solid rgba(0,0,0,0.12)' }} />
-                  <span className="font-label text-[10px] text-outline uppercase tracking-widest">XP</span>
+                  <span className="font-label text-xs text-outline uppercase tracking-widest">XP</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <input type="number" min="0" max="120" value={act.minutes}
                     onChange={e => { const n = [...draft.recurringActivities]; n[i] = { ...n[i], minutes: parseInt(e.target.value) || 0 }; update('recurringActivities', n); }}
                     className="w-16 h-11 px-2 rounded-xl font-body text-on-surface text-sm text-center outline-none transition-all"
                     style={{ background: 'rgba(255,255,255,0.6)', border: '1.5px solid rgba(0,0,0,0.12)' }} />
-                  <span className="font-label text-[10px] text-outline uppercase tracking-widest">Min</span>
+                  <span className="font-label text-xs text-outline uppercase tracking-widest">Min</span>
                 </div>
               </div>
             </div>
@@ -609,7 +609,7 @@ function SectionLabel({ icon, text }) {
       <span className="material-symbols-outlined text-primary text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
         {icon}
       </span>
-      <h3 className="font-label font-bold text-[10px] uppercase tracking-widest text-outline">{text}</h3>
+      <h3 className="font-label font-bold text-xs uppercase tracking-widest text-outline">{text}</h3>
     </div>
   );
 }
@@ -617,9 +617,9 @@ function SectionLabel({ icon, text }) {
 function StatCard({ label, value, sub }) {
   return (
     <div className="mm-card p-5">
-      <p className="font-label font-bold text-[10px] text-outline uppercase tracking-widest">{label}</p>
+      <p className="font-label font-bold text-xs text-outline uppercase tracking-widest">{label}</p>
       <p className="font-headline font-bold text-3xl text-on-surface mt-1">{value}</p>
-      <p className="font-label text-[10px] text-on-surface-variant mt-1">{sub}</p>
+      <p className="font-label text-xs text-on-surface-variant mt-1">{sub}</p>
     </div>
   );
 }
@@ -652,7 +652,7 @@ function SectionCard({ icon, title, subtitle, expanded, onToggle, children, tint
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-headline font-bold text-sm text-on-surface">{title}</p>
-          <p className="font-label text-[10px] text-on-surface-variant truncate uppercase tracking-wider">{subtitle}</p>
+          <p className="font-label text-xs text-on-surface-variant truncate uppercase tracking-wider">{subtitle}</p>
         </div>
         <span className="material-symbols-outlined text-on-surface-variant/40 text-lg transition-transform duration-300"
               style={{ transform: expanded ? 'rotate(180deg)' : 'none' }}>
@@ -730,7 +730,7 @@ function AddBtn({ label, onClick }) {
 function FieldRow({ label, children }) {
   return (
     <div className="space-y-1.5">
-      <label className="font-label text-[10px] font-bold text-on-surface-variant/60 px-1 block uppercase tracking-widest">
+      <label className="font-label text-xs font-bold text-on-surface-variant/60 px-1 block uppercase tracking-widest">
         {label}
       </label>
       {children}

@@ -309,10 +309,10 @@ export default function StarCatcherGame({ onComplete }) {
   }, []);
 
   const reward = useMemo(() => {
-    if (score >= 50) return { xp: 40, hp: 30 };
-    if (score >= 30) return { xp: 25, hp: 20 };
-    if (score >= 10) return { xp: 15, hp: 10 };
-    return { xp: 5, hp: 5 };
+    if (score >= 50) return { xp: 0, hp: 8 };
+    if (score >= 30) return { xp: 0, hp: 5 };
+    if (score >= 10) return { xp: 0, hp: 3 };
+    return { xp: 0, hp: 2 };
   }, [score]);
 
   return (
@@ -419,11 +419,11 @@ export default function StarCatcherGame({ onComplete }) {
             <div className="flex gap-4 mb-6">
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(167,139,250,0.15)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold" style={{ color: '#a78bfa' }}>+{reward.xp}</p>
-                <p className="font-label text-[10px] font-bold uppercase tracking-widest mt-1" style={{ color: 'rgba(167,139,250,0.6)' }}>XP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest mt-1" style={{ color: 'rgba(167,139,250,0.6)' }}>XP</p>
               </div>
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(252,211,77,0.15)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold" style={{ color: '#fcd34d' }}>+{reward.hp}</p>
-                <p className="font-label text-[10px] font-bold uppercase tracking-widest mt-1" style={{ color: 'rgba(252,211,77,0.6)' }}>HP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest mt-1" style={{ color: 'rgba(252,211,77,0.6)' }}>HP</p>
               </div>
             </div>
 
@@ -450,11 +450,11 @@ export default function StarCatcherGame({ onComplete }) {
                           {hs.score} Sterne
                         </span>
                         {isMe && (
-                          <span className="font-label text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                          <span className="font-label text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
                                 style={{ background: 'rgba(252,211,77,0.2)', color: '#fcd34d' }}>Neu</span>
                         )}
                       </div>
-                      <span className="font-label text-[11px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{hs.date}</span>
+                      <span className="font-label text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>{hs.date}</span>
                     </div>
                   );
                 })}

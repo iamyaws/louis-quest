@@ -24,35 +24,35 @@ export default function HeroProfile({ onNavigate }) {
   const level = getLevel(state.xp || 0);
   const lvlProg = getLvlProg(state.xp || 0);
   const heroName = state.familyConfig?.childName || 'Held';
+  const heroAvatar = state.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
   const titleIdx = Math.min(Math.floor(level / 2), LEVEL_TITLES.length - 1);
   const heroTitle = LEVEL_TITLES[titleIdx];
 
   const trophyCount = (state.bossTrophies || []).length;
 
-  // ── Compute kid stats from today's quests ──
-  const quests = state.quests || [];
-  const mainQuests = quests.filter(q => !q.sideQuest);
-  const morningQ = mainQuests.filter(q => q.anchor === 'morning');
-  const eveningQ = mainQuests.filter(q => q.anchor === 'evening');
-  const bedtimeQ = mainQuests.filter(q => q.anchor === 'bedtime');
-  const hobbyQ = mainQuests.filter(q => q.anchor === 'hobby');
-  const sideQ = quests.filter(q => q.sideQuest);
+  // ── Cumulative hero stats (grow over days/weeks) ──
+  // Level thresholds: slow, meaningful progression
+  const STAT_LEVELS = [0, 10, 25, 50, 80, 120, 170, 230, 300, 400];
+  const getStatLevel = (pts) => {
+    let lvl = 0;
+    for (let i = STAT_LEVELS.length - 1; i >= 0; i--) {
+      if (pts >= STAT_LEVELS[i]) { lvl = i + 1; break; }
+    }
+    return Math.min(lvl, 10);
+  };
+  const getStatProgress = (pts) => {
+    const lvl = getStatLevel(pts);
+    if (lvl >= 10) return { cur: 0, need: 1, pct: 100 };
+    const prev = STAT_LEVELS[lvl - 1] || 0;
+    const next = STAT_LEVELS[lvl] || prev + 1;
+    return { cur: pts - prev, need: next - prev, pct: ((pts - prev) / (next - prev)) * 100 };
+  };
 
-  const routineAll = [...morningQ, ...bedtimeQ];
-  const routineDone = routineAll.filter(q => q.done).length;
-  const ordnung = routineAll.length > 0 ? Math.round((routineDone / routineAll.length) * 10) : 0;
-
-  const fokusDone = eveningQ.filter(q => q.done).length;
-  const fokus = eveningQ.length > 0 ? Math.round((fokusDone / eveningQ.length) * 10) : 0;
-
-  const sideDone = sideQ.filter(q => q.done).length;
-  const hobbyDone = hobbyQ.filter(q => q.done).length;
-  const mut = Math.min(10, sideDone * 4 + hobbyDone * 3 + (state.bossDmgToday > 0 ? 2 : 0));
-
-  const heroStats = [
-    { key: 'mut', name: 'Mut', value: mut, icon: 'rocket_launch', color: '#dc2626' },
-    { key: 'fokus', name: 'Fokus', value: fokus, icon: 'center_focus_strong', color: '#2563eb' },
-    { key: 'ordnung', name: 'Ordnung', value: ordnung, icon: 'cleaning_services', color: '#059669' },
+  const stats = state.heroStats || { mut: 0, fokus: 0, ordnung: 0 };
+  const heroStatsDisplay = [
+    { key: 'mut', name: 'Mut', pts: stats.mut, level: getStatLevel(stats.mut), prog: getStatProgress(stats.mut), icon: 'rocket_launch', color: '#dc2626' },
+    { key: 'fokus', name: 'Fokus', pts: stats.fokus, level: getStatLevel(stats.fokus), prog: getStatProgress(stats.fokus), icon: 'center_focus_strong', color: '#2563eb' },
+    { key: 'ordnung', name: 'Ordnung', pts: stats.ordnung, level: getStatLevel(stats.ordnung), prog: getStatProgress(stats.ordnung), icon: 'cleaning_services', color: '#059669' },
   ];
   const gear = state.equippedGear || {};
   const gearInv = state.gearInventory || [];
@@ -70,7 +70,7 @@ export default function HeroProfile({ onNavigate }) {
         <div className="relative">
           <div className="w-36 h-36 rounded-full overflow-hidden shadow-xl"
                style={{ border: '6px solid #e8e1db' }}>
-            <img src={base + 'art/hero-default.webp'}
+            <img src={base + heroAvatar}
                  alt={heroName} className="w-full h-full object-cover" />
           </div>
 
@@ -144,7 +144,7 @@ export default function HeroProfile({ onNavigate }) {
             <span className="material-symbols-outlined text-2xl"
                   style={{ color: s.color, fontVariationSettings: "'FILL' 1" }}>{s.icon}</span>
             <span className="font-headline font-bold text-lg text-on-surface">{s.value}</span>
-            <span className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{s.label}</span>
+            <span className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">{s.label}</span>
           </div>
         ))}
       </section>
@@ -155,9 +155,7 @@ export default function HeroProfile({ onNavigate }) {
             style={{ fontFamily: 'Fredoka, sans-serif' }}>Helden-Werte</h3>
         <div className="rounded-2xl p-5 space-y-5"
              style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-          {heroStats.map(stat => {
-            const pct = (stat.value / 10) * 100;
-            return (
+          {heroStatsDisplay.map(stat => (
               <div key={stat.key} className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <div className="flex items-center gap-2">
@@ -165,15 +163,17 @@ export default function HeroProfile({ onNavigate }) {
                           style={{ color: stat.color, fontVariationSettings: "'FILL' 1" }}>{stat.icon}</span>
                     <span className="font-headline font-bold text-primary">{stat.name}</span>
                   </div>
-                  <span className="text-lg font-bold" style={{ fontFamily: 'Fredoka, sans-serif', color: stat.color }}>{stat.value}/10</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-label text-xs text-on-surface-variant">{stat.prog.cur}/{stat.prog.need}</span>
+                    <span className="text-lg font-bold" style={{ fontFamily: 'Fredoka, sans-serif', color: stat.color }}>Lv.{stat.level}</span>
+                  </div>
                 </div>
                 <div className="h-5 w-full bg-surface-container-highest rounded-full overflow-hidden shadow-inner p-0.5">
                   <div className="h-full rounded-full transition-all duration-500 shadow-sm"
-                       style={{ width: `${pct}%`, background: `linear-gradient(to right, ${stat.color}99, ${stat.color})` }} />
+                       style={{ width: `${Math.max(2, stat.prog.pct)}%`, background: `linear-gradient(to right, ${stat.color}99, ${stat.color})` }} />
                 </div>
               </div>
-            );
-          })}
+            ))}
         </div>
       </section>
 
@@ -209,7 +209,7 @@ export default function HeroProfile({ onNavigate }) {
                       <span className="material-symbols-outlined text-2xl"
                             style={{ color: item.color, fontVariationSettings: "'FILL' 1" }}>{item.icon}</span>
                     </div>
-                    <span className="font-headline text-[10px] font-bold uppercase tracking-widest text-primary text-center leading-tight px-1">
+                    <span className="font-headline text-xs font-bold uppercase tracking-widest text-primary text-center leading-tight px-1">
                       {item.name.split('-')[0].trim()}
                     </span>
                   </>
@@ -219,7 +219,7 @@ export default function HeroProfile({ onNavigate }) {
                       <span className="material-symbols-outlined text-2xl text-primary/25"
                             style={{ fontVariationSettings: "'FILL' 0" }}>{slot.icon}</span>
                     </div>
-                    <span className="font-headline text-[10px] font-bold uppercase tracking-widest text-primary/35">{slot.label}</span>
+                    <span className="font-headline text-xs font-bold uppercase tracking-widest text-primary/35">{slot.label}</span>
                   </>
                 )}
               </div>
@@ -283,7 +283,7 @@ export default function HeroProfile({ onNavigate }) {
                        }}>
                     {badge.i}
                   </div>
-                  <span className="font-label text-[9px] text-center text-on-surface-variant font-bold leading-tight">
+                  <span className="font-label text-xs text-center text-on-surface-variant font-bold leading-tight">
                     {badge.n}
                   </span>
                 </div>
@@ -302,7 +302,7 @@ export default function HeroProfile({ onNavigate }) {
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-3">
               <h3 className="text-xl text-white font-bold" style={{ fontFamily: 'Fredoka, sans-serif' }}>Thang Long Karte</h3>
-              <div className="bg-white/20 text-white px-3 py-1 rounded-full text-[10px] font-bold backdrop-blur-sm">
+              <div className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm">
                 BALD VERFÜGBAR
               </div>
             </div>

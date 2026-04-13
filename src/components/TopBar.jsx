@@ -8,6 +8,7 @@ export default function TopBar({ onNavigate }) {
   const { level, xpProgress } = computed;
   const xpPct = xpProgress.need > 0 ? Math.min(1, xpProgress.cur / xpProgress.need) : 0;
   const heroName = state?.familyConfig?.childName || 'Held';
+  const heroAvatar = state?.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
 
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl"
@@ -19,10 +20,10 @@ export default function TopBar({ onNavigate }) {
           <div className="relative">
             <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden shadow-sm"
                  style={{ border: '2px solid rgba(18,67,70,0.15)' }}>
-              <img src={import.meta.env.BASE_URL + 'art/hero-default.webp'} alt={heroName} className="w-full h-full object-cover" />
+              <img src={import.meta.env.BASE_URL + heroAvatar} alt={heroName} className="w-full h-full object-cover" />
             </div>
             {/* Level badge — golden circle */}
-            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] shadow-md"
+            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shadow-md"
                  style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', border: '2px solid white', color: '#1a1a1a', lineHeight: 1 }}>
               {level}
             </div>
@@ -35,7 +36,7 @@ export default function TopBar({ onNavigate }) {
                 <div className="h-full rounded-full transition-all duration-500"
                      style={{ width: `${xpPct * 100}%`, background: 'linear-gradient(90deg, #124346, #5eead4)' }} />
               </div>
-              <span className="font-label text-[9px] text-outline">{xpProgress.cur}/{xpProgress.need}</span>
+              <span className="font-label text-xs text-outline">{xpProgress.cur}/{xpProgress.need}</span>
             </div>
           </div>
         </button>

@@ -110,7 +110,7 @@ export default function RoomCustomizer({ visible, onClose, roomTheme, roomLevel,
                     }}>
                       <span style={{ fontSize: "12px", lineHeight: 1 }}>{"\u{1F512}"}</span>
                       <span style={{
-                        fontSize: "8px", fontWeight: 800,
+                        fontSize: "12px", fontWeight: 800,
                         color: "white", lineHeight: 1, marginTop: 1,
                       }}>
                         Lvl {c.unlock}
@@ -165,7 +165,7 @@ export default function RoomCustomizer({ visible, onClose, roomTheme, roomLevel,
                     }}>
                       <span style={{ fontSize: "12px", lineHeight: 1 }}>{"\u{1F512}"}</span>
                       <span style={{
-                        fontSize: "8px", fontWeight: 800,
+                        fontSize: "12px", fontWeight: 800,
                         color: "white", lineHeight: 1, marginTop: 1,
                       }}>
                         Lvl {f.unlock}

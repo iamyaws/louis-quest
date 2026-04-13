@@ -154,7 +154,7 @@ export default function Journal() {
             {gratitude.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {gratitude.map(g => (
-                  <span key={g} className="px-2.5 py-1 rounded-full font-label text-[10px] font-bold text-primary"
+                  <span key={g} className="px-2.5 py-1 rounded-full font-label text-xs font-bold text-primary"
                         style={{ background: 'rgba(109,40,217,0.08)' }}>
                     {g}
                   </span>
@@ -165,7 +165,7 @@ export default function Journal() {
             {achievements.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {achievements.map(a => (
-                  <span key={a} className="px-2.5 py-1 rounded-full font-label text-[10px] font-bold"
+                  <span key={a} className="px-2.5 py-1 rounded-full font-label text-xs font-bold"
                         style={{ background: 'rgba(252,211,77,0.15)', color: '#b45309' }}>
                     ⭐ {a}
                   </span>
@@ -204,7 +204,7 @@ export default function Journal() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-label text-[10px] font-bold text-outline uppercase">Heute</p>
+                <p className="font-label text-xs font-bold text-outline uppercase">Heute</p>
                 <p className="text-sm font-bold font-label text-primary">
                   {new Date().toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' })}
                 </p>
@@ -214,7 +214,7 @@ export default function Journal() {
 
           {/* ── Mood Selector ── */}
           <section className="mb-6">
-            <h3 className="font-label font-bold uppercase tracking-widest text-[10px] text-outline mb-4">Aktuelle Stimmung</h3>
+            <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline mb-4">Aktuelle Stimmung</h3>
             <div className="grid grid-cols-3 gap-3">
               {MOOD_EMOJIS.map((emoji, i) => {
                 const isSelected = state.moodAM === i;
@@ -230,7 +230,7 @@ export default function Journal() {
                     onClick={() => { SFX.play('pop'); actions.setMood('moodAM', i); }}
                   >
                     <span className={`text-3xl ${!isSelected ? 'grayscale' : ''}`}>{emoji}</span>
-                    <span className="font-label text-[10px] font-bold uppercase">{MOOD_LABELS[i]}</span>
+                    <span className="font-label text-xs font-bold uppercase">{MOOD_LABELS[i]}</span>
                   </button>
                 );
               })}
@@ -240,7 +240,7 @@ export default function Journal() {
           {/* ── Daily Memory Prompt ── */}
           <section className="mb-6 rounded-2xl p-6"
                    style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <h3 className="font-label font-bold uppercase tracking-widest text-[10px] text-outline mb-2">Tages-Erinnerung</h3>
+            <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline mb-2">Tages-Erinnerung</h3>
             <p className="font-body text-base text-primary font-bold mb-4">{todayPrompt}</p>
             <textarea
               className="w-full rounded-xl p-4 font-body text-base text-on-surface resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
@@ -250,13 +250,13 @@ export default function Journal() {
               onChange={e => setMemory(e.target.value)}
               maxLength={300}
             />
-            <p className="text-right font-label text-[10px] text-outline mt-1">{memory.length}/300</p>
+            <p className="text-right font-label text-xs text-outline mt-1">{memory.length}/300</p>
           </section>
 
           {/* ── Gedanken Heute ── */}
           <section className="mb-6 rounded-2xl p-6"
                    style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <h3 className="font-label font-bold uppercase tracking-widest text-[10px] text-outline mb-6">Gedanken heute</h3>
+            <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline mb-6">Gedanken heute</h3>
 
             {/* Gratitude stickers */}
             <div className="mb-8">
@@ -266,7 +266,7 @@ export default function Journal() {
               <div className="flex flex-wrap gap-3">
                 {GRATITUDE.map(g => (
                   <button key={g}
-                    className={`px-5 py-2.5 rounded-xl font-label text-[11px] font-black uppercase transition-all active:scale-95 ${
+                    className={`px-5 py-2.5 rounded-xl font-label text-xs font-black uppercase transition-all active:scale-95 ${
                       gratitude.includes(g) ? 'bg-primary text-white shadow-lg' : 'bg-white text-primary border-2'
                     }`}
                     style={!gratitude.includes(g) ? {
@@ -307,7 +307,7 @@ export default function Journal() {
               <div className="flex flex-wrap gap-3">
                 {ACHIEVEMENTS.map(a => (
                   <button key={a}
-                    className={`px-4 py-2 rounded-full font-label text-[11px] font-bold uppercase transition-all active:scale-95 ${
+                    className={`px-4 py-2 rounded-full font-label text-xs font-bold uppercase transition-all active:scale-95 ${
                       achievements.includes(a) ? 'bg-primary text-white' : 'text-primary'
                     }`}
                     style={!achievements.includes(a) ? {
@@ -336,9 +336,9 @@ export default function Journal() {
       <details className="mb-6 rounded-2xl"
                style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <summary className="flex justify-between items-center p-5 cursor-pointer select-none list-none">
-          <h3 className="font-label font-bold uppercase tracking-widest text-[10px] text-outline">Stimmungs-Kalender</h3>
+          <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline">Stimmungs-Kalender</h3>
           <div className="flex items-center gap-2">
-            <span className="font-label text-[10px] font-bold text-primary uppercase">
+            <span className="font-label text-xs font-bold text-primary uppercase">
               {new Date().toLocaleDateString('de-DE', { month: 'long' })}
             </span>
             <span className="material-symbols-outlined text-sm text-outline">expand_more</span>
@@ -348,7 +348,7 @@ export default function Journal() {
           <div className="grid grid-cols-7 gap-y-3 gap-x-2">
             {['M','D','M','D','F','S','S'].map((d, i) => (
               <div key={i} className="flex flex-col items-center">
-                <span className="text-[9px] font-bold" style={{ color: 'rgba(123,116,134,0.4)' }}>{d}</span>
+                <span className="text-xs font-bold" style={{ color: 'rgba(123,116,134,0.4)' }}>{d}</span>
               </div>
             ))}
             {Array.from({ length: 28 }, (_, i) => {
@@ -370,7 +370,7 @@ export default function Journal() {
       {/* ── Past Entries (Alte Abenteuer) ── */}
       {history.length > 0 && (
         <section className="mb-8">
-          <h3 className="font-label font-bold uppercase tracking-widest text-[10px] text-outline mb-4 flex items-center gap-2">
+          <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline mb-4 flex items-center gap-2">
             <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>history</span>
             Alte Abenteuer ({history.length})
           </h3>
@@ -407,10 +407,10 @@ export default function Journal() {
                     )}
                     {entry.gratitude.length > 0 && (
                       <div>
-                        <p className="font-label text-[9px] font-bold text-outline uppercase mb-1.5">Dankbar für</p>
+                        <p className="font-label text-xs font-bold text-outline uppercase mb-1.5">Dankbar für</p>
                         <div className="flex flex-wrap gap-1.5">
                           {entry.gratitude.map(g => (
-                            <span key={g} className="px-2.5 py-1 rounded-full font-label text-[10px] font-bold text-primary"
+                            <span key={g} className="px-2.5 py-1 rounded-full font-label text-xs font-bold text-primary"
                                   style={{ background: 'rgba(109,40,217,0.08)' }}>
                               {g}
                             </span>
@@ -420,10 +420,10 @@ export default function Journal() {
                     )}
                     {entry.achievements.length > 0 && (
                       <div>
-                        <p className="font-label text-[9px] font-bold text-outline uppercase mb-1.5">Geschafft</p>
+                        <p className="font-label text-xs font-bold text-outline uppercase mb-1.5">Geschafft</p>
                         <div className="flex flex-wrap gap-1.5">
                           {entry.achievements.map(a => (
-                            <span key={a} className="px-2.5 py-1 rounded-full font-label text-[10px] font-bold"
+                            <span key={a} className="px-2.5 py-1 rounded-full font-label text-xs font-bold"
                                   style={{ background: 'rgba(252,211,77,0.15)', color: '#b45309' }}>
                               ⭐ {a}
                             </span>
@@ -455,7 +455,7 @@ export default function Journal() {
       {/* ── Privacy Badge ── */}
       <div className="flex justify-center items-center gap-2 py-6" style={{ color: 'rgba(123,116,134,0.5)' }}>
         <span className="material-symbols-outlined text-sm">lock</span>
-        <span className="font-label text-[10px] font-bold uppercase tracking-widest">Ende-zu-Ende verschlüsselt</span>
+        <span className="font-label text-xs font-bold uppercase tracking-widest">Ende-zu-Ende verschlüsselt</span>
       </div>
     </div>
   );

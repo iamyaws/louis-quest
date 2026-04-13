@@ -233,18 +233,19 @@ export const BOSS_TIERS = [
 ] as const;
 
 export const BOSSES: import('./types').BossTemplate[] = [
-  // Tier 1: W\u00E4chter (Guardian) \u2014 available from start
-  { id: "schnarchling", name: "Schnarchling", icon: "\u{1F634}", hp: 60, reward: { hp: 50 }, desc: "Er will, dass du den ganzen Tag schl\u00E4fst und faulenzt!", tier: "tier1" },
-  { id: "wusselwicht", name: "Wusselwicht", icon: "\u{1F47E}", hp: 80, reward: { hp: 55 }, desc: "Er liebt Unordnung und wirft alles durcheinander!", tier: "tier1" },
-  { id: "flimmerfux", name: "Flimmerfux", icon: "\u{1F98A}", hp: 70, reward: { hp: 50 }, desc: "Er lockt dich mit bunten Bildschirmen!", tier: "tier1" },
-  // Tier 2: Krieger (Warrior) \u2014 unlocks at companion stage 2
-  { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 100, reward: { hp: 80 }, desc: "Er will, dass du nur auf dem Sofa liegst!", tier: "tier2" },
-  { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 110, reward: { hp: 85 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!", tier: "tier2" },
-  { id: "b7", name: "Langeweile-Blob", icon: "\u{1F47D}", hp: 90, reward: { hp: 75 }, desc: "Er macht alles langweilig!", tier: "tier2" },
-  // Tier 3: K\u00F6nig (King) \u2014 unlocks at companion stage 3
-  { id: "b4", name: "Vergesslichkeits-Geist", icon: "\u{1F47B}", hp: 130, reward: { hp: 120 }, desc: "Er l\u00E4sst dich alles vergessen!", tier: "tier3" },
-  { id: "b8", name: "Angst-Schatten", icon: "\u{1F5A4}", hp: 150, reward: { hp: 130 }, desc: "Er fl\u00FCstert dir Zweifel ein!", tier: "tier3" },
-  { id: "b9", name: "Sturheit-Stein", icon: "\u{1FAA8}", hp: 160, reward: { hp: 150 }, desc: "Er will nicht, dass du dich \u00E4nderst!", tier: "tier3" },
+  // Tier 1: Wächter (Guardian) — available from start
+  // Boss rewards reduced to prevent swingy economy (~15% of daily quest HP)
+  { id: "schnarchling", name: "Schnarchling", icon: "\u{1F634}", hp: 60, reward: { hp: 25 }, desc: "Er will, dass du den ganzen Tag schläfst und faulenzt!", tier: "tier1" },
+  { id: "wusselwicht", name: "Wusselwicht", icon: "\u{1F47E}", hp: 80, reward: { hp: 30 }, desc: "Er liebt Unordnung und wirft alles durcheinander!", tier: "tier1" },
+  { id: "flimmerfux", name: "Flimmerfux", icon: "\u{1F98A}", hp: 70, reward: { hp: 25 }, desc: "Er lockt dich mit bunten Bildschirmen!", tier: "tier1" },
+  // Tier 2: Krieger (Warrior) — unlocks at companion stage 2
+  { id: "b3", name: "Faulheits-Troll", icon: "\u{1F9CC}", hp: 100, reward: { hp: 45 }, desc: "Er will, dass du nur auf dem Sofa liegst!", tier: "tier2" },
+  { id: "b6", name: "Bildschirm-Krake", icon: "\u{1F419}", hp: 110, reward: { hp: 50 }, desc: "Will dich den ganzen Tag am Bildschirm festhalten!", tier: "tier2" },
+  { id: "b7", name: "Langeweile-Blob", icon: "\u{1F47D}", hp: 90, reward: { hp: 40 }, desc: "Er macht alles langweilig!", tier: "tier2" },
+  // Tier 3: König (King) — unlocks at companion stage 3
+  { id: "b4", name: "Vergesslichkeits-Geist", icon: "\u{1F47B}", hp: 130, reward: { hp: 65 }, desc: "Er lässt dich alles vergessen!", tier: "tier3" },
+  { id: "b8", name: "Angst-Schatten", icon: "\u{1F5A4}", hp: 150, reward: { hp: 70 }, desc: "Er flüstert dir Zweifel ein!", tier: "tier3" },
+  { id: "b9", name: "Sturheit-Stein", icon: "\u{1FAA8}", hp: 160, reward: { hp: 80 }, desc: "Er will nicht, dass du dich änderst!", tier: "tier3" },
 ];
 
 export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {
@@ -400,20 +401,21 @@ export const GEAR_SLOTS: Record<string, { label: string; icon: string; items: st
 // ═══ NEW: Default Belohnungen (parent can customize) ═══
 
 export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
-  // Mini-games (HP, 1 each, anytime)
-  { id: "bel_memory", name: "Memory-Spiel", emoji: "\u{1F0CF}", cost: 1, active: true, currency: "hp" },
-  // Media rewards (Drachen-Eier — scarce, ~60 min max on weekends)
-  // Weekday: ~13 eggs/day → audio(5) or game(6) but not both = ~20-30 min
+  // ── Mini-games: free to play, rewards built into game component (max 2/day) ──
+  // No HP cost to launch — the reward is capped inside MiniGames.jsx
+  // Media rewards (Drachen-Eier — scarce, ~16 eggs/day from quests)
+  // Weekday: ~16 eggs → audio(5) or game(6) but not both = ~20-30 min
   // Weekend: saved eggs → audio(3)+game(4)+TV(5) = ~60 min for 12 eggs
-  { id: "bel_audio", name: "H\u00F6rspiel (25 Min)", emoji: "\u{1F3A7}", cost: 5, active: true, currency: "eggs", minutes: 25, availableAfter: "19:00", availableAfterFree: "10:00", weekendCost: 3 },
+  { id: "bel_audio", name: "Hörspiel (25 Min)", emoji: "\u{1F3A7}", cost: 5, active: true, currency: "eggs", minutes: 25, availableAfter: "19:00", availableAfterFree: "10:00", weekendCost: 3 },
   { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 6, active: true, currency: "eggs", minutes: 20, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 4 },
   { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 8, active: true, currency: "eggs", minutes: 30, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 5 },
   { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 12, active: true, currency: "eggs", minutes: 90, availableAfter: "18:00", availableAfterFree: "14:00", weekendCost: 8 },
-  // Fun rewards (HP — generous family currency)
-  { id: "bel_candy", name: "S\u00FC\u00DFigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 30, active: true, currency: "hp" },
-  { id: "bel_vote", name: "Lieblingsessen w\u00E4hlen", emoji: "\u{1F355}", cost: 50, active: true, currency: "hp" },
-  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 200, active: true, currency: "hp" },
-  { id: "bel_evoboost", name: "Begleiter-Boost (+5 EP)", emoji: "\u{1F4AA}", cost: 80, active: true, currency: "hp" },
+  // Fun rewards (HP — meaningful save-up loops for a ~200 HP/day earner)
+  // Small: 1 day, Medium: 2-3 days, Big: ~1 week
+  { id: "bel_candy", name: "Süßigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 150, active: true, currency: "hp" },
+  { id: "bel_vote", name: "Lieblingsessen wählen", emoji: "\u{1F355}", cost: 400, active: true, currency: "hp" },
+  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 1500, active: true, currency: "hp" },
+  { id: "bel_evoboost", name: "Begleiter-Boost (+5 EP)", emoji: "\u{1F4AA}", cost: 300, active: true, currency: "hp" },
 ];
 
 // ═══ Bavaria School Vacations ═══

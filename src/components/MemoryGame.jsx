@@ -97,8 +97,8 @@ export default function MemoryGame({ onComplete }) {
   }, [flipped, matched, cards, busy, won]);
 
   const reward = {
-    xp: moves <= 10 ? 40 : moves <= 16 ? 25 : 15,
-    hp: moves <= 10 ? 30 : moves <= 16 ? 20 : 10,
+    xp: 0, // XP only from quests
+    hp: moves <= 10 ? 8 : moves <= 16 ? 5 : 3, // small bonus, max 3 games/day
   };
 
   const pairsFound = matched.size / 2;
@@ -219,11 +219,11 @@ export default function MemoryGame({ onComplete }) {
             <div className="flex gap-4 mb-8">
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(83,0,183,0.06)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold text-primary">+{reward.xp}</p>
-                <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">XP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mt-1">XP</p>
               </div>
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(252,211,77,0.15)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold" style={{ color: '#735c00' }}>+{reward.hp}</p>
-                <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">HP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mt-1">HP</p>
               </div>
             </div>
 
@@ -251,13 +251,13 @@ export default function MemoryGame({ onComplete }) {
                           {hs.moves} Züge
                         </span>
                         {isCurrentGame && (
-                          <span className="font-label text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                          <span className="font-label text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
                                 style={{ background: 'rgba(252,211,77,0.3)', color: '#735c00' }}>
                             Neu
                           </span>
                         )}
                       </div>
-                      <span className="font-label text-[11px] text-outline">{hs.date}</span>
+                      <span className="font-label text-xs text-outline">{hs.date}</span>
                     </div>
                   );
                 })}

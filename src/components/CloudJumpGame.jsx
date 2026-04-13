@@ -273,10 +273,10 @@ export default function CloudJumpGame({ onComplete }) {
   }, []);
 
   const reward = useMemo(() => {
-    if (score >= 20) return { xp: 40, hp: 30 };
-    if (score >= 10) return { xp: 25, hp: 20 };
-    if (score >= 3) return { xp: 15, hp: 10 };
-    return { xp: 5, hp: 5 };
+    if (score >= 20) return { xp: 0, hp: 8 };
+    if (score >= 10) return { xp: 0, hp: 5 };
+    if (score >= 3) return { xp: 0, hp: 3 };
+    return { xp: 0, hp: 2 };
   }, [score]);
 
   return (
@@ -352,11 +352,11 @@ export default function CloudJumpGame({ onComplete }) {
             <div className="flex gap-4 mb-6">
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(83,0,183,0.06)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold text-primary">+{reward.xp}</p>
-                <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">XP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mt-1">XP</p>
               </div>
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(252,211,77,0.15)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold" style={{ color: '#735c00' }}>+{reward.hp}</p>
-                <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">HP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mt-1">HP</p>
               </div>
             </div>
 
@@ -383,11 +383,11 @@ export default function CloudJumpGame({ onComplete }) {
                           {hs.score} Punkte
                         </span>
                         {isMe && (
-                          <span className="font-label text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                          <span className="font-label text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
                                 style={{ background: 'rgba(252,211,77,0.3)', color: '#735c00' }}>Neu</span>
                         )}
                       </div>
-                      <span className="font-label text-[11px] text-outline">{hs.date}</span>
+                      <span className="font-label text-xs text-outline">{hs.date}</span>
                     </div>
                   );
                 })}

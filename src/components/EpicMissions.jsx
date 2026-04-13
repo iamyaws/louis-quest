@@ -68,7 +68,7 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
       {/* Header: tag + title + progress */}
       <div className="flex justify-between items-start mb-5 relative z-10">
         <div className="max-w-[70%]">
-          <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-3"
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-3"
                 style={{ background: tag.bg, color: tag.color }}>
             {mission.tag}
           </span>
@@ -87,9 +87,9 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
           </span>
         </div>
         <div>
-          <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Belohnung</p>
+          <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">Belohnung</p>
           <p className="font-body font-bold text-on-surface">{mission.rewardLabel}</p>
-          <p className="font-label text-[10px] text-on-surface-variant">
+          <p className="font-label text-xs text-on-surface-variant">
             +{mission.reward.hp} HP &middot; +{mission.reward.evo} Evo
           </p>
         </div>

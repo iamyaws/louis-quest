@@ -310,7 +310,7 @@ export default function RoomSVG({
               <div style={{
                 position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)",
                 background: "white", borderRadius: 14, padding: "6px 12px", marginBottom: 8,
-                fontSize: "11px", fontWeight: 700, color: T.textPrimary, whiteSpace: "nowrap",
+                fontSize: "12px", fontWeight: 700, color: T.textPrimary, whiteSpace: "nowrap",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.15)", animation: "fadeIn 0.3s ease",
                 fontFamily: "'Nunito',sans-serif", zIndex: 10,
               }}>
@@ -345,7 +345,7 @@ export default function RoomSVG({
                 <div style={{
                   position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)",
                   background: "white", borderRadius: 14, padding: "5px 10px", marginBottom: 6,
-                  fontSize: "10px", fontWeight: 700, color: T.textPrimary, whiteSpace: "nowrap",
+                  fontSize: "12px", fontWeight: 700, color: T.textPrimary, whiteSpace: "nowrap",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.15)", animation: "fadeIn 0.3s ease",
                   fontFamily: "'Nunito',sans-serif", zIndex: 10,
                 }}>

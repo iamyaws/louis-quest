@@ -91,20 +91,20 @@ function AppContent() {
       </div>
       <NavBar active={view} onNavigate={setView} />
       {showParental && <ParentalDashboard onClose={() => setShowParental(false)} />}
-      {view === 'memory' && <MemoryGame onComplete={(reward) => {
-        if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
+      {view === 'memory' && <MemoryGame onComplete={() => {
+        actions.claimGameReward('memory'); // +1 screen min (once/day)
         setView('games');
       }} />}
-      {view === 'potion' && <PotionGame onComplete={(reward) => {
-        if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
+      {view === 'potion' && <PotionGame onComplete={() => {
+        actions.claimGameReward('potion');
         setView('games');
       }} />}
-      {view === 'clouds' && <CloudJumpGame onComplete={(reward) => {
-        if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
+      {view === 'clouds' && <CloudJumpGame onComplete={() => {
+        actions.claimGameReward('clouds');
         setView('games');
       }} />}
-      {view === 'starfall' && <StarCatcherGame onComplete={(reward) => {
-        if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
+      {view === 'starfall' && <StarCatcherGame onComplete={() => {
+        actions.claimGameReward('starfall');
         setView('games');
       }} />}
       <CompanionToast trigger={toastTrigger} />

@@ -38,7 +38,7 @@ export default function BadgeGrid() {
                 {badge.n}
               </span>
               {isUnlocked && (
-                <span className="text-[11px] font-label text-on-surface-variant text-center leading-snug">
+                <span className="text-xs font-label text-on-surface-variant text-center leading-snug">
                   {badge.desc}
                 </span>
               )}

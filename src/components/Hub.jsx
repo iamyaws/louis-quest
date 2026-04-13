@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES, BOSS_TIERS, GEAR_ITEMS, CAT_STAGES, COMPANION_STAGES } from '../constants';
 import { useTask } from '../context/TaskContext';
-import { getLevel, getCatStage } from '../utils/helpers';
+import { getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
 import Egg from './Egg';
@@ -47,7 +47,10 @@ export default function Hub({ onNavigate }) {
   if (!state) return null;
 
   const level = getLevel(state.xp || 0);
+  const lvlProg = getLvlProg(state.xp || 0);
+  const xpPct = lvlProg.need > 0 ? Math.min(100, (lvlProg.cur / lvlProg.need) * 100) : 0;
   const heroName = state.familyConfig?.childName || 'Held';
+  const heroAvatar = state.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
 
   return (
     <div className="relative min-h-screen bg-surface pb-32">
@@ -59,14 +62,23 @@ export default function Hub({ onNavigate }) {
           <div className="relative">
             <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden shadow-sm"
                  style={{ border: '2px solid rgba(18,67,70,0.15)' }}>
-              <img src={base + 'art/hero-default.webp'} alt={heroName} className="w-full h-full object-cover" />
+              <img src={base + heroAvatar} alt={heroName} className="w-full h-full object-cover" />
             </div>
-            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] shadow-md"
+            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shadow-md"
                  style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', border: '2px solid white', color: '#1a1a1a', lineHeight: 1 }}>
               {level}
             </div>
           </div>
-          <span className="text-lg font-headline font-bold text-primary">{heroName}</span>
+          <div className="flex flex-col">
+            <span className="text-lg font-headline font-bold text-primary leading-tight">{heroName}</span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
+                <div className="h-full rounded-full transition-all duration-500"
+                     style={{ width: `${xpPct}%`, background: 'linear-gradient(90deg, #124346, #5eead4)' }} />
+              </div>
+              <span className="font-label text-xs text-outline">{lvlProg.cur}/{lvlProg.need}</span>
+            </div>
+          </div>
         </button>
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
              style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
@@ -174,24 +186,27 @@ export default function Hub({ onNavigate }) {
         <div className="grid grid-cols-2 gap-4">
           {/* Mood */}
           <div className="p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center"
-               style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
+               style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             {state.moodAM !== null ? (
               <>
                 <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl"
-                     style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid white', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06)' }}>
+                     style={{ background: 'rgba(252,211,77,0.1)', border: '2px solid rgba(252,211,77,0.2)' }}>
                   {MOOD_EMOJIS[state.moodAM]}
                 </div>
-                <p className="font-bold text-[10px] font-label text-on-surface-variant uppercase tracking-widest">Stimmung</p>
-                <p className="font-headline font-bold text-lg text-primary-container">{MOOD_LABELS[state.moodAM]}</p>
+                <p className="font-bold text-xs font-label text-on-surface-variant uppercase tracking-widest">Stimmung</p>
+                <p className="font-headline font-bold text-lg text-primary">{MOOD_LABELS[state.moodAM]}</p>
               </>
             ) : (
               <>
-                <p className="font-bold text-[10px] font-label text-on-surface-variant uppercase tracking-widest mb-1">Wie geht's dir?</p>
+                <p className="font-bold text-xs font-label uppercase tracking-widest mb-1" style={{ color: '#b45309' }}>
+                  Wie geht's dir?
+                </p>
+                <p className="font-body text-xs text-on-surface-variant mb-1">Tippe auf ein Gesicht!</p>
                 <div className="grid grid-cols-3 gap-1.5">
                   {MOOD_EMOJIS.map((e, i) => (
                     <button key={i} onClick={() => { SFX.play("pop"); actions.setMood("moodAM", i); }}
-                      className="text-2xl p-1.5 rounded-xl hover:bg-white/50 transition-all active:scale-90 flex items-center justify-center"
-                      style={{ minHeight: 40 }}>{e}</button>
+                      className="text-2xl p-1.5 rounded-xl transition-all active:scale-90 flex items-center justify-center"
+                      style={{ minHeight: 44, background: 'rgba(252,211,77,0.08)', border: '1.5px solid rgba(252,211,77,0.15)' }}>{e}</button>
                   ))}
                 </div>
               </>
@@ -200,25 +215,33 @@ export default function Hub({ onNavigate }) {
 
           {/* Water */}
           <div className="p-5 rounded-2xl flex flex-col justify-between"
-               style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
+               style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div className="flex justify-between items-center mb-3">
-              <p className="font-bold text-[10px] font-label text-on-surface-variant uppercase tracking-widest">Wasser</p>
-              <span className="material-symbols-outlined text-primary text-lg">water_drop</span>
+              <p className="font-bold text-xs font-label text-on-surface-variant uppercase tracking-widest">Wasser</p>
+              <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>water_drop</span>
             </div>
-            <div className="grid grid-cols-3 gap-2 justify-items-center">
-              {[0,1,2,3,4,5].map(i => (
-                <button key={i}
-                  className={`w-5 h-5 rounded-full border-2 transition-all ${
-                    i < (state.dailyWaterCount || 0) ? 'bg-primary border-primary' : 'border-primary/20'
-                  }`}
-                  style={{ background: i < (state.dailyWaterCount || 0) ? undefined : 'rgba(18,67,70,0.05)' }}
-                  onClick={() => i === (state.dailyWaterCount || 0) && actions.drinkWater?.()}
-                />
-              ))}
+            <div className="grid grid-cols-3 gap-3 justify-items-center">
+              {[0,1,2,3,4,5].map(i => {
+                const filled = i < (state.dailyWaterCount || 0);
+                const isNext = i === (state.dailyWaterCount || 0);
+                return (
+                  <button key={i}
+                    className={`w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center ${filled ? 'bg-primary border-primary' : isNext ? 'border-primary animate-pulse' : 'border-primary/15'}`}
+                    style={{ background: filled ? undefined : isNext ? 'rgba(18,67,70,0.08)' : 'rgba(18,67,70,0.03)' }}
+                    onClick={() => isNext && actions.drinkWater?.()}
+                  >
+                    {filled && <span className="material-symbols-outlined text-white text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>}
+                    {isNext && <span className="material-symbols-outlined text-primary text-sm">add</span>}
+                  </button>
+                );
+              })}
             </div>
-            <p className="text-center font-bold text-[10px] font-label mt-2 text-on-surface-variant">
+            <p className="text-center font-bold text-xs font-label mt-3 text-on-surface-variant">
               {state.dailyWaterCount || 0}/6 Gläser
             </p>
+            {(state.dailyWaterCount || 0) < 6 && (
+              <p className="text-center font-body text-xs mt-1" style={{ color: '#b45309' }}>Tippe auf +</p>
+            )}
           </div>
         </div>
 
@@ -340,7 +363,7 @@ export default function Hub({ onNavigate }) {
                                  style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
                               <span className="material-symbols-outlined text-base" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
                               <span className="font-label font-bold text-xs" style={{ color: '#b45309' }}>+{courageBonus} Schaden</span>
-                              <span className="font-label text-[9px] text-on-surface-variant">(Mut)</span>
+                              <span className="font-label text-xs text-on-surface-variant">(Mut)</span>
                             </div>
                           )}
                           {defenseBonus > 0 && (
@@ -348,7 +371,7 @@ export default function Hub({ onNavigate }) {
                                  style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
                               <span className="material-symbols-outlined text-base" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>shield</span>
                               <span className="font-label font-bold text-xs" style={{ color: '#059669' }}>+{defenseBonus} Beute</span>
-                              <span className="font-label text-[9px] text-on-surface-variant">(Schutz)</span>
+                              <span className="font-label text-xs text-on-surface-variant">(Schutz)</span>
                             </div>
                           )}
                         </div>
@@ -361,7 +384,7 @@ export default function Hub({ onNavigate }) {
                       return tier ? (
                         <div className="flex items-center gap-2 mb-5">
                           <span className="text-sm">{tier.icon}</span>
-                          <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: tier.color }}>
+                          <span className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: tier.color }}>
                             {tier.name}-Klasse
                           </span>
                         </div>
@@ -439,7 +462,7 @@ export default function Hub({ onNavigate }) {
                         <img src={artSrc} alt={bd.name} className="w-full h-40 object-cover" />
                       )}
                       <div className="p-5">
-                        <p className="font-label font-bold text-[10px] text-error uppercase tracking-widest">
+                        <p className="font-label font-bold text-xs text-error uppercase tracking-widest">
                           {defeated ? 'Bezwungen' : 'Tages-Boss'}
                         </p>
                         <h3 className="font-headline font-bold text-2xl text-on-surface mt-1">{bd.name}</h3>
@@ -457,14 +480,14 @@ export default function Hub({ onNavigate }) {
                             <span className="material-symbols-outlined text-2xl text-primary mb-1 block"
                                   style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
                             <p className="font-label font-bold text-lg text-primary">+{bd.reward.hp}</p>
-                            <p className="font-label text-[10px] text-on-surface-variant uppercase">Heldenpunkte</p>
+                            <p className="font-label text-xs text-on-surface-variant uppercase">Heldenpunkte</p>
                           </div>
                           <div className="p-4 rounded-2xl text-center"
                                style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
                             <span className="material-symbols-outlined text-2xl mb-1 block"
                                   style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
                             <p className="font-label font-bold text-lg" style={{ color: '#b45309' }}>+1</p>
-                            <p className="font-label text-[10px] text-on-surface-variant uppercase">Evo-Essenz</p>
+                            <p className="font-label text-xs text-on-surface-variant uppercase">Evo-Essenz</p>
                           </div>
                         </div>
                       </div>
@@ -497,12 +520,12 @@ export default function Hub({ onNavigate }) {
                                     <span className="material-symbols-outlined text-base" style={{ color: '#c0c8c9' }}>lock</span>
                                   )}
                                 </div>
-                                <span className="font-label font-bold text-[9px] text-center leading-tight text-on-surface"
+                                <span className="font-label font-bold text-xs text-center leading-tight text-on-surface"
                                       style={{ opacity: isDefeated ? 1 : 0.5 }}>
                                   {isDefeated ? boss.name : '???'}
                                 </span>
                                 {tier && isDefeated && (
-                                  <span className="text-[8px] font-label font-bold px-1.5 py-0.5 rounded-full"
+                                  <span className="text-xs font-label font-bold px-1.5 py-0.5 rounded-full"
                                         style={{ background: `${tier.color}15`, color: tier.color }}>
                                     {tier.icon}
                                   </span>
@@ -511,7 +534,7 @@ export default function Hub({ onNavigate }) {
                             );
                           })}
                         </div>
-                        <p className="font-label text-[10px] text-on-surface-variant text-center mt-3">
+                        <p className="font-label text-xs text-on-surface-variant text-center mt-3">
                           {(state.bossTrophies || []).length} / {BOSSES.length} Bosse besiegt
                         </p>
                       </div>
@@ -560,28 +583,38 @@ export default function Hub({ onNavigate }) {
         })()}
 
         {/* ── Epic Missions Entry — Kristallgold ── */}
-        <button
-          className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98] relative overflow-hidden"
-          style={{ background: '#451a03', border: '1.5px solid rgba(252,211,77,0.2)', boxShadow: '0 4px 20px rgba(69,26,3,0.25)' }}
-          onClick={() => onNavigate?.('missions')}
-        >
-          <img src={base + 'art/tex-wolkengrat.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(69,26,3,0.55), rgba(120,53,15,0.45))' }} />
-          <div className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center shrink-0"
-               style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', border: '3px solid #fcd34d', boxShadow: '0 0 12px rgba(252,211,77,0.3)' }}>
-            <span className="material-symbols-outlined text-white text-2xl"
-                  style={{ fontVariationSettings: "'FILL' 1" }}>swords</span>
-          </div>
-          <div className="relative z-10 flex-1">
-            <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>Epische Missionen</p>
-            <h4 className="font-headline font-bold text-lg text-white">
-              {(state.activeMissions || []).length > 0
-                ? `${state.activeMissions.length} aktiv`
-                : 'Wähle dein Abenteuer!'}
-            </h4>
-          </div>
-          <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
-        </button>
+        {(() => {
+          const hasActive = (state.activeMissions || []).length > 0;
+          return (
+            <button
+              className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98] relative overflow-hidden"
+              style={{ background: '#451a03', border: '1.5px solid rgba(252,211,77,0.2)', boxShadow: '0 4px 20px rgba(69,26,3,0.25)' }}
+              onClick={() => onNavigate?.('missions')}
+            >
+              <img src={base + 'art/tex-wolkengrat.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(69,26,3,0.55), rgba(120,53,15,0.45))' }} />
+              <div className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                   style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', border: '3px solid #fcd34d', boxShadow: '0 0 12px rgba(252,211,77,0.3)' }}>
+                <span className="material-symbols-outlined text-white text-2xl"
+                      style={{ fontVariationSettings: "'FILL' 1" }}>swords</span>
+                {/* Red notification dot when no mission selected */}
+                {!hasActive && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full animate-pulse"
+                        style={{ background: '#ef4444', border: '2px solid #fcd34d', boxShadow: '0 0 8px rgba(239,68,68,0.5)' }} />
+                )}
+              </div>
+              <div className="relative z-10 flex-1">
+                <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>Epische Missionen</p>
+                <h4 className="font-headline font-bold text-lg text-white">
+                  {hasActive
+                    ? `${state.activeMissions.length} aktiv`
+                    : 'Wähle dein Abenteuer!'}
+                </h4>
+              </div>
+              <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
+            </button>
+          );
+        })()}
 
         {/* ── Latest Achievement Spotlight ── */}
         {(() => {
@@ -591,23 +624,26 @@ export default function Hub({ onNavigate }) {
           const badge = BADGES.find(b => b.id === latestId);
           if (!badge) return null;
           return (
-            <div className="p-5 rounded-2xl flex items-center gap-4 relative overflow-hidden"
-                 style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.08)' }}
+            <button className="w-full p-5 rounded-2xl flex items-center gap-4 relative overflow-hidden text-left active:scale-[0.98] transition-all"
+                 style={{ border: '1.5px solid rgba(252,211,77,0.4)', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}
                  onClick={() => onNavigate?.('kodex')}>
-              <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
-                   style={{ background: 'rgba(252,211,77,0.15)', border: '2px solid rgba(252,211,77,0.3)' }}>
+              {/* Background texture */}
+              <img src={base + 'art/bg-achievement.webp'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-25 pointer-events-none" />
+              <div className="absolute inset-0 bg-white/70 pointer-events-none" />
+              <div className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                   style={{ background: 'rgba(252,211,77,0.2)', border: '2px solid rgba(252,211,77,0.4)' }}>
                 <span className="text-3xl">{badge.i}</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-[10px] font-label uppercase tracking-widest" style={{ color: '#b45309' }}>Neueste Errungenschaft</p>
-                <h4 className="font-headline font-bold text-base text-on-surface truncate">{badge.n}</h4>
-                <p className="font-body text-xs text-on-surface-variant truncate">{badge.desc}</p>
+              <div className="relative z-10 flex-1 min-w-0">
+                <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#92400e' }}>Neueste Errungenschaft</p>
+                <h4 className="font-headline font-bold text-lg truncate" style={{ color: '#1a1a1a' }}>{badge.n}</h4>
+                <p className="font-body text-sm truncate" style={{ color: '#5c4813' }}>{badge.desc}</p>
               </div>
-              <div className="flex flex-col items-center gap-1 shrink-0">
-                <span className="material-symbols-outlined text-xl" style={{ color: 'rgba(18,67,70,0.3)' }}>chevron_right</span>
-                <span className="font-label font-bold text-[10px] text-on-surface-variant">{unlocked.length}/{BADGES.length}</span>
+              <div className="relative z-10 flex flex-col items-center gap-1 shrink-0">
+                <span className="material-symbols-outlined text-xl" style={{ color: '#92400e' }}>chevron_right</span>
+                <span className="font-label font-bold text-xs" style={{ color: '#78350f' }}>{unlocked.length}/{BADGES.length}</span>
               </div>
-            </div>
+            </button>
           );
         })()}
 

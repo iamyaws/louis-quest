@@ -54,7 +54,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
              style={{ background: 'linear-gradient(135deg, #5300b7, #6d28d9)' }}>
           <div className="flex items-center gap-2 mb-2">
             <Pearl size={20} dark />
-            <p className="font-label font-bold uppercase tracking-widest text-[10px] text-white/60">Heldenpunkte</p>
+            <p className="font-label font-bold uppercase tracking-widest text-xs text-white/60">Heldenpunkte</p>
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-headline font-bold text-white">{hp}</span>
@@ -70,7 +70,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
              style={{ background: 'linear-gradient(135deg, #00b4d8, #00CEC9)' }}>
           <div className="flex items-center gap-2 mb-2">
             <Hourglass size={20} dark />
-            <p className="font-label font-bold uppercase tracking-widest text-[10px] text-white/70">Screen-Minuten</p>
+            <p className="font-label font-bold uppercase tracking-widest text-xs text-white/70">Screen-Minuten</p>
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-headline font-bold text-white">{screenMin}</span>
@@ -226,7 +226,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
           style={{ background: 'rgba(156,163,175,0.1)', border: '1.5px solid rgba(156,163,175,0.2)' }}>
           <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#9ca3af' }}>lock</span>
         </button>
-        <span className="font-label text-[9px] text-[#9ca3af] tracking-wide" style={{ opacity: 0.5 }}>Verwaltung</span>
+        <span className="font-label text-xs text-[#9ca3af] tracking-wide" style={{ opacity: 0.5 }}>Verwaltung</span>
       </div>
     </div>
   );
