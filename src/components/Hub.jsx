@@ -294,21 +294,46 @@ export default function Hub({ onNavigate }) {
                       </div>
                     )}
 
-                    {/* Combat progress */}
-                    {(state.bossDmgToday || 0) > 0 && (
-                      <div className="mb-6 p-4 rounded-2xl flex items-start gap-3"
-                           style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
-                        <span className="material-symbols-outlined text-xl shrink-0" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>swords</span>
-                        <div>
-                          <p className="font-label font-bold text-sm" style={{ color: '#059669' }}>
-                            Deine heutige Power: +{state.bossDmgToday} Schaden
-                          </p>
-                          <p className="font-body text-xs text-on-surface-variant mt-1">
-                            Jede erledigte Aufgabe schwächt den Boss!
-                          </p>
+                    {/* Combat progress — damage log */}
+                    {(state.bossDmgToday || 0) > 0 && (() => {
+                      const doneQuests = (state.quests || []).filter(q => q.done && !q.sideQuest);
+                      const dmgLog = doneQuests.map(q => ({
+                        name: q.name || q.id,
+                        icon: q.icon || '',
+                        dmg: Math.max(5, Math.floor((q.xp || 0) * 0.8)),
+                      }));
+                      return (
+                        <div className="mb-6 rounded-2xl overflow-hidden"
+                             style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.2)' }}>
+                          {/* Header */}
+                          <div className="flex items-center gap-3 p-4 pb-2">
+                            <span className="material-symbols-outlined text-xl shrink-0" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>swords</span>
+                            <div className="flex-1">
+                              <p className="font-label font-bold text-sm" style={{ color: '#059669' }}>
+                                Heutige Power: +{state.bossDmgToday} Schaden
+                              </p>
+                            </div>
+                          </div>
+                          {/* Quest damage list */}
+                          {dmgLog.length > 0 && (
+                            <div className="px-4 pb-4 pt-1">
+                              <div className="flex flex-col gap-1.5">
+                                {dmgLog.map((entry, i) => (
+                                  <div key={i} className="flex items-center gap-2.5 py-1.5 px-3 rounded-xl"
+                                       style={{ background: 'rgba(255,255,255,0.7)' }}>
+                                    <span className="text-base">{entry.icon}</span>
+                                    <span className="font-body text-xs text-on-surface flex-1 truncate">{entry.name}</span>
+                                    <span className="font-label font-bold text-xs whitespace-nowrap" style={{ color: '#059669' }}>
+                                      -{entry.dmg} HP
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
 
                     {/* Boss lore card */}
                     <div className="mb-6 rounded-2xl overflow-hidden"

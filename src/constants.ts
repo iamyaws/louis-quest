@@ -525,3 +525,24 @@ export const SIDE_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "sq4", name: "Drau\u00DFen spielen", icon: "\u26BD", anchor: "morning", xp: 15, minutes: 15, order: 95 },
   { id: "sq5", name: "Etwas Neues lernen", icon: "\uD83D\uDCA1", anchor: "evening", xp: 15, minutes: 10, order: 96 },
 ];
+
+// ── Companion Gear ──
+export interface GearItem {
+  id: string;
+  name: string;
+  icon: string;
+  slot: 'head' | 'back' | 'neck';
+  rarity: 'common' | 'rare' | 'epic';
+  stats: { defense?: number; courage?: number };
+  missionId: string; // which epic mission awards this
+  color: string;
+}
+
+export const GEAR_ITEMS: GearItem[] = [
+  { id: 'g_helm', name: 'Waldwächter-Helm', icon: 'shield', slot: 'head', rarity: 'rare', stats: { defense: 10 }, missionId: 'em1', color: '#059669' },
+  { id: 'g_wings', name: 'Sonnenflügel', icon: 'flutter_dash', slot: 'back', rarity: 'rare', stats: { courage: 12 }, missionId: 'em2', color: '#f59e0b' },
+  { id: 'g_lantern', name: 'Sternenlaterne', icon: 'light', slot: 'neck', rarity: 'rare', stats: { courage: 10 }, missionId: 'em3', color: '#6d28d9' },
+  { id: 'g_crown', name: 'Weisheits-Krone', icon: 'menu_book', slot: 'head', rarity: 'epic', stats: { courage: 15 }, missionId: 'em4', color: '#0ea5e9' },
+  { id: 'g_cape', name: 'Goldener Umhang', icon: 'sports_soccer', slot: 'back', rarity: 'rare', stats: { defense: 8, courage: 5 }, missionId: 'em5', color: '#059669' },
+  { id: 'g_amulet', name: 'Sternensplitter-Amulett', icon: 'star', slot: 'neck', rarity: 'epic', stats: { defense: 15, courage: 15 }, missionId: 'em6', color: '#f59e0b' },
+];

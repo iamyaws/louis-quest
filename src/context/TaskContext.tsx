@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import type { Quest, GameState, Boss } from '../types';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
-import { BOSSES, CHEST_MILESTONES, CAT_STAGES, WEEKLY_MISSIONS } from '../constants';
+import { BOSSES, CHEST_MILESTONES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS } from '../constants';
 import storage from '../utils/storage';
 
 // ── Minimal state shape for the task list ──
@@ -38,6 +38,8 @@ interface TaskState {
   chestsClaimed: number[];
   activeMissions: { id: string; progress: number; startDate: string }[];
   completedMissions: string[];
+  gearInventory: string[];
+  equippedGear: { head?: string; back?: string; neck?: string };
 }
 
 interface TaskComputed {
@@ -65,6 +67,8 @@ interface TaskActions {
   startMission: (id: string) => void;
   abandonMission: (id: string) => void;
   addHP: (amount: number) => void;
+  equipGear: (gearId: string) => void;
+  unequipGear: (slot: 'head' | 'back' | 'neck') => void;
 }
 
 interface CelebrationEvent {
@@ -161,6 +165,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           chestsClaimed: raw.chestsClaimed || [],
           activeMissions: raw.activeMissions || [],
           completedMissions: raw.completedMissions || [],
+          gearInventory: raw.gearInventory || [],
+          equippedGear: raw.equippedGear || {},
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -206,6 +212,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           chestsClaimed: [],
           activeMissions: [],
           completedMissions: [],
+          gearInventory: [],
+          equippedGear: {},
         });
       }
       setLoading(false);
@@ -264,6 +272,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     let completedMissions = [...(s.completedMissions || [])];
     let missionHp = 0;
     let missionEvo = 0;
+    const gearAwarded: string[] = [];
 
     activeMissions = activeMissions.map(m => {
       const def = WEEKLY_MISSIONS.find(wm => wm.id === m.id);
@@ -280,13 +289,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         completedMissions.push(m.id);
         missionHp += def.reward.hp;
         missionEvo += def.reward.evo;
+        // Award gear for this mission
+        const gear = GEAR_ITEMS.find(g => g.missionId === def.id);
+        if (gear && !gearAwarded.includes(gear.id)) gearAwarded.push(gear.id);
         queueCelebration({ type: 'victory', payload: { mission: def.title, hp: def.reward.hp, evo: def.reward.evo } });
       }
       return { ...m, progress: newProg };
     });
     // Remove completed missions from active
     activeMissions = activeMissions.filter(m => !completedMissions.includes(m.id) || !s.completedMissions?.includes(m.id));
-    s = { ...s, hp: (s.hp || 0) + missionHp, catEvo: (s.catEvo || 0) + missionEvo };
+    s = { ...s, hp: (s.hp || 0) + missionHp, catEvo: (s.catEvo || 0) + missionEvo, gearInventory: [...(s.gearInventory || []), ...gearAwarded] };
 
     // Rebuild quests for today, preserve streaks
     const quests = buildDay(s.vacMode).map(q => ({
@@ -407,6 +419,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       let completedMissions = [...(prev.completedMissions || [])];
       let bonusHp = 0;
       let bonusEvo = 0;
+      const newGear: string[] = [];
       activeMissions = activeMissions.map(m => {
         const def = WEEKLY_MISSIONS.find(wm => wm.id === m.id);
         if (!def || def.goal !== 'water' || m.progress >= def.target) return m;
@@ -415,6 +428,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           completedMissions.push(m.id);
           bonusHp += def.reward.hp;
           bonusEvo += def.reward.evo;
+          const gear = GEAR_ITEMS.find(g => g.missionId === def.id);
+          if (gear && !(prev.gearInventory || []).includes(gear.id)) newGear.push(gear.id);
           queueCelebration({ type: 'victory', payload: { mission: def.title, hp: def.reward.hp, evo: def.reward.evo } });
         }
         return { ...m, progress: newProg };
@@ -426,6 +441,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         catEvo: (prev.catEvo || 0) + bonusEvo,
         activeMissions,
         completedMissions,
+        gearInventory: [...(prev.gearInventory || []), ...newGear],
       };
     });
   }, [queueCelebration]);
@@ -532,6 +548,24 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, hp: (prev.hp || 0) + amount } : prev);
   }, []);
 
+  const equipGear = useCallback((gearId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const gear = GEAR_ITEMS.find(g => g.id === gearId);
+      if (!gear || !prev.gearInventory.includes(gearId)) return prev;
+      return { ...prev, equippedGear: { ...prev.equippedGear, [gear.slot]: gearId } };
+    });
+  }, []);
+
+  const unequipGear = useCallback((slot: 'head' | 'back' | 'neck') => {
+    setState(prev => {
+      if (!prev) return prev;
+      const eq = { ...prev.equippedGear };
+      delete eq[slot];
+      return { ...prev, equippedGear: eq };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -555,7 +589,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP }, loading, celebration }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, equipGear, unequipGear }, loading, celebration }}>
       {children}
     </TaskContext.Provider>
   );

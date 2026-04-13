@@ -2,6 +2,7 @@ import React from 'react';
 import { useTask } from '../context/TaskContext';
 import SFX from '../utils/sfx';
 import { Pearl } from './CurrencyIcons';
+import GearVault from './GearVault';
 
 const STAGES = [
   { name: 'Ei', emoji: '🥚', threshold: 0 },
@@ -214,6 +215,9 @@ export default function Sanctuary() {
             </div>
           </div>
         </section>
+
+        {/* ── Gear Vault ── */}
+        <GearVault />
 
         {/* ── Wachstums-Orbs ── */}
         <section className="rounded-2xl p-6 mb-6 relative overflow-hidden"
