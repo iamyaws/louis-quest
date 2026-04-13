@@ -396,17 +396,33 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const prevXp = prev.xp || 0;
       const newXp = prevXp + q.xp;
 
-      // Boss damage
+      // Boss damage — gear courage boosts damage, defense boosts loot
       let boss = prev.boss ? { ...prev.boss } : null;
       let bossTrophies = [...(prev.bossTrophies || [])];
       let bossDmgToday = prev.bossDmgToday || 0;
       if (boss && boss.hp > 0) {
-        const dmg = Math.max(5, Math.floor(q.xp * 0.8));
+        // Calculate gear bonus from equipped courage stat
+        const equipped = prev.equippedGear || {};
+        let gearCourage = 0;
+        let gearDefense = 0;
+        for (const slotId of Object.values(equipped)) {
+          const g = GEAR_ITEMS.find(gi => gi.id === slotId);
+          if (g) {
+            gearCourage += g.stats.courage || 0;
+            gearDefense += g.stats.defense || 0;
+          }
+        }
+        // Base damage + courage bonus (1 extra dmg per 5 courage)
+        const baseDmg = Math.max(5, Math.floor(q.xp * 0.8));
+        const courageBonus = Math.floor(gearCourage / 5);
+        const dmg = baseDmg + courageBonus;
         boss.hp = Math.max(0, boss.hp - dmg);
         bossDmgToday += dmg;
         if (boss.hp <= 0) {
           const bd = BOSSES.find(b => b.id === boss!.id);
-          if (bd) hp += bd.reward.hp;
+          // Defense bonus: extra HP on defeat (1 per 5 defense)
+          const defenseBonus = Math.floor(gearDefense / 5);
+          if (bd) hp += bd.reward.hp + defenseBonus;
           if (!bossTrophies.includes(boss.id)) bossTrophies.push(boss.id);
         }
       }

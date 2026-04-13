@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES } from '../constants';
+import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES, BOSS_TIERS, GEAR_ITEMS } from '../constants';
 import { useTask } from '../context/TaskContext';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
@@ -276,6 +276,52 @@ export default function Hub({ onNavigate }) {
                   <div className="flex-1 rounded-t-[2rem] -mt-4 relative z-10 px-6 pt-8 pb-36"
                        style={{ background: '#fff8f2' }}>
 
+                    {/* Gear Bonus Indicator */}
+                    {(() => {
+                      const eq = state.equippedGear || {};
+                      let totalCourage = 0, totalDefense = 0;
+                      for (const slotId of Object.values(eq)) {
+                        const g = GEAR_ITEMS.find(gi => gi.id === slotId);
+                        if (g) { totalCourage += g.stats.courage || 0; totalDefense += g.stats.defense || 0; }
+                      }
+                      const courageBonus = Math.floor(totalCourage / 5);
+                      const defenseBonus = Math.floor(totalDefense / 5);
+                      if (courageBonus <= 0 && defenseBonus <= 0) return null;
+                      return (
+                        <div className="flex gap-3 mb-5">
+                          {courageBonus > 0 && (
+                            <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
+                                 style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
+                              <span className="material-symbols-outlined text-base" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
+                              <span className="font-label font-bold text-xs" style={{ color: '#b45309' }}>+{courageBonus} Schaden</span>
+                              <span className="font-label text-[9px] text-on-surface-variant">(Mut)</span>
+                            </div>
+                          )}
+                          {defenseBonus > 0 && (
+                            <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
+                                 style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
+                              <span className="material-symbols-outlined text-base" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>shield</span>
+                              <span className="font-label font-bold text-xs" style={{ color: '#059669' }}>+{defenseBonus} Beute</span>
+                              <span className="font-label text-[9px] text-on-surface-variant">(Schutz)</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+
+                    {/* Boss Tier Badge */}
+                    {(() => {
+                      const tier = BOSS_TIERS.find(t => t.id === bd.tier);
+                      return tier ? (
+                        <div className="flex items-center gap-2 mb-5">
+                          <span className="text-sm">{tier.icon}</span>
+                          <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: tier.color }}>
+                            {tier.name}-Klasse
+                          </span>
+                        </div>
+                      ) : null;
+                    })()}
+
                     {/* HP Bar */}
                     {!defeated ? (
                       <div className="mb-6">
@@ -375,6 +421,53 @@ export default function Hub({ onNavigate }) {
                             <p className="font-label text-[10px] text-on-surface-variant uppercase">Evo-Essenz</p>
                           </div>
                         </div>
+                      </div>
+                    )}
+
+                    {/* Trophy Gallery */}
+                    {(state.bossTrophies || []).length > 0 && (
+                      <div className="mb-6 mm-card p-5">
+                        <h4 className="font-label font-bold text-xs uppercase tracking-widest text-outline mb-3 flex items-center gap-2">
+                          <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
+                          Trophäen-Sammlung
+                        </h4>
+                        <div className="grid grid-cols-3 gap-3">
+                          {BOSSES.map(boss => {
+                            const isDefeated = (state.bossTrophies || []).includes(boss.id);
+                            const tier = BOSS_TIERS.find(t => t.id === boss.tier);
+                            return (
+                              <div key={boss.id} className="flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all"
+                                   style={{
+                                     background: isDefeated ? 'rgba(252,211,77,0.08)' : 'rgba(232,225,218,0.3)',
+                                     border: isDefeated ? '1.5px solid rgba(252,211,77,0.3)' : '1.5px dashed rgba(204,195,215,0.3)',
+                                     opacity: isDefeated ? 1 : 0.4,
+                                   }}>
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                                     style={{
+                                       background: isDefeated ? 'rgba(252,211,77,0.15)' : 'rgba(232,225,218,0.5)',
+                                       boxShadow: isDefeated ? '0 0 12px rgba(252,211,77,0.2)' : 'none',
+                                     }}>
+                                  {isDefeated ? boss.icon : (
+                                    <span className="material-symbols-outlined text-base" style={{ color: '#c0c8c9' }}>lock</span>
+                                  )}
+                                </div>
+                                <span className="font-label font-bold text-[9px] text-center leading-tight text-on-surface"
+                                      style={{ opacity: isDefeated ? 1 : 0.5 }}>
+                                  {isDefeated ? boss.name : '???'}
+                                </span>
+                                {tier && isDefeated && (
+                                  <span className="text-[8px] font-label font-bold px-1.5 py-0.5 rounded-full"
+                                        style={{ background: `${tier.color}15`, color: tier.color }}>
+                                    {tier.icon}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <p className="font-label text-[10px] text-on-surface-variant text-center mt-3">
+                          {(state.bossTrophies || []).length} / {BOSSES.length} Bosse besiegt
+                        </p>
                       </div>
                     )}
                   </div>

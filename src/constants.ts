@@ -536,19 +536,42 @@ export const SIDE_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
 export interface GearItem {
   id: string;
   name: string;
+  desc: string;
   icon: string;
   slot: 'head' | 'back' | 'neck';
   rarity: 'common' | 'rare' | 'epic';
   stats: { defense?: number; courage?: number };
-  missionId: string; // which epic mission awards this
+  missionId: string;
   color: string;
 }
 
 export const GEAR_ITEMS: GearItem[] = [
-  { id: 'g_helm', name: 'Waldwächter-Helm', icon: 'shield', slot: 'head', rarity: 'rare', stats: { defense: 10 }, missionId: 'em1', color: '#059669' },
-  { id: 'g_wings', name: 'Sonnenflügel', icon: 'flutter_dash', slot: 'back', rarity: 'rare', stats: { courage: 12 }, missionId: 'em2', color: '#f59e0b' },
-  { id: 'g_lantern', name: 'Sternenlaterne', icon: 'light', slot: 'neck', rarity: 'rare', stats: { courage: 10 }, missionId: 'em3', color: '#6d28d9' },
-  { id: 'g_crown', name: 'Weisheits-Krone', icon: 'menu_book', slot: 'head', rarity: 'epic', stats: { courage: 15 }, missionId: 'em4', color: '#0ea5e9' },
-  { id: 'g_cape', name: 'Goldener Umhang', icon: 'sports_soccer', slot: 'back', rarity: 'rare', stats: { defense: 8, courage: 5 }, missionId: 'em5', color: '#059669' },
-  { id: 'g_amulet', name: 'Sternensplitter-Amulett', icon: 'star', slot: 'neck', rarity: 'epic', stats: { defense: 15, courage: 15 }, missionId: 'em6', color: '#f59e0b' },
+  { id: 'g_helm', name: 'Waldwächter-Helm', desc: 'Geschmiedet aus dem Herzen eines alten Baumes. Schützt vor faulen Ausreden.', icon: 'shield', slot: 'head', rarity: 'rare', stats: { defense: 10 }, missionId: 'em1', color: '#059669' },
+  { id: 'g_wings', name: 'Sonnenflügel', desc: 'Leuchten heller, je mehr du dich bewegst. Geben dir Mut zum Losfliegen.', icon: 'flutter_dash', slot: 'back', rarity: 'rare', stats: { courage: 12 }, missionId: 'em2', color: '#f59e0b' },
+  { id: 'g_lantern', name: 'Sternenlaterne', desc: 'Fängt das Licht der Sterne ein. Zeigt dir den Weg, wenn es dunkel ist.', icon: 'light', slot: 'neck', rarity: 'rare', stats: { courage: 10 }, missionId: 'em3', color: '#6d28d9' },
+  { id: 'g_crown', name: 'Weisheits-Krone', desc: 'Aus gelesenen Geschichten geboren. Jedes Buch macht sie stärker.', icon: 'menu_book', slot: 'head', rarity: 'epic', stats: { courage: 15 }, missionId: 'em4', color: '#0ea5e9' },
+  { id: 'g_cape', name: 'Goldener Umhang', desc: 'Gewoben aus Sonnenstrahlen und Trainings-Schweiß. Macht schnell und stark.', icon: 'sports_soccer', slot: 'back', rarity: 'rare', stats: { defense: 8, courage: 5 }, missionId: 'em5', color: '#059669' },
+  { id: 'g_amulet', name: 'Sternensplitter-Amulett', desc: 'Ein Splitter vom hellsten Stern. Verleiht ultimative Kraft und Schutz.', icon: 'star', slot: 'neck', rarity: 'epic', stats: { defense: 15, courage: 15 }, missionId: 'em6', color: '#f59e0b' },
 ];
+
+// ── Orb Milestones ──
+export interface OrbMilestone {
+  threshold: number;
+  title: string;
+  icon: string;
+  reward: number; // bonus HP
+}
+
+export const ORB_MILESTONES: OrbMilestone[] = [
+  { threshold: 5, title: 'Funke', icon: 'local_fire_department', reward: 10 },
+  { threshold: 15, title: 'Flamme', icon: 'whatshot', reward: 25 },
+  { threshold: 30, title: 'Glut', icon: 'bolt', reward: 50 },
+  { threshold: 50, title: 'Stern', icon: 'star', reward: 100 },
+];
+
+export const ORB_META = [
+  { key: 'vitality', name: 'Vitalität', icon: 'favorite', color: '#34d399', desc: 'Körperpflege & Gesundheit', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.3)' },
+  { key: 'radiance', name: 'Leuchten', icon: 'light_mode', color: '#fcd34d', desc: 'Bewegung & Draußen sein', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.4)' },
+  { key: 'patience', name: 'Geduld', icon: 'self_improvement', color: '#124346', desc: 'Verantwortung & Pflichten', bg: 'rgba(18,67,70,0.06)', border: 'rgba(18,67,70,0.15)' },
+  { key: 'wisdom', name: 'Weisheit', icon: 'psychology', color: '#00CEC9', desc: 'Lernen & Lesen', bg: 'rgba(0,206,201,0.1)', border: 'rgba(0,206,201,0.3)' },
+] as const;

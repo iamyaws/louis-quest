@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
 import SFX from '../utils/sfx';
 import { Pearl } from './CurrencyIcons';
 import GearVault from './GearVault';
+import { ORB_MILESTONES, ORB_META } from '../constants';
 
 const STAGES = [
   { name: 'Ei', emoji: '🥚', threshold: 0 },
@@ -220,79 +221,8 @@ export default function Sanctuary() {
         {/* ── Gear Vault ── */}
         <GearVault />
 
-        {/* ── Wachstums-Orbs ── */}
-        <section className="rounded-2xl p-6 mb-6 relative overflow-hidden"
-                 style={{ background: 'rgba(255,255,255,0.75)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
-          <h3 className="font-headline font-bold text-xl mb-2 flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>blur_on</span>
-            Wachstums-Orbs
-          </h3>
-          <p className="text-xs font-label text-on-surface-variant mb-5">Sammle Orbs durch Quests für die Evolution!</p>
-
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            {[
-              { key: 'vitality', name: 'Vitalität', icon: 'favorite', color: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.3)' },
-              { key: 'radiance', name: 'Leuchten', icon: 'light_mode', color: '#fcd34d', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.4)' },
-              { key: 'patience', name: 'Geduld', icon: 'self_improvement', color: '#124346', bg: 'rgba(18,67,70,0.06)', border: 'rgba(18,67,70,0.15)' },
-              { key: 'wisdom', name: 'Weisheit', icon: 'psychology', color: '#00CEC9', bg: 'rgba(0,206,201,0.1)', border: 'rgba(0,206,201,0.3)' },
-            ].map(orb => {
-              const count = (state.orbs || {})[orb.key] || 0;
-              const collected = count > 0;
-              return (
-                <div key={orb.key}
-                  className="relative rounded-xl p-4 flex items-center gap-3 transition-all"
-                  style={{
-                    background: collected ? orb.bg : 'transparent',
-                    border: collected ? `2px solid ${orb.border}` : '2px dashed rgba(204,195,215,0.4)',
-                    opacity: collected ? 1 : 0.5,
-                  }}>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                       style={{ background: collected ? orb.color + '22' : 'rgba(232,225,218,0.5)' }}>
-                    <span className="material-symbols-outlined text-xl"
-                          style={{ color: collected ? orb.color : '#9e9e9e', fontVariationSettings: "'FILL' 1" }}>
-                      {orb.icon}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-label font-bold text-xs" style={{ color: collected ? orb.color : '#7b7486' }}>{orb.name}</p>
-                    <p className="font-headline font-bold text-lg text-on-surface">{count}</p>
-                  </div>
-                  {collected && (
-                    <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-white font-label font-bold shadow-md"
-                         style={{ background: orb.color, fontSize: '10px' }}>
-                      {count}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Next stage preview with progress ring */}
-          {nextStage && (
-            <div className="flex items-center gap-4 p-4 rounded-xl"
-                 style={{ background: 'rgba(249,243,235,0.8)', border: '1px solid white' }}>
-              <div className="relative w-16 h-16 shrink-0">
-                <svg className="w-full h-full -rotate-90">
-                  <circle cx="32" cy="32" r="27" fill="transparent" stroke="rgba(18,67,70,0.1)" strokeWidth="5" />
-                  <circle cx="32" cy="32" r="27" fill="transparent" stroke="#2d5a5e"
-                    strokeWidth="5" strokeLinecap="round"
-                    strokeDasharray="170" strokeDashoffset={170 - (progressPct / 100) * 170} />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span style={{ fontSize: '1.5rem', filter: 'blur(1px) grayscale(0.5)', opacity: 0.6 }}>{nextStage.emoji}</span>
-                </div>
-              </div>
-              <div>
-                <p className="font-label font-bold text-[10px] text-outline uppercase tracking-widest">Nächste Stufe</p>
-                <p className="font-headline font-bold text-lg text-primary">{nextStage.name}</p>
-                <p className="text-xs font-label text-on-surface-variant">
-                  Noch {nextStage.threshold - evo} Schritte
-                </p>
-              </div>
-            </div>
-          )}
-        </section>
+        {/* ── Wachstums-Orbs (Enhanced with milestones) ── */}
+        <OrbsSection state={state} nextStage={nextStage} progressPct={progressPct} evo={evo} />
 
         {/* Evolution Path — Vertical Winding */}
         <section className="rounded-2xl p-6 relative overflow-hidden"
@@ -376,5 +306,163 @@ export default function Sanctuary() {
 
       </main>
     </div>
+  );
+}
+
+// ── Orbs Detail Section with Milestones ──
+function OrbsSection({ state, nextStage, progressPct, evo }) {
+  const [expandedOrb, setExpandedOrb] = useState(null);
+  const orbs = state.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 };
+  const totalOrbs = Object.values(orbs).reduce((a, b) => a + b, 0);
+
+  return (
+    <section className="rounded-2xl p-6 mb-6 relative overflow-hidden"
+             style={{ background: 'rgba(255,255,255,0.75)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
+      <h3 className="font-headline font-bold text-xl mb-1 flex items-center gap-2">
+        <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>blur_on</span>
+        Wachstums-Orbs
+      </h3>
+      <p className="text-xs font-label text-on-surface-variant mb-5">
+        Sammle Orbs durch Quests — erreiche Meilensteine für Boni!
+      </p>
+
+      {/* Total orb count badge */}
+      <div className="flex items-center justify-center mb-5">
+        <div className="flex items-center gap-3 px-5 py-2.5 rounded-full"
+             style={{ background: 'rgba(18,67,70,0.06)', border: '1px solid rgba(18,67,70,0.1)' }}>
+          <span className="material-symbols-outlined text-lg text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
+          <span className="font-headline font-bold text-lg text-primary">{totalOrbs}</span>
+          <span className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">Gesamt</span>
+        </div>
+      </div>
+
+      {/* Orb Cards */}
+      <div className="flex flex-col gap-3 mb-5">
+        {ORB_META.map(orb => {
+          const count = orbs[orb.key] || 0;
+          const collected = count > 0;
+          const isExpanded = expandedOrb === orb.key;
+          // Find current and next milestone
+          const currentMilestone = [...ORB_MILESTONES].reverse().find(m => count >= m.threshold);
+          const nextMilestone = ORB_MILESTONES.find(m => count < m.threshold);
+          const milestonePct = nextMilestone ? Math.min(1, count / nextMilestone.threshold) : 1;
+
+          return (
+            <div key={orb.key}>
+              <button onClick={() => setExpandedOrb(isExpanded ? null : orb.key)}
+                className="w-full rounded-xl p-4 flex items-center gap-3 transition-all text-left active:scale-[0.98]"
+                style={{
+                  background: collected ? orb.bg : 'rgba(232,225,218,0.3)',
+                  border: isExpanded ? `2px solid ${orb.border}` : collected ? `1.5px solid ${orb.border}` : '1.5px dashed rgba(204,195,215,0.4)',
+                  opacity: collected ? 1 : 0.6,
+                  boxShadow: isExpanded ? `0 4px 16px ${orb.color}15` : 'none',
+                }}>
+                {/* Orb icon with mini ring */}
+                <div className="relative w-12 h-12 shrink-0">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 48 48">
+                    <circle cx="24" cy="24" r="20" fill="transparent" stroke="rgba(0,0,0,0.06)" strokeWidth="3" />
+                    <circle cx="24" cy="24" r="20" fill="transparent" stroke={orb.color} strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeDasharray={125.6} strokeDashoffset={125.6 * (1 - milestonePct)}
+                      style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-xl"
+                          style={{ color: collected ? orb.color : '#9e9e9e', fontVariationSettings: "'FILL' 1" }}>
+                      {orb.icon}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-headline font-bold text-sm text-on-surface">{orb.name}</p>
+                    {currentMilestone && (
+                      <span className="px-2 py-0.5 rounded-full text-[8px] font-label font-bold uppercase tracking-wider text-white"
+                            style={{ background: orb.color }}>
+                        {currentMilestone.title}
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-label text-[10px] text-on-surface-variant">{orb.desc}</p>
+                </div>
+
+                <span className="font-headline font-bold text-2xl" style={{ color: collected ? orb.color : '#c0c8c9' }}>
+                  {count}
+                </span>
+                <span className="material-symbols-outlined text-on-surface-variant/40 text-sm transition-transform"
+                      style={{ transform: isExpanded ? 'rotate(180deg)' : 'none' }}>
+                  expand_more
+                </span>
+              </button>
+
+              {/* Expanded milestone progress */}
+              {isExpanded && (
+                <div className="mt-2 mx-2 p-4 rounded-xl space-y-3"
+                     style={{ background: 'rgba(255,255,255,0.6)', border: `1px solid ${orb.border}` }}>
+                  {ORB_MILESTONES.map((ms, i) => {
+                    const reached = count >= ms.threshold;
+                    const isCurrent = !reached && (i === 0 || count >= ORB_MILESTONES[i - 1].threshold);
+                    const pct = reached ? 100 : isCurrent ? (count / ms.threshold) * 100 : 0;
+                    return (
+                      <div key={ms.threshold} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                             style={{
+                               background: reached ? orb.color : 'rgba(232,225,218,0.5)',
+                               boxShadow: reached ? `0 0 8px ${orb.color}40` : 'none',
+                             }}>
+                          <span className="material-symbols-outlined text-sm"
+                                style={{ color: reached ? '#ffffff' : '#c0c8c9', fontVariationSettings: "'FILL' 1" }}>
+                            {reached ? 'check' : ms.icon}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-label font-bold text-[10px] uppercase tracking-widest"
+                                  style={{ color: reached ? orb.color : '#707979' }}>
+                              {ms.title} — {ms.threshold} Orbs
+                            </span>
+                            <span className="font-label text-[9px] font-bold" style={{ color: '#fcd34d' }}>
+                              +{ms.reward} HP
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.06)' }}>
+                            <div className="h-full rounded-full transition-all duration-500"
+                                 style={{ width: `${pct}%`, background: reached ? orb.color : isCurrent ? `${orb.color}80` : 'transparent' }} />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Next evolution preview */}
+      {nextStage && (
+        <div className="flex items-center gap-4 p-4 rounded-xl"
+             style={{ background: 'rgba(249,243,235,0.8)', border: '1px solid white' }}>
+          <div className="relative w-16 h-16 shrink-0">
+            <svg className="w-full h-full -rotate-90">
+              <circle cx="32" cy="32" r="27" fill="transparent" stroke="rgba(18,67,70,0.1)" strokeWidth="5" />
+              <circle cx="32" cy="32" r="27" fill="transparent" stroke="#2d5a5e"
+                strokeWidth="5" strokeLinecap="round"
+                strokeDasharray="170" strokeDashoffset={170 - (progressPct / 100) * 170} />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span style={{ fontSize: '1.5rem', filter: 'blur(1px) grayscale(0.5)', opacity: 0.6 }}>{nextStage.emoji}</span>
+            </div>
+          </div>
+          <div>
+            <p className="font-label font-bold text-[10px] text-outline uppercase tracking-widest">Nächste Stufe</p>
+            <p className="font-headline font-bold text-lg text-primary">{nextStage.name}</p>
+            <p className="text-xs font-label text-on-surface-variant">Noch {nextStage.threshold - evo} Schritte</p>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }

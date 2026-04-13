@@ -112,67 +112,117 @@ export default function GearVault() {
         })}
       </div>
 
-      {/* Active Stats */}
+      {/* Active Stats with effect explanation */}
       {(totalStats.defense > 0 || totalStats.courage > 0) && (
-        <div className="flex gap-3 mb-5">
-          {totalStats.defense > 0 && (
-            <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
-                 style={{ background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.15)' }}>
-              <span className="material-symbols-outlined text-lg" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>shield</span>
-              <div>
-                <p className="font-label font-bold text-[10px] text-on-surface-variant uppercase">Verteidigung</p>
-                <p className="font-headline font-bold text-lg" style={{ color: '#059669' }}>+{totalStats.defense}</p>
+        <div className="flex flex-col gap-3 mb-5">
+          <div className="flex gap-3">
+            {totalStats.courage > 0 && (
+              <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
+                   style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
+                <span className="material-symbols-outlined text-lg" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
+                <div>
+                  <p className="font-label font-bold text-[10px] text-on-surface-variant uppercase">Mut</p>
+                  <p className="font-headline font-bold text-lg" style={{ color: '#b45309' }}>+{totalStats.courage}</p>
+                </div>
               </div>
-            </div>
-          )}
-          {totalStats.courage > 0 && (
-            <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
-                 style={{ background: 'rgba(18,67,70,0.06)', border: '1px solid rgba(18,67,70,0.12)' }}>
-              <span className="material-symbols-outlined text-lg" style={{ color: '#124346', fontVariationSettings: "'FILL' 1" }}>bolt</span>
-              <div>
-                <p className="font-label font-bold text-[10px] text-on-surface-variant uppercase">Mut</p>
-                <p className="font-headline font-bold text-lg text-primary">+{totalStats.courage}</p>
+            )}
+            {totalStats.defense > 0 && (
+              <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
+                   style={{ background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.15)' }}>
+                <span className="material-symbols-outlined text-lg" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>shield</span>
+                <div>
+                  <p className="font-label font-bold text-[10px] text-on-surface-variant uppercase">Schutz</p>
+                  <p className="font-headline font-bold text-lg" style={{ color: '#059669' }}>+{totalStats.defense}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+          <div className="flex items-start gap-2 px-2">
+            <span className="material-symbols-outlined text-sm text-on-surface-variant/50 mt-0.5">info</span>
+            <p className="font-label text-[10px] text-on-surface-variant leading-relaxed">
+              Mut erhöht den Schaden gegen Bosse. Schutz gibt extra Heldenpunkte beim Sieg.
+            </p>
+          </div>
         </div>
       )}
 
-      {/* Inventory Grid */}
+      {/* Inventory List */}
       {hasGear ? (
         <>
           <p className="font-label font-bold text-xs text-outline uppercase tracking-widest mb-3">Inventar ({ownedGear.length}/{GEAR_ITEMS.length})</p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="flex flex-col gap-2.5">
             {ownedGear.map(gear => {
               const isEquipped = equipped[gear.slot] === gear.id;
               const rarity = RARITY_STYLES[gear.rarity];
+              const isSelected = selectedGear === gear.id;
               return (
-                <button key={gear.id}
-                  onClick={() => handleItemTap(gear)}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl active:scale-90 transition-all"
-                  style={{
-                    background: isEquipped ? rarity.bg : 'rgba(249,243,235,0.8)',
-                    border: isEquipped ? `2px solid ${gear.color}` : '1px solid rgba(0,0,0,0.04)',
-                    boxShadow: isEquipped ? `0 0 12px ${gear.color}20` : 'none',
-                  }}>
-                  <span className="material-symbols-outlined text-2xl"
-                        style={{ color: gear.color, fontVariationSettings: "'FILL' 1" }}>
-                    {gear.icon}
-                  </span>
-                  <span className="font-label font-bold text-[10px] text-on-surface text-center leading-tight">
-                    {gear.name}
-                  </span>
-                  <span className="text-[8px] font-label font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider"
-                        style={{ background: rarity.bg, color: rarity.color }}>
-                    {rarity.label}
-                  </span>
-                  {gear.stats.defense && (
-                    <span className="text-[9px] font-label text-on-surface-variant">🛡 +{gear.stats.defense}</span>
+                <div key={gear.id}>
+                  <button
+                    onClick={() => {
+                      if (isSelected) { handleItemTap(gear); }
+                      else { setSelectedGear(gear.id); }
+                    }}
+                    className="w-full flex items-center gap-3 p-3.5 rounded-xl active:scale-[0.98] transition-all text-left"
+                    style={{
+                      background: isEquipped ? rarity.bg : 'rgba(249,243,235,0.8)',
+                      border: isEquipped ? `2px solid ${gear.color}` : '1.5px solid rgba(0,0,0,0.08)',
+                      boxShadow: isEquipped ? `0 0 16px ${gear.color}15` : 'none',
+                    }}>
+                    {/* Icon */}
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                         style={{ background: `${gear.color}15` }}>
+                      <span className="material-symbols-outlined text-2xl"
+                            style={{ color: gear.color, fontVariationSettings: "'FILL' 1" }}>
+                        {gear.icon}
+                      </span>
+                    </div>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="font-headline font-bold text-sm text-on-surface">{gear.name}</span>
+                        {isEquipped && (
+                          <span className="material-symbols-outlined text-sm" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[8px] font-label font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider"
+                              style={{ background: rarity.bg, color: rarity.color }}>
+                          {rarity.label}
+                        </span>
+                        <span className="font-label text-[10px] text-on-surface-variant uppercase tracking-wider">
+                          {SLOT_META[gear.slot]?.label}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Stats */}
+                    <div className="flex flex-col items-end gap-0.5 shrink-0">
+                      {gear.stats.courage > 0 && (
+                        <span className="font-label font-bold text-[10px]" style={{ color: '#f59e0b' }}>⚡ +{gear.stats.courage}</span>
+                      )}
+                      {gear.stats.defense > 0 && (
+                        <span className="font-label font-bold text-[10px]" style={{ color: '#059669' }}>🛡 +{gear.stats.defense}</span>
+                      )}
+                    </div>
+                  </button>
+                  {/* Expanded detail */}
+                  {isSelected && (
+                    <div className="mx-3 mt-1 p-3 rounded-xl space-y-2"
+                         style={{ background: 'rgba(255,255,255,0.6)', border: `1px solid ${gear.color}30` }}>
+                      <p className="font-body text-xs text-on-surface-variant italic leading-relaxed">
+                        &ldquo;{gear.desc}&rdquo;
+                      </p>
+                      <button onClick={() => handleItemTap(gear)}
+                        className="w-full py-2.5 rounded-lg font-label font-bold text-xs active:scale-95 transition-all"
+                        style={{
+                          background: isEquipped ? 'rgba(186,26,26,0.06)' : gear.color,
+                          color: isEquipped ? '#ba1a1a' : '#ffffff',
+                          border: isEquipped ? '1px solid rgba(186,26,26,0.15)' : 'none',
+                        }}>
+                        {isEquipped ? 'Ablegen' : 'Ausrüsten'}
+                      </button>
+                    </div>
                   )}
-                  {gear.stats.courage && (
-                    <span className="text-[9px] font-label text-on-surface-variant">⚡ +{gear.stats.courage}</span>
-                  )}
-                </button>
+                </div>
               );
             })}
           </div>
