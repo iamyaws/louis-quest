@@ -6,7 +6,8 @@ import SFX from '../utils/sfx';
 
 const ANCHOR_META = {
   morning: { label: 'Morgen-Routine', sublabel: 'Morgen-Aufgaben', icon: 'light_mode', col: '#F97316' },
-  evening: { label: 'Abend-Routine',  sublabel: 'Abend-Aufgaben',  icon: 'dark_mode',  col: '#6d28d9' },
+  evening: { label: 'Schul-Vorbereitung', vacLabel: 'Abend-Routine', sublabel: 'Schul-Aufgaben', vacSublabel: 'Abend-Aufgaben', icon: 'backpack', vacIcon: 'dark_mode', col: '#6d28d9' },
+  bedtime: { label: 'Gute Nacht', sublabel: 'Schlafens-Zeit', icon: 'bedtime', col: '#6d28d9' },
 };
 
 // Kid-friendly subtitles that explain each task's purpose
@@ -52,6 +53,17 @@ export default function TaskList() {
 
   if (!state) return null;
 
+  // Remap old stored quests that still have anchor:"evening" but belong to bedtime
+  const BEDTIME_IDS = new Set(['s8', 's12', 's13', 's14', 's15', 'v10', 'v11', 'v12', 'v13']);
+  const groups = { ...byGroup };
+  if (groups.evening) {
+    const fromEvening = groups.evening.filter(q => BEDTIME_IDS.has(q.id));
+    if (fromEvening.length) {
+      groups.evening = groups.evening.filter(q => !BEDTIME_IDS.has(q.id));
+      groups.bedtime = [...(groups.bedtime || []), ...fromEvening].sort((a, b) => (a.order || 0) - (b.order || 0));
+    }
+  }
+
   // Weather data for clothing hints
   const todayWeather = weather?.daily?.[0];
   const currentWeather = weather?.current;
@@ -83,15 +95,18 @@ export default function TaskList() {
       {/* ── Epic Quest Groups ── */}
       <div className="flex flex-col gap-5">
 
-        {['morning', 'evening'].map(anchor => {
+        {['morning', 'evening', 'bedtime'].map(anchor => {
           const meta = ANCHOR_META[anchor];
-          const quests = (byGroup[anchor] || []).filter(q => !q.sideQuest);
+          const quests = (groups[anchor] || []).filter(q => !q.sideQuest);
           if (!quests.length) return null;
 
           const secDone = quests.every(q => q.done);
           const doneCount = quests.filter(q => q.done).length;
-          const isEvening = anchor === 'evening';
+          const isEvening = anchor === 'evening' || anchor === 'bedtime';
           const firstUndoneIdx = quests.findIndex(q => !q.done);
+          const label = state.vacMode && meta.vacLabel ? meta.vacLabel : meta.label;
+          const sublabel = state.vacMode && meta.vacSublabel ? meta.vacSublabel : meta.sublabel;
+          const icon = state.vacMode && meta.vacIcon ? meta.vacIcon : meta.icon;
 
           return (
             <details key={anchor} className="group overflow-hidden" open={!secDone && !isEvening}
@@ -103,18 +118,18 @@ export default function TaskList() {
               }}
             >
               {/* ── Epic Header (Summary) ── */}
-              <summary className="p-6 cursor-pointer lotus-pattern">
+              <summary className="p-6 cursor-pointer lotus-pattern list-none [&::-webkit-details-marker]:hidden">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
                          style={{ background: `${meta.col}15` }}>
                       <span className="material-symbols-outlined text-3xl"
                             style={{ color: meta.col }}>
-                        {meta.icon}
+                        {icon}
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold font-headline text-on-surface">{meta.label}</h3>
+                      <h3 className="text-xl font-bold font-headline text-on-surface">{label}</h3>
                       <p className="text-sm font-medium font-label text-on-surface/60">
                         {secDone ? 'Geschafft!' : `Noch ${quests.length - doneCount} Aufgaben`}
                       </p>
@@ -136,9 +151,11 @@ export default function TaskList() {
                         {doneCount}/{quests.length}
                       </span>
                     </div>
-                    <span className="material-symbols-outlined text-on-surface/40 group-open:rotate-180 transition-transform">
-                      expand_more
-                    </span>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary group-open:rotate-180 transition-transform">
+                      <span className="material-symbols-outlined text-white text-lg">
+                        expand_more
+                      </span>
+                    </div>
                   </div>
                 </div>
               </summary>
@@ -150,7 +167,7 @@ export default function TaskList() {
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-1.5 h-4 rounded-full" style={{ background: meta.col }} />
                     <h4 className="text-sm font-bold font-label uppercase tracking-wider text-on-surface/60">
-                      {meta.sublabel}
+                      {sublabel}
                     </h4>
                   </div>
 

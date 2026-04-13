@@ -14,6 +14,7 @@ import Celebration from './components/Celebration';
 import EpicMissions from './components/EpicMissions';
 import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
+import PotionGame from './components/PotionGame';
 
 function AppContent() {
   const { state, actions, loading } = useTask();
@@ -64,11 +65,16 @@ function AppContent() {
         {view === 'missions' && <EpicMissions />}
         {view === 'games' && <MiniGames onPlay={(id) => {
           if (id === 'memory') setView('memory');
+          if (id === 'potion') setView('potion');
         }} />}
       </div>
       <NavBar active={view} onNavigate={setView} />
       {showParental && <ParentalDashboard onClose={() => setShowParental(false)} />}
       {view === 'memory' && <MemoryGame onComplete={(reward) => {
+        if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
+        setView('games');
+      }} />}
+      {view === 'potion' && <PotionGame onComplete={(reward) => {
         if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
         setView('games');
       }} />}

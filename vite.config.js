@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
     port: 5173,
     open: true,
+    hmr: { path: '/', clientPort: 5173 },
   },
   test: {
     environment: 'jsdom',

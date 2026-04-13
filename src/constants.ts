@@ -46,14 +46,14 @@ export const SCHOOL_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "s_water", name: "Wasserflasche auff\u00FCllen", icon: "\u{1F4A7}", anchor: "evening", xp: 10, minutes: 1, order: 2 },
   { id: "s_packcheck", name: "Schultasche checken", icon: "\u{1F392}", anchor: "evening", xp: 10, minutes: 3, order: 3 },
   { id: "s_signature", name: "Unterschriften checken", icon: "\u270D\uFE0F", anchor: "evening", xp: 10, minutes: 2, order: 4 },
-  // 2. Homework & reading
+  // 2. Homework
   { id: "s7", name: "Hausaufgaben", icon: "\u{1F4DA}", anchor: "evening", xp: 10, minutes: 8, order: 5 },
-  { id: "s8", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "evening", xp: 10, minutes: 5, order: 6 },
-  // 3. Hygiene & bed
-  { id: "s12", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "evening", xp: 10, minutes: 3, order: 7 },
-  { id: "s13", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "evening", xp: 10, minutes: 3, order: 8 },
-  { id: "s14", name: "Creme auftragen", icon: "\u2728", anchor: "evening", xp: 10, minutes: 2, order: 9 },
-  { id: "s15", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2, order: 10 },
+  // 3. Bedtime routine
+  { id: "s8", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "bedtime", xp: 10, minutes: 5, order: 1 },
+  { id: "s12", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "bedtime", xp: 10, minutes: 3, order: 2 },
+  { id: "s13", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "bedtime", xp: 10, minutes: 3, order: 3 },
+  { id: "s14", name: "Creme auftragen", icon: "\u2728", anchor: "bedtime", xp: 10, minutes: 2, order: 4 },
+  { id: "s15", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "bedtime", xp: 10, minutes: 2, order: 5 },
 ];
 
 export const VACATION_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
@@ -66,10 +66,11 @@ export const VACATION_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   // Evening
   { id: "v6", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "evening", xp: 10, minutes: 5, order: 1 },
   { id: "v7", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "evening", xp: 10, minutes: 5, order: 2 },
-  { id: "v10", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "evening", xp: 10, minutes: 3, order: 3 },
-  { id: "v11", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "evening", xp: 10, minutes: 3, order: 4 },
-  { id: "v12", name: "Creme auftragen", icon: "\u2728", anchor: "evening", xp: 10, minutes: 2, order: 5 },
-  { id: "v13", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "evening", xp: 10, minutes: 2, order: 6 },
+  // Bedtime
+  { id: "v10", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "bedtime", xp: 10, minutes: 3, order: 1 },
+  { id: "v11", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "bedtime", xp: 10, minutes: 3, order: 2 },
+  { id: "v12", name: "Creme auftragen", icon: "\u2728", anchor: "bedtime", xp: 10, minutes: 2, order: 3 },
+  { id: "v13", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "bedtime", xp: 10, minutes: 2, order: 4 },
 ];
 
 export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "evening", xp: 10, minutes: 10, order: 0, target: 2 };
@@ -248,7 +249,8 @@ export const BOSSES: import('./types').BossTemplate[] = [
 
 export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {
   morning: { label: "Bereit f\u00FCr den Tag", icon: "\u{1F305}", col: "#F97316" },
-  evening: { label: "Gute Nacht Routine", icon: "\u{1F319}", col: "#6D28D9" },
+  evening: { label: "Schul-Vorbereitung", icon: "\u{1F392}", col: "#6D28D9" },
+  bedtime: { label: "Gute Nacht", icon: "\u{1F319}", col: "#6d28d9" },
 };
 
 export const LVL = [0, 50, 120, 220, 360, 550, 800, 1100, 1500, 2000, 2600, 3300, 4100, 5000, 6000, 7200] as const;

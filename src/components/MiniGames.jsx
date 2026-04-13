@@ -35,7 +35,7 @@ const GAMES = [
     iconColor: '#6b3000',
     visualBg: 'linear-gradient(135deg, rgba(143,66,0,0.1), rgba(107,48,0,0.05))',
     visualColor: '#8f4200',
-    ready: false,
+    ready: true,
   },
   {
     id: 'clouds',
