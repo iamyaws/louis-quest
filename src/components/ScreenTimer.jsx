@@ -1,0 +1,177 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import SFX from '../utils/sfx';
+
+/**
+ * Floating screen-time timer badge.
+ *
+ * Props:
+ *  - totalSeconds: total duration in seconds
+ *  - cost: original screen-minute cost (for proportional refund)
+ *  - rewardName: display name ("Hörspiel", etc.)
+ *  - onFinish: called when timer hits 0
+ *  - onStore: called with {refundMinutes} when user saves remaining time
+ *  - onDismiss: called to remove the timer
+ */
+export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, onStore, onDismiss }) {
+  const [remaining, setRemaining] = useState(totalSeconds);
+  const [paused, setPaused] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const intervalRef = useRef(null);
+  const warningPlayed = useRef(false);
+
+  // Countdown logic
+  useEffect(() => {
+    if (paused || finished) {
+      clearInterval(intervalRef.current);
+      return;
+    }
+    intervalRef.current = setInterval(() => {
+      setRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current);
+          setFinished(true);
+          SFX.play('alarm');
+          if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+          onFinish?.();
+          return 0;
+        }
+        // Warning tick in last 60 seconds
+        if (prev <= 61 && prev > 1 && prev % 10 === 0 && !warningPlayed.current) {
+          SFX.play('tick');
+        }
+        if (prev <= 11) {
+          SFX.play('tick');
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(intervalRef.current);
+  }, [paused, finished, onFinish]);
+
+  const togglePause = useCallback(() => {
+    SFX.play('tap');
+    setPaused(p => !p);
+  }, []);
+
+  const handleStore = useCallback(() => {
+    SFX.play('coin');
+    clearInterval(intervalRef.current);
+    // Proportional refund: remaining/total * cost, rounded down
+    const refundMinutes = Math.floor((remaining / totalSeconds) * cost);
+    onStore?.({ refundMinutes });
+  }, [remaining, totalSeconds, cost, onStore]);
+
+  const handleDismiss = useCallback(() => {
+    clearInterval(intervalRef.current);
+    onDismiss?.();
+  }, [onDismiss]);
+
+  const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
+  const ss = String(remaining % 60).padStart(2, '0');
+  const pct = totalSeconds > 0 ? remaining / totalSeconds : 0;
+  const isLow = remaining <= 60;
+
+  // SVG ring
+  const R = 22;
+  const C = 2 * Math.PI * R;
+  const dashOffset = C * (1 - pct);
+
+  if (finished) {
+    return (
+      <div className="fixed z-[450] bottom-28 right-4 animate-bounce"
+           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <button onClick={handleDismiss}
+          className="flex items-center gap-3 px-5 py-3 rounded-full shadow-xl active:scale-95 transition-all"
+          style={{ background: 'linear-gradient(135deg, #ba1a1a, #ef4444)', color: 'white' }}>
+          <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>alarm</span>
+          <span className="font-headline font-bold text-lg">Zeit ist um!</span>
+          <span className="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed z-[450] bottom-28 right-4"
+         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+
+      {/* Expanded panel */}
+      {expanded && (
+        <div className="mb-3 rounded-2xl p-4 shadow-xl w-56"
+             style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+          {/* Reward label */}
+          <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3 text-center">
+            {rewardName}
+          </p>
+
+          {/* Big time display */}
+          <div className="text-center mb-4">
+            <span className={`font-headline font-bold text-4xl ${isLow ? 'text-error' : 'text-primary'}`}>
+              {mm}:{ss}
+            </span>
+          </div>
+
+          {/* Controls */}
+          <div className="flex gap-2">
+            {/* Pause / Play */}
+            <button onClick={togglePause}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full font-label font-bold text-sm active:scale-95 transition-all"
+              style={{ background: paused ? 'rgba(5,150,105,0.1)' : 'rgba(18,67,70,0.06)', color: paused ? '#059669' : '#124346' }}>
+              <span className="material-symbols-outlined text-lg"
+                    style={{ fontVariationSettings: "'FILL' 1" }}>
+                {paused ? 'play_arrow' : 'pause'}
+              </span>
+              {paused ? 'Weiter' : 'Pause'}
+            </button>
+
+            {/* Store remaining */}
+            <button onClick={handleStore}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full font-label font-bold text-sm active:scale-95 transition-all"
+              style={{ background: 'rgba(0,206,201,0.1)', color: '#00827e' }}>
+              <span className="material-symbols-outlined text-lg">savings</span>
+              Sparen
+            </button>
+          </div>
+
+          {/* Refund preview */}
+          {remaining < totalSeconds && (
+            <p className="text-center text-[10px] text-on-surface-variant mt-2 font-label">
+              Sparen gibt {Math.floor((remaining / totalSeconds) * cost)} Min. zurück
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Floating badge (always visible) */}
+      <button onClick={() => setExpanded(e => !e)}
+        className="flex items-center gap-2.5 pl-2 pr-4 py-2 rounded-full shadow-xl active:scale-95 transition-all"
+        style={{
+          background: isLow ? 'linear-gradient(135deg, #fef2f2, #ffffff)' : 'linear-gradient(135deg, #f0fdfa, #ffffff)',
+          border: isLow ? '2px solid rgba(186,26,26,0.2)' : '2px solid rgba(0,206,201,0.25)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        }}>
+        {/* Ring progress */}
+        <div className="relative w-11 h-11 flex items-center justify-center">
+          <svg width="44" height="44" className="absolute -rotate-90">
+            <circle cx="22" cy="22" r={R} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="3" />
+            <circle cx="22" cy="22" r={R} fill="none"
+                    stroke={isLow ? '#ba1a1a' : '#00CEC9'}
+                    strokeWidth="3" strokeLinecap="round"
+                    strokeDasharray={C} strokeDashoffset={dashOffset}
+                    className="transition-all duration-1000 ease-linear" />
+          </svg>
+          <span className={`material-symbols-outlined text-lg relative z-10 ${isLow ? 'text-error' : 'text-primary'}`}
+                style={{ fontVariationSettings: "'FILL' 1" }}>
+            {paused ? 'pause' : 'timer'}
+          </span>
+        </div>
+
+        {/* Time text */}
+        <span className={`font-headline font-bold text-lg ${isLow ? 'text-error' : 'text-primary'}`}>
+          {mm}:{ss}
+        </span>
+      </button>
+    </div>
+  );
+}

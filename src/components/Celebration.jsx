@@ -88,7 +88,7 @@ function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
 // ── Task Completion / Level Up ──
 function LevelUpCelebration({ level, onDismiss }) {
   return (
-    <main className="flex-grow w-full max-w-2xl px-6 pt-24 pb-32 flex flex-col items-center justify-center relative overflow-hidden mx-auto">
+    <main className="min-h-screen w-full max-w-2xl px-6 pt-24 pb-32 flex flex-col items-center justify-center relative overflow-hidden mx-auto">
       {/* Gold dust texture */}
       <img src={import.meta.env.BASE_URL + 'art/bg-gold-dust.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" />
       {/* Ambient blurs */}
@@ -322,7 +322,8 @@ export default function Celebration() {
            transform: visible ? 'translateY(0)' : 'translateY(20px)',
          }}>
       {/* Top bar */}
-      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 h-16">
+      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 h-16"
+              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <button onClick={handleDismiss} className="material-symbols-outlined text-primary hover:opacity-80 transition-opacity">close</button>
         <h1 className="font-headline font-bold text-2xl text-primary">Quest Complete!</h1>
         <div className="w-6" />

@@ -11,7 +11,8 @@ const TABS = [
 export default function NavBar({ active = 'quests', onNavigate }) {
   return (
     <nav className="fixed bottom-0 left-0 w-full z-50 bg-surface/80 backdrop-blur-xl rounded-t-[2rem] shadow-[0_-8px_24px_rgba(30,27,23,0.06)]">
-      <div className="flex justify-around items-center px-4 pb-8 pt-4 max-w-lg mx-auto">
+      <div className="flex justify-around items-center px-4 pt-4 max-w-lg mx-auto"
+           style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))' }}>
         {TABS.map(tab => {
           const isActive = tab.id === active;
           return (

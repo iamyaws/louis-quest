@@ -18,6 +18,7 @@ import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
 import CompanionToast from './components/CompanionToast';
 import WelcomeTour from './components/WelcomeTour';
+import ScreenTimer from './components/ScreenTimer';
 
 function AppContent() {
   const { state, actions, loading, toastTrigger } = useTask();
@@ -25,6 +26,15 @@ function AppContent() {
   const [showParental, setShowParental] = useState(false);
   const [showTour, setShowTour] = useState(() => !localStorage.getItem('ronki_tour_done'));
   const longPressTimer = useRef(null);
+  const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
+
+  const startScreenTimer = (reward) => {
+    setScreenTimer({
+      totalSeconds: reward.minutes * 60,
+      cost: reward.cost,
+      rewardName: reward.name,
+    });
+  };
 
   if (loading) {
     return (
@@ -59,9 +69,12 @@ function AppContent() {
         </div>
       )}
       <div className={`min-h-screen max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
-           style={{ paddingTop: ['hub', 'care'].includes(view) ? 0 : 72, paddingBottom: 96 }}>
+           style={{
+             paddingTop: ['hub', 'care'].includes(view) ? 0 : 'calc(72px + env(safe-area-inset-top, 0px))',
+             paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
+           }}>
         {view === 'quests' && <TaskList />}
-        {view === 'shop' && <Belohnungsbank onNavigate={setView} />}
+        {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} />}
         {view === 'hub' && <Hub onNavigate={setView} />}
         {view === 'care' && <Sanctuary />}
         {view === 'journal' && <Journal />}
@@ -84,6 +97,19 @@ function AppContent() {
       }} />}
       <CompanionToast trigger={toastTrigger} />
       <Celebration />
+      {screenTimer && (
+        <ScreenTimer
+          totalSeconds={screenTimer.totalSeconds}
+          cost={screenTimer.cost}
+          rewardName={screenTimer.rewardName}
+          onFinish={() => {}}
+          onStore={({ refundMinutes }) => {
+            if (refundMinutes > 0) actions.addScreenMinutes(refundMinutes);
+            setScreenTimer(null);
+          }}
+          onDismiss={() => setScreenTimer(null)}
+        />
+      )}
       {showTour && (
         <WelcomeTour onDone={() => {
           localStorage.setItem('ronki_tour_done', '1');

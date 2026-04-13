@@ -39,7 +39,8 @@ export default function Sanctuary() {
       </div>
       <div className="fixed inset-0 -z-10" style={{ background: 'rgba(255,248,241,0.55)' }} />
 
-      <main className="px-5 max-w-lg mx-auto pt-6">
+      <main className="px-5 max-w-lg mx-auto"
+            style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
 
         {/* Header */}
         <div className="flex justify-between items-center mb-6">

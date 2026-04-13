@@ -9,7 +9,7 @@ const ICON_MAP = {
   '🎢': 'attractions', '💪': 'fitness_center',
 };
 
-export default function Belohnungsbank({ onNavigate }) {
+export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive }) {
   const { state, actions } = useTask();
   const hp = state?.hp || 0;
   const screenMin = state?.drachenEier || 0; // Screen minutes (repurposed from eggs)
@@ -133,6 +133,7 @@ export default function Belohnungsbank({ onNavigate }) {
             {screenRewards.map(reward => {
               const canAfford = screenMin >= reward.cost;
               const matIcon = ICON_MAP[reward.emoji] || 'devices';
+              const blocked = timerActive; // can't start a second timer
               return (
                 <div key={reward.id}
                   className="rounded-2xl p-5 flex flex-col gap-4 transition-all"
@@ -154,13 +155,18 @@ export default function Belohnungsbank({ onNavigate }) {
                     </div>
                     <button
                       className={`font-label font-bold py-2 px-6 rounded-full text-sm text-white transition-all active:scale-95 ${
-                        canAfford ? '' : 'opacity-50 cursor-not-allowed'
+                        canAfford && !blocked ? '' : 'opacity-50 cursor-not-allowed'
                       }`}
-                      style={{ background: canAfford ? '#00CEC9' : '#e8e1da', color: canAfford ? 'white' : '#7b7486' }}
-                      disabled={!canAfford}
-                      onClick={() => { if (canAfford) actions.redeemReward('eggs', reward.cost); }}
+                      style={{ background: canAfford && !blocked ? '#00CEC9' : '#e8e1da', color: canAfford && !blocked ? 'white' : '#7b7486' }}
+                      disabled={!canAfford || blocked}
+                      onClick={() => {
+                        if (canAfford && !blocked) {
+                          actions.redeemReward('eggs', reward.cost);
+                          onStartTimer?.(reward);
+                        }
+                      }}
                     >
-                      {canAfford ? 'Einlösen' : 'Zu wenig'}
+                      {blocked ? 'Timer läuft' : canAfford ? 'Einlösen' : 'Zu wenig'}
                     </button>
                   </div>
                 </div>

@@ -111,27 +111,42 @@ export default function TaskList() {
           return (
             <details key={anchor} className="group overflow-hidden" open={!secDone && !isEvening}
               style={{
-                background: meta.bg,
+                background: secDone ? 'linear-gradient(135deg, #f0fdf4, #ecfdf5)' : meta.bg,
                 borderRadius: '1.25rem',
-                border: `1.5px solid ${meta.border}`,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                border: secDone ? '1.5px solid rgba(52,211,153,0.25)' : `1.5px solid ${meta.border}`,
+                boxShadow: secDone ? '0 4px 16px rgba(52,211,153,0.1)' : '0 2px 8px rgba(0,0,0,0.04)',
               }}
             >
               {/* ── Epic Header (Summary) ── */}
               <summary className="p-6 cursor-pointer lotus-pattern list-none [&::-webkit-details-marker]:hidden">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                         style={{ background: `${meta.col}15` }}>
-                      <span className="material-symbols-outlined text-3xl"
-                            style={{ color: meta.col }}>
-                        {icon}
-                      </span>
-                    </div>
+                    {secDone ? (
+                      /* Companion approval avatar when routine is complete */
+                      <div className="relative w-14 h-14">
+                        <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-emerald/30"
+                             style={{ background: 'rgba(52,211,153,0.1)' }}>
+                          <img src={import.meta.env.BASE_URL + 'art/dragon-baby.webp'} alt=""
+                               className="w-full h-full object-cover" />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                             style={{ background: '#34d399', border: '2px solid #ecfdf5', lineHeight: 1 }}>
+                          <span className="material-symbols-outlined text-white text-sm" style={{ fontVariationSettings: "'FILL' 1", fontSize: 14 }}>thumb_up</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                           style={{ background: `${meta.col}15` }}>
+                        <span className="material-symbols-outlined text-3xl"
+                              style={{ color: meta.col }}>
+                          {icon}
+                        </span>
+                      </div>
+                    )}
                     <div>
-                      <h3 className="text-xl font-bold font-headline text-on-surface">{label}</h3>
-                      <p className="text-sm font-medium font-label text-on-surface/60">
-                        {secDone ? 'Geschafft!' : `Noch ${quests.length - doneCount} Aufgaben`}
+                      <h3 className={`text-xl font-bold font-headline ${secDone ? 'text-emerald-dark' : 'text-on-surface'}`}>{label}</h3>
+                      <p className={`text-sm font-medium font-label ${secDone ? 'text-emerald-dark/70' : 'text-on-surface/60'}`}>
+                        {secDone ? 'Geschafft! Ronki ist stolz!' : `Noch ${quests.length - doneCount} Aufgaben`}
                       </p>
                     </div>
                   </div>
@@ -147,11 +162,13 @@ export default function TaskList() {
                                 strokeDasharray="125.6"
                                 strokeDashoffset={125.6 - (doneCount / quests.length) * 125.6} />
                       </svg>
-                      <span className="absolute text-[10px] font-bold font-label">
-                        {doneCount}/{quests.length}
+                      <span className={`absolute text-[10px] font-bold font-label ${secDone ? 'text-emerald-dark' : ''}`}>
+                        {secDone ? (
+                          <span className="material-symbols-outlined text-base text-emerald-dark" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
+                        ) : `${doneCount}/${quests.length}`}
                       </span>
                     </div>
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary group-open:rotate-180 transition-transform">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center group-open:rotate-180 transition-transform ${secDone ? 'bg-emerald-dark' : 'bg-primary'}`}>
                       <span className="material-symbols-outlined text-white text-lg">
                         expand_more
                       </span>

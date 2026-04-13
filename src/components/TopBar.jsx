@@ -9,7 +9,8 @@ export default function TopBar() {
   const xpPct = xpProgress.need > 0 ? Math.min(1, xpProgress.cur / xpProgress.need) : 0;
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl">
+    <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl"
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <div className="flex justify-between items-center px-6 py-3 w-full max-w-lg mx-auto">
         {/* Left: Avatar + Level badge + Brand */}
         <div className="flex items-center gap-3">

@@ -137,6 +137,7 @@ export interface Belohnung {
   cost: number;
   active: boolean;
   currency?: 'hp' | 'eggs';  // which currency this costs (default: 'hp')
+  minutes?: number;           // duration in real minutes for screen-time rewards
   availableAfter?: string;
   availableAfterFree?: string;
   weekendCost?: number;
