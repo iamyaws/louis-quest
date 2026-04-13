@@ -108,6 +108,18 @@ const SFX = {
           g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.2);
           o.start(now + i * 0.15); o.stop(now + i * 0.15 + 0.2);
         });
+      } else if (type === "flap") {
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine"; o.frequency.setValueAtTime(400, now); o.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+        g.gain.setValueAtTime(0.15, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        o.start(now); o.stop(now + 0.1);
+      } else if (type === "crash") {
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine"; o.frequency.setValueAtTime(300, now); o.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+        g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        o.start(now); o.stop(now + 0.25);
       } else if (type === "tick") {
         // Soft tick for last-minute warning
         const o = ctx.createOscillator(); const g = ctx.createGain();

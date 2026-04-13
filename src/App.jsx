@@ -16,6 +16,7 @@ import EpicMissions from './components/EpicMissions';
 import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
+import CloudJumpGame from './components/CloudJumpGame';
 import CompanionToast from './components/CompanionToast';
 import WelcomeTour from './components/WelcomeTour';
 import ScreenTimer from './components/ScreenTimer';
@@ -83,6 +84,7 @@ function AppContent() {
         {view === 'games' && <MiniGames onPlay={(id) => {
           if (id === 'memory') setView('memory');
           if (id === 'potion') setView('potion');
+          if (id === 'clouds') setView('clouds');
         }} />}
       </div>
       <NavBar active={view} onNavigate={setView} />
@@ -92,6 +94,10 @@ function AppContent() {
         setView('games');
       }} />}
       {view === 'potion' && <PotionGame onComplete={(reward) => {
+        if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
+        setView('games');
+      }} />}
+      {view === 'clouds' && <CloudJumpGame onComplete={(reward) => {
         if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
         setView('games');
       }} />}

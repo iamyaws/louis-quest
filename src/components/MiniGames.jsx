@@ -40,14 +40,14 @@ const GAMES = [
   {
     id: 'clouds',
     title: 'Wolkensprung',
-    desc: 'Springe von Wolke zu Wolke bis zum Mond.',
+    desc: 'Fliege mit deinem Drachen durch die Wolken!',
     icon: 'cloud',
     visualIcon: 'air',
-    iconBg: 'rgba(211,187,255,0.2)',
-    iconColor: '#6d28d9',
-    visualBg: 'linear-gradient(135deg, rgba(211,187,255,0.15), rgba(83,0,183,0.05))',
-    visualColor: '#5300b7',
-    ready: false,
+    iconBg: 'rgba(135,206,235,0.2)',
+    iconColor: '#0284c7',
+    visualBg: 'linear-gradient(135deg, rgba(135,206,235,0.15), rgba(2,132,199,0.05))',
+    visualColor: '#0284c7',
+    ready: true,
   },
 ];
 
