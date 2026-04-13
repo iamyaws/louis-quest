@@ -9,7 +9,7 @@ const ICON_MAP = {
   '🎢': 'attractions', '💪': 'fitness_center',
 };
 
-export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive }) {
+export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, onOpenParental }) {
   const { state, actions } = useTask();
   const hp = state?.hp || 0;
   const screenMin = state?.drachenEier || 0; // Screen minutes (repurposed from eggs)
@@ -196,6 +196,15 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive }
           </div>
         </div>
       </div>
+
+      {/* ── Parental access (boring on purpose) ── */}
+      <button
+        onClick={onOpenParental}
+        className="mt-10 mb-2 mx-auto flex items-center gap-1.5 px-3 py-1.5 rounded transition-all"
+        style={{ opacity: 0.3 }}>
+        <span className="material-symbols-outlined" style={{ fontSize: '14px', color: '#9ca3af' }}>lock</span>
+        <span className="font-label text-[10px] text-[#9ca3af] tracking-wide">Systemverwaltung</span>
+      </button>
     </div>
   );
 }

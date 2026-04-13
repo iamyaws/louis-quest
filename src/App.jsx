@@ -76,7 +76,7 @@ function AppContent() {
              paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
            }}>
         {view === 'quests' && <TaskList />}
-        {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} />}
+        {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} onOpenParental={() => setShowParental(true)} />}
         {view === 'hub' && <Hub onNavigate={setView} />}
         {view === 'care' && <Sanctuary />}
         {view === 'journal' && <Journal />}
