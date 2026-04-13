@@ -39,7 +39,7 @@ export default function Hub({ onNavigate }) {
               style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg"
-               style={{ background: '#ebddff' }}>
+               style={{ background: '#ccfbf1' }}>
             <img src={base + 'art/dragon-baby.webp'} alt="Avatar" className="w-full h-full object-cover" />
           </div>
           <span className="text-xl font-headline font-bold text-primary" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
@@ -48,7 +48,7 @@ export default function Hub({ onNavigate }) {
         </div>
         <div className="px-4 py-1.5 rounded-full flex items-center gap-2"
              style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.5)' }}>
-          <span className="font-bold text-[11px] font-label text-primary">Lv. 1 · {state.hp || 0} HP</span>
+          <span className="font-bold text-[11px] font-label text-primary">Lv. 1</span>
         </div>
       </header>
 
@@ -112,7 +112,7 @@ export default function Hub({ onNavigate }) {
             </div>
             <div className="relative w-16 h-16 shrink-0">
               <svg className="w-full h-full -rotate-90">
-                <circle cx="32" cy="32" r="28" fill="transparent" stroke="rgba(83,0,183,0.1)" strokeWidth="5" />
+                <circle cx="32" cy="32" r="28" fill="transparent" stroke="rgba(15,118,110,0.1)" strokeWidth="5" />
                 <circle cx="32" cy="32" r="28" fill="transparent" stroke="#fcd34d"
                   strokeWidth="5" strokeLinecap="round"
                   strokeDasharray="176" strokeDashoffset={176 - pct * 176} />
@@ -165,7 +165,7 @@ export default function Hub({ onNavigate }) {
                   className={`w-5 h-5 rounded-full border-2 transition-all ${
                     i < (state.dailyWaterCount || 0) ? 'bg-primary border-primary' : 'border-primary/20'
                   }`}
-                  style={{ background: i < (state.dailyWaterCount || 0) ? undefined : 'rgba(83,0,183,0.05)' }}
+                  style={{ background: i < (state.dailyWaterCount || 0) ? undefined : 'rgba(15,118,110,0.05)' }}
                   onClick={() => i === (state.dailyWaterCount || 0) && actions.drinkWater?.()}
                 />
               ))}
@@ -186,12 +186,14 @@ export default function Hub({ onNavigate }) {
           const hpPct = state.boss.maxHp > 0 ? (state.boss.hp / state.boss.maxHp) * 100 : 0;
           return (
             <>
-              <div className="p-5 rounded-2xl flex items-center gap-4"
-                   style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}
+              <div className="p-5 rounded-2xl flex items-center gap-4 relative overflow-hidden"
+                   style={{ background: '#1a1a3e', border: '1.5px solid rgba(252,211,77,0.2)', boxShadow: '0 4px 20px rgba(26,26,62,0.25)' }}
                    onClick={() => setShowBossDetail(true)}>
+                <img src={base + 'art/tex-sternenmeer.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(26,26,62,0.7), rgba(35,35,80,0.6))' }} />
                 {/* Round portrait */}
-                <div className="w-16 h-16 rounded-full overflow-hidden shrink-0 cursor-pointer shadow-lg"
-                     style={{ border: defeated ? '3px solid #34d399' : '3px solid rgba(186,26,26,0.3)' }}>
+                <div className="relative z-10 w-16 h-16 rounded-full overflow-hidden shrink-0 cursor-pointer shadow-lg"
+                     style={{ border: '3px solid #fcd34d', boxShadow: '0 0 12px rgba(252,211,77,0.3)' }}>
                   {artSrc ? (
                     <img src={artSrc} alt={bd.name} className="w-full h-full object-cover" />
                   ) : (
@@ -199,31 +201,31 @@ export default function Hub({ onNavigate }) {
                   )}
                 </div>
                 {/* Stats */}
-                <div className="flex-1">
+                <div className="relative z-10 flex-1">
                   {defeated ? (
                     <>
-                      <p className="font-bold text-[10px] font-label uppercase tracking-widest" style={{ color: '#059669' }}>Boss besiegt!</p>
-                      <h4 className="font-headline font-bold text-lg text-on-surface">{bd.name}</h4>
+                      <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>Boss besiegt!</p>
+                      <h4 className="font-headline font-bold text-lg text-white">{bd.name}</h4>
                     </>
                   ) : (
                     <>
                       <div className="flex justify-between items-center">
-                        <p className="font-bold text-[10px] font-label text-error uppercase tracking-widest">Boss-Kampf</p>
-                        <p className="font-bold text-xs font-label text-error">{state.boss.hp}/{state.boss.maxHp} HP</p>
+                        <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fca5a5' }}>Boss-Kampf</p>
+                        <p className="font-bold text-xs font-label" style={{ color: '#fca5a5' }}>{state.boss.hp}/{state.boss.maxHp} HP</p>
                       </div>
-                      <h4 className="font-headline font-bold text-lg text-on-surface">{bd.name}</h4>
-                      <div className="w-full h-2 rounded-full overflow-hidden mt-2" style={{ background: 'rgba(232,225,218,0.5)' }}>
-                        <div className="h-full bg-error rounded-full transition-all duration-500" style={{ width: `${hpPct}%` }} />
+                      <h4 className="font-headline font-bold text-lg text-white">{bd.name}</h4>
+                      <div className="w-full h-2 rounded-full overflow-hidden mt-2" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${hpPct}%`, background: '#f87171' }} />
                       </div>
                       {(state.bossDmgToday || 0) > 0 && (
-                        <p className="font-label font-bold text-xs mt-1" style={{ color: '#059669' }}>
+                        <p className="font-label font-bold text-xs mt-1" style={{ color: '#fcd34d' }}>
                           Heute: -{state.bossDmgToday} Schaden!
                         </p>
                       )}
                     </>
                   )}
                 </div>
-                <span className="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
+                <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
               </div>
 
               {/* Full-screen Boss Battle Detail */}
@@ -357,7 +359,7 @@ export default function Hub({ onNavigate }) {
                         <h4 className="font-label font-bold text-xs uppercase tracking-widest text-outline mb-3">Beute erhalten</h4>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="p-4 rounded-2xl text-center"
-                               style={{ background: 'rgba(83,0,183,0.05)', border: '1px solid rgba(83,0,183,0.1)' }}>
+                               style={{ background: 'rgba(15,118,110,0.05)', border: '1px solid rgba(15,118,110,0.1)' }}>
                             <span className="material-symbols-outlined text-2xl text-primary mb-1 block"
                                   style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
                             <p className="font-label font-bold text-lg text-primary">+{bd.reward.hp}</p>
@@ -405,7 +407,7 @@ export default function Hub({ onNavigate }) {
                 {sideQuests.slice(0, 3).map(q => (
                   <div key={q.id} className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                         style={{ background: 'rgba(83,0,183,0.05)' }}>
+                         style={{ background: 'rgba(15,118,110,0.05)' }}>
                       <span className="text-xl">{q.icon}</span>
                     </div>
                     <p className="font-body text-xs text-on-surface font-semibold flex-1">{q.name}</p>
@@ -416,53 +418,57 @@ export default function Hub({ onNavigate }) {
           );
         })()}
 
-        {/* ── Epic Missions Entry ── */}
+        {/* ── Epic Missions Entry — Kristallgold ── */}
         <button
-          className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98]"
-          style={{ background: 'linear-gradient(135deg, rgba(83,0,183,0.08), rgba(252,211,77,0.08))', border: '1.5px solid rgba(83,0,183,0.12)' }}
+          className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98] relative overflow-hidden"
+          style={{ background: '#451a03', border: '1.5px solid rgba(252,211,77,0.2)', boxShadow: '0 4px 20px rgba(69,26,3,0.25)' }}
           onClick={() => onNavigate?.('missions')}
         >
-          <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-               style={{ background: 'linear-gradient(135deg, #5300b7, #6d28d9)' }}>
+          <img src={base + 'art/tex-wolkengrat.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(69,26,3,0.55), rgba(120,53,15,0.45))' }} />
+          <div className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+               style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', border: '3px solid #fcd34d', boxShadow: '0 0 12px rgba(252,211,77,0.3)' }}>
             <span className="material-symbols-outlined text-white text-2xl"
                   style={{ fontVariationSettings: "'FILL' 1" }}>swords</span>
           </div>
-          <div className="flex-1">
-            <p className="font-headline font-bold text-base text-primary">Epische Missionen</p>
-            <p className="font-body text-sm text-on-surface-variant">
+          <div className="relative z-10 flex-1">
+            <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>Epische Missionen</p>
+            <h4 className="font-headline font-bold text-lg text-white">
               {(state.activeMissions || []).length > 0
                 ? `${state.activeMissions.length} aktiv`
                 : 'Wähle dein Abenteuer!'}
-            </p>
+            </h4>
           </div>
-          <span className="material-symbols-outlined text-primary/40">chevron_right</span>
+          <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
         </button>
 
         {/* ── Badge Grid ── */}
         <BadgeGrid />
 
-        {/* ── Helden-Kodex Card ── */}
+        {/* ── Helden-Kodex Card — Morgenwald ── */}
         <button
-          className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98]"
-          style={{ background: 'rgba(83,0,183,0.05)', border: '1px solid rgba(83,0,183,0.1)' }}
+          className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98] relative overflow-hidden"
+          style={{ background: '#fef9c3', border: '1.5px solid rgba(101,163,13,0.15)', boxShadow: '0 4px 16px rgba(101,163,13,0.08)' }}
           onClick={() => onNavigate?.('kodex')}
         >
-          <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-               style={{ background: 'rgba(83,0,183,0.1)' }}>
-            <span className="material-symbols-outlined text-primary text-2xl"
+          <img src={base + 'art/tex-morgenwald.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none" />
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(254,249,195,0.55), rgba(236,252,203,0.5))' }} />
+          <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+               style={{ background: 'linear-gradient(135deg, #65a30d, #84cc16)', boxShadow: '0 2px 8px rgba(101,163,13,0.3)' }}>
+            <span className="material-symbols-outlined text-white text-2xl"
                   style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
           </div>
-          <div className="flex-1">
-            <p className="font-headline font-bold text-base text-primary">Helden-Kodex</p>
-            <p className="font-body text-sm text-on-surface-variant">Unsere Familien-Werte</p>
+          <div className="relative z-10 flex-1">
+            <p className="font-headline font-bold text-lg" style={{ color: '#1a2e05' }}>Helden-Kodex</p>
+            <p className="font-body text-base" style={{ color: '#365314' }}>Unsere Familien-Werte</p>
           </div>
-          <span className="material-symbols-outlined text-primary/40">chevron_right</span>
+          <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: '#4d7c0f' }}>chevron_right</span>
         </button>
 
         {/* ── Bodhi leaf ── */}
         <div className="flex justify-center py-2 opacity-20">
           <svg width="40" height="40" viewBox="0 0 120 120" fill="none">
-            <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#5300b7" />
+            <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#0f766e" />
           </svg>
         </div>
       </main>

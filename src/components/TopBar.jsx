@@ -19,7 +19,7 @@ export default function TopBar() {
             </div>
             {/* Level badge */}
             <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                 style={{ background: '#5300b7', border: '2px solid #fff8f1', lineHeight: 1 }}>
+                 style={{ background: '#0f766e', border: '2px solid #fff8f1', lineHeight: 1 }}>
               {level}
             </div>
           </div>
@@ -27,9 +27,9 @@ export default function TopBar() {
             <span className="font-headline text-xl font-bold text-primary leading-tight">Ronki</span>
             {/* XP progress bar */}
             <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(83,0,183,0.1)' }}>
+              <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(15,118,110,0.1)' }}>
                 <div className="h-full rounded-full transition-all duration-500"
-                     style={{ width: `${xpPct * 100}%`, background: 'linear-gradient(90deg, #5300b7, #a78bfa)' }} />
+                     style={{ width: `${xpPct * 100}%`, background: 'linear-gradient(90deg, #0f766e, #5eead4)' }} />
               </div>
               <span className="font-label text-[9px] text-outline">{xpProgress.cur}/{xpProgress.need}</span>
             </div>

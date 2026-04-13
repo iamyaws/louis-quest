@@ -112,7 +112,7 @@ export default function EggProfile() {
         {/* Bodhi leaf */}
         <div className="flex justify-center py-4 opacity-10">
           <svg width="40" height="40" viewBox="0 0 120 120" fill="none">
-            <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#5300b7" />
+            <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#0f766e" />
           </svg>
         </div>
       </div>

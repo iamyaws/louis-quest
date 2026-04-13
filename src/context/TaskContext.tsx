@@ -42,6 +42,7 @@ interface TaskState {
   equippedGear: { head?: string; back?: string; neck?: string };
   unlockedBadges: string[];
   totalTasksDone: number;
+  birthdayEpic: { done: string[]; completed: boolean };
 }
 
 interface TaskComputed {
@@ -71,6 +72,7 @@ interface TaskActions {
   addHP: (amount: number) => void;
   equipGear: (gearId: string) => void;
   unequipGear: (slot: 'head' | 'back' | 'neck') => void;
+  updateBirthdayEpic: (data: { done: string[]; completed: boolean }) => void;
 }
 
 interface CelebrationEvent {
@@ -177,6 +179,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           equippedGear: raw.equippedGear || {},
           unlockedBadges: raw.unlockedBadges || [],
           totalTasksDone: raw.totalTasksDone || 0,
+          birthdayEpic: raw.birthdayEpic || { done: [], completed: false },
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -226,6 +229,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           equippedGear: {},
           unlockedBadges: [],
           totalTasksDone: 0,
+          birthdayEpic: { done: [], completed: false },
         });
       }
       setLoading(false);
@@ -602,6 +606,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const updateBirthdayEpic = useCallback((data: { done: string[]; completed: boolean }) => {
+    setState(prev => prev ? { ...prev, birthdayEpic: data } : prev);
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -625,7 +633,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, equipGear, unequipGear }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, equipGear, unequipGear, updateBirthdayEpic }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

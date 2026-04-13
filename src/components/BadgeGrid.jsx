@@ -17,7 +17,7 @@ export default function BadgeGrid() {
           <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
           Abzeichen
         </h3>
-        <span className="font-label font-bold text-xs text-on-surface-variant">{count}/{BADGES.length}</span>
+        <span className="font-label font-bold text-sm text-on-surface-variant">{count}/{BADGES.length}</span>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
@@ -31,19 +31,19 @@ export default function BadgeGrid() {
                 border: isUnlocked ? '1.5px solid rgba(252,211,77,0.3)' : '1.5px solid transparent',
                 opacity: isUnlocked ? 1 : 0.4,
               }}>
-              <span className="text-2xl" style={{ filter: isUnlocked ? 'none' : 'grayscale(1)' }}>
+              <span className="text-3xl" style={{ filter: isUnlocked ? 'none' : 'grayscale(1)' }}>
                 {badge.i}
               </span>
-              <span className="font-label font-bold text-[10px] text-on-surface text-center leading-tight">
+              <span className="font-label font-bold text-xs text-on-surface text-center leading-tight">
                 {badge.n}
               </span>
               {isUnlocked && (
-                <span className="text-[8px] font-label text-on-surface-variant text-center leading-tight">
+                <span className="text-[11px] font-label text-on-surface-variant text-center leading-snug">
                   {badge.desc}
                 </span>
               )}
               {!isUnlocked && (
-                <span className="material-symbols-outlined text-xs" style={{ color: '#ccc3d7' }}>lock</span>
+                <span className="material-symbols-outlined text-sm" style={{ color: '#ccc3d7' }}>lock</span>
               )}
             </div>
           );

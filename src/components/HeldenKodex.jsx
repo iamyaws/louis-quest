@@ -81,8 +81,8 @@ export default function HeldenKodex() {
       <section
         className="mt-10 rounded-xl p-8 relative overflow-hidden"
         style={{
-          background: 'rgba(83,0,183,0.05)',
-          border: '1px solid rgba(83,0,183,0.08)',
+          background: 'rgba(15,118,110,0.05)',
+          border: '1px solid rgba(15,118,110,0.08)',
         }}
       >
         {/* Header row */}

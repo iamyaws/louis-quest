@@ -89,7 +89,7 @@ function LevelUpCelebration({ level, onDismiss }) {
     <main className="flex-grow w-full max-w-2xl px-6 pt-24 pb-32 flex flex-col items-center justify-center relative overflow-hidden mx-auto">
       {/* Ambient blurs */}
       <div className="absolute -top-12 -left-12 w-64 h-64 rounded-full blur-3xl" style={{ background: 'rgba(252,211,77,0.1)' }} />
-      <div className="absolute bottom-24 -right-12 w-48 h-48 rounded-full blur-2xl" style={{ background: 'rgba(83,0,183,0.05)' }} />
+      <div className="absolute bottom-24 -right-12 w-48 h-48 rounded-full blur-2xl" style={{ background: 'rgba(15,118,110,0.05)' }} />
 
       <div className="relative z-10 w-full flex flex-col items-center text-center">
         {/* Sparkle checkmark */}
@@ -129,7 +129,7 @@ function LevelUpCelebration({ level, onDismiss }) {
         <div className="flex flex-col gap-4 w-full max-w-xs">
           <button onClick={onDismiss}
             className="bg-primary-container text-white font-headline font-bold text-xl px-8 py-5 rounded-full active:scale-95 transition-all"
-            style={{ boxShadow: '0 8px 24px rgba(83,0,183,0.2)' }}>
+            style={{ boxShadow: '0 8px 24px rgba(15,118,110,0.2)' }}>
             Stark!
           </button>
         </div>
@@ -215,7 +215,7 @@ function VictoryCelebration({ onDismiss }) {
         <div className="w-full max-w-sm space-y-4">
           <button onClick={onDismiss}
             className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full active:scale-95 transition-all flex items-center justify-center gap-3"
-            style={{ boxShadow: '0 8px 24px rgba(83,0,183,0.2)' }}>
+            style={{ boxShadow: '0 8px 24px rgba(15,118,110,0.2)' }}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
             Weiter!
           </button>
@@ -282,7 +282,7 @@ function ChestCelebration({ milestone, reward, onDismiss }) {
         <div className="w-full max-w-sm">
           <button onClick={onDismiss}
             className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full active:scale-95 transition-all flex items-center justify-center gap-3"
-            style={{ boxShadow: '0 8px 24px rgba(83,0,183,0.2)' }}>
+            style={{ boxShadow: '0 8px 24px rgba(15,118,110,0.2)' }}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
             Einsammeln!
           </button>

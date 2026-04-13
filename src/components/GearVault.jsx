@@ -11,7 +11,7 @@ const SLOT_META = {
 
 const RARITY_STYLES = {
   common: { bg: 'rgba(232,225,218,0.6)', border: 'rgba(0,0,0,0.08)', label: 'Gewöhnlich', color: '#7b7486' },
-  rare: { bg: 'rgba(83,0,183,0.06)', border: 'rgba(83,0,183,0.15)', label: 'Selten', color: '#5300b7' },
+  rare: { bg: 'rgba(15,118,110,0.06)', border: 'rgba(15,118,110,0.15)', label: 'Selten', color: '#0f766e' },
   epic: { bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.4)', label: 'Episch', color: '#b45309' },
 };
 
@@ -127,8 +127,8 @@ export default function GearVault() {
           )}
           {totalStats.courage > 0 && (
             <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
-                 style={{ background: 'rgba(83,0,183,0.06)', border: '1px solid rgba(83,0,183,0.12)' }}>
-              <span className="material-symbols-outlined text-lg" style={{ color: '#5300b7', fontVariationSettings: "'FILL' 1" }}>bolt</span>
+                 style={{ background: 'rgba(15,118,110,0.06)', border: '1px solid rgba(15,118,110,0.12)' }}>
+              <span className="material-symbols-outlined text-lg" style={{ color: '#0f766e', fontVariationSettings: "'FILL' 1" }}>bolt</span>
               <div>
                 <p className="font-label font-bold text-[10px] text-on-surface-variant uppercase">Mut</p>
                 <p className="font-headline font-bold text-lg text-primary">+{totalStats.courage}</p>

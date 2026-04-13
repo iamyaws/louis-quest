@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
 import { WEEKLY_MISSIONS } from '../constants';
+import BirthdayEpic from './BirthdayEpic';
 
 const TAG_STYLES = {
   emerald: { bg: 'rgba(16,185,129,0.1)', color: '#065f46' },
@@ -126,10 +127,19 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
 
 export default function EpicMissions() {
   const { state, actions } = useTask();
+  const [showBirthday, setShowBirthday] = useState(false);
+  const base = import.meta.env.BASE_URL;
   if (!state) return null;
 
   const activeMissions = state.activeMissions || [];
   const completedMissions = state.completedMissions || [];
+  const bdState = state.birthdayEpic || { done: [], completed: false };
+  const bdDone = bdState.done?.length || 0;
+  const bdCompleted = bdState.completed;
+
+  if (showBirthday) {
+    return <BirthdayEpic onBack={() => setShowBirthday(false)} />;
+  }
 
   return (
     <div className="px-6 pt-4 pb-8">
@@ -141,7 +151,51 @@ export default function EpicMissions() {
         </p>
       </section>
 
-      {/* Active missions first */}
+      {/* Birthday Epic — Featured Quest */}
+      <div className="mb-6">
+        <button
+          className="w-full rounded-2xl overflow-hidden text-left transition-all active:scale-[0.98] relative"
+          style={{ boxShadow: '0 4px 20px rgba(217,119,6,0.15)' }}
+          onClick={() => setShowBirthday(true)}
+        >
+          <div className="relative h-44 overflow-hidden">
+            <img src={base + 'art/birthday-prep.png'} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #451a03 0%, rgba(69,26,3,0.4) 40%, transparent 70%)' }} />
+            <div className="absolute top-3 left-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-label uppercase tracking-widest"
+                    style={{ background: '#fcd34d', color: '#725b00' }}>
+                <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                Event Quest
+              </span>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 p-5">
+              <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>
+                {bdCompleted ? 'Abgeschlossen!' : `${bdDone}/6 Aufgaben`}
+              </p>
+              <h3 className="font-headline font-bold text-xl text-white mt-1">Mission: Geburtstags-Überraschung</h3>
+            </div>
+          </div>
+          {!bdCompleted && (
+            <div className="bg-white p-4 flex items-center justify-between"
+                 style={{ borderTop: '3px solid #fcd34d' }}>
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-lg" style={{ color: '#d97706', fontVariationSettings: "'FILL' 1" }}>cake</span>
+                <span className="font-body text-sm text-on-surface-variant">Bereite die Überraschung vor!</span>
+              </div>
+              <span className="material-symbols-outlined text-xl" style={{ color: '#d97706' }}>chevron_right</span>
+            </div>
+          )}
+          {bdCompleted && (
+            <div className="p-4 flex items-center justify-center gap-2"
+                 style={{ background: 'rgba(52,211,153,0.1)' }}>
+              <span className="material-symbols-outlined" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+              <span className="font-label font-bold text-sm" style={{ color: '#059669' }}>Super-Bruder Abzeichen erhalten!</span>
+            </div>
+          )}
+        </button>
+      </div>
+
+      {/* Regular missions */}
       <div className="flex flex-col gap-6">
         {WEEKLY_MISSIONS.map(mission => {
           const active = activeMissions.find(m => m.id === mission.id);
