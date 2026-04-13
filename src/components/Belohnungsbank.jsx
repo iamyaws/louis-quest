@@ -20,10 +20,31 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
   return (
     <div className="px-6 pb-32">
 
-      {/* ── Header ── */}
-      <section className="mb-6">
-        <h1 className="text-3xl font-bold font-headline text-on-surface mb-2">Belohnungsbank</h1>
-        <p className="text-on-surface-variant font-body text-lg">Wandle deine Punkte in tolle Erlebnisse um!</p>
+      {/* ── Header with hero illustration ── */}
+      <section className="mb-6 -mx-6 -mt-6">
+        <div className="relative rounded-b-3xl overflow-hidden"
+             style={{ background: 'linear-gradient(135deg, #0c3236, #124346)' }}>
+          <div className="flex items-end px-6 pt-4 pb-5">
+            {/* Text */}
+            <div className="flex-1 z-10 pb-2">
+              <h1 className="text-3xl font-bold font-headline text-white mb-1"
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                Belohnungsbank
+              </h1>
+              <p className="text-white/60 font-body text-sm leading-relaxed">
+                Wandle Punkte in tolle Erlebnisse um!
+              </p>
+            </div>
+            {/* Hero with coins illustration */}
+            <img src={import.meta.env.BASE_URL + 'art/hero-shop.webp'}
+                 alt=""
+                 className="w-32 h-auto -mb-5 -mr-2 drop-shadow-2xl"
+                 style={{ filter: 'brightness(1.1)' }} />
+          </div>
+          {/* Coin glow */}
+          <div className="absolute bottom-0 right-12 w-24 h-16 rounded-full blur-2xl opacity-35 pointer-events-none"
+               style={{ background: '#fcd34d' }} />
+        </div>
       </section>
 
       {/* ── Dual Balance Cards ── */}

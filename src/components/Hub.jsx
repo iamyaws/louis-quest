@@ -1,11 +1,31 @@
 import React, { useState } from 'react';
-import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES, BOSS_TIERS, GEAR_ITEMS } from '../constants';
+import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES, BOSS_TIERS, GEAR_ITEMS, CAT_STAGES, COMPANION_STAGES } from '../constants';
 import { useTask } from '../context/TaskContext';
+import { getLevel, getCatStage } from '../utils/helpers';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
 import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
 import { BADGES } from '../constants';
+
+// ── Egg art per onboarding type (stage 0) ──
+const EGG_ART = {
+  fire: 'art/onboarding/egg-fire.webp',
+  golden: 'art/onboarding/egg-golden.webp',
+  spirit: 'art/onboarding/egg-spirit.webp',
+};
+
+// ── Dragon evolution art per stage (1-4) ──
+const COMPANION_ART = {
+  dragon: [
+    null, // stage 0 = egg (use EGG_ART)
+    'art/companion/dragon-baby.webp',
+    'art/companion/dragon-young.webp',
+    'art/companion/dragon-majestic.webp',
+    'art/companion/dragon-legendary.webp',
+  ],
+  // TODO: add art for other companion types (wolf, phoenix, cat)
+};
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 
@@ -26,52 +46,77 @@ export default function Hub({ onNavigate }) {
 
   if (!state) return null;
 
-  return (
-    <div className="relative min-h-screen pb-32">
-      {/* ── Background: time-of-day sky ── */}
-      <div className="fixed inset-0 -z-20">
-        <img src={base + 'art/bg-cream-brush.webp'} alt="" className="w-full h-full object-cover" />
-      </div>
+  const level = getLevel(state.xp || 0);
+  const heroName = state.familyConfig?.childName || 'Held';
 
-      {/* ── Minimal Top Bar ── */}
+  return (
+    <div className="relative min-h-screen bg-surface pb-32">
+
+      {/* ── Top Bar (matches TopBar component style) ── */}
       <header className="flex justify-between items-center px-6 pb-2"
-              style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))', background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}>
-        <button onClick={() => onNavigate?.('hero')} className="flex items-center gap-3 active:scale-95 transition-all">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg"
-               style={{ background: '#a2d0d4' }}>
-            <img src={base + 'art/hero-default.webp'} alt="Avatar" className="w-full h-full object-cover" />
+              style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
+        <button onClick={() => onNavigate?.('hero')} className="flex items-center gap-2 active:scale-95 transition-all">
+          <div className="relative">
+            <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden shadow-sm"
+                 style={{ border: '2px solid rgba(18,67,70,0.15)' }}>
+              <img src={base + 'art/hero-default.webp'} alt={heroName} className="w-full h-full object-cover" />
+            </div>
+            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] shadow-md"
+                 style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', border: '2px solid white', color: '#1a1a1a', lineHeight: 1 }}>
+              {level}
+            </div>
           </div>
-          <span className="text-xl font-headline font-bold text-primary" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
-            Ronki
-          </span>
+          <span className="text-lg font-headline font-bold text-primary">{heroName}</span>
         </button>
-        <button onClick={() => onNavigate?.('hero')}
-          className="px-4 py-1.5 rounded-full flex items-center gap-2 active:scale-95 transition-all"
-          style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.5)' }}>
-          <span className="material-symbols-outlined text-primary" style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }}>shield</span>
-          <span className="font-bold text-[11px] font-label text-primary">Profil</span>
-        </button>
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
+             style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
+          <Pearl size={20} />
+          <span className="text-primary font-bold text-sm font-label">{state.hp || 0}</span>
+        </div>
       </header>
 
       <main className="px-6 max-w-lg mx-auto flex flex-col gap-6">
 
-        {/* ── Companion Egg ── */}
-        <section className="relative flex flex-col items-center py-4">
-          <div className="absolute w-72 h-72 rounded-full blur-[80px] -z-10"
-               style={{ background: 'rgba(252,211,77,0.25)', animation: 'pulse 3s ease-in-out infinite' }} />
+        {/* ── Companion ── */}
+        {(() => {
+          const eggType = state.eggType || 'fire';
+          const catStage = getCatStage(state.catEvo || 0);
+          const companionType = 'dragon'; // TODO: map eggType → companion type
+          const stages = COMPANION_STAGES[companionType] || COMPANION_STAGES.dragon;
+          const stageName = stages[catStage]?.name || CAT_STAGES[catStage]?.name || 'Ei';
+          const stageNum = catStage + 1;
 
-          <div className="relative w-48 h-56 rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%] overflow-hidden border-4 border-white shadow-2xl"
-               style={{ boxShadow: '0 0 30px rgba(255,255,255,0.4), 0 0 60px rgba(252,211,77,0.2)' }}>
-            <img src={base + 'art/egg-glow.webp'} alt="Dragon Egg" className="w-full h-full object-cover scale-110" />
-          </div>
+          // Pick art: stage 0 = egg type, stage 1+ = evolution art
+          const artSrc = catStage === 0
+            ? (EGG_ART[eggType] || EGG_ART.fire)
+            : (COMPANION_ART[companionType]?.[catStage] || 'art/companion/dragon-baby.webp');
 
-          <div className="absolute -bottom-2 px-6 py-2 rounded-full z-20"
-               style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.5)' }}>
-            <p className="font-bold text-[12px] font-label uppercase tracking-[0.2em] text-primary-container">
-              Stufe 1 Ei
-            </p>
-          </div>
-        </section>
+          // Egg shape for stage 0, round for hatched
+          const isEgg = catStage === 0;
+
+          return (
+            <section className="relative flex flex-col items-center py-4">
+              <div className="absolute w-72 h-72 rounded-full blur-[80px] -z-10"
+                   style={{ background: 'rgba(252,211,77,0.25)', animation: 'pulse 3s ease-in-out infinite' }} />
+
+              <div className={`relative overflow-hidden border-4 border-white shadow-2xl ${
+                isEgg
+                  ? 'w-48 h-56 rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%]'
+                  : 'w-52 h-52 rounded-[2rem]'
+              }`}
+                   style={{ boxShadow: '0 0 30px rgba(255,255,255,0.4), 0 0 60px rgba(252,211,77,0.2)' }}>
+                <img src={base + artSrc} alt={stageName} className="w-full h-full object-cover scale-110" />
+              </div>
+
+              <div className="absolute -bottom-2 px-6 py-2 rounded-full z-20"
+                   style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.5)' }}>
+                <p className="font-bold text-[12px] font-label uppercase tracking-[0.2em] text-primary-container">
+                  Stufe {stageNum} {stageName}
+                </p>
+              </div>
+            </section>
+          );
+        })()}
 
         {/* ── Heldenpunkte ── */}
         <div className="flex justify-center">
