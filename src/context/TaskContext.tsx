@@ -74,6 +74,7 @@ interface TaskActions {
   startMission: (id: string) => void;
   abandonMission: (id: string) => void;
   addHP: (amount: number) => void;
+  addScreenMinutes: (amount: number) => void;
   equipGear: (gearId: string) => void;
   unequipGear: (slot: 'head' | 'back' | 'neck') => void;
   updateBirthdayEpic: (data: { done: string[]; completed: boolean }) => void;
@@ -614,6 +615,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, hp: (prev.hp || 0) + amount } : prev);
   }, []);
 
+  // ── Add screen minutes (refund unused timer time) ──
+  const addScreenMinutes = useCallback((amount: number) => {
+    setState(prev => prev ? { ...prev, drachenEier: (prev.drachenEier || 0) + amount } : prev);
+  }, []);
+
   const equipGear = useCallback((gearId: string) => {
     setState(prev => {
       if (!prev) return prev;
@@ -663,7 +669,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

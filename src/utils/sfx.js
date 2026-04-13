@@ -98,6 +98,23 @@ const SFX = {
           g.gain.setValueAtTime(0.18, now + i * 0.09); g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.09 + 0.2);
           o.start(now + i * 0.09); o.stop(now + i * 0.09 + 0.2);
         });
+      } else if (type === "alarm") {
+        // Friendly alarm bell — three ascending chimes repeated
+        [880, 1047, 1319, 880, 1047, 1319, 880, 1047, 1319].forEach((f, i) => {
+          const o = ctx.createOscillator(); const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = "sine"; o.frequency.setValueAtTime(f, now + i * 0.15);
+          g.gain.setValueAtTime(0.25, now + i * 0.15);
+          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.2);
+          o.start(now + i * 0.15); o.stop(now + i * 0.15 + 0.2);
+        });
+      } else if (type === "tick") {
+        // Soft tick for last-minute warning
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine"; o.frequency.setValueAtTime(1200, now);
+        g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+        o.start(now); o.stop(now + 0.06);
       } else if (type === "victory") {
         // Victory fanfare — longer celebratory sequence
         [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => {

@@ -404,10 +404,10 @@ export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
   // Media rewards (Drachen-Eier — scarce, ~60 min max on weekends)
   // Weekday: ~13 eggs/day → audio(5) or game(6) but not both = ~20-30 min
   // Weekend: saved eggs → audio(3)+game(4)+TV(5) = ~60 min for 12 eggs
-  { id: "bel_audio", name: "H\u00F6rspiel (25 Min)", emoji: "\u{1F3A7}", cost: 5, active: true, currency: "eggs", availableAfter: "19:00", availableAfterFree: "10:00", weekendCost: 3 },
-  { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 6, active: true, currency: "eggs", availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 4 },
-  { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 8, active: true, currency: "eggs", availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 5 },
-  { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 12, active: true, currency: "eggs", availableAfter: "18:00", availableAfterFree: "14:00", weekendCost: 8 },
+  { id: "bel_audio", name: "H\u00F6rspiel (25 Min)", emoji: "\u{1F3A7}", cost: 5, active: true, currency: "eggs", minutes: 25, availableAfter: "19:00", availableAfterFree: "10:00", weekendCost: 3 },
+  { id: "bel_game20", name: "20 Min Videospiel", emoji: "\u{1F3AE}", cost: 6, active: true, currency: "eggs", minutes: 20, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 4 },
+  { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 8, active: true, currency: "eggs", minutes: 30, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 5 },
+  { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 12, active: true, currency: "eggs", minutes: 90, availableAfter: "18:00", availableAfterFree: "14:00", weekendCost: 8 },
   // Fun rewards (HP — generous family currency)
   { id: "bel_candy", name: "S\u00FC\u00DFigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 30, active: true, currency: "hp" },
   { id: "bel_vote", name: "Lieblingsessen w\u00E4hlen", emoji: "\u{1F355}", cost: 50, active: true, currency: "hp" },
