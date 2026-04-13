@@ -30,7 +30,7 @@ export default function Hub({ onNavigate }) {
     <div className="relative min-h-screen pb-32">
       {/* ── Background: time-of-day sky ── */}
       <div className="fixed inset-0 -z-20">
-        <img src={base + 'art/bg-warm-cream.webp'} alt="" className="w-full h-full object-cover" />
+        <img src={base + 'art/bg-cream-brush.webp'} alt="" className="w-full h-full object-cover" />
       </div>
 
       {/* ── Minimal Top Bar ── */}
