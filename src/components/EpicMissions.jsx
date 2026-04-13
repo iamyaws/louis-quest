@@ -137,7 +137,7 @@ export default function EpicMissions() {
       <section className="mb-8">
         <h2 className="font-headline text-3xl font-bold text-on-surface mb-2">Epische Missionen</h2>
         <p className="font-body text-on-surface-variant text-lg">
-          Wahle dein nachstes grosses Abenteuer, kleiner Held!
+          Wähle dein nächstes großes Abenteuer, kleiner Held!
         </p>
       </section>
 

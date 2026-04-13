@@ -121,7 +121,7 @@ function LevelUpCelebration({ level, onDismiss }) {
             <span className="material-symbols-outlined relative z-10 text-secondary" style={{ fontSize: '5rem', fontVariationSettings: "'FILL' 1" }}>military_tech</span>
           </div>
           <p className="font-body text-lg text-on-surface/80 leading-relaxed max-w-[240px]">
-            Du bist jetzt <span className="font-bold text-on-surface">Level {level}</span>! Deine Macht wachst!
+            Du bist jetzt <span className="font-bold text-on-surface">Level {level}</span>! Deine Macht wächst!
           </p>
         </div>
 

@@ -406,7 +406,7 @@ export default function Hub({ onNavigate }) {
             <p className="font-body text-sm text-on-surface-variant">
               {(state.activeMissions || []).length > 0
                 ? `${state.activeMissions.length} aktiv`
-                : 'Wahle dein Abenteuer!'}
+                : 'Wähle dein Abenteuer!'}
             </p>
           </div>
           <span className="material-symbols-outlined text-primary/40">chevron_right</span>

@@ -355,14 +355,6 @@ export default function TaskList() {
         </svg>
       </div>
 
-      {/* ── FAB ── */}
-      <div className="fixed right-6 bottom-28 z-40">
-        <button className="w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
-                style={{ background: '#fcd34d', color: '#725b00' }}>
-          <span className="material-symbols-outlined text-3xl">add</span>
-        </button>
-      </div>
-
       {/* ── Weather Outfit Modal ── */}
       {showWeather && currentWeather && (
         <div className="fixed inset-0 z-[200] flex items-end justify-center"

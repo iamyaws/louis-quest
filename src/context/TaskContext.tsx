@@ -64,6 +64,7 @@ interface TaskActions {
   dismissCelebration: () => void;
   startMission: (id: string) => void;
   abandonMission: (id: string) => void;
+  addHP: (amount: number) => void;
 }
 
 interface CelebrationEvent {
@@ -526,6 +527,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Add HP (for mini-game rewards etc.) ──
+  const addHP = useCallback((amount: number) => {
+    setState(prev => prev ? { ...prev, hp: (prev.hp || 0) + amount } : prev);
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -549,7 +555,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission }, loading, celebration }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP }, loading, celebration }}>
       {children}
     </TaskContext.Provider>
   );

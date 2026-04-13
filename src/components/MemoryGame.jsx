@@ -165,7 +165,7 @@ export default function MemoryGame({ onComplete }) {
                 <span className="material-symbols-outlined text-on-surface">lightbulb</span>
               </div>
               <p className="font-body text-sm text-on-surface-variant leading-relaxed">
-                Finde alle passenden Paare, um Ronki's Fokus zu starken. Bleib konzentriert!
+                Finde alle passenden Paare, um Ronkis Fokus zu stärken. Bleib konzentriert!
               </p>
             </div>
           </>
@@ -182,7 +182,7 @@ export default function MemoryGame({ onComplete }) {
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6"
                    style={{ background: 'rgba(52,211,153,0.1)', color: '#059669' }}>
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="font-label font-bold text-xs uppercase tracking-widest">Meister-Gedachtnis!</span>
+                <span className="font-label font-bold text-xs uppercase tracking-widest">Meister-Gedächtnis!</span>
               </div>
             )}
 

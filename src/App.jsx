@@ -33,7 +33,6 @@ function AppContent() {
   if (state && !state.onboardingDone) {
     return (
       <Onboarding onComplete={(cfg) => {
-        console.log('Onboarding config:', cfg);
         actions.completeOnboarding(cfg);
       }} />
     );
