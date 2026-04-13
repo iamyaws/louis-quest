@@ -131,7 +131,8 @@ export default function MemoryGame({ onComplete }) {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 mt-24 mb-8 px-6 max-w-md mx-auto w-full flex flex-col items-center">
+      <main className="flex-1 mb-8 px-6 max-w-md mx-auto w-full flex flex-col items-center"
+            style={{ marginTop: 'calc(6rem + env(safe-area-inset-top, 0px))' }}>
         {/* Score header */}
         <section className="w-full rounded-2xl p-4 mb-6 flex justify-center items-center gap-0"
                  style={{ background: 'rgba(249,243,235,0.6)', backdropFilter: 'blur(12px)', boxShadow: '0 2px 12px rgba(30,27,23,0.04)' }}>

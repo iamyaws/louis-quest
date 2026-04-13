@@ -81,7 +81,8 @@ export default function PotionGame({ onComplete }) {
         </button>
       </header>
 
-      <main className="flex-1 mt-24 mb-8 px-6 max-w-md mx-auto w-full flex flex-col items-center">
+      <main className="flex-1 mb-8 px-6 max-w-md mx-auto w-full flex flex-col items-center"
+            style={{ marginTop: 'calc(6rem + env(safe-area-inset-top, 0px))' }}>
         {!result ? (
           <>
             {/* Steam clouds */}
