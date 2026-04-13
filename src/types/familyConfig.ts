@@ -11,6 +11,7 @@ export interface DailyHabit {
 export interface SiblingConfig {
   name: string;
   relationship: 'Bruder' | 'Schwester' | 'Geschwister';
+  pronouns: Pronouns;
   birthday?: string;  // ISO date
 }
 
@@ -29,8 +30,21 @@ export interface ParentMessage {
   signature: string;
 }
 
+export type Pronouns = 'er' | 'sie' | 'they';
+
+// Helper to get pronoun forms for German text
+export function pronouns(p: Pronouns) {
+  switch (p) {
+    case 'er':  return { nom: 'er', acc: 'ihn', dat: 'ihm', pos: 'sein', posE: 'seine', posEm: 'seinem', posEn: 'seinen' };
+    case 'sie': return { nom: 'sie', acc: 'sie', dat: 'ihr', pos: 'ihr', posE: 'ihre', posEm: 'ihrem', posEn: 'ihren' };
+    case 'they': return { nom: 'they', acc: 'they', dat: 'them', pos: 'their', posE: 'their', posEm: 'their', posEn: 'their' };
+  }
+}
+
 export interface FamilyConfig {
   childName: string;
+  childBirthday?: string;  // ISO date
+  childPronouns: Pronouns;
   siblings: SiblingConfig[];
   dailyHabits: DailyHabit[];
   recurringActivities: RecurringActivity[];
@@ -42,10 +56,13 @@ export interface FamilyConfig {
 // ── Louis's family as the default template ──
 export const DEFAULT_FAMILY_CONFIG: FamilyConfig = {
   childName: 'Louis',
+  childBirthday: '2019-10-25',
+  childPronouns: 'er',
   siblings: [
     {
       name: 'Liam',
       relationship: 'Bruder',
+      pronouns: 'er',
       birthday: '2026-04-26',
     },
   ],
