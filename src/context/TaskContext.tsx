@@ -7,6 +7,16 @@ import { BOSSES, CHEST_MILESTONES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADG
 import storage from '../utils/storage';
 import { useAuth } from './AuthContext';
 
+// ── Journal entry for history ──
+export interface JournalEntry {
+  date: string;
+  memory: string;
+  gratitude: string[];
+  dayEmoji: number | null;
+  achievements: string[];
+  mood: number | null;
+}
+
 // ── Minimal state shape for the task list ──
 interface TaskState {
   quests: Quest[];
@@ -35,6 +45,8 @@ interface TaskState {
   journalGratitude: string[];
   journalDayEmoji: number | null;
   journalAchievements: string[];
+  journalHistory: JournalEntry[];
+  journalSaved: boolean;
   bossDmgToday: number;
   orbs: { vitality: number; radiance: number; patience: number; wisdom: number };
   xp: number;
@@ -180,6 +192,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           journalGratitude: raw.journalGratitude || [],
           journalDayEmoji: raw.journalDayEmoji ?? null,
           journalAchievements: raw.journalAchievements || [],
+          journalHistory: raw.journalHistory || [],
+          journalSaved: raw.journalSaved || false,
           bossDmgToday: raw.bossDmgToday || 0,
           orbs: raw.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
           xp: raw.xp || raw.coins || 0,
@@ -231,6 +245,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           journalGratitude: [],
           journalDayEmoji: null,
           journalAchievements: [],
+          journalHistory: [],
+          journalSaved: false,
           bossDmgToday: 0,
           orbs: { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
           xp: 0,
@@ -349,6 +365,22 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       streak: newSm[q.id] || 0,
     }));
 
+    // Archive yesterday's journal entry if it had content
+    let journalHistory = [...(s.journalHistory || [])];
+    if (s.journalMemory || (s.journalGratitude && s.journalGratitude.length > 0) || s.journalDayEmoji !== null) {
+      const entry: JournalEntry = {
+        date: s.lastDate,
+        memory: s.journalMemory || '',
+        gratitude: s.journalGratitude || [],
+        dayEmoji: s.journalDayEmoji ?? null,
+        achievements: s.journalAchievements || [],
+        mood: s.moodAM ?? null,
+      };
+      const existingIdx = journalHistory.findIndex(e => e.date === entry.date);
+      if (existingIdx >= 0) journalHistory[existingIdx] = entry;
+      else journalHistory.push(entry);
+    }
+
     return {
       ...s,
       quests,
@@ -371,6 +403,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       journalGratitude: [],
       journalDayEmoji: null,
       journalAchievements: [],
+      journalHistory,
+      journalSaved: false,
       bossDmgToday: 0,
     };
   }
@@ -578,15 +612,32 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, onboardingDone: true, eggType: cfg?.eggType || prev.eggType } : prev);
   }, []);
 
-  // ── Save journal ──
+  // ── Save journal (also archives to history) ──
   const saveJournal = useCallback((data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => {
-    setState(prev => prev ? {
-      ...prev,
-      journalMemory: data.memory,
-      journalGratitude: data.gratitude,
-      journalDayEmoji: data.dayEmoji,
-      journalAchievements: data.achievements,
-    } : prev);
+    setState(prev => {
+      if (!prev) return prev;
+      const entry: JournalEntry = {
+        date: prev.lastDate,
+        memory: data.memory,
+        gratitude: data.gratitude,
+        dayEmoji: data.dayEmoji,
+        achievements: data.achievements,
+        mood: prev.moodAM ?? null,
+      };
+      const history = [...(prev.journalHistory || [])];
+      const existingIdx = history.findIndex(e => e.date === entry.date);
+      if (existingIdx >= 0) history[existingIdx] = entry;
+      else history.push(entry);
+      return {
+        ...prev,
+        journalMemory: data.memory,
+        journalGratitude: data.gratitude,
+        journalDayEmoji: data.dayEmoji,
+        journalAchievements: data.achievements,
+        journalHistory: history,
+        journalSaved: true,
+      };
+    });
   }, []);
 
   // ── Redeem reward ──

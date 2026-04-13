@@ -198,13 +198,15 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
       </div>
 
       {/* ── Parental access (boring on purpose) ── */}
-      <button
-        onClick={onOpenParental}
-        className="mt-10 mb-2 mx-auto flex items-center justify-center gap-1.5 rounded-lg transition-all active:scale-95"
-        style={{ opacity: 0.35, padding: '12px 24px', minHeight: '48px' }}>
-        <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#9ca3af' }}>lock</span>
-        <span className="font-label text-xs text-[#9ca3af] tracking-wide">Systemverwaltung</span>
-      </button>
+      <div className="flex flex-col items-center mt-10 mb-2 gap-1">
+        <button
+          onClick={onOpenParental}
+          className="w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-all"
+          style={{ background: 'rgba(156,163,175,0.1)', border: '1.5px solid rgba(156,163,175,0.2)' }}>
+          <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#9ca3af' }}>lock</span>
+        </button>
+        <span className="font-label text-[9px] text-[#9ca3af] tracking-wide" style={{ opacity: 0.5 }}>Verwaltung</span>
+      </div>
     </div>
   );
 }
