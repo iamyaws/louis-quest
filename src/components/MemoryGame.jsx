@@ -26,6 +26,24 @@ function shuffle(arr) {
   return a;
 }
 
+const HS_KEY = 'ronki_memory_highscores';
+
+function loadHighscores() {
+  try {
+    return JSON.parse(localStorage.getItem(HS_KEY) || '[]').slice(0, 5);
+  } catch { return []; }
+}
+
+function saveHighscore(moves) {
+  const list = loadHighscores();
+  const entry = { moves, date: new Date().toLocaleDateString('de-DE') };
+  list.push(entry);
+  list.sort((a, b) => a.moves - b.moves);
+  const top5 = list.slice(0, 5);
+  localStorage.setItem(HS_KEY, JSON.stringify(top5));
+  return { list: top5, rank: top5.findIndex(e => e === entry) };
+}
+
 export default function MemoryGame({ onComplete }) {
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
@@ -33,6 +51,8 @@ export default function MemoryGame({ onComplete }) {
   const [moves, setMoves] = useState(0);
   const [won, setWon] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [highscores, setHighscores] = useState(loadHighscores);
+  const [currentRank, setCurrentRank] = useState(-1);
 
   const pairs = 8;
 
@@ -60,7 +80,14 @@ export default function MemoryGame({ onComplete }) {
           setFlipped([]);
           setBusy(false);
           if (newMatched.size === cards.length) {
-            setTimeout(() => { SFX.play('celeb'); setWon(true); }, 400);
+            setTimeout(() => {
+              SFX.play('celeb');
+              const finalMoves = moves + 1; // moves hasn't updated yet in this closure
+              const { list, rank } = saveHighscore(finalMoves);
+              setHighscores(list);
+              setCurrentRank(rank);
+              setWon(true);
+            }, 400);
           }
         }, 400);
       } else {
@@ -188,7 +215,7 @@ export default function MemoryGame({ onComplete }) {
             )}
 
             {/* Reward cards */}
-            <div className="flex gap-4 mb-10">
+            <div className="flex gap-4 mb-8">
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(83,0,183,0.06)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold text-primary">+{reward.xp}</p>
                 <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">XP</p>
@@ -198,6 +225,43 @@ export default function MemoryGame({ onComplete }) {
                 <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">HP</p>
               </div>
             </div>
+
+            {/* Highscore table */}
+            {highscores.length > 0 && (
+              <div className="w-full max-w-xs mb-10 rounded-2xl overflow-hidden"
+                   style={{ background: 'rgba(18,67,70,0.04)', border: '1px solid rgba(18,67,70,0.08)' }}>
+                <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid rgba(18,67,70,0.06)' }}>
+                  <span className="material-symbols-outlined text-lg text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
+                  <span className="font-headline font-bold text-sm text-primary">Bestenliste</span>
+                </div>
+                {highscores.map((hs, i) => {
+                  const isCurrentGame = i === currentRank;
+                  const medals = ['🥇', '🥈', '🥉'];
+                  return (
+                    <div key={i}
+                         className="flex items-center justify-between px-4 py-2.5"
+                         style={{
+                           background: isCurrentGame ? 'rgba(252,211,77,0.15)' : 'transparent',
+                           borderBottom: i < highscores.length - 1 ? '1px solid rgba(18,67,70,0.04)' : 'none',
+                         }}>
+                      <div className="flex items-center gap-3">
+                        <span className="text-base w-6 text-center">{i < 3 ? medals[i] : `${i + 1}.`}</span>
+                        <span className={`font-label text-sm ${isCurrentGame ? 'font-bold text-primary' : 'text-on-surface'}`}>
+                          {hs.moves} Züge
+                        </span>
+                        {isCurrentGame && (
+                          <span className="font-label text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                                style={{ background: 'rgba(252,211,77,0.3)', color: '#735c00' }}>
+                            Neu
+                          </span>
+                        )}
+                      </div>
+                      <span className="font-label text-[11px] text-outline">{hs.date}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             <button onClick={() => onComplete(reward)}
               className="w-full max-w-xs py-5 rounded-full font-headline font-bold text-xl text-white active:scale-95 transition-all flex items-center justify-center gap-3"
