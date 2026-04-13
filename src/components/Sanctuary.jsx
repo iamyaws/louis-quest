@@ -7,10 +7,10 @@ import { ORB_MILESTONES, ORB_META } from '../constants';
 
 const STAGES = [
   { name: 'Ei', emoji: '🥚', threshold: 0 },
-  { name: 'Baby', emoji: '🐣', threshold: 10 },
-  { name: 'Jungtier', emoji: '🐲', threshold: 30 },
-  { name: 'Stolz', emoji: '🔥', threshold: 60 },
-  { name: 'Legendär', emoji: '⭐', threshold: 100 },
+  { name: 'Baby', emoji: '🐣', threshold: 3 },      // Day 1: all 3 care actions
+  { name: 'Jungtier', emoji: '🐲', threshold: 9 },   // ~Day 3
+  { name: 'Stolz', emoji: '🔥', threshold: 18 },     // ~Day 6 (1 week)
+  { name: 'Legendär', emoji: '⭐', threshold: 30 },  // ~Day 10
 ];
 
 export default function Sanctuary() {

@@ -188,11 +188,11 @@ export const WEEKLY_MISSIONS: WeeklyMission[] = [
 export const GRADUATION_THRESHOLD = 30;
 
 export const CAT_STAGES: import('./types').CatStageInfo[] = [
-  { name: "K\u00E4tzchen", threshold: 0, emoji: "\u{1F431}", desc: "Klein aber fein!" },
-  { name: "Jungkatze", threshold: 25, emoji: "\u{1F63A}", desc: "W\u00E4chst und gedeiht!" },
-  { name: "Katze", threshold: 75, emoji: "\u{1F638}", desc: "Stark und geschickt!" },
-  { name: "Prachtkatze", threshold: 150, emoji: "\u{1F63B}", desc: "Wundersch\u00F6n!" },
-  { name: "Legend\u00E4r", threshold: 300, emoji: "\u{1F451}", desc: "Eine Legende!" },
+  { name: "Ei", threshold: 0, emoji: "\u{1F95A}", desc: "Was schl\u00FCpft wohl?" },
+  { name: "Baby", threshold: 3, emoji: "\u{1F423}", desc: "Frisch geschl\u00FCpft!" },
+  { name: "Jungtier", threshold: 9, emoji: "\u{1F432}", desc: "W\u00E4chst und gedeiht!" },
+  { name: "Stolz", threshold: 18, emoji: "\u{1F525}", desc: "Stark und mutig!" },
+  { name: "Legend\u00E4r", threshold: 30, emoji: "\u{1F451}", desc: "Eine Legende!" },
 ];
 
 export const COMPANION_STAGES: Record<string, { name: string; emoji: string; desc: string }[]> = {
