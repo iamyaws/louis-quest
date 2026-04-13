@@ -9,7 +9,7 @@ const ICON_MAP = {
   '🎢': 'attractions', '💪': 'fitness_center',
 };
 
-export default function Belohnungsbank() {
+export default function Belohnungsbank({ onNavigate }) {
   const { state, actions } = useTask();
   const hp = state?.hp || 0;
   const screenMin = state?.drachenEier || 0; // Screen minutes (repurposed from eggs)
@@ -60,6 +60,21 @@ export default function Belohnungsbank() {
           </div>
         </div>
       </div>
+
+      {/* ── Mini-Spiele Entry ── */}
+      <button onClick={() => onNavigate?.('games')}
+        className="w-full rounded-2xl p-5 mb-8 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
+        style={{ background: 'linear-gradient(135deg, rgba(252,211,77,0.15), rgba(83,0,183,0.06))', border: '1.5px solid rgba(252,211,77,0.3)' }}>
+        <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
+             style={{ background: 'rgba(83,0,183,0.08)' }}>
+          <span className="material-symbols-outlined text-2xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>sports_esports</span>
+        </div>
+        <div className="flex-1">
+          <h4 className="font-headline font-bold text-lg text-on-surface">Mini-Spiele</h4>
+          <p className="text-sm text-on-surface-variant font-body">Spiele & sammle Bonus-Punkte!</p>
+        </div>
+        <span className="material-symbols-outlined text-primary">chevron_right</span>
+      </button>
 
       {/* ── Family Adventures (HP currency) ── */}
       {familyRewards.length > 0 && (

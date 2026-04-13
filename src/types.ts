@@ -81,8 +81,12 @@ export interface WeeklyMission {
   story: string;
   goal: string;
   target: number;
-  reward: { type: 'hp'; amount: number };
+  reward: { hp: number; evo: number };
   icon: string;
+  tag: string;
+  tagColor: string;
+  rewardLabel: string;
+  rewardIcon: string;
 }
 
 export interface JournalQuestion {

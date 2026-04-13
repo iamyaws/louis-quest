@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import type { Quest, GameState, Boss } from '../types';
-import { buildDay } from '../utils/helpers';
-import { BOSSES } from '../constants';
+import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
+import { BOSSES, CHEST_MILESTONES, CAT_STAGES, WEEKLY_MISSIONS } from '../constants';
 import storage from '../utils/storage';
 
 // ── Minimal state shape for the task list ──
@@ -34,6 +34,10 @@ interface TaskState {
   journalAchievements: string[];
   bossDmgToday: number;
   orbs: { vitality: number; radiance: number; patience: number; wisdom: number };
+  xp: number;
+  chestsClaimed: number[];
+  activeMissions: { id: string; progress: number; startDate: string }[];
+  completedMissions: string[];
 }
 
 interface TaskComputed {
@@ -42,6 +46,8 @@ interface TaskComputed {
   allDone: boolean;
   pct: number;
   byGroup: Record<string, Quest[]>;
+  level: number;
+  xpProgress: { cur: number; need: number };
 }
 
 interface TaskActions {
@@ -55,6 +61,14 @@ interface TaskActions {
   completeOnboarding: (cfg?: { eggType?: string }) => void;
   saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
   redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
+  dismissCelebration: () => void;
+  startMission: (id: string) => void;
+  abandonMission: (id: string) => void;
+}
+
+interface CelebrationEvent {
+  type: 'victory' | 'levelUp' | 'evolution' | 'chest';
+  payload?: Record<string, any>;
 }
 
 interface TaskContextValue {
@@ -62,6 +76,7 @@ interface TaskContextValue {
   computed: TaskComputed;
   actions: TaskActions;
   loading: boolean;
+  celebration: CelebrationEvent | null;
 }
 
 function assignBoss(): Boss {
@@ -81,12 +96,31 @@ export function useTask() {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const emptyComputed: TaskComputed = { done: 0, total: 0, allDone: false, pct: 0, byGroup: {} };
+const emptyComputed: TaskComputed = { done: 0, total: 0, allDone: false, pct: 0, byGroup: {}, level: 1, xpProgress: { cur: 0, need: 50 } };
 
 export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<TaskState | null>(null);
   const [loading, setLoading] = useState(true);
+  const [celebration, setCelebration] = useState<CelebrationEvent | null>(null);
+  const celebQueue = useRef<CelebrationEvent[]>([]);
+  const [celebTick, setCelebTick] = useState(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const queueCelebration = useCallback((evt: CelebrationEvent) => {
+    celebQueue.current.push(evt);
+    setCelebTick(t => t + 1); // trigger effect
+  }, []);
+
+  // Drain celebration queue one at a time
+  useEffect(() => {
+    if (celebration || celebQueue.current.length === 0) return;
+    const next = celebQueue.current.shift();
+    if (next) setCelebration(next);
+  }, [celebration, celebTick]);
+
+  const dismissCelebration = useCallback(() => {
+    setCelebration(null);
+  }, []);
 
   // ── Load on mount ──
   useEffect(() => {
@@ -122,6 +156,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           journalAchievements: raw.journalAchievements || [],
           bossDmgToday: raw.bossDmgToday || 0,
           orbs: raw.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
+          xp: raw.xp || raw.coins || 0,
+          chestsClaimed: raw.chestsClaimed || [],
+          activeMissions: raw.activeMissions || [],
+          completedMissions: raw.completedMissions || [],
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -163,6 +201,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           journalAchievements: [],
           bossDmgToday: 0,
           orbs: { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
+          xp: 0,
+          chestsClaimed: [],
+          activeMissions: [],
+          completedMissions: [],
         });
       }
       setLoading(false);
@@ -199,6 +241,52 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     const allDoneYesterday = mainQuests.length > 0 && mainQuests.every(q => q.done);
     const newSd = allDoneYesterday ? s.sd + 1 : 0;
 
+    // Chest milestone check
+    let chestsClaimed = [...(s.chestsClaimed || [])];
+    if (CHEST_MILESTONES.includes(newSd as any) && !chestsClaimed.includes(newSd)) {
+      chestsClaimed.push(newSd);
+      const chestHp = newSd * 5; // bonus scales with milestone
+      s = { ...s, hp: (s.hp || 0) + chestHp };
+      // Schedule celebration after load completes
+      setTimeout(() => queueCelebration({ type: 'chest', payload: { milestone: newSd, reward: chestHp } }), 500);
+    }
+
+    // Mission progress from yesterday's quests
+    const morningDone = s.quests.filter(q => q.anchor === 'morning' && q.done && !q.sideQuest);
+    const eveningDone = s.quests.filter(q => q.anchor === 'evening' && q.done && !q.sideQuest);
+    const allMorningDone = morningDone.length > 0 && s.quests.filter(q => q.anchor === 'morning' && !q.sideQuest).every(q => q.done);
+    const allEveningDone = eveningDone.length > 0 && s.quests.filter(q => q.anchor === 'evening' && !q.sideQuest).every(q => q.done);
+    const readDone = s.quests.some(q => q.id === 's8' && q.done) || s.quests.some(q => q.id === 'v6' && q.done);
+    const footballDone = s.quests.some(q => q.id === 'ft' && q.done);
+
+    let activeMissions = [...(s.activeMissions || [])];
+    let completedMissions = [...(s.completedMissions || [])];
+    let missionHp = 0;
+    let missionEvo = 0;
+
+    activeMissions = activeMissions.map(m => {
+      const def = WEEKLY_MISSIONS.find(wm => wm.id === m.id);
+      if (!def || m.progress >= def.target) return m;
+      let inc = 0;
+      if (def.goal === 'allMorning' && allMorningDone) inc = 1;
+      if (def.goal === 'allEvening' && allEveningDone) inc = 1;
+      if (def.goal === 'allDone' && allDoneYesterday) inc = 1;
+      if (def.goal === 'read' && readDone) inc = 1;
+      if (def.goal === 'football' && footballDone) inc = 1;
+      if (def.goal === 'water') inc = 0; // water tracked in real-time
+      const newProg = Math.min(m.progress + inc, def.target);
+      if (newProg >= def.target && !completedMissions.includes(m.id)) {
+        completedMissions.push(m.id);
+        missionHp += def.reward.hp;
+        missionEvo += def.reward.evo;
+        queueCelebration({ type: 'victory', payload: { mission: def.title, hp: def.reward.hp, evo: def.reward.evo } });
+      }
+      return { ...m, progress: newProg };
+    });
+    // Remove completed missions from active
+    activeMissions = activeMissions.filter(m => !completedMissions.includes(m.id) || !s.completedMissions?.includes(m.id));
+    s = { ...s, hp: (s.hp || 0) + missionHp, catEvo: (s.catEvo || 0) + missionEvo };
+
     // Rebuild quests for today, preserve streaks
     const quests = buildDay(s.vacMode).map(q => ({
       ...q,
@@ -210,6 +298,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       quests,
       sm: newSm,
       sd: newSd,
+      chestsClaimed,
+      activeMissions,
+      completedMissions,
       lastDate: today(),
       dt: 0,
       moodAM: null,
@@ -246,6 +337,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const dt = prev.dt + (q.minutes || 0);
       const hpGain = q.xp; // 1:1 XP to HP
       let hp = (prev.hp || 0) + hpGain;
+      const prevXp = prev.xp || 0;
+      const newXp = prevXp + q.xp;
 
       // Boss damage
       let boss = prev.boss ? { ...prev.boss } : null;
@@ -262,13 +355,41 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // Award random orb
-      const orbKeys = ['vitality', 'radiance', 'patience', 'wisdom'] as const;
-      const orbKey = orbKeys[Math.floor(Math.random() * orbKeys.length)];
+      // Award orb based on quest category
+      const orbMap: Record<string, keyof typeof prev.orbs> = {
+        // Vitalität — hygiene & body care
+        s1: 'vitality', s3: 'vitality', s12: 'vitality', s13: 'vitality', s14: 'vitality',
+        s15: 'vitality', s6b: 'vitality', v1: 'vitality', v3: 'vitality', v10: 'vitality',
+        v11: 'vitality', v12: 'vitality', v13: 'vitality', v5b: 'vitality',
+        // Weisheit — learning & reading
+        s7: 'wisdom', s8: 'wisdom', v6: 'wisdom', s_signature: 'wisdom',
+        // Geduld — responsibility & chores
+        s2: 'patience', s4: 'patience', s5: 'patience', s_lunchbox: 'patience',
+        s_water: 'patience', s_packcheck: 'patience', v2: 'patience', v4: 'patience',
+        v7: 'patience', sq_geschirr: 'patience', sq_zimmer: 'patience',
+        // Leuchten — physical & outdoors
+        sq_draussen: 'radiance', sq_fussball: 'radiance',
+      };
+      const orbKey = orbMap[id] || (['vitality', 'radiance', 'patience', 'wisdom'] as const)[Math.floor(Math.random() * 4)];
       const orbs = { ...(prev.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 }) };
       orbs[orbKey] += 1;
 
-      return { ...prev, quests, dt, hp, boss, bossTrophies, bossDmgToday, orbs };
+      // Level-up detection
+      const prevLevel = getLevel(prevXp);
+      const newLevel = getLevel(newXp);
+      if (newLevel > prevLevel) {
+        queueCelebration({ type: 'levelUp', payload: { level: newLevel, prevLevel } });
+      }
+
+      // Victory detection — all main quests done
+      const mainQuests = quests.filter(qq => !qq.sideQuest);
+      const allDone = mainQuests.length > 0 && mainQuests.every(qq => qq.done);
+      const wasDone = prev.quests.filter(qq => !qq.sideQuest).every(qq => qq.done);
+      if (allDone && !wasDone) {
+        queueCelebration({ type: 'victory' });
+      }
+
+      return { ...prev, quests, dt, hp, xp: newXp, boss, bossTrophies, bossDmgToday, orbs };
     });
   }, []);
 
@@ -277,35 +398,73 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, [period]: val } : prev);
   }, []);
 
-  // ── Drink water ──
+  // ── Drink water (also tracks water missions) ──
   const drinkWater = useCallback(() => {
     setState(prev => {
       if (!prev || (prev.dailyWaterCount || 0) >= 6) return prev;
-      return { ...prev, dailyWaterCount: (prev.dailyWaterCount || 0) + 1, hp: (prev.hp || 0) + 2 };
+      let activeMissions = [...(prev.activeMissions || [])];
+      let completedMissions = [...(prev.completedMissions || [])];
+      let bonusHp = 0;
+      let bonusEvo = 0;
+      activeMissions = activeMissions.map(m => {
+        const def = WEEKLY_MISSIONS.find(wm => wm.id === m.id);
+        if (!def || def.goal !== 'water' || m.progress >= def.target) return m;
+        const newProg = m.progress + 1;
+        if (newProg >= def.target && !completedMissions.includes(m.id)) {
+          completedMissions.push(m.id);
+          bonusHp += def.reward.hp;
+          bonusEvo += def.reward.evo;
+          queueCelebration({ type: 'victory', payload: { mission: def.title, hp: def.reward.hp, evo: def.reward.evo } });
+        }
+        return { ...m, progress: newProg };
+      });
+      return {
+        ...prev,
+        dailyWaterCount: (prev.dailyWaterCount || 0) + 1,
+        hp: (prev.hp || 0) + 2 + bonusHp,
+        catEvo: (prev.catEvo || 0) + bonusEvo,
+        activeMissions,
+        completedMissions,
+      };
     });
+  }, [queueCelebration]);
+
+  // ── Companion care (with evolution detection) ──
+  const evolveCheck = useCallback((prevEvo: number, newEvo: number) => {
+    const prevStage = getCatStage(prevEvo);
+    const newStage = getCatStage(newEvo);
+    if (newStage > prevStage) {
+      const stageInfo = CAT_STAGES[newStage];
+      queueCelebration({ type: 'evolution', payload: { stage: newStage, name: stageInfo.name, emoji: stageInfo.emoji } });
+    }
   }, []);
 
-  // ── Companion care ──
   const feedCompanion = useCallback(() => {
     setState(prev => {
       if (!prev || prev.catFed) return prev;
-      return { ...prev, catFed: true, hp: (prev.hp || 0) + 5, catEvo: (prev.catEvo || 0) + 1 };
+      const newEvo = (prev.catEvo || 0) + 1;
+      evolveCheck(prev.catEvo || 0, newEvo);
+      return { ...prev, catFed: true, hp: (prev.hp || 0) + 5, catEvo: newEvo };
     });
-  }, []);
+  }, [evolveCheck]);
 
   const petCompanion = useCallback(() => {
     setState(prev => {
       if (!prev || prev.catPetted) return prev;
-      return { ...prev, catPetted: true, hp: (prev.hp || 0) + 3, catEvo: (prev.catEvo || 0) + 1 };
+      const newEvo = (prev.catEvo || 0) + 1;
+      evolveCheck(prev.catEvo || 0, newEvo);
+      return { ...prev, catPetted: true, hp: (prev.hp || 0) + 3, catEvo: newEvo };
     });
-  }, []);
+  }, [evolveCheck]);
 
   const playCompanion = useCallback(() => {
     setState(prev => {
       if (!prev || prev.catPlayed) return prev;
-      return { ...prev, catPlayed: true, hp: (prev.hp || 0) + 8, catEvo: (prev.catEvo || 0) + 1 };
+      const newEvo = (prev.catEvo || 0) + 1;
+      evolveCheck(prev.catEvo || 0, newEvo);
+      return { ...prev, catPlayed: true, hp: (prev.hp || 0) + 8, catEvo: newEvo };
     });
-  }, []);
+  }, [evolveCheck]);
 
   // ── Login bonus ──
   const collectLoginBonus = useCallback(() => {
@@ -344,6 +503,29 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Mission management ──
+  const startMission = useCallback((id: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      if (prev.activeMissions.some(m => m.id === id)) return prev;
+      if (prev.completedMissions.includes(id)) return prev;
+      return {
+        ...prev,
+        activeMissions: [...prev.activeMissions, { id, progress: 0, startDate: today() }],
+      };
+    });
+  }, []);
+
+  const abandonMission = useCallback((id: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        activeMissions: prev.activeMissions.filter(m => m.id !== id),
+      };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -361,11 +543,13 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     for (const key of Object.keys(byGroup)) {
       byGroup[key].sort((a, b) => (a.order || 0) - (b.order || 0));
     }
-    return { done, total, allDone, pct, byGroup };
+    const level = getLevel(state.xp || 0);
+    const xpProgress = getLvlProg(state.xp || 0);
+    return { done, total, allDone, pct, byGroup, level, xpProgress };
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward }, loading }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission }, loading, celebration }}>
       {children}
     </TaskContext.Provider>
   );

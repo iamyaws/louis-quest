@@ -134,12 +134,54 @@ export const CHEST_MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100] as const;
 export const MAX_MONTHLY_FREEZES = 2;
 
 export const WEEKLY_MISSIONS: WeeklyMission[] = [
-  { id: "wm1", title: "Sternenj\u00E4ger", story: "Rocket hat einen Stern verloren! Schaffe 5 Tage alle Aufgaben um ihn zu finden.", goal: "allDone5", target: 5, reward: { type: "hp", amount: 200 }, icon: "\u2B50" },
-  { id: "wm2", title: "Regenbogen-Woche", story: "Esse diese Woche jeden Tag alle Farben des Regenbogens!", goal: "rainbow5", target: 5, reward: { type: "hp", amount: 150 }, icon: "\u{1F308}" },
-  { id: "wm3", title: "B\u00FCcherwurm", story: "Lies diese Woche jeden Tag! Dein Held wird kl\u00FCger!", goal: "read7", target: 7, reward: { type: "hp", amount: 100 }, icon: "\u{1F4D6}" },
-  { id: "wm4", title: "Fr\u00FChaufsteher", story: "Schaffe 5 Tage alle Morgen-Aufgaben vor dem Mittagessen!", goal: "allMorning5", target: 5, reward: { type: "hp", amount: 175 }, icon: "\u{1F305}" },
-  { id: "wm5", title: "Sauberheld", story: "Schaffe 7 Tage deine Abend-Pflege komplett!", goal: "allEvening7", target: 7, reward: { type: "hp", amount: 80 }, icon: "\u2728" },
-  { id: "wm6", title: "Fu\u00DFball-Star", story: "Geh diese Woche zu allen Trainings!", goal: "football2", target: 2, reward: { type: "hp", amount: 120 }, icon: "\u26BD" },
+  {
+    id: "em1", title: "Der Wächter des Waldes",
+    story: "Meistere 14 Morgenroutinen, um die magische Rüstung des Waldwächters zu erhalten.",
+    goal: "allMorning", target: 14,
+    reward: { hp: 200, evo: 5 },
+    icon: "🌲", tag: "Wald-Quest", tagColor: "emerald",
+    rewardLabel: "Waldwächter-Rüstung", rewardIcon: "shield",
+  },
+  {
+    id: "em2", title: "Sonnenglast-Expedition",
+    story: "Trinke 30 Mal Wasser, um deine Energie zu bündeln und die Sonnenflügel zu entfalten.",
+    goal: "water", target: 30,
+    reward: { hp: 150, evo: 4 },
+    icon: "☀️", tag: "Tages-Expedition", tagColor: "amber",
+    rewardLabel: "Sonnenflügel", rewardIcon: "flutter_dash",
+  },
+  {
+    id: "em3", title: "Die Nachtwache",
+    story: "Schließe 7 Abendroutinen komplett ab, um die Dunkelheit zu erleuchten.",
+    goal: "allEvening", target: 7,
+    reward: { hp: 120, evo: 3 },
+    icon: "🌙", tag: "Nacht-Quest", tagColor: "violet",
+    rewardLabel: "Sternenlaterne", rewardIcon: "light",
+  },
+  {
+    id: "em4", title: "Bücherwurm-Saga",
+    story: "Lies 10 Tage lang, um das verborgene Buch der Weisheit zu finden.",
+    goal: "read", target: 10,
+    reward: { hp: 180, evo: 4 },
+    icon: "📖", tag: "Wissens-Quest", tagColor: "sky",
+    rewardLabel: "Buch der Weisheit", rewardIcon: "menu_book",
+  },
+  {
+    id: "em5", title: "Fußball-Legende",
+    story: "Gehe 6 Mal zum Training und werde zur Fußball-Legende des Reichs!",
+    goal: "football", target: 6,
+    reward: { hp: 160, evo: 3 },
+    icon: "⚽", tag: "Sport-Quest", tagColor: "green",
+    rewardLabel: "Goldene Stollenschuhe", rewardIcon: "sports_soccer",
+  },
+  {
+    id: "em6", title: "Sternenjäger",
+    story: "Schließe 5 Tage ALLE Aufgaben ab, um einen verlorenen Stern einzufangen.",
+    goal: "allDone", target: 5,
+    reward: { hp: 250, evo: 6 },
+    icon: "⭐", tag: "Meister-Quest", tagColor: "yellow",
+    rewardLabel: "Sternensplitter", rewardIcon: "star",
+  },
 ];
 
 export const GRADUATION_THRESHOLD = 30;

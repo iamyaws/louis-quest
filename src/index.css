@@ -142,3 +142,9 @@
   80% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+@keyframes celebFloat {
+  0% { opacity: 0; transform: translateY(0) translateX(0) scale(0); }
+  20% { opacity: 1; transform: translateY(-20vh) translateX(var(--drift, 0px)) scale(1); }
+  100% { opacity: 0; transform: translateY(-100vh) translateX(var(--drift, 0px)) scale(0.5); }
+}

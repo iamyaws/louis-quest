@@ -10,6 +10,10 @@ import Journal from './components/Journal';
 import HeldenKodex from './components/HeldenKodex';
 import Onboarding from './components/Onboarding';
 import ParentalDashboard from './components/ParentalDashboard';
+import Celebration from './components/Celebration';
+import EpicMissions from './components/EpicMissions';
+import MiniGames from './components/MiniGames';
+import MemoryGame from './components/MemoryGame';
 
 function AppContent() {
   const { state, actions, loading } = useTask();
@@ -53,14 +57,23 @@ function AppContent() {
       <div className={`min-h-screen max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
            style={{ paddingTop: ['hub', 'care'].includes(view) ? 0 : 72, paddingBottom: 96 }}>
         {view === 'quests' && <TaskList />}
-        {view === 'shop' && <Belohnungsbank />}
+        {view === 'shop' && <Belohnungsbank onNavigate={setView} />}
         {view === 'hub' && <Hub onNavigate={setView} />}
         {view === 'care' && <Sanctuary />}
         {view === 'journal' && <Journal />}
         {view === 'kodex' && <HeldenKodex />}
+        {view === 'missions' && <EpicMissions />}
+        {view === 'games' && <MiniGames onPlay={(id) => {
+          if (id === 'memory') setView('memory');
+        }} />}
       </div>
       <NavBar active={view} onNavigate={setView} />
       {showParental && <ParentalDashboard onClose={() => setShowParental(false)} />}
+      {view === 'memory' && <MemoryGame onComplete={(reward) => {
+        if (reward.xp > 0 || reward.hp > 0) actions.addHP(reward.hp);
+        setView('games');
+      }} />}
+      <Celebration />
     </>
   );
 }

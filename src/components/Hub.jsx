@@ -390,26 +390,27 @@ export default function Hub({ onNavigate }) {
           );
         })()}
 
-        {/* ── Weekly Mission ── */}
-        {(() => {
-          const wm = WEEKLY_MISSIONS?.find(m => m.id === state.weeklyMission);
-          if (!wm) return null;
-          const wp = state.weeklyProgress || 0;
-          return (
-            <div className="p-5 rounded-2xl"
-                 style={{ background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', border: '1px dashed rgba(83,0,183,0.3)' }}>
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary/80">sports_soccer</span>
-                  <h4 className="font-bold text-sm font-label text-primary/80 uppercase tracking-tight">Wochen-Mission</h4>
-                </div>
-                <span className="font-bold text-xs font-label text-primary/60">{Math.min(wp, wm.target)}/{wm.target}</span>
-              </div>
-              <p className="font-headline font-bold text-base text-primary-container mb-1">{wm.title}</p>
-              <p className="font-body text-xs text-on-surface-variant">{wm.story}</p>
-            </div>
-          );
-        })()}
+        {/* ── Epic Missions Entry ── */}
+        <button
+          className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+          style={{ background: 'linear-gradient(135deg, rgba(83,0,183,0.08), rgba(252,211,77,0.08))', border: '1.5px solid rgba(83,0,183,0.12)' }}
+          onClick={() => onNavigate?.('missions')}
+        >
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+               style={{ background: 'linear-gradient(135deg, #5300b7, #6d28d9)' }}>
+            <span className="material-symbols-outlined text-white text-2xl"
+                  style={{ fontVariationSettings: "'FILL' 1" }}>swords</span>
+          </div>
+          <div className="flex-1">
+            <p className="font-headline font-bold text-base text-primary">Epische Missionen</p>
+            <p className="font-body text-sm text-on-surface-variant">
+              {(state.activeMissions || []).length > 0
+                ? `${state.activeMissions.length} aktiv`
+                : 'Wahle dein Abenteuer!'}
+            </p>
+          </div>
+          <span className="material-symbols-outlined text-primary/40">chevron_right</span>
+        </button>
 
         {/* ── Helden-Kodex Card ── */}
         <button
