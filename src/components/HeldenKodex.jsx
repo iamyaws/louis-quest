@@ -1,4 +1,5 @@
 import React from 'react';
+import BadgeGrid from './BadgeGrid';
 
 const TRAITS = [
   { emoji: '💪', label: 'Gibt sein Bestes' },
@@ -75,6 +76,15 @@ export default function HeldenKodex() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── Badge Collection ── */}
+      <section className="mt-10 space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
+          <h2 className="text-xl font-bold font-headline">Abzeichen-Sammlung</h2>
+        </div>
+        <BadgeGrid />
       </section>
 
       {/* ── Parent Message Card ── */}

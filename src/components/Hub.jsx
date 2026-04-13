@@ -5,7 +5,7 @@ import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
 import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
-import BadgeGrid from './BadgeGrid';
+import { BADGES } from '../constants';
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 
@@ -442,8 +442,33 @@ export default function Hub({ onNavigate }) {
           <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
         </button>
 
-        {/* ── Badge Grid ── */}
-        <BadgeGrid />
+        {/* ── Latest Achievement Spotlight ── */}
+        {(() => {
+          const unlocked = state.unlockedBadges || [];
+          if (unlocked.length === 0) return null;
+          const latestId = unlocked[unlocked.length - 1];
+          const badge = BADGES.find(b => b.id === latestId);
+          if (!badge) return null;
+          return (
+            <div className="p-5 rounded-2xl flex items-center gap-4 relative overflow-hidden"
+                 style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.08)' }}
+                 onClick={() => onNavigate?.('kodex')}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                   style={{ background: 'rgba(252,211,77,0.15)', border: '2px solid rgba(252,211,77,0.3)' }}>
+                <span className="text-3xl">{badge.i}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-[10px] font-label uppercase tracking-widest" style={{ color: '#b45309' }}>Neueste Errungenschaft</p>
+                <h4 className="font-headline font-bold text-base text-on-surface truncate">{badge.n}</h4>
+                <p className="font-body text-xs text-on-surface-variant truncate">{badge.desc}</p>
+              </div>
+              <div className="flex flex-col items-center gap-1 shrink-0">
+                <span className="material-symbols-outlined text-xl" style={{ color: 'rgba(18,67,70,0.3)' }}>chevron_right</span>
+                <span className="font-label font-bold text-[10px] text-on-surface-variant">{unlocked.length}/{BADGES.length}</span>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ── Helden-Kodex Card — Morgenwald ── */}
         <button

@@ -17,11 +17,13 @@ import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
 import CompanionToast from './components/CompanionToast';
+import WelcomeTour from './components/WelcomeTour';
 
 function AppContent() {
   const { state, actions, loading, toastTrigger } = useTask();
-  const [view, setView] = useState('quests');
+  const [view, setView] = useState('hub');
   const [showParental, setShowParental] = useState(false);
+  const [showTour, setShowTour] = useState(() => !localStorage.getItem('ronki_tour_done'));
   const longPressTimer = useRef(null);
 
   if (loading) {
@@ -82,6 +84,12 @@ function AppContent() {
       }} />}
       <CompanionToast trigger={toastTrigger} />
       <Celebration />
+      {showTour && (
+        <WelcomeTour onDone={() => {
+          localStorage.setItem('ronki_tour_done', '1');
+          setShowTour(false);
+        }} />
+      )}
     </>
   );
 }
