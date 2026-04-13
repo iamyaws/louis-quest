@@ -79,12 +79,31 @@ export default function Journal() {
       {/* Background texture */}
       <img src={base + 'art/bg-navy-night.png'} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none opacity-20" />
 
-      {/* ── Header ── */}
-      <section className="mb-6">
-        <h1 className="text-4xl font-bold font-headline text-on-surface mb-2">Abenteuer-Buch</h1>
-        <p className="text-on-surface-variant font-body leading-relaxed">
-          Dein persönliches Tagebuch voller Erinnerungen
-        </p>
+      {/* ── Header with hero illustration ── */}
+      <section className="mb-6 -mx-6 -mt-6">
+        <div className="relative rounded-b-3xl overflow-hidden"
+             style={{ background: 'linear-gradient(135deg, #0c3236, #124346)' }}>
+          <div className="flex items-end px-6 pt-4 pb-5">
+            {/* Text */}
+            <div className="flex-1 z-10 pb-2">
+              <h1 className="text-3xl font-bold font-headline text-white mb-1"
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                Abenteuer-Buch
+              </h1>
+              <p className="text-white/60 font-body text-sm leading-relaxed">
+                Dein Tagebuch voller Erinnerungen
+              </p>
+            </div>
+            {/* Hero campfire illustration */}
+            <img src={base + 'art/hero-journal.webp'}
+                 alt=""
+                 className="w-32 h-auto -mb-5 -mr-2 drop-shadow-2xl"
+                 style={{ filter: 'brightness(1.1)' }} />
+          </div>
+          {/* Warm glow from campfire */}
+          <div className="absolute bottom-0 right-8 w-24 h-16 rounded-full blur-2xl opacity-30 pointer-events-none"
+               style={{ background: '#f59e0b' }} />
+        </div>
       </section>
 
       {/* ── Today's Entry ── */}

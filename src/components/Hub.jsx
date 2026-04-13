@@ -39,7 +39,7 @@ export default function Hub({ onNavigate }) {
         <button onClick={() => onNavigate?.('hero')} className="flex items-center gap-3 active:scale-95 transition-all">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg"
                style={{ background: '#a2d0d4' }}>
-            <img src={base + 'art/dragon-baby.webp'} alt="Avatar" className="w-full h-full object-cover" />
+            <img src={base + 'art/hero-default.webp'} alt="Avatar" className="w-full h-full object-cover" />
           </div>
           <span className="text-xl font-headline font-bold text-primary" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
             Ronki

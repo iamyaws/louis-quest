@@ -66,7 +66,7 @@ function AppContent() {
       {!['hub', 'care'].includes(view) && (
         <div onTouchStart={handleLongPressStart} onTouchEnd={handleLongPressEnd}
              onMouseDown={handleLongPressStart} onMouseUp={handleLongPressEnd} onMouseLeave={handleLongPressEnd}>
-          <TopBar />
+          <TopBar onNavigate={setView} />
         </div>
       )}
       <div className={`min-h-screen max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}

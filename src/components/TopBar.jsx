@@ -2,30 +2,33 @@ import React from 'react';
 import { useTask } from '../context/TaskContext';
 import { Pearl } from './CurrencyIcons';
 
-export default function TopBar() {
+export default function TopBar({ onNavigate }) {
   const { state, computed } = useTask();
   const hp = state?.hp || 0;
   const { level, xpProgress } = computed;
   const xpPct = xpProgress.need > 0 ? Math.min(1, xpProgress.cur / xpProgress.need) : 0;
+  const heroName = state?.familyConfig?.childName || 'Held';
 
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <div className="flex justify-between items-center px-6 py-3 w-full max-w-lg mx-auto">
-        {/* Left: Avatar + Level badge + Brand */}
-        <div className="flex items-center gap-3">
+        {/* Left: Hero Avatar + Level badge + Name */}
+        <button onClick={() => onNavigate?.('hero')}
+                className="flex items-center gap-2 active:scale-95 transition-all">
           <div className="relative">
-            <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
-              <img src={import.meta.env.BASE_URL + 'art/dragon-baby.webp'} alt="Avatar" className="w-full h-full object-cover" />
+            <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden shadow-sm"
+                 style={{ border: '2px solid rgba(18,67,70,0.15)' }}>
+              <img src={import.meta.env.BASE_URL + 'art/hero-default.webp'} alt={heroName} className="w-full h-full object-cover" />
             </div>
-            {/* Level badge */}
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                 style={{ background: '#124346', border: '2px solid #fff8f2', lineHeight: 1 }}>
+            {/* Level badge — golden circle */}
+            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] shadow-md"
+                 style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', border: '2px solid white', color: '#1a1a1a', lineHeight: 1 }}>
               {level}
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="font-headline text-xl font-bold text-primary leading-tight">Ronki</span>
+            <span className="font-headline text-lg font-bold text-primary leading-tight">{heroName}</span>
             {/* XP progress bar */}
             <div className="flex items-center gap-1.5 mt-0.5">
               <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
@@ -35,7 +38,7 @@ export default function TopBar() {
               <span className="font-label text-[9px] text-outline">{xpProgress.cur}/{xpProgress.need}</span>
             </div>
           </div>
-        </div>
+        </button>
 
         {/* Right: HP pill with Pearl icon */}
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
