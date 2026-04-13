@@ -33,6 +33,7 @@ interface TaskState {
   journalDayEmoji: number | null;
   journalAchievements: string[];
   bossDmgToday: number;
+  orbs: { vitality: number; radiance: number; patience: number; wisdom: number };
 }
 
 interface TaskComputed {
@@ -120,6 +121,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           journalDayEmoji: raw.journalDayEmoji ?? null,
           journalAchievements: raw.journalAchievements || [],
           bossDmgToday: raw.bossDmgToday || 0,
+          orbs: raw.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
         };
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -160,6 +162,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           journalDayEmoji: null,
           journalAchievements: [],
           bossDmgToday: 0,
+          orbs: { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
         });
       }
       setLoading(false);
@@ -259,7 +262,13 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      return { ...prev, quests, dt, hp, boss, bossTrophies, bossDmgToday };
+      // Award random orb
+      const orbKeys = ['vitality', 'radiance', 'patience', 'wisdom'] as const;
+      const orbKey = orbKeys[Math.floor(Math.random() * orbKeys.length)];
+      const orbs = { ...(prev.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 }) };
+      orbs[orbKey] += 1;
+
+      return { ...prev, quests, dt, hp, boss, bossTrophies, bossDmgToday, orbs };
     });
   }, []);
 

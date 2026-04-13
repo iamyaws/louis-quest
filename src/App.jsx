@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { TaskProvider, useTask } from './context/TaskContext';
 import TopBar from './components/TopBar';
 import NavBar from './components/NavBar';
@@ -9,10 +9,13 @@ import Sanctuary from './components/Sanctuary';
 import Journal from './components/Journal';
 import HeldenKodex from './components/HeldenKodex';
 import Onboarding from './components/Onboarding';
+import ParentalDashboard from './components/ParentalDashboard';
 
 function AppContent() {
   const { state, actions, loading } = useTask();
   const [view, setView] = useState('quests');
+  const [showParental, setShowParental] = useState(false);
+  const longPressTimer = useRef(null);
 
   if (loading) {
     return (
@@ -32,9 +35,21 @@ function AppContent() {
     );
   }
 
+  const handleLongPressStart = () => {
+    longPressTimer.current = setTimeout(() => setShowParental(true), 1500);
+  };
+  const handleLongPressEnd = () => {
+    clearTimeout(longPressTimer.current);
+  };
+
   return (
     <>
-      {!['hub', 'care'].includes(view) && <TopBar />}
+      {!['hub', 'care'].includes(view) && (
+        <div onTouchStart={handleLongPressStart} onTouchEnd={handleLongPressEnd}
+             onMouseDown={handleLongPressStart} onMouseUp={handleLongPressEnd} onMouseLeave={handleLongPressEnd}>
+          <TopBar />
+        </div>
+      )}
       <div className={`min-h-screen max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
            style={{ paddingTop: ['hub', 'care'].includes(view) ? 0 : 72, paddingBottom: 96 }}>
         {view === 'quests' && <TaskList />}
@@ -45,6 +60,7 @@ function AppContent() {
         {view === 'kodex' && <HeldenKodex />}
       </div>
       <NavBar active={view} onNavigate={setView} />
+      {showParental && <ParentalDashboard onClose={() => setShowParental(false)} />}
     </>
   );
 }

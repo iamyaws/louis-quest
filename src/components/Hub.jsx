@@ -225,35 +225,138 @@ export default function Hub({ onNavigate }) {
                 <span className="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
               </div>
 
-              {/* Boss detail popup */}
+              {/* Full-screen Boss Battle Detail */}
               {showBossDetail && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center px-6" onClick={() => setShowBossDetail(false)}>
-                  <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-                  <div className="relative rounded-2xl overflow-hidden max-w-sm w-full" onClick={e => e.stopPropagation()}
-                       style={{ background: '#fff8f1', boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}>
-                    {artSrc && <img src={artSrc} alt={bd.name} className="w-full h-56 object-cover" />}
-                    <div className="p-6">
-                      <p className="font-bold text-[10px] font-label text-error uppercase tracking-widest">{defeated ? 'Besiegt!' : 'Tages-Boss'}</p>
-                      <h3 className="font-headline font-bold text-2xl text-on-surface mt-1">{bd.name}</h3>
-                      <p className="font-body text-on-surface-variant mt-2">{bd.desc}</p>
-                      {!defeated && (
-                        <div className="mt-4">
-                          <div className="flex justify-between text-sm font-label font-bold mb-1">
-                            <span className="text-error">Lebensenergie</span>
-                            <span className="text-error">{state.boss.hp}/{state.boss.maxHp}</span>
-                          </div>
-                          <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: '#e8e1da' }}>
-                            <div className="h-full bg-error rounded-full" style={{ width: `${hpPct}%` }} />
-                          </div>
-                          <p className="font-body text-xs text-on-surface-variant italic mt-2">Erledige Quests, um Schaden zu verursachen!</p>
-                        </div>
-                      )}
-                      <button className="w-full mt-5 py-3 rounded-full font-label font-bold text-base"
-                              style={{ background: '#fcd34d', color: '#725b00' }}
-                              onClick={() => setShowBossDetail(false)}>
-                        {defeated ? 'Super gemacht!' : 'Verstanden!'}
-                      </button>
+                <div className="fixed inset-0 z-[200] flex flex-col bg-on-surface overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+                  {/* Close button */}
+                  <button onClick={() => setShowBossDetail(false)}
+                    className="fixed top-5 right-5 z-50 w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
+                    <span className="material-symbols-outlined text-white text-xl">close</span>
+                  </button>
+
+                  {/* VS Face-off */}
+                  <div className="relative flex items-center justify-center pt-12 pb-6 px-6"
+                       style={{ background: 'linear-gradient(135deg, #1a0030 0%, #2d0060 50%, #400000 100%)' }}>
+                    {/* Hero side */}
+                    <div className="flex flex-col items-center flex-1">
+                      <div className="w-24 h-24 rounded-full overflow-hidden border-4 shadow-xl"
+                           style={{ borderColor: '#fcd34d', boxShadow: '0 0 20px rgba(252,211,77,0.4)' }}>
+                        <img src={base + 'art/egg-glow.webp'} alt="Held" className="w-full h-full object-cover" />
+                      </div>
+                      <p className="font-headline font-bold text-white text-sm mt-2">Dein Held</p>
                     </div>
+
+                    {/* VS badge */}
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 mx-2"
+                         style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', boxShadow: '0 0 30px rgba(252,211,77,0.5)' }}>
+                      <span className="font-headline font-black text-xl" style={{ color: '#725b00' }}>VS</span>
+                    </div>
+
+                    {/* Boss side */}
+                    <div className="flex flex-col items-center flex-1">
+                      <div className="w-24 h-24 rounded-full overflow-hidden border-4 shadow-xl"
+                           style={{ borderColor: '#ba1a1a', boxShadow: '0 0 20px rgba(186,26,26,0.4)' }}>
+                        {artSrc ? (
+                          <img src={artSrc} alt={bd.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-3xl" style={{ background: '#ba1a1a33' }}>{bd.icon}</div>
+                        )}
+                      </div>
+                      <p className="font-headline font-bold text-white text-sm mt-2">{bd.name}</p>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 rounded-t-[2rem] -mt-4 relative z-10 px-6 pt-8 pb-36"
+                       style={{ background: '#fff8f1' }}>
+
+                    {/* HP Bar */}
+                    {!defeated ? (
+                      <div className="mb-6">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-label font-bold text-xs text-error uppercase tracking-widest">Boss-Lebensenergie</span>
+                          <span className="font-label font-bold text-sm text-error">{state.boss.hp} / {state.boss.maxHp}</span>
+                        </div>
+                        <div className="w-full h-5 rounded-full overflow-hidden relative"
+                             style={{ background: '#ffdad6', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)' }}>
+                          <div className="h-full rounded-full transition-all duration-700 relative overflow-hidden"
+                               style={{ width: `${hpPct}%`, background: 'linear-gradient(90deg, #ba1a1a, #ff6b6b)' }}>
+                            <div className="absolute inset-0 opacity-30"
+                                 style={{ background: 'repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(255,255,255,0.3) 6px, rgba(255,255,255,0.3) 12px)', animation: 'slide 1s linear infinite' }} />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mb-6 text-center py-4 rounded-2xl" style={{ background: 'rgba(52,211,153,0.1)', border: '2px solid #34d399' }}>
+                        <span className="material-symbols-outlined text-4xl mb-1 block" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
+                        <p className="font-headline font-bold text-xl" style={{ color: '#059669' }}>Boss besiegt!</p>
+                      </div>
+                    )}
+
+                    {/* Combat progress */}
+                    {(state.bossDmgToday || 0) > 0 && (
+                      <div className="mb-6 p-4 rounded-2xl flex items-start gap-3"
+                           style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
+                        <span className="material-symbols-outlined text-xl shrink-0" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>swords</span>
+                        <div>
+                          <p className="font-label font-bold text-sm" style={{ color: '#059669' }}>
+                            Deine heutige Power: +{state.bossDmgToday} Schaden
+                          </p>
+                          <p className="font-body text-xs text-on-surface-variant mt-1">
+                            Jede erledigte Aufgabe schwächt den Boss!
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Boss lore card */}
+                    <div className="mb-6 rounded-2xl overflow-hidden"
+                         style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                      {artSrc && (
+                        <img src={artSrc} alt={bd.name} className="w-full h-40 object-cover" />
+                      )}
+                      <div className="p-5">
+                        <p className="font-label font-bold text-[10px] text-error uppercase tracking-widest">
+                          {defeated ? 'Bezwungen' : 'Tages-Boss'}
+                        </p>
+                        <h3 className="font-headline font-bold text-2xl text-on-surface mt-1">{bd.name}</h3>
+                        <p className="font-body text-on-surface-variant mt-2 leading-relaxed">{bd.desc}</p>
+                      </div>
+                    </div>
+
+                    {/* Loot section */}
+                    {defeated && (
+                      <div className="mb-6">
+                        <h4 className="font-label font-bold text-xs uppercase tracking-widest text-outline mb-3">Beute erhalten</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-4 rounded-2xl text-center"
+                               style={{ background: 'rgba(83,0,183,0.05)', border: '1px solid rgba(83,0,183,0.1)' }}>
+                            <span className="material-symbols-outlined text-2xl text-primary mb-1 block"
+                                  style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
+                            <p className="font-label font-bold text-lg text-primary">+{bd.reward.hp}</p>
+                            <p className="font-label text-[10px] text-on-surface-variant uppercase">Heldenpunkte</p>
+                          </div>
+                          <div className="p-4 rounded-2xl text-center"
+                               style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
+                            <span className="material-symbols-outlined text-2xl mb-1 block"
+                                  style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                            <p className="font-label font-bold text-lg" style={{ color: '#b45309' }}>+1</p>
+                            <p className="font-label text-[10px] text-on-surface-variant uppercase">Evo-Essenz</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom CTA */}
+                  <div className="fixed bottom-0 left-0 w-full z-50 p-6"
+                       style={{ background: 'linear-gradient(to top, #fff8f1 70%, transparent)' }}>
+                    <button onClick={() => setShowBossDetail(false)}
+                      className="w-full max-w-lg mx-auto block py-4 rounded-full font-label font-extrabold text-lg active:scale-95 transition-all"
+                      style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 8px 24px rgba(252,211,77,0.4), 0 4px 0 #d4a830' }}>
+                      {defeated ? 'Sieg feiern!' : 'Weiter kämpfen!'}
+                    </button>
                   </div>
                 </div>
               )}
