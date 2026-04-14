@@ -607,7 +607,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (!prev || prev.catFed) return prev;
       const newEvo = (prev.catEvo || 0) + 1;
       evolveCheck(prev.catEvo || 0, newEvo);
-      return { ...prev, catFed: true, hp: (prev.hp || 0) + 3, catEvo: newEvo };
+      return { ...prev, catFed: true, hp: (prev.hp || 0) + 5, catEvo: newEvo };
     });
   }, [evolveCheck]);
 
@@ -616,7 +616,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (!prev || prev.catPetted) return prev;
       const newEvo = (prev.catEvo || 0) + 1;
       evolveCheck(prev.catEvo || 0, newEvo);
-      return { ...prev, catPetted: true, hp: (prev.hp || 0) + 2, catEvo: newEvo };
+      return { ...prev, catPetted: true, hp: (prev.hp || 0) + 3, catEvo: newEvo };
     });
   }, [evolveCheck]);
 
@@ -625,7 +625,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (!prev || prev.catPlayed) return prev;
       const newEvo = (prev.catEvo || 0) + 1;
       evolveCheck(prev.catEvo || 0, newEvo);
-      return { ...prev, catPlayed: true, hp: (prev.hp || 0) + 5, catEvo: newEvo };
+      return { ...prev, catPlayed: true, hp: (prev.hp || 0) + 8, catEvo: newEvo };
     });
   }, [evolveCheck]);
 
