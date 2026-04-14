@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { ANCHORS } from '../constants';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import useWeather, { getWeatherInfo, getClothingRecs } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
 
-const ANCHOR_META = {
-  morning: { label: 'Morgen-Routine', sublabel: 'Morgen-Aufgaben', icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)' },
-  evening: { label: 'Schul-Vorbereitung', vacLabel: 'Abend-Routine', sublabel: 'Schul-Aufgaben', vacSublabel: 'Abend-Aufgaben', icon: 'backpack', vacIcon: 'dark_mode', col: '#2d5a5e', bg: '#f0fdfa', border: 'rgba(45,90,94,0.1)' },
-  hobby: { label: 'Hobbys', sublabel: 'Freizeit-Aktivitäten', icon: 'sports_soccer', col: '#059669', bg: '#ecfdf5', border: 'rgba(5,150,105,0.1)' },
-  bedtime: { label: 'Gute Nacht', sublabel: 'Schlafens-Zeit', icon: 'bedtime', col: '#4338ca', bg: '#eef2ff', border: 'rgba(67,56,202,0.1)' },
+const ANCHOR_META_BASE = {
+  morning: { icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)' },
+  evening: { icon: 'backpack', vacIcon: 'dark_mode', col: '#2d5a5e', bg: '#f0fdfa', border: 'rgba(45,90,94,0.1)' },
+  hobby: { icon: 'sports_soccer', col: '#059669', bg: '#ecfdf5', border: 'rgba(5,150,105,0.1)' },
+  bedtime: { icon: 'bedtime', col: '#4338ca', bg: '#eef2ff', border: 'rgba(67,56,202,0.1)' },
 };
 
 // Kid-friendly subtitles that explain each task's purpose
@@ -51,6 +52,14 @@ export default function TaskList() {
   const { done, total, allDone, pct, byGroup } = computed;
   const { weather } = useWeather();
   const [showWeather, setShowWeather] = useState(false);
+  const { t, locale } = useTranslation();
+
+  const ANCHOR_META_I18N = {
+    morning: { ...ANCHOR_META_BASE.morning, label: t('task.morning.title'), sublabel: t('task.morning.subtitle') },
+    evening: { ...ANCHOR_META_BASE.evening, label: t('task.evening.title'), vacLabel: t('task.evening.vacTitle'), sublabel: t('task.evening.subtitle'), vacSublabel: t('task.evening.vacSubtitle') },
+    hobby: { ...ANCHOR_META_BASE.hobby, label: t('task.hobby.title'), sublabel: t('task.hobby.subtitle') },
+    bedtime: { ...ANCHOR_META_BASE.bedtime, label: t('task.bedtime.title'), sublabel: t('task.bedtime.subtitle') },
+  };
 
   if (!state) return null;
 
@@ -91,9 +100,9 @@ export default function TaskList() {
       {/* ── Header ── */}
       <section className="mb-6">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-xl font-bold font-headline text-on-surface">Deine Tages-Epics</h2>
+          <h2 className="text-xl font-bold font-headline text-on-surface">{t('task.section.title')}</h2>
           <button className="text-sm font-bold font-label text-primary flex items-center gap-1 px-3 py-1 rounded-full hover:bg-surface-container-low transition-colors">
-            Alle ansehen
+            {t('task.viewAll')}
             <span className="material-symbols-outlined text-base">chevron_right</span>
           </button>
         </div>
@@ -103,7 +112,7 @@ export default function TaskList() {
       <div className="flex flex-col gap-5">
 
         {['morning', 'evening', 'hobby', 'bedtime'].map(anchor => {
-          const meta = ANCHOR_META[anchor];
+          const meta = ANCHOR_META_I18N[anchor];
           const quests = (groups[anchor] || []).filter(q => !q.sideQuest);
           if (!quests.length) return null;
 
@@ -153,7 +162,7 @@ export default function TaskList() {
                     <div>
                       <h3 className={`text-xl font-bold font-headline ${secDone ? 'text-emerald-dark' : 'text-on-surface'}`}>{label}</h3>
                       <p className={`text-sm font-medium font-label ${secDone ? 'text-emerald-dark/70' : 'text-on-surface/60'}`}>
-                        {secDone ? 'Geschafft! Ronki ist stolz!' : `Noch ${quests.length - doneCount} Aufgaben`}
+                        {secDone ? t('task.status.complete') : t('task.tasksLeft', { count: quests.length - doneCount })}
                       </p>
                     </div>
                   </div>
@@ -205,7 +214,7 @@ export default function TaskList() {
                       const canTap = isRepeatable ? curCompletions < maxTaps : !q.done;
                       const isNext = idx === firstUndoneIdx;
                       const isLast = idx === quests.length - 1;
-                      const hint = TASK_HINTS[q.id];
+                      const hint = t('hint.' + q.id);
                       const isAnziehen = q.id === 's4' || q.id === 'v4';
 
                       return (
@@ -250,7 +259,7 @@ export default function TaskList() {
                                   >
                                     <span className="text-sm">{weatherInfo.emoji}</span>
                                     <span className="text-xs font-bold" style={{ color: '#0284C7' }}>
-                                      {todayWeather.tempMin}°/{todayWeather.tempMax}° — Outfit ansehen
+                                      {todayWeather.tempMin}°/{todayWeather.tempMax}° — {t('task.weather.viewOutfit')}
                                     </span>
                                   </button>
                                 )}
@@ -280,7 +289,7 @@ export default function TaskList() {
                                     >
                                       <span className="text-sm">{weatherInfo.emoji}</span>
                                       <span className="text-xs font-bold" style={{ color: '#0284C7' }}>
-                                        {todayWeather.tempMin}°/{todayWeather.tempMax}° — Tippe für Outfit-Tipp!
+                                        {todayWeather.tempMin}°/{todayWeather.tempMax}° — {t('task.weather.outfitHint')}
                                       </span>
                                     </button>
                                   ) : hint ? (
@@ -288,7 +297,7 @@ export default function TaskList() {
                                   ) : null}
                                   {isRepeatable && (
                                     <p className="text-xs font-body text-on-surface/60 mt-0.5">
-                                      {curCompletions}/{q.target} erledigt
+                                      {t('task.progress', { cur: curCompletions, target: q.target })}
                                     </p>
                                   )}
                                 </div>
@@ -314,9 +323,9 @@ export default function TaskList() {
             <section>
               <div className="flex items-center gap-3 mb-4 px-1">
                 <div className="w-1.5 h-8 rounded-full" style={{ background: '#735c00' }} />
-                <h2 className="font-headline text-xl text-on-surface">Bonus</h2>
+                <h2 className="font-headline text-xl text-on-surface">{t('task.bonus')}</h2>
                 <span className="font-label text-xs text-on-surface-variant px-2 py-0.5 rounded-full"
-                      style={{ background: '#f4ede5' }}>Optional</span>
+                      style={{ background: '#f4ede5' }}>{t('task.optional')}</span>
               </div>
               <div className="flex flex-col gap-3">
                 {sideQuests.map(q => (
@@ -339,7 +348,7 @@ export default function TaskList() {
                         className="w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all hover:border-secondary cursor-pointer active:scale-95"
                         style={{ borderColor: 'rgba(204,195,215,0.5)' }}
                         onClick={() => handleComplete(q.id)}
-                        aria-label={`${q.name} erledigen`}
+                        aria-label={`${q.name} ${t('task.complete')}`}
                       />
                     )}
                     <div className="flex-1">
@@ -365,8 +374,8 @@ export default function TaskList() {
           <div className="rounded-2xl p-6 text-white flex flex-col justify-between relative overflow-hidden"
                style={{ background: 'linear-gradient(135deg, #124346, #2d5a5e)', minHeight: 160 }}>
             <div className="relative z-10">
-              <p className="font-label text-sm uppercase tracking-wider opacity-80">Tagesziel</p>
-              <h4 className="font-headline text-2xl mt-1">{Math.round(pct * 100)}% Bereit</h4>
+              <p className="font-label text-sm uppercase tracking-wider opacity-80">{t('task.bento.dailyGoal')}</p>
+              <h4 className="font-headline text-2xl mt-1">{t('task.bento.ready', { pct: Math.round(pct * 100) })}</h4>
             </div>
             <div className="relative z-10 w-full h-2 rounded-full mt-4" style={{ background: 'rgba(255,255,255,0.2)' }}>
               <div className="h-full rounded-full transition-all duration-500"
@@ -379,9 +388,9 @@ export default function TaskList() {
           <div className="rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden"
                style={{ background: '#fcd34d', color: '#725b00', minHeight: 160 }}>
             <div className="relative z-10">
-              <p className="font-label text-sm uppercase tracking-wider opacity-80">Begleiter</p>
-              <h4 className="font-headline text-2xl mt-1">{done} Schritte</h4>
-              <p className="font-body text-xs mt-1 opacity-70">Jede Aufgabe hilft deinem Ei!</p>
+              <p className="font-label text-sm uppercase tracking-wider opacity-80">{t('task.bento.companion')}</p>
+              <h4 className="font-headline text-2xl mt-1">{t('task.bento.steps', { done })}</h4>
+              <p className="font-body text-xs mt-1 opacity-70">{t('task.bento.eggHelp')}</p>
             </div>
             <span className="material-symbols-outlined text-4xl relative z-10"
                   style={{ fontVariationSettings: "'FILL' 1" }}>egg</span>
@@ -414,14 +423,14 @@ export default function TaskList() {
             {/* Weather header */}
             <div className="text-center mb-6">
               <div className="text-5xl mb-2">{weatherInfo?.emoji}</div>
-              <h2 className="font-headline text-2xl text-on-surface">Heute anziehen</h2>
+              <h2 className="font-headline text-2xl text-on-surface">{t('task.weather.title')}</h2>
               <p className="font-body text-on-surface-variant mt-1">
-                {weatherInfo?.label} · {currentWeather.temp}° (fühlt sich an wie {currentWeather.feelsLike}°)
+                {weatherInfo?.label} · {currentWeather.temp}° ({t('task.weather.feelsLike', { temp: currentWeather.feelsLike })})
               </p>
               {todayWeather && (
                 <p className="font-label text-sm text-on-surface-variant mt-1">
                   {todayWeather.tempMin}° — {todayWeather.tempMax}°
-                  {todayWeather.precipProb > 20 && ` · ${todayWeather.precipProb}% Regen`}
+                  {todayWeather.precipProb > 20 && ` · ${t('task.weather.rain', { prob: todayWeather.precipProb })}`}
                 </p>
               )}
             </div>
@@ -446,7 +455,7 @@ export default function TaskList() {
               style={{ background: '#fcd34d', color: '#725b00' }}
               onClick={() => setShowWeather(false)}
             >
-              Verstanden!
+              {t('task.weather.ok')}
             </button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import SFX from '../utils/sfx';
+import { useTranslation } from '../i18n/LanguageContext';
 
 // ── Star types ──
 const STAR_TYPES = {
@@ -19,9 +20,9 @@ function loadHighscores() {
   catch { return []; }
 }
 
-function saveHighscore(score) {
+function saveHighscore(score, locale) {
   const list = loadHighscores();
-  const entry = { score, date: new Date().toLocaleDateString('de-DE') };
+  const entry = { score, date: new Date().toLocaleDateString(locale) };
   list.push(entry);
   list.sort((a, b) => b.score - a.score);
   const top5 = list.slice(0, 5);
@@ -40,6 +41,7 @@ function pickStarType() {
 }
 
 export default function StarCatcherGame({ onComplete }) {
+  const { t, locale } = useTranslation();
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const animRef = useRef(null);
@@ -146,7 +148,7 @@ export default function StarCatcherGame({ onComplete }) {
     setScore(finalScore);
     SFX.play('celeb');
     if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    const { list, rank } = saveHighscore(finalScore);
+    const { list, rank } = saveHighscore(finalScore, locale);
     setHighscores(list);
     setCurrentRank(rank);
   }, []);
@@ -322,12 +324,12 @@ export default function StarCatcherGame({ onComplete }) {
               style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top, 0px))', background: 'rgba(15,12,41,0.8)', backdropFilter: 'blur(12px)' }}>
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-2xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>stars</span>
-          <h1 className="text-xl font-bold tracking-tight font-headline" style={{ color: '#fcd34d' }}>Sternenf&auml;nger</h1>
+          <h1 className="text-xl font-bold tracking-tight font-headline" style={{ color: '#fcd34d' }}>{t('game.star.title')}</h1>
         </div>
         <button onClick={() => onComplete({ xp: 0, hp: 0 })}
           className="px-5 py-2 rounded-full font-label font-bold text-sm active:scale-95 transition-transform"
           style={{ background: 'rgba(255,255,255,0.1)', color: '#a78bfa' }}>
-          Beenden
+          {t('game.star.quit')}
         </button>
       </header>
 
@@ -375,9 +377,9 @@ export default function StarCatcherGame({ onComplete }) {
           <div className="px-8 py-6 rounded-2xl text-center"
                style={{ background: 'rgba(15,12,41,0.85)', backdropFilter: 'blur(8px)', border: '1px solid rgba(167,139,250,0.2)' }}>
             <span className="material-symbols-outlined text-5xl mb-3 block" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-            <p className="font-headline font-bold text-2xl text-white mb-2">Tippe zum Starten!</p>
+            <p className="font-headline font-bold text-2xl text-white mb-2">{t('game.star.tapToStart')}</p>
             <p className="font-body text-sm" style={{ color: '#a78bfa' }}>
-              Fange die fallenden Sterne!
+              {t('game.star.catchStars')}
             </p>
             <div className="flex justify-center gap-4 mt-4">
               <div className="flex items-center gap-1.5 text-xs font-label font-bold text-white/60">
@@ -402,16 +404,16 @@ export default function StarCatcherGame({ onComplete }) {
             <div className="text-7xl mb-4">
               {score >= 50 ? '\u{1F31F}' : score >= 30 ? '\u2728' : '\u2B50'}
             </div>
-            <h2 className="font-headline text-4xl font-bold text-white mb-2">Spielende!</h2>
+            <h2 className="font-headline text-4xl font-bold text-white mb-2">{t('game.star.gameOver')}</h2>
             <p className="font-body text-lg mb-6" style={{ color: '#a78bfa' }}>
-              {score} {score === 1 ? 'Stern' : 'Sterne'} gefangen!
+              {t('game.star.caught', { count: score, unit: score === 1 ? t('game.star.starSingular') : t('game.star.starPlural') })}
             </p>
 
             {score >= 50 && (
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6"
                    style={{ background: 'rgba(252,211,77,0.15)', color: '#fcd34d' }}>
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="font-label font-bold text-xs uppercase tracking-widest">Stern-Meister!</span>
+                <span className="font-label font-bold text-xs uppercase tracking-widest">{t('game.star.masterBadge')}</span>
               </div>
             )}
 
@@ -433,7 +435,7 @@ export default function StarCatcherGame({ onComplete }) {
                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(167,139,250,0.15)' }}>
                 <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid rgba(167,139,250,0.1)' }}>
                   <span className="material-symbols-outlined text-lg" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
-                  <span className="font-headline font-bold text-sm" style={{ color: '#fcd34d' }}>Bestenliste</span>
+                  <span className="font-headline font-bold text-sm" style={{ color: '#fcd34d' }}>{t('game.star.leaderboard')}</span>
                 </div>
                 {highscores.map((hs, i) => {
                   const isMe = i === currentRank;
@@ -447,11 +449,11 @@ export default function StarCatcherGame({ onComplete }) {
                       <div className="flex items-center gap-3">
                         <span className="text-base w-6 text-center">{i < 3 ? medals[i] : `${i + 1}.`}</span>
                         <span className={`font-label text-sm ${isMe ? 'font-bold text-white' : 'text-white/70'}`}>
-                          {hs.score} Sterne
+                          {t('game.star.starsUnit', { count: hs.score })}
                         </span>
                         {isMe && (
                           <span className="font-label text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                                style={{ background: 'rgba(252,211,77,0.2)', color: '#fcd34d' }}>Neu</span>
+                                style={{ background: 'rgba(252,211,77,0.2)', color: '#fcd34d' }}>{t('game.star.new')}</span>
                         )}
                       </div>
                       <span className="font-label text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>{hs.date}</span>
@@ -466,13 +468,13 @@ export default function StarCatcherGame({ onComplete }) {
               <button onClick={() => { setPhase('idle'); initGame(); }}
                 className="flex-1 py-4 rounded-full font-headline font-bold text-lg active:scale-95 transition-all"
                 style={{ background: 'rgba(255,255,255,0.08)', color: '#a78bfa' }}>
-                Nochmal
+                {t('game.star.again')}
               </button>
               <button onClick={() => onComplete(reward)}
                 className="flex-1 py-4 rounded-full font-headline font-bold text-lg text-white active:scale-95 transition-all flex items-center justify-center gap-2"
                 style={{ background: 'linear-gradient(135deg, #6d28d9, #a78bfa)', boxShadow: '0 8px 24px rgba(109,40,217,0.3)' }}>
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
-                Einsammeln!
+                {t('game.star.collect')}
               </button>
             </div>
           </div>

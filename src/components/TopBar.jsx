@@ -1,13 +1,15 @@
 import React from 'react';
 import { useTask } from '../context/TaskContext';
 import { Pearl } from './CurrencyIcons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 export default function TopBar({ onNavigate }) {
   const { state, computed } = useTask();
+  const { t } = useTranslation();
   const hp = state?.hp || 0;
   const { level, xpProgress } = computed;
   const xpPct = xpProgress.need > 0 ? Math.min(1, xpProgress.cur / xpProgress.need) : 0;
-  const heroName = state?.familyConfig?.childName || 'Held';
+  const heroName = state?.familyConfig?.childName || t('topbar.heroFallback');
   const heroAvatar = state?.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
 
   return (

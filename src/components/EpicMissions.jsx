@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { WEEKLY_MISSIONS } from '../constants';
 import BirthdayEpic from './BirthdayEpic';
 
@@ -52,6 +53,7 @@ function ProgressRing({ progress, target, size = 64 }) {
 }
 
 function MissionCard({ mission, active, completed, onStart, onAbandon }) {
+  const { t } = useTranslation();
   const tag = TAG_STYLES[mission.tagColor] || TAG_STYLES.violet;
   const btn = BTN_STYLES[mission.tagColor] || BTN_STYLES.violet;
   const iconBg = REWARD_ICON_BG[mission.tagColor] || '#d3bbff';
@@ -87,7 +89,7 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
           </span>
         </div>
         <div>
-          <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">Belohnung</p>
+          <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">{t('mission.reward.label')}</p>
           <p className="font-body font-bold text-on-surface">{mission.rewardLabel}</p>
           <p className="font-label text-xs text-on-surface-variant">
             +{mission.reward.hp} HP &middot; +{mission.reward.evo} Evo
@@ -100,13 +102,13 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
         <div className="w-full py-4 rounded-full font-label font-bold text-center flex items-center justify-center gap-2"
              style={{ background: 'rgba(52,211,153,0.1)', color: '#059669' }}>
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-          Abgeschlossen!
+          {t('mission.complete')}
         </div>
       ) : active ? (
         <div className="flex gap-3">
           <div className="flex-1 py-4 rounded-full font-label font-bold text-center"
                style={{ background: 'rgba(252,211,77,0.15)', color: '#735c00' }}>
-            Aktiv &middot; {progress}/{mission.target}
+            {t('mission.active')} &middot; {progress}/{mission.target}
           </div>
           <button onClick={() => onAbandon(mission.id)}
             className="px-4 py-4 rounded-full font-label font-bold active:scale-95 transition-all"
@@ -118,7 +120,7 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
         <button onClick={() => onStart(mission.id)}
           className="w-full py-4 rounded-full font-label font-bold active:scale-95 transition-all"
           style={{ background: btn.bg, color: btn.text, boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
-          Mission starten
+          {t('mission.start')}
         </button>
       )}
     </div>
@@ -126,6 +128,7 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
 }
 
 export default function EpicMissions() {
+  const { t } = useTranslation();
   const { state, actions } = useTask();
   const [showBirthday, setShowBirthday] = useState(false);
   const base = import.meta.env.BASE_URL;
@@ -146,9 +149,9 @@ export default function EpicMissions() {
       <img src={import.meta.env.BASE_URL + 'art/bg-purple-depth.png'} alt="" className="fixed inset-0 w-full h-full object-cover opacity-10 -z-10 pointer-events-none" />
       {/* Header */}
       <section className="mb-8">
-        <h2 className="font-headline text-3xl font-bold text-on-surface mb-2">Epische Missionen</h2>
+        <h2 className="font-headline text-3xl font-bold text-on-surface mb-2">{t('mission.header')}</h2>
         <p className="font-body text-on-surface-variant text-lg">
-          Wähle dein nächstes großes Abenteuer, kleiner Held!
+          {t('mission.subtitle')}
         </p>
       </section>
 
@@ -166,14 +169,14 @@ export default function EpicMissions() {
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-label uppercase tracking-widest"
                     style={{ background: '#fcd34d', color: '#725b00' }}>
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-                Event Quest
+                {t('mission.eventQuest')}
               </span>
             </div>
             <div className="absolute bottom-0 left-0 right-0 p-5">
               <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>
-                {bdCompleted ? 'Abgeschlossen!' : `${bdDone}/6 Aufgaben`}
+                {bdCompleted ? t('mission.complete') : t('mission.tasks', { done: bdDone, total: 6 })}
               </p>
-              <h3 className="font-headline font-bold text-xl text-white mt-1">Mission: Geburtstags-Überraschung</h3>
+              <h3 className="font-headline font-bold text-xl text-white mt-1">{t('mission.birthdayTitle')}</h3>
             </div>
           </div>
           {!bdCompleted && (
@@ -181,7 +184,7 @@ export default function EpicMissions() {
                  style={{ borderTop: '3px solid #fcd34d' }}>
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-lg" style={{ color: '#d97706', fontVariationSettings: "'FILL' 1" }}>cake</span>
-                <span className="font-body text-sm text-on-surface-variant">Bereite die Überraschung vor!</span>
+                <span className="font-body text-sm text-on-surface-variant">{t('mission.birthdayHint')}</span>
               </div>
               <span className="material-symbols-outlined text-xl" style={{ color: '#d97706' }}>chevron_right</span>
             </div>
@@ -190,7 +193,7 @@ export default function EpicMissions() {
             <div className="p-4 flex items-center justify-center gap-2"
                  style={{ background: 'rgba(52,211,153,0.1)' }}>
               <span className="material-symbols-outlined" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-              <span className="font-label font-bold text-sm" style={{ color: '#059669' }}>Super-Bruder Abzeichen erhalten!</span>
+              <span className="font-label font-bold text-sm" style={{ color: '#059669' }}>{t('mission.birthdayBadge')}</span>
             </div>
           )}
         </button>

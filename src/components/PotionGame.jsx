@@ -1,20 +1,21 @@
 import React, { useState, useCallback } from 'react';
 import SFX from '../utils/sfx';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const INGREDIENTS = [
-  { id: 'bloom', name: 'Blüten', icon: 'local_florist', color: '#00b894' },
-  { id: 'dew', name: 'Tautropfen', icon: 'opacity', color: '#60a5fa' },
-  { id: 'root', name: 'Wurzeln', icon: 'yard', color: '#92400e' },
-  { id: 'fern', name: 'Nachtfarn', icon: 'filter_vintage', color: '#a78bfa' },
+  { id: 'bloom', key: 'game.potion.ing.bloom', icon: 'local_florist', color: '#00b894' },
+  { id: 'dew', key: 'game.potion.ing.dew', icon: 'opacity', color: '#60a5fa' },
+  { id: 'root', key: 'game.potion.ing.root', icon: 'yard', color: '#92400e' },
+  { id: 'fern', key: 'game.potion.ing.fern', icon: 'filter_vintage', color: '#a78bfa' },
 ];
 
 const RECIPES = [
-  { combo: ['bloom', 'dew'], name: 'Wachstums-Elixier', desc: 'Lässt deinen Ronki doppelt so schnell wachsen.', badge: '2x EP', badgeBg: '#fcd34d', badgeText: '#725b00', icon: 'eco', reward: { xp: 0, hp: 6 } },
-  { combo: ['root', 'fern'], name: 'Stärke-Trank', desc: 'Erhöht Angriffskraft kurzzeitig für Bosskämpfe.', badge: '+20% DMG', badgeBg: '#fecaca', badgeText: '#991b1b', icon: 'bolt', reward: { xp: 0, hp: 5 } },
-  { combo: ['bloom', 'fern'], name: 'Nacht-Nektar', desc: 'Gibt deinem Begleiter ruhige Träume und Energie.', badge: '+15 HP', badgeBg: '#d3bbff', badgeText: '#5300b7', icon: 'bedtime', reward: { xp: 0, hp: 8 } },
-  { combo: ['dew', 'root'], name: 'Erd-Essenz', desc: 'Stärkt die Verbindung zur Natur und heilt sanft.', badge: 'Heilung', badgeBg: '#a7f3d0', badgeText: '#065f46', icon: 'spa', reward: { xp: 0, hp: 5 } },
-  { combo: ['bloom', 'root'], name: 'Wurzel-Blüte', desc: 'Ein seltenes Gebräu aus Erde und Licht.', badge: 'Selten', badgeBg: '#fcd34d', badgeText: '#725b00', icon: 'auto_awesome', reward: { xp: 0, hp: 4 } },
-  { combo: ['dew', 'fern'], name: 'Mond-Tropfen', desc: 'Glitzert im Mondlicht und gibt magische Kraft.', badge: 'Magie', badgeBg: '#d3bbff', badgeText: '#5300b7', icon: 'stars', reward: { xp: 0, hp: 5 } },
+  { combo: ['bloom', 'dew'], nameKey: 'game.potion.recipe.growthElixir', descKey: 'game.potion.recipe.growthElixir.desc', badge: '2x EP', badgeBg: '#fcd34d', badgeText: '#725b00', icon: 'eco', reward: { xp: 0, hp: 6 } },
+  { combo: ['root', 'fern'], nameKey: 'game.potion.recipe.strengthPotion', descKey: 'game.potion.recipe.strengthPotion.desc', badge: '+20% DMG', badgeBg: '#fecaca', badgeText: '#991b1b', icon: 'bolt', reward: { xp: 0, hp: 5 } },
+  { combo: ['bloom', 'fern'], nameKey: 'game.potion.recipe.nightNectar', descKey: 'game.potion.recipe.nightNectar.desc', badge: '+15 HP', badgeBg: '#d3bbff', badgeText: '#5300b7', icon: 'bedtime', reward: { xp: 0, hp: 8 } },
+  { combo: ['dew', 'root'], nameKey: 'game.potion.recipe.earthEssence', descKey: 'game.potion.recipe.earthEssence.desc', badge: 'Heilung', badgeBg: '#a7f3d0', badgeText: '#065f46', icon: 'spa', reward: { xp: 0, hp: 5 } },
+  { combo: ['bloom', 'root'], nameKey: 'game.potion.recipe.rootBlossom', descKey: 'game.potion.recipe.rootBlossom.desc', badge: 'Selten', badgeBg: '#fcd34d', badgeText: '#725b00', icon: 'auto_awesome', reward: { xp: 0, hp: 4 } },
+  { combo: ['dew', 'fern'], nameKey: 'game.potion.recipe.moonDrop', descKey: 'game.potion.recipe.moonDrop.desc', badge: 'Magie', badgeBg: '#d3bbff', badgeText: '#5300b7', icon: 'stars', reward: { xp: 0, hp: 5 } },
 ];
 
 function findRecipe(selected) {
@@ -26,6 +27,7 @@ function findRecipe(selected) {
 }
 
 export default function PotionGame({ onComplete }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState([]);
   const [brewing, setBrewing] = useState(false);
   const [result, setResult] = useState(null);
@@ -73,11 +75,11 @@ export default function PotionGame({ onComplete }) {
               style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-primary text-3xl">storm</span>
-          <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Kräutermischung</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">{t('game.potion.title')}</h1>
         </div>
         <button onClick={() => onComplete({ xp: 0, hp: 0 })}
           className="bg-primary-container text-white px-6 py-2 rounded-full font-label font-bold text-sm active:scale-95 transition-transform">
-          Beenden
+          {t('game.potion.quit')}
         </button>
       </header>
 
@@ -135,9 +137,9 @@ export default function PotionGame({ onComplete }) {
 
             {/* CTA */}
             <div className="text-center mb-6">
-              <h2 className="font-headline font-bold text-2xl text-primary mb-1">Mische die Zutaten!</h2>
+              <h2 className="font-headline font-bold text-2xl text-primary mb-1">{t('game.potion.mixTitle')}</h2>
               <p className="text-on-surface-variant font-medium text-sm">
-                {selected.length === 0 ? 'Wähle 2 Zutaten aus dem Tablett.' : selected.length === 1 ? 'Noch 1 Zutat wählen...' : 'Bereit zum Brauen!'}
+                {selected.length === 0 ? t('game.potion.choose2') : selected.length === 1 ? t('game.potion.choose1More') : t('game.potion.readyToBrew')}
               </p>
             </div>
 
@@ -145,7 +147,7 @@ export default function PotionGame({ onComplete }) {
             <section className="w-full rounded-[2rem] p-6 mb-6" style={{ background: 'rgba(249,243,235,0.8)' }}>
               <h3 className="font-headline font-bold text-lg mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-secondary">inventory_2</span>
-                Zutaten-Tablett
+                {t('game.potion.ingredientsTray')}
               </h3>
               <div className="grid grid-cols-4 gap-4">
                 {INGREDIENTS.map(ing => {
@@ -163,7 +165,7 @@ export default function PotionGame({ onComplete }) {
                           {ing.icon}
                         </span>
                       </div>
-                      <span className="text-xs font-bold uppercase text-on-surface-variant">{ing.name}</span>
+                      <span className="text-xs font-bold uppercase text-on-surface-variant">{t(ing.key)}</span>
                     </button>
                   );
                 })}
@@ -176,13 +178,13 @@ export default function PotionGame({ onComplete }) {
                 className="flex-1 bg-secondary-container text-on-secondary-container font-bold py-4 px-2 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-all"
                 style={{ opacity: selected.length ? 1 : 0.4 }}>
                 <span className="material-symbols-outlined">refresh</span>
-                <span className="text-xs uppercase tracking-wider">Leeren</span>
+                <span className="text-xs uppercase tracking-wider">{t('game.potion.clear')}</span>
               </button>
               <button onClick={brew}
                 className="flex-1 bg-primary text-on-primary font-bold py-4 px-2 rounded-full flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
                 style={{ opacity: selected.length === 2 ? 1 : 0.4 }}>
                 <span className="material-symbols-outlined">auto_fix_high</span>
-                <span className="text-xs uppercase tracking-wider">Brauen</span>
+                <span className="text-xs uppercase tracking-wider">{t('game.potion.brew')}</span>
               </button>
             </div>
 
@@ -193,7 +195,7 @@ export default function PotionGame({ onComplete }) {
                 <span className="material-symbols-outlined text-on-surface">lightbulb</span>
               </div>
               <p className="font-body text-sm text-on-surface-variant leading-relaxed">
-                Jede Kombination ergibt einen anderen Trank. Probiere alle 6 Rezepte!
+                {t('game.potion.hint')}
               </p>
             </div>
           </>
@@ -201,7 +203,7 @@ export default function PotionGame({ onComplete }) {
           /* Result screen */
           <div className="flex flex-col items-center text-center w-full">
             <div className="text-7xl mb-6 animate-bounce">&#x1f9ea;</div>
-            <h2 className="font-headline text-4xl font-bold text-on-surface mb-2">{result.name}</h2>
+            <h2 className="font-headline text-4xl font-bold text-on-surface mb-2">{t(result.nameKey)}</h2>
 
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4"
                  style={{ background: result.badgeBg, color: result.badgeText }}>
@@ -209,7 +211,7 @@ export default function PotionGame({ onComplete }) {
               <span className="font-label font-bold text-xs uppercase tracking-widest">{result.badge}</span>
             </div>
 
-            <p className="font-body text-lg text-on-surface-variant mb-8 max-w-xs">{result.desc}</p>
+            <p className="font-body text-lg text-on-surface-variant mb-8 max-w-xs">{t(result.descKey)}</p>
 
             {/* Reward cards */}
             <div className="flex gap-4 mb-8">
@@ -228,13 +230,13 @@ export default function PotionGame({ onComplete }) {
                 className="flex-1 py-4 rounded-full font-headline font-bold text-lg active:scale-95 transition-all flex items-center justify-center gap-2"
                 style={{ background: 'rgba(232,225,218,0.6)', color: '#404849' }}>
                 <span className="material-symbols-outlined">refresh</span>
-                Nochmal
+                {t('game.potion.again')}
               </button>
               <button onClick={() => onComplete(reward)}
                 className="flex-1 py-4 rounded-full font-headline font-bold text-lg text-white active:scale-95 transition-all flex items-center justify-center gap-2"
                 style={{ background: 'linear-gradient(135deg, #059669, #34d399)', boxShadow: '0 8px 24px rgba(5,150,105,0.2)' }}>
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
-                Einsammeln!
+                {t('game.potion.collect')}
               </button>
             </div>
           </div>

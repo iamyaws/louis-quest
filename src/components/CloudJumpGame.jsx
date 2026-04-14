@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import SFX from '../utils/sfx';
+import { useTranslation } from '../i18n/LanguageContext';
 
 // ── Physics (logical 400px-wide coordinate space) ──
 const P = {
@@ -28,9 +29,9 @@ function loadHighscores() {
   catch { return []; }
 }
 
-function saveHighscore(score) {
+function saveHighscore(score, locale) {
   const list = loadHighscores();
-  const entry = { score, date: new Date().toLocaleDateString('de-DE') };
+  const entry = { score, date: new Date().toLocaleDateString(locale) };
   list.push(entry);
   list.sort((a, b) => b.score - a.score);
   const top5 = list.slice(0, 5);
@@ -39,6 +40,7 @@ function saveHighscore(score) {
 }
 
 export default function CloudJumpGame({ onComplete }) {
+  const { t, locale } = useTranslation();
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const animRef = useRef(null);
@@ -225,7 +227,7 @@ export default function CloudJumpGame({ onComplete }) {
     SFX.play('crash');
     if (navigator.vibrate) navigator.vibrate(100);
     cancelAnimationFrame(animRef.current);
-    const { list, rank } = saveHighscore(g.score);
+    const { list, rank } = saveHighscore(g.score, locale);
     setHighscores(list);
     setCurrentRank(rank);
   }, []);
@@ -286,11 +288,11 @@ export default function CloudJumpGame({ onComplete }) {
               style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top, 0px))' }}>
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>cloud</span>
-          <h1 className="text-xl font-bold tracking-tight text-primary font-headline">Wolkensprung</h1>
+          <h1 className="text-xl font-bold tracking-tight text-primary font-headline">{t('game.cloud.title')}</h1>
         </div>
         <button onClick={() => onComplete({ xp: 0, hp: 0 })}
           className="bg-primary-container text-white px-5 py-2 rounded-full font-label font-bold text-sm active:scale-95 transition-transform">
-          Beenden
+          {t('game.cloud.quit')}
         </button>
       </header>
 
@@ -319,9 +321,9 @@ export default function CloudJumpGame({ onComplete }) {
         <div className="fixed inset-0 z-[401] flex flex-col items-center justify-center pointer-events-none">
           <div className="px-6 py-4 rounded-2xl text-center"
                style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)' }}>
-            <p className="font-headline font-bold text-2xl text-primary mb-2">Tippe zum Fliegen!</p>
+            <p className="font-headline font-bold text-2xl text-primary mb-2">{t('game.cloud.tapToFly')}</p>
             <p className="font-body text-sm text-on-surface-variant">
-              Hilf deinem Drachen durch die Wolken!
+              {t('game.cloud.helpDragon')}
             </p>
           </div>
         </div>
@@ -335,16 +337,16 @@ export default function CloudJumpGame({ onComplete }) {
             <div className="text-7xl mb-4">
               {score >= 20 ? '\u{1F389}' : score >= 10 ? '\u{1F60E}' : '\u2601\uFE0F'}
             </div>
-            <h2 className="font-headline text-4xl font-bold text-on-surface mb-2">Spielende!</h2>
+            <h2 className="font-headline text-4xl font-bold text-on-surface mb-2">{t('game.cloud.gameOver')}</h2>
             <p className="font-body text-lg text-on-surface-variant mb-6">
-              {score} {score === 1 ? 'Wolke' : 'Wolken'} geschafft!
+              {t('game.cloud.cleared', { count: score, unit: score === 1 ? t('game.cloud.cloudSingular') : t('game.cloud.cloudPlural') })}
             </p>
 
             {score >= 20 && (
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6"
                    style={{ background: 'rgba(52,211,153,0.1)', color: '#059669' }}>
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="font-label font-bold text-xs uppercase tracking-widest">Meister-Flieger!</span>
+                <span className="font-label font-bold text-xs uppercase tracking-widest">{t('game.cloud.masterBadge')}</span>
               </div>
             )}
 
@@ -366,7 +368,7 @@ export default function CloudJumpGame({ onComplete }) {
                    style={{ background: 'rgba(18,67,70,0.04)', border: '1px solid rgba(18,67,70,0.08)' }}>
                 <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid rgba(18,67,70,0.06)' }}>
                   <span className="material-symbols-outlined text-lg text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
-                  <span className="font-headline font-bold text-sm text-primary">Bestenliste</span>
+                  <span className="font-headline font-bold text-sm text-primary">{t('game.cloud.leaderboard')}</span>
                 </div>
                 {highscores.map((hs, i) => {
                   const isMe = i === currentRank;
@@ -380,11 +382,11 @@ export default function CloudJumpGame({ onComplete }) {
                       <div className="flex items-center gap-3">
                         <span className="text-base w-6 text-center">{i < 3 ? medals[i] : `${i + 1}.`}</span>
                         <span className={`font-label text-sm ${isMe ? 'font-bold text-primary' : 'text-on-surface'}`}>
-                          {hs.score} Punkte
+                          {t('game.cloud.pointsUnit', { count: hs.score })}
                         </span>
                         {isMe && (
                           <span className="font-label text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                                style={{ background: 'rgba(252,211,77,0.3)', color: '#735c00' }}>Neu</span>
+                                style={{ background: 'rgba(252,211,77,0.3)', color: '#735c00' }}>{t('game.cloud.new')}</span>
                         )}
                       </div>
                       <span className="font-label text-xs text-outline">{hs.date}</span>
@@ -399,13 +401,13 @@ export default function CloudJumpGame({ onComplete }) {
               <button onClick={handleRestart}
                 className="flex-1 py-4 rounded-full font-headline font-bold text-lg active:scale-95 transition-all"
                 style={{ background: 'rgba(18,67,70,0.06)', color: '#124346' }}>
-                Nochmal
+                {t('game.cloud.again')}
               </button>
               <button onClick={() => onComplete(reward)}
                 className="flex-1 py-4 rounded-full font-headline font-bold text-lg text-white active:scale-95 transition-all flex items-center justify-center gap-2"
                 style={{ background: 'linear-gradient(135deg, #059669, #34d399)', boxShadow: '0 8px 24px rgba(5,150,105,0.2)' }}>
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
-                Einsammeln!
+                {t('game.cloud.collect')}
               </button>
             </div>
           </div>

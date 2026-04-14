@@ -7,6 +7,7 @@ import SFX from '../utils/sfx';
 import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
 import { BADGES } from '../constants';
+import { useTranslation } from '../i18n/LanguageContext';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -38,9 +39,11 @@ const BOSS_ART = {
 export default function Hub({ onNavigate }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct } = computed;
+  const { t, locale } = useTranslation();
   const { weather } = useWeather();
   const base = import.meta.env.BASE_URL;
   const remaining = total - done;
+  const MOOD_LABELS_I18N = [t('mood.sad'), t('mood.worried'), t('mood.okay'), t('mood.good'), t('mood.magical'), t('mood.tired')];
 
   const [showBossDetail, setShowBossDetail] = useState(false);
 
@@ -49,7 +52,7 @@ export default function Hub({ onNavigate }) {
   const level = getLevel(state.xp || 0);
   const lvlProg = getLvlProg(state.xp || 0);
   const xpPct = lvlProg.need > 0 ? Math.min(100, (lvlProg.cur / lvlProg.need) * 100) : 0;
-  const heroName = state.familyConfig?.childName || 'Held';
+  const heroName = state.familyConfig?.childName || t('hero.fallback');
   const heroAvatar = state.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
 
   return (
@@ -95,7 +98,7 @@ export default function Hub({ onNavigate }) {
           const catStage = getCatStage(state.catEvo || 0);
           const companionType = 'dragon'; // TODO: map eggType → companion type
           const stages = COMPANION_STAGES[companionType] || COMPANION_STAGES.dragon;
-          const stageName = stages[catStage]?.name || CAT_STAGES[catStage]?.name || 'Ei';
+          const stageName = stages[catStage]?.name || CAT_STAGES[catStage]?.name || t('companion.stage.egg');
           const stageNum = catStage + 1;
 
           // Pick art: stage 0 = egg type, stage 1+ = evolution art
@@ -123,7 +126,7 @@ export default function Hub({ onNavigate }) {
               <div className="absolute -bottom-2 px-6 py-2 rounded-full z-20"
                    style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.5)' }}>
                 <p className="font-bold text-[12px] font-label uppercase tracking-[0.2em] text-primary-container">
-                  Stufe {stageNum} {stageName}
+                  {t('hub.companion.stage', { stage: stageNum })} {stageName}
                 </p>
               </div>
             </section>
@@ -135,7 +138,7 @@ export default function Hub({ onNavigate }) {
           <div className="flex items-center gap-2 px-6 py-3 rounded-full"
                style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(16px)', border: '1px solid white', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
             <Pearl size={24} />
-            <span className="font-extrabold font-label text-sm text-primary-container">{state.hp || 0} Heldenpunkte</span>
+            <span className="font-extrabold font-label text-sm text-primary-container">{`${state.hp || 0} ${t('hero.hp')}`}</span>
           </div>
         </div>
 
@@ -148,8 +151,8 @@ export default function Hub({ onNavigate }) {
           >
             <span className="text-3xl">👋</span>
             <div className="flex-1">
-              <p className="font-headline font-bold text-base text-secondary">Willkommen zurück!</p>
-              <p className="font-body text-sm text-on-surface-variant">Tippe für deinen täglichen Heldenpunkt</p>
+              <p className="font-headline font-bold text-base text-secondary">{t('hub.loginBonus.title')}</p>
+              <p className="font-body text-sm text-on-surface-variant">{t('hub.loginBonus.subtitle')}</p>
             </div>
             <span className="px-3 py-1.5 rounded-full font-label font-bold text-xs"
                   style={{ background: '#fcd34d', color: '#725b00' }}>+5 HP</span>
@@ -162,10 +165,10 @@ export default function Hub({ onNavigate }) {
           <div className="flex justify-between items-center">
             <div>
               <h3 className="font-headline font-bold text-xl text-primary-container">
-                {allDone ? 'Alles geschafft!' : `Noch ${remaining} Aufgaben heute`}
+                {allDone ? t('hub.allDone.title') : t('hub.remaining', { count: remaining })}
               </h3>
               <p className="font-body text-on-surface-variant text-sm">
-                {allDone ? 'Du bist ein wahrer Held!' : 'Bleib dran, dein Drache wächst!'}
+                {allDone ? t('hub.allDone.subtitle') : t('hub.keepGoing')}
               </p>
             </div>
             <div className="relative w-16 h-16 shrink-0">
@@ -193,15 +196,15 @@ export default function Hub({ onNavigate }) {
                      style={{ background: 'rgba(252,211,77,0.1)', border: '2px solid rgba(252,211,77,0.2)' }}>
                   {MOOD_EMOJIS[state.moodAM]}
                 </div>
-                <p className="font-bold text-xs font-label text-on-surface-variant uppercase tracking-widest">Stimmung</p>
-                <p className="font-headline font-bold text-lg text-primary">{MOOD_LABELS[state.moodAM]}</p>
+                <p className="font-bold text-xs font-label text-on-surface-variant uppercase tracking-widest">{t('hub.mood.label')}</p>
+                <p className="font-headline font-bold text-lg text-primary">{MOOD_LABELS_I18N[state.moodAM]}</p>
               </>
             ) : (
               <>
                 <p className="font-bold text-xs font-label uppercase tracking-widest mb-1" style={{ color: '#b45309' }}>
-                  Wie geht's dir?
+                  {t('hub.mood.title')}
                 </p>
-                <p className="font-body text-xs text-on-surface-variant mb-1">Tippe auf ein Gesicht!</p>
+                <p className="font-body text-xs text-on-surface-variant mb-1">{t('hub.mood.hint')}</p>
                 <div className="grid grid-cols-3 gap-1.5">
                   {MOOD_EMOJIS.map((e, i) => (
                     <button key={i} onClick={() => { SFX.play("pop"); actions.setMood("moodAM", i); }}
@@ -217,7 +220,7 @@ export default function Hub({ onNavigate }) {
           <div className="p-5 rounded-2xl flex flex-col justify-between"
                style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div className="flex justify-between items-center mb-3">
-              <p className="font-bold text-xs font-label text-on-surface-variant uppercase tracking-widest">Wasser</p>
+              <p className="font-bold text-xs font-label text-on-surface-variant uppercase tracking-widest">{t('hub.water.title')}</p>
               <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>water_drop</span>
             </div>
             <div className="grid grid-cols-3 gap-3 justify-items-center">
@@ -237,10 +240,10 @@ export default function Hub({ onNavigate }) {
               })}
             </div>
             <p className="text-center font-bold text-xs font-label mt-3 text-on-surface-variant">
-              {state.dailyWaterCount || 0}/6 Gläser
+              {t('hub.water.count', { count: state.dailyWaterCount || 0 })}
             </p>
             {(state.dailyWaterCount || 0) < 6 && (
-              <p className="text-center font-body text-xs mt-1" style={{ color: '#b45309' }}>Tippe auf +</p>
+              <p className="text-center font-body text-xs mt-1" style={{ color: '#b45309' }}>{t('hub.water.hint')}</p>
             )}
           </div>
         </div>
@@ -273,13 +276,13 @@ export default function Hub({ onNavigate }) {
                 <div className="relative z-10 flex-1">
                   {defeated ? (
                     <>
-                      <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>Boss besiegt!</p>
+                      <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>{t('hub.boss.defeated')}</p>
                       <h4 className="font-headline font-bold text-lg text-white">{bd.name}</h4>
                     </>
                   ) : (
                     <>
                       <div className="flex justify-between items-center">
-                        <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fca5a5' }}>Boss-Kampf</p>
+                        <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fca5a5' }}>{t('hub.boss.fight')}</p>
                         <p className="font-bold text-xs font-label" style={{ color: '#fca5a5' }}>{state.boss.hp}/{state.boss.maxHp} HP</p>
                       </div>
                       <h4 className="font-headline font-bold text-lg text-white">{bd.name}</h4>
@@ -288,7 +291,7 @@ export default function Hub({ onNavigate }) {
                       </div>
                       {(state.bossDmgToday || 0) > 0 && (
                         <p className="font-label font-bold text-xs mt-1" style={{ color: '#fcd34d' }}>
-                          Heute: -{state.bossDmgToday} Schaden!
+                          {t('hub.boss.todayDmg', { dmg: state.bossDmgToday })}
                         </p>
                       )}
                     </>
@@ -316,9 +319,9 @@ export default function Hub({ onNavigate }) {
                     <div className="flex flex-col items-center flex-1">
                       <div className="w-24 h-24 rounded-full overflow-hidden border-4 shadow-xl"
                            style={{ borderColor: '#fcd34d', boxShadow: '0 0 20px rgba(252,211,77,0.4)' }}>
-                        <img src={base + 'art/egg-glow.webp'} alt="Held" className="w-full h-full object-cover" />
+                        <img src={base + 'art/egg-glow.webp'} alt={t('hero.fallback')} className="w-full h-full object-cover" />
                       </div>
-                      <p className="font-headline font-bold text-white text-sm mt-2">Dein Held</p>
+                      <p className="font-headline font-bold text-white text-sm mt-2">{t('hub.boss.detail.hero')}</p>
                     </div>
 
                     {/* VS badge */}
@@ -362,16 +365,16 @@ export default function Hub({ onNavigate }) {
                             <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
                                  style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
                               <span className="material-symbols-outlined text-base" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
-                              <span className="font-label font-bold text-xs" style={{ color: '#b45309' }}>+{courageBonus} Schaden</span>
-                              <span className="font-label text-xs text-on-surface-variant">(Mut)</span>
+                              <span className="font-label font-bold text-xs" style={{ color: '#b45309' }}>{t('hub.boss.detail.gearDmg', { bonus: courageBonus })}</span>
+                              <span className="font-label text-xs text-on-surface-variant">{t('hub.boss.detail.gearCourage')}</span>
                             </div>
                           )}
                           {defenseBonus > 0 && (
                             <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
                                  style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
                               <span className="material-symbols-outlined text-base" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>shield</span>
-                              <span className="font-label font-bold text-xs" style={{ color: '#059669' }}>+{defenseBonus} Beute</span>
-                              <span className="font-label text-xs text-on-surface-variant">(Schutz)</span>
+                              <span className="font-label font-bold text-xs" style={{ color: '#059669' }}>{t('hub.boss.detail.gearLoot', { bonus: defenseBonus })}</span>
+                              <span className="font-label text-xs text-on-surface-variant">{t('hub.boss.detail.gearDefense')}</span>
                             </div>
                           )}
                         </div>
@@ -380,12 +383,12 @@ export default function Hub({ onNavigate }) {
 
                     {/* Boss Tier Badge */}
                     {(() => {
-                      const tier = BOSS_TIERS.find(t => t.id === bd.tier);
+                      const tier = BOSS_TIERS.find(bt => bt.id === bd.tier);
                       return tier ? (
                         <div className="flex items-center gap-2 mb-5">
                           <span className="text-sm">{tier.icon}</span>
                           <span className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: tier.color }}>
-                            {tier.name}-Klasse
+                            {t('hub.boss.detail.tierClass', { name: tier.name })}
                           </span>
                         </div>
                       ) : null;
@@ -395,7 +398,7 @@ export default function Hub({ onNavigate }) {
                     {!defeated ? (
                       <div className="mb-6">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="font-label font-bold text-xs text-error uppercase tracking-widest">Boss-Lebensenergie</span>
+                          <span className="font-label font-bold text-xs text-error uppercase tracking-widest">{t('hub.boss.detail.hp')}</span>
                           <span className="font-label font-bold text-sm text-error">{state.boss.hp} / {state.boss.maxHp}</span>
                         </div>
                         <div className="w-full h-5 rounded-full overflow-hidden relative"
@@ -410,7 +413,7 @@ export default function Hub({ onNavigate }) {
                     ) : (
                       <div className="mb-6 text-center py-4 rounded-2xl" style={{ background: 'rgba(52,211,153,0.1)', border: '2px solid #34d399' }}>
                         <span className="material-symbols-outlined text-4xl mb-1 block" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
-                        <p className="font-headline font-bold text-xl" style={{ color: '#059669' }}>Boss besiegt!</p>
+                        <p className="font-headline font-bold text-xl" style={{ color: '#059669' }}>{t('hub.boss.detail.bossDefeated')}</p>
                       </div>
                     )}
 
@@ -430,7 +433,7 @@ export default function Hub({ onNavigate }) {
                             <span className="material-symbols-outlined text-xl shrink-0" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>swords</span>
                             <div className="flex-1">
                               <p className="font-label font-bold text-sm" style={{ color: '#059669' }}>
-                                Heutige Power: +{state.bossDmgToday} Schaden
+                                {t('hub.boss.detail.power', { dmg: state.bossDmgToday })}
                               </p>
                             </div>
                           </div>
@@ -463,7 +466,7 @@ export default function Hub({ onNavigate }) {
                       )}
                       <div className="p-5">
                         <p className="font-label font-bold text-xs text-error uppercase tracking-widest">
-                          {defeated ? 'Bezwungen' : 'Tages-Boss'}
+                          {defeated ? t('hub.boss.detail.defeated') : t('hub.boss.detail.dailyBoss')}
                         </p>
                         <h3 className="font-headline font-bold text-2xl text-on-surface mt-1">{bd.name}</h3>
                         <p className="font-body text-on-surface-variant mt-2 leading-relaxed">{bd.desc}</p>
@@ -473,21 +476,21 @@ export default function Hub({ onNavigate }) {
                     {/* Loot section */}
                     {defeated && (
                       <div className="mb-6">
-                        <h4 className="font-label font-bold text-xs uppercase tracking-widest text-outline mb-3">Beute erhalten</h4>
+                        <h4 className="font-label font-bold text-xs uppercase tracking-widest text-outline mb-3">{t('hub.boss.detail.loot')}</h4>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="p-4 rounded-2xl text-center"
                                style={{ background: 'rgba(18,67,70,0.05)', border: '1px solid rgba(18,67,70,0.1)' }}>
                             <span className="material-symbols-outlined text-2xl text-primary mb-1 block"
                                   style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
                             <p className="font-label font-bold text-lg text-primary">+{bd.reward.hp}</p>
-                            <p className="font-label text-xs text-on-surface-variant uppercase">Heldenpunkte</p>
+                            <p className="font-label text-xs text-on-surface-variant uppercase">{t('hub.boss.detail.heroPoints')}</p>
                           </div>
                           <div className="p-4 rounded-2xl text-center"
                                style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
                             <span className="material-symbols-outlined text-2xl mb-1 block"
                                   style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
                             <p className="font-label font-bold text-lg" style={{ color: '#b45309' }}>+1</p>
-                            <p className="font-label text-xs text-on-surface-variant uppercase">Evo-Essenz</p>
+                            <p className="font-label text-xs text-on-surface-variant uppercase">{t('hub.boss.detail.evoEssence')}</p>
                           </div>
                         </div>
                       </div>
@@ -498,12 +501,12 @@ export default function Hub({ onNavigate }) {
                       <div className="mb-6 mm-card p-5">
                         <h4 className="font-label font-bold text-xs uppercase tracking-widest text-outline mb-3 flex items-center gap-2">
                           <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
-                          Trophäen-Sammlung
+                          {t('hub.boss.detail.trophies')}
                         </h4>
                         <div className="grid grid-cols-3 gap-3">
                           {BOSSES.map(boss => {
                             const isDefeated = (state.bossTrophies || []).includes(boss.id);
-                            const tier = BOSS_TIERS.find(t => t.id === boss.tier);
+                            const tier = BOSS_TIERS.find(bt => bt.id === boss.tier);
                             return (
                               <div key={boss.id} className="flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all"
                                    style={{
@@ -535,7 +538,7 @@ export default function Hub({ onNavigate }) {
                           })}
                         </div>
                         <p className="font-label text-xs text-on-surface-variant text-center mt-3">
-                          {(state.bossTrophies || []).length} / {BOSSES.length} Bosse besiegt
+                          {t('hub.boss.detail.bossCount', { done: (state.bossTrophies || []).length, total: BOSSES.length })}
                         </p>
                       </div>
                     )}
@@ -547,7 +550,7 @@ export default function Hub({ onNavigate }) {
                     <button onClick={() => setShowBossDetail(false)}
                       className="w-full max-w-lg mx-auto block py-4 rounded-full font-label font-extrabold text-lg active:scale-95 transition-all"
                       style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 8px 24px rgba(252,211,77,0.4), 0 4px 0 #d4a830' }}>
-                      {defeated ? 'Sieg feiern!' : 'Weiter kämpfen!'}
+                      {defeated ? t('hub.boss.detail.celebrate') : t('hub.boss.detail.keepFighting')}
                     </button>
                   </div>
                 </div>
@@ -565,7 +568,7 @@ export default function Hub({ onNavigate }) {
                  style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="material-symbols-outlined text-primary">explore</span>
-                <h4 className="font-bold text-sm font-label text-primary uppercase tracking-tight">Neben-Quests</h4>
+                <h4 className="font-bold text-sm font-label text-primary uppercase tracking-tight">{t('hub.sideQuests')}</h4>
               </div>
               <div className="flex flex-col gap-3">
                 {sideQuests.slice(0, 3).map(q => (
@@ -604,11 +607,11 @@ export default function Hub({ onNavigate }) {
                 )}
               </div>
               <div className="relative z-10 flex-1">
-                <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>Epische Missionen</p>
+                <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>{t('hub.missions.title')}</p>
                 <h4 className="font-headline font-bold text-lg text-white">
                   {hasActive
-                    ? `${state.activeMissions.length} aktiv`
-                    : 'Wähle dein Abenteuer!'}
+                    ? t('hub.missions.active', { count: state.activeMissions.length })
+                    : t('hub.missions.choose')}
                 </h4>
               </div>
               <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
@@ -635,7 +638,7 @@ export default function Hub({ onNavigate }) {
                 <span className="text-3xl">{badge.i}</span>
               </div>
               <div className="relative z-10 flex-1 min-w-0">
-                <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#92400e' }}>Neueste Errungenschaft</p>
+                <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#92400e' }}>{t('hub.achievement.latest')}</p>
                 <h4 className="font-headline font-bold text-lg truncate" style={{ color: '#1a1a1a' }}>{badge.n}</h4>
                 <p className="font-body text-sm truncate" style={{ color: '#5c4813' }}>{badge.desc}</p>
               </div>
@@ -661,8 +664,8 @@ export default function Hub({ onNavigate }) {
                   style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
           </div>
           <div className="relative z-10 flex-1">
-            <p className="font-headline font-bold text-lg" style={{ color: '#1a2e05' }}>Helden-Kodex</p>
-            <p className="font-body text-base" style={{ color: '#365314' }}>Unsere Familien-Werte</p>
+            <p className="font-headline font-bold text-lg" style={{ color: '#1a2e05' }}>{t('hub.kodex.title')}</p>
+            <p className="font-body text-base" style={{ color: '#365314' }}>{t('hub.kodex.subtitle')}</p>
           </div>
           <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: '#4d7c0f' }}>chevron_right</span>
         </button>

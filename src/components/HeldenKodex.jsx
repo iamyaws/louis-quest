@@ -2,18 +2,20 @@ import React from 'react';
 import BadgeGrid from './BadgeGrid';
 import { useTask } from '../context/TaskContext';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const TRAITS = [
-  { emoji: '💪', label: 'Gibt sein Bestes' },
-  { emoji: '🤝', label: 'Hilft anderen' },
-  { emoji: '🤫', label: 'Ist ehrlich' },
-  { emoji: '🌟', label: 'Probiert Neues' },
-  { emoji: '🧘', label: 'Bleibt ruhig' },
-  { emoji: '🙏', label: 'Sagt Danke' },
+  { emoji: '💪', key: 'kodex.trait.best' },
+  { emoji: '🤝', key: 'kodex.trait.help' },
+  { emoji: '🤫', key: 'kodex.trait.honest' },
+  { emoji: '🌟', key: 'kodex.trait.try' },
+  { emoji: '🧘', key: 'kodex.trait.calm' },
+  { emoji: '🙏', key: 'kodex.trait.thanks' },
 ];
 
 export default function HeldenKodex() {
   const { state } = useTask();
+  const { t } = useTranslation();
   const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
   const msg = config.parentMessage;
 
@@ -59,7 +61,7 @@ export default function HeldenKodex() {
       <section className="mt-10 space-y-6">
         {/* Header row */}
         <div className="flex justify-between items-baseline">
-          <h2 className="text-xl font-bold font-headline">Ein wahrer Held...</h2>
+          <h2 className="text-xl font-bold font-headline">{t('kodex.trueHero')}</h2>
           <span className="text-primary text-sm font-semibold font-label flex items-center gap-1">
             <span
               className="material-symbols-outlined text-sm"
@@ -67,7 +69,7 @@ export default function HeldenKodex() {
             >
               stars
             </span>
-            Helden-Kodex
+            {t('kodex.title')}
           </span>
         </div>
 
@@ -79,7 +81,7 @@ export default function HeldenKodex() {
               className="bg-white p-6 rounded-xl flex flex-col items-center text-center gap-3 shadow-sm hover:scale-[1.02] transition"
             >
               <span className="text-4xl">{trait.emoji}</span>
-              <span className="font-bold text-sm font-headline">{trait.label}</span>
+              <span className="font-bold text-sm font-headline">{t(trait.key)}</span>
             </div>
           ))}
         </div>
@@ -89,7 +91,7 @@ export default function HeldenKodex() {
       <section className="mt-10 space-y-4">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
-          <h2 className="text-xl font-bold font-headline">Abzeichen-Sammlung</h2>
+          <h2 className="text-xl font-bold font-headline">{t('kodex.badges')}</h2>
         </div>
         <BadgeGrid />
       </section>
@@ -114,7 +116,7 @@ export default function HeldenKodex() {
           </div>
           <div>
             <div className="font-bold font-headline text-sm">{msg.title}</div>
-            <div className="text-xs text-on-surface-variant font-body">Gerade eben von Mama &amp; Papa</div>
+            <div className="text-xs text-on-surface-variant font-body">{t('kodex.fromParents')}</div>
           </div>
         </div>
 

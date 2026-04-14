@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 
 // ── Evolution Celebration ──
 function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
+  const { t } = useTranslation();
   return (
     <main className="relative flex flex-col items-center justify-center min-h-dvh px-6 pt-16 pb-24 text-center">
       {/* Gold dust texture */}
@@ -44,10 +46,10 @@ function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-2"
                style={{ background: 'rgba(252,211,77,0.2)' }}>
             <span className="material-symbols-outlined text-secondary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
-            <span className="text-secondary font-bold text-xs tracking-widest uppercase">Level Aufgestiegen</span>
+            <span className="text-secondary font-bold text-xs tracking-widest uppercase">{t('celebrate.evolution.label')}</span>
           </div>
           <h2 className="font-headline font-bold text-5xl text-primary leading-tight">
-            Evolution vollendet!
+            {t('celebrate.evolution.title')}
           </h2>
           <p className="font-body text-xl text-on-surface-variant max-w-md mx-auto leading-relaxed">
             Dein <span className="font-bold text-primary">Ronki</span> ist jetzt: <span className="font-bold text-primary">{name}</span> {emoji}
@@ -59,16 +61,16 @@ function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
           <div className="bg-white p-6 rounded-2xl text-left" style={{ boxShadow: '0 8px 24px rgba(30,27,23,0.04)' }}>
             <div className="flex items-center gap-2 mb-2">
               <span className="material-symbols-outlined text-primary">bolt</span>
-              <span className="text-on-surface-variant font-bold text-sm">Energie</span>
+              <span className="text-on-surface-variant font-bold text-sm">{t('celebrate.evolution.energy')}</span>
             </div>
             <div className="text-2xl font-headline font-bold text-on-surface">+250</div>
           </div>
           <div className="bg-white p-6 rounded-2xl text-left translate-y-4" style={{ boxShadow: '0 8px 24px rgba(30,27,23,0.04)' }}>
             <div className="flex items-center gap-2 mb-2">
               <span className="material-symbols-outlined text-secondary">favorite</span>
-              <span className="text-on-surface-variant font-bold text-sm">Bindung</span>
+              <span className="text-on-surface-variant font-bold text-sm">{t('celebrate.evolution.bond')}</span>
             </div>
-            <div className="text-2xl font-headline font-bold text-on-surface">Stufe {(stage || 0) + 1}</div>
+            <div className="text-2xl font-headline font-bold text-on-surface">{t('celebrate.evolution.stage', { stage: (stage || 0) + 1 })}</div>
           </div>
         </div>
 
@@ -76,7 +78,7 @@ function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
         <div className="relative z-10 mt-16 w-full px-4">
           <button onClick={onDismiss}
             className="w-full bg-primary-container text-white py-5 rounded-full font-headline font-bold text-xl active:scale-95 transition-all flex items-center justify-center gap-3">
-            Weiter geht's
+            {t('celebrate.evolution.button')}
             <span className="material-symbols-outlined">arrow_forward</span>
           </button>
         </div>
@@ -87,6 +89,7 @@ function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
 
 // ── Task Completion / Level Up ──
 function LevelUpCelebration({ level, onDismiss }) {
+  const { t } = useTranslation();
   return (
     <main className="min-h-dvh w-full max-w-2xl px-6 pb-32 flex flex-col items-center justify-center relative overflow-hidden mx-auto"
           style={{ paddingTop: 'calc(6rem + env(safe-area-inset-top, 0px))' }}>
@@ -107,13 +110,13 @@ function LevelUpCelebration({ level, onDismiss }) {
                style={{ boxShadow: '0 8px 24px rgba(30,27,23,0.06)' }}>
             <div className="flex flex-col items-center">
               <span className="font-headline font-bold text-5xl text-primary">{level}</span>
-              <span className="font-label text-xs text-on-surface-variant uppercase tracking-widest">Level</span>
+              <span className="font-label text-xs text-on-surface-variant uppercase tracking-widest">{t('celebrate.levelup.label')}</span>
             </div>
           </div>
         </div>
 
         {/* Headline */}
-        <h2 className="font-headline font-bold text-5xl text-on-surface mb-6 tracking-tight">Level Up!</h2>
+        <h2 className="font-headline font-bold text-5xl text-on-surface mb-6 tracking-tight">{t('celebrate.levelup.title')}</h2>
 
         {/* Reward card */}
         <div className="rounded-2xl p-8 w-full max-w-sm mb-12 flex flex-col items-center relative"
@@ -126,7 +129,7 @@ function LevelUpCelebration({ level, onDismiss }) {
             <span className="material-symbols-outlined relative z-10 text-secondary" style={{ fontSize: '5rem', fontVariationSettings: "'FILL' 1" }}>military_tech</span>
           </div>
           <p className="font-body text-lg text-on-surface/80 leading-relaxed max-w-[240px]">
-            Du bist jetzt <span className="font-bold text-on-surface">Level {level}</span>! Deine Macht wächst!
+            {t('celebrate.levelup.power', { level })}
           </p>
         </div>
 
@@ -135,7 +138,7 @@ function LevelUpCelebration({ level, onDismiss }) {
           <button onClick={onDismiss}
             className="bg-primary-container text-white font-headline font-bold text-xl px-8 py-5 rounded-full active:scale-95 transition-all"
             style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
-            Stark!
+            {t('celebrate.levelup.button')}
           </button>
         </div>
       </div>
@@ -145,6 +148,7 @@ function LevelUpCelebration({ level, onDismiss }) {
 
 // ── Victory / All Quests Done ──
 function VictoryCelebration({ onDismiss }) {
+  const { t } = useTranslation();
   const { state, computed } = useTask();
   const streak = state?.sd || 0;
 
@@ -166,9 +170,9 @@ function VictoryCelebration({ onDismiss }) {
 
         {/* Headline */}
         <div className="space-y-4 mb-12">
-          <h2 className="font-headline font-bold text-5xl text-primary leading-tight">Alle Quests geschafft!</h2>
+          <h2 className="font-headline font-bold text-5xl text-primary leading-tight">{t('celebrate.victory.title')}</h2>
           <p className="text-xl text-on-surface-variant font-body px-4">
-            Du bist heute ein wahrer Held!
+            {t('celebrate.victory.message')}
           </p>
         </div>
 
@@ -181,9 +185,9 @@ function VictoryCelebration({ onDismiss }) {
           <div className="relative z-10 flex flex-col items-center">
             <div className="flex items-center gap-3 mb-2">
               <span className="material-symbols-outlined text-4xl text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
-              <span className="font-headline font-bold text-3xl text-on-surface">{streak + 1} Tage in Folge!</span>
+              <span className="font-headline font-bold text-3xl text-on-surface">{t('celebrate.victory.streak', { days: streak + 1 })}</span>
             </div>
-            <p className="font-label text-sm uppercase tracking-widest text-on-surface-variant/60">Aktuelle Serie</p>
+            <p className="font-label text-sm uppercase tracking-widest text-on-surface-variant/60">{t('celebrate.victory.streakLabel')}</p>
             {/* Progress dots */}
             <div className="flex gap-2 mt-6">
               {Array.from({ length: Math.min(streak + 1, 7) }, (_, i) => (
@@ -196,7 +200,7 @@ function VictoryCelebration({ onDismiss }) {
 
         {/* Quest log summary */}
         <div className="w-full mb-10">
-          <h3 className="font-headline font-bold text-2xl text-on-surface mb-6 text-center">Heutige Taten</h3>
+          <h3 className="font-headline font-bold text-2xl text-on-surface mb-6 text-center">{t('celebrate.victory.summary')}</h3>
           <div className="rounded-2xl p-6 space-y-3" style={{ background: '#f9f2ec' }}>
             {(state?.quests || []).filter(q => q.done && !q.sideQuest).slice(0, 5).map(q => (
               <div key={q.id} className="flex items-center gap-4">
@@ -210,7 +214,7 @@ function VictoryCelebration({ onDismiss }) {
             ))}
             {(state?.quests || []).filter(q => q.done && !q.sideQuest).length > 5 && (
               <p className="font-label text-sm text-on-surface-variant text-center">
-                +{(state?.quests || []).filter(q => q.done && !q.sideQuest).length - 5} weitere
+                {t('celebrate.victory.more', { count: (state?.quests || []).filter(q => q.done && !q.sideQuest).length - 5 })}
               </p>
             )}
           </div>
@@ -222,7 +226,7 @@ function VictoryCelebration({ onDismiss }) {
             className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full active:scale-95 transition-all flex items-center justify-center gap-3"
             style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
-            Weiter!
+            {t('celebrate.victory.button')}
           </button>
         </div>
       </section>
@@ -232,6 +236,7 @@ function VictoryCelebration({ onDismiss }) {
 
 // ── Chest / Streak Milestone ──
 function ChestCelebration({ milestone, reward, onDismiss }) {
+  const { t } = useTranslation();
   return (
     <main className="min-h-dvh pt-24 pb-32 px-6 flex flex-col items-center justify-center relative overflow-hidden lotus-pattern">
       {/* Ambient glow */}
@@ -257,9 +262,9 @@ function ChestCelebration({ milestone, reward, onDismiss }) {
 
         {/* Headline */}
         <div className="space-y-4 mb-10">
-          <h2 className="font-headline font-bold text-5xl text-primary leading-tight">Streak-Truhe!</h2>
+          <h2 className="font-headline font-bold text-5xl text-primary leading-tight">{t('celebrate.chest.title')}</h2>
           <p className="text-xl text-on-surface-variant font-body px-4">
-            {milestone} Tage in Folge! Eine Belohnung wartet auf dich!
+            {t('celebrate.chest.daysInRow', { days: milestone })}
           </p>
         </div>
 
@@ -278,7 +283,7 @@ function ChestCelebration({ milestone, reward, onDismiss }) {
               </div>
             </div>
             <p className="font-body text-xl text-on-surface/80 leading-relaxed">
-              Du hast <span className="font-bold text-on-surface">+{reward} Heldenpunkte</span> verdient!
+              {t('celebrate.chest.earned', { reward })}
             </p>
           </div>
         </div>
@@ -289,7 +294,7 @@ function ChestCelebration({ milestone, reward, onDismiss }) {
             className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full active:scale-95 transition-all flex items-center justify-center gap-3"
             style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
-            Einsammeln!
+            {t('celebrate.chest.button')}
           </button>
         </div>
       </section>
@@ -298,6 +303,7 @@ function ChestCelebration({ milestone, reward, onDismiss }) {
 }
 
 export default function Celebration() {
+  const { t } = useTranslation();
   const { celebration, actions } = useTask();
   const [visible, setVisible] = useState(false);
 
@@ -326,7 +332,7 @@ export default function Celebration() {
       <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 h-16"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <button onClick={handleDismiss} className="material-symbols-outlined text-primary hover:opacity-80 transition-opacity">close</button>
-        <h1 className="font-headline font-bold text-2xl text-primary">Quest Complete!</h1>
+        <h1 className="font-headline font-bold text-2xl text-primary">{t('celebrate.header')}</h1>
         <div className="w-6" />
       </header>
 

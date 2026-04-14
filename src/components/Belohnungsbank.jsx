@@ -1,6 +1,7 @@
 import React from 'react';
 import { DEFAULT_BELOHNUNGEN } from '../constants';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { Pearl, Hourglass } from './CurrencyIcons';
 
 const ICON_MAP = {
@@ -10,6 +11,7 @@ const ICON_MAP = {
 };
 
 export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, onOpenParental }) {
+  const { t } = useTranslation();
   const { state, actions } = useTask();
   const hp = state?.hp || 0;
   const screenMin = state?.drachenEier || 0; // Screen minutes (repurposed from eggs)
@@ -29,10 +31,10 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
             <div className="flex-1 z-10 pb-2">
               <h1 className="text-3xl font-bold font-headline text-white mb-1"
                   style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-                Belohnungsbank
+                {t('shop.header.title')}
               </h1>
               <p className="text-white/60 font-body text-sm leading-relaxed">
-                Wandle Punkte in tolle Erlebnisse um!
+                {t('shop.header.subtitle')}
               </p>
             </div>
             {/* Hero with coins illustration */}
@@ -54,7 +56,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
              style={{ background: 'linear-gradient(135deg, #5300b7, #6d28d9)' }}>
           <div className="flex items-center gap-2 mb-2">
             <Pearl size={20} dark />
-            <p className="font-label font-bold uppercase tracking-widest text-xs text-white/60">Heldenpunkte</p>
+            <p className="font-label font-bold uppercase tracking-widest text-xs text-white/60">{t('hero.hp')}</p>
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-headline font-bold text-white">{hp}</span>
@@ -70,7 +72,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
              style={{ background: 'linear-gradient(135deg, #00b4d8, #00CEC9)' }}>
           <div className="flex items-center gap-2 mb-2">
             <Hourglass size={20} dark />
-            <p className="font-label font-bold uppercase tracking-widest text-xs text-white/70">Screen-Minuten</p>
+            <p className="font-label font-bold uppercase tracking-widest text-xs text-white/70">{t('shop.screenMinutes')}</p>
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-headline font-bold text-white">{screenMin}</span>
@@ -91,8 +93,8 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
           <span className="material-symbols-outlined text-2xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>sports_esports</span>
         </div>
         <div className="flex-1">
-          <h4 className="font-headline font-bold text-lg text-on-surface">Mini-Spiele</h4>
-          <p className="text-sm text-on-surface-variant font-body">Spiele & sammle Bonus-Punkte!</p>
+          <h4 className="font-headline font-bold text-lg text-on-surface">{t('shop.miniGames')}</h4>
+          <p className="text-sm text-on-surface-variant font-body">{t('shop.miniGames.subtitle')}</p>
         </div>
         <span className="material-symbols-outlined text-primary">chevron_right</span>
       </button>
@@ -101,7 +103,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
       {familyRewards.length > 0 && (
         <div className="mb-8">
           <h3 className="font-label font-bold text-sm uppercase tracking-widest text-on-surface px-2 mb-4">
-            Familien-Abenteuer
+            {t('shop.familyAdventures')}
           </h3>
           <div className="flex flex-col gap-4">
             {familyRewards.map(reward => {
@@ -118,7 +120,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                     </div>
                     <div>
                       <h4 className="font-label font-bold text-lg text-on-surface leading-tight">{reward.name}</h4>
-                      <p className="text-sm text-on-surface-variant font-body mt-1">{reward.emoji} Belohnung für deine Heldentaten!</p>
+                      <p className="text-sm text-on-surface-variant font-body mt-1">{reward.emoji} {t('shop.rewardForDeeds')}</p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid #f4ede5' }}>
@@ -134,7 +136,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                       disabled={!canAfford}
                       onClick={() => { if (canAfford) actions.redeemReward('hp', reward.cost); }}
                     >
-                      {canAfford ? 'Einlösen' : 'Zu wenig'}
+                      {canAfford ? t('shop.redeem') : t('shop.tooFew')}
                     </button>
                   </div>
                 </div>
@@ -148,7 +150,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
       {screenRewards.length > 0 && (
         <div className="mb-8">
           <h3 className="font-label font-bold text-sm uppercase tracking-widest text-on-surface px-2 mb-4">
-            Digitale Zeit
+            {t('shop.digitalTime')}
           </h3>
           <div className="flex flex-col gap-4">
             {screenRewards.map(reward => {
@@ -166,7 +168,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                     </div>
                     <div>
                       <h4 className="font-label font-bold text-lg text-on-surface leading-tight">{reward.name}</h4>
-                      <p className="text-sm text-on-surface-variant font-body mt-1">{reward.emoji} Screen-Zeit als Belohnung</p>
+                      <p className="text-sm text-on-surface-variant font-body mt-1">{reward.emoji} {t('shop.screenReward')}</p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid #f4ede5' }}>
@@ -187,7 +189,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                         }
                       }}
                     >
-                      {blocked ? 'Timer läuft' : canAfford ? 'Einlösen' : 'Zu wenig'}
+                      {blocked ? t('shop.timerRunning') : canAfford ? t('shop.redeem') : t('shop.tooFew')}
                     </button>
                   </div>
                 </div>
@@ -209,10 +211,9 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
             <span className="material-symbols-outlined text-primary text-xl">lightbulb</span>
           </div>
           <div>
-            <h5 className="font-label font-bold text-primary text-lg">So funktioniert's</h5>
+            <h5 className="font-label font-bold text-primary text-lg">{t('shop.howItWorks')}</h5>
             <p className="text-sm font-body text-on-surface-variant mt-1 leading-relaxed">
-              Wähle eine Belohnung und klicke auf <span className="font-bold text-primary">Einlösen</span>.
-              Heldenpunkte bekommst du für erledigte Quests, Screen-Minuten werden automatisch gutgeschrieben!
+              {t('shop.howItWorksBody')}
             </p>
           </div>
         </div>
@@ -226,7 +227,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
           style={{ background: 'rgba(156,163,175,0.1)', border: '1.5px solid rgba(156,163,175,0.2)' }}>
           <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#9ca3af' }}>lock</span>
         </button>
-        <span className="font-label text-xs text-[#9ca3af] tracking-wide" style={{ opacity: 0.5 }}>Verwaltung</span>
+        <span className="font-label text-xs text-[#9ca3af] tracking-wide" style={{ opacity: 0.5 }}>{t('shop.admin')}</span>
       </div>
     </div>
   );

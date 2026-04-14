@@ -1,10 +1,11 @@
 import React from 'react';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const GAMES = [
   {
     id: 'memory',
-    title: 'Magisches Gedächtnis',
-    desc: 'Finde die Paare in Ronkis Wald.',
+    titleKey: 'game.magicMemory',
+    descKey: 'game.magicMemory.desc',
     icon: 'style',
     visualIcon: 'style',
     iconBg: 'rgba(234,195,62,0.15)',
@@ -15,8 +16,8 @@ const GAMES = [
   },
   {
     id: 'starfall',
-    title: 'Sternenfänger',
-    desc: 'Sammle die fallenden Lichter der Nacht.',
+    titleKey: 'game.starfall',
+    descKey: 'game.starfall.desc',
     icon: 'stars',
     visualIcon: 'auto_awesome',
     iconBg: 'rgba(83,0,183,0.08)',
@@ -27,8 +28,8 @@ const GAMES = [
   },
   {
     id: 'potion',
-    title: 'Kräutermischung',
-    desc: 'Braue heilende Elixiere aus Waldkräutern.',
+    titleKey: 'game.herbalBlend',
+    descKey: 'game.herbalBlend.desc',
     icon: 'vital_signs',
     visualIcon: 'science',
     iconBg: 'rgba(107,48,0,0.08)',
@@ -39,8 +40,8 @@ const GAMES = [
   },
   {
     id: 'clouds',
-    title: 'Wolkensprung',
-    desc: 'Fliege mit deinem Drachen durch die Wolken!',
+    titleKey: 'game.cloudJump',
+    descKey: 'game.cloudJump.desc',
     icon: 'cloud',
     visualIcon: 'air',
     iconBg: 'rgba(135,206,235,0.2)',
@@ -52,12 +53,13 @@ const GAMES = [
 ];
 
 export default function MiniGames({ onPlay }) {
+  const { t } = useTranslation();
   return (
     <div className="px-6 pb-8">
       {/* Header */}
       <section className="mb-8">
-        <h2 className="font-headline text-4xl font-bold text-primary tracking-tight">Mini-Spiele</h2>
-        <p className="font-body text-on-surface-variant text-lg mt-1">Entspanne dich in der magischen Lichtung.</p>
+        <h2 className="font-headline text-4xl font-bold text-primary tracking-tight">{t('game.header')}</h2>
+        <p className="font-body text-on-surface-variant text-lg mt-1">{t('game.subtitle')}</p>
       </section>
 
       {/* Game cards */}
@@ -83,22 +85,22 @@ export default function MiniGames({ onPlay }) {
 
                 {/* Text */}
                 <div>
-                  <h3 className="font-headline text-2xl font-semibold text-on-surface">{game.title}</h3>
-                  <p className="font-body text-sm text-on-surface-variant mt-1">{game.desc}</p>
+                  <h3 className="font-headline text-2xl font-semibold text-on-surface">{t(game.titleKey)}</h3>
+                  <p className="font-body text-sm text-on-surface-variant mt-1">{t(game.descKey)}</p>
                 </div>
 
                 {/* Button */}
                 {game.ready ? (
                   <button onClick={() => onPlay(game.id)}
                     className="bg-secondary-container text-on-surface px-8 py-2.5 rounded-full font-label font-bold text-sm active:scale-95 transition-all flex items-center gap-2">
-                    Spielen
+                    {t('game.play')}
                     <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
                   </button>
                 ) : (
                   <div className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-label font-bold"
                        style={{ background: 'rgba(232,225,218,0.6)', color: '#7b7486' }}>
                     <span className="material-symbols-outlined text-lg">lock</span>
-                    Bald verfügbar
+                    {t('game.comingSoon')}
                   </div>
                 )}
               </div>

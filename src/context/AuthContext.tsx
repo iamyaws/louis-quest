@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../i18n/LanguageContext';
 import type { User } from '@supabase/supabase-js';
 
 interface AuthState {
@@ -57,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function LoginScreen() {
+  const { t } = useTranslation();
   const { signIn, signUp } = useAuth();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
@@ -91,21 +93,21 @@ export function LoginScreen() {
           <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-surface-container-highest flex items-center justify-center" style={{ boxShadow: '0 0 40px rgba(252,211,77,0.2)' }}>
             <span className="material-symbols-outlined text-5xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>mark_email_read</span>
           </div>
-          <h2 className="font-headline text-3xl font-bold text-primary mb-3">Post ist da!</h2>
+          <h2 className="font-headline text-3xl font-bold text-primary mb-3">{t('auth.mailSent')}</h2>
 
           <p className="font-body text-on-surface-variant mb-6 leading-relaxed">
-            Wir haben einen magischen Link an <span className="font-bold text-primary">{email}</span> gesendet. Klicke darauf, um dein Konto zu aktivieren.
+            {t('auth.mailBody', { email })}
           </p>
           <div className="p-4 rounded-xl mb-6 flex items-start gap-3 text-left" style={{ background: 'rgba(232,225,219,0.5)' }}>
             <span className="material-symbols-outlined text-secondary mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-            <span className="font-body text-sm text-on-surface-variant">Der Link ist nur für kurze Zeit gültig.</span>
+            <span className="font-body text-sm text-on-surface-variant">{t('auth.linkExpiry')}</span>
           </div>
           <button
             onClick={() => { setSignupDone(false); setMode('login'); }}
             className="font-label font-bold text-primary flex items-center gap-1 mx-auto"
           >
             <span className="material-symbols-outlined text-lg">arrow_back</span>
-            Zurück zum Login
+            {t('auth.backToLogin')}
           </button>
         </div>
       </div>
@@ -133,10 +135,10 @@ export function LoginScreen() {
             />
           </div>
           <h2 className="font-headline font-extrabold text-2xl text-on-surface text-center">
-            {mode === 'login' ? 'Willkommen zurück!' : 'Werde ein Held!'}
+            {mode === 'login' ? t('auth.welcomeBack') : t('auth.becomeHero')}
           </h2>
           <p className="font-body text-on-surface-variant mt-1 text-base opacity-80">
-            {mode === 'login' ? 'Begib dich auf deine Heldenreise' : 'Erstelle dein Helden-Konto'}
+            {mode === 'login' ? t('auth.heroJourney') : t('auth.createAccount')}
           </p>
         </div>
 
@@ -145,7 +147,7 @@ export function LoginScreen() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="font-label text-xs font-semibold text-primary/70 px-1 block">
-                E-Mail der Eltern
+                {t('auth.parentEmail')}
               </label>
               <div className="relative group">
                 <input
@@ -154,14 +156,14 @@ export function LoginScreen() {
                   onChange={e => setEmail(e.target.value)}
                   required
                   className="w-full h-14 px-5 rounded-full bg-surface-container-low border border-outline-variant/30 font-body text-on-surface placeholder:text-outline-variant/60 focus:border-primary/30 focus:ring-4 focus:ring-primary/5 outline-none transition-all"
-                  placeholder="name@beispiel.de"
+                  placeholder={t('auth.emailPlaceholder')}
                 />
                 <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-outline-variant/60 group-focus-within:text-primary/60 text-xl transition-colors">mail</span>
               </div>
             </div>
             <div className="space-y-2">
               <label className="font-label text-xs font-semibold text-primary/70 px-1 block">
-                Passwort
+                {t('auth.password')}
               </label>
               <div className="relative group">
                 <input
@@ -171,7 +173,7 @@ export function LoginScreen() {
                   required
                   minLength={6}
                   className="w-full h-14 px-5 rounded-full bg-surface-container-low border border-outline-variant/30 font-body text-on-surface placeholder:text-outline-variant/60 focus:border-primary/30 focus:ring-4 focus:ring-primary/5 outline-none transition-all"
-                  placeholder="Mindestens 6 Zeichen"
+                  placeholder={t('auth.passwordPlaceholder')}
                 />
                 <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-outline-variant/60 group-focus-within:text-primary/60 text-xl transition-colors">lock</span>
               </div>
@@ -189,7 +191,7 @@ export function LoginScreen() {
               disabled={busy}
               className="w-full py-5 bg-primary text-on-primary font-headline font-bold text-base rounded-2xl shadow-xl shadow-primary/10 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
             >
-              <span>{busy ? 'Laden...' : mode === 'login' ? 'Anmelden' : 'Kostenlos starten'}</span>
+              <span>{busy ? t('auth.loading') : mode === 'login' ? t('auth.login') : t('auth.startFree')}</span>
               {!busy && <span className="material-symbols-outlined text-secondary-container text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
                 {mode === 'login' ? 'login' : 'bolt'}
               </span>}
@@ -202,7 +204,7 @@ export function LoginScreen() {
           onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); }}
           className="w-full py-4 text-primary font-headline font-semibold rounded-2xl hover:bg-surface-container-low transition-all flex items-center justify-center gap-2"
         >
-          <span>{mode === 'login' ? 'Ich habe noch kein Konto' : 'Ich habe bereits ein Konto'}</span>
+          <span>{mode === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}</span>
           <span className="material-symbols-outlined text-primary/40 text-lg">{mode === 'login' ? 'person_add' : 'login'}</span>
         </button>
       </div>

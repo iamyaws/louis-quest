@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import SFX from '../utils/sfx';
+import { useTranslation } from '../i18n/LanguageContext';
 
 // Material icon pairs for the memory cards
 const ALL_ICONS = [
@@ -34,9 +35,9 @@ function loadHighscores() {
   } catch { return []; }
 }
 
-function saveHighscore(moves) {
+function saveHighscore(moves, locale) {
   const list = loadHighscores();
-  const entry = { moves, date: new Date().toLocaleDateString('de-DE') };
+  const entry = { moves, date: new Date().toLocaleDateString(locale) };
   list.push(entry);
   list.sort((a, b) => a.moves - b.moves);
   const top5 = list.slice(0, 5);
@@ -45,6 +46,7 @@ function saveHighscore(moves) {
 }
 
 export default function MemoryGame({ onComplete }) {
+  const { t, locale } = useTranslation();
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState(new Set());
@@ -83,7 +85,7 @@ export default function MemoryGame({ onComplete }) {
             setTimeout(() => {
               SFX.play('celeb');
               const finalMoves = moves + 1; // moves hasn't updated yet in this closure
-              const { list, rank } = saveHighscore(finalMoves);
+              const { list, rank } = saveHighscore(finalMoves, locale);
               setHighscores(list);
               setCurrentRank(rank);
               setWon(true);
@@ -126,7 +128,7 @@ export default function MemoryGame({ onComplete }) {
         </div>
         <button onClick={() => onComplete({ xp: 0, hp: 0 })}
           className="bg-primary-container text-white px-6 py-2 rounded-full font-label font-bold text-sm active:scale-95 transition-transform">
-          Spiel beenden
+          {t('game.memory.endGame')}
         </button>
       </header>
 
@@ -138,12 +140,12 @@ export default function MemoryGame({ onComplete }) {
                  style={{ background: 'rgba(249,243,235,0.6)', backdropFilter: 'blur(12px)', boxShadow: '0 2px 12px rgba(30,27,23,0.04)' }}>
           <div className="flex items-center gap-2 px-5 py-1">
             <span className="material-symbols-outlined text-xl" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>timer</span>
-            <span className="font-headline font-bold text-lg text-on-surface">Züge: {moves}</span>
+            <span className="font-headline font-bold text-lg text-on-surface">{t('game.memory.moves')}: {moves}</span>
           </div>
           <div className="h-6 w-px" style={{ background: 'rgba(204,195,215,0.3)' }} />
           <div className="flex items-center gap-2 px-5 py-1">
             <span className="material-symbols-outlined text-xl" style={{ color: '#735c00', fontVariationSettings: "'FILL' 1" }}>star</span>
-            <span className="font-headline font-bold text-lg text-on-surface">Paare: {pairsFound}/{pairs}</span>
+            <span className="font-headline font-bold text-lg text-on-surface">{t('game.memory.pairs')}: {pairsFound}/{pairs}</span>
           </div>
         </section>
 
@@ -194,7 +196,7 @@ export default function MemoryGame({ onComplete }) {
                 <span className="material-symbols-outlined text-on-surface">lightbulb</span>
               </div>
               <p className="font-body text-sm text-on-surface-variant leading-relaxed">
-                Finde alle passenden Paare, um Ronkis Fokus zu stärken. Bleib konzentriert!
+                {t('game.memory.hint')}
               </p>
             </div>
           </>
@@ -202,16 +204,16 @@ export default function MemoryGame({ onComplete }) {
           /* Victory state */
           <div className="flex flex-col items-center text-center w-full">
             <div className="text-7xl mb-6 animate-bounce">&#x1f389;</div>
-            <h2 className="font-headline text-4xl font-bold text-on-surface mb-2">Geschafft!</h2>
+            <h2 className="font-headline text-4xl font-bold text-on-surface mb-2">{t('game.memory.won')}</h2>
             <p className="font-body text-lg text-on-surface-variant mb-8">
-              Alle Paare in {moves} Zügen gefunden!
+              {t('game.memory.wonDesc', { moves })}
             </p>
 
             {moves <= 10 && (
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6"
                    style={{ background: 'rgba(52,211,153,0.1)', color: '#059669' }}>
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="font-label font-bold text-xs uppercase tracking-widest">Meister-Gedächtnis!</span>
+                <span className="font-label font-bold text-xs uppercase tracking-widest">{t('game.memory.masterBadge')}</span>
               </div>
             )}
 
@@ -233,7 +235,7 @@ export default function MemoryGame({ onComplete }) {
                    style={{ background: 'rgba(18,67,70,0.04)', border: '1px solid rgba(18,67,70,0.08)' }}>
                 <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid rgba(18,67,70,0.06)' }}>
                   <span className="material-symbols-outlined text-lg text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
-                  <span className="font-headline font-bold text-sm text-primary">Bestenliste</span>
+                  <span className="font-headline font-bold text-sm text-primary">{t('game.memory.leaderboard')}</span>
                 </div>
                 {highscores.map((hs, i) => {
                   const isCurrentGame = i === currentRank;
@@ -248,12 +250,12 @@ export default function MemoryGame({ onComplete }) {
                       <div className="flex items-center gap-3">
                         <span className="text-base w-6 text-center">{i < 3 ? medals[i] : `${i + 1}.`}</span>
                         <span className={`font-label text-sm ${isCurrentGame ? 'font-bold text-primary' : 'text-on-surface'}`}>
-                          {hs.moves} Züge
+                          {t('game.memory.movesUnit', { count: hs.moves })}
                         </span>
                         {isCurrentGame && (
                           <span className="font-label text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
                                 style={{ background: 'rgba(252,211,77,0.3)', color: '#735c00' }}>
-                            Neu
+                            {t('game.memory.new')}
                           </span>
                         )}
                       </div>
@@ -268,7 +270,7 @@ export default function MemoryGame({ onComplete }) {
               className="w-full max-w-xs py-5 rounded-full font-headline font-bold text-xl text-white active:scale-95 transition-all flex items-center justify-center gap-3"
               style={{ background: 'linear-gradient(135deg, #059669, #34d399)', boxShadow: '0 8px 24px rgba(5,150,105,0.2)' }}>
               <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
-              Einsammeln!
+              {t('game.memory.collect')}
             </button>
           </div>
         )}

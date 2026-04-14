@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { GEAR_ITEMS } from '../constants';
 import SFX from '../utils/sfx';
 
 const SLOT_META = {
-  head: { label: 'Kopf', icon: 'face', emptyIcon: 'add_circle' },
-  back: { label: 'Rücken', icon: 'checkroom', emptyIcon: 'add_circle' },
-  neck: { label: 'Hals', icon: 'diamond', emptyIcon: 'add_circle' },
+  head: { key: 'gear.slot.head', icon: 'face', emptyIcon: 'add_circle' },
+  back: { key: 'gear.slot.back', icon: 'checkroom', emptyIcon: 'add_circle' },
+  neck: { key: 'gear.slot.neck', icon: 'diamond', emptyIcon: 'add_circle' },
 };
 
 const RARITY_STYLES = {
-  common: { bg: 'rgba(232,225,218,0.6)', border: 'rgba(0,0,0,0.08)', label: 'Gewöhnlich', color: '#7b7486' },
-  rare: { bg: 'rgba(18,67,70,0.06)', border: 'rgba(18,67,70,0.15)', label: 'Selten', color: '#124346' },
-  epic: { bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.4)', label: 'Episch', color: '#b45309' },
+  common: { bg: 'rgba(232,225,218,0.6)', border: 'rgba(0,0,0,0.08)', key: 'gear.rarity.common', color: '#7b7486' },
+  rare: { bg: 'rgba(18,67,70,0.06)', border: 'rgba(18,67,70,0.15)', key: 'gear.rarity.rare', color: '#124346' },
+  epic: { bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.4)', key: 'gear.rarity.epic', color: '#b45309' },
 };
 
 export default function GearVault() {
   const { state, actions } = useTask();
+  const { t } = useTranslation();
   const [selectedGear, setSelectedGear] = useState(null);
 
   if (!state) return null;
@@ -59,9 +61,9 @@ export default function GearVault() {
              style={{ background: 'rgba(255,255,255,0.75)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
       <h3 className="font-headline font-bold text-xl mb-2 flex items-center gap-2">
         <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>shield</span>
-        Ausrüstungs-Tresor
+        {t('gear.title')}
       </h3>
-      <p className="text-xs font-label text-on-surface-variant mb-5">Rüste Ronki mit Beute aus Epischen Missionen aus!</p>
+      <p className="text-xs font-label text-on-surface-variant mb-5">{t('gear.subtitle')}</p>
 
       {/* Equipment Slots */}
       <div className="grid grid-cols-3 gap-3 mb-5">
@@ -99,7 +101,7 @@ export default function GearVault() {
                 )}
               </div>
               <span className="font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
-                {meta.label}
+                {t(meta.key)}
               </span>
               {gear && (
                 <span className="text-xs font-label font-bold px-2 py-0.5 rounded-full"
@@ -121,7 +123,7 @@ export default function GearVault() {
                    style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
                 <span className="material-symbols-outlined text-lg" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
                 <div>
-                  <p className="font-label font-bold text-xs text-on-surface-variant uppercase">Mut</p>
+                  <p className="font-label font-bold text-xs text-on-surface-variant uppercase">{t('gear.courage')}</p>
                   <p className="font-headline font-bold text-lg" style={{ color: '#b45309' }}>+{totalStats.courage}</p>
                 </div>
               </div>
@@ -131,7 +133,7 @@ export default function GearVault() {
                    style={{ background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.15)' }}>
                 <span className="material-symbols-outlined text-lg" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>shield</span>
                 <div>
-                  <p className="font-label font-bold text-xs text-on-surface-variant uppercase">Schutz</p>
+                  <p className="font-label font-bold text-xs text-on-surface-variant uppercase">{t('gear.defense')}</p>
                   <p className="font-headline font-bold text-lg" style={{ color: '#059669' }}>+{totalStats.defense}</p>
                 </div>
               </div>
@@ -140,7 +142,7 @@ export default function GearVault() {
           <div className="flex items-start gap-2 px-2">
             <span className="material-symbols-outlined text-sm text-on-surface-variant/50 mt-0.5">info</span>
             <p className="font-label text-xs text-on-surface-variant leading-relaxed">
-              Mut erhöht den Schaden gegen Bosse. Schutz gibt extra Heldenpunkte beim Sieg.
+              {t('gear.statExplain')}
             </p>
           </div>
         </div>
@@ -149,7 +151,7 @@ export default function GearVault() {
       {/* Inventory List */}
       {hasGear ? (
         <>
-          <p className="font-label font-bold text-xs text-outline uppercase tracking-widest mb-3">Inventar ({ownedGear.length}/{GEAR_ITEMS.length})</p>
+          <p className="font-label font-bold text-xs text-outline uppercase tracking-widest mb-3">{t('gear.inventory')} ({ownedGear.length}/{GEAR_ITEMS.length})</p>
           <div className="flex flex-col gap-2.5">
             {ownedGear.map(gear => {
               const isEquipped = equipped[gear.slot] === gear.id;
@@ -187,10 +189,10 @@ export default function GearVault() {
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-label font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider"
                               style={{ background: rarity.bg, color: rarity.color }}>
-                          {rarity.label}
+                          {t(rarity.key)}
                         </span>
                         <span className="font-label text-xs text-on-surface-variant uppercase tracking-wider">
-                          {SLOT_META[gear.slot]?.label}
+                          {t(SLOT_META[gear.slot]?.key)}
                         </span>
                       </div>
                     </div>
@@ -218,7 +220,7 @@ export default function GearVault() {
                           color: isEquipped ? '#ba1a1a' : '#ffffff',
                           border: isEquipped ? '1px solid rgba(186,26,26,0.15)' : 'none',
                         }}>
-                        {isEquipped ? 'Ablegen' : 'Ausrüsten'}
+                        {isEquipped ? t('gear.unequip') : t('gear.equip')}
                       </button>
                     </div>
                   )}
@@ -230,8 +232,8 @@ export default function GearVault() {
       ) : (
         <div className="flex flex-col items-center py-6 text-center">
           <span className="material-symbols-outlined text-4xl mb-2" style={{ color: 'rgba(204,195,215,0.5)' }}>inventory_2</span>
-          <p className="font-body text-sm text-on-surface-variant">Noch keine Ausrüstung gesammelt.</p>
-          <p className="font-body text-xs text-outline mt-1">Schließe Epische Missionen ab, um Beute zu erhalten!</p>
+          <p className="font-body text-sm text-on-surface-variant">{t('gear.emptyTitle')}</p>
+          <p className="font-body text-xs text-outline mt-1">{t('gear.emptyHint')}</p>
         </div>
       )}
     </section>

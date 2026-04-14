@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const MESSAGES = [
-  { text: 'Ronki fühlt sich stärker!', icon: 'bolt' },
-  { text: 'Ronki ist stolz auf dich!', icon: 'sentiment_very_satisfied' },
-  { text: 'Ronki hat neue Energie!', icon: 'local_fire_department' },
-  { text: 'Ronki strahlt vor Freude!', icon: 'auto_awesome' },
-  { text: 'Super gemacht, Held!', icon: 'military_tech' },
-  { text: 'Ronki wächst weiter!', icon: 'trending_up' },
+  { key: 'toast.stronger', icon: 'bolt' },
+  { key: 'toast.proud', icon: 'sentiment_very_satisfied' },
+  { key: 'toast.energy', icon: 'local_fire_department' },
+  { key: 'toast.joyful', icon: 'auto_awesome' },
+  { key: 'toast.wellDone', icon: 'military_tech' },
+  { key: 'toast.growing', icon: 'trending_up' },
 ];
 
 export default function CompanionToast({ trigger }) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [msg, setMsg] = useState(MESSAGES[0]);
   const [lastTrigger, setLastTrigger] = useState(0);
@@ -37,7 +39,7 @@ export default function CompanionToast({ trigger }) {
         </div>
         <span className="material-symbols-outlined text-primary text-lg"
               style={{ fontVariationSettings: "'FILL' 1" }}>{msg.icon}</span>
-        <span className="font-headline font-bold text-base text-on-surface whitespace-nowrap">{msg.text}</span>
+        <span className="font-headline font-bold text-base text-on-surface whitespace-nowrap">{t(msg.key)}</span>
       </div>
     </div>
   );

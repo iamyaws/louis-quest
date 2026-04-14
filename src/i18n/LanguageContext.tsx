@@ -18,10 +18,21 @@ const LOCALES: Record<Lang, string> = { de: 'de-DE', en: 'en-US' };
 const STORAGE_KEY = 'ronki-lang';
 
 function getInitialLang(): Lang {
+  // 1. Explicit user choice (persisted from settings or onboarding)
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === 'en' || saved === 'de') return saved;
   } catch {}
+  // 2. Auto-detect from browser / phone language config
+  try {
+    const browserLangs = navigator.languages ?? [navigator.language];
+    for (const bl of browserLangs) {
+      const tag = bl.toLowerCase();
+      if (tag.startsWith('de')) return 'de';
+      if (tag.startsWith('en')) return 'en';
+    }
+  } catch {}
+  // 3. Fallback — primary audience is German-speaking
   return 'de';
 }
 

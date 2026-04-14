@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import { Pearl } from './CurrencyIcons';
 import GearVault from './GearVault';
@@ -14,8 +15,10 @@ const STAGES = [
 ];
 
 export default function Sanctuary() {
+  const { t } = useTranslation();
   const { state, actions } = useTask();
   const base = import.meta.env.BASE_URL;
+  const stageName = (i) => [t('companion.stage.egg'), t('companion.stage.baby'), t('companion.stage.juvenile'), t('companion.stage.pride'), t('companion.stage.legendary')][i];
   if (!state) return null;
 
   const evo = state.catEvo || 0;
@@ -51,7 +54,7 @@ export default function Sanctuary() {
               <img src={base + (currentStage === 0 ? 'art/egg-glow.webp' : 'art/dragon-baby.webp')} alt="" className="w-full h-full object-cover" />
             </div>
             <span className="text-xl font-headline font-bold text-primary" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
-              Magical Sanctuary
+              {t('care.sanctuary')}
             </span>
           </div>
           <span className="material-symbols-outlined text-2xl"
@@ -68,11 +71,11 @@ export default function Sanctuary() {
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-label shadow-sm"
                  style={{ background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' }}>
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#22c55e' }} />
-              {allCareDone ? 'Geliebt!' : 'Glücklich'}
+              {allCareDone ? t('care.status.loved') : t('care.status.happy')}
             </div>
             <div className="px-3 py-1 rounded-full shadow-sm font-label text-xs font-bold text-primary"
                  style={{ background: 'rgba(255,255,255,0.9)' }}>
-              {STAGES[currentStage].name}
+              {stageName(currentStage)}
             </div>
           </div>
 
@@ -82,14 +85,14 @@ export default function Sanctuary() {
             </div>
             <div className="w-full mt-4 text-center">
               <h2 className="font-headline font-bold text-2xl text-primary">Ronki</h2>
-              <p className="text-xs font-label text-outline uppercase" style={{ letterSpacing: '0.2em' }}>Mystic Companion</p>
+              <p className="text-xs font-label text-outline uppercase" style={{ letterSpacing: '0.2em' }}>{t('care.mysticCompanion')}</p>
               <div className="h-3 w-full rounded-full overflow-hidden shadow-inner mt-3"
                    style={{ background: 'rgba(255,255,255,0.5)' }}>
                 <div className="h-full rounded-full" style={{ width: progressPct + '%', background: 'linear-gradient(90deg, #124346, #2d5a5e)' }} />
               </div>
               {nextStage && (
                 <p className="text-xs font-label text-on-surface-variant mt-2">
-                  Noch {nextStage.threshold - evo} bis <strong>{nextStage.name}</strong>
+                  {t('care.stepsTo', { count: nextStage.threshold - evo, name: stageName(currentStage + 1) })}
                 </p>
               )}
             </div>
@@ -102,7 +105,7 @@ export default function Sanctuary() {
           <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>restaurant</span>
-              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>Hunger</span>
+              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>{t('care.hunger')}</span>
             </div>
             <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(252,211,77,0.2)' }}>
               <div className="h-full rounded-full transition-all duration-500" style={{ width: state.catFed ? '85%' : '40%', background: '#fcd34d' }} />
@@ -112,7 +115,7 @@ export default function Sanctuary() {
           <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#ba1a1a', fontVariationSettings: "'FILL' 1" }}>favorite</span>
-              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>Glück</span>
+              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>{t('care.happiness')}</span>
             </div>
             <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(186,26,26,0.1)' }}>
               <div className="h-full rounded-full transition-all duration-500" style={{ width: (allCareDone ? 95 : Math.min(95, careDoneCount * 30 + 5)) + '%', background: '#ba1a1a' }} />
@@ -122,7 +125,7 @@ export default function Sanctuary() {
           <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#124346', fontVariationSettings: "'FILL' 1" }}>bolt</span>
-              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>Energie</span>
+              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>{t('care.energy')}</span>
             </div>
             <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
               <div className="h-full rounded-full transition-all duration-500" style={{ width: state.catPlayed ? '60%' : '30%', background: '#124346' }} />
@@ -143,10 +146,10 @@ export default function Sanctuary() {
                 {state.catFed ? 'check_circle' : 'cookie'}
               </span>
             </div>
-            <span className="font-headline font-bold text-sm">Füttern</span>
+            <span className="font-headline font-bold text-sm">{t('care.feed')}</span>
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-sm" style={{ background: 'white' }}>
               {state.catFed
-                ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>Erledigt!</span>
+                ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>{t('care.done')}</span>
                 : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>5 HP</span></React.Fragment>
               }
             </div>
@@ -163,10 +166,10 @@ export default function Sanctuary() {
                 {state.catPetted ? 'check_circle' : 'favorite'}
               </span>
             </div>
-            <span className="font-headline font-bold text-sm">Streicheln</span>
+            <span className="font-headline font-bold text-sm">{t('care.pet')}</span>
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-sm" style={{ background: 'white' }}>
               {state.catPetted
-                ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>Erledigt!</span>
+                ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>{t('care.done')}</span>
                 : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>3 HP</span></React.Fragment>
               }
             </div>
@@ -183,10 +186,10 @@ export default function Sanctuary() {
                 {state.catPlayed ? 'check_circle' : 'sports_baseball'}
               </span>
             </div>
-            <span className="font-headline font-bold text-sm">Spielen</span>
+            <span className="font-headline font-bold text-sm">{t('care.play')}</span>
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-sm" style={{ background: 'white' }}>
               {state.catPlayed
-                ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>Erledigt!</span>
+                ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>{t('care.done')}</span>
                 : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>8 HP</span></React.Fragment>
               }
             </div>
@@ -198,18 +201,18 @@ export default function Sanctuary() {
                  style={{ background: 'rgba(255,255,255,0.75)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
           <h3 className="font-headline font-bold text-xl mb-5 flex items-center gap-2">
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>auto_fix_high</span>
-            Tägliches Wohlbefinden
+            {t('care.wellbeing')}
           </h3>
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-2xl" style={{ background: 'rgba(249,243,235,0.8)', border: '1px solid white' }}>
-              <span className="text-xs font-label font-bold text-outline uppercase">Heldenpunkte</span>
+              <span className="text-xs font-label font-bold text-outline uppercase">{t('hero.hp')}</span>
               <div className="flex items-center gap-2 mt-1">
                 <Pearl size={24} />
                 <span className="text-2xl font-headline font-bold">{state.hp || 0}</span>
               </div>
             </div>
             <div className="p-4 rounded-2xl" style={{ background: 'rgba(249,243,235,0.8)', border: '1px solid white' }}>
-              <span className="text-xs font-label font-bold text-outline uppercase">Zuneigung</span>
+              <span className="text-xs font-label font-bold text-outline uppercase">{t('care.affection')}</span>
               <div className="flex items-center gap-2 mt-1">
                 <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>heart_check</span>
                 <span className="text-2xl font-headline font-bold">{allCareDone ? 'Max' : careDoneCount + '/3'}</span>
@@ -229,7 +232,7 @@ export default function Sanctuary() {
                  style={{ background: 'rgba(255,255,255,0.75)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
           <h3 className="font-headline font-bold text-xl mb-6 flex items-center gap-2">
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>auto_fix_high</span>
-            Entwicklungspfad
+            {t('care.evolutionPath')}
           </h3>
 
           <div className="relative flex flex-col items-center space-y-12">
@@ -250,7 +253,7 @@ export default function Sanctuary() {
                   <div className="flex-1 flex items-center" style={{ justifyContent: i % 2 === 0 ? 'flex-end' : 'flex-start' }}>
                     <span className={'font-label font-bold' + (isLocked ? ' text-outline opacity-40' : isCompleted ? ' text-on-surface' : ' font-headline')}
                           style={{ fontSize: isCurrent ? '14px' : '12px', color: isCurrent ? '#725b00' : undefined }}>
-                      {stage.name}
+                      {stageName(i)}
                     </span>
                   </div>
 
@@ -258,11 +261,11 @@ export default function Sanctuary() {
                     {/* Badge */}
                     {isCompleted && (
                       <span className="absolute -top-3 left-1/2 font-black font-label px-2 py-0.5 rounded-full z-20 shadow-sm whitespace-nowrap"
-                            style={{ background: '#059669', color: 'white', transform: 'translateX(-50%)', fontSize: '12px', letterSpacing: '0.1em' }}>FERTIG</span>
+                            style={{ background: '#059669', color: 'white', transform: 'translateX(-50%)', fontSize: '12px', letterSpacing: '0.1em' }}>{t('care.stageComplete')}</span>
                     )}
                     {isCurrent && (
                       <span className="absolute -top-3 left-1/2 font-black font-label px-2 py-0.5 rounded-full z-20 shadow-sm whitespace-nowrap animate-pulse"
-                            style={{ background: '#735c00', color: 'white', transform: 'translateX(-50%)', fontSize: '12px', letterSpacing: '0.1em' }}>AKTUELL</span>
+                            style={{ background: '#735c00', color: 'white', transform: 'translateX(-50%)', fontSize: '12px', letterSpacing: '0.1em' }}>{t('care.stageCurrent')}</span>
                     )}
 
                     <div className={'rounded-full flex items-center justify-center transition-all duration-300'
@@ -291,7 +294,7 @@ export default function Sanctuary() {
                     )}
                     {isCurrent && nextStage && (
                       <span className="text-xs font-label text-on-surface-variant text-center" style={{ maxWidth: '6rem' }}>
-                        Noch {nextStage.threshold - evo} Quests bis <strong>{nextStage.name}</strong>
+                        {t('care.questsTo', { count: nextStage.threshold - evo, name: stageName(currentStage + 1) })}
                       </span>
                     )}
                     {isLocked && (
@@ -311,6 +314,7 @@ export default function Sanctuary() {
 
 // ── Orbs Detail Section with Milestones ──
 function OrbsSection({ state, nextStage, progressPct, evo }) {
+  const { t } = useTranslation();
   const [expandedOrb, setExpandedOrb] = useState(null);
   const orbs = state.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 };
   const totalOrbs = Object.values(orbs).reduce((a, b) => a + b, 0);
@@ -320,10 +324,10 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
              style={{ background: 'rgba(255,255,255,0.75)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
       <h3 className="font-headline font-bold text-xl mb-1 flex items-center gap-2">
         <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>blur_on</span>
-        Wachstums-Orbs
+        {t('care.growthOrbs')}
       </h3>
       <p className="text-xs font-label text-on-surface-variant mb-5">
-        Sammle Orbs durch Quests — erreiche Meilensteine für Boni!
+        {t('care.orbsHint')}
       </p>
 
       {/* Total orb count badge */}
@@ -332,7 +336,7 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
              style={{ background: 'rgba(18,67,70,0.06)', border: '1px solid rgba(18,67,70,0.1)' }}>
           <span className="material-symbols-outlined text-lg text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
           <span className="font-headline font-bold text-lg text-primary">{totalOrbs}</span>
-          <span className="font-label text-xs text-on-surface-variant uppercase tracking-widest">Gesamt</span>
+          <span className="font-label text-xs text-on-surface-variant uppercase tracking-widest">{t('care.total')}</span>
         </div>
       </div>
 
@@ -457,9 +461,9 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
             </div>
           </div>
           <div>
-            <p className="font-label font-bold text-xs text-outline uppercase tracking-widest">Nächste Stufe</p>
+            <p className="font-label font-bold text-xs text-outline uppercase tracking-widest">{t('care.nextStage')}</p>
             <p className="font-headline font-bold text-lg text-primary">{nextStage.name}</p>
-            <p className="text-xs font-label text-on-surface-variant">Noch {nextStage.threshold - evo} Schritte</p>
+            <p className="text-xs font-label text-on-surface-variant">{t('care.stepsMore', { count: nextStage.threshold - evo })}</p>
           </div>
         </div>
       )}

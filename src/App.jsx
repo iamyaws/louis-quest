@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { AuthProvider, useAuth, LoginScreen } from './context/AuthContext';
 import { TaskProvider, useTask } from './context/TaskContext';
+import { useTranslation } from './i18n/LanguageContext';
 import TopBar from './components/TopBar';
 import NavBar from './components/NavBar';
 import TaskList from './components/TaskList';
@@ -23,6 +24,7 @@ import ScreenTimer from './components/ScreenTimer';
 import HeroProfile from './components/HeroProfile';
 
 function AppContent() {
+  const { t } = useTranslation();
   const { state, actions, loading, toastTrigger } = useTask();
   const [view, setView] = useState('hub');
   const [showParental, setShowParental] = useState(false);
@@ -40,7 +42,7 @@ function AppContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-dvh bg-surface">
-        <p className="font-headline text-xl font-bold text-primary">Laden...</p>
+        <p className="font-headline text-xl font-bold text-primary">{t('app.loading')}</p>
       </div>
     );
   }
@@ -127,6 +129,7 @@ function AppContent() {
 }
 
 function AuthGate() {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -134,7 +137,7 @@ function AuthGate() {
       <div className="flex items-center justify-center h-dvh bg-surface">
         <div className="text-center">
           <img src={`${import.meta.env.BASE_URL}art/ronki-egg-logo.svg`} alt="Ronki" className="w-20 h-auto mx-auto mb-4 drop-shadow-lg" />
-          <p className="font-headline text-xl font-bold text-primary">Laden...</p>
+          <p className="font-headline text-xl font-bold text-primary">{t('app.loading')}</p>
         </div>
       </div>
     );
@@ -152,18 +155,19 @@ function AuthGate() {
 }
 
 function ErrorBoundary({ children }) {
+  const { t } = useTranslation();
   const [error, setError] = React.useState(null);
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-dvh bg-surface px-6 text-center">
         <div className="text-5xl mb-4">😿</div>
-        <h2 className="font-headline text-xl font-bold text-error mb-2">Ups! Da ist etwas schiefgelaufen.</h2>
-        <p className="font-body text-on-surface-variant mb-6">Keine Sorge, deine Daten sind sicher gespeichert.</p>
+        <h2 className="font-headline text-xl font-bold text-error mb-2">{t('app.error.title')}</h2>
+        <p className="font-body text-on-surface-variant mb-6">{t('app.error.desc')}</p>
         <button
           onClick={() => { setError(null); window.location.reload(); }}
           className="bg-primary-container text-white px-8 py-3 rounded-full font-label font-bold"
         >
-          Nochmal versuchen
+          {t('app.error.retry')}
         </button>
       </div>
     );

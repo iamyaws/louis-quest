@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 
 /**
@@ -13,6 +14,7 @@ import SFX from '../utils/sfx';
  *  - onDismiss: called to remove the timer
  */
 export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, onStore, onDismiss }) {
+  const { t } = useTranslation();
   const [remaining, setRemaining] = useState(totalSeconds);
   const [paused, setPaused] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -85,7 +87,7 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
           className="flex items-center gap-3 px-5 py-3 rounded-full shadow-xl active:scale-95 transition-all"
           style={{ background: 'linear-gradient(135deg, #ba1a1a, #ef4444)', color: 'white' }}>
           <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>alarm</span>
-          <span className="font-headline font-bold text-lg">Zeit ist um!</span>
+          <span className="font-headline font-bold text-lg">{t('screen.timeUp')}</span>
           <span className="material-symbols-outlined text-lg">close</span>
         </button>
       </div>
@@ -122,7 +124,7 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
                     style={{ fontVariationSettings: "'FILL' 1" }}>
                 {paused ? 'play_arrow' : 'pause'}
               </span>
-              {paused ? 'Weiter' : 'Pause'}
+              {paused ? t('screen.resume') : t('screen.pause')}
             </button>
 
             {/* Store remaining */}
@@ -130,14 +132,14 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full font-label font-bold text-sm active:scale-95 transition-all"
               style={{ background: 'rgba(0,206,201,0.1)', color: '#00827e' }}>
               <span className="material-symbols-outlined text-lg">savings</span>
-              Sparen
+              {t('screen.save')}
             </button>
           </div>
 
           {/* Refund preview */}
           {remaining < totalSeconds && (
             <p className="text-center text-xs text-on-surface-variant mt-2 font-label">
-              Sparen gibt {Math.floor((remaining / totalSeconds) * cost)} Min. zurück
+              {t('screen.saveRefund', { min: Math.floor((remaining / totalSeconds) * cost) })}
             </p>
           )}
         </div>
