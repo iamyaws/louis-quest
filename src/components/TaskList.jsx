@@ -12,40 +12,8 @@ const ANCHOR_META_BASE = {
   bedtime: { icon: 'bedtime', col: '#4338ca', bg: '#eef2ff', border: 'rgba(67,56,202,0.1)' },
 };
 
-// Kid-friendly subtitles that explain each task's purpose
-const TASK_HINTS = {
-  s1: 'Frisches Gesicht, frischer Start!',
-  s3: '3 Minuten glänzen lassen',
-  s4: 'Dein Helden-Outfit wählen',
-  s2: 'Kissen glatt, Decke drauf!',
-  s5: 'Bücher und Pausenbrot einpacken',
-  s6b: 'Schutz für sonnige Tage',
-  s_lunchbox: 'Ausspülen und trocknen lassen',
-  s_water: 'Frisches Wasser für morgen',
-  s_packcheck: 'Hefte, Bücher, Mäppchen — alles drin?',
-  s_signature: 'Mama/Papa müssen noch unterschreiben?',
-  s7: 'Erst die Arbeit, dann das Spiel',
-  s8: 'Abenteuer im Kopf erleben',
-  s9: 'Alles hat seinen Platz',
-  s12: 'Vor dem Schlafen sauber putzen',
-  s13: 'Gesicht sauber machen',
-  s14: 'Pflege für deine Haut',
-  s15: 'Ab in die Schlafklamotten',
-  sq_geschirr: 'Teller & Gläser einräumen',
-  sq_zimmer: 'Alles hat seinen Platz',
-  ft: 'Volle Power auf dem Platz!',
-  v1: 'Frisches Gesicht, frischer Start!',
-  v3: '3 Minuten glänzen lassen',
-  v4: 'Dein Helden-Outfit wählen',
-  v2: 'Kissen glatt, Decke drauf!',
-  v5b: 'Schutz für sonnige Tage',
-  v6: 'Abenteuer im Kopf erleben',
-  v7: 'Alles hat seinen Platz',
-  v10: 'Vor dem Schlafen sauber putzen',
-  v11: 'Gesicht sauber machen',
-  v12: 'Pflege für deine Haut',
-  v13: 'Ab in die Schlafklamotten',
-};
+// Vacation quests share the same hints as their school counterparts
+const HINT_ALIAS = { v1: 's1', v3: 's3', v4: 's4', v2: 's2', v5b: 's6b', v6: 's8', v7: 'sq_zimmer', v10: 's12', v11: 's13', v12: 's14', v13: 's15' };
 
 export default function TaskList() {
   const { state, computed, actions } = useTask();
@@ -214,7 +182,9 @@ export default function TaskList() {
                       const canTap = isRepeatable ? curCompletions < maxTaps : !q.done;
                       const isNext = idx === firstUndoneIdx;
                       const isLast = idx === quests.length - 1;
-                      const hint = t('hint.' + q.id);
+                      const hintKey = 'hint.' + (HINT_ALIAS[q.id] || q.id);
+                      const hintRaw = t(hintKey);
+                      const hint = hintRaw !== hintKey ? hintRaw : null;
                       const isAnziehen = q.id === 's4' || q.id === 'v4';
 
                       return (
@@ -267,17 +237,17 @@ export default function TaskList() {
                             ) : (
                               /* ── Active task ── */
                               <div
-                                className="w-full flex items-center gap-3 p-4 rounded-xl transition-all text-left cursor-pointer active:scale-[0.98]"
+                                className={`w-full flex items-center gap-3 rounded-xl transition-all text-left cursor-pointer active:scale-[0.97] ${isNext ? 'p-5' : 'p-4'}`}
                                 style={{
                                   background: '#ffffff',
-                                  border: isNext ? '1.5px solid rgba(18,67,70,0.15)' : '1px solid rgba(0,0,0,0.06)',
-                                  boxShadow: isNext ? '0 2px 12px rgba(18,67,70,0.08)' : '0 1px 4px rgba(0,0,0,0.04)',
+                                  border: isNext ? '2px solid rgba(18,67,70,0.18)' : '1px solid rgba(0,0,0,0.06)',
+                                  boxShadow: isNext ? '0 4px 16px rgba(18,67,70,0.10), 0 0 0 3px rgba(252,211,77,0.12)' : '0 1px 4px rgba(0,0,0,0.04)',
                                 }}
                                 onClick={() => canTap && handleComplete(q.id)}
                               >
-                                <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-                                     style={{ background: `${meta.col}12` }}>
-                                  <span className="text-lg">{q.icon}</span>
+                                <div className={`${isNext ? 'w-14 h-14' : 'w-11 h-11'} rounded-2xl flex items-center justify-center shrink-0 transition-all`}
+                                     style={{ background: `${meta.col}${isNext ? '18' : '12'}` }}>
+                                  <span className={isNext ? 'text-2xl' : 'text-lg'}>{q.icon}</span>
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-bold font-label text-on-surface">{t('quest.' + q.id)}</p>
@@ -338,18 +308,20 @@ export default function TaskList() {
                     }}
                   >
                     {q.done ? (
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
                            style={{ background: '#34d399' }}>
                         <span className="material-symbols-outlined text-white text-xl"
                               style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                       </div>
                     ) : (
                       <button
-                        className="w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all hover:border-secondary cursor-pointer active:scale-95"
-                        style={{ borderColor: 'rgba(204,195,215,0.5)' }}
+                        className="w-12 h-12 rounded-full border-[2.5px] flex items-center justify-center shrink-0 transition-all hover:border-secondary cursor-pointer active:scale-90"
+                        style={{ borderColor: '#735c00', background: 'rgba(252,211,77,0.06)', boxShadow: '0 0 0 3px rgba(252,211,77,0.12)' }}
                         onClick={() => handleComplete(q.id)}
                         aria-label={`${t('quest.' + q.id)} ${t('task.complete')}`}
-                      />
+                      >
+                        <span className="material-symbols-outlined text-secondary/40 text-lg">radio_button_unchecked</span>
+                      </button>
                     )}
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
