@@ -106,7 +106,7 @@ export default function GearVault() {
               {gear && (
                 <span className="text-xs font-label font-bold px-2 py-0.5 rounded-full"
                       style={{ background: rarity.bg, color: rarity.color }}>
-                  {gear.name.split(' ')[0]}
+                  {t('gear.' + gear.id).split(' ')[0]}
                 </span>
               )}
             </button>
@@ -181,7 +181,7 @@ export default function GearVault() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="font-headline font-bold text-sm text-on-surface">{gear.name}</span>
+                        <span className="font-headline font-bold text-sm text-on-surface">{t('gear.' + gear.id)}</span>
                         {isEquipped && (
                           <span className="material-symbols-outlined text-sm" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                         )}
@@ -211,7 +211,7 @@ export default function GearVault() {
                     <div className="mx-3 mt-1 p-3 rounded-xl space-y-2"
                          style={{ background: 'rgba(255,255,255,0.6)', border: `1px solid ${gear.color}30` }}>
                       <p className="font-body text-xs text-on-surface-variant italic leading-relaxed">
-                        &ldquo;{gear.desc}&rdquo;
+                        &ldquo;{t('gear.' + gear.id + '.desc')}&rdquo;
                       </p>
                       <button onClick={() => handleItemTap(gear)}
                         className="w-full py-2.5 rounded-lg font-label font-bold text-xs active:scale-95 transition-all"

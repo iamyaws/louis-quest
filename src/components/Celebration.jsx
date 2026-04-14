@@ -208,7 +208,7 @@ function VictoryCelebration({ onDismiss }) {
                   <span className="material-symbols-outlined text-2xl" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                 </div>
                 <div className="flex-1 pl-4 text-left" style={{ borderLeft: '2px solid rgba(204,195,215,0.2)' }}>
-                  <p className="font-headline font-bold text-lg text-on-surface">{q.icon} {q.name}</p>
+                  <p className="font-headline font-bold text-lg text-on-surface">{q.icon} {t('quest.' + q.id)}</p>
                 </div>
               </div>
             ))}

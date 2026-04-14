@@ -35,7 +35,7 @@ export default function NavBar({ active = 'quests', onNavigate }) {
               >
                 {tab.icon}
               </span>
-              <span className="font-label text-xs font-semibold tracking-wide uppercase mt-1">
+              <span className="font-label text-sm font-semibold tracking-wide uppercase mt-1">
                 {label}
               </span>
             </button>

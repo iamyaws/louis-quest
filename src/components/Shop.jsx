@@ -4,6 +4,7 @@ import { ViewHeader } from './ui';
 import { getCatStage } from '../utils/helpers';
 import { useGame } from '../context/GameContext';
 import GearSlots from './GearSlots';
+import { useTranslation } from '../i18n/LanguageContext';
 
 function getProgress(cond, state) {
   switch (cond.type) {
@@ -23,6 +24,7 @@ function getProgress(cond, state) {
 }
 
 export default function Shop() {
+  const { t } = useTranslation();
   const { state, actions, ui } = useGame();
   const { shopTab, setShopTab, setView } = ui;
 
@@ -158,7 +160,7 @@ export default function Shop() {
                   color: T.textPrimary,
                   marginBottom: owned ? 0 : 4,
                 }}>
-                  {item.name}
+                  {t('item.' + item.id)}
                 </div>
 
                 {owned ? (

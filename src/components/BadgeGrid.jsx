@@ -1,9 +1,11 @@
 import React from 'react';
 import { BADGES } from '../constants';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 
 export default function BadgeGrid() {
   const { state } = useTask();
+  const { t } = useTranslation();
   if (!state) return null;
 
   const unlocked = state.unlockedBadges || [];
@@ -35,11 +37,11 @@ export default function BadgeGrid() {
                 {badge.i}
               </span>
               <span className="font-label font-bold text-xs text-on-surface text-center leading-tight">
-                {badge.n}
+                {t('badge.' + badge.id)}
               </span>
               {isUnlocked && (
                 <span className="text-xs font-label text-on-surface-variant text-center leading-snug">
-                  {badge.desc}
+                  {t('badge.' + badge.id + '.desc')}
                 </span>
               )}
               {!isUnlocked && (

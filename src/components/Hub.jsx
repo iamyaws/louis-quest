@@ -98,7 +98,7 @@ export default function Hub({ onNavigate }) {
           const catStage = getCatStage(state.catEvo || 0);
           const companionType = 'dragon'; // TODO: map eggType → companion type
           const stages = COMPANION_STAGES[companionType] || COMPANION_STAGES.dragon;
-          const stageName = stages[catStage]?.name || CAT_STAGES[catStage]?.name || t('companion.stage.egg');
+          const stageName = t('companion.' + companionType + '.' + catStage) || t('companion.stage.egg');
           const stageNum = catStage + 1;
 
           // Pick art: stage 0 = egg type, stage 1+ = evolution art
@@ -185,68 +185,96 @@ export default function Hub({ onNavigate }) {
           </div>
         </div>
 
-        {/* ── Mood + Water Grid ── */}
-        <div className="grid grid-cols-2 gap-4">
-          {/* Mood */}
-          <div className="p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center"
-               style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            {state.moodAM !== null ? (
-              <>
-                <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl"
-                     style={{ background: 'rgba(252,211,77,0.1)', border: '2px solid rgba(252,211,77,0.2)' }}>
-                  {MOOD_EMOJIS[state.moodAM]}
+        {/* ── Daily Check-in (collapsible mood + water) ── */}
+        <details className="group rounded-2xl overflow-hidden"
+                 style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+                 open={state.moodAM === null || (state.dailyWaterCount || 0) < 6}>
+          {/* Summary row — always visible */}
+          <summary className="p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                     style={{ background: 'rgba(252,211,77,0.12)' }}>
+                  <span className="material-symbols-outlined text-2xl" style={{ color: '#d97706', fontVariationSettings: "'FILL' 1" }}>self_improvement</span>
                 </div>
-                <p className="font-bold text-xs font-label text-on-surface-variant uppercase tracking-widest">{t('hub.mood.label')}</p>
-                <p className="font-headline font-bold text-lg text-primary">{MOOD_LABELS_I18N[state.moodAM]}</p>
-              </>
-            ) : (
-              <>
-                <p className="font-bold text-xs font-label uppercase tracking-widest mb-1" style={{ color: '#b45309' }}>
-                  {t('hub.mood.title')}
-                </p>
-                <p className="font-body text-xs text-on-surface-variant mb-1">{t('hub.mood.hint')}</p>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {MOOD_EMOJIS.map((e, i) => (
-                    <button key={i} onClick={() => { SFX.play("pop"); actions.setMood("moodAM", i); }}
-                      className="text-2xl p-1.5 rounded-xl transition-all active:scale-90 flex items-center justify-center"
-                      style={{ minHeight: 44, background: 'rgba(252,211,77,0.08)', border: '1.5px solid rgba(252,211,77,0.15)' }}>{e}</button>
-                  ))}
+                <div>
+                  <h3 className="font-headline font-bold text-lg text-on-surface">{t('hub.checkin.title')}</h3>
+                  <p className="font-label text-sm text-on-surface-variant">
+                    {state.moodAM !== null ? `${MOOD_EMOJIS[state.moodAM]} ${MOOD_LABELS_I18N[state.moodAM]}` : t('hub.mood.hint')}
+                    {' · '}
+                    {t('hub.water.count', { count: state.dailyWaterCount || 0 })}
+                  </p>
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center group-open:rotate-180 transition-transform bg-surface-container">
+                <span className="material-symbols-outlined text-on-surface-variant text-xl">expand_more</span>
+              </div>
+            </div>
+          </summary>
 
-          {/* Water */}
-          <div className="p-5 rounded-2xl flex flex-col justify-between"
-               style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <div className="flex justify-between items-center mb-3">
-              <p className="font-bold text-xs font-label text-on-surface-variant uppercase tracking-widest">{t('hub.water.title')}</p>
-              <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>water_drop</span>
+          {/* Expanded: Mood + Water full-width */}
+          <div className="px-5 pb-5 flex flex-col gap-5 border-t border-surface-container" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+
+            {/* Mood */}
+            <div className="pt-4">
+              {state.moodAM !== null ? (
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center text-4xl"
+                       style={{ background: 'rgba(252,211,77,0.1)', border: '2px solid rgba(252,211,77,0.2)' }}>
+                    {MOOD_EMOJIS[state.moodAM]}
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm font-label text-on-surface-variant uppercase tracking-widest">{t('hub.mood.label')}</p>
+                    <p className="font-headline font-bold text-xl text-primary">{MOOD_LABELS_I18N[state.moodAM]}</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="font-bold text-sm font-label uppercase tracking-widest mb-3" style={{ color: '#b45309' }}>
+                    {t('hub.mood.title')}
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {MOOD_EMOJIS.map((e, i) => (
+                      <button key={i} onClick={() => { SFX.play("pop"); actions.setMood("moodAM", i); }}
+                        className="w-[60px] h-[60px] text-3xl rounded-2xl transition-all active:scale-90 flex items-center justify-center"
+                        style={{ background: 'rgba(252,211,77,0.08)', border: '2px solid rgba(252,211,77,0.2)', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>{e}</button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
-            <div className="grid grid-cols-3 gap-3 justify-items-center">
-              {[0,1,2,3,4,5].map(i => {
-                const filled = i < (state.dailyWaterCount || 0);
-                const isNext = i === (state.dailyWaterCount || 0);
-                return (
-                  <button key={i}
-                    className={`w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center ${filled ? 'bg-primary border-primary' : isNext ? 'border-primary animate-pulse' : 'border-primary/15'}`}
-                    style={{ background: filled ? undefined : isNext ? 'rgba(18,67,70,0.08)' : 'rgba(18,67,70,0.03)' }}
-                    onClick={() => isNext && actions.drinkWater?.()}
-                  >
-                    {filled && <span className="material-symbols-outlined text-white text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>}
-                    {isNext && <span className="material-symbols-outlined text-primary text-sm">add</span>}
-                  </button>
-                );
-              })}
+
+            {/* Water */}
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <p className="font-bold text-sm font-label text-on-surface-variant uppercase tracking-widest">{t('hub.water.title')}</p>
+                <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>water_drop</span>
+              </div>
+              <div className="flex justify-center gap-4">
+                {[0,1,2,3,4,5].map(i => {
+                  const filled = i < (state.dailyWaterCount || 0);
+                  const isNext = i === (state.dailyWaterCount || 0);
+                  return (
+                    <button key={i}
+                      className={`w-12 h-12 rounded-full border-[2.5px] transition-all flex items-center justify-center ${filled ? 'bg-primary border-primary' : isNext ? 'border-primary animate-pulse' : 'border-primary/15'}`}
+                      style={{ background: filled ? undefined : isNext ? 'rgba(18,67,70,0.08)' : 'rgba(18,67,70,0.03)', boxShadow: isNext ? '0 0 0 4px rgba(18,67,70,0.06)' : 'none' }}
+                      onClick={() => isNext && actions.drinkWater?.()}
+                    >
+                      {filled && <span className="material-symbols-outlined text-white text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>}
+                      {isNext && <span className="material-symbols-outlined text-primary text-lg">add</span>}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-center font-bold text-sm font-label mt-3 text-on-surface-variant">
+                {t('hub.water.count', { count: state.dailyWaterCount || 0 })}
+              </p>
+              {(state.dailyWaterCount || 0) < 6 && (
+                <p className="text-center font-body text-sm mt-1" style={{ color: '#b45309' }}>{t('hub.water.hint')}</p>
+              )}
             </div>
-            <p className="text-center font-bold text-xs font-label mt-3 text-on-surface-variant">
-              {t('hub.water.count', { count: state.dailyWaterCount || 0 })}
-            </p>
-            {(state.dailyWaterCount || 0) < 6 && (
-              <p className="text-center font-body text-xs mt-1" style={{ color: '#b45309' }}>{t('hub.water.hint')}</p>
-            )}
           </div>
-        </div>
+        </details>
 
         {/* ── Boss Card (compact with tappable portrait) ── */}
         {state.boss && (() => {
@@ -267,7 +295,7 @@ export default function Hub({ onNavigate }) {
                 <div className="relative z-10 w-16 h-16 rounded-full overflow-hidden shrink-0 cursor-pointer shadow-lg"
                      style={{ border: '3px solid #fcd34d', boxShadow: '0 0 12px rgba(252,211,77,0.3)' }}>
                   {artSrc ? (
-                    <img src={artSrc} alt={bd.name} className="w-full h-full object-cover" />
+                    <img src={artSrc} alt={t('boss.' + bd.id)} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-2xl" style={{ background: 'rgba(186,26,26,0.1)' }}>{bd.icon}</div>
                   )}
@@ -277,7 +305,7 @@ export default function Hub({ onNavigate }) {
                   {defeated ? (
                     <>
                       <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>{t('hub.boss.defeated')}</p>
-                      <h4 className="font-headline font-bold text-lg text-white">{bd.name}</h4>
+                      <h4 className="font-headline font-bold text-lg text-white">{t('boss.' + bd.id)}</h4>
                     </>
                   ) : (
                     <>
@@ -285,7 +313,7 @@ export default function Hub({ onNavigate }) {
                         <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fca5a5' }}>{t('hub.boss.fight')}</p>
                         <p className="font-bold text-xs font-label" style={{ color: '#fca5a5' }}>{state.boss.hp}/{state.boss.maxHp} HP</p>
                       </div>
-                      <h4 className="font-headline font-bold text-lg text-white">{bd.name}</h4>
+                      <h4 className="font-headline font-bold text-lg text-white">{t('boss.' + bd.id)}</h4>
                       <div className="w-full h-2 rounded-full overflow-hidden mt-2" style={{ background: 'rgba(255,255,255,0.15)' }}>
                         <div className="h-full rounded-full transition-all duration-500" style={{ width: `${hpPct}%`, background: '#f87171' }} />
                       </div>
@@ -335,12 +363,12 @@ export default function Hub({ onNavigate }) {
                       <div className="w-24 h-24 rounded-full overflow-hidden border-4 shadow-xl"
                            style={{ borderColor: '#ba1a1a', boxShadow: '0 0 20px rgba(186,26,26,0.4)' }}>
                         {artSrc ? (
-                          <img src={artSrc} alt={bd.name} className="w-full h-full object-cover" />
+                          <img src={artSrc} alt={t('boss.' + bd.id)} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-3xl" style={{ background: '#ba1a1a33' }}>{bd.icon}</div>
                         )}
                       </div>
-                      <p className="font-headline font-bold text-white text-sm mt-2">{bd.name}</p>
+                      <p className="font-headline font-bold text-white text-sm mt-2">{t('boss.' + bd.id)}</p>
                     </div>
                   </div>
 
@@ -388,7 +416,7 @@ export default function Hub({ onNavigate }) {
                         <div className="flex items-center gap-2 mb-5">
                           <span className="text-sm">{tier.icon}</span>
                           <span className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: tier.color }}>
-                            {t('hub.boss.detail.tierClass', { name: tier.name })}
+                            {t('hub.boss.detail.tierClass', { name: t('boss.tier.' + tier.id) })}
                           </span>
                         </div>
                       ) : null;
@@ -421,7 +449,7 @@ export default function Hub({ onNavigate }) {
                     {(state.bossDmgToday || 0) > 0 && (() => {
                       const doneQuests = (state.quests || []).filter(q => q.done && !q.sideQuest);
                       const dmgLog = doneQuests.map(q => ({
-                        name: q.name || q.id,
+                        name: t('quest.' + q.id),
                         icon: q.icon || '',
                         dmg: Math.max(5, Math.floor((q.xp || 0) * 0.8)),
                       }));
@@ -462,14 +490,14 @@ export default function Hub({ onNavigate }) {
                     <div className="mb-6 rounded-2xl overflow-hidden"
                          style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                       {artSrc && (
-                        <img src={artSrc} alt={bd.name} className="w-full h-40 object-cover" />
+                        <img src={artSrc} alt={t('boss.' + bd.id)} className="w-full h-40 object-cover" />
                       )}
                       <div className="p-5">
                         <p className="font-label font-bold text-xs text-error uppercase tracking-widest">
                           {defeated ? t('hub.boss.detail.defeated') : t('hub.boss.detail.dailyBoss')}
                         </p>
-                        <h3 className="font-headline font-bold text-2xl text-on-surface mt-1">{bd.name}</h3>
-                        <p className="font-body text-on-surface-variant mt-2 leading-relaxed">{bd.desc}</p>
+                        <h3 className="font-headline font-bold text-2xl text-on-surface mt-1">{t('boss.' + bd.id)}</h3>
+                        <p className="font-body text-on-surface-variant mt-2 leading-relaxed">{t('boss.' + bd.id + '.desc')}</p>
                       </div>
                     </div>
 
@@ -525,7 +553,7 @@ export default function Hub({ onNavigate }) {
                                 </div>
                                 <span className="font-label font-bold text-xs text-center leading-tight text-on-surface"
                                       style={{ opacity: isDefeated ? 1 : 0.5 }}>
-                                  {isDefeated ? boss.name : '???'}
+                                  {isDefeated ? t('boss.' + boss.id) : '???'}
                                 </span>
                                 {tier && isDefeated && (
                                   <span className="text-xs font-label font-bold px-1.5 py-0.5 rounded-full"
@@ -577,7 +605,7 @@ export default function Hub({ onNavigate }) {
                          style={{ background: 'rgba(18,67,70,0.05)' }}>
                       <span className="text-xl">{q.icon}</span>
                     </div>
-                    <p className="font-body text-xs text-on-surface font-semibold flex-1">{q.name}</p>
+                    <p className="font-body text-xs text-on-surface font-semibold flex-1">{t('quest.' + q.id)}</p>
                   </div>
                 ))}
               </div>
@@ -639,8 +667,8 @@ export default function Hub({ onNavigate }) {
               </div>
               <div className="relative z-10 flex-1 min-w-0">
                 <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#92400e' }}>{t('hub.achievement.latest')}</p>
-                <h4 className="font-headline font-bold text-lg truncate" style={{ color: '#1a1a1a' }}>{badge.n}</h4>
-                <p className="font-body text-sm truncate" style={{ color: '#5c4813' }}>{badge.desc}</p>
+                <h4 className="font-headline font-bold text-lg truncate" style={{ color: '#1a1a1a' }}>{t('badge.' + badge.id)}</h4>
+                <p className="font-body text-sm truncate" style={{ color: '#5c4813' }}>{t('badge.' + badge.id + '.desc')}</p>
               </div>
               <div className="relative z-10 flex flex-col items-center gap-1 shrink-0">
                 <span className="material-symbols-outlined text-xl" style={{ color: '#92400e' }}>chevron_right</span>

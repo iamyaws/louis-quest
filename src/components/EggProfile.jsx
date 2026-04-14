@@ -1,8 +1,10 @@
 import React from 'react';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 
 export default function EggProfile() {
   const { state, computed } = useTask();
+  const { t } = useTranslation();
   const { done, total, pct } = computed;
   const remaining = total - done;
   const base = import.meta.env.BASE_URL;
@@ -83,7 +85,7 @@ export default function EggProfile() {
                     </span>
                   </div>
                   <span className={`font-label font-bold ${q.done ? 'text-on-surface/40 line-through' : 'text-on-surface'}`}>
-                    {q.name}
+                    {t('quest.' + q.id)}
                   </span>
                 </div>
                 {q.done && (

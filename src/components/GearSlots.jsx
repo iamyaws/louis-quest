@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { T, GEAR_SLOTS } from '../constants';
 import { findShopItem } from '../utils/helpers';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const SLOT_KEYS = ["head", "body", "accessory"];
 
 export default function GearSlots({ equippedGear, purchased, onEquip, onUnequip }) {
+  const { t } = useTranslation();
   const [openSlot, setOpenSlot] = useState(null);
 
   const toggleSlot = (slot) => {
@@ -131,7 +133,7 @@ export default function GearSlots({ equippedGear, purchased, onEquip, onUnequip 
                   }}
                 >
                   <span style={{ fontSize: "1.05rem" }}>{item.icon}</span>
-                  <span>{item.name}</span>
+                  <span>{t('item.' + item.id)}</span>
                   {isEquipped && <span style={{ fontSize: ".75rem", marginLeft: 2 }}>x</span>}
                 </button>
               );

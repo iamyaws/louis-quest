@@ -315,6 +315,7 @@ export default function Sanctuary() {
 // ── Orbs Detail Section with Milestones ──
 function OrbsSection({ state, nextStage, progressPct, evo }) {
   const { t } = useTranslation();
+  const stageName = (i) => [t('companion.stage.egg'), t('companion.stage.baby'), t('companion.stage.juvenile'), t('companion.stage.pride'), t('companion.stage.legendary')][i];
   const [expandedOrb, setExpandedOrb] = useState(null);
   const orbs = state.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 };
   const totalOrbs = Object.values(orbs).reduce((a, b) => a + b, 0);
@@ -348,6 +349,7 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
           const isExpanded = expandedOrb === orb.key;
           // Find current and next milestone
           const currentMilestone = [...ORB_MILESTONES].reverse().find(m => count >= m.threshold);
+          const milestoneIndex = currentMilestone ? ORB_MILESTONES.indexOf(currentMilestone) : -1;
           const nextMilestone = ORB_MILESTONES.find(m => count < m.threshold);
           const milestonePct = nextMilestone ? Math.min(1, count / nextMilestone.threshold) : 1;
 
@@ -380,15 +382,15 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-headline font-bold text-sm text-on-surface">{orb.name}</p>
+                    <p className="font-headline font-bold text-sm text-on-surface">{t('stat.' + orb.key)}</p>
                     {currentMilestone && (
                       <span className="px-2 py-0.5 rounded-full text-xs font-label font-bold uppercase tracking-wider text-white"
                             style={{ background: orb.color }}>
-                        {currentMilestone.title}
+                        {t('orb.milestone.' + milestoneIndex)}
                       </span>
                     )}
                   </div>
-                  <p className="font-label text-xs text-on-surface-variant">{orb.desc}</p>
+                  <p className="font-label text-xs text-on-surface-variant">{t('stat.' + orb.key + '.desc')}</p>
                 </div>
 
                 <span className="font-headline font-bold text-2xl" style={{ color: collected ? orb.color : '#c0c8c9' }}>
@@ -424,7 +426,7 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
                           <div className="flex justify-between items-center mb-1">
                             <span className="font-label font-bold text-xs uppercase tracking-widest"
                                   style={{ color: reached ? orb.color : '#707979' }}>
-                              {ms.title} — {ms.threshold} Orbs
+                              {t('orb.milestone.' + i)} — {ms.threshold} Orbs
                             </span>
                             <span className="font-label text-xs font-bold" style={{ color: '#fcd34d' }}>
                               +{ms.reward} HP
@@ -462,7 +464,7 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
           </div>
           <div>
             <p className="font-label font-bold text-xs text-outline uppercase tracking-widest">{t('care.nextStage')}</p>
-            <p className="font-headline font-bold text-lg text-primary">{nextStage.name}</p>
+            <p className="font-headline font-bold text-lg text-primary">{stageName(STAGES.indexOf(nextStage))}</p>
             <p className="text-xs font-label text-on-surface-variant">{t('care.stepsMore', { count: nextStage.threshold - evo })}</p>
           </div>
         </div>

@@ -18,7 +18,7 @@ export default function TopBar({ onNavigate }) {
       <div className="flex justify-between items-center px-6 py-3 w-full max-w-lg mx-auto">
         {/* Left: Hero Avatar + Level badge + Name */}
         <button onClick={() => onNavigate?.('hero')}
-                className="flex items-center gap-2 active:scale-95 transition-all">
+                className="flex items-center gap-1 active:scale-95 transition-all">
           <div className="relative">
             <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden shadow-sm"
                  style={{ border: '2px solid rgba(18,67,70,0.15)' }}>

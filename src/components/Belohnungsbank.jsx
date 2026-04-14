@@ -119,7 +119,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                       <span className="material-symbols-outlined text-2xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>{matIcon}</span>
                     </div>
                     <div>
-                      <h4 className="font-label font-bold text-lg text-on-surface leading-tight">{reward.name}</h4>
+                      <h4 className="font-label font-bold text-lg text-on-surface leading-tight">{t('bel.' + reward.id)}</h4>
                       <p className="text-sm text-on-surface-variant font-body mt-1">{reward.emoji} {t('shop.rewardForDeeds')}</p>
                     </div>
                   </div>
@@ -167,7 +167,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                       <span className="material-symbols-outlined text-2xl" style={{ color: '#00CEC9', fontVariationSettings: "'FILL' 1" }}>{matIcon}</span>
                     </div>
                     <div>
-                      <h4 className="font-label font-bold text-lg text-on-surface leading-tight">{reward.name}</h4>
+                      <h4 className="font-label font-bold text-lg text-on-surface leading-tight">{t('bel.' + reward.id)}</h4>
                       <p className="text-sm text-on-surface-variant font-body mt-1">{reward.emoji} {t('shop.screenReward')}</p>
                     </div>
                   </div>

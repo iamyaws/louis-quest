@@ -271,7 +271,7 @@ function OverviewTab({ state }) {
               </span>
               <span className="text-sm">{q.icon}</span>
               <span className={'font-body text-sm flex-1' + (q.done ? ' line-through text-on-surface-variant/60' : ' text-on-surface')}>
-                {q.name}
+                {t('quest.' + q.id)}
               </span>
               <span className="font-label text-xs font-bold uppercase tracking-wider"
                     style={{ color: q.done ? '#059669' : '#707979' }}>{q.xp} XP</span>

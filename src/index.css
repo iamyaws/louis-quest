@@ -56,7 +56,7 @@
   --color-surface-variant: #e8e1db;
   --color-surface-bright: #fff8f2;
   --color-surface-dim: #dfd9d2;
-  --color-outline: #707979;
+  --color-outline: #4d5556;            /* AAA 7:1+ on surface cream */
   --color-outline-variant: #c0c8c9;
   --color-inverse-surface: #33302c;
   --color-inverse-on-surface: #f6f0e9;
@@ -118,6 +118,7 @@
     background: #fff8f2;
     font-family: "Be Vietnam Pro", sans-serif;
     color: #1e1b17;
+    letter-spacing: 0.01em;           /* early-reader legibility boost */
     overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
   }

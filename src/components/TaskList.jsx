@@ -246,7 +246,7 @@ export default function TaskList() {
                                     <span className="text-lg">{q.icon}</span>
                                   </div>
                                   <div className="flex-1">
-                                    <p className="font-bold font-label line-through text-on-surface/50">{q.name}</p>
+                                    <p className="font-bold font-label line-through text-on-surface/50">{t('quest.' + q.id)}</p>
                                   </div>
                                   <span className="font-bold font-label text-xs" style={{ color: '#34d399' }}>+{q.xp} XP</span>
                                 </div>
@@ -280,7 +280,7 @@ export default function TaskList() {
                                   <span className="text-lg">{q.icon}</span>
                                 </div>
                                 <div className="flex-1">
-                                  <p className="font-bold font-label text-on-surface">{q.name}</p>
+                                  <p className="font-bold font-label text-on-surface">{t('quest.' + q.id)}</p>
                                   {isAnziehen && todayWeather && weatherInfo ? (
                                     <button
                                       className="flex items-center gap-1.5 mt-1 px-2 py-1 rounded-lg transition-all text-left"
@@ -348,14 +348,14 @@ export default function TaskList() {
                         className="w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all hover:border-secondary cursor-pointer active:scale-95"
                         style={{ borderColor: 'rgba(204,195,215,0.5)' }}
                         onClick={() => handleComplete(q.id)}
-                        aria-label={`${q.name} ${t('task.complete')}`}
+                        aria-label={`${t('quest.' + q.id)} ${t('task.complete')}`}
                       />
                     )}
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-lg">{q.icon}</span>
                         <p className={`text-lg font-bold font-label ${q.done ? 'line-through text-on-surface/50' : 'text-on-surface'}`}>
-                          {q.name}
+                          {t('quest.' + q.id)}
                         </p>
                       </div>
                     </div>
@@ -442,7 +442,7 @@ export default function TaskList() {
                      style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)' }}>
                   <span className="text-3xl shrink-0">{item.emoji}</span>
                   <div className="flex-1">
-                    <p className="font-label font-bold text-on-surface">{item.name}</p>
+                    <p className="font-label font-bold text-on-surface">{t('quest.' + item.id)}</p>
                     <p className="font-body text-sm text-on-surface-variant">{item.reason}</p>
                   </div>
                 </div>

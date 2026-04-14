@@ -72,10 +72,10 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
         <div className="max-w-[70%]">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-3"
                 style={{ background: tag.bg, color: tag.color }}>
-            {mission.tag}
+            {t('mission.' + mission.id + '.tag')}
           </span>
-          <h3 className="font-headline text-2xl font-bold text-on-surface mb-2">{mission.title}</h3>
-          <p className="font-body text-on-surface-variant text-sm leading-relaxed">{mission.story}</p>
+          <h3 className="font-headline text-2xl font-bold text-on-surface mb-2">{t('mission.' + mission.id + '.title')}</h3>
+          <p className="font-body text-on-surface-variant text-sm leading-relaxed">{t('mission.' + mission.id + '.story')}</p>
         </div>
         <ProgressRing progress={progress} target={mission.target} />
       </div>
@@ -90,7 +90,7 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
         </div>
         <div>
           <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">{t('mission.reward.label')}</p>
-          <p className="font-body font-bold text-on-surface">{mission.rewardLabel}</p>
+          <p className="font-body font-bold text-on-surface">{t('mission.' + mission.id + '.reward')}</p>
           <p className="font-label text-xs text-on-surface-variant">
             +{mission.reward.hp} HP &middot; +{mission.reward.evo} Evo
           </p>

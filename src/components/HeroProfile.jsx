@@ -207,7 +207,7 @@ export default function HeroProfile({ onNavigate }) {
                             style={{ color: item.color, fontVariationSettings: "'FILL' 1" }}>{item.icon}</span>
                     </div>
                     <span className="font-headline text-xs font-bold uppercase tracking-widest text-primary text-center leading-tight px-1">
-                      {item.name.split('-')[0].trim()}
+                      {t('item.' + item.id).split('-')[0].trim()}
                     </span>
                   </>
                 ) : (
@@ -254,7 +254,7 @@ export default function HeroProfile({ onNavigate }) {
                     opacity: defeated ? 1 : 0.35,
                     filter: defeated ? 'none' : 'grayscale(1)',
                   }}
-                  title={boss.name}>
+                  title={t('boss.' + boss.id)}>
                   {boss.icon}
                 </div>
               );
@@ -281,7 +281,7 @@ export default function HeroProfile({ onNavigate }) {
                     {badge.i}
                   </div>
                   <span className="font-label text-xs text-center text-on-surface-variant font-bold leading-tight">
-                    {badge.n}
+                    {t('badge.' + badge.id)}
                   </span>
                 </div>
               );
