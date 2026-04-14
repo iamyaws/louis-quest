@@ -19,7 +19,7 @@ export default class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div style={{
-          minHeight: "100vh", display: "flex", flexDirection: "column",
+          minHeight: "100dvh", display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center", padding: 32,
           background: T.bg, fontFamily: "'Nunito',sans-serif", color: T.textPrimary,
           textAlign: "center",

@@ -12,7 +12,7 @@ export default function Weather() {
 
   if (loading) {
     return (
-      <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
+      <div className="view-enter" style={{ minHeight: "100dvh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
         <ViewHeader onBack={() => ui.setView("hub")} title="Wetter" />
         <div style={{ textAlign: "center", padding: 40, color: T.textSecondary }}>
           <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>{"\u{1F324}\uFE0F"}</div>
@@ -24,7 +24,7 @@ export default function Weather() {
 
   if (error || !weather) {
     return (
-      <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
+      <div className="view-enter" style={{ minHeight: "100dvh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
         <ViewHeader onBack={() => ui.setView("hub")} title="Wetter" />
         <div style={{ textAlign: "center", padding: 40, color: T.textSecondary }}>
           <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>{"\u{1F327}\uFE0F"}</div>
@@ -43,7 +43,7 @@ export default function Weather() {
   const tempColor = current.temp < 0 ? "#60A5FA" : current.temp < 10 ? "#38BDF8" : current.temp < 18 ? "#34D399" : current.temp < 25 ? "#F59E0B" : "#EF4444";
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
+    <div className="view-enter" style={{ minHeight: "100dvh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
       <ViewHeader onBack={() => ui.setView("hub")} title="Wetter" />
 
       {/* ── Current Weather Card ── */}

@@ -51,7 +51,7 @@ export default function CatCare() {
   ];
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh" }}>
+    <div className="view-enter" style={{ minHeight: "100dvh" }}>
       <ViewHeader title={careTitle} icon={stageInfo.emoji} onBack={() => ui.setView("hub")} />
 
       <div style={{ padding: "0 16px 100px" }}>

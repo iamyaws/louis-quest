@@ -1,32 +1,29 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { GEAR_ITEMS, BADGES, BOSSES } from '../constants';
 import { getLevel, getLvlProg } from '../utils/helpers';
 
 const base = import.meta.env.BASE_URL;
 
-const GEAR_SLOTS = [
-  { key: 'head', label: 'Kopf', icon: 'person_play' },
-  { key: 'neck', label: 'Amulett', icon: 'diamond' },
-  { key: 'back', label: 'Rücken', icon: 'checkroom' },
-];
-
-const LEVEL_TITLES = [
-  'Neuling', 'Entdecker', 'Spurensucher', 'Pfadfinder', 'Waldläufer',
-  'Nebelkämpfer', 'Lichtbringer', 'Sternenwächter', 'Legendärer Held',
+const GEAR_SLOT_KEYS = [
+  { key: 'head', labelKey: 'profile.gear.head', icon: 'person_play' },
+  { key: 'neck', labelKey: 'profile.gear.neck', icon: 'diamond' },
+  { key: 'back', labelKey: 'profile.gear.back', icon: 'checkroom' },
 ];
 
 export default function HeroProfile({ onNavigate }) {
   const { state } = useTask();
+  const { t } = useTranslation();
   const [showEditHint, setShowEditHint] = useState(false);
   if (!state) return null;
 
   const level = getLevel(state.xp || 0);
   const lvlProg = getLvlProg(state.xp || 0);
-  const heroName = state.familyConfig?.childName || 'Held';
+  const heroName = state.familyConfig?.childName || t('hero.fallback');
   const heroAvatar = state.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
-  const titleIdx = Math.min(Math.floor(level / 2), LEVEL_TITLES.length - 1);
-  const heroTitle = LEVEL_TITLES[titleIdx];
+  const titleIdx = Math.min(Math.floor(level / 2), 8);
+  const heroTitle = t(`profile.level.titles.${titleIdx}`);
 
   const trophyCount = (state.bossTrophies || []).length;
 
@@ -50,9 +47,9 @@ export default function HeroProfile({ onNavigate }) {
 
   const stats = state.heroStats || { mut: 0, fokus: 0, ordnung: 0 };
   const heroStatsDisplay = [
-    { key: 'mut', name: 'Mut', pts: stats.mut, level: getStatLevel(stats.mut), prog: getStatProgress(stats.mut), icon: 'rocket_launch', color: '#dc2626' },
-    { key: 'fokus', name: 'Fokus', pts: stats.fokus, level: getStatLevel(stats.fokus), prog: getStatProgress(stats.fokus), icon: 'center_focus_strong', color: '#2563eb' },
-    { key: 'ordnung', name: 'Ordnung', pts: stats.ordnung, level: getStatLevel(stats.ordnung), prog: getStatProgress(stats.ordnung), icon: 'cleaning_services', color: '#059669' },
+    { key: 'mut', name: t('stat.mut'), pts: stats.mut, level: getStatLevel(stats.mut), prog: getStatProgress(stats.mut), icon: 'rocket_launch', color: '#dc2626' },
+    { key: 'fokus', name: t('stat.fokus'), pts: stats.fokus, level: getStatLevel(stats.fokus), prog: getStatProgress(stats.fokus), icon: 'center_focus_strong', color: '#2563eb' },
+    { key: 'ordnung', name: t('stat.ordnung'), pts: stats.ordnung, level: getStatLevel(stats.ordnung), prog: getStatProgress(stats.ordnung), icon: 'cleaning_services', color: '#059669' },
   ];
   const gear = state.equippedGear || {};
   const gearInv = state.gearInventory || [];
@@ -106,7 +103,7 @@ export default function HeroProfile({ onNavigate }) {
         {/* XP progress bar */}
         <div className="w-full max-w-xs mt-4">
           <div className="flex justify-between items-center px-1 mb-1.5">
-            <span className="font-label text-xs font-bold text-primary/50 uppercase tracking-widest">Erfahrung</span>
+            <span className="font-label text-xs font-bold text-primary/50 uppercase tracking-widest">{t('profile.xp')}</span>
             <span className="font-label text-xs font-bold text-primary">{lvlProg.cur}/{lvlProg.need} XP</span>
           </div>
           <div className="h-3 w-full bg-surface-container-highest rounded-full overflow-hidden shadow-inner">
@@ -122,7 +119,7 @@ export default function HeroProfile({ onNavigate }) {
             <span className="material-symbols-outlined text-primary text-xl"
                   style={{ fontVariationSettings: "'FILL' 1" }}>info</span>
             <p className="font-body text-sm text-primary/80">
-              Eigenes Bild hochladen kommt bald!
+              {t('profile.avatar.hint')}
             </p>
             <button onClick={() => setShowEditHint(false)}
                     className="ml-auto text-primary/40 hover:text-primary">
@@ -135,9 +132,9 @@ export default function HeroProfile({ onNavigate }) {
       {/* ── Quick Stats Row ── */}
       <section className="grid grid-cols-3 gap-3 mt-6">
         {[
-          { icon: 'swords', label: 'Bosse', value: trophyCount, color: '#ba1a1a' },
+          { icon: 'swords', label: t('profile.trophies.bosses'), value: trophyCount, color: '#ba1a1a' },
           { icon: 'local_fire_department', label: 'Streak', value: `${state.sd || 0}d`, color: '#f59e0b' },
-          { icon: 'task_alt', label: 'Quests', value: state.totalTasksDone || 0, color: '#124346' },
+          { icon: 'task_alt', label: t('nav.quests'), value: state.totalTasksDone || 0, color: '#124346' },
         ].map((s, i) => (
           <div key={i} className="rounded-2xl p-4 flex flex-col items-center gap-1"
                style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
@@ -152,7 +149,7 @@ export default function HeroProfile({ onNavigate }) {
       {/* ── Hero Stats (from daily quests) ── */}
       <section className="mt-8">
         <h3 className="font-headline font-bold text-lg text-primary mb-4 px-1"
-            style={{ fontFamily: 'Fredoka, sans-serif' }}>Helden-Werte</h3>
+            style={{ fontFamily: 'Fredoka, sans-serif' }}>{t('profile.stats.title')}</h3>
         <div className="rounded-2xl p-5 space-y-5"
              style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
           {heroStatsDisplay.map(stat => (
@@ -182,10 +179,10 @@ export default function HeroProfile({ onNavigate }) {
         <div className="flex items-center gap-2 mb-4 px-1">
           <span className="material-symbols-outlined text-xl" style={{ color: '#735c00', fontVariationSettings: "'FILL' 1" }}>backpack</span>
           <h3 className="font-headline font-bold text-lg text-primary"
-              style={{ fontFamily: 'Fredoka, sans-serif' }}>Magischer Rucksack</h3>
+              style={{ fontFamily: 'Fredoka, sans-serif' }}>{t('profile.gear.title')}</h3>
         </div>
         <div className="grid grid-cols-3 gap-4">
-          {GEAR_SLOTS.map(slot => {
+          {GEAR_SLOT_KEYS.map(slot => {
             const equippedId = gear[slot.key];
             const item = equippedId ? GEAR_ITEMS.find(g => g.id === equippedId) : null;
             return (
@@ -219,7 +216,7 @@ export default function HeroProfile({ onNavigate }) {
                       <span className="material-symbols-outlined text-2xl text-primary/25"
                             style={{ fontVariationSettings: "'FILL' 0" }}>{slot.icon}</span>
                     </div>
-                    <span className="font-headline text-xs font-bold uppercase tracking-widest text-primary/35">{slot.label}</span>
+                    <span className="font-headline text-xs font-bold uppercase tracking-widest text-primary/35">{t(slot.labelKey)}</span>
                   </>
                 )}
               </div>
@@ -228,7 +225,7 @@ export default function HeroProfile({ onNavigate }) {
         </div>
         {gearInv.length === 0 && (
           <p className="text-center text-sm text-on-surface-variant mt-3 font-body">
-            Schließe <button onClick={() => onNavigate?.('missions')} className="text-primary font-bold underline">Epische Missionen</button> ab, um Ausrüstung zu finden!
+            {t('profile.gear.empty')}
           </p>
         )}
       </section>
@@ -238,13 +235,13 @@ export default function HeroProfile({ onNavigate }) {
         <div className="flex items-center gap-2 mb-4 px-1">
           <span className="material-symbols-outlined text-xl" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
           <h3 className="font-headline font-bold text-lg text-primary"
-              style={{ fontFamily: 'Fredoka, sans-serif' }}>Trophäen & Abzeichen</h3>
+              style={{ fontFamily: 'Fredoka, sans-serif' }}>{t('profile.trophies.title')}</h3>
         </div>
 
         {/* Boss Trophies */}
         <div className="rounded-2xl p-5 mb-4"
              style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-          <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3">Besiegte Bosse</p>
+          <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3">{t('profile.trophies.bosses')}</p>
           <div className="flex flex-wrap gap-3">
             {BOSSES.map(boss => {
               const defeated = (state.bossTrophies || []).includes(boss.id);
@@ -268,7 +265,7 @@ export default function HeroProfile({ onNavigate }) {
         {/* Badges */}
         <div className="rounded-2xl p-5"
              style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-          <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3">Abzeichen</p>
+          <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3">{t('profile.trophies.badges')}</p>
           <div className="flex flex-wrap gap-3">
             {BADGES.map(badge => {
               const unlocked = (state.unlockedBadges || []).includes(badge.id);
@@ -301,13 +298,13 @@ export default function HeroProfile({ onNavigate }) {
                style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-3">
-              <h3 className="text-xl text-white font-bold" style={{ fontFamily: 'Fredoka, sans-serif' }}>Thang Long Karte</h3>
+              <h3 className="text-xl text-white font-bold" style={{ fontFamily: 'Fredoka, sans-serif' }}>{t('profile.map.title')}</h3>
               <div className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm">
-                BALD VERFÜGBAR
+                {t('profile.map.coming')}
               </div>
             </div>
             <p className="text-white/70 text-sm font-body leading-relaxed">
-              Entdecke die Regionen von Thang Long! Besiege Bosse und schalte neue Gebiete frei.
+              {t('profile.map.desc')}
             </p>
             <div className="flex gap-3 mt-4">
               <div className="w-10 h-10 rounded-full flex items-center justify-center"
@@ -336,14 +333,14 @@ export default function HeroProfile({ onNavigate }) {
                style={{ background: 'rgba(252,211,77,0.1)' }} />
           <div className="relative z-10 text-center space-y-4">
             <div className="w-10 h-0.5 bg-primary/10 mx-auto rounded-full" />
-            <h3 className="text-xl text-primary" style={{ fontFamily: 'Fredoka, sans-serif' }}>Helden-Kodex</h3>
+            <h3 className="text-xl text-primary" style={{ fontFamily: 'Fredoka, sans-serif' }}>{t('profile.codex.title')}</h3>
             <p className="text-primary/70 italic leading-relaxed font-body">
-              "Ein wahrer Held von Thang Long hört auf die Bäume, hilft den kleinen Wesen und erledigt seine Morgen-Quest, bevor die Sonne den Gipfel erreicht!"
+              "{t('profile.codex.quote')}"
             </p>
             {state.familyConfig?.parentMessage?.body && (
               <div className="pt-4 mt-4" style={{ borderTop: '1px solid rgba(18,67,70,0.05)' }}>
                 <p className="font-label font-bold text-xs uppercase tracking-widest text-primary/35 mb-2">
-                  {state.familyConfig.parentMessage.title || 'Nachricht von Mama & Papa'}
+                  {state.familyConfig.parentMessage.title || t('profile.codex.parentLabel')}
                 </p>
                 <p className="font-body text-primary font-bold">
                   "{state.familyConfig.parentMessage.body}"

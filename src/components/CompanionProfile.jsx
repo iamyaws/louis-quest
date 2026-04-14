@@ -63,7 +63,7 @@ export default function CompanionProfile() {
   const ageDays = createdDate ? Math.max(1, Math.floor((Date.now() - createdDate) / 86400000)) : 1;
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px", background: "#FFF8F0" }}>
+    <div className="view-enter" style={{ minHeight: "100dvh", padding: "12px 16px 100px", background: "#FFF8F0" }}>
       <ViewHeader onBack={() => ui.setView("hub")} title={`${state.catName || typeInfo.name}`} icon={typeInfo.emoji} />
       <div style={{ textAlign: "center", marginBottom: 16 }}>
         <div style={{ width: 180, height: 180, margin: "0 auto", borderRadius: "50%", background: "radial-gradient(circle, rgba(252,211,77,0.15) 0%, transparent 70%)", display: "flex", alignItems: "center", justifyContent: "center" }}>

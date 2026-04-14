@@ -7,7 +7,7 @@ export default function Familienregeln() {
   const { ui } = useGame();
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", background: T.bg }}>
+    <div className="view-enter" style={{ minHeight: "100dvh", background: T.bg }}>
       <ViewHeader title="Helden-Kodex" icon={"\uD83D\uDEE1\uFE0F"} onBack={() => ui.setView("hub")} />
 
       <div style={{ padding: "0 16px 100px" }}>

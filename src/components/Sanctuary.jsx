@@ -34,7 +34,7 @@ export default function Sanctuary() {
   };
 
   return (
-    <div className="relative min-h-screen pb-32">
+    <div className="relative min-h-dvh pb-32">
       <div className="fixed inset-0 -z-20">
         <img src={base + 'art/bg-teal-soft.png'} alt="" className="w-full h-full object-cover" />
       </div>

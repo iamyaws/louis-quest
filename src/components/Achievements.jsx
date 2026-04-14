@@ -14,7 +14,7 @@ export default function Achievements() {
   }));
 
   return (
-    <div className="view-enter" style={{ minHeight: "100vh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
+    <div className="view-enter" style={{ minHeight: "100dvh", padding: "12px 16px 100px", background: "#EFF3FB" }}>
       <ViewHeader onBack={() => ui.setView("hub")} title="Erfolge" />
       <div className="game-card" style={{ padding: 20, display: "flex", alignItems: "center", gap: 16, marginBottom: 20, borderRadius: 22 }}>
         <HeroSprite shape={state.hero.shape} color={state.hero.color} eyes={state.hero.eyes} hair={state.hero.hair} size={80} level={level} />

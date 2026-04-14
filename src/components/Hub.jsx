@@ -53,7 +53,7 @@ export default function Hub({ onNavigate }) {
   const heroAvatar = state.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
 
   return (
-    <div className="relative min-h-screen bg-surface pb-32">
+    <div className="relative min-h-dvh bg-surface pb-32">
 
       {/* ── Top Bar (matches TopBar component style) ── */}
       <header className="flex justify-between items-center px-6 pb-2"

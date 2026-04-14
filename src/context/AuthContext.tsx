@@ -85,7 +85,7 @@ export function LoginScreen() {
   // ── Signup confirmation ──
   if (signupDone) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-surface px-6 relative overflow-hidden">
+      <div className="flex items-center justify-center min-h-dvh bg-surface px-6 relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, #fcd34d 0%, transparent 70%)', filter: 'blur(40px)' }} />
         <div className="w-full max-w-sm text-center relative z-10">
           <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-surface-container-highest flex items-center justify-center" style={{ boxShadow: '0 0 40px rgba(252,211,77,0.2)' }}>
@@ -114,7 +114,7 @@ export function LoginScreen() {
 
   // ── Login / Signup form ──
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background px-6 relative overflow-hidden">
+    <div className="flex items-center justify-center min-h-dvh bg-background px-6 relative overflow-hidden">
       {/* Cream brush texture */}
       <img src={`${import.meta.env.BASE_URL}art/bg-cream-brush.png`} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" />
       {/* Subtle gradient overlays */}

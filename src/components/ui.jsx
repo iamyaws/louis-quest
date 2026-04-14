@@ -3,7 +3,7 @@ import { T } from '../constants';
 
 // ── Onboarding shared wrappers ──
 export const OBWrap = ({ children }) => (
-  <div style={{ minHeight: "100vh", background: T.bg, fontFamily: "'Nunito',sans-serif", color: T.textPrimary, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, paddingTop: "env(safe-area-inset-top, 24px)" }}>
+  <div style={{ minHeight: "100dvh", background: T.bg, fontFamily: "'Nunito',sans-serif", color: T.textPrimary, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, paddingTop: "env(safe-area-inset-top, 24px)" }}>
     {children}
   </div>
 );

@@ -4,7 +4,7 @@ import { useTask } from '../context/TaskContext';
 // ── Evolution Celebration ──
 function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
   return (
-    <main className="relative flex flex-col items-center justify-center min-h-screen px-6 pt-16 pb-24 text-center">
+    <main className="relative flex flex-col items-center justify-center min-h-dvh px-6 pt-16 pb-24 text-center">
       {/* Gold dust texture */}
       <img src={import.meta.env.BASE_URL + 'art/bg-gold-dust.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
       {/* Background motifs */}
@@ -88,7 +88,7 @@ function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
 // ── Task Completion / Level Up ──
 function LevelUpCelebration({ level, onDismiss }) {
   return (
-    <main className="min-h-screen w-full max-w-2xl px-6 pb-32 flex flex-col items-center justify-center relative overflow-hidden mx-auto"
+    <main className="min-h-dvh w-full max-w-2xl px-6 pb-32 flex flex-col items-center justify-center relative overflow-hidden mx-auto"
           style={{ paddingTop: 'calc(6rem + env(safe-area-inset-top, 0px))' }}>
       {/* Gold dust texture */}
       <img src={import.meta.env.BASE_URL + 'art/bg-gold-dust.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" />
@@ -149,7 +149,7 @@ function VictoryCelebration({ onDismiss }) {
   const streak = state?.sd || 0;
 
   return (
-    <main className="min-h-screen pt-24 pb-32 px-6 flex flex-col items-center justify-center relative overflow-hidden lotus-pattern">
+    <main className="min-h-dvh pt-24 pb-32 px-6 flex flex-col items-center justify-center relative overflow-hidden lotus-pattern">
       {/* Ambient glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
         <div className="w-[500px] h-[500px] rounded-full blur-[120px]" style={{ background: '#fcd34d' }} />
@@ -233,7 +233,7 @@ function VictoryCelebration({ onDismiss }) {
 // ── Chest / Streak Milestone ──
 function ChestCelebration({ milestone, reward, onDismiss }) {
   return (
-    <main className="min-h-screen pt-24 pb-32 px-6 flex flex-col items-center justify-center relative overflow-hidden lotus-pattern">
+    <main className="min-h-dvh pt-24 pb-32 px-6 flex flex-col items-center justify-center relative overflow-hidden lotus-pattern">
       {/* Ambient glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
         <div className="w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: '#fcd34d' }} />

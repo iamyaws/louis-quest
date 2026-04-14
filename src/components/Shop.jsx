@@ -39,7 +39,7 @@ export default function Shop() {
 
   return (
     <div className="view-enter" style={{
-      minHeight: '100vh',
+      minHeight: '100dvh',
       padding: '12px 16px 100px',
       background: '#EFF3FB',
     }}>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 
 const PIN_CODE = '1234';
 const MOOD_EMOJIS = ['😢', '😕', '😐', '🙂', '😊', '🤩'];
-const MOOD_LABELS = ['Traurig', 'Besorgt', 'Okay', 'Gut', 'Magisch', 'Müde'];
-const DAY_LABELS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const MOOD_LABELS_KEYS = ['mood.sad', 'mood.worried', 'mood.okay', 'mood.good', 'mood.magical', 'mood.tired'];
+const DAY_LABELS_DE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const DAY_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const base = typeof import.meta !== 'undefined' ? import.meta.env.BASE_URL : '/';
 
 // ── Bodhi Leaf Decoration ──
@@ -21,10 +23,12 @@ function BodhiLeaf({ className = '' }) {
 
 export default function ParentalDashboard({ onClose }) {
   const { state, actions } = useTask();
+  const { t, lang, setLang } = useTranslation();
   const [pin, setPin] = useState('');
   const [authed, setAuthed] = useState(false);
   const [pinError, setPinError] = useState(false);
   const [tab, setTab] = useState('overview');
+  const DAY_LABELS = lang === 'en' ? DAY_LABELS_EN : DAY_LABELS_DE;
 
   if (!state) return null;
 
@@ -150,30 +154,33 @@ export default function ParentalDashboard({ onClose }) {
       {/* Tab Bar */}
       <div className="relative z-10 flex gap-2 px-6 py-3">
         {[
-          { id: 'overview', label: 'Übersicht', icon: 'dashboard' },
-          { id: 'family', label: 'Familie', icon: 'family_restroom' },
-        ].map(t => (
-          <button key={t.id}
-            onClick={() => setTab(t.id)}
+          { id: 'overview', label: t('parent.tab.overview'), icon: 'dashboard' },
+          { id: 'family', label: t('parent.tab.family'), icon: 'family_restroom' },
+          { id: 'settings', label: t('parent.tab.settings'), icon: 'settings' },
+        ].map(tb => (
+          <button key={tb.id}
+            onClick={() => setTab(tb.id)}
             className="flex-1 py-3 rounded-full font-label font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300"
             style={{
-              background: tab === t.id ? '#124346' : 'rgba(255,255,255,0.6)',
-              backdropFilter: tab !== t.id ? 'blur(12px)' : undefined,
-              border: tab === t.id ? 'none' : '1px solid rgba(255,255,255,0.5)',
-              color: tab === t.id ? '#ffffff' : '#707979',
-              boxShadow: tab === t.id ? '0 4px 16px rgba(18,67,70,0.2)' : 'none',
+              background: tab === tb.id ? '#124346' : 'rgba(255,255,255,0.6)',
+              backdropFilter: tab !== tb.id ? 'blur(12px)' : undefined,
+              border: tab === tb.id ? 'none' : '1px solid rgba(255,255,255,0.5)',
+              color: tab === tb.id ? '#ffffff' : '#707979',
+              boxShadow: tab === tb.id ? '0 4px 16px rgba(18,67,70,0.2)' : 'none',
             }}>
             <span className="material-symbols-outlined text-lg"
-                  style={{ fontVariationSettings: tab === t.id ? "'FILL' 1" : undefined }}>
-              {t.icon}
+                  style={{ fontVariationSettings: tab === tb.id ? "'FILL' 1" : undefined }}>
+              {tb.icon}
             </span>
-            {t.label}
+            {tb.label}
           </button>
         ))}
       </div>
 
       <main className="relative z-10 px-6 pb-12 max-w-lg mx-auto flex flex-col gap-5">
-        {tab === 'overview' ? <OverviewTab state={state} /> : <FamilyTab state={state} actions={actions} />}
+        {tab === 'overview' && <OverviewTab state={state} />}
+        {tab === 'family' && <FamilyTab state={state} actions={actions} />}
+        {tab === 'settings' && <SettingsTab lang={lang} setLang={setLang} t={t} />}
         <BodhiLeaf />
       </main>
     </div>
@@ -735,5 +742,42 @@ function FieldRow({ label, children }) {
       </label>
       {children}
     </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS TAB (Language Toggle)
+// ═══════════════════════════════════════════════════════
+
+function SettingsTab({ lang, setLang, t }) {
+  return (
+    <>
+      <div className="rounded-2xl p-6"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">
+          {t('parent.lang.title')}
+        </p>
+        <div className="flex gap-3">
+          {[
+            { code: 'de', label: '🇩🇪 Deutsch', flag: '🇩🇪' },
+            { code: 'en', label: '🇬🇧 English', flag: '🇬🇧' },
+          ].map(opt => (
+            <button
+              key={opt.code}
+              onClick={() => setLang(opt.code)}
+              className="flex-1 py-4 rounded-2xl font-headline font-bold text-lg flex items-center justify-center gap-3 transition-all"
+              style={{
+                background: lang === opt.code ? '#124346' : 'rgba(18,67,70,0.05)',
+                color: lang === opt.code ? '#ffffff' : '#124346',
+                border: lang === opt.code ? '2px solid #124346' : '2px solid rgba(18,67,70,0.1)',
+                boxShadow: lang === opt.code ? '0 4px 16px rgba(18,67,70,0.2)' : 'none',
+              }}>
+              <span className="text-2xl">{opt.flag}</span>
+              {opt.code === 'de' ? 'Deutsch' : 'English'}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }

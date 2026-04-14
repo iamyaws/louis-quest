@@ -18,7 +18,7 @@ export default function HeldenKodex() {
   const msg = config.parentMessage;
 
   return (
-    <div className="min-h-screen bg-surface px-6 pb-32 relative">
+    <div className="min-h-dvh bg-surface px-6 pb-32 relative">
       <img src={`${import.meta.env.BASE_URL}art/bg-parchment.png`} alt="" className="fixed inset-0 w-full h-full object-cover opacity-30 -z-10 pointer-events-none" />
 
       {/* ── Hero Heart Section ── */}

@@ -39,7 +39,7 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-surface">
+      <div className="flex items-center justify-center h-dvh bg-surface">
         <p className="font-headline text-xl font-bold text-primary">Laden...</p>
       </div>
     );
@@ -69,7 +69,7 @@ function AppContent() {
           <TopBar onNavigate={setView} />
         </div>
       )}
-      <div className={`min-h-screen max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
+      <div className={`min-h-dvh max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
            style={{
              paddingTop: ['hub', 'care'].includes(view) ? 0 : 'calc(72px + env(safe-area-inset-top, 0px))',
              paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
@@ -131,7 +131,7 @@ function AuthGate() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-surface">
+      <div className="flex items-center justify-center h-dvh bg-surface">
         <div className="text-center">
           <img src={`${import.meta.env.BASE_URL}art/ronki-egg-logo.svg`} alt="Ronki" className="w-20 h-auto mx-auto mb-4 drop-shadow-lg" />
           <p className="font-headline text-xl font-bold text-primary">Laden...</p>
@@ -155,7 +155,7 @@ function ErrorBoundary({ children }) {
   const [error, setError] = React.useState(null);
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-surface px-6 text-center">
+      <div className="flex flex-col items-center justify-center h-dvh bg-surface px-6 text-center">
         <div className="text-5xl mb-4">😿</div>
         <h2 className="font-headline text-xl font-bold text-error mb-2">Ups! Da ist etwas schiefgelaufen.</h2>
         <p className="font-body text-on-surface-variant mb-6">Keine Sorge, deine Daten sind sicher gespeichert.</p>
