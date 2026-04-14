@@ -411,11 +411,14 @@ export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
   { id: "bel_tv30", name: "30 Min Serie/Film", emoji: "\u{1F4FA}", cost: 8, active: true, currency: "eggs", minutes: 30, availableAfter: "16:00", availableAfterFree: "10:00", weekendCost: 5 },
   { id: "bel_movie", name: "Filmabend", emoji: "\u{1F3AC}", cost: 12, active: true, currency: "eggs", minutes: 90, availableAfter: "18:00", availableAfterFree: "14:00", weekendCost: 8 },
   // Fun rewards (HP — meaningful save-up loops for a ~200 HP/day earner)
-  // Small: 1 day, Medium: 2-3 days, Big: ~1 week
-  { id: "bel_candy", name: "Süßigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 150, active: true, currency: "hp" },
-  { id: "bel_vote", name: "Lieblingsessen wählen", emoji: "\u{1F355}", cost: 400, active: true, currency: "hp" },
-  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 1500, active: true, currency: "hp" },
-  { id: "bel_evoboost", name: "Begleiter-Boost (+5 EP)", emoji: "\u{1F4AA}", cost: 300, active: true, currency: "hp" },
+  // Tiered for a 1st grader: Tier 0 (~half a day, instant win), Tier 1 (1 day),
+  // Tier 2 (~2-3 days), Tier 3 (~1 week aspirational)
+  { id: "bel_sticker", name: "Glitzer-Sticker", emoji: "\u2728", cost: 50, active: true, currency: "hp" },
+  { id: "bel_candy", name: "Süßigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 100, active: true, currency: "hp" },
+  { id: "bel_storytime", name: "Extra Gute-Nacht-Geschichte", emoji: "\u{1F4DA}", cost: 175, active: true, currency: "hp" },
+  { id: "bel_evoboost", name: "Begleiter-Boost (+5 EP)", emoji: "\u{1F4AA}", cost: 250, active: true, currency: "hp" },
+  { id: "bel_vote", name: "Lieblingsessen wählen", emoji: "\u{1F355}", cost: 350, active: true, currency: "hp" },
+  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 1000, active: true, currency: "hp" },
 ];
 
 // ═══ Bavaria School Vacations ═══

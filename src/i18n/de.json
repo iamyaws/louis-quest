@@ -806,10 +806,12 @@
   "bel.bel_game20": "20 Min Videospiel",
   "bel.bel_tv30": "30 Min Serie/Film",
   "bel.bel_movie": "Filmabend",
+  "bel.bel_sticker": "Glitzer-Sticker",
   "bel.bel_candy": "Süßigkeit / 2. Nachtisch",
+  "bel.bel_storytime": "Extra Gute-Nacht-Geschichte",
+  "bel.bel_evoboost": "Begleiter-Boost (+5 EP)",
   "bel.bel_vote": "Lieblingsessen wählen",
   "bel.bel_trip": "Besonderer Ausflug",
-  "bel.bel_evoboost": "Begleiter-Boost (+5 EP)",
 
   "gear.g_helm": "Waldwächter-Helm",
   "gear.g_helm.desc": "Geschmiedet aus dem Herzen eines alten Baumes. Schützt vor faulen Ausreden.",

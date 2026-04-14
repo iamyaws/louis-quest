@@ -806,10 +806,12 @@
   "bel.bel_game20": "20 min Video Game",
   "bel.bel_tv30": "30 min Show/Movie",
   "bel.bel_movie": "Movie Night",
+  "bel.bel_sticker": "Glitter Sticker",
   "bel.bel_candy": "Sweets / 2nd Dessert",
+  "bel.bel_storytime": "Extra Bedtime Story",
+  "bel.bel_evoboost": "Companion Boost (+5 EP)",
   "bel.bel_vote": "Pick favourite meal",
   "bel.bel_trip": "Special Outing",
-  "bel.bel_evoboost": "Companion Boost (+5 EP)",
 
   "gear.g_helm": "Forest Guardian Helm",
   "gear.g_helm.desc": "Forged from the heart of an old tree. Protects against lazy excuses.",
