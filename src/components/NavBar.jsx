@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 
 const TAB_KEYS = [
-  { id: 'hub',     key: 'nav.hub',     icon: 'home' },
+  { id: 'hub',     key: 'nav.hub',     icon: 'local_fire_department' },
   { id: 'quests',  key: 'nav.quests',  icon: 'military_tech' },
   { id: 'care',    key: 'nav.care',    icon: 'favorite' },
   { id: 'shop',    key: 'nav.shop',    icon: 'shopping_bag' },

@@ -62,11 +62,18 @@ export default function BirthdayEpic({ onBack }) {
   if (showCelebration || isCompleted) {
     return (
       <div className="fixed inset-0 z-[200] flex flex-col bg-surface overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-        {/* Back button */}
+        {/* Close button — respects safe-area so it never hides under the notch */}
         <button onClick={onBack}
-          className="fixed top-5 right-5 z-50 w-10 h-10 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(0,0,0,0.08)' }}>
-          <span className="material-symbols-outlined text-on-surface text-xl">close</span>
+          aria-label={t('birthday.close') || 'Schließen'}
+          className="fixed right-3 z-[300] w-12 h-12 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+          style={{
+            top: 'calc(0.75rem + env(safe-area-inset-top, 0px))',
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(0,0,0,0.08)',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.14)',
+          }}>
+          <span className="material-symbols-outlined text-on-surface text-2xl">close</span>
         </button>
 
         {/* Hero illustration */}
@@ -129,11 +136,18 @@ export default function BirthdayEpic({ onBack }) {
         <div className="absolute inset-0"
              style={{ background: 'linear-gradient(to top, #fff8f2 0%, rgba(255,248,241,0.3) 40%, transparent 60%)' }} />
 
-        {/* Back button */}
+        {/* Back button — fixed + respects safe-area so it's always tappable */}
         <button onClick={onBack}
-          className="absolute top-5 left-5 z-50 w-10 h-10 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)' }}>
-          <span className="material-symbols-outlined text-on-surface text-xl">arrow_back</span>
+          aria-label={t('birthday.back') || 'Zurück'}
+          className="fixed left-3 z-[300] w-12 h-12 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+          style={{
+            top: 'calc(0.75rem + env(safe-area-inset-top, 0px))',
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(0,0,0,0.08)',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.14)',
+          }}>
+          <span className="material-symbols-outlined text-on-surface text-2xl">arrow_back</span>
         </button>
 
         {/* Epic Quest badge */}

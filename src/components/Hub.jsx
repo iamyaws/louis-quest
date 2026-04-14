@@ -41,7 +41,7 @@ const BOSS_ART = {
 export default function Hub({ onNavigate }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct } = computed;
-  const { t, locale } = useTranslation();
+  const { t, lang } = useTranslation();
   const { weather } = useWeather();
   const voice = useVoice();
   const base = import.meta.env.BASE_URL;
@@ -118,31 +118,53 @@ export default function Hub({ onNavigate }) {
           // Egg shape for stage 0, round for hatched
           const isEgg = catStage === 0;
 
-          return (
-            <section className="relative flex flex-col items-center py-4 gap-3">
-              <div className="absolute w-72 h-72 rounded-full blur-[80px] -z-10"
-                   style={{ background: 'rgba(252,211,77,0.25)', animation: 'pulse 3s ease-in-out infinite' }} />
+          // Painted campfire scene — contained illustration (not wallpaper).
+          // Per-stage variants can swap in under `campfire/lager-stage{N}.png`.
+          const sceneSrc = `art/campfire/lager-stage1.png`;
 
-              {/* Ronki's greeting chip — inline so it doesn't collide with stage badge / hero header */}
+          return (
+            <section className="relative flex flex-col items-center pt-2 pb-4">
+              {/* Ronki's greeting chip — above the scene so it doesn't fight the painted border */}
               {voice.line && (
-                <div className="flex justify-center w-full px-6">
+                <div className="relative z-10 flex justify-center w-full px-6 mb-2">
                   <VoiceBubble line={voice.line} onDismiss={voice.dismiss} variant="chip" />
                 </div>
               )}
 
-              <div className={`relative overflow-hidden border-4 border-white shadow-2xl ${
-                isEgg
-                  ? 'w-48 h-56 rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%]'
-                  : 'w-52 h-52 rounded-[2rem]'
-              }`}
-                   style={{ boxShadow: '0 0 30px rgba(255,255,255,0.4), 0 0 60px rgba(252,211,77,0.2)' }}>
-                <img src={base + artSrc} alt={stageName} className="w-full h-full object-cover scale-110" />
+              {/* Painted campfire scene — framed illustration with its own cream painted border.
+                  Fades to surface at the bottom so cards below land on cream paper. */}
+              <div className="relative w-full max-w-[420px]">
+                <img
+                  src={base + sceneSrc}
+                  alt={t('hub.campfire.alt') || `${heroName} am Lagerfeuer`}
+                  className="w-full h-auto companion-breathe select-none"
+                  style={{ filter: 'drop-shadow(0 14px 22px rgba(18,67,70,0.22))' }}
+                  draggable={false}
+                />
+
+                {/* Fade-to-cream at the bottom so the illustration dissolves into the page */}
+                <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none"
+                     style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(255,248,242,0.45) 50%, #fff8f2 100%)' }}
+                     aria-hidden="true" />
+
+                {/* Floating embers rising from the fire area (roughly centered-right above the flame) */}
+                <div className="absolute inset-0 pointer-events-none overflow-visible" aria-hidden="true">
+                  <span className="ember" style={{ bottom: '32%', left: '52%', '--delay': '0s',   '--dur': '4.8s', '--drift': '14px' }} />
+                  <span className="ember" style={{ bottom: '34%', left: '58%', '--delay': '1.2s', '--dur': '5.4s', '--drift': '-10px' }} />
+                  <span className="ember" style={{ bottom: '28%', left: '64%', '--delay': '2.0s', '--dur': '4.2s', '--drift': '6px' }} />
+                  <span className="ember" style={{ bottom: '36%', left: '48%', '--delay': '0.6s', '--dur': '5.0s', '--drift': '-14px' }} />
+                </div>
               </div>
 
-              <div className="absolute -bottom-2 px-6 py-2 rounded-full z-20"
-                   style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.5)' }}>
-                <p className="font-bold text-[12px] font-label uppercase tracking-[0.2em] text-primary-container">
-                  {t('hub.companion.stage', { stage: stageNum })} {stageName}
+              {/* Stage nameplate — painted banner under the scene */}
+              <div className="-mt-4 relative z-10 px-5 py-1.5 rounded-full"
+                   style={{
+                     background: 'rgba(255,248,242,0.95)',
+                     border: '1px solid rgba(18,67,70,0.15)',
+                     boxShadow: '0 6px 14px -4px rgba(18,67,70,0.18), inset 0 1px 0 rgba(255,255,255,0.9)',
+                   }}>
+                <p className="font-bold text-[11px] font-label uppercase tracking-[0.22em] text-primary-container whitespace-nowrap">
+                  {t('hub.companion.stage', { stage: stageNum })} · {stageName}
                 </p>
               </div>
             </section>
@@ -176,30 +198,53 @@ export default function Hub({ onNavigate }) {
         )}
 
         {/* ── Daily Summary Card ── */}
-        <div className="p-6 rounded-2xl relative overflow-hidden"
-             style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="font-headline font-bold text-xl text-primary-container">
+        <button onClick={() => onNavigate?.('quests')}
+                className="w-full p-6 rounded-2xl relative overflow-hidden text-left active:scale-[0.98] transition-transform"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(252,235,200,0.78) 60%, rgba(162,208,212,0.55) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255,255,255,0.85)',
+                  boxShadow: '0 12px 36px -8px rgba(18,67,70,0.18), inset 0 1px 0 rgba(255,255,255,0.6)'
+                }}>
+          {/* decorative corner sparkle */}
+          <span className="absolute top-3 right-20 text-base opacity-60 select-none" aria-hidden="true">✦</span>
+          <span className="absolute bottom-3 left-5 text-xs opacity-40 select-none" aria-hidden="true">✦</span>
+
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-[11px] font-label uppercase tracking-[0.18em] text-secondary mb-1.5">
+                {lang === 'de' ? 'HEUTE' : 'TODAY'}
+              </p>
+              <h3 className="font-headline font-extrabold text-2xl text-primary-container leading-tight">
                 {allDone ? t('hub.allDone.title') : t('hub.remaining', { count: remaining })}
               </h3>
-              <p className="font-body text-on-surface-variant text-sm">
+              <p className="font-body text-on-surface-variant text-sm mt-1">
                 {allDone ? t('hub.allDone.subtitle') : t('hub.keepGoing')}
               </p>
             </div>
-            <div className="relative w-16 h-16 shrink-0">
-              <svg className="w-full h-full -rotate-90">
-                <circle cx="32" cy="32" r="28" fill="transparent" stroke="rgba(18,67,70,0.1)" strokeWidth="5" />
-                <circle cx="32" cy="32" r="28" fill="transparent" stroke="#fcd34d"
-                  strokeWidth="5" strokeLinecap="round"
+
+            {/* Progress ring with quest count in center */}
+            <div className="relative w-20 h-20 shrink-0">
+              <svg key={done} className="progress-ring-anim w-full h-full -rotate-90" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="28" fill="transparent" stroke="rgba(18,67,70,0.12)" strokeWidth="6" />
+                <circle cx="32" cy="32" r="28" fill="transparent"
+                  stroke={allDone ? '#34d399' : '#fcd34d'}
+                  strokeWidth="6" strokeLinecap="round"
                   strokeDasharray="176" strokeDashoffset={176 - pct * 176} />
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
+                {allDone ? (
+                  <span className="material-symbols-outlined text-3xl" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                ) : (
+                  <>
+                    <span className="font-headline font-extrabold text-xl text-primary-container">{done}</span>
+                    <span className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mt-0.5">/ {total}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
-        </div>
+        </button>
 
         {/* ── Daily Check-in (collapsible mood + water) ── */}
         <details className="group rounded-2xl overflow-hidden"
