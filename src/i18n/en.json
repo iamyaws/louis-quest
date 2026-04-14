@@ -587,6 +587,18 @@
   "care.status.loved": "Loved!",
   "care.status.happy": "Happy",
   "care.mysticCompanion": "Mystic Companion",
+
+  "zone.selector.label": "Places",
+  "zone.sanctuary.name": "Sanctuary",
+  "zone.sanctuary.flavor": "Where the magic begins.",
+  "zone.sanctuary.unlockHint": "Always open to you.",
+  "zone.meadow.name": "Meadow",
+  "zone.meadow.flavor": "The flowers smell like adventure.",
+  "zone.meadow.unlockHint": "Opens when Ronki hatches.",
+  "zone.cave.name": "Mist Cave",
+  "zone.cave.flavor": "Stones whisper ancient secrets.",
+  "zone.cave.unlockHint": "Opens when Ronki reaches Juvenile.",
+
   "care.stepsTo": "{count} more until {name}",
   "care.done": "Done!",
   "care.wellbeing": "Daily Wellbeing",

@@ -587,6 +587,18 @@
   "care.status.loved": "Geliebt!",
   "care.status.happy": "Glücklich",
   "care.mysticCompanion": "Mystic Companion",
+
+  "zone.selector.label": "Orte",
+  "zone.sanctuary.name": "Heiligtum",
+  "zone.sanctuary.flavor": "Hier beginnt die Magie.",
+  "zone.sanctuary.unlockHint": "Immer offen für dich.",
+  "zone.meadow.name": "Wiese",
+  "zone.meadow.flavor": "Die Blumen duften nach Abenteuer.",
+  "zone.meadow.unlockHint": "Öffnet sich, wenn Ronki aus dem Ei schlüpft.",
+  "zone.cave.name": "Nebel-Höhle",
+  "zone.cave.flavor": "Steine flüstern uralte Geheimnisse.",
+  "zone.cave.unlockHint": "Offen wenn Ronki Jungtier wird.",
+
   "care.stepsTo": "Noch {count} bis {name}",
   "care.done": "Erledigt!",
   "care.wellbeing": "Tägliches Wohlbefinden",

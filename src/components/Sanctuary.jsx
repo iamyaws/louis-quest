@@ -7,6 +7,8 @@ import GearVault from './GearVault';
 import { ORB_MILESTONES, ORB_META } from '../constants';
 import { useVoice } from '../companion/useVoice';
 import VoiceBubble from './VoiceBubble';
+import { useZones } from '../world/useZones';
+import ZoneSelector from './ZoneSelector';
 
 const STAGES = [
   { name: 'Ei', emoji: '🥚', threshold: 0 },
@@ -20,6 +22,7 @@ export default function Sanctuary() {
   const { t } = useTranslation();
   const { state, actions } = useTask();
   const voice = useVoice();
+  const zones = useZones();
   const base = import.meta.env.BASE_URL;
   const stageName = (i) => [t('companion.stage.egg'), t('companion.stage.baby'), t('companion.stage.juvenile'), t('companion.stage.pride'), t('companion.stage.legendary')][i];
 
@@ -50,12 +53,28 @@ export default function Sanctuary() {
   return (
     <div className="relative min-h-dvh pb-32">
       <div className="fixed inset-0 -z-20">
-        <img src={base + 'art/bg-teal-soft.png'} alt="" className="w-full h-full object-cover" />
+        <img
+          src={base + 'art/bg-teal-soft.png'}
+          alt=""
+          className="w-full h-full object-cover transition-[filter] duration-700 ease-out"
+          style={{ filter: zones.activeZone.bgFilter }}
+        />
       </div>
       <div className="fixed inset-0 -z-10" style={{ background: 'rgba(255,248,241,0.55)' }} />
 
       <main className="px-5 max-w-lg mx-auto"
             style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
+
+        {/* Zone selector — lets Louis wander between Sanctuary / Meadow / Nebel-Höhle */}
+        <div className="mb-4">
+          <ZoneSelector
+            zones={zones.zones}
+            activeZone={zones.activeZone}
+            lockedAttemptZoneId={zones.lockedAttemptZoneId}
+            onSelect={zones.setActiveZone}
+            isUnlocked={zones.isUnlocked}
+          />
+        </div>
 
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -98,6 +117,14 @@ export default function Sanctuary() {
             <div className="w-full mt-4 text-center">
               <h2 className="font-headline font-bold text-2xl text-primary">Ronki</h2>
               <p className="text-xs font-label text-outline uppercase" style={{ letterSpacing: '0.2em' }}>{t('care.mysticCompanion')}</p>
+              {/* Zone flavor — one painterly line that changes with location */}
+              <p
+                className="text-sm font-body mt-2 italic transition-opacity duration-500"
+                style={{ color: zones.activeZone.accent, opacity: 0.85 }}
+                key={zones.activeZone.id}
+              >
+                {zones.activeZone.emoji} {t(zones.activeZone.flavorKey)}
+              </p>
               <div className="h-3 w-full rounded-full overflow-hidden shadow-inner mt-3"
                    style={{ background: 'rgba(255,255,255,0.5)' }}>
                 <div className="h-full rounded-full" style={{ width: progressPct + '%', background: 'linear-gradient(90deg, #124346, #2d5a5e)' }} />
