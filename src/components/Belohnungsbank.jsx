@@ -49,36 +49,58 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         </div>
       </section>
 
-      {/* ── Dual Balance Cards ── */}
+      {/* ── Dual Balance Cards — painterly parchment + sage palette ── */}
       <div className="grid grid-cols-2 gap-4 mb-8">
-        {/* HP Balance */}
-        <div className="p-6 rounded-2xl relative overflow-hidden shadow-lg"
-             style={{ background: 'linear-gradient(135deg, #5300b7, #6d28d9)' }}>
-          <div className="flex items-center gap-2 mb-2">
-            <Pearl size={20} dark />
-            <p className="font-label font-bold uppercase tracking-widest text-xs text-white/60">{t('hero.hp')}</p>
+        {/* HP Balance — gilded parchment */}
+        <div className="p-6 rounded-2xl relative overflow-hidden"
+             style={{
+               background: 'linear-gradient(140deg, #fef3c7 0%, #fcd34d 55%, #eab308 100%)',
+               border: '1.5px solid rgba(161, 98, 7, 0.25)',
+               boxShadow: '0 10px 24px -10px rgba(161,98,7,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
+             }}>
+          {/* Painted gold-dust texture overlay for depth */}
+          <div className="absolute inset-0 opacity-40 mix-blend-overlay pointer-events-none"
+               style={{
+                 backgroundImage: `url(${import.meta.env.BASE_URL}art/bg-gold-dust.webp)`,
+                 backgroundSize: 'cover',
+                 backgroundPosition: 'center',
+               }} />
+          <div className="relative flex items-center gap-2 mb-2">
+            <Pearl size={20} />
+            <p className="font-label font-bold uppercase tracking-widest text-xs" style={{ color: '#7a4a05' }}>{t('hero.hp')}</p>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-4xl font-headline font-bold text-white">{hp}</span>
-            <span className="text-sm font-label font-bold text-white/80">HP</span>
+          <div className="relative flex items-baseline gap-1">
+            <span className="text-4xl font-headline font-bold" style={{ color: '#3b2802' }}>{hp}</span>
+            <span className="text-sm font-label font-bold" style={{ color: '#7a4a05' }}>HP</span>
           </div>
-          <div className="absolute -bottom-3 -right-3 opacity-10">
-            <Pearl size={64} dark />
+          <div className="absolute -bottom-3 -right-3 opacity-20">
+            <Pearl size={64} />
           </div>
         </div>
 
-        {/* Screen Minutes Balance */}
-        <div className="p-6 rounded-2xl relative overflow-hidden shadow-lg"
-             style={{ background: 'linear-gradient(135deg, #00b4d8, #00CEC9)' }}>
-          <div className="flex items-center gap-2 mb-2">
+        {/* Screen Minutes Balance — painted sage/teal */}
+        <div className="p-6 rounded-2xl relative overflow-hidden"
+             style={{
+               background: 'linear-gradient(140deg, #d1eae2 0%, #86d7b6 55%, #4ca88c 100%)',
+               border: '1.5px solid rgba(0, 81, 59, 0.25)',
+               boxShadow: '0 10px 24px -10px rgba(0,81,59,0.35), inset 0 1px 0 rgba(255,255,255,0.5)',
+             }}>
+          {/* Painted teal-brush texture overlay */}
+          <div className="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none"
+               style={{
+                 backgroundImage: `url(${import.meta.env.BASE_URL}art/bg-teal-soft.webp)`,
+                 backgroundSize: 'cover',
+                 backgroundPosition: 'center',
+               }} />
+          <div className="relative flex items-center gap-2 mb-2">
             <Hourglass size={20} dark />
-            <p className="font-label font-bold uppercase tracking-widest text-xs text-white/70">{t('shop.screenMinutes')}</p>
+            <p className="font-label font-bold uppercase tracking-widest text-xs" style={{ color: '#00513b' }}>{t('shop.screenMinutes')}</p>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-4xl font-headline font-bold text-white">{screenMin}</span>
-            <span className="text-sm font-label font-bold text-white/80">MIN</span>
+          <div className="relative flex items-baseline gap-1">
+            <span className="text-4xl font-headline font-bold" style={{ color: '#00291d' }}>{screenMin}</span>
+            <span className="text-sm font-label font-bold" style={{ color: '#00513b' }}>MIN</span>
           </div>
-          <div className="absolute -bottom-3 -right-3 opacity-10">
+          <div className="absolute -bottom-3 -right-3 opacity-20">
             <Hourglass size={64} dark />
           </div>
         </div>
@@ -87,9 +109,9 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
       {/* ── Mini-Spiele Entry ── */}
       <button onClick={() => onNavigate?.('games')}
         className="w-full rounded-2xl p-5 mb-8 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
-        style={{ background: 'linear-gradient(135deg, rgba(252,211,77,0.15), rgba(83,0,183,0.06))', border: '1.5px solid rgba(252,211,77,0.3)' }}>
+        style={{ background: 'linear-gradient(135deg, rgba(252,211,77,0.2), rgba(162,208,212,0.18))', border: '1.5px solid rgba(252,211,77,0.35)' }}>
         <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
-             style={{ background: 'rgba(83,0,183,0.08)' }}>
+             style={{ background: 'rgba(252,211,77,0.22)' }}>
           <span className="material-symbols-outlined text-2xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>sports_esports</span>
         </div>
         <div className="flex-1">

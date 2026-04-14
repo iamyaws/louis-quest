@@ -119,11 +119,11 @@ export default function Journal() {
         /* ══ CLOSED BOOK — summary card ══ */
         <section className="mb-8 rounded-2xl overflow-hidden"
                  style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
-          {/* Book cover */}
+          {/* Book cover — painted parchment + burgundy leather */}
           <div className="p-6 flex items-center gap-4"
-               style={{ background: 'linear-gradient(135deg, rgba(109,40,217,0.08), rgba(252,211,77,0.08))' }}>
+               style={{ background: 'linear-gradient(135deg, rgba(252,211,77,0.18), rgba(18,67,70,0.08))' }}>
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                 style={{ background: '#6d28d9', boxShadow: '0 4px 12px rgba(109,40,217,0.3)' }}>
+                 style={{ background: 'linear-gradient(140deg, #b45309 0%, #7c2d12 100%)', boxShadow: '0 4px 12px rgba(124,45,18,0.35), inset 0 1px 0 rgba(255,255,255,0.25)' }}>
               <span className="material-symbols-outlined text-white text-3xl"
                     style={{ fontVariationSettings: "'FILL' 1" }}>menu_book</span>
             </div>
@@ -228,17 +228,24 @@ export default function Journal() {
                 const isSelected = state.moodAM === i;
                 return (
                   <button key={i}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-2xl transition-all duration-300 active:scale-95 ${
-                      isSelected ? 'text-white shadow-xl scale-105' : 'bg-white shadow-sm'
+                    aria-pressed={isSelected}
+                    className={`flex flex-col items-center gap-2 py-5 px-2 rounded-2xl transition-all duration-300 active:scale-95 ${
+                      isSelected ? 'scale-[1.04]' : ''
                     }`}
                     style={isSelected ? {
-                      background: '#6d28d9',
-                      boxShadow: '0 8px 24px rgba(109,40,217,0.3)',
-                    } : { border: '2px solid rgba(0,0,0,0.04)' }}
+                      background: 'linear-gradient(140deg, #fef3c7 0%, #fcd34d 100%)',
+                      border: '2.5px solid #eab308',
+                      boxShadow: '0 10px 24px -6px rgba(234,179,8,0.5), inset 0 1px 0 rgba(255,255,255,0.7)',
+                      color: '#3b2802',
+                    } : {
+                      background: '#ffffff',
+                      border: '2px solid rgba(18,67,70,0.08)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                    }}
                     onClick={() => { SFX.play('pop'); actions.setMood('moodAM', i); }}
                   >
-                    <span className={`text-3xl ${!isSelected ? 'grayscale' : ''}`}>{emoji}</span>
-                    <span className="font-label text-xs font-bold uppercase">{moodLabels[i]}</span>
+                    <span className={`text-5xl ${!isSelected ? 'grayscale opacity-80' : ''}`} style={{ lineHeight: 1 }}>{emoji}</span>
+                    <span className="font-label text-sm font-extrabold uppercase tracking-wide text-center leading-tight">{moodLabels[i]}</span>
                   </button>
                 );
               })}
@@ -252,7 +259,7 @@ export default function Journal() {
             <p className="font-body text-base text-primary font-bold mb-4">{todayPrompt}</p>
             <textarea
               className="w-full rounded-xl p-4 font-body text-base text-on-surface resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-              style={{ background: 'rgba(109,40,217,0.04)', border: '1.5px solid rgba(109,40,217,0.12)', minHeight: 100 }}
+              style={{ background: 'rgba(252,211,77,0.08)', border: '1.5px solid rgba(18,67,70,0.15)', minHeight: 100 }}
               placeholder={t('journal.memory.placeholder')}
               value={memory}
               onChange={e => setMemory(e.target.value)}

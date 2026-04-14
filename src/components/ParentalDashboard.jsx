@@ -56,9 +56,16 @@ export default function ParentalDashboard({ onClose }) {
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(255,248,241,0.6)' }} />
 
         <button onClick={onClose}
-          className="absolute top-5 right-5 z-10 w-10 h-10 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.5)' }}>
-          <span className="material-symbols-outlined text-on-surface-variant">close</span>
+          aria-label="Schließen"
+          className="fixed right-3 z-[300] w-12 h-12 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+          style={{
+            top: 'calc(0.75rem + env(safe-area-inset-top, 0px))',
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(0,0,0,0.08)',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.14)',
+          }}>
+          <span className="material-symbols-outlined text-on-surface-variant text-2xl">close</span>
         </button>
 
         <div className="relative z-10 flex flex-col items-center">

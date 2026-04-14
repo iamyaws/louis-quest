@@ -394,11 +394,18 @@ export default function Hub({ onNavigate }) {
                 <div className="fixed inset-0 z-[200] flex flex-col overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
                   {/* Background texture */}
                   <img src={base + 'art/bg-emerald-mist.png'} alt="" className="fixed inset-0 w-full h-full object-cover pointer-events-none" style={{ zIndex: -1 }} />
-                  {/* Close button */}
+                  {/* Close button — safe-area aware, always tappable */}
                   <button onClick={() => setShowBossDetail(false)}
-                    className="fixed top-5 right-5 z-50 w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
-                    <span className="material-symbols-outlined text-white text-xl">close</span>
+                    aria-label="Schließen"
+                    className="fixed right-3 z-[300] w-12 h-12 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+                    style={{
+                      top: 'calc(0.75rem + env(safe-area-inset-top, 0px))',
+                      background: 'rgba(0,0,0,0.35)',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255,255,255,0.25)',
+                      boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+                    }}>
+                    <span className="material-symbols-outlined text-white text-2xl">close</span>
                   </button>
 
                   {/* VS Face-off */}

@@ -52,15 +52,19 @@ export default function Sanctuary() {
 
   return (
     <div className="relative min-h-dvh pb-32">
-      <div className="fixed inset-0 -z-20">
-        <img
-          src={base + 'art/bg-teal-soft.png'}
-          alt=""
-          className="w-full h-full object-cover transition-[filter] duration-700 ease-out"
-          style={{ filter: zones.activeZone.bgFilter }}
-        />
-      </div>
-      <div className="fixed inset-0 -z-10" style={{ background: 'rgba(255,248,241,0.55)' }} />
+      {/* Soft painted backdrop — contained gold halo + teal wash, fades to cream so cards stay readable */}
+      <div className="fixed inset-0 -z-20" style={{ background: '#fff8f2' }} />
+      <div className="fixed inset-x-0 top-0 h-[60vh] -z-10 pointer-events-none transition-[filter] duration-700 ease-out"
+           style={{
+             backgroundImage: `url(${base}art/bg-teal-soft.webp)`,
+             backgroundSize: 'cover',
+             backgroundPosition: 'top center',
+             WebkitMaskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.75) 45%, transparent 100%)',
+             maskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.75) 45%, transparent 100%)',
+             opacity: 0.7,
+             filter: zones.activeZone.bgFilter,
+           }}
+           aria-hidden="true" />
 
       <main className="px-5 max-w-lg mx-auto"
             style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
@@ -138,36 +142,63 @@ export default function Sanctuary() {
           </div>
         </section>
 
-        {/* Tamagotchi Stat Meters */}
+        {/* Tamagotchi Stat Meters — painted parchment with gradient-washed bars */}
         <section className="grid grid-cols-3 gap-3 mb-6">
           {/* Hunger */}
-          <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
+          <div className="rounded-2xl p-3"
+               style={{
+                 background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(254,243,199,0.6) 100%)',
+                 border: '1.5px solid rgba(234,179,8,0.22)',
+                 boxShadow: '0 4px 10px -4px rgba(18,67,70,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
+               }}>
             <div className="flex items-center gap-1.5 mb-2">
-              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>restaurant</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#d97706', fontVariationSettings: "'FILL' 1" }}>restaurant</span>
               <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>{t('care.hunger')}</span>
             </div>
-            <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(252,211,77,0.2)' }}>
-              <div className="h-full rounded-full transition-all duration-500" style={{ width: state.catFed ? '85%' : '40%', background: '#fcd34d' }} />
+            <div className="h-3 w-full rounded-full overflow-hidden" style={{ background: 'rgba(234,179,8,0.15)', boxShadow: 'inset 0 1px 2px rgba(161,98,7,0.15)' }}>
+              <div className="h-full rounded-full transition-all duration-500" style={{
+                width: state.catFed ? '85%' : '40%',
+                background: 'linear-gradient(90deg, #fde68a, #fcd34d 60%, #eab308)',
+                boxShadow: '0 0 8px rgba(252,211,77,0.5)',
+              }} />
             </div>
           </div>
           {/* Glück */}
-          <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
+          <div className="rounded-2xl p-3"
+               style={{
+                 background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(254,226,226,0.6) 100%)',
+                 border: '1.5px solid rgba(186,26,26,0.2)',
+                 boxShadow: '0 4px 10px -4px rgba(18,67,70,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
+               }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#ba1a1a', fontVariationSettings: "'FILL' 1" }}>favorite</span>
               <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>{t('care.happiness')}</span>
             </div>
-            <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(186,26,26,0.1)' }}>
-              <div className="h-full rounded-full transition-all duration-500" style={{ width: (allCareDone ? 95 : Math.min(95, careDoneCount * 30 + 5)) + '%', background: '#ba1a1a' }} />
+            <div className="h-3 w-full rounded-full overflow-hidden" style={{ background: 'rgba(186,26,26,0.12)', boxShadow: 'inset 0 1px 2px rgba(147,0,10,0.15)' }}>
+              <div className="h-full rounded-full transition-all duration-500" style={{
+                width: (allCareDone ? 95 : Math.min(95, careDoneCount * 30 + 5)) + '%',
+                background: 'linear-gradient(90deg, #fecaca, #f87171 55%, #dc2626)',
+                boxShadow: '0 0 8px rgba(239,68,68,0.45)',
+              }} />
             </div>
           </div>
           {/* Energie */}
-          <div className="rounded-2xl p-3 shadow-sm" style={{ background: '#ffffff', border: '1px solid rgba(18,67,70,0.05)' }}>
+          <div className="rounded-2xl p-3"
+               style={{
+                 background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(209,234,226,0.6) 100%)',
+                 border: '1.5px solid rgba(18,67,70,0.2)',
+                 boxShadow: '0 4px 10px -4px rgba(18,67,70,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
+               }}>
             <div className="flex items-center gap-1.5 mb-2">
               <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#124346', fontVariationSettings: "'FILL' 1" }}>bolt</span>
               <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>{t('care.energy')}</span>
             </div>
-            <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
-              <div className="h-full rounded-full transition-all duration-500" style={{ width: state.catPlayed ? '60%' : '30%', background: '#124346' }} />
+            <div className="h-3 w-full rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.12)', boxShadow: 'inset 0 1px 2px rgba(11,45,47,0.15)' }}>
+              <div className="h-full rounded-full transition-all duration-500" style={{
+                width: state.catPlayed ? '60%' : '30%',
+                background: 'linear-gradient(90deg, #a2d0d4, #5eead4 55%, #0d9488)',
+                boxShadow: '0 0 8px rgba(94,234,212,0.5)',
+              }} />
             </div>
           </div>
         </section>
