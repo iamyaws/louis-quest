@@ -414,7 +414,7 @@ export default function TaskList() {
                      style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)' }}>
                   <span className="text-3xl shrink-0">{item.emoji}</span>
                   <div className="flex-1">
-                    <p className="font-label font-bold text-on-surface">{t('quest.' + item.id)}</p>
+                    <p className="font-label font-bold text-on-surface">{item.name}</p>
                     <p className="font-body text-sm text-on-surface-variant">{item.reason}</p>
                   </div>
                 </div>
