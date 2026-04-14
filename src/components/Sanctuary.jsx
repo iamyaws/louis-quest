@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import { Pearl } from './CurrencyIcons';
 import GearVault from './GearVault';
 import { ORB_MILESTONES, ORB_META } from '../constants';
+import { useVoice } from '../companion/useVoice';
+import VoiceBubble from './VoiceBubble';
 
 const STAGES = [
   { name: 'Ei', emoji: '🥚', threshold: 0 },
@@ -17,8 +19,16 @@ const STAGES = [
 export default function Sanctuary() {
   const { t } = useTranslation();
   const { state, actions } = useTask();
+  const voice = useVoice();
   const base = import.meta.env.BASE_URL;
   const stageName = (i) => [t('companion.stage.egg'), t('companion.stage.baby'), t('companion.stage.juvenile'), t('companion.stage.pride'), t('companion.stage.legendary')][i];
+
+  // One greeting when the Sanctuary view opens.
+  useEffect(() => {
+    voice.say('sanctuary_open');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!state) return null;
 
   const evo = state.catEvo || 0;
@@ -30,10 +40,11 @@ export default function Sanctuary() {
   const allCareDone = state.catFed && state.catPetted && state.catPlayed;
   const careDoneCount = [state.catFed, state.catPetted, state.catPlayed].filter(Boolean).length;
 
-  const handleCare = (action) => {
+  const handleCare = (action, careKey) => {
     SFX.play('pop');
     if (navigator.vibrate) navigator.vibrate(100);
     action();
+    if (careKey) voice.say('care_action', { careAction: careKey });
   };
 
   return (
@@ -80,7 +91,8 @@ export default function Sanctuary() {
           </div>
 
           <div className="relative z-10 flex flex-col items-center">
-            <div className="w-56 h-56 flex items-center justify-center">
+            <div className="relative w-56 h-56 flex items-center justify-center">
+              <VoiceBubble line={voice.line} onDismiss={voice.dismiss} variant="float" />
               <img src={base + (currentStage === 0 ? 'art/egg-glow.webp' : 'art/dragon-baby.webp')} alt="Ronki" className="w-full h-full object-contain" />
             </div>
             <div className="w-full mt-4 text-center">
@@ -137,7 +149,7 @@ export default function Sanctuary() {
         <section className="grid grid-cols-3 gap-4 mb-6">
           {/* Feed */}
           <button className={'flex flex-col items-center gap-3 active:scale-90' + (state.catFed ? ' opacity-50' : '')}
-            onClick={() => !state.catFed && handleCare(actions.feedCompanion)}
+            onClick={() => !state.catFed && handleCare(actions.feedCompanion, 'fed')}
             disabled={state.catFed}>
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
                  style={{ background: state.catFed ? '#d1fae5' : '#ffffff', border: state.catFed ? '2px solid #34d399' : '1px solid rgba(18,67,70,0.05)' }}>
@@ -157,7 +169,7 @@ export default function Sanctuary() {
 
           {/* Pet */}
           <button className={'flex flex-col items-center gap-3 active:scale-90' + (state.catPetted ? ' opacity-50' : '')}
-            onClick={() => !state.catPetted && handleCare(actions.petCompanion)}
+            onClick={() => !state.catPetted && handleCare(actions.petCompanion, 'petted')}
             disabled={state.catPetted}>
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
                  style={{ background: state.catPetted ? '#d1fae5' : '#fcd34d', border: state.catPetted ? '2px solid #34d399' : 'none' }}>
@@ -177,7 +189,7 @@ export default function Sanctuary() {
 
           {/* Play */}
           <button className={'flex flex-col items-center gap-3 active:scale-90' + (state.catPlayed ? ' opacity-50' : '')}
-            onClick={() => !state.catPlayed && handleCare(actions.playCompanion)}
+            onClick={() => !state.catPlayed && handleCare(actions.playCompanion, 'played')}
             disabled={state.catPlayed}>
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
                  style={{ background: state.catPlayed ? '#d1fae5' : '#ffffff', border: state.catPlayed ? '2px solid #34d399' : '1px solid rgba(18,67,70,0.05)' }}>

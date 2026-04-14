@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES, BOSS_TIERS, GEAR_ITEMS, CAT_STAGES, COMPANION_STAGES } from '../constants';
 import { useTask } from '../context/TaskContext';
 import { getLevel, getLvlProg, getCatStage } from '../utils/helpers';
@@ -8,6 +8,8 @@ import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
 import { BADGES } from '../constants';
 import { useTranslation } from '../i18n/LanguageContext';
+import { useVoice } from '../companion/useVoice';
+import VoiceBubble from './VoiceBubble';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -41,11 +43,18 @@ export default function Hub({ onNavigate }) {
   const { done, total, allDone, pct } = computed;
   const { t, locale } = useTranslation();
   const { weather } = useWeather();
+  const voice = useVoice();
   const base = import.meta.env.BASE_URL;
   const remaining = total - done;
   const MOOD_LABELS_I18N = [t('mood.sad'), t('mood.worried'), t('mood.okay'), t('mood.good'), t('mood.magical'), t('mood.tired')];
 
   const [showBossDetail, setShowBossDetail] = useState(false);
+
+  // Ronki greets Louis once when Hub mounts.
+  useEffect(() => {
+    voice.say('hub_open');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!state) return null;
 
@@ -110,9 +119,16 @@ export default function Hub({ onNavigate }) {
           const isEgg = catStage === 0;
 
           return (
-            <section className="relative flex flex-col items-center py-4">
+            <section className="relative flex flex-col items-center py-4 gap-3">
               <div className="absolute w-72 h-72 rounded-full blur-[80px] -z-10"
                    style={{ background: 'rgba(252,211,77,0.25)', animation: 'pulse 3s ease-in-out infinite' }} />
+
+              {/* Ronki's greeting chip — inline so it doesn't collide with stage badge / hero header */}
+              {voice.line && (
+                <div className="flex justify-center w-full px-6">
+                  <VoiceBubble line={voice.line} onDismiss={voice.dismiss} variant="chip" />
+                </div>
+              )}
 
               <div className={`relative overflow-hidden border-4 border-white shadow-2xl ${
                 isEgg
