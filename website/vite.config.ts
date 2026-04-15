@@ -21,5 +21,9 @@ export default defineConfig({
     globals: true,
     setupFiles: path.resolve(__dirname, 'src/test/setup.ts'),
     include: ['tests/**/*.test.{ts,tsx}'],
+    env: {
+      VITE_SUPABASE_URL: 'https://test.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'test-anon-key',
+    },
   },
 });
