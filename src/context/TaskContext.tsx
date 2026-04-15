@@ -479,6 +479,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       let boss = prev.boss ? { ...prev.boss } : null;
       let bossTrophies = [...(prev.bossTrophies || [])];
       let bossDmgToday = prev.bossDmgToday || 0;
+      let bossKilledToday = prev.bossKilledToday ?? false;
+      let arcBeatAdvancedToday = prev.arcBeatAdvancedToday ?? false;
       if (boss && boss.hp > 0) {
         // Calculate gear bonus from equipped courage stat
         const equipped = prev.equippedGear || {};
@@ -504,6 +506,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           if (bd) hp += bd.reward.hp + defenseBonus;
           screenMin += 3; // bonus screen minutes on boss defeat
           if (!bossTrophies.includes(boss.id)) bossTrophies.push(boss.id);
+          bossKilledToday = true;
         }
       }
 
@@ -575,10 +578,18 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       // If the completed quest is tagged as an arc beat, advance the arc state.
       let arcEngine = prev.arcEngine ?? initialArcState();
       if (q.arcBeatId) {
+        const prevBeatIndex = arcEngine.activeBeatIndex;
+        const prevCompletedLen = arcEngine.completedArcIds.length;
         arcEngine = advanceBeat(arcEngine, q.arcBeatId);
+        if (
+          arcEngine.activeBeatIndex !== prevBeatIndex ||
+          arcEngine.completedArcIds.length !== prevCompletedLen
+        ) {
+          arcBeatAdvancedToday = true;
+        }
       }
 
-      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine };
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday };
     });
     setToastTrigger(t => t + 1);
   }, []);
