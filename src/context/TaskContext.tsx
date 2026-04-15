@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import type { Quest, GameState, Boss } from '../types';
 import type { FamilyConfig, DragonVariant } from '../types/familyConfig';
 import type { ArcEngineState } from '../arcs/types';
-import { advanceBeat } from '../arcs/ArcEngine';
+import { advanceBeat, initialArcState } from '../arcs/ArcEngine';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
@@ -182,6 +182,7 @@ export function createInitialState(): TaskState {
     gamesPlayedToday: [],
     birthdayEpic: { done: [], completed: false },
     familyConfig: DEFAULT_FAMILY_CONFIG,
+    arcEngine: initialArcState(),
   };
 }
 
@@ -542,8 +543,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       }
 
       // If the completed quest is tagged as an arc beat, advance the arc state.
-      let arcEngine = prev.arcEngine;
-      if (q.arcBeatId && arcEngine) {
+      let arcEngine = prev.arcEngine ?? initialArcState();
+      if (q.arcBeatId) {
         arcEngine = advanceBeat(arcEngine, q.arcBeatId);
       }
 

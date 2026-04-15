@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTask } from '../context/TaskContext';
 import {
   initialArcState,
@@ -16,24 +16,25 @@ import type { ArcEngineState } from './types';
 
 export function useArc() {
   const { state, actions } = useTask();
+  // TODO: unify TaskState and GameState shapes so this cast can go away.
   const [arcState, setArcState] = useState<ArcEngineState>(() =>
     state ? expireCooldownIfReady(loadArcEngineState(state as any)) : initialArcState()
   );
 
   // Persist whenever arcState changes
   useEffect(() => {
-    if (actions.patchState) {
-      actions.patchState({ arcEngine: arcState });
-    }
-  }, [arcState]);
+    actions.patchState({ arcEngine: arcState });
+  }, [arcState, actions.patchState]);
 
-  // Hydrate once on mount from server/localStorage state
+  // Hydrate once when state transitions from null (async load completes)
+  const initializedRef = useRef(false);
   useEffect(() => {
-    if (state) {
+    if (state && !initializedRef.current) {
+      initializedRef.current = true;
+      // TODO: unify TaskState and GameState shapes so this cast can go away.
       setArcState(expireCooldownIfReady(loadArcEngineState(state as any)));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [state]);
 
   const offer = useCallback(() => setArcState(s => offerNextArc(s)), []);
   const accept = useCallback(() => setArcState(s => acceptOffer(s)), []);
