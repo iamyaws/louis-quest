@@ -370,12 +370,9 @@ export const UNLOCK_CONDITIONS: Record<string, UnlockCondition> = {
   // Gear items — calibrated so Louis gets one every ~1-2 days early on
   c_bowtie: { type: "tasks", value: 3, label: "3 Aufgaben", icon: "\u2705" },
   h_headband: { type: "tasks", value: 8, label: "8 Aufgaben", icon: "\u2705" },
-  h_sunglasses: { type: "streak", value: 2, label: "2-Tage Streak", icon: "\u{1F525}" },
   h_cape_red: { type: "boss", value: 1, label: "1 Boss besiegt", icon: "\u2694\uFE0F" },
   c_collar: { type: "tasks", value: 15, label: "15 Aufgaben", icon: "\u2705" },
-  c_scarf: { type: "streak", value: 5, label: "5-Tage Streak", icon: "\u{1F525}" },
   c_crown: { type: "tasks", value: 40, label: "40 Aufgaben", icon: "\u2705" },
-  h_wings: { type: "streak", value: 14, label: "14-Tage Streak", icon: "\u{1F525}" },
   // Room items
   rm_poster: { type: "tasks", value: 10, label: "10 Aufgaben", icon: "\u2705" },
   rm_plant: { type: "streak", value: 5, label: "5-Tage Streak", icon: "\u{1F525}" },
