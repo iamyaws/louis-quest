@@ -100,7 +100,6 @@ export function useVoice(): UseVoiceResult {
         timeOfDay: timeOfDay(),
         weather: weatherTag(weather),
         mood: null, // wired in 1b from Buch mood
-        streak: 0, // wired in 1b from streakMap max
         stage: stageTag(s.catEvo || 0),
         questsCompletedToday,
         careAction: extras.careAction,

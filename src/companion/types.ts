@@ -18,7 +18,6 @@ export interface VoiceContext {
   timeOfDay: TimeOfDay;
   weather: WeatherTag | null;
   mood: MoodTag | null;
-  streak: number;
   stage: StageTag;
   questsCompletedToday: number;
   careAction?: CareAction;

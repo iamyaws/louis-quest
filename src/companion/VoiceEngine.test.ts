@@ -7,7 +7,6 @@ const baseCtx: VoiceContext = {
   timeOfDay: 'morning',
   weather: null,
   mood: null,
-  streak: 0,
   stage: 'baby',
   questsCompletedToday: 0,
   lang: 'de',
