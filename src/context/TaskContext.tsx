@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import type { Quest, GameState, Boss } from '../types';
 import type { FamilyConfig, DragonVariant } from '../types/familyConfig';
 import type { ArcEngineState, RoutineBeat } from '../arcs/types';
+import type { DreamHighlightsData, PrevDaySnapshot } from '../dream/types'; // used in applyDayTransition (Task 4)
+import { buildHighlights } from '../dream/dreamHighlights';
 import { advanceBeat, initialArcState } from '../arcs/ArcEngine';
 import { findArc } from '../arcs/arcs';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
@@ -66,6 +68,9 @@ interface TaskState {
   familyConfig: FamilyConfig;
   _v2_economy_reset?: boolean;
   arcEngine?: ArcEngineState;
+  bossKilledToday?: boolean;
+  arcBeatAdvancedToday?: boolean;
+  dreamHighlights?: DreamHighlightsData;
 }
 
 interface TaskComputed {
@@ -184,6 +189,8 @@ export function createInitialState(): TaskState {
     birthdayEpic: { done: [], completed: false },
     familyConfig: DEFAULT_FAMILY_CONFIG,
     arcEngine: initialArcState(),
+    bossKilledToday: false,
+    arcBeatAdvancedToday: false,
   };
 }
 
@@ -239,6 +246,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           dailyWaterCount: raw.dailyWaterCount || 0,
           boss: raw.boss || null,
           bossTrophies: raw.bossTrophies || [],
+          bossKilledToday: raw.bossKilledToday ?? false,
+          arcBeatAdvancedToday: raw.arcBeatAdvancedToday ?? false,
+          dreamHighlights: raw.dreamHighlights,
           catFed: raw.catFed || false,
           catPetted: raw.catPetted || false,
           catPlayed: raw.catPlayed || false,

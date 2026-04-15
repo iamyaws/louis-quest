@@ -1,6 +1,7 @@
 // ═══ Ronki — Shared Type Definitions ═══
 import type { FamilyConfig } from './types/familyConfig';
 import type { ArcEngineState } from './arcs/types';
+import type { DreamHighlightsData } from './dream/types';
 
 export interface Hero {
   name: string;
@@ -259,6 +260,9 @@ export interface GameState {
   totalTaskDays: number;
   // ── Arc Engine (narrative episodes) ──
   arcEngine?: ArcEngineState;
+  bossKilledToday?: boolean;
+  arcBeatAdvancedToday?: boolean;
+  dreamHighlights?: DreamHighlightsData;
 }
 
 export interface ComputedState {
