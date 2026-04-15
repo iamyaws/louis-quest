@@ -12,6 +12,7 @@
     "dev:web": "vite --config website/vite.config.ts",
     "build:web": "vite build --config website/vite.config.ts",
     "preview:web": "vite preview --config website/vite.config.ts",
+    "prebuild:web": "tsx website/scripts/generate-sitemap.ts",
     "test:web": "vitest run --config website/vite.config.ts"
   },
   "dependencies": {
@@ -31,6 +32,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.2.1",
     "jsdom": "^29.0.2",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vite": "^5.4.19",
     "vitest": "^4.1.4"
