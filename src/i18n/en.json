@@ -37,7 +37,7 @@
   "hub.missions.title": "Epic Missions",
   "hub.missions.cta": "Start quest",
   "hub.missions.noActive": "Pick a new mission!",
-  "hub.screenTime": "Screen Time",
+  "hub.screenTime": "Sparkle Time",
   "hub.screenMin": "{min} min",
 
   "mood.sad": "Sad",
@@ -247,7 +247,7 @@
   "shop.owned": "Already redeemed",
   "shop.tooExpensive": "Not enough HP",
   "shop.section.rewards": "Rewards",
-  "shop.section.screen": "Screen Time",
+  "shop.section.screen": "Sparkle Time",
 
   "reward.audio": "Audiobook (25 min)",
   "reward.game20": "20 min Video Game",
@@ -408,7 +408,7 @@
   "game.pairs": "Pairs",
   "game.time": "Time",
 
-  "screen.title": "Screen Time",
+  "screen.title": "Sparkle Time",
   "screen.remaining": "Remaining",
   "screen.minutes": "Minutes",
   "screen.start": "Start timer",
@@ -574,18 +574,18 @@
 
   "shop.header.title": "Reward Shop",
   "shop.header.subtitle": "Turn points into great experiences!",
-  "shop.screenMinutes": "Screen Minutes",
+  "shop.screenMinutes": "Sparkle Time",
   "shop.miniGames": "Mini Games",
   "shop.miniGames.subtitle": "Play & collect bonus points!",
   "shop.familyAdventures": "Family Adventures",
   "shop.digitalTime": "Digital Time",
   "shop.rewardForDeeds": "Reward for your heroic deeds!",
-  "shop.screenReward": "Screen time as reward",
+  "shop.screenReward": "Sparkle Time reward",
   "shop.redeem": "Redeem",
   "shop.tooFew": "Too few",
   "shop.timerRunning": "Timer running",
   "shop.howItWorks": "How it works",
-  "shop.howItWorksBody": "Choose a reward and click Redeem. You earn Hero Points for completed quests, Screen Minutes are credited automatically!",
+  "shop.howItWorksBody": "Choose a reward and click Redeem. You earn Hero Points for completed quests, Sparkle Time is credited automatically!",
   "shop.admin": "Admin",
 
   "care.sanctuary": "Magical Sanctuary",

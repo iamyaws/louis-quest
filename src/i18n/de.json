@@ -37,7 +37,7 @@
   "hub.missions.title": "Epische Missionen",
   "hub.missions.cta": "Quest starten",
   "hub.missions.noActive": "Neue Mission wählen!",
-  "hub.screenTime": "Bildschirmzeit",
+  "hub.screenTime": "Funkelzeit",
   "hub.screenMin": "{min} Min",
 
   "mood.sad": "Traurig",
@@ -247,7 +247,7 @@
   "shop.owned": "Bereits eingelöst",
   "shop.tooExpensive": "Nicht genug HP",
   "shop.section.rewards": "Belohnungen",
-  "shop.section.screen": "Bildschirmzeit",
+  "shop.section.screen": "Funkelzeit",
 
   "reward.audio": "Hörspiel (25 Min)",
   "reward.game20": "20 Min Videospiel",
@@ -408,7 +408,7 @@
   "game.pairs": "Paare",
   "game.time": "Zeit",
 
-  "screen.title": "Bildschirmzeit",
+  "screen.title": "Funkelzeit",
   "screen.remaining": "Verbleibend",
   "screen.minutes": "Minuten",
   "screen.start": "Timer starten",
@@ -574,18 +574,18 @@
 
   "shop.header.title": "Belohnungsbank",
   "shop.header.subtitle": "Wandle Punkte in tolle Erlebnisse um!",
-  "shop.screenMinutes": "Screen-Minuten",
+  "shop.screenMinutes": "Funkelzeit",
   "shop.miniGames": "Mini-Spiele",
   "shop.miniGames.subtitle": "Spiele & sammle Bonus-Punkte!",
   "shop.familyAdventures": "Familien-Abenteuer",
   "shop.digitalTime": "Digitale Zeit",
   "shop.rewardForDeeds": "Belohnung für deine Heldentaten!",
-  "shop.screenReward": "Screen-Zeit als Belohnung",
+  "shop.screenReward": "Funkelzeit als Belohnung",
   "shop.redeem": "Einlösen",
   "shop.tooFew": "Zu wenig",
   "shop.timerRunning": "Timer läuft",
   "shop.howItWorks": "So funktioniert's",
-  "shop.howItWorksBody": "Wähle eine Belohnung und klicke auf Einlösen. Heldenpunkte bekommst du für erledigte Quests, Screen-Minuten werden automatisch gutgeschrieben!",
+  "shop.howItWorksBody": "Wähle eine Belohnung und klicke auf Einlösen. Heldenpunkte bekommst du für erledigte Quests, Funkelzeit wird automatisch gutgeschrieben!",
   "shop.admin": "Verwaltung",
 
   "care.sanctuary": "Ronki-Pflege",
