@@ -248,7 +248,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           bossTrophies: raw.bossTrophies || [],
           bossKilledToday: raw.bossKilledToday ?? false,
           arcBeatAdvancedToday: raw.arcBeatAdvancedToday ?? false,
-          dreamHighlights: raw.dreamHighlights,
+          dreamHighlights: raw.dreamHighlights?.highlights && typeof raw.dreamHighlights.seen === 'boolean'
+            ? raw.dreamHighlights
+            : undefined,
           catFed: raw.catFed || false,
           catPetted: raw.catPetted || false,
           catPlayed: raw.catPlayed || false,

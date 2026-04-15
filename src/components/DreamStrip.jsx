@@ -1,5 +1,5 @@
 // src/components/DreamStrip.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 
 // ─── Scene art components ────────────────────────────────────────────────────
@@ -252,6 +252,8 @@ export default function DreamStrip({ highlights, onDismiss }) {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [panelsReady, setPanelsReady] = useState(false);
+  const dismissTimerRef = useRef(null);
+  const dismissedRef = useRef(false);
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => setVisible(true));
@@ -259,13 +261,16 @@ export default function DreamStrip({ highlights, onDismiss }) {
     return () => {
       cancelAnimationFrame(frameId);
       clearTimeout(timerId);
+      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
     };
   }, []);
 
   const handleDismiss = () => {
+    if (dismissedRef.current) return;
+    dismissedRef.current = true;
     setVisible(false);
     setPanelsReady(false);
-    setTimeout(onDismiss, 360);
+    dismissTimerRef.current = setTimeout(onDismiss, 360);
   };
 
   return (
