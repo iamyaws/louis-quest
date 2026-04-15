@@ -61,7 +61,7 @@ export default function Hub({ onNavigate }) {
   const level = getLevel(state.xp || 0);
   const lvlProg = getLvlProg(state.xp || 0);
   const xpPct = lvlProg.need > 0 ? Math.min(100, (lvlProg.cur / lvlProg.need) * 100) : 0;
-  const heroName = state.familyConfig?.childName || t('hero.fallback');
+  const heroName = state.familyConfig?.childName || 'Ronki';
   const heroAvatar = state.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
 
   return (
@@ -70,7 +70,7 @@ export default function Hub({ onNavigate }) {
       {/* ── Top Bar (matches TopBar component style) ── */}
       <header className="flex justify-between items-center px-6 pb-2"
               style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
-        <button onClick={() => onNavigate?.('hero')} className="flex items-center gap-2 active:scale-95 transition-all">
+        <button onClick={() => onNavigate?.('ronki')} className="flex items-center gap-2 active:scale-95 transition-all">
           <div className="relative">
             <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden shadow-sm"
                  style={{ border: '2px solid rgba(18,67,70,0.15)' }}>
@@ -176,7 +176,7 @@ export default function Hub({ onNavigate }) {
           <div className="flex items-center gap-2 px-6 py-3 rounded-full"
                style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(16px)', border: '1px solid white', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
             <Pearl size={24} />
-            <span className="font-extrabold font-label text-sm text-primary-container">{`${state.hp || 0} ${t('hero.hp')}`}</span>
+            <span className="font-extrabold font-label text-sm text-primary-container">{`${state.hp || 0} ${t('hub.boss.detail.heroPoints')}`}</span>
           </div>
         </div>
 
@@ -415,7 +415,7 @@ export default function Hub({ onNavigate }) {
                     <div className="flex flex-col items-center flex-1">
                       <div className="w-24 h-24 rounded-full overflow-hidden border-4 shadow-xl"
                            style={{ borderColor: '#fcd34d', boxShadow: '0 0 20px rgba(252,211,77,0.4)' }}>
-                        <img src={base + 'art/egg-glow.webp'} alt={t('hero.fallback')} className="w-full h-full object-cover" />
+                        <img src={base + 'art/egg-glow.webp'} alt="Ronki" className="w-full h-full object-cover" />
                       </div>
                       <p className="font-headline font-bold text-white text-sm mt-2">{t('hub.boss.detail.hero')}</p>
                     </div>
