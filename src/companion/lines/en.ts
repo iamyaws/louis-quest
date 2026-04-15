@@ -42,4 +42,9 @@ export const linesEn: VoiceLine[] = [
   { id: 'en_idle_02', text: 'What did you learn today? I want to know.', triggers: ['idle'] },
   { id: 'en_idle_03', text: 'When I\u2019m big I\u2019ll be\u2026 I don\u2019t know. You?', triggers: ['idle'] },
   { id: 'en_idle_04', text: 'Do clouds feel soft, you think?', triggers: ['idle'] },
+
+  // ── Arc voice lines ──
+  { id: 'en_arc_cooldown_01', text: 'I am still resting. But your routines keep me warm.', triggers: ['hub_open'], arcPhase: 'cooldown' },
+  { id: 'en_arc_cooldown_02', text: 'Phew, that was an adventure. I need a little sleep. See you soon!', triggers: ['hub_open'], arcPhase: 'cooldown' },
+  { id: 'en_arc_active_01', text: 'We are in the middle of an adventure. Check the banner up top!', triggers: ['hub_open'], arcPhase: 'active' },
 ];

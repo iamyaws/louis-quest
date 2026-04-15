@@ -5,6 +5,7 @@ import useWeather from '../hooks/useWeather';
 import { getCatStage } from '../utils/helpers';
 import { pickLine, recordUse, pruneHistory } from './VoiceEngine';
 import { linesFor } from './voiceLines';
+import type { ArcLifecyclePhase } from '../arcs/types';
 import type {
   VoiceContext,
   VoiceLine,
@@ -72,6 +73,7 @@ function stageTag(catEvo: number): StageTag {
 
 export interface SayExtras {
   careAction?: CareAction;
+  arcPhase?: ArcLifecyclePhase;
 }
 
 export interface UseVoiceResult {
@@ -103,6 +105,7 @@ export function useVoice(): UseVoiceResult {
         stage: stageTag(s.catEvo || 0),
         questsCompletedToday,
         careAction: extras.careAction,
+        arcPhase: extras.arcPhase,
         lang: (lang === 'en' ? 'en' : 'de'),
       };
 

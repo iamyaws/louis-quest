@@ -55,6 +55,19 @@ describe('matchesContext', () => {
     expect(matchesContext(line, { ...ctx, careAction: 'fed' })).toBe(true);
     expect(matchesContext(line, { ...ctx, careAction: 'played' })).toBe(false);
   });
+
+  it('matches arcPhase context field', () => {
+    const line = L({ arcPhase: 'cooldown' });
+    expect(matchesContext(line, { ...baseCtx, arcPhase: 'cooldown' })).toBe(true);
+    expect(matchesContext(line, { ...baseCtx, arcPhase: 'idle' })).toBe(false);
+    expect(matchesContext(line, { ...baseCtx })).toBe(false); // no arcPhase in ctx
+  });
+
+  it('lines without arcPhase match any context', () => {
+    const line = L({ id: 'no_phase' });  // no arcPhase field
+    expect(matchesContext(line, { ...baseCtx, arcPhase: 'cooldown' })).toBe(true);
+    expect(matchesContext(line, { ...baseCtx })).toBe(true);
+  });
 });
 
 describe('pickLine', () => {

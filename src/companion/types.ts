@@ -1,6 +1,8 @@
 // Ronki's voice system — types shared across engine, hook, and line catalogs.
 // Voice tone: "curious younger friend" (Baby stage). Never lectures.
 
+import type { ArcLifecyclePhase } from '../arcs/types';
+
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
 export type WeatherTag = 'rain' | 'cold' | 'hot' | 'clear' | 'snow';
 export type MoodTag = 'magisch' | 'gut' | 'okay' | 'besorgt' | 'traurig' | 'müde';
@@ -21,6 +23,7 @@ export interface VoiceContext {
   stage: StageTag;
   questsCompletedToday: number;
   careAction?: CareAction;
+  arcPhase?: ArcLifecyclePhase;
   lang: 'de' | 'en';
 }
 
@@ -34,6 +37,7 @@ export interface VoiceLine {
   mood?: MoodTag[];
   stage?: StageTag[];
   careAction?: CareAction[];
+  arcPhase?: ArcLifecyclePhase;
   minQuestsToday?: number;
   cooldownHours?: number; // default 24
   weight?: number; // default 1

@@ -51,9 +51,9 @@ export default function Hub({ onNavigate }) {
   const remaining = total - done;
   const MOOD_LABELS_I18N = [t('mood.sad'), t('mood.worried'), t('mood.okay'), t('mood.good'), t('mood.magical'), t('mood.tired')];
 
-  const { phase, offer } = useArc();
+  const { phase: arcPhase, offer } = useArc();
   useEffect(() => {
-    if (phase === 'idle') {
+    if (arcPhase === 'idle') {
       offer();
     }
   }, []);  // mount-only — more nuanced timing lands in Phase 2
@@ -63,7 +63,7 @@ export default function Hub({ onNavigate }) {
 
   // Ronki greets Louis once when Hub mounts.
   useEffect(() => {
-    voice.say('hub_open');
+    voice.say('hub_open', { arcPhase });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
