@@ -37,8 +37,8 @@ export function Hero() {
             alt="Ronki, der Drachen-Gefährte, in einer sanft gemalten Szene seines Sanctuary."
             className="w-full h-auto rounded-2xl shadow-lg"
             loading="eager"
-            width={800}
-            height={900}
+            width={1600}
+            height={1200}
           />
         </motion.div>
       </div>

@@ -36,8 +36,8 @@ export function Pillars() {
                 alt={pillar.alt}
                 className="w-full aspect-[4/3] object-cover rounded-2xl shadow-sm"
                 loading="lazy"
-                width={480}
-                height={360}
+                width={800}
+                height={600}
               />
               <h3 className="text-2xl font-display leading-tight">{pillar.title}</h3>
               <p className="opacity-85 leading-relaxed">{pillar.body}</p>

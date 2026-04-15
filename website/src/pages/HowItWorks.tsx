@@ -49,8 +49,8 @@ export default function HowItWorks() {
                 alt="Drei Snapshots des Sanctuary über Wochen: leer, beginnend, gefüllt mit Erinnerungen."
                 className="w-full rounded-2xl shadow-sm my-4"
                 loading="lazy"
-                width={900}
-                height={400}
+                width={1200}
+                height={800}
               />
               <p>Eine Unterzone, die <strong>Hatching Chamber</strong>, hält Eier — die über Tage schlüpfen, nicht über Minuten. Anticipation statt Dopamin.</p>
             </div>
@@ -67,8 +67,8 @@ export default function HowItWorks() {
                 alt="Ein Raster aus Kreatur-Silhouetten auf Pergament, einige davon bereits entdeckt und bemalt."
                 className="w-full rounded-2xl shadow-sm my-4"
                 loading="lazy"
-                width={900}
-                height={600}
+                width={1200}
+                height={800}
               />
               <p>
                 Unterteilt in fünf Kapitel — <em>Wald, Himmel, Wasser, Traum, Herd</em> — damit die Gesamtzahl sich erreichbar anfühlt. Jede Entdeckung trägt eine Erinnerungszeile: <em>„Gefunden im Wiesen-Abschnitt am dritten Tag des Karten-Abenteuers."</em>

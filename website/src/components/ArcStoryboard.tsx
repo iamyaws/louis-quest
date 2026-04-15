@@ -60,8 +60,8 @@ function Beat({ beat, index }: { beat: typeof BEATS[number]; index: number }) {
         alt={beat.title}
         className="w-full aspect-[4/3] object-cover rounded-2xl shadow-md"
         loading="lazy"
-        width={640}
-        height={480}
+        width={1200}
+        height={900}
       />
       <div className="flex flex-col gap-3">
         <p className="text-sm uppercase tracking-widest text-ochre font-medium">{beat.label}</p>
