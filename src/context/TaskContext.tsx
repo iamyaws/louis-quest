@@ -636,11 +636,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         eggType: cfg?.eggType || prev.eggType,
         heroGender: cfg?.heroGender || prev.heroGender || null,
       };
-      if (cfg?.heroName) {
-        updated.familyConfig = { ...(updated.familyConfig || prev.familyConfig), childName: cfg.heroName };
-      }
-      if (cfg?.dragonVariant) {
-        updated.familyConfig = { ...(updated.familyConfig || prev.familyConfig), dragonVariant: cfg.dragonVariant };
+      const familyConfigPatch: Partial<FamilyConfig> = {};
+      if (cfg?.heroName) familyConfigPatch.childName = cfg.heroName;
+      if (cfg?.dragonVariant) familyConfigPatch.dragonVariant = cfg.dragonVariant;
+      if (Object.keys(familyConfigPatch).length > 0) {
+        updated.familyConfig = { ...prev.familyConfig, ...familyConfigPatch };
       }
       return updated;
     });
