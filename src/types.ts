@@ -1,5 +1,6 @@
 // ═══ Ronki — Shared Type Definitions ═══
 import type { FamilyConfig } from './types/familyConfig';
+import type { ArcEngineState } from './arcs/types';
 
 export interface Hero {
   name: string;
@@ -256,6 +257,8 @@ export interface GameState {
   dailyWaterCount: number;
   // Total task days (never resets)
   totalTaskDays: number;
+  // ── Arc Engine (narrative episodes) ──
+  arcEngine?: ArcEngineState;
 }
 
 export interface ComputedState {
