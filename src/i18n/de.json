@@ -520,6 +520,8 @@
   "hub.missions.choose": "Wähle dein Abenteuer!",
   "hub.achievement.latest": "Neueste Errungenschaft",
   "hub.kodex.title": "Helden-Kodex",
+  "hub.leitstern.title": "Leitstern",
+  "hub.weather.loading": "…",
   "hub.kodex.subtitle": "Unsere Familien-Werte",
 
   "task.tasksLeft": "Noch {count} Aufgaben",

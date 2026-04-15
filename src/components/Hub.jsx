@@ -820,25 +820,68 @@ export default function Hub({ onNavigate }) {
           );
         })()}
 
-        {/* ── Helden-Kodex Card — Morgenwald ── */}
-        <button
-          className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98] relative overflow-hidden"
-          style={{ background: '#fef9c3', border: '1.5px solid rgba(101,163,13,0.15)', boxShadow: '0 4px 16px rgba(101,163,13,0.08)' }}
-          onClick={() => onNavigate?.('kodex')}
-        >
-          <img src={base + 'art/tex-morgenwald.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none" />
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(254,249,195,0.55), rgba(236,252,203,0.5))' }} />
-          <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-               style={{ background: 'linear-gradient(135deg, #65a30d, #84cc16)', boxShadow: '0 2px 8px rgba(101,163,13,0.3)' }}>
-            <span className="material-symbols-outlined text-white text-2xl"
-                  style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+        {/* ── Widget Row: Leitstern + Weather ── */}
+        <div className="grid grid-cols-2 gap-3">
+
+          {/* Leitstern widget */}
+          <button
+            className="p-4 rounded-2xl flex flex-col gap-3 text-left transition-all active:scale-[0.97] relative overflow-hidden"
+            style={{
+              background: '#fef9c3',
+              border: '1.5px solid rgba(101,163,13,0.15)',
+              boxShadow: '0 2px 10px rgba(101,163,13,0.08)',
+              minHeight: 96,
+            }}
+            onClick={() => onNavigate?.('kodex')}
+          >
+            <img src={base + 'art/tex-morgenwald.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" />
+            <div className="absolute inset-0 pointer-events-none"
+                 style={{ background: 'linear-gradient(135deg, rgba(254,249,195,0.6), rgba(236,252,203,0.5))' }} />
+            <div className="relative z-10 w-9 h-9 rounded-xl flex items-center justify-center"
+                 style={{ background: 'linear-gradient(135deg, #65a30d, #84cc16)', boxShadow: '0 2px 6px rgba(101,163,13,0.3)' }}>
+              <span className="material-symbols-outlined text-white text-lg"
+                    style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+            </div>
+            <p className="relative z-10 font-headline font-bold text-base leading-tight"
+               style={{ color: '#1a2e05' }}>{t('hub.leitstern.title')}</p>
+          </button>
+
+          {/* Weather widget */}
+          <div
+            className="p-4 rounded-2xl flex flex-col justify-between relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, rgba(224,242,254,0.9), rgba(186,230,253,0.7))',
+              border: '1.5px solid rgba(14,165,233,0.18)',
+              boxShadow: '0 2px 10px rgba(14,165,233,0.08)',
+              minHeight: 96,
+            }}
+          >
+            <div className="absolute inset-0 pointer-events-none"
+                 style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.35) 0%, transparent 60%)' }} />
+            <div className="relative z-10">
+              {weather ? (
+                <>
+                  <p className="text-3xl leading-none select-none">
+                    {getWeatherInfo(weather.current.weatherCode).emoji}
+                  </p>
+                  <p className="font-headline font-extrabold text-2xl leading-none mt-1"
+                     style={{ color: '#0c4a6e' }}>
+                    {weather.current.temp}°
+                  </p>
+                  <p className="font-label text-xs mt-1 leading-tight"
+                     style={{ color: '#0369a1' }}>
+                    {getWeatherInfo(weather.current.weatherCode).label}
+                  </p>
+                </>
+              ) : (
+                <p className="font-label text-sm" style={{ color: '#0369a1' }}>
+                  {t('hub.weather.loading')}
+                </p>
+              )}
+            </div>
           </div>
-          <div className="relative z-10 flex-1">
-            <p className="font-headline font-bold text-lg" style={{ color: '#1a2e05' }}>{t('hub.kodex.title')}</p>
-            <p className="font-body text-base" style={{ color: '#365314' }}>{t('hub.kodex.subtitle')}</p>
-          </div>
-          <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: '#4d7c0f' }}>chevron_right</span>
-        </button>
+
+        </div>
 
         {/* ── Bodhi leaf ── */}
         <div className="flex justify-center py-2 opacity-20">

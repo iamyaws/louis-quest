@@ -520,6 +520,8 @@
   "hub.missions.choose": "Choose your adventure!",
   "hub.achievement.latest": "Latest Achievement",
   "hub.kodex.title": "Hero Codex",
+  "hub.leitstern.title": "Guiding Star",
+  "hub.weather.loading": "…",
   "hub.kodex.subtitle": "Our Family Values",
 
   "task.tasksLeft": "{count} tasks left",
