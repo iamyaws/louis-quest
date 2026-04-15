@@ -425,6 +425,17 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       else journalHistory.push(entry);
     }
 
+    // ── Dream Strip snapshot ──
+    // Capture yesterday's highlights before the daily reset so DreamStrip
+    // can show Ronki's impressions when Louis opens the app tomorrow.
+    const dreamSnap: PrevDaySnapshot = {
+      bossKilledToday: s.bossKilledToday ?? false,
+      allCareDone: Boolean(s.catFed && s.catPetted && s.catPlayed),
+      allQuestsDone: allDoneYesterday,
+      arcBeatAdvancedToday: s.arcBeatAdvancedToday ?? false,
+    };
+    const dreamHighlights = buildHighlights(dreamSnap);
+
     return {
       ...s,
       quests,
@@ -450,6 +461,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       journalSaved: false,
       bossDmgToday: 0,
       gamesPlayedToday: [],
+      dreamHighlights,
+      bossKilledToday: false,
+      arcBeatAdvancedToday: false,
     };
   }
 
