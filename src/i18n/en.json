@@ -935,5 +935,9 @@
   "arc.first.beats.map.after": "A map! Now we both know where we can go.",
   "arc.first.beats.wake.before": "One more thing and I will be fully awake for our adventure — do a morning routine with me.",
   "arc.first.beats.wake.after": "Ready. The adventure begins.",
-  "arc.first.complete": "You finished our first adventure!"
+  "arc.first.complete": "You finished our first adventure!",
+
+  "arc.offer.ronkiSays": "Ronki says…",
+  "arc.offer.accept": "Let's go",
+  "arc.offer.later": "Maybe later"
 }

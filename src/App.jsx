@@ -13,6 +13,7 @@ import HeldenKodex from './components/HeldenKodex';
 import Onboarding from './components/Onboarding';
 import ParentalDashboard from './components/ParentalDashboard';
 import Celebration from './components/Celebration';
+import ArcOfferCard from './components/ArcOfferCard';
 import EpicMissions from './components/EpicMissions';
 import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
@@ -111,6 +112,7 @@ function AppContent() {
       }} />}
       <CompanionToast trigger={toastTrigger} />
       <Celebration />
+      <ArcOfferCard />
       {screenTimer && (
         <ScreenTimer
           totalSeconds={screenTimer.totalSeconds}

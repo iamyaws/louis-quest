@@ -10,6 +10,7 @@ import { BADGES } from '../constants';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useVoice } from '../companion/useVoice';
 import VoiceBubble from './VoiceBubble';
+import { useArc } from '../arcs/useArc';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -47,6 +48,13 @@ export default function Hub({ onNavigate }) {
   const base = import.meta.env.BASE_URL;
   const remaining = total - done;
   const MOOD_LABELS_I18N = [t('mood.sad'), t('mood.worried'), t('mood.okay'), t('mood.good'), t('mood.magical'), t('mood.tired')];
+
+  const { phase, offer } = useArc();
+  useEffect(() => {
+    if (phase === 'idle') {
+      offer();
+    }
+  }, [phase, offer]);
 
   const [showBossDetail, setShowBossDetail] = useState(false);
 
