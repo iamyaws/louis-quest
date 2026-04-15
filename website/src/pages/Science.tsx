@@ -77,7 +77,7 @@ export default function Science() {
           </section>
 
           <section>
-            <SectionHeading eyebrow="Design-Prinzipien">D4CR — Designing for Children\'s Rights.</SectionHeading>
+            <SectionHeading eyebrow="Design-Prinzipien">D4CR — Designing for Children's Rights.</SectionHeading>
             <div className="flex flex-col gap-4 leading-relaxed">
               <p>
                 Der D4CR-Verband verbindet Designer:innen, die sich verpflichten, Kinderrechte in jedem Produkt-Entscheid zu tragen. Ronki folgt den D4CR-Prinzipien bei Onboarding, Feedback-Mechanismen und Belohnungsstrukturen.
