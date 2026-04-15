@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import type { Quest, GameState, Boss } from '../types';
-import type { FamilyConfig } from '../types/familyConfig';
+import type { FamilyConfig, DragonVariant } from '../types/familyConfig';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
@@ -82,7 +82,7 @@ interface TaskActions {
   petCompanion: () => void;
   playCompanion: () => void;
   collectLoginBonus: () => void;
-  completeOnboarding: (cfg?: { eggType?: string; heroName?: string; heroGender?: string }) => void;
+  completeOnboarding: (cfg?: { eggType?: string; dragonVariant?: DragonVariant; heroName?: string; heroGender?: string }) => void;
   saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
   redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
   dismissCelebration: () => void;
@@ -627,7 +627,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const completeOnboarding = useCallback((cfg?: { eggType?: string; heroName?: string; heroGender?: string }) => {
+  const completeOnboarding = useCallback((cfg?: { eggType?: string; dragonVariant?: DragonVariant; heroName?: string; heroGender?: string }) => {
     setState(prev => {
       if (!prev) return prev;
       const updated = {
@@ -637,7 +637,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         heroGender: cfg?.heroGender || prev.heroGender || null,
       };
       if (cfg?.heroName) {
-        updated.familyConfig = { ...prev.familyConfig, childName: cfg.heroName };
+        updated.familyConfig = { ...(updated.familyConfig || prev.familyConfig), childName: cfg.heroName };
+      }
+      if (cfg?.dragonVariant) {
+        updated.familyConfig = { ...(updated.familyConfig || prev.familyConfig), dragonVariant: cfg.dragonVariant };
       }
       return updated;
     });

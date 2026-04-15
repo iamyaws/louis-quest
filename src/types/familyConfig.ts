@@ -32,6 +32,12 @@ export interface ParentMessage {
 
 export type Pronouns = 'er' | 'sie' | 'they';
 
+export interface DragonVariant {
+  palette: 'ember' | 'moss' | 'dusk';
+  wings: 'rounded' | 'pointed' | 'feathered';
+  horns: 'short' | 'curved' | 'spiraled';
+}
+
 // Helper to get pronoun forms for German text
 export function pronouns(p: Pronouns) {
   switch (p) {
@@ -51,6 +57,7 @@ export interface FamilyConfig {
   parentMessage: ParentMessage;
   familyMotto: string;
   affirmation: string;
+  dragonVariant?: DragonVariant;
 }
 
 // ── Louis's family as the default template ──

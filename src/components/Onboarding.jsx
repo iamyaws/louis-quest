@@ -3,39 +3,49 @@ import { useTranslation } from '../i18n/LanguageContext';
 
 const base = import.meta.env.BASE_URL;
 
+// Three painterly dragon eggs. Each hatches into the same dragon species
+// with a different visual expression: color palette, wing shape, horn style.
+// Louis picks one at onboarding — the emotional anchor — and this choice
+// is stored as state.familyConfig.dragonVariant for lifetime identity.
 const EGGS = [
   {
-    id: 'fire',
-    name: 'Feuer-Ei',
-    desc: 'Voller Leidenschaft und Kraft!',
+    id: 'ember',
+    nameKey: 'onboarding.egg.ember.name',
+    descKey: 'onboarding.egg.ember.desc',
     icon: 'local_fire_department',
+    // TODO(phase-1-art): replace with painterly egg-ember.webp
     img: 'art/onboarding/egg-fire.webp',
     glowColor: 'rgba(239,68,68,0.25)',
     iconBg: 'rgba(239,68,68,0.12)',
     iconColor: '#ef4444',
     borderColor: '#ef4444',
+    variant: { palette: 'ember', wings: 'rounded', horns: 'short' },
   },
   {
-    id: 'golden',
-    name: 'Goldenes Ei',
-    desc: 'Strahlend und voller Licht!',
-    icon: 'star',
-    img: 'art/onboarding/egg-golden.webp',
-    glowColor: 'rgba(252,211,77,0.3)',
-    iconBg: 'rgba(252,211,77,0.2)',
-    iconColor: '#b45309',
-    borderColor: '#fcd34d',
-  },
-  {
-    id: 'spirit',
-    name: 'Geist-Ei',
-    desc: 'Geheimnisvoll und weise!',
-    icon: 'fluid_med',
+    id: 'moss',
+    nameKey: 'onboarding.egg.moss.name',
+    descKey: 'onboarding.egg.moss.desc',
+    icon: 'eco',
+    // TODO(phase-1-art): replace with painterly egg-moss.webp
     img: 'art/onboarding/egg-spirit.webp',
-    glowColor: 'rgba(109,40,217,0.2)',
-    iconBg: 'rgba(109,40,217,0.1)',
+    glowColor: 'rgba(52,168,128,0.25)',
+    iconBg: 'rgba(52,168,128,0.14)',
+    iconColor: '#1e7a5a',
+    borderColor: '#34a880',
+    variant: { palette: 'moss', wings: 'pointed', horns: 'curved' },
+  },
+  {
+    id: 'dusk',
+    nameKey: 'onboarding.egg.dusk.name',
+    descKey: 'onboarding.egg.dusk.desc',
+    icon: 'bedtime',
+    // TODO(phase-1-art): replace with painterly egg-dusk.webp
+    img: 'art/onboarding/egg-golden.webp',
+    glowColor: 'rgba(109,40,217,0.25)',
+    iconBg: 'rgba(109,40,217,0.12)',
     iconColor: '#6d28d9',
     borderColor: '#6d28d9',
+    variant: { palette: 'dusk', wings: 'feathered', horns: 'spiraled' },
   },
 ];
 
@@ -373,11 +383,11 @@ export default function Onboarding({ onComplete }) {
                     }}>
                     <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0"
                          style={{ background: egg.iconBg }}>
-                      <img src={base + egg.img} alt={egg.name} className="w-full h-full object-cover" />
+                      <img src={base + egg.img} alt={t(egg.nameKey)} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-headline text-xl font-bold text-on-surface">{t('egg.' + egg.id)}</h3>
-                      <p className="text-sm text-on-surface-variant">{egg.desc}</p>
+                      <h3 className="font-headline text-xl font-bold text-on-surface">{t(egg.nameKey)}</h3>
+                      <p className="text-sm text-on-surface-variant">{t(egg.descKey)}</p>
                     </div>
                     {selected && (
                       <span className="material-symbols-outlined text-xl shrink-0"
@@ -394,7 +404,7 @@ export default function Onboarding({ onComplete }) {
         <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-8" style={{ background: 'linear-gradient(to top, rgba(12,50,54,0.95) 40%, transparent)' }}>
           <div className="max-w-xs mx-auto flex flex-col gap-3">
             <PrimaryButton onClick={() => setStep(4)}>
-              {t('onboarding.egg.choose', { name: t('egg.' + EGGS[selectedEgg].id) })}
+              {t('onboarding.egg.choose', { name: t(EGGS[selectedEgg].nameKey) })}
               <span className="material-symbols-outlined">arrow_forward</span>
             </PrimaryButton>
           </div>
@@ -474,14 +484,14 @@ export default function Onboarding({ onComplete }) {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-24 h-24 rounded-2xl overflow-hidden"
                      style={{ boxShadow: `0 0 30px ${EGGS[selectedEgg].glowColor}` }}>
-                  <img src={base + EGGS[selectedEgg].img} alt={t('egg.' + EGGS[selectedEgg].id)}
+                  <img src={base + EGGS[selectedEgg].img} alt={t(EGGS[selectedEgg].nameKey)}
                        className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
             <h2 className="text-3xl font-bold text-on-surface"
                 style={{ fontFamily: 'Fredoka, sans-serif' }}>
-              {t('onboarding.launch.title', { name: heroName.trim() || t('topbar.heroFallback'), egg: t('egg.' + EGGS[selectedEgg].id) })}
+              {t('onboarding.launch.title', { name: heroName.trim() || t('topbar.heroFallback'), egg: t(EGGS[selectedEgg].nameKey) })}
             </h2>
             <p className="text-on-surface-variant text-base leading-relaxed max-w-xs mx-auto">
               {t('onboarding.adventure')}
@@ -521,6 +531,7 @@ export default function Onboarding({ onComplete }) {
               localStorage.setItem('ronki_tour_done', '1');
               onComplete({
                 eggType: EGGS[selectedEgg].id,
+                dragonVariant: EGGS[selectedEgg].variant,
                 heroName: heroName.trim() || undefined,
                 heroGender,
               });
