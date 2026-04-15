@@ -596,7 +596,7 @@ describe('launch state', () => {
     const copy = getLaunchCopy('waitlist');
     expect(copy.ctaLabel).toBe('Auf die Warteliste');
     expect(copy.ctaAction).toBe('waitlist');
-    expect(copy.footerMicro).toMatch(/warten/i);
+    expect(copy.footerMicro).toMatch(/warteliste/i);
   });
 
   it('returns live copy when state is live', () => {

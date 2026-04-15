@@ -14,7 +14,7 @@ const COPY: Record<LaunchState, LaunchCopy> = {
     ctaLabel: 'Auf die Warteliste',
     ctaAction: 'waitlist',
     ctaHelper: 'Eine einzige E-Mail — am Start-Tag. Sonst nichts.',
-    footerMicro: 'Ronki startet bald. Du erfährst es als eine:r der Ersten, wenn du warten kannst.',
+    footerMicro: 'Ronki startet bald. Du erfährst es als eine:r der Ersten, wenn du auf die Warteliste wartest.',
   },
   live: {
     ctaLabel: 'Kostenlos testen',
