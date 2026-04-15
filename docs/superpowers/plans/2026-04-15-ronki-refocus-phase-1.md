@@ -66,15 +66,20 @@
 **Files:**
 - None (git only)
 
-- [ ] **Step 1: Create feature branch**
+- [ ] **Step 1: Create/switch to dev branch**
+
+Phase 1 lands on `dev`, not `main`. `main` stays at current state so the
+live gh-pages deploy is unaffected until Marc explicitly promotes.
 
 Run:
 ```bash
 cd /c/Users/öööö/louis-quest
-git checkout -b phase-1-refocus
+# Create dev off current main if it doesn't exist yet, otherwise just check it out
+git show-ref --verify --quiet refs/heads/dev && git checkout dev || git checkout -b dev
 ```
 
-Expected: `Switched to a new branch 'phase-1-refocus'`
+Expected: `Switched to branch 'dev'` or `Switched to a new branch 'dev'`.
+Confirm with `git status` that HEAD is on `dev` and tree is clean.
 
 - [ ] **Step 2: Verify working tree clean and tests pass**
 
@@ -2219,57 +2224,36 @@ cd /c/Users/öööö/.basic-memory
 
 (Or skip if memory tracking is manual.)
 
-- [ ] **Step 6: Merge branch back to main**
+- [ ] **Step 6: Push dev branch to origin**
 
-In louis-quest:
+Phase 1 lands on `dev`. `main` is NOT touched in this plan — the live
+gh-pages build stays at its current state until Marc explicitly
+promotes the work.
+
 ```bash
 cd /c/Users/öööö/louis-quest
-git checkout main
-git merge --no-ff phase-1-refocus -m "$(cat <<'EOF'
-feat: Ronki refocus Phase 1 — narrative routine-mediator direction
-
-Delivers the refine phase of the refocus spec:
-
-Cuts (removed):
-  - Streak mechanics (state.sd, voice triggers, gear items, UI display)
-  - Hero Profile tab (replaced by Ronki Profile stub in same nav slot)
-  - Pick-your-mission nav entry (missions reborn as Ronki-delivered arcs)
-
-Constraints (scope-reduced):
-  - Onboarding egg ceremony now hatches cosmetic dragon variants
-    (ember / moss / dusk) rather than three different companions
-
-New systems:
-  - Arc Engine (src/arcs/) — pure state machine + React hook + persistence
-  - Arc data catalog with 'The First Adventure' (3 beats: lore / craft / routine)
-  - ArcOfferCard modal, ArcActiveBanner, BeatCompletionModal components
-  - arcPhase context in VoiceEngine + cooldown voice lines
-
-Louis now experiences missions as episodes delivered by Ronki, not
-as a shelf of choices to pick from. The shelf he never discovered
-is gone. Continuity is no longer communicated via streak pressure;
-it will be communicated in Phase 2 via Sanctuary accretion.
-
-Spec: docs/superpowers/specs/2026-04-15-ronki-refocus-design.md
-Plan: docs/superpowers/plans/2026-04-15-ronki-refocus-phase-1.md
-
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
-EOF
-)"
+git push -u origin dev
 ```
 
-- [ ] **Step 7: Push to origin**
+Expected: `dev` branch published on GitHub. No gh-pages redeploy
+(deploy workflow is main-only).
+
+- [ ] **Step 7: Local smoke test on dev**
+
+Since live is untouched, verification happens on the local preview of
+`dev`:
 
 ```bash
-git push origin main
-git push origin phase-1-refocus   # keep the branch for reference
+npm run build
+npm run preview
 ```
 
-Expected: deploy pipeline produces the updated gh-pages build within 2–3 minutes.
+Walk the full arc flow one more time on the local preview URL.
+Confirm everything works end-to-end. Report a concise summary of
+what shipped and any rough edges Marc should see before promotion.
 
-- [ ] **Step 8: Live smoke test**
-
-Open https://iamyaws.github.io/Ronki/ on Louis's device (after hard-reload / service-worker clear). Walk the arc flow. Report back.
+Promotion to `main` (and therefore live) is an explicit follow-up
+step requested by Marc — NOT part of this plan.
 
 ---
 
