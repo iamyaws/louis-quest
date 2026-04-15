@@ -859,20 +859,19 @@ export default function Hub({ onNavigate }) {
             <div className="absolute inset-0 pointer-events-none"
                  style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.35) 0%, transparent 60%)' }} />
             <div className="relative z-10">
-              {weather ? (
-                <>
-                  <p className="text-3xl leading-none select-none">
-                    {getWeatherInfo(weather.current.weatherCode).emoji}
-                  </p>
-                  <p className="font-headline font-extrabold text-2xl leading-none mt-1"
-                     style={{ color: '#0c4a6e' }}>
-                    {weather.current.temp}°
-                  </p>
-                  <p className="font-label text-xs mt-1 leading-tight"
-                     style={{ color: '#0369a1' }}>
-                    {getWeatherInfo(weather.current.weatherCode).label}
-                  </p>
-                </>
+              {weather?.current ? (
+                (() => {
+                  const wi = getWeatherInfo(weather.current.weatherCode);
+                  return (
+                    <>
+                      <p className="text-3xl leading-none select-none">{wi.emoji}</p>
+                      <p className="font-headline font-extrabold text-2xl leading-none mt-1"
+                         style={{ color: '#0c4a6e' }}>{weather.current.temp}°</p>
+                      <p className="font-label text-xs mt-1 leading-tight"
+                         style={{ color: '#0369a1' }}>{wi.label}</p>
+                    </>
+                  );
+                })()
               ) : (
                 <p className="font-label text-sm" style={{ color: '#0369a1' }}>
                   {t('hub.weather.loading')}
