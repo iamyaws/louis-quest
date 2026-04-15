@@ -16,9 +16,8 @@ import type { ArcEngineState } from './types';
 
 export function useArc() {
   const { state, actions } = useTask();
-  // TODO: unify TaskState and GameState shapes so this cast can go away.
   const [arcState, setArcState] = useState<ArcEngineState>(() =>
-    state ? expireCooldownIfReady(loadArcEngineState(state as any)) : initialArcState()
+    state ? expireCooldownIfReady(loadArcEngineState(state)) : initialArcState()
   );
 
   // Persist whenever arcState changes
@@ -31,8 +30,7 @@ export function useArc() {
   useEffect(() => {
     if (state && !initializedRef.current) {
       initializedRef.current = true;
-      // TODO: unify TaskState and GameState shapes so this cast can go away.
-      setArcState(expireCooldownIfReady(loadArcEngineState(state as any)));
+      setArcState(expireCooldownIfReady(loadArcEngineState(state)));
     }
   }, [state]);
 
