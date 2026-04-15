@@ -779,40 +779,6 @@ export default function Hub({ onNavigate }) {
           );
         })()}
 
-        {/* ── Epic Missions Entry — Kristallgold ── */}
-        {(() => {
-          const hasActive = (state.activeMissions || []).length > 0;
-          return (
-            <button
-              className="w-full p-5 rounded-2xl flex items-center gap-4 text-left transition-all active:scale-[0.98] relative overflow-hidden"
-              style={{ background: '#451a03', border: '1.5px solid rgba(252,211,77,0.2)', boxShadow: '0 4px 20px rgba(69,26,3,0.25)' }}
-              onClick={() => onNavigate?.('missions')}
-            >
-              <img src={base + 'art/tex-wolkengrat.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
-              <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(69,26,3,0.55), rgba(120,53,15,0.45))' }} />
-              <div className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center shrink-0"
-                   style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', border: '3px solid #fcd34d', boxShadow: '0 0 12px rgba(252,211,77,0.3)' }}>
-                <span className="material-symbols-outlined text-white text-2xl"
-                      style={{ fontVariationSettings: "'FILL' 1" }}>swords</span>
-                {/* Red notification dot when no mission selected */}
-                {!hasActive && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full animate-pulse"
-                        style={{ background: '#ef4444', border: '2px solid #fcd34d', boxShadow: '0 0 8px rgba(239,68,68,0.5)' }} />
-                )}
-              </div>
-              <div className="relative z-10 flex-1">
-                <p className="font-bold text-xs font-label uppercase tracking-widest" style={{ color: '#fcd34d' }}>{t('hub.missions.title')}</p>
-                <h4 className="font-headline font-bold text-lg text-white">
-                  {hasActive
-                    ? t('hub.missions.active', { count: state.activeMissions.length })
-                    : t('hub.missions.choose')}
-                </h4>
-              </div>
-              <span className="relative z-10 material-symbols-outlined text-2xl" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
-            </button>
-          );
-        })()}
-
         {/* ── Latest Achievement Spotlight ── */}
         {(() => {
           const unlocked = state.unlockedBadges || [];

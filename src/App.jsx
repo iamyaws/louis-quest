@@ -14,7 +14,6 @@ import Onboarding from './components/Onboarding';
 import ParentalDashboard from './components/ParentalDashboard';
 import Celebration from './components/Celebration';
 import ArcOfferCard from './components/ArcOfferCard';
-import EpicMissions from './components/EpicMissions';
 import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
@@ -84,7 +83,6 @@ function AppContent() {
         {view === 'journal' && <Journal />}
         {view === 'kodex' && <HeldenKodex />}
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
-        {view === 'missions' && <EpicMissions />}
         {view === 'games' && <MiniGames onPlay={(id) => {
           if (id === 'memory') setView('memory');
           if (id === 'potion') setView('potion');
