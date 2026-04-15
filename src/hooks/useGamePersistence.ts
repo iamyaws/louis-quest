@@ -158,7 +158,7 @@ function applyDefaults(p: GameState): void {
   if (p.freezesUsedThisMonth === undefined) p.freezesUsedThisMonth = 0;
   if (!p.lastFreezeMonth) p.lastFreezeMonth = "";
   if (p.comebackActive === undefined) p.comebackActive = false;
-  if (p.bestStreak === undefined) p.bestStreak = p.sd || 0;
+  if (p.bestStreak === undefined) p.bestStreak = 0;
   if (p.freezeUsedToday === undefined) p.freezeUsedToday = false;
   if (!p.weeklyMission) {
     const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
@@ -239,8 +239,8 @@ function applyDefaults(p: GameState): void {
   if (p.yesterdayCommitment === undefined) p.yesterdayCommitment = null;
   // Water drinking tracker
   if (p.dailyWaterCount === undefined) p.dailyWaterCount = 0;
-  // Total task days migration (from streak)
-  if (p.totalTaskDays === undefined) p.totalTaskDays = p.sd || 0;
+  // Total task days migration
+  if (p.totalTaskDays === undefined) p.totalTaskDays = 0;
 }
 
 interface OnboardData {
@@ -257,7 +257,7 @@ export function createInitialState({ hero, catVariant, catName, startXP, startCo
   const wm = WEEKLY_MISSIONS[Math.floor(Math.random() * WEEKLY_MISSIONS.length)];
   return {
     hero, catVariant, catName, xp: startXP || 0, coins: startCoins || 0, drachenEier: 0,
-    quests: buildDay(false), rewards: REWARDS, acc: [], sd: 0,
+    quests: buildDay(false), rewards: REWARDS, acc: [],
     lastDate: new Date().toDateString(), dt: 0, hist: [], vacMode: false,
     sm: {}, roomItems: [], purchased: [], moodAM: null, moodPM: null,
     journal: "", jAnswers: {}, rainbow: [false, false, false, false, false, false],

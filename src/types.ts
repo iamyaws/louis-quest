@@ -179,7 +179,6 @@ export interface GameState {
   quests: Quest[];
   rewards: Reward[];
   acc: string[];
-  sd: number;
   lastDate: string;
   dt: number;
   hist: { id: string; d: number }[];

@@ -1,6 +1,5 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
-  CHEST_MILESTONES, MILESTONE_REWARDS,
   WEEKLY_MISSIONS, BOSSES, UNLOCK_CONDITIONS, SHOP_ITEMS,
 } from '../constants';
 import { getLevel, buildDay, getCatStage, getTierForStage } from '../utils/helpers';
@@ -28,7 +27,7 @@ function checkUnlocks(state: GameState): string[] {
     if (current.includes(itemId)) continue;
     let met = false;
     switch (cond.type) {
-      case "streak": met = (state.sd || 0) >= cond.value || (state.bestStreak || 0) >= cond.value; break;
+      case "streak": met = (state.bestStreak || 0) >= cond.value; break;
       case "boss": met = (state.bossTrophies || []).length >= cond.value; break;
       case "tasks": met = (state.hist || []).length >= cond.value; break;
       case "catStage": met = getCatStage(state.catEvo || 0) >= cond.value; break;
@@ -93,22 +92,15 @@ export default function useGameActions(
       if (newLvl > prevLvl) setTimeout(() => SFX.play("levelup"), 300);
 
       const sm = { ...prev.sm, [id]: (prev.sm[id] || 0) + 1 };
-      const newSD = all ? prev.sd + 1 : prev.sd;
-      const STREAK_MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100];
-      const hitMilestone = all && prev.sd !== newSD && STREAK_MILESTONES.includes(newSD);
-      if (hitMilestone) {
-        setTimeout(() => SFX.play("celeb"), 1000);
-      }
-      const newBest = Math.max(prev.bestStreak || 0, newSD);
-      const newTotalDays = all && prev.sd !== newSD ? (prev.totalTaskDays || 0) + 1 : (prev.totalTaskDays || 0);
+      const newTotalDays = all ? (prev.totalTaskDays || 0) + 1 : (prev.totalTaskDays || 0);
 
       // Every 8th task gives a guaranteed bonus
       const taskCount = prev.hist.length + 1;
       const bonusHP = (taskCount % 8 === 0) ? 20 : 0;
       const bonusMin = 0;
 
-      const chestEarned = all && CHEST_MILESTONES.includes(newSD as typeof CHEST_MILESTONES[number]) && !prev.chestMilestone;
-      if (chestEarned) setTimeout(() => setShowChest(true), all ? 2500 : 800);
+      // Chest milestone (streak-based milestones removed in Phase 1)
+      const chestEarned = false;
 
       // Weekly mission progress
       const wm = WEEKLY_MISSIONS.find(m => m.id === prev.weeklyMission);
@@ -199,9 +191,9 @@ export default function useGameActions(
         xp: prev.xp + totalHP,
         coins: prev.coins + totalHP,
         drachenEier: (prev.drachenEier || 0) + eggsEarned,
-        dt: prev.dt + q.minutes + bonusMin, sd: newSD,
-        hist: [...prev.hist, { id, d: Date.now() }], sm, bestStreak: newBest,
-        chestMilestone: chestEarned ? newSD : prev.chestMilestone,
+        dt: prev.dt + q.minutes + bonusMin,
+        hist: [...prev.hist, { id, d: Date.now() }], sm,
+        chestMilestone: prev.chestMilestone,
         xpBoost: all ? false : prev.xpBoost,
         weeklyProgress: wp,
         weeklyMissionsCompleted: wmcCount,
@@ -328,13 +320,7 @@ export default function useGameActions(
   const collectChest = useCallback(() => {
     setState(prev => {
       if (!prev) return prev;
-      const streakDays = prev.sd || 0;
-      const milestone = MILESTONE_REWARDS[streakDays];
-      const u = { ...prev, chestMilestone: null };
-      if (milestone && !u.purchased.includes(milestone.itemId)) {
-        u.purchased = [...u.purchased, milestone.itemId];
-      }
-      return u;
+      return { ...prev, chestMilestone: null };
     });
     setShowChest(false);
   }, [setState, setShowChest]);

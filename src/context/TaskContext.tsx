@@ -3,7 +3,7 @@ import type { Quest, GameState, Boss } from '../types';
 import type { FamilyConfig } from '../types/familyConfig';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
-import { BOSSES, CHEST_MILESTONES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
+import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
 import storage from '../utils/storage';
 import { useAuth } from './AuthContext';
 
@@ -21,7 +21,6 @@ export interface JournalEntry {
 interface TaskState {
   quests: Quest[];
   sm: Record<string, number>;
-  sd: number;
   lastDate: string;
   vacMode: boolean;
   dt: number;
@@ -135,6 +134,53 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 const emptyComputed: TaskComputed = { done: 0, total: 0, allDone: false, pct: 0, byGroup: {}, level: 1, xpProgress: { cur: 0, need: 50 } };
 
+export function createInitialState(): TaskState {
+  return {
+    quests: buildDay(false),
+    sm: {},
+    lastDate: new Date().toISOString().slice(0, 10),
+    vacMode: false,
+    dt: 0,
+    hp: 0,
+    drachenEier: 0,
+    eggType: 'dragon',
+    heroGender: null,
+    eggProgress: 0,
+    eggHatched: false,
+    moodAM: null,
+    moodPM: null,
+    dailyWaterCount: 0,
+    boss: assignBoss(0),
+    bossTrophies: [],
+    catFed: false,
+    catPetted: false,
+    catPlayed: false,
+    catEvo: 0,
+    loginBonusClaimed: false,
+    onboardingDone: false,
+    journalMemory: '',
+    journalGratitude: [],
+    journalDayEmoji: null,
+    journalAchievements: [],
+    journalHistory: [],
+    journalSaved: false,
+    bossDmgToday: 0,
+    orbs: { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
+    heroStats: { mut: 0, fokus: 0, ordnung: 0 },
+    xp: 0,
+    chestsClaimed: [],
+    activeMissions: [],
+    completedMissions: [],
+    gearInventory: [],
+    equippedGear: {},
+    unlockedBadges: [],
+    totalTasksDone: 0,
+    gamesPlayedToday: [],
+    birthdayEpic: { done: [], completed: false },
+    familyConfig: DEFAULT_FAMILY_CONFIG,
+  };
+}
+
 export function TaskProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [state, setState] = useState<TaskState | null>(null);
@@ -173,7 +219,6 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         let s: TaskState = {
           quests: raw.quests,
           sm: raw.sm || {},
-          sd: raw.sd || 0,
           lastDate: raw.lastDate || '',
           vacMode: raw.vacMode || false,
           dt: raw.dt || 0,
@@ -231,52 +276,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         setState(s);
       } else {
         // Fresh start
-        const quests = buildDay(false);
-        setState({
-          quests,
-          sm: {},
-          sd: 0,
-          lastDate: today(),
-          vacMode: false,
-          dt: 0,
-          hp: 0,
-          drachenEier: 0,
-          eggType: 'dragon',
-          heroGender: null,
-          eggProgress: 0,
-          eggHatched: false,
-          moodAM: null,
-          moodPM: null,
-          dailyWaterCount: 0,
-          boss: assignBoss(0),
-          bossTrophies: [],
-          catFed: false,
-          catPetted: false,
-          catPlayed: false,
-          catEvo: 0,
-          loginBonusClaimed: false,
-          onboardingDone: false,
-          journalMemory: '',
-          journalGratitude: [],
-          journalDayEmoji: null,
-          journalAchievements: [],
-          journalHistory: [],
-          journalSaved: false,
-          bossDmgToday: 0,
-          orbs: { vitality: 0, radiance: 0, patience: 0, wisdom: 0 },
-          heroStats: { mut: 0, fokus: 0, ordnung: 0 },
-          xp: 0,
-          chestsClaimed: [],
-          activeMissions: [],
-          completedMissions: [],
-          gearInventory: [],
-          equippedGear: {},
-          unlockedBadges: [],
-          totalTasksDone: 0,
-          gamesPlayedToday: [],
-          birthdayEpic: { done: [], completed: false },
-          familyConfig: DEFAULT_FAMILY_CONFIG,
-        });
+        setState(createInitialState());
       }
       setLoading(false);
     })();
@@ -324,17 +324,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     // Check if all main quests were done yesterday
     const mainQuests = s.quests.filter(q => !q.sideQuest);
     const allDoneYesterday = mainQuests.length > 0 && mainQuests.every(q => q.done);
-    const newSd = allDoneYesterday ? s.sd + 1 : 0;
 
-    // Chest milestone check
-    let chestsClaimed = [...(s.chestsClaimed || [])];
-    if (CHEST_MILESTONES.includes(newSd as any) && !chestsClaimed.includes(newSd)) {
-      chestsClaimed.push(newSd);
-      const chestHp = newSd * 5; // bonus scales with milestone
-      s = { ...s, hp: (s.hp || 0) + chestHp };
-      // Schedule celebration after load completes
-      setTimeout(() => queueCelebration({ type: 'chest', payload: { milestone: newSd, reward: chestHp } }), 500);
-    }
+    // Chest milestone check (streak-based milestones removed in Phase 1)
+    const chestsClaimed = [...(s.chestsClaimed || [])];
 
     // Mission progress from yesterday's quests
     const morningDone = s.quests.filter(q => q.anchor === 'morning' && q.done && !q.sideQuest);
@@ -402,7 +394,6 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       ...s,
       quests,
       sm: newSm,
-      sd: newSd,
       chestsClaimed,
       activeMissions,
       completedMissions,
@@ -529,12 +520,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
       // Badge checking
       const unlockedBadges = [...(prev.unlockedBadges || [])];
-      const sd = prev.sd || 0;
       const checkVals: Record<string, boolean> = {
-        sd1: sd >= 1 || totalTasksDone >= 1,
-        sd3: sd >= 3,
-        sd7: sd >= 7,
-        sd30: sd >= 30,
+        sd1: totalTasksDone >= 1,
+        sd3: false,
+        sd7: false,
+        sd30: false,
         lvl5: getLevel(newXp) >= 5,
         lvl10: getLevel(newXp) >= 10,
         tasks50: totalTasksDone >= 50,
