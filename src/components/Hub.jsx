@@ -392,7 +392,7 @@ export default function Hub({ onNavigate }) {
                   return (
                     <button
                       key={i}
-                      className="w-11 h-11 rounded-2xl border-[2px] transition-all flex items-center justify-center"
+                      className="w-11 h-11 rounded-2xl transition-all flex items-center justify-center"
                       style={{
                         border: filled
                           ? '2px solid #124346'
