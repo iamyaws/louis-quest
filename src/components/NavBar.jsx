@@ -7,6 +7,7 @@ const TAB_KEYS = [
   { id: 'care',    key: 'nav.care',    icon: 'favorite' },
   { id: 'shop',    key: 'nav.shop',    icon: 'shopping_bag' },
   { id: 'journal', key: 'nav.journal', icon: 'auto_stories' },
+  { id: 'ronki',   key: 'nav.ronki',   icon: 'pets' },
 ];
 
 export default function NavBar({ active = 'quests', onNavigate }) {

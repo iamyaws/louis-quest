@@ -150,7 +150,6 @@ function LevelUpCelebration({ level, onDismiss }) {
 function VictoryCelebration({ onDismiss }) {
   const { t } = useTranslation();
   const { state, computed } = useTask();
-  const streak = state?.sd || 0;
 
   return (
     <main className="min-h-dvh pt-24 pb-32 px-6 flex flex-col items-center justify-center relative overflow-hidden lotus-pattern">
@@ -174,28 +173,6 @@ function VictoryCelebration({ onDismiss }) {
           <p className="text-xl text-on-surface-variant font-body px-4">
             {t('celebrate.victory.message')}
           </p>
-        </div>
-
-        {/* Streak bento card */}
-        <div className="w-full bg-white rounded-2xl p-8 relative overflow-hidden mb-10"
-             style={{ boxShadow: '0 8px 24px rgba(30,27,23,0.06)' }}>
-          <div className="absolute bottom-0 right-0 opacity-5 pointer-events-none">
-            <span className="material-symbols-outlined" style={{ fontSize: '120px' }}>local_florist</span>
-          </div>
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="material-symbols-outlined text-4xl text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
-              <span className="font-headline font-bold text-3xl text-on-surface">{t('celebrate.victory.streak', { days: streak + 1 })}</span>
-            </div>
-            <p className="font-label text-sm uppercase tracking-widest text-on-surface-variant/60">{t('celebrate.victory.streakLabel')}</p>
-            {/* Progress dots */}
-            <div className="flex gap-2 mt-6">
-              {Array.from({ length: Math.min(streak + 1, 7) }, (_, i) => (
-                <div key={i} className={`h-2 rounded-full ${i === Math.min(streak, 6) ? 'w-12 bg-secondary ring-4' : 'w-8 bg-secondary-container'}`}
-                     style={i === Math.min(streak, 6) ? { ringColor: 'rgba(252,211,77,0.2)' } : {}} />
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Quest log summary */}

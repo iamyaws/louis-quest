@@ -42,7 +42,7 @@ export default function ParentPanel() {
       <div style={{ background: "rgba(180,120,40,0.04)", borderRadius: 16, padding: 12, marginTop: 10, border: "2.5px solid rgba(180,120,40,0.08)" }}>
         <div style={{ fontSize: ".85rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F4CA}"} \u00DCbersicht</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-          {[{ v: state.sd, l: "Tage-Streak", c: T.primary }, { v: state.bestStreak || state.sd, l: "Bester Streak", c: "#F97316" }, { v: `\u2744\uFE0F ${state.streakFreezes || 0}`, l: "Streak-Schutz", c: T.teal }, { v: state.hist.length, l: "Aufgaben gesamt", c: T.success }, { v: (state.graduated || []).length, l: "Gemeistert \u{1F393}", c: T.accentDark }, { v: `Lvl ${level}`, l: `${state.xp} HP`, c: "#EC4899" }].map((s, i) => (
+          {[{ v: state.hist.length, l: "Aufgaben gesamt", c: T.success }, { v: (state.graduated || []).length, l: "Gemeistert \u{1F393}", c: T.accentDark }, { v: `Lvl ${level}`, l: `${state.xp} HP`, c: "#EC4899" }].map((s, i) => (
             <div key={i} style={{ background: "white", borderRadius: 12, padding: "10px", textAlign: "center", border: "2px solid rgba(180,120,40,0.06)" }}>
               <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: s.c }}>{s.v}</div>
               <div style={{ fontSize: ".85rem", color: T.textSecondary, fontWeight: 600 }}>{s.l}</div>

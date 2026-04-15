@@ -105,11 +105,10 @@ export default function VictoryScreen({ onClose, onMemoryGame }) {
           border: "1px solid rgba(255,255,255,0.15)", marginBottom: 24,
         }}>
           <div style={{ fontSize: ".85rem", fontWeight: 800, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12, textAlign: "center" }}>Tagesübersicht</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {[
               { label: "Aufgaben", value: `${done}/${total}`, icon: "\u2694\uFE0F" },
               { label: "Verdient", value: `+${state.dt}min`, icon: "\u23F0" },
-              { label: "Streak", value: `${state.sd}d`, icon: "\u{1F525}" },
             ].map((s, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "1.5rem", marginBottom: 4 }}>{s.icon}</div>

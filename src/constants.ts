@@ -258,10 +258,6 @@ export const ANCHORS: Record<string, { label: string; icon: string; col: string 
 export const LVL = [0, 50, 120, 220, 360, 550, 800, 1100, 1500, 2000, 2600, 3300, 4100, 5000, 6000, 7200] as const;
 
 export const BADGES: Badge[] = [
-  { id: 'b_day1',    i: "\u{1F31F}", n: "Erster Tag",     desc: "Dein erstes Abenteuer!",         check: 'sd1' },
-  { id: 'b_day3',    i: "\u{1F525}", n: "3-Tage-Held",    desc: "3 Tage in Folge geschafft!",     check: 'sd3' },
-  { id: 'b_day7',    i: "\u26A1",    n: "Wochenkrieger",   desc: "7 Tage am Stück!",               check: 'sd7' },
-  { id: 'b_day30',   i: "\u{1F3F0}", n: "Monatsmeister",  desc: "30 Tage durchgehalten!",          check: 'sd30' },
   { id: 'b_lvl5',    i: "\u{1F451}", n: "Level 5",        desc: "Stufe 5 erreicht!",               check: 'lvl5' },
   { id: 'b_lvl10',   i: "\u{1F48E}", n: "Level 10",       desc: "Stufe 10 — Wahre Stärke!",       check: 'lvl10' },
   { id: 'b_task50',  i: "\u{1F3AF}", n: "50 Aufgaben",    desc: "50 Quests abgeschlossen!",        check: 'tasks50' },

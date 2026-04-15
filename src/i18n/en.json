@@ -11,8 +11,11 @@
   "nav.shop": "Shop",
   "nav.journal": "Book",
 
-  "hero.fallback": "Hero",
-  "hero.hp": "Hero Points",
+  "ronki.evoLabel": "Stage",
+  "ronki.daysTogetherLabel": "Days together",
+  "ronki.stubNote": "More about Ronki coming soon — his traits, your adventures, and the Micropedia.",
+
+  "nav.ronki": "Ronki",
 
   "hub.greeting.morning": "Good Morning",
   "hub.greeting.afternoon": "Good Afternoon",

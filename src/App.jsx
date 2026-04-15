@@ -21,7 +21,7 @@ import CloudJumpGame from './components/CloudJumpGame';
 import StarCatcherGame from './components/StarCatcherGame';
 import CompanionToast from './components/CompanionToast';
 import ScreenTimer from './components/ScreenTimer';
-import HeroProfile from './components/HeroProfile';
+import RonkiProfile from './components/RonkiProfile';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -82,7 +82,7 @@ function AppContent() {
         {view === 'care' && <Sanctuary />}
         {view === 'journal' && <Journal />}
         {view === 'kodex' && <HeldenKodex />}
-        {view === 'hero' && <HeroProfile onNavigate={setView} />}
+        {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
         {view === 'missions' && <EpicMissions />}
         {view === 'games' && <MiniGames onPlay={(id) => {
           if (id === 'memory') setView('memory');

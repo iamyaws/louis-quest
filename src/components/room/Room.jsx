@@ -142,8 +142,10 @@ export default function Room() {
 
 function getBadgeUnlocks(state, level) {
   return [
-    state.xp > 0, state.sd >= 3, state.sd >= 7, level >= 5,
-    state.hist.length >= 50, level >= 10, state.sd >= 30,
-    state.hist.length >= 100, (state.acc || []).length > 0,
+    level >= 5,
+    level >= 10,
+    state.hist.length >= 50,
+    state.hist.length >= 100,
+    (state.acc || []).length > 0,
   ];
 }

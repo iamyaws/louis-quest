@@ -9,7 +9,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 function getProgress(cond, state) {
   switch (cond.type) {
     case 'streak':
-      return { current: Math.max(state.sd || 0, state.bestStreak || 0), target: cond.value };
+      return { current: 0, target: cond.value };
     case 'boss':
       return { current: (state.bossTrophies || []).length, target: cond.value };
     case 'tasks':

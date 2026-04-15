@@ -100,7 +100,6 @@ export default function useGameActions(
       const bonusMin = 0;
 
       // Chest milestone (streak-based milestones removed in Phase 1)
-      const chestEarned = false;
 
       // Weekly mission progress
       const wm = WEEKLY_MISSIONS.find(m => m.id === prev.weeklyMission);

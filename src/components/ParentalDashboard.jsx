@@ -216,8 +216,6 @@ function OverviewTab({ state }) {
         </div>
         {/* HP */}
         <StatCard label="Heldenpunkte" value={state.hp || 0} sub="Verfügbar" />
-        {/* Streak */}
-        <StatCard label="Tages-Streak" value={state.sd || 0} sub="Tage in Folge" />
         {/* Orbs */}
         <StatCard label="Wachstums-Orbs" value={totalOrbs} sub="Gesammelt" />
       </div>
