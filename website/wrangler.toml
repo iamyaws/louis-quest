@@ -1,0 +1,11 @@
+name = "ronki-website"
+compatibility_date = "2026-04-15"
+pages_build_output_dir = "website/dist"
+
+[build]
+command = "npm run build:web"
+
+[vars]
+# Actual secrets are set in Cloudflare dashboard, not here.
+# VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be configured in:
+# Cloudflare Pages project > Settings > Environment variables
