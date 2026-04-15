@@ -939,5 +939,6 @@
 
   "arc.offer.ronkiSays": "Ronki says…",
   "arc.offer.accept": "Let's go",
-  "arc.offer.later": "Maybe later"
+  "arc.offer.later": "Maybe later",
+  "arc.banner.tapToOpen": "Tap to open"
 }

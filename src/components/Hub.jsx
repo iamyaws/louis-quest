@@ -11,6 +11,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 import { useVoice } from '../companion/useVoice';
 import VoiceBubble from './VoiceBubble';
 import { useArc } from '../arcs/useArc';
+import ArcActiveBanner from './ArcActiveBanner';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -54,9 +55,10 @@ export default function Hub({ onNavigate }) {
     if (phase === 'idle') {
       offer();
     }
-  }, [phase, offer]);
+  }, []);  // mount-only — more nuanced timing lands in Phase 2
 
   const [showBossDetail, setShowBossDetail] = useState(false);
+  const [openBeat, setOpenBeat] = useState(null);
 
   // Ronki greets Louis once when Hub mounts.
   useEffect(() => {
@@ -108,6 +110,8 @@ export default function Hub({ onNavigate }) {
       </header>
 
       <main className="px-6 max-w-lg mx-auto flex flex-col gap-6">
+
+        <ArcActiveBanner onOpenBeat={setOpenBeat} />
 
         {/* ── Companion ── */}
         {(() => {
