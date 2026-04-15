@@ -162,8 +162,8 @@ export default function Journal() {
             {gratitude.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {gratitude.map(g => (
-                  <span key={g} className="px-2.5 py-1 rounded-full font-label text-xs font-bold text-primary"
-                        style={{ background: 'rgba(109,40,217,0.08)' }}>
+                  <span key={g} className="px-2.5 py-1 rounded-full font-label text-xs font-bold"
+                        style={{ background: 'rgba(252,211,77,0.12)', color: '#b45309' }}>
                     {g}
                   </span>
                 ))}
@@ -186,7 +186,7 @@ export default function Journal() {
           <div className="px-6 pb-5">
             <button onClick={handleReopen}
               className="w-full py-3 rounded-xl font-label font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all"
-              style={{ background: 'rgba(109,40,217,0.06)', color: '#6d28d9', border: '1px solid rgba(109,40,217,0.12)' }}>
+              style={{ background: 'rgba(180,83,9,0.06)', color: '#b45309', border: '1px solid rgba(180,83,9,0.15)' }}>
               <span className="material-symbols-outlined text-lg">edit</span>
               {t('journal.edit')}
             </button>
@@ -197,23 +197,22 @@ export default function Journal() {
         <>
           {/* ── Journal Info Card ── */}
           <section className="mb-6 rounded-2xl overflow-hidden"
-                   style={{ background: 'linear-gradient(135deg, #5300b7, #6d28d9)', padding: '2px' }}>
-            <div className="rounded-[0.85rem] p-5 flex items-center justify-between"
-                 style={{ background: '#ffffff' }}>
+                   style={{ background: 'linear-gradient(135deg, #0c3236, #124346)' }}>
+            <div className="p-5 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
-                     style={{ background: '#6d28d9', boxShadow: '0 8px 16px rgba(109,40,217,0.4)' }}>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                     style={{ background: 'rgba(252,211,77,0.12)', border: '1px solid rgba(252,211,77,0.28)', boxShadow: '0 0 16px rgba(252,211,77,0.12)' }}>
                   <span className="material-symbols-outlined text-white text-3xl"
                         style={{ fontVariationSettings: "'FILL' 1" }}>auto_stories</span>
                 </div>
                 <div>
-                  <p className="font-label font-bold text-xs text-primary uppercase tracking-wider">{t('journal.bookOpen')}</p>
-                  <p className="text-2xl font-black font-headline text-on-surface">{t('journal.yourDay')}</p>
+                  <p className="font-label font-bold text-xs uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('journal.bookOpen')}</p>
+                  <p className="text-2xl font-black font-headline text-white">{t('journal.yourDay')}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-label text-xs font-bold text-outline uppercase">{t('common.today')}</p>
-                <p className="text-sm font-bold font-label text-primary">
+                <p className="font-label text-xs font-bold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('common.today')}</p>
+                <p className="text-sm font-bold font-label" style={{ color: '#fcd34d' }}>
                   {new Date().toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}
                 </p>
               </div>
@@ -224,10 +223,11 @@ export default function Journal() {
           <section className="mb-6">
             <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline mb-4">{t('journal.mood.title')}</h3>
             <div className="grid grid-cols-3 gap-3">
-              {MOOD_EMOJIS.map((emoji, i) => {
-                const isSelected = state.moodAM === i;
+              {[3, 4, 2, 0, 1, 5].map((idx) => {
+                const emoji = MOOD_EMOJIS[idx];
+                const isSelected = state.moodAM === idx;
                 return (
-                  <button key={i}
+                  <button key={idx}
                     aria-pressed={isSelected}
                     className={`flex flex-col items-center gap-2 py-5 px-2 rounded-2xl transition-all duration-300 active:scale-95 ${
                       isSelected ? 'scale-[1.04]' : ''
@@ -242,10 +242,10 @@ export default function Journal() {
                       border: '2px solid rgba(18,67,70,0.08)',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                     }}
-                    onClick={() => { SFX.play('pop'); actions.setMood('moodAM', i); }}
+                    onClick={() => { SFX.play('pop'); actions.setMood('moodAM', idx); }}
                   >
                     <span className={`text-5xl ${!isSelected ? 'grayscale opacity-80' : ''}`} style={{ lineHeight: 1 }}>{emoji}</span>
-                    <span className="font-label text-sm font-extrabold uppercase tracking-wide text-center leading-tight">{moodLabels[i]}</span>
+                    <span className="font-label text-sm font-extrabold uppercase tracking-wide text-center leading-tight">{moodLabels[idx]}</span>
                   </button>
                 );
               })}
@@ -285,8 +285,8 @@ export default function Journal() {
                       gratitude.includes(g) ? 'bg-primary text-white shadow-lg' : 'bg-white text-primary border-2'
                     }`}
                     style={!gratitude.includes(g) ? {
-                      border: '2px solid rgba(109,40,217,0.1)',
-                      boxShadow: '4px 4px 0px rgba(109,40,217,0.1)',
+                      border: '2px solid rgba(18,67,70,0.12)',
+                      boxShadow: '4px 4px 0px rgba(18,67,70,0.08)',
                       transform: `rotate(${(g.length % 5) - 2}deg)`,
                     } : undefined}
                     onClick={() => toggleItem(gratitude, setGratitude, g)}
@@ -301,13 +301,13 @@ export default function Journal() {
                 {t('journal.dayEmoji.title')}
               </label>
               <div className="grid grid-cols-3 gap-3 p-4 rounded-2xl"
-                   style={{ background: 'rgba(109,40,217,0.05)', border: '1px solid rgba(109,40,217,0.1)' }}>
+                   style={{ background: 'rgba(18,67,70,0.05)', border: '1px solid rgba(18,67,70,0.1)' }}>
                 {DAY_EMOJIS.map((e, i) => (
                   <button key={i}
                     className={`aspect-square flex items-center justify-center text-3xl rounded-2xl shadow-sm transition-all active:scale-95 ${
                       dayEmoji === i ? 'ring-4 ring-primary/30 scale-110' : ''
                     }`}
-                    style={{ background: dayEmoji === i ? 'rgba(109,40,217,0.1)' : 'rgba(255,255,255,0.5)' }}
+                    style={{ background: dayEmoji === i ? 'rgba(252,211,77,0.15)' : 'rgba(255,255,255,0.5)' }}
                     onClick={() => { SFX.play('tap'); setDayEmoji(i); }}
                   >{e}</button>
                 ))}
@@ -326,7 +326,7 @@ export default function Journal() {
                       achievements.includes(a) ? 'bg-primary text-white' : 'text-primary'
                     }`}
                     style={!achievements.includes(a) ? {
-                      background: 'rgba(109,40,217,0.05)', border: '1px solid rgba(109,40,217,0.2)',
+                      background: 'rgba(252,211,77,0.06)', border: '1px solid rgba(252,211,77,0.25)',
                     } : undefined}
                     onClick={() => toggleItem(achievements, setAchievements, a)}
                   >{achievementLabels[i]}</button>
@@ -371,11 +371,11 @@ export default function Journal() {
               const today = new Date().getDate();
               const isPast = dayNum < today;
               const isToday = dayNum === today;
-              const colors = ['#34d399', '#a78bfa', '#fbbf24', '#6d28d9', '#d1fae5'];
+              const colors = ['#34d399', '#fcd34d', '#fbbf24', '#5eead4', '#d1fae5'];
               const col = isPast ? colors[dayNum % colors.length] : '#f4ede5';
               return (
                 <div key={i} className={`w-4 h-4 rounded-full mx-auto transition-transform hover:scale-125 ${isToday ? 'ring-4 ring-primary/20' : ''}`}
-                     style={{ background: isToday && state.moodAM !== null ? '#6d28d9' : col }} />
+                     style={{ background: isToday && state.moodAM !== null ? '#b45309' : col }} />
               );
             })}
           </div>
@@ -395,8 +395,8 @@ export default function Journal() {
                 onClick={() => { SFX.play('tap'); setViewingEntry(viewingEntry === entry.date ? null : entry.date); }}
                 className="w-full text-left rounded-2xl p-4 transition-all active:scale-[0.98]"
                 style={{
-                  background: viewingEntry === entry.date ? 'rgba(109,40,217,0.04)' : '#ffffff',
-                  border: viewingEntry === entry.date ? '1.5px solid rgba(109,40,217,0.2)' : '1px solid rgba(0,0,0,0.06)',
+                  background: viewingEntry === entry.date ? 'rgba(18,67,70,0.04)' : '#ffffff',
+                  border: viewingEntry === entry.date ? '1.5px solid rgba(18,67,70,0.12)' : '1px solid rgba(0,0,0,0.06)',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                 }}>
                 {/* Header row */}
@@ -425,8 +425,8 @@ export default function Journal() {
                         <p className="font-label text-xs font-bold text-outline uppercase mb-1.5">{t('journal.gratefulFor')}</p>
                         <div className="flex flex-wrap gap-1.5">
                           {entry.gratitude.map(g => (
-                            <span key={g} className="px-2.5 py-1 rounded-full font-label text-xs font-bold text-primary"
-                                  style={{ background: 'rgba(109,40,217,0.08)' }}>
+                            <span key={g} className="px-2.5 py-1 rounded-full font-label text-xs font-bold"
+                                  style={{ background: 'rgba(252,211,77,0.12)', color: '#b45309' }}>
                               {g}
                             </span>
                           ))}
@@ -459,7 +459,7 @@ export default function Journal() {
 
       {/* ── Closing Affirmation ── */}
       <section className="mb-8 rounded-2xl p-6 text-center"
-               style={{ background: 'linear-gradient(135deg, rgba(109,40,217,0.08), rgba(252,211,77,0.12))', border: '1px solid rgba(109,40,217,0.1)' }}>
+               style={{ background: 'linear-gradient(135deg, rgba(18,67,70,0.07), rgba(252,211,77,0.12))', border: '1px solid rgba(18,67,70,0.08)' }}>
         <span className="material-symbols-outlined text-3xl text-primary mb-3 block"
               style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
         <p className="font-headline text-lg font-bold text-on-surface leading-relaxed">
