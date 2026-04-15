@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import type { Quest, GameState, Boss } from '../types';
 import type { FamilyConfig, DragonVariant } from '../types/familyConfig';
+import type { ArcEngineState } from '../arcs/types';
+import { advanceBeat } from '../arcs/ArcEngine';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
@@ -62,6 +64,7 @@ interface TaskState {
   birthdayEpic: { done: string[]; completed: boolean };
   familyConfig: FamilyConfig;
   _v2_economy_reset?: boolean;
+  arcEngine?: ArcEngineState;
 }
 
 interface TaskComputed {
@@ -95,6 +98,7 @@ interface TaskActions {
   unequipGear: (slot: 'head' | 'back' | 'neck') => void;
   updateBirthdayEpic: (data: { done: string[]; completed: boolean }) => void;
   updateFamilyConfig: (config: FamilyConfig) => void;
+  patchState: (partial: Partial<TaskState>) => void;
 }
 
 interface CelebrationEvent {
@@ -537,7 +541,13 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges };
+      // If the completed quest is tagged as an arc beat, advance the arc state.
+      let arcEngine = prev.arcEngine;
+      if (q.arcBeatId && arcEngine) {
+        arcEngine = advanceBeat(arcEngine, q.arcBeatId);
+      }
+
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine };
     });
     setToastTrigger(t => t + 1);
   }, []);
@@ -761,6 +771,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, familyConfig: config } : prev);
   }, []);
 
+  const patchState = useCallback((partial: Partial<TaskState>) => {
+    setState(prev => prev ? { ...prev, ...partial } : prev);
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -784,7 +798,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
