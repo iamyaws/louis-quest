@@ -8,7 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "dev:web": "vite --config website/vite.config.ts",
+    "build:web": "vite build --config website/vite.config.ts",
+    "preview:web": "vite preview --config website/vite.config.ts",
+    "test:web": "vitest run --config website/vite.config.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.103.0",
@@ -16,6 +20,7 @@
     "motion": "^12.38.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.30.3",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
