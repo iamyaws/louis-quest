@@ -98,27 +98,13 @@ export default function Hub({ onNavigate }) {
   const heroAvatar = state.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
 
   return (
-    <div className="relative min-h-dvh pb-32">
-      {/* ── Time-of-day sky atmosphere ── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'fixed', inset: 0, zIndex: 0,
-          backgroundImage: `url(${base}${skyFile})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center top',
-          opacity: 0.22,
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'fixed', inset: 0, zIndex: 0,
-          background: 'rgba(255,248,242,0.74)',
-          pointerEvents: 'none',
-        }}
-      />
+    <div
+      className="relative min-h-dvh pb-32"
+      style={{
+        background: `linear-gradient(rgba(255,248,242,0.80) 0%, rgba(255,248,242,0.80) 100%), url(${base}${skyFile}) center top / cover no-repeat`,
+        backgroundColor: '#fff8f2',
+      }}
+    >
 
       {/* ── Top Bar (matches TopBar component style) ── */}
       <header className="flex justify-between items-center px-6 pb-2"
@@ -817,37 +803,45 @@ export default function Hub({ onNavigate }) {
           <button
             className="p-4 rounded-2xl flex flex-col gap-3 text-left transition-all active:scale-[0.97] relative overflow-hidden"
             style={{
-              background: '#fef9c3',
-              border: '1.5px solid rgba(101,163,13,0.15)',
-              boxShadow: '0 2px 10px rgba(101,163,13,0.08)',
+              background: '#0c1a2e',
+              border: '1.5px solid rgba(252,211,77,0.22)',
+              boxShadow: '0 4px 16px rgba(12,26,46,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
               minHeight: 96,
             }}
             onClick={() => onNavigate?.('kodex')}
           >
-            <img src={base + 'art/tex-morgenwald.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" />
-            <div className="absolute inset-0 pointer-events-none"
-                 style={{ background: 'linear-gradient(135deg, rgba(254,249,195,0.6), rgba(236,252,203,0.5))' }} />
+            {/* Navy texture */}
+            <img src={base + 'art/bg-texture/IAMYAWS_Very_soft_dark_navy_texture_matte_and_smooth._Deep_na_740c8f28-fea5-4e9e-904f-4c0f0fc526de_2.webp'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
+            {/* Star particles */}
+            <div aria-hidden="true" style={{ position: 'absolute', top: '20%', right: '20%', width: 2, height: 2, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 4px 2px rgba(252,211,77,0.7)', animation: 'dream-spark 1.8s ease-in-out infinite' }} />
+            <div aria-hidden="true" style={{ position: 'absolute', top: '65%', right: '12%', width: 1.5, height: 1.5, borderRadius: '50%', background: 'white', boxShadow: '0 0 3px 1px rgba(255,255,255,0.6)', animation: 'dream-spark 2.4s ease-in-out infinite 0.7s' }} />
+            <div aria-hidden="true" style={{ position: 'absolute', top: '38%', right: '35%', width: 1.5, height: 1.5, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 3px 1px rgba(252,211,77,0.5)', animation: 'dream-spark 2.1s ease-in-out infinite 1.2s' }} />
+            {/* Star icon */}
             <div className="relative z-10 w-9 h-9 rounded-xl flex items-center justify-center"
-                 style={{ background: 'linear-gradient(135deg, #65a30d, #84cc16)', boxShadow: '0 2px 6px rgba(101,163,13,0.3)' }}>
-              <span className="material-symbols-outlined text-white text-lg"
-                    style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                 style={{ background: 'rgba(252,211,77,0.12)', border: '1px solid rgba(252,211,77,0.35)', boxShadow: '0 0 12px 3px rgba(252,211,77,0.18)' }}>
+              <span className="material-symbols-outlined text-lg"
+                    style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>star</span>
             </div>
-            <p className="relative z-10 font-headline font-bold text-base leading-tight"
-               style={{ color: '#1a2e05' }}>{t('hub.leitstern.title')}</p>
+            <p className="relative z-10 font-headline font-bold text-base leading-tight text-white">
+              {t('hub.leitstern.title')}
+            </p>
           </button>
 
           {/* Weather widget */}
           <div
             className="p-4 rounded-2xl flex flex-col justify-between relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(224,242,254,0.9), rgba(186,230,253,0.7))',
-              border: '1.5px solid rgba(14,165,233,0.18)',
-              boxShadow: '0 2px 10px rgba(14,165,233,0.08)',
+              background: '#0c1830',
+              border: '1.5px solid rgba(94,234,212,0.15)',
+              boxShadow: '0 4px 16px rgba(12,24,48,0.35)',
               minHeight: 96,
             }}
           >
+            {/* Actual sky image as backdrop */}
+            <img src={base + skyFile} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" style={{ objectPosition: 'center 25%' }} />
+            {/* Subtle dark vignette so text stays readable */}
             <div className="absolute inset-0 pointer-events-none"
-                 style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.35) 0%, transparent 60%)' }} />
+                 style={{ background: 'linear-gradient(135deg, rgba(12,24,48,0.55) 0%, rgba(12,24,48,0.25) 100%)' }} />
             <div className="relative z-10">
               {weather?.current ? (
                 (() => {
@@ -855,15 +849,16 @@ export default function Hub({ onNavigate }) {
                   return (
                     <>
                       <p className="text-3xl leading-none select-none">{wi.emoji}</p>
-                      <p className="font-headline font-extrabold text-2xl leading-none mt-1"
-                         style={{ color: '#0c4a6e' }}>{weather.current.temp}°</p>
+                      <p className="font-headline font-extrabold text-2xl leading-none mt-1 text-white">
+                        {weather.current.temp}°
+                      </p>
                       <p className="font-label text-xs mt-1 leading-tight"
-                         style={{ color: '#0369a1' }}>{wi.label}</p>
+                         style={{ color: 'rgba(255,255,255,0.72)' }}>{wi.label}</p>
                     </>
                   );
                 })()
               ) : (
-                <p className="font-label text-sm" style={{ color: '#0369a1' }}>
+                <p className="font-label text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {t('hub.weather.loading')}
                 </p>
               )}
