@@ -275,7 +275,7 @@ export default function Sanctuary() {
           </h3>
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-2xl" style={{ background: 'rgba(249,243,235,0.8)', border: '1px solid white' }}>
-              <span className="text-xs font-label font-bold text-outline uppercase">{t('hero.hp')}</span>
+              <span className="text-xs font-label font-bold text-outline uppercase">{t('hub.boss.detail.heroPoints')}</span>
               <div className="flex items-center gap-2 mt-1">
                 <Pearl size={24} />
                 <span className="text-2xl font-headline font-bold">{state.hp || 0}</span>

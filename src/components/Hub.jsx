@@ -61,7 +61,7 @@ export default function Hub({ onNavigate }) {
   const level = getLevel(state.xp || 0);
   const lvlProg = getLvlProg(state.xp || 0);
   const xpPct = lvlProg.need > 0 ? Math.min(100, (lvlProg.cur / lvlProg.need) * 100) : 0;
-  const heroName = state.familyConfig?.childName || 'Ronki';
+  const heroName = state.familyConfig?.childName || t('topbar.heroFallback');
   const heroAvatar = state.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
 
   return (
@@ -415,7 +415,7 @@ export default function Hub({ onNavigate }) {
                     <div className="flex flex-col items-center flex-1">
                       <div className="w-24 h-24 rounded-full overflow-hidden border-4 shadow-xl"
                            style={{ borderColor: '#fcd34d', boxShadow: '0 0 20px rgba(252,211,77,0.4)' }}>
-                        <img src={base + 'art/egg-glow.webp'} alt="Ronki" className="w-full h-full object-cover" />
+                        <img src={base + 'art/egg-glow.webp'} alt={heroName} className="w-full h-full object-cover" />
                       </div>
                       <p className="font-headline font-bold text-white text-sm mt-2">{t('hub.boss.detail.hero')}</p>
                     </div>

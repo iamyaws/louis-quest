@@ -9,7 +9,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 function getProgress(cond, state) {
   switch (cond.type) {
     case 'streak':
-      return { current: 0, target: cond.value };
+      return null;
     case 'boss':
       return { current: (state.bossTrophies || []).length, target: cond.value };
     case 'tasks':
@@ -183,34 +183,38 @@ export default function Shop() {
                     </div>
 
                     {/* Progress bar */}
-                    <div style={{
-                      width: '100%',
-                      height: 10,
-                      borderRadius: 5,
-                      background: 'rgba(180,120,40,0.10)',
-                      overflow: 'hidden',
-                    }}>
-                      <div style={{
-                        width: `${pct * 100}%`,
-                        height: '100%',
-                        borderRadius: 5,
-                        background: pct >= 1
-                          ? `linear-gradient(90deg, ${T.success}, ${T.successDark})`
-                          : `linear-gradient(90deg, ${T.primaryLight}, ${T.primary})`,
-                        transition: 'width .4s ease',
-                      }} />
-                    </div>
+                    {prog && (
+                      <>
+                        <div style={{
+                          width: '100%',
+                          height: 10,
+                          borderRadius: 5,
+                          background: 'rgba(180,120,40,0.10)',
+                          overflow: 'hidden',
+                        }}>
+                          <div style={{
+                            width: `${pct * 100}%`,
+                            height: '100%',
+                            borderRadius: 5,
+                            background: pct >= 1
+                              ? `linear-gradient(90deg, ${T.success}, ${T.successDark})`
+                              : `linear-gradient(90deg, ${T.primaryLight}, ${T.primary})`,
+                            transition: 'width .4s ease',
+                          }} />
+                        </div>
 
-                    {/* Progress text */}
-                    <div style={{
-                      fontSize: '.78rem',
-                      fontWeight: 700,
-                      color: T.textLight,
-                      marginTop: 3,
-                      textAlign: 'right',
-                    }}>
-                      {prog.current} / {prog.target}
-                    </div>
+                        {/* Progress text */}
+                        <div style={{
+                          fontSize: '.78rem',
+                          fontWeight: 700,
+                          color: T.textLight,
+                          marginTop: 3,
+                          textAlign: 'right',
+                        }}>
+                          {prog.current} / {prog.target}
+                        </div>
+                      </>
+                    )}
                   </>
                 ) : null}
               </div>

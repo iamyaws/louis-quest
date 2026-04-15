@@ -481,7 +481,7 @@ export default function Onboarding({ onComplete }) {
             </div>
             <h2 className="text-3xl font-bold text-on-surface"
                 style={{ fontFamily: 'Fredoka, sans-serif' }}>
-              {t('onboarding.launch.title', { name: heroName.trim() || t('hero.fallback'), egg: t('egg.' + EGGS[selectedEgg].id) })}
+              {t('onboarding.launch.title', { name: heroName.trim() || t('topbar.heroFallback'), egg: t('egg.' + EGGS[selectedEgg].id) })}
             </h2>
             <p className="text-on-surface-variant text-base leading-relaxed max-w-xs mx-auto">
               {t('onboarding.adventure')}

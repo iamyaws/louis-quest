@@ -120,7 +120,7 @@ export default function Room() {
           Zimmer Level {roomLevel}
         </div>
         <div style={{ fontSize: ".85rem", color: "rgba(255,255,255,0.45)", marginTop: 2 }}>
-          {roomItems} / {SHOP_ITEMS.room.length} Items {"\u00B7"} {badgeCount} / 9 Badges
+          {roomItems} / {SHOP_ITEMS.room.length} Items {"\u00B7"} {badgeCount} / {BADGE_DEFS.length} Badges
         </div>
         <button className="btn-tap" onClick={() => setShowCustomizer(true)} style={{
           marginTop: 10, background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)",

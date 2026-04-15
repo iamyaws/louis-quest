@@ -67,7 +67,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                }} />
           <div className="relative flex items-center gap-2 mb-2">
             <Pearl size={20} />
-            <p className="font-label font-bold uppercase tracking-widest text-xs" style={{ color: '#7a4a05' }}>{t('hero.hp')}</p>
+            <p className="font-label font-bold uppercase tracking-widest text-xs" style={{ color: '#7a4a05' }}>{t('hub.boss.detail.heroPoints')}</p>
           </div>
           <div className="relative flex items-baseline gap-1">
             <span className="text-4xl font-headline font-bold" style={{ color: '#3b2802' }}>{hp}</span>
