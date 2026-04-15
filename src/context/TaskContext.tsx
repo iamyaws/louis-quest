@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import type { Quest, GameState, Boss } from '../types';
 import type { FamilyConfig, DragonVariant } from '../types/familyConfig';
 import type { ArcEngineState, RoutineBeat } from '../arcs/types';
+import type { DreamHighlightsData, PrevDaySnapshot } from '../dream/types'; // used in applyDayTransition (Task 4)
+import { buildHighlights } from '../dream/dreamHighlights';
 import { advanceBeat, initialArcState } from '../arcs/ArcEngine';
 import { findArc } from '../arcs/arcs';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
@@ -66,6 +68,9 @@ interface TaskState {
   familyConfig: FamilyConfig;
   _v2_economy_reset?: boolean;
   arcEngine?: ArcEngineState;
+  bossKilledToday?: boolean;
+  arcBeatAdvancedToday?: boolean;
+  dreamHighlights?: DreamHighlightsData;
 }
 
 interface TaskComputed {
@@ -184,6 +189,8 @@ export function createInitialState(): TaskState {
     birthdayEpic: { done: [], completed: false },
     familyConfig: DEFAULT_FAMILY_CONFIG,
     arcEngine: initialArcState(),
+    bossKilledToday: false,
+    arcBeatAdvancedToday: false,
   };
 }
 
@@ -239,6 +246,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           dailyWaterCount: raw.dailyWaterCount || 0,
           boss: raw.boss || null,
           bossTrophies: raw.bossTrophies || [],
+          bossKilledToday: raw.bossKilledToday ?? false,
+          arcBeatAdvancedToday: raw.arcBeatAdvancedToday ?? false,
+          dreamHighlights: raw.dreamHighlights?.highlights && typeof raw.dreamHighlights.seen === 'boolean'
+            ? raw.dreamHighlights
+            : undefined,
           catFed: raw.catFed || false,
           catPetted: raw.catPetted || false,
           catPlayed: raw.catPlayed || false,
@@ -415,6 +427,17 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       else journalHistory.push(entry);
     }
 
+    // ── Dream Strip snapshot ──
+    // Capture yesterday's highlights before the daily reset so DreamStrip
+    // can show Ronki's impressions when Louis opens the app tomorrow.
+    const dreamSnap: PrevDaySnapshot = {
+      bossKilledToday: s.bossKilledToday ?? false,
+      allCareDone: Boolean(s.catFed && s.catPetted && s.catPlayed),
+      allQuestsDone: allDoneYesterday,
+      arcBeatAdvancedToday: s.arcBeatAdvancedToday ?? false,
+    };
+    const dreamHighlights = buildHighlights(dreamSnap);
+
     return {
       ...s,
       quests,
@@ -440,6 +463,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       journalSaved: false,
       bossDmgToday: 0,
       gamesPlayedToday: [],
+      dreamHighlights,
+      bossKilledToday: false,
+      arcBeatAdvancedToday: false,
     };
   }
 
@@ -469,6 +495,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       let boss = prev.boss ? { ...prev.boss } : null;
       let bossTrophies = [...(prev.bossTrophies || [])];
       let bossDmgToday = prev.bossDmgToday || 0;
+      let bossKilledToday = prev.bossKilledToday ?? false;
+      let arcBeatAdvancedToday = prev.arcBeatAdvancedToday ?? false;
       if (boss && boss.hp > 0) {
         // Calculate gear bonus from equipped courage stat
         const equipped = prev.equippedGear || {};
@@ -494,6 +522,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           if (bd) hp += bd.reward.hp + defenseBonus;
           screenMin += 3; // bonus screen minutes on boss defeat
           if (!bossTrophies.includes(boss.id)) bossTrophies.push(boss.id);
+          bossKilledToday = true;
         }
       }
 
@@ -565,10 +594,18 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       // If the completed quest is tagged as an arc beat, advance the arc state.
       let arcEngine = prev.arcEngine ?? initialArcState();
       if (q.arcBeatId) {
+        const prevBeatIndex = arcEngine.activeBeatIndex;
+        const prevCompletedLen = arcEngine.completedArcIds.length;
         arcEngine = advanceBeat(arcEngine, q.arcBeatId);
+        if (
+          arcEngine.activeBeatIndex !== prevBeatIndex ||
+          arcEngine.completedArcIds.length !== prevCompletedLen
+        ) {
+          arcBeatAdvancedToday = true;
+        }
       }
 
-      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine };
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday };
     });
     setToastTrigger(t => t + 1);
   }, []);

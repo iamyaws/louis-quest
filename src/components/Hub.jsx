@@ -13,6 +13,7 @@ import VoiceBubble from './VoiceBubble';
 import { useArc } from '../arcs/useArc';
 import ArcActiveBanner from './ArcActiveBanner';
 import BeatCompletionModal from './BeatCompletionModal';
+import DreamStrip from './DreamStrip';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -60,6 +61,12 @@ export default function Hub({ onNavigate }) {
 
   const [showBossDetail, setShowBossDetail] = useState(false);
   const [openBeat, setOpenBeat] = useState(null);
+  const [showDream, setShowDream] = useState(false);
+  const pendingDream = Boolean(state?.dreamHighlights && !state.dreamHighlights.seen);
+
+  const handleCampfireTap = () => {
+    if (pendingDream) setShowDream(true);
+  };
 
   // Ronki greets Louis once when Hub mounts.
   useEffect(() => {
@@ -136,7 +143,11 @@ export default function Hub({ onNavigate }) {
           const sceneSrc = `art/campfire/lager-stage1.png`;
 
           return (
-            <section className="relative flex flex-col items-center pt-2 pb-4">
+            <section
+              className="relative flex flex-col items-center pt-2 pb-4"
+              onClick={handleCampfireTap}
+              style={{ cursor: pendingDream ? 'pointer' : 'default' }}
+            >
               {/* Ronki's greeting chip — above the scene so it doesn't fight the painted border */}
               {voice.line && (
                 <div className="relative z-10 flex justify-center w-full px-6 mb-2">
@@ -168,6 +179,21 @@ export default function Hub({ onNavigate }) {
                   <span className="ember" style={{ bottom: '36%', left: '48%', '--delay': '0.6s', '--dur': '5.0s', '--drift': '-14px' }} />
                 </div>
               </div>
+
+              {/* Dream indicator — pulsing ring when unseen highlights exist */}
+              {pendingDream && (
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute', top: '50%', left: '50%',
+                    width: '56%', aspectRatio: '1',
+                    borderRadius: '50%',
+                    border: '1.5px solid rgba(252,211,77,0.5)',
+                    pointerEvents: 'none',
+                    animation: 'dream-pulse-ring 2.8s ease-in-out infinite',
+                  }}
+                />
+              )}
 
               {/* Stage nameplate — painted banner under the scene */}
               <div className="-mt-4 relative z-10 px-5 py-1.5 rounded-full"
@@ -788,6 +814,18 @@ export default function Hub({ onNavigate }) {
       </main>
 
       <BeatCompletionModal beat={openBeat} onClose={() => setOpenBeat(null)} />
+
+      {showDream && state?.dreamHighlights && (
+        <DreamStrip
+          highlights={state.dreamHighlights.highlights}
+          onDismiss={() => {
+            setShowDream(false);
+            actions.patchState({
+              dreamHighlights: { ...state.dreamHighlights, seen: true },
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

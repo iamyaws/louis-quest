@@ -269,3 +269,30 @@
 .progress-ring-anim circle:last-child {
   animation: progress-ring-fill 1.2s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
+
+/* ── Dream Strip animations ── */
+@keyframes dream-pulse-ring {
+  0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.75; transform: translate(-50%, -50%) scale(1.06); }
+}
+
+@keyframes dream-dissolve {
+  0%, 100% { opacity: 0.9; transform: scale(1) rotate(0deg); }
+  50%       { opacity: 0.5; transform: scale(0.91) rotate(1.5deg); }
+}
+
+@keyframes dream-spark {
+  0%, 100% { opacity: 0;   transform: scale(0.5) translateY(0); }
+  30%       { opacity: 1;   transform: scale(1)   translateY(-5px); }
+  70%       { opacity: 0.5; transform: scale(0.7) translateY(-9px); }
+}
+
+@keyframes dream-float {
+  0%, 100% { transform: translateY(0)     rotate(0deg); }
+  50%       { transform: translateY(-10px) rotate(3deg); }
+}
+
+@keyframes dream-breathe {
+  0%, 100% { transform: scale(1);    opacity: 0.55; }
+  50%       { transform: scale(1.14); opacity: 1; }
+}
