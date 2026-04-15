@@ -76,6 +76,21 @@ export default function Hub({ onNavigate }) {
 
   if (!state) return null;
 
+  // ── Time-of-day sky ──
+  const SKY_IMAGES = {
+    dawn:   'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_an_early_morning_sky._S_882cfbe3-5eac-4403-87a0-5c66602cf76b_2.webp',
+    midday: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_bright_midday_sky._Wa_e8eca682-4eb9-4da2-8c93-a4cb25ba363d_1.webp',
+    golden: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_golden_hour_sky._Rich_a1deb403-56d2-4c34-9775-f174de32afb4_1.webp',
+    night:  'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_deep_night_sky._Rich__c902cc19-afa0-4c99-a434-6e206610ddf9_0.webp',
+  };
+  const _h = new Date().getHours();
+  const skyFile = SKY_IMAGES[
+    _h >= 6 && _h < 10  ? 'dawn'   :
+    _h >= 10 && _h < 17 ? 'midday' :
+    _h >= 17 && _h < 20 ? 'golden' :
+    'night'
+  ];
+
   const level = getLevel(state.xp || 0);
   const lvlProg = getLvlProg(state.xp || 0);
   const xpPct = lvlProg.need > 0 ? Math.min(100, (lvlProg.cur / lvlProg.need) * 100) : 0;
@@ -83,7 +98,27 @@ export default function Hub({ onNavigate }) {
   const heroAvatar = state.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
 
   return (
-    <div className="relative min-h-dvh bg-surface pb-32">
+    <div className="relative min-h-dvh pb-32">
+      {/* ── Time-of-day sky atmosphere ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed', inset: 0, zIndex: 0,
+          backgroundImage: `url(${base}${skyFile})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          opacity: 0.22,
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed', inset: 0, zIndex: 0,
+          background: 'rgba(255,248,242,0.74)',
+          pointerEvents: 'none',
+        }}
+      />
 
       {/* ── Top Bar (matches TopBar component style) ── */}
       <header className="flex justify-between items-center px-6 pb-2"
