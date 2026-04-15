@@ -940,5 +940,9 @@
   "arc.offer.ronkiSays": "Ronki says…",
   "arc.offer.accept": "Let's go",
   "arc.offer.later": "Maybe later",
-  "arc.banner.tapToOpen": "Tap to open"
+  "arc.banner.tapToOpen": "Tap to open",
+
+  "beat.close": "Close",
+  "beat.didIt": "I did it!",
+  "beat.doneReading": "Done reading"
 }

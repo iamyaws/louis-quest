@@ -12,6 +12,7 @@ import { useVoice } from '../companion/useVoice';
 import VoiceBubble from './VoiceBubble';
 import { useArc } from '../arcs/useArc';
 import ArcActiveBanner from './ArcActiveBanner';
+import BeatCompletionModal from './BeatCompletionModal';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -785,6 +786,8 @@ export default function Hub({ onNavigate }) {
           </svg>
         </div>
       </main>
+
+      <BeatCompletionModal beat={openBeat} onClose={() => setOpenBeat(null)} />
     </div>
   );
 }

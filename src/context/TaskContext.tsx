@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import type { Quest, GameState, Boss } from '../types';
 import type { FamilyConfig, DragonVariant } from '../types/familyConfig';
-import type { ArcEngineState } from '../arcs/types';
+import type { ArcEngineState, RoutineBeat } from '../arcs/types';
 import { advanceBeat, initialArcState } from '../arcs/ArcEngine';
+import { findArc } from '../arcs/arcs';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
@@ -313,6 +314,25 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(cloudTimer.current);
     };
   }, [state, user]);
+
+  // ── Arc on-accept hydration: tag routine beats onto matching quests ──
+  useEffect(() => {
+    if (state?.arcEngine?.phase !== 'active' || !state.arcEngine.activeArcId) return;
+    const arc = findArc(state.arcEngine.activeArcId);
+    if (!arc) return;
+    setState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        quests: prev.quests.map(q => {
+          const matchingBeat = arc.beats.find(
+            (b): b is RoutineBeat => b.kind === 'routine' && (b as RoutineBeat).questId === q.id
+          );
+          return matchingBeat ? { ...q, arcBeatId: matchingBeat.id } : q;
+        }),
+      };
+    });
+  }, [state?.arcEngine?.phase]);
 
   // ── Day transition ──
   function applyDayTransition(s: TaskState): TaskState {

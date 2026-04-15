@@ -940,5 +940,9 @@
   "arc.offer.ronkiSays": "Ronki sagt…",
   "arc.offer.accept": "Lass uns loslegen",
   "arc.offer.later": "Später vielleicht",
-  "arc.banner.tapToOpen": "Tippe, um loszulegen"
+  "arc.banner.tapToOpen": "Tippe, um loszulegen",
+
+  "beat.close": "Schließen",
+  "beat.didIt": "Hab's geschafft!",
+  "beat.doneReading": "Fertig gelesen"
 }
