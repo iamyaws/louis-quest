@@ -41,18 +41,12 @@ describe('matchesContext', () => {
     expect(matchesContext(line, { ...baseCtx, weather: 'snow' })).toBe(false);
   });
 
-  it('enforces minStreak', () => {
-    const line = L({ minStreak: 3 });
-    expect(matchesContext(line, { ...baseCtx, streak: 2 })).toBe(false);
-    expect(matchesContext(line, { ...baseCtx, streak: 3 })).toBe(true);
-    expect(matchesContext(line, { ...baseCtx, streak: 10 })).toBe(true);
-  });
-
   it('enforces minQuestsToday', () => {
     const line = L({ minQuestsToday: 3, triggers: ['quest_complete'] });
     const ctx = { ...baseCtx, trigger: 'quest_complete' as const };
     expect(matchesContext(line, { ...ctx, questsCompletedToday: 2 })).toBe(false);
     expect(matchesContext(line, { ...ctx, questsCompletedToday: 3 })).toBe(true);
+    expect(matchesContext(line, { ...ctx, questsCompletedToday: 10 })).toBe(true);
   });
 
   it('requires careAction when line specifies it', () => {

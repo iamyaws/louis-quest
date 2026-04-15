@@ -38,9 +38,9 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_care_play_01', text: 'Spielen! Spielen! Ich bin die schnellste.', triggers: ['care_action'], careAction: ['played'] },
 
   // ── Streak milestones ──
-  { id: 'de_streak_3_01', text: 'Drei Tage in Folge?! Das ist ein Zauber!', triggers: ['hub_open', 'sanctuary_open'], minStreak: 3 },
-  { id: 'de_streak_7_01', text: 'Sieben Tage. Ich z\u00e4hle. Du auch?', triggers: ['hub_open', 'sanctuary_open'], minStreak: 7 },
-  { id: 'de_streak_14_01', text: 'Vierzehn Tage! Ich glaub, wir sind jetzt Team.', triggers: ['hub_open', 'sanctuary_open'], minStreak: 14 },
+  { id: 'de_streak_3_01', text: 'Drei Tage in Folge?! Das ist ein Zauber!', triggers: ['hub_open', 'sanctuary_open'] },
+  { id: 'de_streak_7_01', text: 'Sieben Tage. Ich z\u00e4hle. Du auch?', triggers: ['hub_open', 'sanctuary_open'] },
+  { id: 'de_streak_14_01', text: 'Vierzehn Tage! Ich glaub, wir sind jetzt Team.', triggers: ['hub_open', 'sanctuary_open'] },
 
   // ── Idle wonder ──
   { id: 'de_idle_01', text: 'Ich hab getr\u00e4umt, ich kann fliegen. Kannst du das auch?', triggers: ['idle'] },

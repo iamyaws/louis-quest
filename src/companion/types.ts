@@ -35,7 +35,6 @@ export interface VoiceLine {
   mood?: MoodTag[];
   stage?: StageTag[];
   careAction?: CareAction[];
-  minStreak?: number;
   minQuestsToday?: number;
   cooldownHours?: number; // default 24
   weight?: number; // default 1

@@ -20,7 +20,6 @@ export function matchesContext(line: VoiceLine, ctx: VoiceContext): boolean {
     if (!ctx.careAction) return false;
     if (!line.careAction.includes(ctx.careAction)) return false;
   }
-  if (line.minStreak != null && ctx.streak < line.minStreak) return false;
   if (line.minQuestsToday != null && ctx.questsCompletedToday < line.minQuestsToday) return false;
   return true;
 }
