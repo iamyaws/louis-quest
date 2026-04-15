@@ -354,11 +354,14 @@ export default function Hub({ onNavigate }) {
                   <p className="font-bold text-sm font-label uppercase tracking-widest mb-3" style={{ color: '#b45309' }}>
                     {t('hub.mood.title')}
                   </p>
+                  {/* Display order: positive first [Gut, Magisch, Okay] then negative [Traurig, Besorgt, Müde] */}
                   <div className="flex flex-wrap justify-center gap-3">
-                    {MOOD_EMOJIS.map((e, i) => (
-                      <button key={i} onClick={() => { SFX.play("pop"); actions.setMood("moodAM", i); }}
+                    {[3, 4, 2, 0, 1, 5].map((idx) => (
+                      <button key={idx} onClick={() => { SFX.play("pop"); actions.setMood("moodAM", idx); }}
                         className="w-[60px] h-[60px] text-3xl rounded-2xl transition-all active:scale-90 flex items-center justify-center"
-                        style={{ background: 'rgba(252,211,77,0.08)', border: '2px solid rgba(252,211,77,0.2)', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>{e}</button>
+                        style={{ background: 'rgba(252,211,77,0.08)', border: '2px solid rgba(252,211,77,0.2)', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                        {MOOD_EMOJIS[idx]}
+                      </button>
                     ))}
                   </div>
                 </>
@@ -801,68 +804,69 @@ export default function Hub({ onNavigate }) {
 
           {/* Leitstern widget */}
           <button
-            className="p-4 rounded-2xl flex flex-col gap-3 text-left transition-all active:scale-[0.97] relative overflow-hidden"
+            className="p-4 rounded-2xl flex flex-col items-center justify-center gap-2 text-center transition-all active:scale-[0.97] relative overflow-hidden"
             style={{
               background: '#0c1a2e',
               border: '1.5px solid rgba(252,211,77,0.22)',
               boxShadow: '0 4px 16px rgba(12,26,46,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
-              minHeight: 96,
+              minHeight: 110,
             }}
             onClick={() => onNavigate?.('kodex')}
           >
             {/* Navy texture */}
             <img src={base + 'art/bg-texture/IAMYAWS_Very_soft_dark_navy_texture_matte_and_smooth._Deep_na_740c8f28-fea5-4e9e-904f-4c0f0fc526de_2.webp'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
-            {/* Star particles */}
-            <div aria-hidden="true" style={{ position: 'absolute', top: '20%', right: '20%', width: 2, height: 2, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 4px 2px rgba(252,211,77,0.7)', animation: 'dream-spark 1.8s ease-in-out infinite' }} />
-            <div aria-hidden="true" style={{ position: 'absolute', top: '65%', right: '12%', width: 1.5, height: 1.5, borderRadius: '50%', background: 'white', boxShadow: '0 0 3px 1px rgba(255,255,255,0.6)', animation: 'dream-spark 2.4s ease-in-out infinite 0.7s' }} />
-            <div aria-hidden="true" style={{ position: 'absolute', top: '38%', right: '35%', width: 1.5, height: 1.5, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 3px 1px rgba(252,211,77,0.5)', animation: 'dream-spark 2.1s ease-in-out infinite 1.2s' }} />
-            {/* Star icon */}
-            <div className="relative z-10 w-9 h-9 rounded-xl flex items-center justify-center"
-                 style={{ background: 'rgba(252,211,77,0.12)', border: '1px solid rgba(252,211,77,0.35)', boxShadow: '0 0 12px 3px rgba(252,211,77,0.18)' }}>
-              <span className="material-symbols-outlined text-lg"
-                    style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>star</span>
-            </div>
-            <p className="relative z-10 font-headline font-bold text-base leading-tight text-white">
+            {/* Star particles — scattered across widget */}
+            <div aria-hidden="true" style={{ position: 'absolute', top: '18%', right: '18%', width: 2, height: 2, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 4px 2px rgba(252,211,77,0.7)', animation: 'dream-spark 1.8s ease-in-out infinite' }} />
+            <div aria-hidden="true" style={{ position: 'absolute', top: '62%', right: '10%', width: 1.5, height: 1.5, borderRadius: '50%', background: 'white', boxShadow: '0 0 3px 1px rgba(255,255,255,0.6)', animation: 'dream-spark 2.4s ease-in-out infinite 0.7s' }} />
+            <div aria-hidden="true" style={{ position: 'absolute', top: '30%', left: '14%', width: 1.5, height: 1.5, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 3px 1px rgba(252,211,77,0.5)', animation: 'dream-spark 2.1s ease-in-out infinite 1.2s' }} />
+            {/* Big outline star — bold weight, prominent glow */}
+            <span
+              className="relative z-10 material-symbols-outlined select-none leading-none"
+              style={{ fontSize: 48, color: '#fcd34d', fontVariationSettings: "'FILL' 0, 'wght' 300, 'OPSZ' 48", filter: 'drop-shadow(0 0 10px rgba(252,211,77,0.65))' }}
+            >star</span>
+            <p className="relative z-10 font-headline font-bold text-sm leading-none text-white">
               {t('hub.leitstern.title')}
             </p>
           </button>
 
           {/* Weather widget */}
           <div
-            className="p-4 rounded-2xl flex flex-col justify-between relative overflow-hidden"
+            className="px-4 py-3 rounded-2xl flex items-center gap-3 relative overflow-hidden"
             style={{
               background: '#0c1830',
               border: '1.5px solid rgba(94,234,212,0.15)',
               boxShadow: '0 4px 16px rgba(12,24,48,0.35)',
-              minHeight: 96,
+              minHeight: 110,
             }}
           >
             {/* Actual sky image as backdrop */}
             <img src={base + skyFile} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" style={{ objectPosition: 'center 25%' }} />
-            {/* Subtle dark vignette so text stays readable */}
+            {/* Subtle dark vignette */}
             <div className="absolute inset-0 pointer-events-none"
                  style={{ background: 'linear-gradient(135deg, rgba(12,24,48,0.55) 0%, rgba(12,24,48,0.25) 100%)' }} />
-            <div className="relative z-10">
-              {weather?.current ? (
-                (() => {
-                  const wi = getWeatherInfo(weather.current.weatherCode);
-                  return (
-                    <>
-                      <p className="text-3xl leading-none select-none">{wi.emoji}</p>
-                      <p className="font-headline font-extrabold text-2xl leading-none mt-1 text-white">
+            {weather?.current ? (
+              (() => {
+                const wi = getWeatherInfo(weather.current.weatherCode);
+                return (
+                  <>
+                    {/* Big weather emoji anchors the left */}
+                    <p className="relative z-10 leading-none select-none flex-shrink-0" style={{ fontSize: 48 }}>{wi.emoji}</p>
+                    {/* Temp + condition stacked on the right */}
+                    <div className="relative z-10 min-w-0">
+                      <p className="font-headline font-extrabold leading-none text-white" style={{ fontSize: 34 }}>
                         {weather.current.temp}°
                       </p>
-                      <p className="font-label text-xs mt-1 leading-tight"
+                      <p className="font-label text-xs mt-1 leading-tight truncate"
                          style={{ color: 'rgba(255,255,255,0.72)' }}>{wi.label}</p>
-                    </>
-                  );
-                })()
-              ) : (
-                <p className="font-label text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {t('hub.weather.loading')}
-                </p>
-              )}
-            </div>
+                    </div>
+                  </>
+                );
+              })()
+            ) : (
+              <p className="relative z-10 font-label text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                {t('hub.weather.loading')}
+              </p>
+            )}
           </div>
 
         </div>
