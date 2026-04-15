@@ -113,9 +113,13 @@ export default function Sanctuary() {
             </div>
           </div>
 
+          {voice.line && (
+            <div className="flex justify-center mb-3">
+              <VoiceBubble line={voice.line} onDismiss={voice.dismiss} variant="chip" />
+            </div>
+          )}
           <div className="relative z-10 flex flex-col items-center">
             <div className="relative w-56 h-56 flex items-center justify-center">
-              <VoiceBubble line={voice.line} onDismiss={voice.dismiss} variant="float" />
               <img src={base + (currentStage === 0 ? 'art/egg-glow.webp' : 'art/dragon-baby.webp')} alt="Ronki" className="w-full h-full object-contain" />
             </div>
             <div className="w-full mt-4 text-center">
@@ -230,7 +234,7 @@ export default function Sanctuary() {
             onClick={() => !state.catPetted && handleCare(actions.petCompanion, 'petted')}
             disabled={state.catPetted}>
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
-                 style={{ background: state.catPetted ? '#d1fae5' : '#fcd34d', border: state.catPetted ? '2px solid #34d399' : 'none' }}>
+                 style={{ background: state.catPetted ? '#d1fae5' : '#ffffff', border: state.catPetted ? '2px solid #34d399' : '1px solid rgba(18,67,70,0.05)' }}>
               <span className="material-symbols-outlined text-4xl"
                     style={{ color: state.catPetted ? '#059669' : '#725b00', fontVariationSettings: "'FILL' 1" }}>
                 {state.catPetted ? 'check_circle' : 'favorite'}
