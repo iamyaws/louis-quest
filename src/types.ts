@@ -25,6 +25,7 @@ export interface Quest {
   bonus?: number;
   completions?: number;
   sideQuest?: boolean;
+  arcBeatId?: string;   // if set, completing this quest advances the given arc beat
 }
 
 export interface QuestChain {
