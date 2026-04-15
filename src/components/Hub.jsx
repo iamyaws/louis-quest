@@ -385,18 +385,42 @@ export default function Hub({ onNavigate }) {
                 <p className="font-bold text-sm font-label text-on-surface-variant uppercase tracking-widest">{t('hub.water.title')}</p>
                 <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>water_drop</span>
               </div>
-              <div className="flex justify-center gap-4">
+              <div className="flex justify-center gap-3">
                 {[0,1,2,3,4,5].map(i => {
                   const filled = i < (state.dailyWaterCount || 0);
                   const isNext = i === (state.dailyWaterCount || 0);
                   return (
-                    <button key={i}
-                      className={`w-12 h-12 rounded-full border-[2.5px] transition-all flex items-center justify-center ${filled ? 'bg-primary border-primary' : isNext ? 'border-primary animate-pulse' : 'border-primary/15'}`}
-                      style={{ background: filled ? undefined : isNext ? 'rgba(18,67,70,0.08)' : 'rgba(18,67,70,0.03)', boxShadow: isNext ? '0 0 0 4px rgba(18,67,70,0.06)' : 'none' }}
+                    <button
+                      key={i}
+                      className="w-11 h-11 rounded-2xl border-[2px] transition-all flex items-center justify-center"
+                      style={{
+                        border: filled
+                          ? '2px solid #124346'
+                          : isNext
+                          ? '2px solid #124346'
+                          : '2px solid rgba(18,67,70,0.15)',
+                        background: filled
+                          ? 'linear-gradient(160deg, #124346 0%, #1d5c60 100%)'
+                          : isNext
+                          ? 'rgba(18,67,70,0.07)'
+                          : 'rgba(18,67,70,0.02)',
+                        boxShadow: filled
+                          ? '0 2px 8px rgba(18,67,70,0.22)'
+                          : isNext
+                          ? '0 0 0 3px rgba(18,67,70,0.07)'
+                          : 'none',
+                        animation: isNext ? 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite' : 'none',
+                      }}
                       onClick={() => isNext && actions.drinkWater?.()}
                     >
-                      {filled && <span className="material-symbols-outlined text-white text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>}
-                      {isNext && <span className="material-symbols-outlined text-primary text-lg">add</span>}
+                      <span
+                        className="material-symbols-outlined"
+                        style={{
+                          fontSize: 20,
+                          color: filled ? '#ffffff' : isNext ? '#124346' : 'rgba(18,67,70,0.22)',
+                          fontVariationSettings: filled ? "'FILL' 1" : "'FILL' 0",
+                        }}
+                      >local_drink</span>
                     </button>
                   );
                 })}
