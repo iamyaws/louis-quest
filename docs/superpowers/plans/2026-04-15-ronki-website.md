@@ -1035,7 +1035,7 @@ Expected: FAIL — component doesn't exist.
 
 ```tsx
 import { useState, FormEvent } from 'react';
-import { submitWaitlistEmail } from '../lib/waitlist';
+import { submitWaitlistEmail, isValidEmail } from '../lib/waitlist';
 import { getLaunchCopy, LaunchState } from '../config/launch-state';
 
 type Status =
@@ -1077,6 +1077,10 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!isValidEmail(email)) {
+      setStatus({ kind: 'invalid' });
+      return;
+    }
     setStatus({ kind: 'submitting' });
     const result = await submitWaitlistEmail(email);
     if (result.ok) {
