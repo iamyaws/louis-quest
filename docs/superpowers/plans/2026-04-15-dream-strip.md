@@ -542,7 +542,7 @@ git commit -m "feat(dream): CSS keyframes for panel + indicator animations"
 **Files:**
 - Create: `src/components/DreamStrip.jsx`
 
-The component renders a full-screen dark overlay with 1–3 stacked panels. All scene art is inline (pure CSS, no images). Tapping anywhere dismisses.
+The component renders a full-screen dark overlay with a two-phase entrance: (1) overlay fades in with a centered Ronki silhouette glowing softly for ~700ms — "entering the dream"; (2) 1–3 stacked panels stagger in, covering the silhouette. All scene art is inline (pure CSS, no images). Tapping anywhere dismisses.
 
 - [ ] **Step 1: Create the component**
 
@@ -808,19 +808,29 @@ function DreamPanel({ kind, index, total, visible }) {
 }
 
 // ─── DreamStrip overlay ───────────────────────────────────────────────────────
+// Two-phase entrance:
+//   Phase 1 (0–700ms): overlay dark, Ronki silhouette glows center-screen.
+//   Phase 2 (700ms+):  panels stagger in, silhouette fades behind them.
 
 export default function DreamStrip({ highlights, onDismiss }) {
   const { t } = useTranslation();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false);      // controls overlay + silhouette opacity
+  const [panelsReady, setPanelsReady] = useState(false); // controls panel stagger
 
   useEffect(() => {
-    // Defer one frame so the enter transition fires after mount.
-    const id = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(id);
+    // Frame 1: overlay fades in immediately.
+    const frameId = requestAnimationFrame(() => setVisible(true));
+    // Phase 2: panels stagger in after 700ms, silhouette cross-fades out.
+    const timerId = setTimeout(() => setPanelsReady(true), 700);
+    return () => {
+      cancelAnimationFrame(frameId);
+      clearTimeout(timerId);
+    };
   }, []);
 
   const handleDismiss = () => {
     setVisible(false);
+    setPanelsReady(false);
     setTimeout(onDismiss, 360);
   };
 
@@ -839,15 +849,49 @@ export default function DreamStrip({ highlights, onDismiss }) {
         padding: 0,
       }}
     >
+      {/* ── Phase 1: Ronki silhouette — "entering the dream" ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          opacity: panelsReady ? 0 : (visible ? 1 : 0),
+          transition: panelsReady
+            ? 'opacity 400ms ease'
+            : 'opacity 500ms ease 200ms',
+          pointerEvents: 'none',
+          zIndex: 1,
+        }}
+      >
+        {/* Ambient glow */}
+        <div style={{
+          position: 'absolute',
+          width: 110, height: 110, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(94,234,212,0.07) 0%, transparent 70%)',
+        }} />
+        {/* Ronki silhouette — larger than panel versions, breathing */}
+        <div style={{
+          width: 52, height: 66,
+          borderRadius: '50% 50% 40% 40%',
+          background: 'rgba(18,67,70,0.88)',
+          boxShadow:
+            '0 0 32px 14px rgba(94,234,212,0.1), 0 0 60px 24px rgba(252,211,77,0.06)',
+          animation: 'dream-breathe 3s ease-in-out infinite',
+        }} />
+      </div>
+
+      {/* ── Phase 2: Panels ── */}
       {highlights.map((h, i) => (
         <DreamPanel
           key={h.kind + i}
           kind={h.kind}
           index={i}
           total={highlights.length}
-          visible={visible}
+          visible={panelsReady}
         />
       ))}
+
       {/* Wordless tap hint — a small horizontal bar */}
       <div
         aria-hidden="true"
@@ -855,7 +899,7 @@ export default function DreamStrip({ highlights, onDismiss }) {
           position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
           width: 32, height: 2, borderRadius: 1,
           background: 'rgba(255,255,255,0.18)',
-          opacity: visible ? 1 : 0,
+          opacity: panelsReady ? 1 : 0,
           transition: 'opacity 600ms ease 700ms',
         }}
       />
