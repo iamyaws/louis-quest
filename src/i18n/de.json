@@ -919,5 +919,21 @@
 
   "gearslot.head": "Kopf",
   "gearslot.body": "Körper",
-  "gearslot.accessory": "Accessoire"
+  "gearslot.accessory": "Accessoire",
+
+  "arc.first.title": "Das erste Abenteuer",
+  "arc.first.chapter": "Prolog",
+  "arc.first.beats.dream.before": "Ich hatte heute Nacht einen seltsamen Traum. Möchtest du ihn hören?",
+  "arc.first.beats.dream.text": "Ich träumte von einem Ort, den ich noch nie gesehen hab. Er lag nicht weit von hier. Vielleicht kennst du ihn — vielleicht hast du eine Karte davon im Kopf. Wir sollten sie zeichnen.",
+  "arc.first.beats.dream.after": "Wow. Dein Kopf ist voller Orte. Lass uns eine davon aufmalen.",
+  "arc.first.beats.map.title": "Zeichne eine Karte",
+  "arc.first.beats.map.before": "Wähle einen Lieblingsort — dein Zimmer, der Garten, der Spielplatz. Und zeichne ihn.",
+  "arc.first.beats.map.step1": "Male die Karte mit Farben, die zu dem Ort passen.",
+  "arc.first.beats.map.step2": "Hänge sie irgendwo auf, wo du sie siehst.",
+  "arc.first.beats.map.step3": "Erzähle jemandem in der Familie davon.",
+  "arc.first.beats.map.step4": "Zeige sie mir, wenn du fertig bist!",
+  "arc.first.beats.map.after": "Eine Karte! Jetzt wissen wir beide, wohin wir gehen können.",
+  "arc.first.beats.wake.before": "Noch eine Sache, dann bin ich ganz wach für unser Abenteuer — mach eine Morgenroutine mit mir.",
+  "arc.first.beats.wake.after": "Bereit. Das Abenteuer beginnt.",
+  "arc.first.complete": "Du hast unser erstes Abenteuer geschafft!"
 }

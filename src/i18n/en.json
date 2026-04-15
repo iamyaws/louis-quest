@@ -919,5 +919,21 @@
 
   "gearslot.head": "Head",
   "gearslot.body": "Body",
-  "gearslot.accessory": "Accessory"
+  "gearslot.accessory": "Accessory",
+
+  "arc.first.title": "The First Adventure",
+  "arc.first.chapter": "Prologue",
+  "arc.first.beats.dream.before": "I had a strange dream last night. Want to hear it?",
+  "arc.first.beats.dream.text": "I dreamed of a place I had never seen before. It was close by. Maybe you know it — maybe you have a map of it in your head. We should draw it.",
+  "arc.first.beats.dream.after": "Wow. Your head is full of places. Let's draw one of them.",
+  "arc.first.beats.map.title": "Draw a map",
+  "arc.first.beats.map.before": "Pick a favorite place — your room, the garden, the playground. And draw it.",
+  "arc.first.beats.map.step1": "Color the map with shades that fit the place.",
+  "arc.first.beats.map.step2": "Hang it somewhere you can see it.",
+  "arc.first.beats.map.step3": "Tell someone in the family about it.",
+  "arc.first.beats.map.step4": "Show it to me when you are done!",
+  "arc.first.beats.map.after": "A map! Now we both know where we can go.",
+  "arc.first.beats.wake.before": "One more thing and I will be fully awake for our adventure — do a morning routine with me.",
+  "arc.first.beats.wake.after": "Ready. The adventure begins.",
+  "arc.first.complete": "You finished our first adventure!"
 }
