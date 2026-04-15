@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 
-const API_URL = "https://api.open-meteo.com/v1/forecast?latitude=48.0833&longitude=11.6167&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&timezone=Europe/Berlin&forecast_days=3";
+// Default: geographic centre of Germany (fallback when geolocation denied/unavailable)
+const DEFAULT_LAT = 51.165;
+const DEFAULT_LON = 10.451;
+
+function buildApiUrl(lat: number, lon: number): string {
+  return `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&timezone=auto&forecast_days=3`;
+}
 
 export interface WeatherData {
   current: {
@@ -20,8 +26,30 @@ export interface WeatherData {
   fetchedAt: number;
 }
 
-const CACHE_KEY = "hdx_weather";
+const CACHE_KEY = 'hdx_weather';
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+function parseWeatherResponse(data: Record<string, unknown>): WeatherData {
+  const current = data.current as Record<string, number>;
+  const daily = data.daily as Record<string, unknown[]>;
+  return {
+    current: {
+      temp: Math.round(current.temperature_2m),
+      feelsLike: Math.round(current.apparent_temperature),
+      weatherCode: current.weathercode,
+      windSpeed: Math.round(current.windspeed_10m),
+      humidity: current.relative_humidity_2m,
+    },
+    daily: (daily.time as string[]).map((d, i) => ({
+      date: d,
+      tempMax: Math.round((daily.temperature_2m_max as number[])[i]),
+      tempMin: Math.round((daily.temperature_2m_min as number[])[i]),
+      weatherCode: (daily.weathercode as number[])[i],
+      precipProb: (daily.precipitation_probability_max as number[])[i],
+    })),
+    fetchedAt: Date.now(),
+  };
+}
 
 export default function useWeather() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -29,7 +57,7 @@ export default function useWeather() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    // Check cache first
+    // Serve from cache if fresh
     try {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
@@ -40,112 +68,105 @@ export default function useWeather() {
           return;
         }
       }
-    } catch { /* ignore */ }
+    } catch { /* ignore parse errors */ }
 
-    fetch(API_URL)
-      .then(r => r.json())
-      .then(data => {
-        const result: WeatherData = {
-          current: {
-            temp: Math.round(data.current.temperature_2m),
-            feelsLike: Math.round(data.current.apparent_temperature),
-            weatherCode: data.current.weathercode,
-            windSpeed: Math.round(data.current.windspeed_10m),
-            humidity: data.current.relative_humidity_2m,
-          },
-          daily: data.daily.time.map((d: string, i: number) => ({
-            date: d,
-            tempMax: Math.round(data.daily.temperature_2m_max[i]),
-            tempMin: Math.round(data.daily.temperature_2m_min[i]),
-            weatherCode: data.daily.weathercode[i],
-            precipProb: data.daily.precipitation_probability_max[i],
-          })),
-          fetchedAt: Date.now(),
-        };
-        setWeather(result);
-        try { localStorage.setItem(CACHE_KEY, JSON.stringify(result)); } catch { /* full */ }
-      })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
+    const fetchWeather = (lat: number, lon: number) => {
+      fetch(buildApiUrl(lat, lon))
+        .then(r => r.json())
+        .then((data: Record<string, unknown>) => {
+          const result = parseWeatherResponse(data);
+          setWeather(result);
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify(result)); } catch { /* storage full */ }
+        })
+        .catch(() => setError(true))
+        .finally(() => setLoading(false));
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+        () => fetchWeather(DEFAULT_LAT, DEFAULT_LON), // denied or unavailable
+        { timeout: 5000 },
+      );
+    } else {
+      fetchWeather(DEFAULT_LAT, DEFAULT_LON);
+    }
   }, []);
 
   return { weather, loading, error };
 }
 
-// ── Weather code to emoji + label ──
+// ── Weather code → emoji + label ──────────────────────────────────────────────
 export function getWeatherInfo(code: number): { emoji: string; label: string } {
-  if (code === 0) return { emoji: "\u2600\uFE0F", label: "Sonnig" };
-  if (code <= 3) return { emoji: "\u26C5", label: "Bewölkt" };
-  if (code <= 48) return { emoji: "\u{1F32B}\uFE0F", label: "Nebel" };
-  if (code <= 57) return { emoji: "\u{1F327}\uFE0F", label: "Nieselregen" };
-  if (code <= 67) return { emoji: "\u{1F327}\uFE0F", label: "Regen" };
-  if (code <= 77) return { emoji: "\u{1F328}\uFE0F", label: "Schnee" };
-  if (code <= 82) return { emoji: "\u{1F326}\uFE0F", label: "Regenschauer" };
-  if (code <= 86) return { emoji: "\u{1F328}\uFE0F", label: "Schneeschauer" };
-  if (code <= 99) return { emoji: "\u26C8\uFE0F", label: "Gewitter" };
-  return { emoji: "\u2601\uFE0F", label: "Bewölkt" };
+  if (code === 0)   return { emoji: '☀️',  label: 'Sonnig' };
+  if (code <= 3)    return { emoji: '⛅',  label: 'Bewölkt' };
+  if (code <= 48)   return { emoji: '🌫️',  label: 'Nebel' };
+  if (code <= 57)   return { emoji: '🌧️',  label: 'Nieselregen' };
+  if (code <= 67)   return { emoji: '🌧️',  label: 'Regen' };
+  if (code <= 77)   return { emoji: '🌨️',  label: 'Schnee' };
+  if (code <= 82)   return { emoji: '🌦️',  label: 'Regenschauer' };
+  if (code <= 86)   return { emoji: '🌨️',  label: 'Schneeschauer' };
+  if (code <= 99)   return { emoji: '⛈️',  label: 'Gewitter' };
+  return { emoji: '☁️', label: 'Bewölkt' };
 }
 
-// ── Clothing recommendations ──
+// ── Clothing recommendations ──────────────────────────────────────────────────
 export interface ClothingItem {
   emoji: string;
   name: string;
   reason: string;
 }
 
-export function getClothingRecs(temp: number, feelsLike: number, weatherCode: number, windSpeed: number): ClothingItem[] {
+export function getClothingRecs(
+  temp: number,
+  feelsLike: number,
+  weatherCode: number,
+  windSpeed: number,
+): ClothingItem[] {
   const items: ClothingItem[] = [];
   const effective = feelsLike;
   const isRain = (weatherCode >= 51 && weatherCode <= 67) || (weatherCode >= 80 && weatherCode <= 82) || weatherCode >= 95;
   const isSnow = (weatherCode >= 71 && weatherCode <= 77) || (weatherCode >= 85 && weatherCode <= 86);
   const isWindy = windSpeed >= 25;
 
-  // Base layers by temperature
   if (effective < 0) {
-    items.push({ emoji: "\u{1F9E5}", name: "Winterjacke", reason: "Es ist eiskalt!" });
-    items.push({ emoji: "\u{1F9E3}", name: "Schal", reason: "Hals warm halten" });
-    items.push({ emoji: "\u{1F9E4}", name: "Handschuhe", reason: "Finger schützen" });
-    items.push({ emoji: "\u{1F9E2}", name: "Mütze", reason: "Kopf warm halten" });
-    items.push({ emoji: "\u{1F456}", name: "Dicke Hose", reason: "Beine warmhalten" });
-    items.push({ emoji: "\u{1F97E}", name: "Winterstiefel", reason: "Füße warmhalten" });
+    items.push({ emoji: '🧥', name: 'Winterjacke',   reason: 'Es ist eiskalt!' });
+    items.push({ emoji: '🧣', name: 'Schal',          reason: 'Hals warm halten' });
+    items.push({ emoji: '🧤', name: 'Handschuhe',     reason: 'Finger schützen' });
+    items.push({ emoji: '🧢', name: 'Mütze',          reason: 'Kopf warm halten' });
+    items.push({ emoji: '👖', name: 'Dicke Hose',     reason: 'Beine warmhalten' });
+    items.push({ emoji: '🥾', name: 'Winterstiefel',  reason: 'Füße warmhalten' });
   } else if (effective < 10) {
-    items.push({ emoji: "\u{1F9E5}", name: "Jacke", reason: "Es ist kalt" });
-    items.push({ emoji: "\u{1F9E5}", name: "Langer Pulli", reason: "Extra Wärme" });
-    items.push({ emoji: "\u{1F456}", name: "Lange Hose", reason: "Beine warmhalten" });
+    items.push({ emoji: '🧥', name: 'Jacke',          reason: 'Es ist kalt' });
+    items.push({ emoji: '🧥', name: 'Langer Pulli',   reason: 'Extra Wärme' });
+    items.push({ emoji: '👖', name: 'Lange Hose',     reason: 'Beine warmhalten' });
   } else if (effective < 18) {
-    items.push({ emoji: "\u{1F9E5}", name: "Leichte Jacke", reason: "Für morgens/abends" });
-    items.push({ emoji: "\u{1F9E5}", name: "Pulli/Hoodie", reason: "Kann kühl werden" });
-    items.push({ emoji: "\u{1F456}", name: "Lange Hose", reason: "Angenehm warm" });
+    items.push({ emoji: '🧥', name: 'Leichte Jacke',  reason: 'Für morgens/abends' });
+    items.push({ emoji: '🧥', name: 'Pulli/Hoodie',   reason: 'Kann kühl werden' });
+    items.push({ emoji: '👖', name: 'Lange Hose',     reason: 'Angenehm warm' });
   } else if (effective < 25) {
-    items.push({ emoji: "\u{1F455}", name: "T-Shirt", reason: "Schönes Wetter!" });
-    items.push({ emoji: "\u{1FA73}", name: "Kurze/Lange Hose", reason: "Wie du magst" });
-    items.push({ emoji: "\u{1F45F}", name: "Sneaker", reason: "Bequem unterwegs" });
+    items.push({ emoji: '👕', name: 'T-Shirt',        reason: 'Schönes Wetter!' });
+    items.push({ emoji: '🩳', name: 'Kurze/Lange Hose', reason: 'Wie du magst' });
+    items.push({ emoji: '👟', name: 'Sneaker',        reason: 'Bequem unterwegs' });
   } else {
-    items.push({ emoji: "\u{1F455}", name: "T-Shirt", reason: "Es ist heiß!" });
-    items.push({ emoji: "\u{1FA73}", name: "Kurze Hose", reason: "Bleib kühl" });
-    items.push({ emoji: "\u{1F576}\uFE0F", name: "Sonnenbrille", reason: "Augen schützen" });
-    items.push({ emoji: "\u{1F9E2}", name: "Kappe/Hut", reason: "Sonnenschutz" });
+    items.push({ emoji: '👕', name: 'T-Shirt',        reason: 'Es ist heiß!' });
+    items.push({ emoji: '🩳', name: 'Kurze Hose',     reason: 'Bleib kühl' });
+    items.push({ emoji: '🕶️', name: 'Sonnenbrille',   reason: 'Augen schützen' });
+    items.push({ emoji: '🧢', name: 'Kappe/Hut',      reason: 'Sonnenschutz' });
   }
 
-  // Sun protection
   if (temp >= 20 && weatherCode <= 3) {
-    items.push({ emoji: "\u2600\uFE0F", name: "Sonnencreme", reason: "UV-Schutz!" });
+    items.push({ emoji: '☀️', name: 'Sonnencreme',    reason: 'UV-Schutz!' });
   }
-
-  // Rain gear
   if (isRain) {
-    items.push({ emoji: "\u{1F327}\uFE0F", name: "Regenjacke", reason: "Es regnet!" });
-    items.push({ emoji: "\u2602\uFE0F", name: "Regenschirm", reason: "Trocken bleiben" });
+    items.push({ emoji: '🌧️', name: 'Regenjacke',    reason: 'Es regnet!' });
+    items.push({ emoji: '☂️', name: 'Regenschirm',   reason: 'Trocken bleiben' });
   }
-
-  // Snow gear
   if (isSnow && effective >= 0) {
-    items.push({ emoji: "\u{1F97E}", name: "Winterstiefel", reason: "Rutschfest bleiben" });
+    items.push({ emoji: '🥾', name: 'Winterstiefel', reason: 'Rutschfest bleiben' });
   }
-
-  // Wind
   if (isWindy && effective >= 10) {
-    items.push({ emoji: "\u{1F4A8}", name: "Windbreaker", reason: "Starker Wind!" });
+    items.push({ emoji: '💨', name: 'Windbreaker',   reason: 'Starker Wind!' });
   }
 
   return items;
