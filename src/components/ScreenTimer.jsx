@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
+import VoiceAudio from '../utils/voiceAudio';
 
 function AnimatedDigit({ d, size }) {
   // size: 'sm' (badge, text-lg) or 'lg' (expanded panel, text-4xl)
@@ -56,9 +57,21 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
           clearInterval(intervalRef.current);
           setFinished(true);
           SFX.play('alarm');
+          VoiceAudio.play('de_screen_done');
           if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
           onFinish?.();
           return 0;
+        }
+        // Ronki voice milestones
+        const halfPoint = Math.floor(totalSeconds / 2);
+        if (prev === halfPoint) VoiceAudio.play('de_screen_half');
+        if (prev === 300) VoiceAudio.play('de_screen_5min');  // 5 min left
+        if (prev === 120) VoiceAudio.play('de_screen_2min');  // 2 min left
+        if (prev === 60) VoiceAudio.play('de_screen_1min');   // 1 min left
+        // Eye care reminders every 10 minutes
+        if (prev > 60 && prev % 600 === 0) {
+          const eyeLines = ['de_screen_eyes', 'de_screen_eyes2', 'de_screen_eyes3'];
+          VoiceAudio.play(eyeLines[Math.floor(Math.random() * eyeLines.length)]);
         }
         // Warning tick in last 60 seconds
         if (prev <= 61 && prev > 1 && prev % 10 === 0 && !warningPlayed.current) {

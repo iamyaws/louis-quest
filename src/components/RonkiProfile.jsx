@@ -20,7 +20,7 @@ const STAGE_COLORS = ['#94a3b8', '#34d399', '#0ea5e9', '#f59e0b', '#a855f7'];
 
 // Fun facts about Ronki — data from the old CompanionProfile
 const FACTS = {
-  species: { de: 'Vietnamesischer Rồng', en: 'Vietnamese Rồng' },
+  species: { de: 'Rồng (Drache)', en: 'Rồng (Dragon)' },
   likes: { de: 'Feuer, Flüge, Abenteuer', en: 'Fire, flights, adventures' },
   dislikes: { de: 'Kälte, Langeweile', en: 'Cold weather, boredom' },
   talent: { de: 'Kann kleine Flammen pusten', en: 'Can blow tiny flames' },

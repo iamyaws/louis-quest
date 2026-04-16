@@ -88,9 +88,9 @@ export const DEFAULT_FAMILY_CONFIG: FamilyConfig = {
     },
   ],
   parentMessage: {
-    title: 'Botschaft für Louis',
-    body: 'Fehler sind okay. Mama & Papa sind immer für dich da. 🧡',
-    signature: 'Louis, Papa und Mama lieben dich.',
+    title: 'Botschaft für dich',
+    body: 'Fehler sind okay. Deine Familie ist immer für dich da. 🧡',
+    signature: 'Wir haben dich lieb.',
   },
   familyMotto: 'Lieb sein. Sich Mühe geben.\u00A0Zusammen sein.',
   affirmation: 'Ich bin geliebt, so wie ich bin.',

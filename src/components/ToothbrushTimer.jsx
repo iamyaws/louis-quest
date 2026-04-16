@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SFX from '../utils/sfx';
+import VoiceAudio from '../utils/voiceAudio';
 
 /**
  * ToothbrushTimer — 2-3 minute countdown with animated dragon.
@@ -31,6 +32,9 @@ export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
   const currentStage = STAGES.reduce((acc, s) => pct >= s.pct ? s : acc, STAGES[0]);
   const stageIdx = STAGES.indexOf(currentStage);
 
+  // Voice on mount
+  useEffect(() => { VoiceAudio.play('de_teeth_start'); }, []);
+
   // Countdown
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -39,15 +43,24 @@ export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
           clearInterval(intervalRef.current);
           setFinished(true);
           SFX.play('alarm');
+          VoiceAudio.play('de_teeth_done');
           if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
           return 0;
         }
-        // Tick sound at stage transitions
+        // Voice + tick sound at stage transitions
         const newPct = 1 - ((prev - 1) / duration);
         const newStage = STAGES.reduce((acc, s) => newPct >= s.pct ? s : acc, STAGES[0]);
-        if (STAGES.indexOf(newStage) !== stageIdx) {
+        const newIdx = STAGES.indexOf(newStage);
+        if (newIdx !== stageIdx) {
           SFX.play('pop');
           if (navigator.vibrate) navigator.vibrate(100);
+          // Ronki voice for each quadrant
+          const voiceMap = ['de_teeth_start', 'de_teeth_topright', 'de_teeth_bottomleft', 'de_teeth_bottomright'];
+          if (voiceMap[newIdx]) VoiceAudio.play(voiceMap[newIdx]);
+        }
+        // Halfway voice
+        if (prev === Math.floor(duration / 2) + 1) {
+          VoiceAudio.play('de_teeth_halfway');
         }
         return prev - 1;
       });
