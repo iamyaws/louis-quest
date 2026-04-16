@@ -3,6 +3,7 @@ import { MOOD_EMOJIS } from '../constants';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
+import VoiceAudio from '../utils/voiceAudio';
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 const GRATITUDE = ["Familie", "Freunde", "Spielen", "Essen", "Natur", "Schule", "Ronki"];
@@ -69,8 +70,11 @@ export default function Journal() {
   const hasTodayContent = memory || gratitude.length > 0 || dayEmoji !== null || achievements.length > 0;
 
   const handleSave = () => {
-    SFX.play('pop');
     actions.saveJournal({ memory, gratitude, dayEmoji, achievements });
+    // Actual book close SFX (not Ronki's voice) + delayed Ronki encouragement
+    SFX.play('pop');
+    const encouragements = ['de_journal_done_01', 'de_journal_done_02', 'de_journal_done_03'];
+    setTimeout(() => VoiceAudio.play(encouragements[Math.floor(Math.random() * encouragements.length)]), 800);
     setBookOpen(false);
   };
 

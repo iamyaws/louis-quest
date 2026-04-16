@@ -112,6 +112,7 @@ function AppContent() {
           if (id === 'potion') setView('potion');
           if (id === 'clouds') setView('clouds');
           if (id === 'starfall') setView('starfall');
+          if (id === 'starfighter') setView('starfighter');
         }} />}
       </div>
       <NavBar active={view} onNavigate={setView} />

@@ -20,10 +20,8 @@ const GAMES = [
     titleKey: 'game.starfall',
     descKey: 'game.starfall.desc',
     emoji: '⭐',
-    bg: 'linear-gradient(160deg, #f5f3ff 0%, #c4b5fd 50%, #8b5cf6 100%)',
-    textColor: '#3b0764',
-    btnBg: 'rgba(59,7,100,0.1)',
-    btnColor: '#3b0764',
+    bg: 'linear-gradient(160deg, #fef9c3 0%, #fde047 50%, #eab308 100%)',
+    textColor: '#713f12',
     ready: true,
   },
   {
@@ -53,10 +51,8 @@ const GAMES = [
     titleKey: 'game.starfighter',
     descKey: 'game.starfighter.desc',
     emoji: '🐉',
-    bg: 'linear-gradient(160deg, #ede9fe 0%, #a78bfa 50%, #7c3aed 100%)',
-    textColor: '#2e1065',
-    btnBg: 'rgba(46,16,101,0.1)',
-    btnColor: '#2e1065',
+    bg: 'linear-gradient(160deg, #ecfdf5 0%, #6ee7b7 50%, #059669 100%)',
+    textColor: '#064e3b',
     ready: true,
   },
 ];
@@ -117,9 +113,13 @@ export default function MiniGames({ onPlay }) {
               </p>
             </div>
             <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-                 style={{ background: game.btnBg }}>
+                 style={{
+                   background: '#ffffff',
+                   border: `2.5px solid ${game.textColor}30`,
+                   boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                 }}>
               <span className="material-symbols-outlined text-xl"
-                    style={{ color: game.btnColor, fontVariationSettings: "'FILL' 1" }}>
+                    style={{ color: game.textColor, fontVariationSettings: "'FILL' 1" }}>
                 {unlocked ? 'play_arrow' : 'lock'}
               </span>
             </div>

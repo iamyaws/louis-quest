@@ -364,24 +364,31 @@ export default function RonkiProfile({ onNavigate }) {
 
         {/* ═══ QUICK LINKS ═══ */}
         <div className="flex flex-col gap-3 mt-8">
-          {/* Ronkis Freunde link (Phase 2) */}
+          {/* Ronkis Freunde — prominent card */}
           <button
-            className="w-full flex items-center gap-4 p-4 rounded-2xl active:scale-[0.98] transition-all text-left"
-            style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)', border: '1.5px solid rgba(161,98,7,0.16)' }}
+            className="w-full rounded-2xl p-5 active:scale-[0.98] transition-all text-left relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%)',
+              border: '2px solid rgba(161,98,7,0.2)',
+              boxShadow: '0 6px 20px rgba(252,211,77,0.35), 0 2px 0 #d4a830',
+            }}
             onClick={() => onNavigate?.('micropedia')}
           >
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                 style={{ background: 'rgba(252,211,77,0.2)' }}>
-              <span className="material-symbols-outlined text-xl" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>grid_view</span>
+            <div className="flex items-center gap-4">
+              <span className="text-4xl select-none">🐾</span>
+              <div className="flex-1">
+                <h3 className="font-headline font-bold text-xl" style={{ color: '#78350f' }}>
+                  {lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}
+                </h3>
+                <p className="font-body text-sm mt-0.5" style={{ color: '#92400e' }}>
+                  {lang === 'de' ? '9 Freunde warten auf dich!' : '9 friends waiting for you!'}
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                   style={{ background: 'rgba(255,255,255,0.4)' }}>
+                <span className="material-symbols-outlined text-xl" style={{ color: '#78350f' }}>arrow_forward</span>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-headline font-bold text-base text-on-surface">Ronkis Freunde</p>
-              <p className="font-label text-xs text-on-surface-variant">
-                {lang === 'de' ? 'Entdecke neue Freunde!' : 'Discover new friends!'}
-                {' · '}{lang === 'de' ? 'Bald verfügbar' : 'Coming soon'}
-              </p>
-            </div>
-            <span className="material-symbols-outlined text-on-surface-variant/40">chevron_right</span>
           </button>
 
           {/* Discovery Log link */}
