@@ -20,7 +20,7 @@ const STAGES = [
   { pct: 1.00, label: 'Fertig!',      emoji: '🎉', side: 'done' },
 ];
 
-const base = typeof import?.meta?.env?.BASE_URL === 'string' ? import.meta.env.BASE_URL : '/';
+const base = import.meta.env.BASE_URL;
 
 export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
   const [remaining, setRemaining] = useState(duration);

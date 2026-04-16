@@ -40,7 +40,7 @@ const TARGET_DATA = {
   green:  { label: { de: 'Grün',   en: 'Green' },   hex: '#22c55e', emoji: '🟢', answer: ['blue', 'yellow'] },
 };
 
-const base = typeof import?.meta?.env?.BASE_URL === 'string' ? import.meta.env.BASE_URL : '/';
+const base = import.meta.env.BASE_URL;
 
 export default function PotionGame({ onComplete }) {
   const { t, lang } = useTranslation();

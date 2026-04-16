@@ -29,7 +29,7 @@ const BULLET_R = 4;
 const ENEMY_R = 16;
 const FIRE_RATE = 280; // ms between shots
 
-const base = typeof import?.meta?.env?.BASE_URL === 'string' ? import.meta.env.BASE_URL : '/';
+const base = import.meta.env.BASE_URL;
 
 export default function StarfighterGame({ onComplete }) {
   const { lang } = useTranslation();
