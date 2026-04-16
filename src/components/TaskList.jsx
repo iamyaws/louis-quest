@@ -4,6 +4,7 @@ import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import useWeather, { getWeatherInfo, getClothingRecs } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
+import { useSpecialQuests } from '../hooks/useSpecialQuests';
 
 const ANCHOR_META_BASE = {
   morning: { icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)', artFile: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_an_early_morning_sky._S_882cfbe3-5eac-4403-87a0-5c66602cf76b_2.webp' },
@@ -21,6 +22,8 @@ export default function TaskList() {
   const { weather } = useWeather();
   const [showWeather, setShowWeather] = useState(false);
   const { t, locale } = useTranslation();
+  const lang = locale || 'de';
+  const { quests: specialQuests, completed: sqCompleted, totalDone: sqDone, total: sqTotal } = useSpecialQuests();
 
   const ANCHOR_META_I18N = {
     morning: { ...ANCHOR_META_BASE.morning, label: t('task.morning.title'), sublabel: t('task.morning.subtitle') },
@@ -77,6 +80,73 @@ export default function TaskList() {
           </button>
         </div>
       </section>
+
+      {/* ── Special / Discovery Quests ── */}
+      {sqDone < sqTotal && (
+        <div className="mb-5">
+          {/* Section header */}
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-headline font-bold text-lg text-on-surface">
+              {lang === 'de' ? 'Entdecker-Quests' : 'Explorer Quests'}
+            </h3>
+            <span className="font-label text-xs text-outline">
+              {sqDone} / {sqTotal}
+            </span>
+          </div>
+
+          {/* Quest list */}
+          <div className="flex flex-col gap-2">
+            {specialQuests.map((q, i) => {
+              const isDone = !!sqCompleted[q.id];
+              const title = lang === 'de' ? q.titleDe : q.titleEn;
+              const desc  = lang === 'de' ? q.descDe  : q.descEn;
+              return (
+                <div
+                  key={q.id}
+                  className="flex items-center gap-3 p-3 rounded-2xl"
+                  style={{
+                    background: isDone ? 'rgba(52,211,153,0.06)' : 'rgba(255,255,255,0.7)',
+                    border: isDone
+                      ? '1px solid rgba(52,211,153,0.2)'
+                      : '1px solid rgba(0,0,0,0.07)',
+                    opacity: isDone ? 0.7 : 1,
+                  }}
+                >
+                  <span className="text-2xl leading-none select-none flex-shrink-0">{q.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-body text-sm font-semibold ${isDone ? 'line-through text-on-surface-variant' : 'text-on-surface'}`}>
+                      {title}
+                    </p>
+                    {!isDone && (
+                      <p className="font-body text-xs text-on-surface-variant mt-0.5 leading-snug">{desc}</p>
+                    )}
+                  </div>
+                  {isDone && (
+                    <span className="material-symbols-outlined text-xl flex-shrink-0"
+                          style={{ color: '#34d399', fontVariationSettings: "'FILL' 1" }}>
+                      check_circle
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* All done — show a small celebration stamp */}
+      {sqDone === sqTotal && sqTotal > 0 && (
+        <div className="mb-5 p-4 rounded-2xl text-center"
+             style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.08), rgba(252,211,77,0.08))', border: '1px solid rgba(52,211,153,0.2)' }}>
+          <p className="text-2xl mb-1">🗺️</p>
+          <p className="font-headline font-bold text-base text-on-surface">
+            {lang === 'de' ? 'Alle Geheimnisse entdeckt!' : 'All secrets discovered!'}
+          </p>
+          <p className="font-body text-sm text-on-surface-variant">
+            {lang === 'de' ? 'Du bist ein wahrer Entdecker.' : 'You are a true explorer.'}
+          </p>
+        </div>
+      )}
 
       {/* ── Epic Quest Groups ── */}
       <div className="flex flex-col gap-5">

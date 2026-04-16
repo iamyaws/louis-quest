@@ -9,6 +9,7 @@ import { findArc } from '../arcs/arcs';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
+import { SPECIAL_QUESTS } from '../data/specialQuests';
 import storage from '../utils/storage';
 import { useAuth } from './AuthContext';
 
@@ -23,7 +24,7 @@ export interface JournalEntry {
 }
 
 // ── Minimal state shape for the task list ──
-interface TaskState {
+export interface TaskState {
   quests: Quest[];
   sm: Record<string, number>;
   lastDate: string;
@@ -72,6 +73,8 @@ interface TaskState {
   arcBeatAdvancedToday?: boolean;
   dreamHighlights?: DreamHighlightsData;
   totalQuestCompletions?: Record<string, number>;
+  completedSpecialQuests?: Record<string, boolean>;
+  viewsVisited?: string[];
 }
 
 interface TaskComputed {
@@ -106,6 +109,8 @@ interface TaskActions {
   updateBirthdayEpic: (data: { done: string[]; completed: boolean }) => void;
   updateFamilyConfig: (config: FamilyConfig) => void;
   patchState: (partial: Partial<TaskState>) => void;
+  completeSpecialQuest: (id: string) => void;
+  recordViewVisit: (view: string) => void;
 }
 
 interface CelebrationEvent {
@@ -192,6 +197,8 @@ export function createInitialState(): TaskState {
     arcEngine: initialArcState(),
     bossKilledToday: false,
     arcBeatAdvancedToday: false,
+    completedSpecialQuests: {},
+    viewsVisited: [],
   };
 }
 
@@ -278,6 +285,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           gamesPlayedToday: raw.gamesPlayedToday || [],
           birthdayEpic: raw.birthdayEpic || { done: [], completed: false },
           familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
+          completedSpecialQuests: raw.completedSpecialQuests || {},
+          viewsVisited: raw.viewsVisited || [],
         };
         // One-time migration: reset inflated HP from old economy
         if (!raw._v2_economy_reset) {
@@ -839,6 +848,30 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, ...partial } : prev);
   }, []);
 
+  // ── Complete a special/discovery quest (idempotent, silent) ──
+  const completeSpecialQuest = useCallback((id: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      if (prev.completedSpecialQuests?.[id]) return prev; // idempotent
+      const quest = SPECIAL_QUESTS.find(q => q.id === id);
+      const xpBonus = quest?.xpReward ?? 0;
+      return {
+        ...prev,
+        completedSpecialQuests: { ...(prev.completedSpecialQuests || {}), [id]: true },
+        xp: (prev.xp || 0) + xpBonus,
+      };
+    });
+  }, []);
+
+  // ── Record first visit to a view (idempotent) ──
+  const recordViewVisit = useCallback((view: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      if ((prev.viewsVisited || []).includes(view)) return prev; // idempotent
+      return { ...prev, viewsVisited: [...(prev.viewsVisited || []), view] };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -862,7 +895,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

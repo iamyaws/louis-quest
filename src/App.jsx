@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { AuthProvider, useAuth, LoginScreen } from './context/AuthContext';
 import { TaskProvider, useTask } from './context/TaskContext';
 import { useTranslation } from './i18n/LanguageContext';
@@ -23,6 +23,7 @@ import CompanionToast from './components/CompanionToast';
 import ScreenTimer from './components/ScreenTimer';
 import RonkiProfile from './components/RonkiProfile';
 import MemoryWall from './components/MemoryWall';
+import { useSpecialQuests } from './hooks/useSpecialQuests';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -31,6 +32,14 @@ function AppContent() {
   const [showParental, setShowParental] = useState(false);
   const longPressTimer = useRef(null);
   const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
+
+  useSpecialQuests(); // side-effect only — silently completes special quests
+
+  // Scroll to top whenever the active view changes; also record first-time visits
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    actions.recordViewVisit(view); // track first-time feature discovery
+  }, [view]);
 
   const startScreenTimer = (reward) => {
     setScreenTimer({

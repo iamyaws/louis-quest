@@ -264,6 +264,9 @@ export interface GameState {
   arcBeatAdvancedToday?: boolean;
   dreamHighlights?: DreamHighlightsData;
   totalQuestCompletions?: Record<string, number>;
+  // ── Special / Discovery Quests ──
+  completedSpecialQuests?: Record<string, boolean>;
+  viewsVisited?: string[];
 }
 
 export interface ComputedState {

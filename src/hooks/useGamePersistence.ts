@@ -241,6 +241,9 @@ function applyDefaults(p: GameState): void {
   if (p.dailyWaterCount === undefined) p.dailyWaterCount = 0;
   // Total task days migration
   if (p.totalTaskDays === undefined) p.totalTaskDays = 0;
+  // Special / discovery quests
+  if (!p.completedSpecialQuests) p.completedSpecialQuests = {};
+  if (!p.viewsVisited) p.viewsVisited = [];
 }
 
 interface OnboardData {

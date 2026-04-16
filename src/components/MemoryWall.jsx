@@ -2,6 +2,8 @@
 import React from 'react';
 import { useTask } from '../context/TaskContext';
 import { BOSSES, BADGES, ANCHORS } from '../constants';
+import { useTranslation } from '../i18n/LanguageContext';
+import { SPECIAL_QUESTS } from '../data/specialQuests';
 
 const BOSS_TIER_COLORS = { tier1: '#34d399', tier2: '#f59e0b', tier3: '#ef4444' };
 
@@ -40,6 +42,8 @@ function Stamp({ emoji, label, accentColor = '#fcd34d', index = 0 }) {
 
 export default function MemoryWall() {
   const { state } = useTask();
+  const { locale } = useTranslation();
+  const lang = locale || 'de';
   const base = import.meta.env.BASE_URL;
 
   if (!state) return null;
@@ -66,6 +70,9 @@ export default function MemoryWall() {
       };
     });
 
+  // Completed discovery quests
+  const completedSQ = SPECIAL_QUESTS.filter(q => state.completedSpecialQuests?.[q.id]);
+
   // Milestone stamps
   const totalTasksDone = state.totalTasksDone || 0;
   const completedMissionsCount = (state.completedMissions || []).length;
@@ -75,7 +82,7 @@ export default function MemoryWall() {
     completedMissionsCount >= 1 && { emoji: '🎯', label: `${completedMissionsCount} Missionen`, color: '#34d399' },
   ].filter(Boolean);
 
-  const totalStamps = defeatedBosses.length + earnedBadges.length + masteredQuests.length + milestoneStamps.length;
+  const totalStamps = defeatedBosses.length + earnedBadges.length + masteredQuests.length + milestoneStamps.length + completedSQ.length;
   let stampIndex = 0;
 
   return (
@@ -187,6 +194,26 @@ export default function MemoryWall() {
                       emoji={ms.emoji}
                       label={ms.label}
                       accentColor={ms.color}
+                      index={stampIndex++}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Discovery quest stamps */}
+            {completedSQ.length > 0 && (
+              <section className="mb-8">
+                <h2 className="font-label font-bold text-xs uppercase tracking-widest text-outline mb-4 flex items-center gap-2">
+                  <span>🗺️</span> {lang === 'de' ? 'Entdeckungen' : 'Discoveries'}
+                </h2>
+                <div className="flex flex-wrap gap-4">
+                  {completedSQ.map((q) => (
+                    <Stamp
+                      key={q.id}
+                      emoji={q.emoji}
+                      label={lang === 'de' ? q.titleDe : q.titleEn}
+                      accentColor="#fcd34d"
                       index={stampIndex++}
                     />
                   ))}
