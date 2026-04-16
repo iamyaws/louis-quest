@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-/* TODO: Download font files to public/fonts/ */
-
 /* Plus Jakarta Sans */
 @font-face {
   font-family: "Plus Jakarta Sans";
