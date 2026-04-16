@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
+import CooldownButton from './CooldownButton';
 
 // Material icon pairs for the memory cards
 const ALL_ICONS = [
@@ -266,12 +267,11 @@ export default function MemoryGame({ onComplete }) {
               </div>
             )}
 
-            <button onClick={() => onComplete(reward)}
-              className="w-full max-w-xs py-5 rounded-full font-headline font-bold text-xl text-white active:scale-95 transition-all flex items-center justify-center gap-3"
+            <CooldownButton delay={3} onClick={() => onComplete(reward)} icon="redeem"
+              className="w-full max-w-xs py-5 rounded-full font-headline font-bold text-xl text-white"
               style={{ background: 'linear-gradient(135deg, #059669, #34d399)', boxShadow: '0 8px 24px rgba(5,150,105,0.2)' }}>
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
               {t('game.memory.collect')}
-            </button>
+            </CooldownButton>
           </div>
         )}
       </main>

@@ -66,6 +66,7 @@ export interface TaskState {
   totalTasksDone: number;
   gamesPlayedToday: string[];
   birthdayEpic: { done: string[]; completed: boolean };
+  poemQuest?: { done: string[]; completed: boolean; title?: string };
   familyConfig: FamilyConfig;
   _v2_economy_reset?: boolean;
   arcEngine?: ArcEngineState;
@@ -118,6 +119,7 @@ interface TaskActions {
   recordViewVisit: (view: string) => void;
   spawnEgg: (egg: EggItem) => void;
   collectEgg: () => void;
+  fireCelebration: () => void;
 }
 
 interface CelebrationEvent {
@@ -239,6 +241,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const dismissCelebration = useCallback(() => {
     setCelebration(null);
   }, []);
+
+  const fireCelebration = useCallback(() => {
+    queueCelebration({ type: 'victory' });
+  }, [queueCelebration]);
 
   // ── Load on mount (cloud-aware) ──
   useEffect(() => {
@@ -948,7 +954,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

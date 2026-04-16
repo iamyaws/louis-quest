@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
+import CooldownButton from './CooldownButton';
 
 // ── Star types ──
 const STAR_TYPES = {
@@ -470,12 +471,11 @@ export default function StarCatcherGame({ onComplete }) {
                 style={{ background: 'rgba(255,255,255,0.08)', color: '#a78bfa' }}>
                 {t('game.star.again')}
               </button>
-              <button onClick={() => onComplete(reward)}
-                className="flex-1 py-4 rounded-full font-headline font-bold text-lg text-white active:scale-95 transition-all flex items-center justify-center gap-2"
+              <CooldownButton delay={3} onClick={() => onComplete(reward)} icon="redeem"
+                className="flex-1 py-4 rounded-full font-headline font-bold text-lg text-white"
                 style={{ background: 'linear-gradient(135deg, #6d28d9, #a78bfa)', boxShadow: '0 8px 24px rgba(109,40,217,0.3)' }}>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
                 {t('game.star.collect')}
-              </button>
+              </CooldownButton>
             </div>
           </div>
         </div>

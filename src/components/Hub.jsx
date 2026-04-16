@@ -14,6 +14,7 @@ import { useArc } from '../arcs/useArc';
 import ArcActiveBanner from './ArcActiveBanner';
 import BeatCompletionModal from './BeatCompletionModal';
 import DreamStrip from './DreamStrip';
+import ClothingSheet from './ClothingSheet';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -62,7 +63,13 @@ export default function Hub({ onNavigate }) {
   const [showBossDetail, setShowBossDetail] = useState(false);
   const [openBeat, setOpenBeat] = useState(null);
   const [showDream, setShowDream] = useState(false);
-  const pendingDream = Boolean(state?.dreamHighlights && !state.dreamHighlights.seen);
+  const [showClothing, setShowClothing] = useState(false);
+  // Only show dream indicator when there are non-ambient highlights worth seeing
+  const pendingDream = Boolean(
+    state?.dreamHighlights &&
+    !state.dreamHighlights.seen &&
+    state.dreamHighlights.highlights?.some(h => h.kind !== 'ambient')
+  );
 
   const handleCampfireTap = () => {
     if (pendingDream) setShowDream(true);
@@ -366,9 +373,68 @@ export default function Hub({ onNavigate }) {
           </div>
         </button>
 
+        {/* ── Bonus Quests strip ── */}
+        {(() => {
+          const all = (state.quests || []).filter(q => q.sideQuest);
+          if (!all.length) return null;
+          const doneSide = all.filter(q => q.done).length;
+          const allSideDone = doneSide === all.length;
+          return (
+            <button onClick={() => onNavigate?.('quests')}
+              className="w-full text-left rounded-2xl overflow-hidden active:scale-[0.98] transition-all"
+              style={{
+                background: allSideDone
+                  ? 'linear-gradient(135deg, #fef9c3 0%, rgba(252,211,77,0.18) 100%)'
+                  : 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                border: allSideDone ? '1.5px solid rgba(161,98,7,0.3)' : '1.5px solid rgba(161,98,7,0.16)',
+                boxShadow: allSideDone ? '0 4px 20px rgba(252,211,77,0.22)' : '0 2px 8px rgba(161,98,7,0.05)',
+              }}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 pt-3.5 pb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-5 rounded-full shrink-0" style={{ background: '#735c00' }} />
+                  <span className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: '#735c00' }}>
+                    {t('task.bonus')}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-label font-bold text-xs" style={{ color: allSideDone ? '#059669' : '#92400e' }}>
+                    {doneSide}/{all.length}
+                  </span>
+                  {allSideDone
+                    ? <span className="material-symbols-outlined text-sm" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>star</span>
+                    : <span className="material-symbols-outlined text-sm" style={{ color: '#92400e' }}>chevron_right</span>
+                  }
+                </div>
+              </div>
+              {/* Quest rows */}
+              <div className="px-4 pb-3.5 flex flex-col gap-2">
+                {all.map(q => (
+                  <div key={q.id} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all"
+                         style={{ background: q.done ? 'rgba(52,211,153,0.12)' : 'rgba(115,92,0,0.08)' }}>
+                      {q.done
+                        ? <span className="material-symbols-outlined text-base" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                        : <span className="text-sm leading-none">{q.icon}</span>
+                      }
+                    </div>
+                    <span className="font-body text-sm flex-1 leading-snug transition-all"
+                          style={{ color: q.done ? 'rgba(18,67,70,0.4)' : '#1c1b1e', textDecoration: q.done ? 'line-through' : 'none' }}>
+                      {t('quest.' + q.id)}
+                    </span>
+                    <span className="font-label font-bold text-xs shrink-0" style={{ color: q.done ? '#059669' : '#b45309' }}>
+                      {q.done ? '✓' : `+${q.xp} HP`}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </button>
+          );
+        })()}
+
         {/* ── Daily Check-in (collapsible mood + water) ── */}
         <details className="group rounded-2xl overflow-hidden"
-                 style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+                 style={{ background: 'linear-gradient(135deg, #fffcf5 0%, #fef3c7 100%)', border: '1.5px solid rgba(217,119,6,0.16)', boxShadow: '0 2px 10px rgba(217,119,6,0.07)' }}
                  open={state.moodAM === null || (state.dailyWaterCount || 0) < 6}>
           {/* Summary row — always visible */}
           <summary className="p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
@@ -497,8 +563,8 @@ export default function Hub({ onNavigate }) {
               <div className="p-5 rounded-2xl flex items-center gap-4 relative overflow-hidden"
                    style={{ background: '#1a1a3e', border: '1.5px solid rgba(252,211,77,0.2)', boxShadow: '0 4px 20px rgba(26,26,62,0.25)' }}
                    onClick={() => setShowBossDetail(true)}>
-                <img src={base + 'art/tex-sternenmeer.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
-                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(26,26,62,0.7), rgba(35,35,80,0.6))' }} />
+                <img src={base + 'art/tex-sternenmeer.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-55 pointer-events-none" />
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(26,26,62,0.35), rgba(35,35,80,0.18))' }} />
                 {/* Round portrait */}
                 <div className="relative z-10 w-16 h-16 rounded-full overflow-hidden shrink-0 cursor-pointer shadow-lg"
                      style={{ border: '3px solid #fcd34d', boxShadow: '0 0 12px rgba(252,211,77,0.3)' }}>
@@ -729,11 +795,11 @@ export default function Hub({ onNavigate }) {
                             <p className="font-label text-xs text-on-surface-variant uppercase">{t('hub.boss.detail.heroPoints')}</p>
                           </div>
                           <div className="p-4 rounded-2xl text-center"
-                               style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
+                               style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.25)' }}>
                             <span className="material-symbols-outlined text-2xl mb-1 block"
-                                  style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-                            <p className="font-label font-bold text-lg" style={{ color: '#b45309' }}>+1</p>
-                            <p className="font-label text-xs text-on-surface-variant uppercase">{t('hub.boss.detail.evoEssence')}</p>
+                                  style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                            <p className="font-label font-bold text-lg" style={{ color: '#059669' }}>{t('hub.boss.detail.evoEssence')}</p>
+                            <p className="font-label text-xs text-on-surface-variant uppercase">Ronki</p>
                           </div>
                         </div>
                       </div>
@@ -790,7 +856,10 @@ export default function Hub({ onNavigate }) {
                   {/* Bottom CTA */}
                   <div className="fixed bottom-0 left-0 w-full z-50 p-6"
                        style={{ background: 'linear-gradient(to top, #fff8f2 70%, transparent)' }}>
-                    <button onClick={() => setShowBossDetail(false)}
+                    <button onClick={() => {
+                        setShowBossDetail(false);
+                        if (defeated) actions.fireCelebration?.();
+                      }}
                       className="w-full max-w-lg mx-auto block py-4 rounded-full font-label font-extrabold text-lg active:scale-95 transition-all"
                       style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 8px 24px rgba(252,211,77,0.4), 0 4px 0 #d4a830' }}>
                       {defeated ? t('hub.boss.detail.celebrate') : t('hub.boss.detail.keepFighting')}
@@ -802,31 +871,6 @@ export default function Hub({ onNavigate }) {
           );
         })()}
 
-        {/* ── Side Quests ── */}
-        {(() => {
-          const sideQuests = (state.quests || []).filter(q => q.sideQuest && !q.done);
-          if (!sideQuests.length) return null;
-          return (
-            <div className="p-5 rounded-2xl"
-                 style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-primary">explore</span>
-                <h4 className="font-bold text-sm font-label text-primary uppercase tracking-tight">{t('hub.sideQuests')}</h4>
-              </div>
-              <div className="flex flex-col gap-3">
-                {sideQuests.slice(0, 3).map(q => (
-                  <div key={q.id} className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                         style={{ background: 'rgba(18,67,70,0.05)' }}>
-                      <span className="text-xl">{q.icon}</span>
-                    </div>
-                    <p className="font-body text-xs text-on-surface font-semibold flex-1">{t('quest.' + q.id)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
 
         {/* ── Latest Achievement Spotlight ── */}
         {(() => {
@@ -861,77 +905,83 @@ export default function Hub({ onNavigate }) {
 
         {/* ── Memory Wall button ── */}
         <button
-          className="w-full flex items-center gap-4 p-4 rounded-2xl active:scale-[0.98] transition-all text-left"
+          className="w-full flex items-center gap-4 p-4 rounded-2xl active:scale-[0.98] transition-all text-left relative overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, rgba(12,26,46,0.06) 0%, rgba(252,211,77,0.04) 100%)',
-            border: '1px solid rgba(12,26,46,0.08)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            background: 'linear-gradient(135deg, #0c1a2e 0%, #0e2840 100%)',
+            border: '1.5px solid rgba(252,211,77,0.18)',
+            boxShadow: '0 4px 16px rgba(12,24,48,0.22)',
           }}
           onClick={() => onNavigate?.('memories')}
         >
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-               style={{ background: 'linear-gradient(135deg, #0c1a2e, #0c3236)', boxShadow: '0 4px 10px rgba(12,26,46,0.3)' }}>
+          {/* Star texture backdrop */}
+          <img src={base + 'art/tex-sternenmeer.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none" />
+          <div className="relative z-10 w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+               style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.25)' }}>
             <span className="material-symbols-outlined text-xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-headline font-bold text-base text-on-surface">Erinnerungen</p>
-            <p className="font-label text-xs text-on-surface-variant">
+          <div className="relative z-10 flex-1 min-w-0">
+            <p className="font-headline font-bold text-base text-white">Erinnerungen</p>
+            <p className="font-label text-xs" style={{ color: 'rgba(252,211,77,0.65)' }}>
               {[...(state.bossTrophies?.length ? [`${[...new Set(state.bossTrophies)].length} Bosse`] : []), ...(state.unlockedBadges?.length ? [`${state.unlockedBadges.length} Abzeichen`] : [])].join(' · ') || 'Deine Geschichte beginnt hier'}
             </p>
           </div>
-          <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+          <span className="relative z-10 material-symbols-outlined" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
         </button>
 
         {/* ── Widget Row: Leitstern + Weather ── */}
         <div className="grid grid-cols-2 gap-3">
 
-          {/* Leitstern widget — warm ember feel, distinct from Weather's cool sky */}
+          {/* Leitstern widget — mirrors weather layout: emoji left, text right */}
           <button
-            className="p-4 rounded-2xl flex flex-col items-center justify-center gap-2 text-center transition-all active:scale-[0.97] relative overflow-hidden"
+            className="px-4 py-3 rounded-2xl flex items-center gap-3 transition-all active:scale-[0.97] relative overflow-hidden"
             style={{
-              background: '#0f0b04',
-              border: '1.5px solid rgba(252,211,77,0.28)',
-              boxShadow: '0 4px 16px rgba(15,11,4,0.7), inset 0 1px 0 rgba(252,211,77,0.06)',
+              background: '#140e02',
+              border: '1.5px solid rgba(252,211,77,0.3)',
+              boxShadow: '0 4px 16px rgba(15,11,4,0.45)',
               minHeight: 110,
             }}
             onClick={() => onNavigate?.('kodex')}
           >
-            {/* Warm ember radial — campfire glow rising from below */}
+            {/* Warm ember glow rising from below */}
             <div aria-hidden="true" style={{
               position: 'absolute', bottom: '-10%', left: '50%', transform: 'translateX(-50%)',
-              width: '120%', height: '80%',
-              background: 'radial-gradient(ellipse at 50% 90%, rgba(180,83,9,0.35) 0%, rgba(120,40,5,0.12) 45%, transparent 70%)',
+              width: '130%', height: '85%',
+              background: 'radial-gradient(ellipse at 50% 90%, rgba(180,83,9,0.55) 0%, rgba(120,40,5,0.22) 50%, transparent 72%)',
               pointerEvents: 'none',
             }} />
-            {/* Star particles twinkling in the warm dark */}
-            <div aria-hidden="true" style={{ position: 'absolute', top: '18%', right: '18%', width: 2, height: 2, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 4px 2px rgba(252,211,77,0.7)', animation: 'dream-spark 1.8s ease-in-out infinite' }} />
-            <div aria-hidden="true" style={{ position: 'absolute', top: '62%', right: '10%', width: 1.5, height: 1.5, borderRadius: '50%', background: 'white', boxShadow: '0 0 3px 1px rgba(255,255,255,0.6)', animation: 'dream-spark 2.4s ease-in-out infinite 0.7s' }} />
-            <div aria-hidden="true" style={{ position: 'absolute', top: '30%', left: '14%', width: 1.5, height: 1.5, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 3px 1px rgba(252,211,77,0.5)', animation: 'dream-spark 2.1s ease-in-out infinite 1.2s' }} />
-            {/* Big outline star */}
-            <span
-              className="relative z-10 material-symbols-outlined select-none leading-none"
-              style={{ fontSize: 48, color: '#fcd34d', fontVariationSettings: "'FILL' 0, 'wght' 300, 'OPSZ' 48", filter: 'drop-shadow(0 0 12px rgba(252,211,77,0.7))' }}
-            >star</span>
-            <p className="relative z-10 font-headline font-bold text-base leading-none text-white">
-              {t('hub.leitstern.title')}
-            </p>
+            {/* Twinkling star particles */}
+            <div aria-hidden="true" style={{ position: 'absolute', top: '18%', right: '12%', width: 2, height: 2, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 4px 2px rgba(252,211,77,0.8)', animation: 'dream-spark 1.8s ease-in-out infinite' }} />
+            <div aria-hidden="true" style={{ position: 'absolute', top: '55%', right: '8%', width: 1.5, height: 1.5, borderRadius: '50%', background: 'white', boxShadow: '0 0 3px 1px rgba(255,255,255,0.7)', animation: 'dream-spark 2.4s ease-in-out infinite 0.7s' }} />
+            <div aria-hidden="true" style={{ position: 'absolute', top: '28%', right: '28%', width: 1.5, height: 1.5, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 3px 1px rgba(252,211,77,0.6)', animation: 'dream-spark 2.1s ease-in-out infinite 1.2s' }} />
+            {/* Star emoji — left anchor, same as weather emoji */}
+            <p className="relative z-10 leading-none select-none flex-shrink-0"
+               style={{ fontSize: 44, filter: 'drop-shadow(0 0 10px rgba(252,211,77,0.6))' }}>⭐</p>
+            {/* Text stack — right, mirrors weather temp layout */}
+            <div className="relative z-10 min-w-0">
+              <p className="font-headline font-extrabold leading-none text-white" style={{ fontSize: 28 }}>
+                {t('hub.leitstern.title')}
+              </p>
+              <p className="font-label text-xs mt-1 leading-tight truncate"
+                 style={{ color: 'rgba(252,211,77,0.65)' }}>Helden-Kodex</p>
+            </div>
           </button>
 
-          {/* Weather widget */}
-          <div
-            className="px-4 py-3 rounded-2xl flex items-center gap-3 relative overflow-hidden"
+          {/* Weather widget — taps open clothing sheet */}
+          <button
+            className="px-4 py-3 rounded-2xl flex items-center gap-3 relative overflow-hidden text-left active:scale-[0.97] transition-all"
             style={{
               background: '#0c1830',
               border: '1.5px solid rgba(94,234,212,0.15)',
               boxShadow: '0 4px 16px rgba(12,24,48,0.35)',
               minHeight: 110,
             }}
+            onClick={() => weather?.current && setShowClothing(true)}
           >
             {/* Actual sky image as backdrop */}
-            <img src={base + skyFile} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" style={{ objectPosition: 'center 25%' }} />
+            <img src={base + skyFile} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" style={{ objectPosition: 'center 25%' }} />
             {/* Subtle dark vignette */}
             <div className="absolute inset-0 pointer-events-none"
-                 style={{ background: 'linear-gradient(135deg, rgba(12,24,48,0.55) 0%, rgba(12,24,48,0.25) 100%)' }} />
+                 style={{ background: 'linear-gradient(135deg, rgba(12,24,48,0.28) 0%, rgba(12,24,48,0.08) 100%)' }} />
             {weather?.current ? (
               (() => {
                 const wi = getWeatherInfo(weather.current.weatherCode);
@@ -955,9 +1005,12 @@ export default function Hub({ onNavigate }) {
                 {t('hub.weather.loading')}
               </p>
             )}
-          </div>
+          </button>
 
         </div>
+
+        {/* Clothing sheet — triggered by weather widget tap */}
+        {showClothing && <ClothingSheet onClose={() => setShowClothing(false)} />}
 
         {/* ── Bodhi leaf ── */}
         <div className="flex justify-center py-2 opacity-20">

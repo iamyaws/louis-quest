@@ -1,12 +1,64 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
+import CooldownButton from './CooldownButton';
+import { getCatStage } from '../utils/helpers';
+
+const DRAGON_ART = ['dragon-egg', 'dragon-baby', 'dragon-young', 'dragon-majestic', 'dragon-legendary'];
+
+// ── Confetti Canvas ──
+function ConfettiCanvas() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width = window.innerWidth;
+    const H = canvas.height = window.innerHeight;
+    const colors = ['#fcd34d', '#34d399', '#f472b6', '#60a5fa', '#a78bfa', '#fb923c', '#ffffff'];
+    const particles = Array.from({ length: 80 }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * -H,
+      w: 4 + Math.random() * 6,
+      h: 8 + Math.random() * 10,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vy: 1.5 + Math.random() * 3,
+      vx: (Math.random() - 0.5) * 2,
+      rot: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 8,
+      opacity: 0.7 + Math.random() * 0.3,
+    }));
+    let raf;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => {
+        p.y += p.vy;
+        p.x += p.vx;
+        p.rot += p.rotSpeed;
+        if (p.y > H + 20) { p.y = -20; p.x = Math.random() * W; }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} className="fixed inset-0 z-[1] pointer-events-none" />;
+}
 
 // ── Evolution Celebration ──
 function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
   const { t } = useTranslation();
+  const artFile = DRAGON_ART[stage] || DRAGON_ART[1];
   return (
     <main className="relative flex flex-col items-center justify-center min-h-dvh px-6 pt-16 pb-24 text-center">
+      <ConfettiCanvas />
       {/* Gold dust texture */}
       <img src={import.meta.env.BASE_URL + 'art/bg-gold-dust.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
       {/* Background motifs */}
@@ -28,7 +80,7 @@ function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
         <div className="relative z-10 mb-8 p-4">
           <div className="relative w-64 h-64 mx-auto">
             <div className="absolute inset-0 flex items-center justify-center">
-              <img src={import.meta.env.BASE_URL + 'art/dragon-baby.webp'} alt="Evolution"
+              <img src={`${import.meta.env.BASE_URL}art/companion/${artFile}.webp`} alt="Evolution"
                    className="w-full h-full object-contain drop-shadow-2xl" />
             </div>
             {/* Floating motifs */}
@@ -74,13 +126,13 @@ function EvolutionCelebration({ stage, name, emoji, onDismiss }) {
           </div>
         </div>
 
-        {/* CTA */}
+        {/* CTA — 4s cooldown so Louis absorbs the moment */}
         <div className="relative z-10 mt-16 w-full px-4">
-          <button onClick={onDismiss}
-            className="w-full bg-primary-container text-white py-5 rounded-full font-headline font-bold text-xl active:scale-95 transition-all flex items-center justify-center gap-3">
+          <CooldownButton delay={4} onClick={onDismiss} icon="arrow_forward"
+            className="w-full bg-primary-container text-white py-5 rounded-full font-headline font-bold text-xl"
+            style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
             {t('celebrate.evolution.button')}
-            <span className="material-symbols-outlined">arrow_forward</span>
-          </button>
+          </CooldownButton>
         </div>
       </div>
     </main>
@@ -93,6 +145,7 @@ function LevelUpCelebration({ level, onDismiss }) {
   return (
     <main className="min-h-dvh w-full max-w-2xl px-6 pb-32 flex flex-col items-center justify-center relative overflow-hidden mx-auto"
           style={{ paddingTop: 'calc(6rem + env(safe-area-inset-top, 0px))' }}>
+      <ConfettiCanvas />
       {/* Gold dust texture */}
       <img src={import.meta.env.BASE_URL + 'art/bg-gold-dust.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" />
       {/* Ambient blurs */}
@@ -133,13 +186,13 @@ function LevelUpCelebration({ level, onDismiss }) {
           </p>
         </div>
 
-        {/* CTA */}
+        {/* CTA — 4s cooldown */}
         <div className="flex flex-col gap-4 w-full max-w-xs">
-          <button onClick={onDismiss}
-            className="bg-primary-container text-white font-headline font-bold text-xl px-8 py-5 rounded-full active:scale-95 transition-all"
+          <CooldownButton delay={4} onClick={onDismiss}
+            className="bg-primary-container text-white font-headline font-bold text-xl px-8 py-5 rounded-full"
             style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
             {t('celebrate.levelup.button')}
-          </button>
+          </CooldownButton>
         </div>
       </div>
     </main>
@@ -153,6 +206,7 @@ function VictoryCelebration({ onDismiss }) {
 
   return (
     <main className="min-h-dvh pt-24 pb-32 px-6 flex flex-col items-center justify-center relative overflow-hidden lotus-pattern">
+      <ConfettiCanvas />
       {/* Ambient glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
         <div className="w-[500px] h-[500px] rounded-full blur-[120px]" style={{ background: '#fcd34d' }} />
@@ -197,14 +251,13 @@ function VictoryCelebration({ onDismiss }) {
           </div>
         </div>
 
-        {/* CTA */}
+        {/* CTA — 5s cooldown on victory, biggest moment */}
         <div className="w-full max-w-sm space-y-4">
-          <button onClick={onDismiss}
-            className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full active:scale-95 transition-all flex items-center justify-center gap-3"
+          <CooldownButton delay={5} onClick={onDismiss} icon="redeem"
+            className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full"
             style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
             {t('celebrate.victory.button')}
-          </button>
+          </CooldownButton>
         </div>
       </section>
     </main>
@@ -216,6 +269,7 @@ function ChestCelebration({ milestone, reward, onDismiss }) {
   const { t } = useTranslation();
   return (
     <main className="min-h-dvh pt-24 pb-32 px-6 flex flex-col items-center justify-center relative overflow-hidden lotus-pattern">
+      <ConfettiCanvas />
       {/* Ambient glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
         <div className="w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: '#fcd34d' }} />
@@ -265,14 +319,13 @@ function ChestCelebration({ milestone, reward, onDismiss }) {
           </div>
         </div>
 
-        {/* CTA */}
+        {/* CTA — 4s cooldown */}
         <div className="w-full max-w-sm">
-          <button onClick={onDismiss}
-            className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full active:scale-95 transition-all flex items-center justify-center gap-3"
+          <CooldownButton delay={4} onClick={onDismiss} icon="redeem"
+            className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full"
             style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
             {t('celebrate.chest.button')}
-          </button>
+          </CooldownButton>
         </div>
       </section>
     </main>

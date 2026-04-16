@@ -42,8 +42,8 @@ export const ZONES: Zone[] = [
     nameKey: 'zone.sanctuary.name',
     flavorKey: 'zone.sanctuary.flavor',
     emoji: '\u2728', // ✨
-    bgFilter: 'none',
-    bgImage: 'art/bioms/101st-egg-center-of-the-world.webp',
+    bgFilter: 'saturate(1.35) brightness(1.12) hue-rotate(-8deg)',
+    bgImage: 'art/bioms/Crystalpalast.webp',
     accent: '#124346',
     unlockHintKey: 'zone.sanctuary.unlockHint', // unused — always unlocked
     unlockThreshold: { field: 'catEvo', min: 0 },

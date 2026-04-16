@@ -1,25 +1,26 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
+import CooldownButton from './CooldownButton';
 
 // ── Physics (logical 400px-wide coordinate space) ──
 const P = {
   LW: 400,
-  GRAVITY: 0.35,
-  FLAP: -6.5,
-  MAX_FALL: 7,
+  GRAVITY: 0.25,       // gentler fall for a 6-year-old
+  FLAP: -5.5,          // softer, more controllable jumps
+  MAX_FALL: 5.5,
   DW: 44,
   DH: 44,
   DX: 80,
-  CLOUD_SPEED: 2.0,
-  CLOUD_W: 70,
-  GAP: 160,
-  SPAWN_DIST: 220,
-  MIN_GAP: 120,
-  GAP_SHRINK: 2,
-  SPEED_INC: 0.02,
-  MAX_SPEED: 3.5,
-  HITBOX_SHRINK: 10,
+  CLOUD_SPEED: 1.4,    // clouds approach slower
+  CLOUD_W: 60,         // slightly narrower pillars = more room
+  GAP: 210,            // much wider opening
+  SPAWN_DIST: 240,     // more time between clouds
+  MIN_GAP: 165,        // gap never gets punishingly small
+  GAP_SHRINK: 0.8,     // difficulty increases very slowly
+  SPEED_INC: 0.008,    // speed barely ramps up
+  MAX_SPEED: 2.2,      // never gets crazy fast
+  HITBOX_SHRINK: 14,   // more forgiving collision
 };
 
 const HS_KEY = 'ronki_clouds_highscores';
@@ -403,12 +404,11 @@ export default function CloudJumpGame({ onComplete }) {
                 style={{ background: 'rgba(18,67,70,0.06)', color: '#124346' }}>
                 {t('game.cloud.again')}
               </button>
-              <button onClick={() => onComplete(reward)}
-                className="flex-1 py-4 rounded-full font-headline font-bold text-lg text-white active:scale-95 transition-all flex items-center justify-center gap-2"
+              <CooldownButton delay={3} onClick={() => onComplete(reward)} icon="redeem"
+                className="flex-1 py-4 rounded-full font-headline font-bold text-lg text-white"
                 style={{ background: 'linear-gradient(135deg, #059669, #34d399)', boxShadow: '0 8px 24px rgba(5,150,105,0.2)' }}>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
                 {t('game.cloud.collect')}
-              </button>
+              </CooldownButton>
             </div>
           </div>
         </div>

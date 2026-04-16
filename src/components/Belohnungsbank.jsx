@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DEFAULT_BELOHNUNGEN } from '../constants';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { Pearl, Hourglass } from './CurrencyIcons';
+import BelohnungRedeemModal from './BelohnungRedeemModal';
+import { useGameAccess } from '../hooks/useGameAccess';
 
 const ICON_MAP = {
   '🃏': 'playing_cards', '🎧': 'headphones', '🎮': 'sports_esports',
@@ -13,8 +15,11 @@ const ICON_MAP = {
 export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, onOpenParental }) {
   const { t } = useTranslation();
   const { state, actions } = useTask();
+  const { unlocked: gamesUnlocked, reason: gateReason } = useGameAccess();
   const hp = state?.hp || 0;
   const screenMin = state?.drachenEier || 0; // Screen minutes (repurposed from eggs)
+
+  const [redeemTarget, setRedeemTarget] = useState(null);
 
   const familyRewards = DEFAULT_BELOHNUNGEN.filter(b => b.active && (b.currency || 'hp') === 'hp');
   const screenRewards = DEFAULT_BELOHNUNGEN.filter(b => b.active && b.currency === 'eggs');
@@ -106,19 +111,31 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         </div>
       </div>
 
-      {/* ── Mini-Spiele Entry ── */}
-      <button onClick={() => onNavigate?.('games')}
-        className="w-full rounded-2xl p-5 mb-8 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
-        style={{ background: 'linear-gradient(135deg, rgba(252,211,77,0.2), rgba(162,208,212,0.18))', border: '1.5px solid rgba(252,211,77,0.35)' }}>
+      {/* ── Mini-Spiele Entry — gated by routine completion ── */}
+      <button onClick={() => gamesUnlocked ? onNavigate?.('games') : null}
+        className={`w-full rounded-2xl p-5 mb-8 flex items-center gap-4 transition-all text-left ${gamesUnlocked ? 'active:scale-[0.98]' : 'opacity-70'}`}
+        style={{
+          background: gamesUnlocked
+            ? 'linear-gradient(135deg, rgba(252,211,77,0.2), rgba(162,208,212,0.18))'
+            : 'rgba(0,0,0,0.03)',
+          border: gamesUnlocked ? '1.5px solid rgba(252,211,77,0.35)' : '1.5px solid rgba(0,0,0,0.08)',
+          filter: gamesUnlocked ? 'none' : 'grayscale(0.6)',
+        }}>
         <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
-             style={{ background: 'rgba(252,211,77,0.22)' }}>
-          <span className="material-symbols-outlined text-2xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>sports_esports</span>
+             style={{ background: gamesUnlocked ? 'rgba(252,211,77,0.22)' : 'rgba(0,0,0,0.06)' }}>
+          <span className="material-symbols-outlined text-2xl" style={{ color: gamesUnlocked ? '#124346' : '#9ca3af', fontVariationSettings: "'FILL' 1" }}>
+            {gamesUnlocked ? 'sports_esports' : 'lock'}
+          </span>
         </div>
         <div className="flex-1">
-          <h4 className="font-headline font-bold text-lg text-on-surface">{t('shop.miniGames')}</h4>
-          <p className="text-sm text-on-surface-variant font-body">{t('shop.miniGames.subtitle')}</p>
+          <h4 className={`font-headline font-bold text-lg ${gamesUnlocked ? 'text-on-surface' : 'text-on-surface-variant'}`}>{t('shop.miniGames')}</h4>
+          <p className="text-sm font-body" style={{ color: gamesUnlocked ? '#707979' : '#9ca3af' }}>
+            {gamesUnlocked ? t('shop.miniGames.subtitle') : 'Erst deine Aufgaben! 💪'}
+          </p>
         </div>
-        <span className="material-symbols-outlined text-primary">chevron_right</span>
+        <span className="material-symbols-outlined" style={{ color: gamesUnlocked ? '#124346' : '#d1d5db' }}>
+          {gamesUnlocked ? 'chevron_right' : 'lock'}
+        </span>
       </button>
 
       {/* ── Family Adventures (HP currency) ── */}
@@ -134,18 +151,21 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
               return (
                 <div key={reward.id}
                   className="rounded-2xl p-5 flex flex-col gap-4 transition-all"
-                  style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                  style={{
+                    background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                    border: '1.5px solid rgba(161,98,7,0.2)',
+                    boxShadow: '0 4px 16px rgba(161,98,7,0.1)',
+                  }}>
                   <div className="flex gap-4">
-                    <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
-                         style={{ background: 'rgba(252,211,77,0.1)' }}>
-                      <span className="material-symbols-outlined text-2xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>{matIcon}</span>
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                         style={{ background: 'rgba(252,211,77,0.2)' }}>
+                      <span className="material-symbols-outlined text-2xl" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>{matIcon}</span>
                     </div>
-                    <div>
+                    <div className="flex-1 flex items-center">
                       <h4 className="font-label font-bold text-lg text-on-surface leading-tight">{t('bel.' + reward.id)}</h4>
-                      <p className="text-sm text-on-surface-variant font-body mt-1">{reward.emoji} {t('shop.rewardForDeeds')}</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid #f4ede5' }}>
+                  <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(161,98,7,0.12)' }}>
                     <div className="flex items-center gap-1.5">
                       <Pearl size={16} />
                       <span className="text-on-surface font-bold font-label">{reward.cost} HP</span>
@@ -156,7 +176,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                       }`}
                       style={{ background: canAfford ? '#fcd34d' : '#e8e1da', color: canAfford ? '#725b00' : '#7b7486' }}
                       disabled={!canAfford}
-                      onClick={() => { if (canAfford) actions.redeemReward('hp', reward.cost); }}
+                      onClick={() => { if (canAfford) setRedeemTarget({ ...reward, name: t('bel.' + reward.id) }); }}
                     >
                       {canAfford ? t('shop.redeem') : t('shop.tooFew')}
                     </button>
@@ -182,24 +202,32 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
               return (
                 <div key={reward.id}
                   className="rounded-2xl p-5 flex flex-col gap-4 transition-all"
-                  style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                  <div className="flex gap-4">
-                    <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
-                         style={{ background: 'rgba(0,206,201,0.1)' }}>
-                      <span className="material-symbols-outlined text-2xl" style={{ color: '#00CEC9', fontVariationSettings: "'FILL' 1" }}>{matIcon}</span>
+                  style={{
+                    background: 'linear-gradient(135deg, #ecfeff 0%, #ccfbf1 100%)',
+                    border: '1.5px solid rgba(0,150,150,0.2)',
+                    boxShadow: '0 4px 16px rgba(0,150,150,0.1)',
+                  }}>
+                  <div className="flex gap-4 items-center">
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                         style={{ background: 'rgba(0,206,201,0.15)' }}>
+                      <span className="material-symbols-outlined text-2xl" style={{ color: '#00827e', fontVariationSettings: "'FILL' 1" }}>{matIcon}</span>
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h4 className="font-label font-bold text-lg text-on-surface leading-tight">{t('bel.' + reward.id)}</h4>
-                      <p className="text-sm text-on-surface-variant font-body mt-1">{reward.emoji} {t('shop.screenReward')}</p>
+                      {/* Prominent digital time display */}
+                      <div className="flex items-baseline gap-1 mt-1">
+                        <span className="font-headline font-bold" style={{ fontSize: '1.75rem', color: '#00827e', lineHeight: 1 }}>{reward.cost}</span>
+                        <span className="font-headline font-bold" style={{ fontSize: '1rem', color: '#00827e' }}>Min.</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid #f4ede5' }}>
+                  <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(0,150,150,0.12)' }}>
                     <div className="flex items-center gap-1.5">
                       <Hourglass size={16} />
-                      <span className="text-on-surface font-bold font-label">{reward.cost} Min.</span>
+                      <span className="font-bold font-label" style={{ color: '#00827e' }}>{reward.cost} Min.</span>
                     </div>
                     <button
-                      className={`font-label font-bold py-2 px-6 rounded-full text-sm text-white transition-all active:scale-95 ${
+                      className={`font-label font-bold py-2 px-6 rounded-full text-sm transition-all active:scale-95 ${
                         canAfford && !blocked ? '' : 'opacity-50 cursor-not-allowed'
                       }`}
                       style={{ background: canAfford && !blocked ? '#00CEC9' : '#e8e1da', color: canAfford && !blocked ? 'white' : '#7b7486' }}
@@ -251,6 +279,18 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         </button>
         <span className="font-label text-xs text-[#9ca3af] tracking-wide" style={{ opacity: 0.5 }}>{t('shop.admin')}</span>
       </div>
+
+      {/* ── HP Reward approval modal ── */}
+      {redeemTarget && (
+        <BelohnungRedeemModal
+          reward={redeemTarget}
+          onApprove={() => {
+            actions.redeemReward('hp', redeemTarget.cost);
+            setRedeemTarget(null);
+          }}
+          onDismiss={() => setRedeemTarget(null)}
+        />
+      )}
     </div>
   );
 }

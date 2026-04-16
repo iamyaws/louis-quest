@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
+import { usePWAInstall } from '../hooks/usePWAInstall';
+import PWAInstallSheet from './PWAInstallSheet';
 
 const base = import.meta.env.BASE_URL;
 
@@ -51,6 +53,9 @@ export default function Onboarding({ onComplete }) {
   const [selectedEgg, setSelectedEgg] = useState(1);
   const [heroName, setHeroName] = useState('');
   const [heroGender, setHeroGender] = useState('boy'); // 'boy' | 'girl'
+  const { isIOS, androidPrompt, promptInstall } = usePWAInstall();
+  const [showPWA, setShowPWA] = useState(false);
+  const [pendingCfg, setPendingCfg] = useState(null);
 
   // ── Progress bar (top) ──
   const ProgressBar = () => (
@@ -523,12 +528,20 @@ export default function Onboarding({ onComplete }) {
         <div className="max-w-xs mx-auto">
           <button onClick={() => {
               localStorage.setItem('ronki_tour_done', '1');
-              onComplete({
+              const cfg = {
                 eggType: EGGS[selectedEgg].id,
                 dragonVariant: EGGS[selectedEgg].variant,
                 heroName: heroName.trim() || undefined,
                 heroGender,
-              });
+              };
+              // If already installed as PWA, launch immediately
+              if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                onComplete(cfg);
+              } else {
+                // Store cfg for after PWA prompt
+                setPendingCfg(cfg);
+                setShowPWA(true);
+              }
             }}
             className="w-full py-5 rounded-full font-headline text-xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-all"
             style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 12px 24px rgba(252,211,77,0.4), 0 4px 0 #d4a830' }}>
@@ -537,6 +550,22 @@ export default function Onboarding({ onComplete }) {
           </button>
         </div>
       </nav>
+
+      {showPWA && (
+        <PWAInstallSheet
+          isIOS={isIOS}
+          androidPrompt={androidPrompt}
+          onInstall={async () => {
+            await promptInstall();
+            setShowPWA(false);
+            onComplete(pendingCfg);
+          }}
+          onSkip={() => {
+            setShowPWA(false);
+            onComplete(pendingCfg);
+          }}
+        />
+      )}
     </div>
   );
 }

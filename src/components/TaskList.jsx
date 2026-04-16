@@ -5,6 +5,22 @@ import { useTranslation } from '../i18n/LanguageContext';
 import useWeather, { getWeatherInfo, getClothingRecs } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
 import { useSpecialQuests } from '../hooks/useSpecialQuests';
+import ToothbrushTimer from './ToothbrushTimer';
+import ClothingSheet from './ClothingSheet';
+
+// Quest IDs that trigger the toothbrush timer
+const TEETH_QUEST_IDS = new Set(['s3', 's12', 'v3', 'v10']);
+
+// Pick a completion phrase that varies by anchor and day — same phrase per
+// anchor all day (consistent), but rotates daily so it never feels stale.
+const DONE_PHRASE_COUNT = 8;
+const ANCHOR_ORDER = ['morning', 'evening', 'hobby', 'bedtime'];
+function getDonePhrase(anchor, t) {
+  const day = new Date().getDate();
+  const anchorIdx = ANCHOR_ORDER.indexOf(anchor);
+  const idx = ((day * 13) + (anchorIdx * 3)) % DONE_PHRASE_COUNT;
+  return t(`task.status.complete.${idx}`);
+}
 
 const ANCHOR_META_BASE = {
   morning: { icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)', artFile: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_an_early_morning_sky._S_882cfbe3-5eac-4403-87a0-5c66602cf76b_2.webp' },
@@ -16,13 +32,13 @@ const ANCHOR_META_BASE = {
 // Vacation quests share the same hints as their school counterparts
 const HINT_ALIAS = { v1: 's1', v3: 's3', v4: 's4', v2: 's2', v5b: 's6b', v6: 's8', v7: 'sq_zimmer', v10: 's12', v11: 's13', v12: 's14', v13: 's15' };
 
-export default function TaskList() {
+export default function TaskList({ onNavigate }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct, byGroup } = computed;
   const { weather } = useWeather();
   const [showWeather, setShowWeather] = useState(false);
-  const { t, locale } = useTranslation();
-  const lang = locale || 'de';
+  const [teethTimerQuestId, setTeethTimerQuestId] = useState(null);
+  const { t, lang } = useTranslation();
   const { quests: specialQuests, completed: sqCompleted, totalDone: sqDone, total: sqTotal } = useSpecialQuests();
 
   const ANCHOR_META_I18N = {
@@ -62,6 +78,11 @@ export default function TaskList() {
     : [];
 
   const handleComplete = (id) => {
+    // Teeth quests launch a brushing timer first
+    if (TEETH_QUEST_IDS.has(id) && !state.quests?.find(q => q.id === id)?.done) {
+      setTeethTimerQuestId(id);
+      return;
+    }
     actions.complete(id);
     SFX.play('pop');
     if (navigator.vibrate) navigator.vibrate(80);
@@ -71,82 +92,48 @@ export default function TaskList() {
     <div className="px-6 pb-32">
 
       {/* ── Header ── */}
-      <section className="mb-6">
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="text-xl font-bold font-headline text-on-surface">{t('task.section.title')}</h2>
-          <button className="text-sm font-bold font-label text-primary flex items-center gap-1 px-3 py-1 rounded-full hover:bg-surface-container-low transition-colors">
-            {t('task.viewAll')}
-            <span className="material-symbols-outlined text-base">chevron_right</span>
-          </button>
-        </div>
+      <section className="mb-5">
+        <h2 className="text-xl font-bold font-headline text-on-surface">{t('task.section.title')}</h2>
       </section>
 
-      {/* ── Special / Discovery Quests ── */}
-      {sqDone < sqTotal && (
-        <div className="mb-5">
-          {/* Section header */}
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-headline font-bold text-lg text-on-surface">
-              {lang === 'de' ? 'Entdecker-Quests' : 'Explorer Quests'}
-            </h3>
-            <span className="font-label text-xs text-outline">
-              {sqDone} / {sqTotal}
-            </span>
+      {/* ── Active Quest-Line Banner (Poem, Birthday, etc.) ── */}
+      {state?.poemQuest && !state.poemQuest.completed ? (
+        <button onClick={() => onNavigate?.('poem')}
+          className="w-full rounded-2xl p-4 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #124346, #2d5a5e)', border: '1.5px solid rgba(252,211,77,0.25)' }}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+               style={{ background: 'rgba(252,211,77,0.15)' }}>
+            <span className="text-2xl">📖</span>
           </div>
-
-          {/* Quest list */}
-          <div className="flex flex-col gap-2">
-            {specialQuests.map((q, i) => {
-              const isDone = !!sqCompleted[q.id];
-              const title = lang === 'de' ? q.titleDe : q.titleEn;
-              const desc  = lang === 'de' ? q.descDe  : q.descEn;
-              return (
-                <div
-                  key={q.id}
-                  className="flex items-center gap-3 p-3 rounded-2xl"
-                  style={{
-                    background: isDone ? 'rgba(52,211,153,0.06)' : 'rgba(255,255,255,0.7)',
-                    border: isDone
-                      ? '1px solid rgba(52,211,153,0.2)'
-                      : '1px solid rgba(0,0,0,0.07)',
-                    opacity: isDone ? 0.7 : 1,
-                  }}
-                >
-                  <span className="text-2xl leading-none select-none flex-shrink-0">{q.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-body text-sm font-semibold ${isDone ? 'line-through text-on-surface-variant' : 'text-on-surface'}`}>
-                      {title}
-                    </p>
-                    {!isDone && (
-                      <p className="font-body text-xs text-on-surface-variant mt-0.5 leading-snug">{desc}</p>
-                    )}
-                  </div>
-                  {isDone && (
-                    <span className="material-symbols-outlined text-xl flex-shrink-0"
-                          style={{ color: '#34d399', fontVariationSettings: "'FILL' 1" }}>
-                      check_circle
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+          <div className="flex-1">
+            <p className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: 'rgba(252,211,77,0.7)' }}>Spezial-Quest</p>
+            <h4 className="font-headline font-bold text-lg text-white">Mein Gedicht</h4>
+            <p className="font-label text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              Tag {(state.poemQuest.done?.length || 0) + 1} von 7
+            </p>
           </div>
-        </div>
-      )}
-
-      {/* All done — show a small celebration stamp */}
-      {sqDone === sqTotal && sqTotal > 0 && (
-        <div className="mb-5 p-4 rounded-2xl text-center"
-             style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.08), rgba(252,211,77,0.08))', border: '1px solid rgba(52,211,153,0.2)' }}>
-          <p className="text-2xl mb-1">🗺️</p>
-          <p className="font-headline font-bold text-base text-on-surface">
-            {lang === 'de' ? 'Alle Geheimnisse entdeckt!' : 'All secrets discovered!'}
-          </p>
-          <p className="font-body text-sm text-on-surface-variant">
-            {lang === 'de' ? 'Du bist ein wahrer Entdecker.' : 'You are a true explorer.'}
-          </p>
-        </div>
-      )}
+          <span className="material-symbols-outlined" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
+        </button>
+      ) : !state?.poemQuest ? (
+        /* Poem quest not started yet — show start button */
+        <button onClick={() => {
+            actions.patchState({ poemQuest: { done: [], completed: false, title: 'Mein Gedicht' } });
+            onNavigate?.('poem');
+          }}
+          className="w-full rounded-2xl p-4 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
+          style={{ background: 'linear-gradient(135deg, #fffbeb, #fef3c7)', border: '1.5px solid rgba(252,211,77,0.35)' }}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+               style={{ background: 'rgba(252,211,77,0.2)' }}>
+            <span className="text-2xl">📖</span>
+          </div>
+          <div className="flex-1">
+            <p className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: '#b45309' }}>Neu!</p>
+            <h4 className="font-headline font-bold text-lg text-on-surface">Gedicht lernen</h4>
+            <p className="font-body text-xs text-on-surface-variant">7-Tage-Quest — Tippe zum Starten!</p>
+          </div>
+          <span className="material-symbols-outlined" style={{ color: '#b45309' }}>play_arrow</span>
+        </button>
+      ) : null}
 
       {/* ── Epic Quest Groups ── */}
       <div className="flex flex-col gap-5">
@@ -218,7 +205,7 @@ export default function TaskList() {
                     <div>
                       <h3 className={`text-xl font-bold font-headline ${secDone ? 'text-emerald-dark' : 'text-on-surface'}`}>{label}</h3>
                       <p className={`text-sm font-medium font-label ${secDone ? 'text-emerald-dark/70' : 'text-on-surface/60'}`}>
-                        {secDone ? t('task.status.complete') : t('task.tasksLeft', { count: quests.length - doneCount })}
+                        {secDone ? getDonePhrase(anchor, t) : t('task.tasksLeft', { count: quests.length - doneCount })}
                       </p>
                     </div>
                   </div>
@@ -306,7 +293,7 @@ export default function TaskList() {
                                   <div className="flex-1">
                                     <p className="font-bold font-label line-through text-on-surface/50">{t('quest.' + q.id)}</p>
                                   </div>
-                                  <span className="font-bold font-label text-xs" style={{ color: '#34d399' }}>+{q.xp} XP</span>
+                                  <span className="font-bold font-label text-xs" style={{ color: '#34d399' }}>+{q.xp} HP</span>
                                 </div>
                                 {/* Weather hint persists after completion */}
                                 {isAnziehen && todayWeather && weatherInfo && (
@@ -359,7 +346,7 @@ export default function TaskList() {
                                     </p>
                                   )}
                                 </div>
-                                <span className="font-bold font-label text-xs text-primary">+{q.xp} XP</span>
+                                <span className="font-bold font-label text-xs text-primary">+{q.xp} HP</span>
                               </div>
                             )}
                           </div>
@@ -378,21 +365,22 @@ export default function TaskList() {
           const sideQuests = (state.quests || []).filter(q => q.sideQuest);
           if (!sideQuests.length) return null;
           return (
-            <section>
-              <div className="flex items-center gap-3 mb-4 px-1">
-                <div className="w-1.5 h-8 rounded-full" style={{ background: '#735c00' }} />
+            <section className="rounded-2xl overflow-hidden"
+                     style={{
+                       background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                       border: '1.5px solid rgba(115,92,0,0.18)',
+                       boxShadow: '0 2px 12px rgba(115,92,0,0.08)',
+                     }}>
+              <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+                <div className="w-1.5 h-7 rounded-full" style={{ background: '#735c00' }} />
                 <h2 className="font-headline text-xl text-on-surface">{t('task.bonus')}</h2>
-                <span className="font-label text-xs text-on-surface-variant px-2 py-0.5 rounded-full"
-                      style={{ background: '#f4ede5' }}>{t('task.optional')}</span>
               </div>
-              <div className="flex flex-col gap-3">
-                {sideQuests.map(q => (
+              <div className="flex flex-col">
+                {sideQuests.map((q, idx) => (
                   <div key={q.id}
-                    className={`flex items-center gap-4 p-4 rounded-xl transition-all ${q.done ? 'opacity-60' : ''}`}
+                    className={`flex items-center gap-4 px-4 py-3.5 transition-all ${q.done ? 'opacity-60' : ''}`}
                     style={{
-                      background: '#ffffff',
-                      border: '1px solid rgba(0,0,0,0.06)',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                      borderTop: idx > 0 ? '1px solid rgba(115,92,0,0.1)' : undefined,
                     }}
                   >
                     {q.done ? (
@@ -420,7 +408,7 @@ export default function TaskList() {
                       </div>
                     </div>
                     <div className={`font-bold font-label text-xs ${q.done ? 'text-emerald-dark' : 'text-secondary'}`}>
-                      +{q.xp} XP
+                      +{q.xp} HP
                     </div>
                   </div>
                 ))}
@@ -458,6 +446,52 @@ export default function TaskList() {
         </div>
       </div>
 
+      {/* ── Explorer / Discovery Quests (collapsible, below routines) ── */}
+      {sqTotal > 0 && (
+        <details className="group mt-4 rounded-2xl overflow-hidden"
+                 style={{ background: 'rgba(18,67,70,0.03)', border: '1.5px solid rgba(18,67,70,0.08)' }}>
+          <summary className="p-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                     style={{ background: 'rgba(18,67,70,0.06)' }}>
+                  <span className="material-symbols-outlined text-primary text-xl"
+                        style={{ fontVariationSettings: "'FILL' 1" }}>explore</span>
+                </div>
+                <div>
+                  <h3 className="font-headline font-bold text-base text-on-surface">
+                    {lang === 'de' ? 'Entdecker-Quests' : 'Explorer Quests'}
+                  </h3>
+                  <p className="font-label text-xs text-on-surface-variant">{sqDone}/{sqTotal} {lang === 'de' ? 'entdeckt' : 'discovered'}</p>
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center group-open:rotate-180 transition-transform"
+                   style={{ background: 'rgba(18,67,70,0.06)' }}>
+                <span className="material-symbols-outlined text-on-surface-variant text-lg">expand_more</span>
+              </div>
+            </div>
+          </summary>
+          <div className="px-4 pb-4 flex flex-col gap-2" style={{ borderTop: '1px solid rgba(18,67,70,0.06)' }}>
+            {specialQuests.map(q => {
+              const isDone = !!sqCompleted[q.id];
+              const title = lang === 'de' ? q.titleDe : q.titleEn;
+              const desc  = lang === 'de' ? q.descDe  : q.descEn;
+              return (
+                <div key={q.id} className="flex items-center gap-3 py-2"
+                     style={{ opacity: isDone ? 0.6 : 1 }}>
+                  <span className="text-xl leading-none select-none shrink-0">{q.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-body text-sm font-semibold ${isDone ? 'line-through text-on-surface-variant' : 'text-on-surface'}`}>{title}</p>
+                    {!isDone && <p className="font-body text-xs text-on-surface-variant mt-0.5">{desc}</p>}
+                  </div>
+                  {isDone && <span className="material-symbols-outlined text-lg shrink-0" style={{ color: '#34d399', fontVariationSettings: "'FILL' 1" }}>check_circle</span>}
+                </div>
+              );
+            })}
+          </div>
+        </details>
+      )}
+
       {/* ── Bodhi leaf ── */}
       <div className="flex justify-center py-6 opacity-10">
         <svg width="40" height="40" viewBox="0 0 120 120" fill="none">
@@ -466,59 +500,20 @@ export default function TaskList() {
       </div>
 
       {/* ── Weather Outfit Modal ── */}
-      {showWeather && currentWeather && (
-        <div className="fixed inset-0 z-[200] flex items-end justify-center"
-             onClick={() => setShowWeather(false)}>
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+      {showWeather && <ClothingSheet onClose={() => setShowWeather(false)} />}
 
-          {/* Sheet */}
-          <div className="relative w-full max-w-lg rounded-t-[2rem] pb-10 pt-6 px-6 overflow-auto"
-               style={{ background: '#fff8f2', maxHeight: '80vh', animation: 'slideUp 0.3s ease' }}
-               onClick={e => e.stopPropagation()}>
-
-            {/* Handle */}
-            <div className="w-11 h-1.5 rounded-full mx-auto mb-6" style={{ background: 'rgba(0,0,0,0.12)' }} />
-
-            {/* Weather header */}
-            <div className="text-center mb-6">
-              <div className="text-5xl mb-2">{weatherInfo?.emoji}</div>
-              <h2 className="font-headline text-2xl text-on-surface">{t('task.weather.title')}</h2>
-              <p className="font-body text-on-surface-variant mt-1">
-                {weatherInfo?.label} · {currentWeather.temp}° ({t('task.weather.feelsLike', { temp: currentWeather.feelsLike })})
-              </p>
-              {todayWeather && (
-                <p className="font-label text-sm text-on-surface-variant mt-1">
-                  {todayWeather.tempMin}° — {todayWeather.tempMax}°
-                  {todayWeather.precipProb > 20 && ` · ${t('task.weather.rain', { prob: todayWeather.precipProb })}`}
-                </p>
-              )}
-            </div>
-
-            {/* Clothing recommendations */}
-            <div className="flex flex-col gap-3 mb-6">
-              {clothingRecs.map((item, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-xl"
-                     style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)' }}>
-                  <span className="text-3xl shrink-0">{item.emoji}</span>
-                  <div className="flex-1">
-                    <p className="font-label font-bold text-on-surface">{item.name}</p>
-                    <p className="font-body text-sm text-on-surface-variant">{item.reason}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Close */}
-            <button
-              className="w-full py-4 rounded-full font-label font-bold text-lg transition-all active:scale-95"
-              style={{ background: '#fcd34d', color: '#725b00' }}
-              onClick={() => setShowWeather(false)}
-            >
-              {t('task.weather.ok')}
-            </button>
-          </div>
-        </div>
+      {/* ── Toothbrush Timer Overlay ── */}
+      {teethTimerQuestId && (
+        <ToothbrushTimer
+          duration={120}
+          onFinish={() => {
+            actions.complete(teethTimerQuestId);
+            SFX.play('coin');
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            setTeethTimerQuestId(null);
+          }}
+          onSkip={() => setTeethTimerQuestId(null)}
+        />
       )}
     </div>
   );

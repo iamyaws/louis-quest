@@ -5,7 +5,8 @@ import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 
 const PIN_CODE = '1234';
 const MOOD_EMOJIS = ['😢', '😕', '😐', '🙂', '😊', '🤩'];
-const MOOD_LABELS_KEYS = ['mood.sad', 'mood.worried', 'mood.okay', 'mood.good', 'mood.magical', 'mood.tired'];
+const MOOD_LABELS = ['Traurig', 'Besorgt', 'Okay', 'Gut', 'Toll', 'Müde'];
+const MOOD_COLORS = ['#ef4444', '#f97316', '#94a3b8', '#34d399', '#fcd34d', '#a78bfa'];
 const DAY_LABELS_DE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 const DAY_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const base = typeof import.meta !== 'undefined' ? import.meta.env.BASE_URL : '/';
@@ -38,7 +39,7 @@ export default function ParentalDashboard({ onClose }) {
       const next = pin + d;
       setPinError(false);
       if (next.length === 4) {
-        if (next === PIN_CODE) {
+        if (next === (localStorage.getItem('ronki_pin') || PIN_CODE)) {
           setAuthed(true);
         } else {
           setPinError(true);
@@ -185,9 +186,9 @@ export default function ParentalDashboard({ onClose }) {
       </div>
 
       <main className="relative z-10 px-6 pb-12 max-w-lg mx-auto flex flex-col gap-5">
-        {tab === 'overview' && <OverviewTab state={state} />}
-        {tab === 'family' && <FamilyTab state={state} actions={actions} />}
-        {tab === 'settings' && <SettingsTab lang={lang} setLang={setLang} t={t} />}
+        {tab === 'overview' && <OverviewTab state={state} lang={lang} />}
+        {tab === 'family' && <FamilyTab state={state} actions={actions} lang={lang} />}
+        {tab === 'settings' && <SettingsTab lang={lang} setLang={setLang} t={t} actions={actions} state={state} />}
         <BodhiLeaf />
       </main>
     </div>
@@ -197,7 +198,7 @@ export default function ParentalDashboard({ onClose }) {
 // ═══════════════════════════════════════════════════════
 // OVERVIEW TAB
 // ═══════════════════════════════════════════════════════
-function OverviewTab({ state }) {
+function OverviewTab({ state, lang }) {
   const completedToday = (state.quests || []).filter(q => q.done && !q.sideQuest).length;
   const totalToday = (state.quests || []).filter(q => !q.sideQuest).length;
   const completionPct = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0;
@@ -220,25 +221,23 @@ function OverviewTab({ state }) {
         <StatCard label="Wachstums-Orbs" value={totalOrbs} sub="Gesammelt" />
       </div>
 
-      {/* Mood Today */}
+      {/* Mood — today + 7-day history */}
       <div className="mm-card p-5">
-        <SectionLabel icon="mood" text="Stimmung heute" />
-        <div className="flex items-center gap-3 mt-3">
-          {state.moodAM !== null ? (
-            <>
-              <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-                   style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid white', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06)' }}>
-                {MOOD_EMOJIS[state.moodAM]}
-              </div>
-              <div>
-                <p className="font-headline font-bold text-base text-on-surface">{MOOD_LABELS[state.moodAM]}</p>
-                <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest">Eingetragen im Journal</p>
-              </div>
-            </>
-          ) : (
-            <p className="font-body text-on-surface-variant italic text-sm">Noch keine Stimmung erfasst</p>
+        <div className="flex items-center justify-between">
+          <SectionLabel icon="mood" text="Stimmung (7 Tage)" />
+          {state.moodAM !== null && (
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{MOOD_EMOJIS[state.moodAM]}</span>
+              <span className="font-label font-bold text-sm" style={{ color: MOOD_COLORS[state.moodAM] }}>
+                {MOOD_LABELS[state.moodAM]}
+              </span>
+            </div>
           )}
         </div>
+        <MoodHistoryChart history={state.journalHistory} lang={lang} />
+        {state.moodAM === null && (
+          <p className="font-body text-on-surface-variant italic text-xs mt-2">Noch keine Stimmung heute erfasst</p>
+        )}
       </div>
 
       {/* Journal Entry */}
@@ -312,34 +311,6 @@ function OverviewTab({ state }) {
         </div>
       </div>
 
-      {/* Settings */}
-      <div className="mm-card p-5">
-        <SectionLabel icon="settings" text="Einstellungen" />
-        <div className="flex flex-col gap-1 mt-3">
-          {[
-            { icon: 'lock', label: 'PIN ändern', trailing: 'chevron_right' },
-            { icon: 'bedtime', label: 'Schlafenszeit-Modus', trailing: null, trailingText: 'Aus' },
-            { icon: 'restart_alt', label: 'Fortschritt zurücksetzen', trailing: 'chevron_right', danger: true },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between py-3 px-2"
-                 style={{ borderBottom: i < 2 ? '1px solid rgba(18,67,70,0.06)' : 'none' }}>
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-lg"
-                      style={{ color: item.danger ? '#ba1a1a' : '#124346' }}>
-                  {item.icon}
-                </span>
-                <span className="font-body text-sm text-on-surface">{item.label}</span>
-              </div>
-              {item.trailingText ? (
-                <span className="font-label text-xs text-on-surface-variant">{item.trailingText}</span>
-              ) : (
-                <span className="material-symbols-outlined text-on-surface-variant/40 text-sm">{item.trailing}</span>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Help */}
       <div className="p-5 rounded-2xl"
            style={{ background: 'rgba(18,67,70,0.04)', border: '1.5px solid rgba(18,67,70,0.08)', borderRadius: '1.25rem' }}>
@@ -363,7 +334,8 @@ function OverviewTab({ state }) {
 // ═══════════════════════════════════════════════════════
 // FAMILY TAB
 // ═══════════════════════════════════════════════════════
-function FamilyTab({ state, actions }) {
+function FamilyTab({ state, actions, lang }) {
+  const DAY_LABELS = lang === 'en' ? DAY_LABELS_EN : DAY_LABELS_DE;
   const config = state.familyConfig || DEFAULT_FAMILY_CONFIG;
   const [draft, setDraft] = useState(() => JSON.parse(JSON.stringify(config)));
   const [saved, setSaved] = useState(false);
@@ -615,6 +587,57 @@ function FamilyTab({ state, actions }) {
 // REUSABLE SUB-COMPONENTS
 // ═══════════════════════════════════════════════════════
 
+// ── 7-day mood bar chart ──
+function MoodHistoryChart({ history, lang }) {
+  const DAY_LABELS = lang === 'en' ? DAY_LABELS_EN : DAY_LABELS_DE;
+  // Build last-7-days array
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    const iso = d.toISOString().slice(0, 10);
+    const entry = (history || []).find(e => e.date === iso);
+    return {
+      label: DAY_LABELS[d.getDay()],
+      mood: entry?.mood ?? null,
+      iso,
+    };
+  });
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  return (
+    <div className="flex items-end gap-1.5 mt-4 h-20">
+      {days.map((day, i) => {
+        const hasMood = day.mood !== null;
+        const barPct = hasMood ? (day.mood + 1) / 6 : 0;
+        const color = hasMood ? MOOD_COLORS[day.mood] : 'rgba(18,67,70,0.08)';
+        const isToday = day.iso === today;
+        return (
+          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+            {hasMood && (
+              <span className="text-xs" title={MOOD_LABELS[day.mood]}>
+                {MOOD_EMOJIS[day.mood]}
+              </span>
+            )}
+            {!hasMood && <div className="h-5" />}
+            <div className="w-full rounded-t-md transition-all duration-500"
+                 style={{
+                   height: hasMood ? `${Math.max(barPct * 44, 8)}px` : '4px',
+                   background: color,
+                   opacity: hasMood ? 1 : 0.4,
+                   boxShadow: hasMood ? `0 2px 8px ${color}60` : 'none',
+                 }} />
+            <span className="font-label text-xs uppercase tracking-widest"
+                  style={{ color: isToday ? '#124346' : 'rgba(18,67,70,0.4)', fontWeight: isToday ? 700 : 500, fontSize: '0.6rem' }}>
+              {day.label}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function SectionLabel({ icon, text }) {
   return (
     <div className="flex items-center gap-2">
@@ -754,34 +777,186 @@ function FieldRow({ label, children }) {
 // SETTINGS TAB (Language Toggle)
 // ═══════════════════════════════════════════════════════
 
-function SettingsTab({ lang, setLang, t }) {
+function SettingsTab({ lang, setLang, t, actions, state }) {
+  const [pinPhase, setPinPhase] = useState(null); // null | 'current' | 'new' | 'confirm'
+  const [pinInput, setPinInput] = useState('');
+  const [newPin, setNewPin] = useState('');
+  const [pinMsg, setPinMsg] = useState(null); // { ok: bool, text: string }
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [resetDone, setResetDone] = useState(false);
+  const storedPin = () => localStorage.getItem('ronki_pin') || PIN_CODE;
+
+  const handlePinDigit = (d) => {
+    const next = pinInput + d;
+    setPinMsg(null);
+    if (next.length < 4) { setPinInput(next); return; }
+    // 4th digit — evaluate
+    if (pinPhase === 'current') {
+      if (next === storedPin()) {
+        setPinPhase('new'); setPinInput('');
+      } else {
+        setPinMsg({ ok: false, text: 'Falscher PIN' }); setPinInput('');
+      }
+    } else if (pinPhase === 'new') {
+      setNewPin(next); setPinPhase('confirm'); setPinInput('');
+    } else if (pinPhase === 'confirm') {
+      if (next === newPin) {
+        localStorage.setItem('ronki_pin', next);
+        setPinMsg({ ok: true, text: 'PIN geändert!' });
+        setPinPhase(null); setPinInput(''); setNewPin('');
+      } else {
+        setPinMsg({ ok: false, text: 'Stimmt nicht überein' }); setPinInput(''); setPinPhase('new');
+      }
+    }
+  };
+
+  const handleResetDay = () => {
+    actions?.patchState?.({
+      quests: (state?.quests || []).map(q => ({ ...q, done: false })),
+      catFed: false,
+      catPetted: false,
+      catPlayed: false,
+      waterIntake: 0,
+      moodAM: null,
+      moodPM: null,
+    });
+    setResetDone(true);
+    setTimeout(() => { setResetDone(false); setShowResetConfirm(false); }, 1500);
+  };
+
+  const pinPrompts = { current: 'Aktuellen PIN eingeben', new: 'Neuen PIN wählen (4 Ziffern)', confirm: 'PIN wiederholen' };
+
   return (
     <>
-      <div className="rounded-2xl p-6"
+      {/* Language */}
+      <div className="rounded-2xl p-5"
            style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">
           {t('parent.lang.title')}
         </p>
         <div className="flex gap-3">
-          {[
-            { code: 'de', label: '🇩🇪 Deutsch', flag: '🇩🇪' },
-            { code: 'en', label: '🇬🇧 English', flag: '🇬🇧' },
-          ].map(opt => (
-            <button
-              key={opt.code}
-              onClick={() => setLang(opt.code)}
-              className="flex-1 py-4 rounded-2xl font-headline font-bold text-lg flex items-center justify-center gap-3 transition-all"
+          {[{ code: 'de', flag: '🇩🇪', label: 'Deutsch' }, { code: 'en', flag: '🇬🇧', label: 'English' }].map(opt => (
+            <button key={opt.code} onClick={() => setLang(opt.code)}
+              className="flex-1 py-3.5 rounded-2xl font-headline font-bold text-base flex items-center justify-center gap-2 transition-all"
               style={{
                 background: lang === opt.code ? '#124346' : 'rgba(18,67,70,0.05)',
                 color: lang === opt.code ? '#ffffff' : '#124346',
                 border: lang === opt.code ? '2px solid #124346' : '2px solid rgba(18,67,70,0.1)',
                 boxShadow: lang === opt.code ? '0 4px 16px rgba(18,67,70,0.2)' : 'none',
               }}>
-              <span className="text-2xl">{opt.flag}</span>
-              {opt.code === 'de' ? 'Deutsch' : 'English'}
+              <span className="text-xl">{opt.flag}</span>
+              {opt.label}
             </button>
           ))}
         </div>
+      </div>
+
+      {/* PIN Change */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(18,67,70,0.08)' }}>
+            <span className="material-symbols-outlined text-primary text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">PIN ändern</p>
+        </div>
+
+        {pinPhase === null ? (
+          <>
+            {pinMsg && (
+              <p className="font-label text-sm font-bold mb-3 flex items-center gap-1.5"
+                 style={{ color: pinMsg.ok ? '#059669' : '#ba1a1a' }}>
+                <span className="material-symbols-outlined text-sm">{pinMsg.ok ? 'check_circle' : 'error'}</span>
+                {pinMsg.text}
+              </p>
+            )}
+            <button onClick={() => { setPinPhase('current'); setPinInput(''); setPinMsg(null); }}
+              className="w-full py-3 rounded-xl font-label font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+              style={{ background: 'rgba(18,67,70,0.06)', color: '#124346', border: '1.5px solid rgba(18,67,70,0.12)' }}>
+              <span className="material-symbols-outlined text-base">key</span>
+              PIN jetzt ändern
+            </button>
+          </>
+        ) : (
+          <div>
+            <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3">
+              {pinPrompts[pinPhase]}
+            </p>
+            {/* PIN dots */}
+            <div className="flex gap-3 mb-4 justify-center">
+              {[0,1,2,3].map(i => (
+                <div key={i} className="w-3.5 h-3.5 rounded-full transition-all duration-200"
+                     style={{ background: i < pinInput.length ? '#124346' : 'rgba(18,67,70,0.12)', transform: i < pinInput.length ? 'scale(1.2)' : 'scale(1)' }} />
+              ))}
+            </div>
+            {pinMsg && <p className="font-label text-xs text-error mb-2 text-center">{pinMsg.text}</p>}
+            {/* Mini numpad */}
+            <div className="grid grid-cols-3 gap-2">
+              {[1,2,3,4,5,6,7,8,9,null,0,'del'].map((d, i) => {
+                if (d === null) return <div key={i} />;
+                if (d === 'del') return (
+                  <button key={i} onClick={() => setPinInput(p => p.slice(0, -1))}
+                    className="h-12 rounded-xl flex items-center justify-center active:scale-95 transition-all"
+                    style={{ background: 'rgba(18,67,70,0.05)', border: '1px solid rgba(18,67,70,0.08)' }}>
+                    <span className="material-symbols-outlined text-on-surface-variant text-base">backspace</span>
+                  </button>
+                );
+                return (
+                  <button key={i} onClick={() => handlePinDigit(String(d))}
+                    className="h-12 rounded-xl font-headline font-bold text-xl text-on-surface flex items-center justify-center active:scale-95 transition-all"
+                    style={{ background: 'rgba(18,67,70,0.05)', border: '1px solid rgba(18,67,70,0.08)' }}>
+                    {d}
+                  </button>
+                );
+              })}
+            </div>
+            <button onClick={() => { setPinPhase(null); setPinInput(''); setNewPin(''); }}
+              className="w-full mt-3 py-2 font-label text-xs text-on-surface-variant active:opacity-70">
+              Abbrechen
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Reset */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(186,26,26,0.06)' }}>
+            <span className="material-symbols-outlined text-error text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>restart_alt</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">Tag zurücksetzen</p>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Setzt alle heutigen Aufgaben zurück, ohne HP oder Gesamtfortschritt zu löschen.
+        </p>
+        {!showResetConfirm ? (
+          <button onClick={() => setShowResetConfirm(true)}
+            className="w-full py-3 rounded-xl font-label font-bold text-sm transition-all active:scale-[0.98]"
+            style={{ background: 'rgba(186,26,26,0.06)', color: '#ba1a1a', border: '1.5px solid rgba(186,26,26,0.12)' }}>
+            Tag zurücksetzen
+          </button>
+        ) : resetDone ? (
+          <div className="flex items-center justify-center gap-2 py-3">
+            <span className="material-symbols-outlined text-lg" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+            <span className="font-label font-bold text-sm" style={{ color: '#059669' }}>Zurückgesetzt!</span>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <button onClick={() => setShowResetConfirm(false)}
+              className="flex-1 py-3 rounded-xl font-label font-bold text-sm transition-all active:scale-[0.98]"
+              style={{ background: 'rgba(18,67,70,0.05)', color: '#124346', border: '1.5px solid rgba(18,67,70,0.1)' }}>
+              Abbrechen
+            </button>
+            <button onClick={handleResetDay}
+              className="flex-1 py-3 rounded-xl font-label font-bold text-sm transition-all active:scale-[0.98]"
+              style={{ background: '#ba1a1a', color: 'white' }}>
+              Ja, zurücksetzen
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

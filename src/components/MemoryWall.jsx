@@ -42,8 +42,7 @@ function Stamp({ emoji, label, accentColor = '#fcd34d', index = 0 }) {
 
 export default function MemoryWall() {
   const { state } = useTask();
-  const { locale } = useTranslation();
-  const lang = locale || 'de';
+  const { lang } = useTranslation();
   const base = import.meta.env.BASE_URL;
 
   if (!state) return null;

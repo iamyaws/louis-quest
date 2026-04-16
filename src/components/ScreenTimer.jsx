@@ -1,6 +1,28 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
+
+function AnimatedDigit({ d, size }) {
+  // size: 'sm' (badge, text-lg) or 'lg' (expanded panel, text-4xl)
+  const h = size === 'lg' ? '2.5rem' : '1.4rem'; // clip box height matches font-size
+  return (
+    <span style={{ display: 'inline-block', overflow: 'hidden', height: h, verticalAlign: 'bottom' }}>
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={d}
+          initial={{ y: h, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: `-${h}`, opacity: 0 }}
+          transition={{ duration: 0.18, ease: [0.32, 0, 0.67, 0] }}
+          style={{ display: 'block', lineHeight: h }}
+        >
+          {d}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
 
 /**
  * Floating screen-time timer badge.
@@ -109,8 +131,13 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
 
           {/* Big time display */}
           <div className="text-center mb-4">
-            <span className={`font-headline font-bold text-4xl ${isLow ? 'text-error' : 'text-primary'}`}>
-              {mm}:{ss}
+            <span className={`font-headline font-bold text-4xl ${isLow ? 'text-error' : 'text-primary'}`}
+                  style={{ display: 'inline-flex', alignItems: 'flex-end', gap: 0 }}>
+              <AnimatedDigit d={mm[0]} size="lg" />
+              <AnimatedDigit d={mm[1]} size="lg" />
+              <span style={{ lineHeight: '2.5rem' }}>:</span>
+              <AnimatedDigit d={ss[0]} size="lg" />
+              <AnimatedDigit d={ss[1]} size="lg" />
             </span>
           </div>
 
@@ -170,8 +197,13 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
         </div>
 
         {/* Time text */}
-        <span className={`font-headline font-bold text-lg ${isLow ? 'text-error' : 'text-primary'}`}>
-          {mm}:{ss}
+        <span className={`font-headline font-bold text-lg ${isLow ? 'text-error' : 'text-primary'}`}
+              style={{ display: 'inline-flex', alignItems: 'flex-end', gap: 0 }}>
+          <AnimatedDigit d={mm[0]} size="sm" />
+          <AnimatedDigit d={mm[1]} size="sm" />
+          <span style={{ lineHeight: '1.4rem' }}>:</span>
+          <AnimatedDigit d={ss[0]} size="sm" />
+          <AnimatedDigit d={ss[1]} size="sm" />
         </span>
       </button>
     </div>

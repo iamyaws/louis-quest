@@ -61,9 +61,10 @@ export default function Sanctuary() {
           backgroundImage: `url(${base}${zones.activeZone.bgImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'top center',
+          filter: zones.activeZone.bgFilter !== 'none' ? zones.activeZone.bgFilter : undefined,
           WebkitMaskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.75) 45%, transparent 100%)',
           maskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.75) 45%, transparent 100%)',
-          opacity: 0.65,
+          opacity: 0.8,
           transition: 'background-image 0s, opacity 400ms ease',
         }}
         aria-hidden="true"
@@ -88,7 +89,7 @@ export default function Sanctuary() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg"
                  style={{ background: '#a2d0d4' }}>
-              <img src={base + (currentStage === 0 ? 'art/egg-glow.webp' : 'art/dragon-baby.webp')} alt="" className="w-full h-full object-cover" />
+              <img src={base + 'art/companion/' + (['dragon-egg','dragon-baby','dragon-young','dragon-majestic','dragon-legendary'][currentStage] || 'dragon-baby') + '.webp'} alt="" className="w-full h-full object-cover" />
             </div>
             <span className="text-xl font-headline font-bold text-primary" style={{ textShadow: '0 1px 4px rgba(255,255,255,0.5)' }}>
               {t('care.sanctuary')}
@@ -123,7 +124,7 @@ export default function Sanctuary() {
           )}
           <div className="relative z-10 flex flex-col items-center">
             <div className="relative w-56 h-56 flex items-center justify-center">
-              <img src={base + (currentStage === 0 ? 'art/egg-glow.webp' : 'art/dragon-baby.webp')} alt="Ronki" className="w-full h-full object-contain" />
+              <img src={base + 'art/companion/' + (['dragon-egg','dragon-baby','dragon-young','dragon-majestic','dragon-legendary'][currentStage] || 'dragon-baby') + '.webp'} alt="Ronki" className="w-full h-full object-contain" />
             </div>
             <div className="w-full mt-4 text-center">
               <h2 className="font-headline font-bold text-2xl text-primary">Ronki</h2>
@@ -298,11 +299,13 @@ export default function Sanctuary() {
           </div>
         </section>
 
-        {/* ── Gear Vault ── */}
-        <GearVault />
+        {/* ── Gear Vault — hidden until player has at least 1 gear item ── */}
+        {(state.equippedGear && Object.values(state.equippedGear).some(Boolean)) || (state.gearInventory || []).length > 0
+          ? <GearVault />
+          : null}
 
-        {/* ── Wachstums-Orbs (Enhanced with milestones) ── */}
-        <OrbsSection state={state} nextStage={nextStage} progressPct={progressPct} evo={evo} />
+        {/* ── Wachstums-Orbs — hidden for now, de-emphasized until Phase 2 rework ── */}
+        {/* <OrbsSection state={state} nextStage={nextStage} progressPct={progressPct} evo={evo} /> */}
 
         {/* Evolution Path — Vertical Winding */}
         <section className="rounded-2xl p-6 relative overflow-hidden"

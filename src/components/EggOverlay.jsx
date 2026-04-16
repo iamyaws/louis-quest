@@ -3,8 +3,7 @@ import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
 
 export default function EggOverlay({ egg, onCollect }) {
-  const { locale } = useTranslation();
-  const lang = locale || 'de';
+  const { lang } = useTranslation();
   const [collected, setCollected] = useState(false);
 
   const handleCollect = () => {

@@ -23,6 +23,10 @@ import CompanionToast from './components/CompanionToast';
 import ScreenTimer from './components/ScreenTimer';
 import RonkiProfile from './components/RonkiProfile';
 import MemoryWall from './components/MemoryWall';
+import DiscoveryLog from './components/DiscoveryLog';
+import Micropedia from './components/Micropedia';
+import PoemQuest from './components/PoemQuest';
+import StarfighterGame from './components/StarfighterGame';
 import { useSpecialQuests } from './hooks/useSpecialQuests';
 import { useEggSystem } from './hooks/useEggSystem';
 import EggOverlay from './components/EggOverlay';
@@ -40,7 +44,10 @@ function AppContent() {
 
   // Scroll to top whenever the active view changes; also record first-time visits
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Belt-and-suspenders: works across iOS PWA, Android WebView, desktop
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     actions.recordViewVisit(view); // track first-time feature discovery
   }, [view]);
 
@@ -89,7 +96,7 @@ function AppContent() {
              paddingTop: ['hub', 'care'].includes(view) ? 0 : 'calc(72px + env(safe-area-inset-top, 0px))',
              paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
            }}>
-        {view === 'quests' && <TaskList />}
+        {view === 'quests' && <TaskList onNavigate={setView} />}
         {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} onOpenParental={() => setShowParental(true)} />}
         {view === 'hub' && <Hub onNavigate={setView} />}
         {view === 'care' && <Sanctuary />}
@@ -97,6 +104,9 @@ function AppContent() {
         {view === 'kodex' && <HeldenKodex />}
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
         {view === 'memories' && <MemoryWall />}
+        {view === 'discovery' && <DiscoveryLog onNavigate={setView} />}
+        {view === 'micropedia' && <Micropedia onNavigate={setView} />}
+        {view === 'poem' && <PoemQuest onBack={() => setView('quests')} />}
         {view === 'games' && <MiniGames onPlay={(id) => {
           if (id === 'memory') setView('memory');
           if (id === 'potion') setView('potion');
@@ -120,6 +130,10 @@ function AppContent() {
       }} />}
       {view === 'starfall' && <StarCatcherGame onComplete={() => {
         actions.claimGameReward('starfall');
+        setView('games');
+      }} />}
+      {view === 'starfighter' && <StarfighterGame onComplete={(reward) => {
+        if (reward?.hp > 0) actions.addHP(reward.hp);
         setView('games');
       }} />}
       {state?.pendingEgg && state.pendingEgg.view === view && (
