@@ -112,9 +112,9 @@ export function HeroVariantF() {
             {...fade(0.75)}
             className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 justify-center md:justify-start"
           >
-            <TrustBadge icon="\uD83D\uDD12" label="Kein Social-Feed" />
-            <TrustBadge icon="\uD83D\uDC64" label="Eltern behalten die Kontrolle" />
-            <TrustBadge icon="\u2764\uFE0F" label="Kein Dark Pattern" />
+            <TrustBadge icon="🔒" label="Kein Social-Feed" />
+            <TrustBadge icon="👤" label="Eltern behalten die Kontrolle" />
+            <TrustBadge icon="❤️" label="Kein Dark Pattern" />
           </motion.div>
         </div>
 
@@ -210,7 +210,7 @@ function PeekCard({ items, reduced, compact = false }: PeekCardProps) {
           style={{ background: 'rgba(45,90,94,0.10)' }}
           aria-hidden
         >
-          {'\uD83D\uDC09'}
+          🐉
         </span>
         <div>
           <p className="font-display font-bold text-teal-dark text-sm leading-tight">
@@ -262,7 +262,7 @@ function PeekCard({ items, reduced, compact = false }: PeekCardProps) {
         className="mt-4 flex items-center gap-2 rounded-2xl px-3 py-2.5"
         style={{ background: 'rgba(45,90,94,0.08)' }}
       >
-        <span className="text-base" aria-hidden>{'\uD83D\uDC09'}</span>
+        <span className="text-base" aria-hidden>🐉</span>
         <p className="text-xs text-teal-dark leading-snug">
           <span className="font-semibold">Ronki sagt:</span>{' '}
           Fast geschafft! Nur noch die Tasche.

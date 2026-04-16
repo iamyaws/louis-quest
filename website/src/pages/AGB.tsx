@@ -35,7 +35,7 @@ export default function AGB() {
 
             <Section heading="§1 Geltungsbereich">
               <p>
-                Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der Webseite ronki.de und der Web-App Ronki, betrieben von [TODO: Betreiber eintragen]. Mit der Nutzung akzeptierst du diese Bedingungen.
+                Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der Webseite ronki.de und der Web-App Ronki, betrieben von Marc Förster, Föhringer Allee 33, 85774 Unterföhring. Mit der Nutzung akzeptierst du diese Bedingungen.
               </p>
             </Section>
 

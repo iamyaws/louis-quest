@@ -34,10 +34,9 @@ export default function Impressum() {
 
             <Section heading="Diensteanbieter">
               <AddressBox>
-                [TODO vom Betreiber einzutragen: Vor- und Nachname / Firmenname]<br />
-                [TODO: ggf. Rechtsform und vertretungsberechtigte Person/en]<br />
-                [TODO: Straße und Hausnummer]<br />
-                [TODO: PLZ und Ort]<br />
+                Marc Förster<br />
+                Föhringer Allee 33<br />
+                85774 Unterföhring<br />
                 Deutschland
               </AddressBox>
             </Section>
@@ -45,28 +44,16 @@ export default function Impressum() {
             <Section heading="Kontakt">
               <p>
                 E-Mail: <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a><br />
-                Telefon: [TODO vom Betreiber einzutragen]
+                Telefon: <a href="tel:+4917657904421" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">+49 176 57904421</a>
               </p>
               <p className="text-sm text-ink/65">
                 Nach § 5 Abs. 1 Nr. 2 DDG ist neben der E-Mail-Adresse ein weiterer Kommunikationsweg anzugeben, der eine schnelle elektronische Kontaktaufnahme ermöglicht. Alternativ zur Telefonnummer kann hier ein elektronisches Kontaktformular angegeben werden.
               </p>
             </Section>
 
-            <Section heading="Registereintrag">
-              <p>
-                [TODO vom Betreiber einzutragen, falls zutreffend: Handelsregister / Vereinsregister / Genossenschaftsregister, Registergericht, Registernummer.]
-              </p>
-              <p className="text-sm text-ink/65">
-                Für Privatpersonen, Einzelunternehmen (nicht im Handelsregister) und Kleingewerbe kann dieser Abschnitt entfallen.
-              </p>
-            </Section>
-
             <Section heading="Umsatzsteuer-Identifikationsnummer">
-              <p>
-                [TODO vom Betreiber einzutragen, falls vorhanden: USt-IdNr. nach § 27a UStG.]
-              </p>
               <p className="text-sm text-ink/65">
-                Wenn keine USt-IdNr. vergeben wurde (z. B. Kleinunternehmerregelung nach § 19 UStG), kann dieser Abschnitt entfallen.
+                Nicht vorhanden (Kleinunternehmerregelung nach § 19 UStG).
               </p>
             </Section>
 
@@ -78,9 +65,9 @@ export default function Impressum() {
 
             <Section heading="Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV">
               <AddressBox>
-                [TODO vom Betreiber einzutragen: Vor- und Nachname]<br />
-                [TODO: Straße und Hausnummer]<br />
-                [TODO: PLZ und Ort]
+                Marc Förster<br />
+                Föhringer Allee 33<br />
+                85774 Unterföhring
               </AddressBox>
             </Section>
 
@@ -143,14 +130,6 @@ export default function Impressum() {
 
           </div>
 
-          <div className="mt-16 rounded-2xl bg-mustard-soft/25 backdrop-blur-sm border border-mustard/40 p-5 sm:p-6">
-            <p className="text-[0.7rem] uppercase tracking-[0.15em] text-teal/70 font-medium mb-2">
-              Hinweis für den Betreiber
-            </p>
-            <p className="text-sm sm:text-base text-ink/80 leading-relaxed">
-              Vor dem Launch müssen alle <code className="px-1.5 py-0.5 rounded bg-cream/70 text-teal-dark font-mono text-[0.85em]">[TODO]</code>-Platzhalter mit echten Daten ersetzt werden. Ein unvollständiges oder falsches Impressum ist wettbewerbsrechtlich abmahnfähig (§ 5 Abs. 1 UWG). Bei Unsicherheit empfehlen wir eine kurze Rücksprache mit einem Anwalt, oder den Impressums-Generator der IHK.
-            </p>
-          </div>
         </article>
       </main>
       <Footer />

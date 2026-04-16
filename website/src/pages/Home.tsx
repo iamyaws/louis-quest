@@ -1,7 +1,7 @@
 import { PageMeta } from '../components/PageMeta';
 import { OrganizationSchema, SoftwareApplicationSchema } from '../components/JsonLd';
 import { PainterlyShell } from '../components/PainterlyShell';
-import { Hero } from '../components/Hero';
+import { HeroVariantF } from '../components/HeroVariantF';
 import { Quote } from '../components/Quote';
 import { BeforeAfter } from '../components/BeforeAfter';
 import { ArcStoryboard } from '../components/ArcStoryboard';
@@ -21,7 +21,7 @@ export default function Home() {
       />
       <OrganizationSchema />
       <SoftwareApplicationSchema />
-      <Hero />
+      <HeroVariantF />
       <Quote />
       <BeforeAfter />
       <ArcStoryboard />

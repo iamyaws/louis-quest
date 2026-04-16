@@ -38,12 +38,12 @@ export default function Datenschutz() {
                 Verantwortlicher für die Verarbeitung personenbezogener Daten auf dieser Website ist (Art. 4 Nr. 7 DSGVO):
               </p>
               <AddressBox>
-                [TODO vom Betreiber einzutragen: Vor- und Nachname / Firmenname]<br />
-                [TODO: Straße und Hausnummer]<br />
-                [TODO: PLZ und Ort]<br />
+                Marc Förster<br />
+                Föhringer Allee 33<br />
+                85774 Unterföhring<br />
                 Deutschland<br />
                 <br />
-                E-Mail: hallo@ronki.de
+                E-Mail: <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a>
               </AddressBox>
               <p>
                 Weitere Pflichtangaben findest du im <Link to="/impressum" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">Impressum</Link>.
@@ -136,8 +136,8 @@ export default function Datenschutz() {
                   <span className="text-sm text-ink/65">Mehr: <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">supabase.com/privacy</a></span>
                 </li>
                 <li>
-                  <strong className="text-teal-dark">[TODO vom Betreiber einzutragen: Hosting-Provider]:</strong> Auslieferung der statischen Website-Inhalte und Server-Logfiles.<br />
-                  <span className="text-sm text-ink/65">Sitz: [TODO], AV-Vertrag abgeschlossen.</span>
+                  <strong className="text-teal-dark">Vercel Inc.:</strong> Auslieferung der statischen Website-Inhalte und Server-Logfiles. Vercel betreibt Edge-Server in der EU (u. a. Frankfurt). Es besteht ein Data Processing Agreement.<br />
+                  <span className="text-sm text-ink/65">Sitz: San Francisco, USA. Übermittlung auf Basis von EU-Standardvertragsklauseln. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">vercel.com/legal/privacy-policy</a></span>
                 </li>
               </ul>
               <p>
@@ -177,7 +177,10 @@ export default function Datenschutz() {
                 Du hast das Recht, dich mit einer Beschwerde an eine Datenschutz-Aufsichtsbehörde zu wenden, wenn du der Ansicht bist, dass wir gegen die DSGVO verstoßen. Zuständig ist in der Regel die Behörde des Bundeslandes, in dem du wohnst, oder die unseres Sitzes:
               </p>
               <AddressBox>
-                [TODO vom Betreiber einzutragen: zuständige Landesdatenschutzbehörde]
+                Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)<br />
+                Promenade 18<br />
+                91522 Ansbach<br />
+                <a href="https://www.lda.bayern.de" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">www.lda.bayern.de</a>
               </AddressBox>
               <p>
                 Eine Liste der deutschen Aufsichtsbehörden findest du bei der Bundesbeauftragten für den Datenschutz:{' '}
