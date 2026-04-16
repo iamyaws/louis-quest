@@ -3,5 +3,6 @@ Allow: /
 Disallow: /modern
 Disallow: /v2
 Disallow: /v3
+Disallow: /hero-compare
 
 Sitemap: https://ronki.de/sitemap.xml

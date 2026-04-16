@@ -10,8 +10,8 @@ type Props = {
 
 export function PageMeta({ title, description, ogImage, canonicalPath, noindex }: Props) {
   useEffect(() => {
-    const resolvedImage = ogImage || 'https://ronki.de/og-ronki.jpg';
-    const resolvedUrl = canonicalPath ? `https://ronki.de${canonicalPath}` : undefined;
+    const resolvedImage = ogImage || 'https://www.ronki.de/og-ronki.jpg';
+    const resolvedUrl = canonicalPath ? `https://www.ronki.de${canonicalPath}` : undefined;
 
     document.title = title;
     setMeta('description', description);
@@ -41,7 +41,7 @@ export function PageMeta({ title, description, ogImage, canonicalPath, noindex }
         link.rel = 'canonical';
         document.head.appendChild(link);
       }
-      link.href = `https://ronki.de${canonicalPath}`;
+      link.href = `https://www.ronki.de${canonicalPath}`;
     }
   }, [title, description, ogImage, canonicalPath, noindex]);
 

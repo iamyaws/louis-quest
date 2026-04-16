@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PageMeta } from '../components/PageMeta';
 import { PainterlyShell } from '../components/PainterlyShell';
 import { HeroVariantB } from '../components/HeroVariantB';
 import { HeroVariantF } from '../components/HeroVariantF';
@@ -20,6 +21,12 @@ export default function HeroCompare() {
 
   return (
     <PainterlyShell>
+      <PageMeta
+        title="Hero-Vergleich (intern)"
+        description=""
+        canonicalPath="/hero-compare"
+        noindex
+      />
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex gap-2 bg-teal-dark/90 backdrop-blur-sm rounded-full px-3 py-2 shadow-xl border border-cream/10">
         {VARIANTS.map(v => (
           <button

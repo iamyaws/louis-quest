@@ -114,6 +114,10 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
         </motion.button>
       </div>
       <p className="text-xs opacity-75 pl-6">{copy.ctaHelper}</p>
+      <p className="mt-1 text-[0.65rem] text-center text-teal-dark/40">
+        Mit dem Absenden stimmst du der{' '}
+        <a href="/datenschutz" className="underline hover:text-teal-dark/60">Datenschutzerklärung</a> zu.
+      </p>
       <AnimatePresence>
         {status.kind === 'invalid' && (
           <motion.p

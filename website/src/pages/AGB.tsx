@@ -80,13 +80,13 @@ export default function AGB() {
                 Ronki wird „wie besehen" bereitgestellt. Wir übernehmen keine Garantie für ununterbrochene Verfügbarkeit.
               </p>
               <p>
-                Für Schäden durch die Nutzung haften wir nur bei Vorsatz oder grober Fahrlässigkeit.
+                Für Schäden durch die Nutzung haften wir nur bei Vorsatz oder grober Fahrlässigkeit. Dies gilt nicht für die Verletzung wesentlicher Vertragspflichten (Kardinalspflichten). In diesem Fall ist die Haftung auf den vertragstypischen, vorhersehbaren Schaden begrenzt.
               </p>
             </Section>
 
             <Section heading="§7 Änderungen der AGB">
               <p>
-                Wir behalten uns vor, diese AGB anzupassen. Änderungen werden auf dieser Seite veröffentlicht. Die weitere Nutzung gilt als Zustimmung.
+                Wir behalten uns vor, diese AGB anzupassen. Wesentliche Änderungen kündigen wir per E-Mail an, sofern du auf der Warteliste eingetragen bist. Die jeweils aktuelle Fassung findest du auf dieser Seite.
               </p>
             </Section>
 

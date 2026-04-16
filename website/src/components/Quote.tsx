@@ -5,7 +5,7 @@ const FEATURED = {
   text: '„Ronki nimmt uns tausend Diskussionen ab. Mein Sohn kümmert sich mit dem Drachen um seine Routinen, und er fühlt sich dabei selbstständig. Nicht kontrolliert."',
   name: 'Marc',
   role: 'Vater von Louis (7)',
-  avatar: 'https://i.pravatar.cc/160?img=12',
+  avatar: '/avatars/avatar-12.jpg',
 };
 
 const TESTIMONIALS = [
@@ -13,37 +13,37 @@ const TESTIMONIALS = [
     text: '„Die Schuh-Suche, der zweite Socken, das ständige ‚Mia, jetzt!\' Seit Ronki da ist, sind unsere Morgen leise. Sie macht ihr Ding, ich trink meinen Kaffee. Kein Streit mehr."',
     name: 'Andrea',
     role: 'Mutter von Mia (6)',
-    avatar: 'https://i.pravatar.cc/160?img=48',
+    avatar: '/avatars/avatar-48.jpg',
   },
   {
     text: '„Felix erzählt Ronki abends, was am Tag war. Nicht weil die App fragt, sondern weil er es will. Das war der Moment, an dem wir gemerkt haben: Das ist keine normale App."',
     name: 'Nina',
     role: 'Mutter von Felix (5)',
-    avatar: 'https://i.pravatar.cc/160?img=5',
+    avatar: '/avatars/avatar-5.jpg',
   },
   {
     text: '„Emilia kam aus zwei Wochen Urlaub zurück und hat Ronki als Erstes vom Meer erzählt. Zehn Minuten lang. Ich saß daneben und wusste: das ist mehr als eine App."',
     name: 'Jonas',
     role: 'Vater von Emilia (8)',
-    avatar: 'https://i.pravatar.cc/160?img=33',
+    avatar: '/avatars/avatar-33.jpg',
   },
   {
     text: '„Mit Zwillingen ist alles doppelt. Die Anzieh-Schlacht, das ‚Ich nicht!\', die Tränen am Morgen. Jeder hat jetzt seinen eigenen Drachen. Seine eigene kleine Welt. Und auf einmal ist es ruhig. Ich versteh selbst nicht ganz wie."',
     name: 'Sandra',
     role: 'Mutter von Zwillingen (6)',
-    avatar: 'https://i.pravatar.cc/160?img=15',
+    avatar: '/avatars/avatar-15.jpg',
   },
   {
     text: '„Ben war immer der, dem nichts richtig gelingt. Jetzt hat er in Ronkis Welt einen Pfad durch den Wald. Weil er eine Woche lang Zähne geputzt hat. Er zeigt ihn jedem: uns, Oma, der Erzieherin."',
     name: 'Claudia',
     role: 'Mutter von Ben (7)',
-    avatar: 'https://i.pravatar.cc/160?img=20',
+    avatar: '/avatars/avatar-20.jpg',
   },
   {
     text: '„Leo, mein Großer, schaut schon kürzer rein als am Anfang. Macht seine Sachen, prüft kurz bei Ronki, fertig. So war\'s uns versprochen: die App soll überflüssig werden. Bei ihm fängt\'s gerade an. Das macht mich ruhig."',
     name: 'Sofia',
     role: 'Mutter von Leo (8) und Nora (5)',
-    avatar: 'https://i.pravatar.cc/160?img=47',
+    avatar: '/avatars/avatar-47.jpg',
   },
 ];
 

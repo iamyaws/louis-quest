@@ -132,12 +132,16 @@ export default function Datenschutz() {
               </p>
               <ul className="list-disc pl-6 space-y-3">
                 <li>
-                  <strong className="text-teal-dark">Supabase Inc.:</strong> Datenbank und Backend für die Warteliste. Wir nutzen ausschließlich die EU-Region. Es besteht ein Auftragsverarbeitungsvertrag.<br />
+                  <strong className="text-teal-dark">Supabase Inc.:</strong> Datenbank und Backend für die Warteliste. Wir nutzen ausschließlich die EU-Region. Es besteht ein Auftragsverarbeitungsvertrag. Sitz: San Francisco, USA. Datenverarbeitung in der EU-Region; Übermittlung abgesichert durch EU-Standardvertragsklauseln.<br />
                   <span className="text-sm text-ink/65">Mehr: <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">supabase.com/privacy</a></span>
                 </li>
                 <li>
                   <strong className="text-teal-dark">Vercel Inc.:</strong> Auslieferung der statischen Website-Inhalte und Server-Logfiles. Vercel betreibt Edge-Server in der EU (u. a. Frankfurt). Es besteht ein Data Processing Agreement.<br />
                   <span className="text-sm text-ink/65">Sitz: San Francisco, USA. Übermittlung auf Basis von EU-Standardvertragsklauseln. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">vercel.com/legal/privacy-policy</a></span>
+                </li>
+                <li>
+                  <strong className="text-teal-dark">ImprovMX (Reflectiv SAS):</strong> E-Mail-Weiterleitung für eingehende Nachrichten an hallo@ronki.de. Sitz: Frankreich (EU). Personenbezogene Daten (Absender-E-Mail, Betreff) werden nur zur Weiterleitung verarbeitet und nicht gespeichert.<br />
+                  <span className="text-sm text-ink/65"><a href="https://improvmx.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">improvmx.com/privacy</a></span>
                 </li>
               </ul>
               <p>
@@ -147,10 +151,10 @@ export default function Datenschutz() {
 
             <Section heading="8. Datenübermittlung in Drittländer">
               <p>
-                Alle oben genannten Auftragsverarbeiter speichern deine Daten in der Europäischen Union. Eine Übermittlung in Drittländer außerhalb der EU/des EWR findet <strong className="text-teal-dark">nicht statt</strong>.
+                Supabase Inc. und Vercel Inc. haben ihren Hauptsitz in den USA. Wir nutzen jeweils die EU-Region (Supabase: EU-Region; Vercel: Edge-Server u. a. in Frankfurt). Ein operativer Zugriff aus den USA kann jedoch nicht vollständig ausgeschlossen werden. Die Übermittlung ist durch EU-Standardvertragsklauseln (Art. 46 Abs. 2 lit. c DSGVO) abgesichert.
               </p>
               <p>
-                Sollte sich das in Zukunft ändern, werden wir die Übermittlung nur auf Grundlage geeigneter Garantien nach Art. 44 ff. DSGVO durchführen, etwa EU-Standardvertragsklauseln, und dich an dieser Stelle darüber informieren.
+                Sollte sich die Übermittlungslage ändern, informieren wir dich an dieser Stelle.
               </p>
             </Section>
 
