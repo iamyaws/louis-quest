@@ -263,6 +263,7 @@ export interface GameState {
   bossKilledToday?: boolean;
   arcBeatAdvancedToday?: boolean;
   dreamHighlights?: DreamHighlightsData;
+  totalQuestCompletions?: Record<string, number>;
 }
 
 export interface ComputedState {

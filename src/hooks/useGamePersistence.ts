@@ -130,8 +130,8 @@ function applyDayTransition(p: GameState, today: string): void {
   p.boss = { id: b.id, hp: b.hp, maxHp: b.hp };
 
   if (!p.graduated) p.graduated = [];
-  Object.entries(p.sm || {}).forEach(([qid, streak]) => {
-    if (streak >= 30 && !p.graduated.includes(qid)) p.graduated.push(qid);
+  Object.entries(p.totalQuestCompletions || {}).forEach(([qid, total]) => {
+    if (total >= 30 && !p.graduated.includes(qid)) p.graduated.push(qid);
   });
 }
 

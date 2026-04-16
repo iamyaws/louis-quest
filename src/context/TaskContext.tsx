@@ -71,6 +71,7 @@ interface TaskState {
   bossKilledToday?: boolean;
   arcBeatAdvancedToday?: boolean;
   dreamHighlights?: DreamHighlightsData;
+  totalQuestCompletions?: Record<string, number>;
 }
 
 interface TaskComputed {
@@ -541,7 +542,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         // Leuchten — physical & outdoors
         sq_draussen: 'radiance', sq_fussball: 'radiance', ft: 'radiance',
       };
-      const orbKey = orbMap[id] || (['vitality', 'radiance', 'patience', 'wisdom'] as const)[Math.floor(Math.random() * 4)];
+      const orbTypes = ['vitality', 'radiance', 'patience', 'wisdom'] as const;
+      const orbTotal = (Object.values(prev.orbs) as number[]).reduce((a, b) => a + b, 0);
+      const orbKey = orbMap[id] || orbTypes[orbTotal % 4];
       const orbs = { ...(prev.orbs || { vitality: 0, radiance: 0, patience: 0, wisdom: 0 }) };
       orbs[orbKey] += 1;
 
@@ -605,7 +608,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday };
+      const prevTotal = (prev.totalQuestCompletions ?? {})[id] || 0;
+      const totalQuestCompletions = { ...(prev.totalQuestCompletions ?? {}), [id]: prevTotal + 1 };
+
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions };
     });
     setToastTrigger(t => t + 1);
   }, []);
