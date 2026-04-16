@@ -7,6 +7,7 @@ import SFX from '../utils/sfx';
 import { useSpecialQuests } from '../hooks/useSpecialQuests';
 import ToothbrushTimer from './ToothbrushTimer';
 import ClothingSheet from './ClothingSheet';
+import VoiceAudio from '../utils/voiceAudio';
 
 // Quest IDs that trigger the toothbrush timer
 const TEETH_QUEST_IDS = new Set(['s3', 's12', 'v3', 'v10']);
@@ -84,6 +85,9 @@ export default function TaskList({ onNavigate }) {
       return;
     }
     actions.complete(id);
+    // Ronki reacts with voice instead of generic pop
+    const reactions = ['sfx_complete', 'sfx_wow', 'sfx_proud', 'sfx_excited', 'sfx_tap_happy'];
+    VoiceAudio.play(reactions[Math.floor(Math.random() * reactions.length)]);
     SFX.play('pop');
     if (navigator.vibrate) navigator.vibrate(80);
   };

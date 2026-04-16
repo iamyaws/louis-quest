@@ -91,12 +91,19 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
     setPaused(p => !p);
   }, []);
 
+  const [refundFlash, setRefundFlash] = useState(null);
+
   const handleStore = useCallback(() => {
     SFX.play('coin');
+    VoiceAudio.play('sfx_celebrate');
     clearInterval(intervalRef.current);
     // Proportional refund: remaining/total * cost, rounded down
     const refundMinutes = Math.floor((remaining / totalSeconds) * cost);
-    onStore?.({ refundMinutes });
+    // Show big flash before dismissing
+    setRefundFlash(refundMinutes);
+    setTimeout(() => {
+      onStore?.({ refundMinutes });
+    }, 2200);
   }, [remaining, totalSeconds, cost, onStore]);
 
   const handleDismiss = useCallback(() => {
@@ -113,6 +120,29 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
   const R = 22;
   const C = 2 * Math.PI * R;
   const dashOffset = C * (1 - pct);
+
+  // ── Refund flash overlay ──
+  if (refundFlash !== null) {
+    return (
+      <div className="fixed inset-0 z-[600] flex items-center justify-center"
+           style={{ background: 'rgba(0,0,0,0.5)', animation: 'fadeIn 0.2s ease' }}>
+        <div className="flex flex-col items-center text-center animate-bounce">
+          <span className="text-6xl mb-2">⏳</span>
+          <p className="font-headline font-extrabold text-white leading-none"
+             style={{ fontSize: 64, textShadow: '0 4px 20px rgba(0,206,201,0.6)' }}>
+            +{refundFlash}
+          </p>
+          <p className="font-headline font-bold text-2xl mt-2"
+             style={{ color: '#00CEC9' }}>
+            {t('screen.save')} ✨
+          </p>
+          <p className="font-body text-sm text-white/60 mt-3">
+            {t('screen.saveRefund', { min: refundFlash })}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (finished) {
     return (
