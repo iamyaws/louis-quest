@@ -802,29 +802,34 @@ export default function Hub({ onNavigate }) {
         {/* ── Widget Row: Leitstern + Weather ── */}
         <div className="grid grid-cols-2 gap-3">
 
-          {/* Leitstern widget */}
+          {/* Leitstern widget — warm ember feel, distinct from Weather's cool sky */}
           <button
             className="p-4 rounded-2xl flex flex-col items-center justify-center gap-2 text-center transition-all active:scale-[0.97] relative overflow-hidden"
             style={{
-              background: '#0c1a2e',
-              border: '1.5px solid rgba(252,211,77,0.22)',
-              boxShadow: '0 4px 16px rgba(12,26,46,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
+              background: '#0f0b04',
+              border: '1.5px solid rgba(252,211,77,0.28)',
+              boxShadow: '0 4px 16px rgba(15,11,4,0.7), inset 0 1px 0 rgba(252,211,77,0.06)',
               minHeight: 110,
             }}
             onClick={() => onNavigate?.('kodex')}
           >
-            {/* Navy texture */}
-            <img src={base + 'art/bg-texture/IAMYAWS_Very_soft_dark_navy_texture_matte_and_smooth._Deep_na_740c8f28-fea5-4e9e-904f-4c0f0fc526de_2.webp'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
-            {/* Star particles — scattered across widget */}
+            {/* Warm ember radial — campfire glow rising from below */}
+            <div aria-hidden="true" style={{
+              position: 'absolute', bottom: '-10%', left: '50%', transform: 'translateX(-50%)',
+              width: '120%', height: '80%',
+              background: 'radial-gradient(ellipse at 50% 90%, rgba(180,83,9,0.35) 0%, rgba(120,40,5,0.12) 45%, transparent 70%)',
+              pointerEvents: 'none',
+            }} />
+            {/* Star particles twinkling in the warm dark */}
             <div aria-hidden="true" style={{ position: 'absolute', top: '18%', right: '18%', width: 2, height: 2, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 4px 2px rgba(252,211,77,0.7)', animation: 'dream-spark 1.8s ease-in-out infinite' }} />
             <div aria-hidden="true" style={{ position: 'absolute', top: '62%', right: '10%', width: 1.5, height: 1.5, borderRadius: '50%', background: 'white', boxShadow: '0 0 3px 1px rgba(255,255,255,0.6)', animation: 'dream-spark 2.4s ease-in-out infinite 0.7s' }} />
             <div aria-hidden="true" style={{ position: 'absolute', top: '30%', left: '14%', width: 1.5, height: 1.5, borderRadius: '50%', background: '#fde68a', boxShadow: '0 0 3px 1px rgba(252,211,77,0.5)', animation: 'dream-spark 2.1s ease-in-out infinite 1.2s' }} />
-            {/* Big outline star — bold weight, prominent glow */}
+            {/* Big outline star */}
             <span
               className="relative z-10 material-symbols-outlined select-none leading-none"
-              style={{ fontSize: 48, color: '#fcd34d', fontVariationSettings: "'FILL' 0, 'wght' 300, 'OPSZ' 48", filter: 'drop-shadow(0 0 10px rgba(252,211,77,0.65))' }}
+              style={{ fontSize: 48, color: '#fcd34d', fontVariationSettings: "'FILL' 0, 'wght' 300, 'OPSZ' 48", filter: 'drop-shadow(0 0 12px rgba(252,211,77,0.7))' }}
             >star</span>
-            <p className="relative z-10 font-headline font-bold text-sm leading-none text-white">
+            <p className="relative z-10 font-headline font-bold text-base leading-none text-white">
               {t('hub.leitstern.title')}
             </p>
           </button>
