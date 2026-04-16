@@ -1,52 +1,91 @@
 import { Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'motion/react';
 import { PageMeta } from '../components/PageMeta';
+import { PainterlyShell } from '../components/PainterlyShell';
 
 export default function NotFound() {
+  const reduced = useReducedMotion();
+
   return (
-    <main className="min-h-screen w-full relative overflow-hidden flex items-center justify-center bg-teal-dark">
+    <PainterlyShell>
       <PageMeta
         title="Seite nicht gefunden: Ronki"
         description="Diese Seite existiert nicht."
         noindex={true}
       />
-      <div className="absolute inset-0 w-full h-full -z-0">
-        <svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 1440 560"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full absolute bottom-0"
-        >
-          <g>
-            <rect width="1440" height="560" x="0" y="0" fill="#2D5A5E" />
-            <path
-              d="M1488 560L0 560 L0 468.76Q37.54 386.3, 120 423.84Q189.28 373.12, 240 442.4Q291.19 421.58, 312 472.77Q366.23 455, 384 509.22Q410.11 463.33, 456 489.43Q489.15 402.58, 576 435.73Q623.36 411.09, 648 458.45Q729.6 420.04, 768 501.64Q816.33 429.97, 888 478.3Q896.89 415.19, 960 424.09Q1002.02 394.11, 1032 436.13Q1123.51 407.64, 1152 499.16Q1168.55 443.71, 1224 460.26Q1272.78 437.04, 1296 485.82Q1310.17 428, 1368 442.17Q1434.53 388.7, 1488 455.22z"
-              fill="#6B8F71"
-              fillOpacity="0.5"
-            />
-            <path
-              d="M1488 560L0 560 L0 545.74Q39.06 464.8, 120 503.85Q162.45 474.31, 192 516.76Q262.98 467.74, 312 538.71Q325.37 480.08, 384 493.45Q461.74 499.19, 456 576.93Q497.16 546.09, 528 587.24Q552.74 539.98, 600 564.71Q601.25 493.96, 672 495.2Q708.76 459.97, 744 496.73Q803.3 484.03, 816 543.33Q866 521.34, 888 571.34Q913.61 476.95, 1008 502.56Q1087.71 462.27, 1128 541.98Q1194.09 488.07, 1248 554.16Q1293.39 479.56, 1368 524.95Q1450.82 487.77, 1488 570.59z"
-              fill="#FBF6EF"
-            />
-          </g>
-        </svg>
-      </div>
 
-      <div className="relative z-10 text-center -translate-y-20 px-6">
-        <h1 className="font-display font-extrabold text-8xl sm:text-9xl text-cream mb-4 tracking-tight">
-          404
-        </h1>
-        <p className="text-cream/70 text-lg sm:text-xl mb-8 max-w-md mx-auto leading-relaxed">
-          Diese Seite hat sich im Wald verlaufen. Ronki sucht noch, aber vielleicht gehst du erstmal zurück.
-        </p>
-        <Link
-          to="/"
-          className="inline-flex items-center justify-center rounded-xl bg-cream px-6 py-3 text-sm font-display font-bold text-teal-dark hover:bg-mustard-soft transition-colors"
+      <main className="flex flex-col items-center justify-center min-h-screen px-6 py-20 text-center">
+        {/* Floating dragon */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85, rotate: -6 }}
+          animate={
+            reduced
+              ? { opacity: 1, scale: 1, rotate: 0 }
+              : { opacity: 1, scale: 1, rotate: 0, y: [0, -12, 0] }
+          }
+          transition={
+            reduced
+              ? { duration: 0.8 }
+              : {
+                  opacity: { duration: 0.8 },
+                  scale: { duration: 0.8 },
+                  rotate: { duration: 0.8 },
+                  y: { duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 },
+                }
+          }
+          className="relative mb-8"
         >
-          Zurück zur Startseite
-        </Link>
-      </div>
-    </main>
+          <div
+            aria-hidden
+            className="absolute inset-0 -m-10 rounded-full blur-3xl"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(252,211,77,0.3) 0%, transparent 65%)',
+            }}
+          />
+          <img
+            src="/art/companion/dragon-baby.webp"
+            alt=""
+            width={280}
+            height={280}
+            className="relative w-48 sm:w-56 md:w-64 h-auto drop-shadow-[0_24px_36px_rgba(45,90,94,0.2)]"
+          />
+        </motion.div>
+
+        {/* Copy */}
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.25 }}
+          className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-teal-dark tracking-tight leading-tight"
+        >
+          Ronki hat sich verflogen.
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-4 text-base sm:text-lg text-ink/70 max-w-md leading-relaxed"
+        >
+          Diese Seite gibt es leider nicht. Aber keine Sorge&nbsp;&mdash; der kleine Drache findet den Weg&nbsp;zurück.
+        </motion.p>
+
+        {/* Back button */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.55 }}
+        >
+          <Link
+            to="/"
+            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-teal-dark px-6 py-3 text-sm font-display font-bold text-cream hover:bg-teal transition-colors"
+          >
+            <span aria-hidden>←</span>
+            Zur&uuml;ck zur Startseite
+          </Link>
+        </motion.div>
+      </main>
+    </PainterlyShell>
   );
 }
