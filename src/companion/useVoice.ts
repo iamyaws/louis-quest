@@ -6,6 +6,7 @@ import { getCatStage } from '../utils/helpers';
 import { pickLine, recordUse, pruneHistory } from './VoiceEngine';
 import { linesFor } from './voiceLines';
 import TTS from '../utils/tts';
+import VoiceAudio from '../utils/voiceAudio';
 import type { ArcLifecyclePhase } from '../arcs/types';
 import type {
   VoiceContext,
@@ -115,9 +116,8 @@ export function useVoice(): UseVoiceResult {
       historyRef.current = recordUse(picked.id, historyRef.current);
       saveHistory(historyRef.current);
       setLine(picked);
-      // TTS disabled — browser speechSynthesis sounds robotic and annoying.
-      // Phase 2: use ElevenLabs pre-generated audio files per voice line.
-      // TTS.speak(picked.text);
+      // Play the pre-generated ElevenLabs audio for this line
+      VoiceAudio.play(picked.id);
     },
     [state, weather, lang],
   );

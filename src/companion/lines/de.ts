@@ -17,7 +17,7 @@ export const linesDe: VoiceLine[] = [
   // ═══════════════════════════════════════
   // GREETINGS — Hub open
   // ═══════════════════════════════════════
-  { id: 'de_greet_01', text: 'Louis! Du bist da! Endlich!', triggers: ['hub_open'] },
+  { id: 'de_greet_01', text: 'Hey! Du bist da! Endlich!', triggers: ['hub_open'] },
   { id: 'de_greet_02', text: 'Hey! Ich hab gerade an dich gedacht!', triggers: ['hub_open'] },
   { id: 'de_greet_03', text: 'Oh! Da bist du ja! Ich hab was entdeckt…', triggers: ['hub_open'] },
   { id: 'de_greet_m01', text: 'Guten Morgen! Ich hab schon gegähnt.', triggers: ['hub_open'], timeOfDay: ['morning'] },
