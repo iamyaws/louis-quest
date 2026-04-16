@@ -19,6 +19,11 @@ export async function submitWaitlistEmail(
     return { ok: false, reason: 'invalid' };
   }
 
+  if (!supabase) {
+    console.warn('Supabase not configured — waitlist submission skipped.');
+    return { ok: false, reason: 'error' };
+  }
+
   const { error } = await supabase.from('waitlist').insert({ email, locale });
 
   if (!error) return { ok: true };
