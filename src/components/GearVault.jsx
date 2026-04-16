@@ -65,87 +65,91 @@ export default function GearVault() {
       </h3>
       <p className="text-xs font-label text-on-surface-variant mb-5">{t('gear.subtitle')}</p>
 
-      {/* Equipment Slots */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        {['head', 'back', 'neck'].map(slot => {
-          const meta = SLOT_META[slot];
-          const equippedId = equipped[slot];
-          const gear = equippedId ? GEAR_ITEMS.find(g => g.id === equippedId) : null;
-          const rarity = gear ? RARITY_STYLES[gear.rarity] : null;
+      {hasGear && (
+        <>
+          {/* Equipment Slots */}
+          <div className="grid grid-cols-3 gap-3 mb-5">
+            {['head', 'back', 'neck'].map(slot => {
+              const meta = SLOT_META[slot];
+              const equippedId = equipped[slot];
+              const gear = equippedId ? GEAR_ITEMS.find(g => g.id === equippedId) : null;
+              const rarity = gear ? RARITY_STYLES[gear.rarity] : null;
 
-          return (
-            <button key={slot}
-              onClick={() => handleSlotTap(slot)}
-              className="flex flex-col items-center gap-2 active:scale-95 transition-transform">
-              <div className="w-20 h-20 rounded-2xl flex items-center justify-center relative shadow-sm transition-all"
-                   style={{
-                     background: gear ? rarity.bg : 'rgba(232,225,218,0.4)',
-                     border: gear ? `2px solid ${rarity.border}` : '2px dashed rgba(204,195,215,0.5)',
-                   }}>
-                {gear ? (
-                  <>
-                    <span className="material-symbols-outlined text-3xl"
-                          style={{ color: gear.color, fontVariationSettings: "'FILL' 1" }}>
-                      {gear.icon}
-                    </span>
-                    {/* Equipped indicator */}
-                    <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm"
-                         style={{ background: '#059669' }}>
-                      <span className="material-symbols-outlined text-white" style={{ fontSize: '12px' }}>check</span>
-                    </div>
-                  </>
-                ) : (
-                  <span className="material-symbols-outlined text-2xl" style={{ color: 'rgba(204,195,215,0.6)' }}>
-                    {meta.emptyIcon}
+              return (
+                <button key={slot}
+                  onClick={() => handleSlotTap(slot)}
+                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform">
+                  <div className="w-20 h-20 rounded-2xl flex items-center justify-center relative shadow-sm transition-all"
+                       style={{
+                         background: gear ? rarity.bg : 'rgba(232,225,218,0.4)',
+                         border: gear ? `2px solid ${rarity.border}` : '2px dashed rgba(204,195,215,0.5)',
+                       }}>
+                    {gear ? (
+                      <>
+                        <span className="material-symbols-outlined text-3xl"
+                              style={{ color: gear.color, fontVariationSettings: "'FILL' 1" }}>
+                          {gear.icon}
+                        </span>
+                        {/* Equipped indicator */}
+                        <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm"
+                             style={{ background: '#059669' }}>
+                          <span className="material-symbols-outlined text-white" style={{ fontSize: '12px' }}>check</span>
+                        </div>
+                      </>
+                    ) : (
+                      <span className="material-symbols-outlined text-2xl" style={{ color: 'rgba(204,195,215,0.6)' }}>
+                        {meta.emptyIcon}
+                      </span>
+                    )}
+                  </div>
+                  <span className="font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
+                    {t(meta.key)}
                   </span>
+                  {gear && (
+                    <span className="text-xs font-label font-bold px-2 py-0.5 rounded-full"
+                          style={{ background: rarity.bg, color: rarity.color }}>
+                      {t('gear.' + gear.id).split(' ')[0]}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Stats with effect explanation */}
+          {(totalStats.defense > 0 || totalStats.courage > 0) && (
+            <div className="flex flex-col gap-3 mb-5">
+              <div className="flex gap-3">
+                {totalStats.courage > 0 && (
+                  <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
+                       style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
+                    <span className="material-symbols-outlined text-lg" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
+                    <div>
+                      <p className="font-label font-bold text-xs text-on-surface-variant uppercase">{t('gear.courage')}</p>
+                      <p className="font-headline font-bold text-lg" style={{ color: '#b45309' }}>+{totalStats.courage}</p>
+                    </div>
+                  </div>
+                )}
+                {totalStats.defense > 0 && (
+                  <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
+                       style={{ background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.15)' }}>
+                    <span className="material-symbols-outlined text-lg" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>shield</span>
+                    <div>
+                      <p className="font-label font-bold text-xs text-on-surface-variant uppercase">{t('gear.defense')}</p>
+                      <p className="font-headline font-bold text-lg" style={{ color: '#059669' }}>+{totalStats.defense}</p>
+                    </div>
+                  </div>
                 )}
               </div>
-              <span className="font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
-                {t(meta.key)}
-              </span>
-              {gear && (
-                <span className="text-xs font-label font-bold px-2 py-0.5 rounded-full"
-                      style={{ background: rarity.bg, color: rarity.color }}>
-                  {t('gear.' + gear.id).split(' ')[0]}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Active Stats with effect explanation */}
-      {(totalStats.defense > 0 || totalStats.courage > 0) && (
-        <div className="flex flex-col gap-3 mb-5">
-          <div className="flex gap-3">
-            {totalStats.courage > 0 && (
-              <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
-                   style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
-                <span className="material-symbols-outlined text-lg" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
-                <div>
-                  <p className="font-label font-bold text-xs text-on-surface-variant uppercase">{t('gear.courage')}</p>
-                  <p className="font-headline font-bold text-lg" style={{ color: '#b45309' }}>+{totalStats.courage}</p>
-                </div>
+              <div className="flex items-start gap-2 px-2">
+                <span className="material-symbols-outlined text-sm text-on-surface-variant/50 mt-0.5">info</span>
+                <p className="font-label text-xs text-on-surface-variant leading-relaxed">
+                  {t('gear.statExplain')}
+                </p>
               </div>
-            )}
-            {totalStats.defense > 0 && (
-              <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
-                   style={{ background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.15)' }}>
-                <span className="material-symbols-outlined text-lg" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>shield</span>
-                <div>
-                  <p className="font-label font-bold text-xs text-on-surface-variant uppercase">{t('gear.defense')}</p>
-                  <p className="font-headline font-bold text-lg" style={{ color: '#059669' }}>+{totalStats.defense}</p>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="flex items-start gap-2 px-2">
-            <span className="material-symbols-outlined text-sm text-on-surface-variant/50 mt-0.5">info</span>
-            <p className="font-label text-xs text-on-surface-variant leading-relaxed">
-              {t('gear.statExplain')}
-            </p>
-          </div>
-        </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Inventory List */}
@@ -230,10 +234,32 @@ export default function GearVault() {
           </div>
         </>
       ) : (
-        <div className="flex flex-col items-center py-6 text-center">
-          <span className="material-symbols-outlined text-4xl mb-2" style={{ color: 'rgba(204,195,215,0.5)' }}>inventory_2</span>
-          <p className="font-body text-sm text-on-surface-variant">{t('gear.emptyTitle')}</p>
-          <p className="font-body text-xs text-outline mt-1">{t('gear.emptyHint')}</p>
+        /* ── No gear yet — locked teaser ── */
+        <div className="rounded-2xl overflow-hidden"
+             style={{ background: 'linear-gradient(135deg, #0c1a2e, #1a2a1a)', border: '1.5px solid rgba(252,211,77,0.15)' }}>
+          {/* Slot silhouettes — ghosted, locked */}
+          <div className="grid grid-cols-3 gap-3 p-4">
+            {['head', 'back', 'neck'].map(slot => (
+              <div key={slot} className="flex flex-col items-center gap-2 opacity-30">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                     style={{ border: '2px dashed rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.04)' }}>
+                  <span className="material-symbols-outlined text-2xl text-white/40">lock</span>
+                </div>
+                <span className="font-label font-bold text-xs uppercase tracking-widest text-white/30">
+                  {t({head: 'gear.slot.head', back: 'gear.slot.back', neck: 'gear.slot.neck'}[slot])}
+                </span>
+              </div>
+            ))}
+          </div>
+          {/* Unlock message */}
+          <div className="px-5 pb-5 text-center">
+            <p className="font-headline font-bold text-base text-white leading-tight mb-1">
+              {t('gear.emptyTitle')}
+            </p>
+            <p className="font-label text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              {t('gear.emptyHint')}
+            </p>
+          </div>
         </div>
       )}
     </section>
