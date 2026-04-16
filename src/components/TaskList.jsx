@@ -103,39 +103,40 @@ export default function TaskList({ onNavigate }) {
       {/* ── Active Quest-Line Banner (Poem, Birthday, etc.) ── */}
       {state?.poemQuest && !state.poemQuest.completed ? (
         <button onClick={() => onNavigate?.('poem')}
-          className="w-full rounded-2xl p-4 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #124346, #2d5a5e)', border: '1.5px solid rgba(252,211,77,0.25)' }}>
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-               style={{ background: 'rgba(252,211,77,0.15)' }}>
-            <span className="text-2xl">📖</span>
-          </div>
+          className="w-full rounded-2xl p-5 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
+          style={{ background: 'linear-gradient(160deg, #ecfdf5 0%, #6ee7b7 50%, #059669 100%)' }}>
+          <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>📖</span>
           <div className="flex-1">
-            <p className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: 'rgba(252,211,77,0.7)' }}>Spezial-Quest</p>
-            <h4 className="font-headline font-bold text-lg text-white">Mein Gedicht</h4>
-            <p className="font-label text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <p className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: '#064e3b' }}>Spezial-Quest</p>
+            <h4 className="font-headline font-bold text-lg" style={{ color: '#064e3b' }}>Mein Gedicht</h4>
+            <p className="font-body text-sm mt-0.5" style={{ color: '#064e3b99' }}>
               Tag {(state.poemQuest.done?.length || 0) + 1} von 7
             </p>
           </div>
-          <span className="material-symbols-outlined" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
+          <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+               style={{ background: '#ffffff', border: '2.5px solid rgba(6,78,59,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <span className="material-symbols-outlined text-xl" style={{ color: '#064e3b', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+          </div>
         </button>
       ) : !state?.poemQuest ? (
-        /* Poem quest not started yet — show start button */
+        /* Poem quest not started yet — game-card style with bouncing NEU! */
         <button onClick={() => {
             actions.patchState({ poemQuest: { done: [], completed: false, title: 'Mein Gedicht' } });
             onNavigate?.('poem');
           }}
-          className="w-full rounded-2xl p-4 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
-          style={{ background: 'linear-gradient(135deg, #fffbeb, #fef3c7)', border: '1.5px solid rgba(252,211,77,0.35)' }}>
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-               style={{ background: 'rgba(252,211,77,0.2)' }}>
-            <span className="text-2xl">📖</span>
-          </div>
+          className="w-full rounded-2xl p-5 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
+          style={{ background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)' }}>
+          <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>📖</span>
           <div className="flex-1">
-            <p className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: '#b45309' }}>Neu!</p>
-            <h4 className="font-headline font-bold text-lg text-on-surface">Gedicht lernen</h4>
-            <p className="font-body text-xs text-on-surface-variant">7-Tage-Quest — Tippe zum Starten!</p>
+            <p className="font-label font-bold text-xs uppercase tracking-widest animate-bounce inline-block"
+               style={{ color: '#ef4444', animationDuration: '1.5s' }}>Neu!</p>
+            <h4 className="font-headline font-bold text-lg" style={{ color: '#78350f' }}>Gedicht lernen</h4>
+            <p className="font-body text-sm mt-0.5" style={{ color: '#78350f99' }}>7-Tage-Quest — Tippe zum Starten!</p>
           </div>
-          <span className="material-symbols-outlined" style={{ color: '#b45309' }}>play_arrow</span>
+          <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+               style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <span className="material-symbols-outlined text-xl" style={{ color: '#78350f', fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+          </div>
         </button>
       ) : null}
 

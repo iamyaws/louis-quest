@@ -18,7 +18,7 @@ const STAGES = [
   { name: 'Legendär', emoji: '⭐', threshold: 30 },  // ~Day 10
 ];
 
-export default function Sanctuary() {
+export default function Sanctuary({ onNavigate }) {
   const { t } = useTranslation();
   const { state, actions } = useTask();
   const voice = useVoice();
@@ -306,6 +306,23 @@ export default function Sanctuary() {
 
         {/* ── Wachstums-Orbs — hidden for now, de-emphasized until Phase 2 rework ── */}
         {/* <OrbsSection state={state} nextStage={nextStage} progressPct={progressPct} evo={evo} /> */}
+
+        {/* ── Ronkis Freunde — game-card style ── */}
+        <button
+          className="w-full rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all"
+          style={{ background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)', boxShadow: '0 4px 16px rgba(252,211,77,0.3)' }}
+          onClick={() => onNavigate?.('micropedia')}
+        >
+          <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>🐾</span>
+          <div className="flex-1">
+            <h3 className="font-headline font-bold text-lg" style={{ color: '#78350f' }}>Ronkis Freunde</h3>
+            <p className="font-body text-sm mt-0.5" style={{ color: '#78350f99' }}>Entdecke neue Freunde!</p>
+          </div>
+          <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+               style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <span className="material-symbols-outlined text-xl" style={{ color: '#78350f', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+          </div>
+        </button>
 
         {/* Evolution Path — Vertical Winding */}
         <section className="rounded-2xl p-6 relative overflow-hidden"

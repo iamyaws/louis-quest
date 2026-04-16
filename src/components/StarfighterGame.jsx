@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
 import CooldownButton from './CooldownButton';
+import VoiceAudio from '../utils/voiceAudio';
 
 /**
  * StarfighterGame — Galaga-style vertical shooter.
@@ -134,6 +135,11 @@ export default function StarfighterGame({ onComplete }) {
       if (now - st.lastFire > FIRE_RATE) {
         st.bullets.push({ x: st.playerX, y: H - 60 });
         st.lastFire = now;
+        SFX.play('tap');
+        // Ronki "Piu!" every ~8th shot for flavor
+        if (st.bullets.length % 8 === 0) {
+          VoiceAudio.play(Math.random() > 0.5 ? 'sfx_pew' : 'sfx_pew2');
+        }
       }
 
       // Spawn enemies
@@ -350,18 +356,19 @@ export default function StarfighterGame({ onComplete }) {
           {lang === 'de' ? `${score} Punkte` : `${score} points`}
         </p>
 
-        <div className="flex gap-3 w-full max-w-xs">
+        <div className="flex flex-col gap-3 w-full max-w-xs">
           {hasNext && (
             <button onClick={() => { setLevel(nextLevel); setGameState('playing'); }}
-              className="flex-1 py-4 rounded-full font-headline font-bold text-base text-white active:scale-95 transition-all"
-              style={{ background: LEVELS[nextLevel].color }}>
-              {lang === 'de' ? 'Nächstes Level' : 'Next Level'} →
+              className="w-full py-4 rounded-full font-headline font-bold text-lg text-white active:scale-95 transition-all flex items-center justify-center gap-2"
+              style={{ background: LEVELS[nextLevel].color, boxShadow: `0 4px 16px ${LEVELS[nextLevel].color}60` }}>
+              {lang === 'de' ? 'Nächstes Level' : 'Next Level'}
+              <span className="material-symbols-outlined text-xl">arrow_forward</span>
             </button>
           )}
-          <CooldownButton delay={3} onClick={() => onComplete(reward)} icon="redeem"
-            className={`${hasNext ? 'flex-1' : 'w-full'} py-4 rounded-full font-headline font-bold text-base text-white`}
-            style={{ background: 'linear-gradient(135deg, #059669, #34d399)' }}>
-            {lang === 'de' ? 'Stark! Weiter 💪' : 'Nice! Continue 💪'}
+          <CooldownButton delay={3} onClick={() => onComplete(reward)}
+            className="w-full py-3.5 rounded-full font-label font-bold text-sm text-white/70"
+            style={{ background: 'rgba(255,255,255,0.1)', border: '1.5px solid rgba(255,255,255,0.15)' }}>
+            {lang === 'de' ? 'Zurück zum Laden' : 'Back to shop'}
           </CooldownButton>
         </div>
       </div>

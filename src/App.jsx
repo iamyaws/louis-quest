@@ -99,7 +99,7 @@ function AppContent() {
         {view === 'quests' && <TaskList onNavigate={setView} />}
         {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} onOpenParental={() => setShowParental(true)} />}
         {view === 'hub' && <Hub onNavigate={setView} />}
-        {view === 'care' && <Sanctuary />}
+        {view === 'care' && <Sanctuary onNavigate={setView} />}
         {view === 'journal' && <Journal />}
         {view === 'kodex' && <HeldenKodex />}
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}

@@ -163,36 +163,29 @@ export default function RonkiProfile({ onNavigate }) {
               ))}
             </div>
 
-            {/* Memory card — last arc completed */}
-            <div className="rounded-2xl p-5 relative overflow-hidden"
-                 style={{ background: 'linear-gradient(135deg, #0c1a2e 0%, #0e2840 100%)', border: '1.5px solid rgba(252,211,77,0.18)' }}>
-              <img src={base + 'art/tex-sternenmeer.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none" />
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="material-symbols-outlined text-base" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>auto_stories</span>
-                  <span className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: 'rgba(252,211,77,0.7)' }}>
-                    {lang === 'de' ? 'Letzte Erinnerung' : 'Last Memory'}
-                  </span>
-                </div>
-                {completedArcs.length > 0 ? (() => {
-                  const lastArcId = completedArcs[completedArcs.length - 1];
-                  const arc = findArc(lastArcId);
-                  return (
-                    <div>
-                      <p className="font-headline font-bold text-lg text-white">{arc ? t(arc.titleKey) : lastArcId}</p>
-                      <p className="font-body text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                        {arc?.chapterKey ? t(arc.chapterKey) : ''}
-                        {' · '}{completedArcs.length} {lang === 'de' ? 'Abenteuer bestanden' : 'adventures survived'}
-                      </p>
-                    </div>
-                  );
-                })() : (
-                  <p className="font-body text-sm italic" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                    {lang === 'de' ? 'Noch kein Abenteuer bestanden — bald!' : 'No adventures yet — coming soon!'}
-                  </p>
-                )}
+            {/* Memory card — game-card style */}
+            <button className="w-full rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all"
+                 style={{ background: 'linear-gradient(160deg, #fef9c3 0%, #fde047 50%, #eab308 100%)' }}
+                 onClick={() => onNavigate?.('discovery')}>
+              <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>📖</span>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-headline font-bold text-lg" style={{ color: '#713f12' }}>
+                  {completedArcs.length > 0 ? (() => {
+                    const arc = findArc(completedArcs[completedArcs.length - 1]);
+                    return arc ? t(arc.titleKey) : (lang === 'de' ? 'Abenteuer' : 'Adventure');
+                  })() : (lang === 'de' ? 'Abenteuer-Chronik' : 'Discovery Log')}
+                </h3>
+                <p className="font-body text-sm mt-0.5" style={{ color: '#713f1299' }}>
+                  {completedArcs.length > 0
+                    ? `${completedArcs.length} ${lang === 'de' ? 'Abenteuer bestanden' : 'adventures survived'}`
+                    : (lang === 'de' ? 'Deine Geschichte beginnt bald!' : 'Your story begins soon!')}
+                </p>
               </div>
-            </div>
+              <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+                   style={{ background: '#ffffff', border: '2.5px solid rgba(113,63,18,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+                <span className="material-symbols-outlined text-xl" style={{ color: '#713f12', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+              </div>
+            </button>
           </div>
         )}
 
@@ -391,29 +384,6 @@ export default function RonkiProfile({ onNavigate }) {
             </div>
           </button>
 
-          {/* Discovery Log link */}
-          <button
-            className="w-full flex items-center gap-4 p-4 rounded-2xl active:scale-[0.98] transition-all text-left relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #0c1a2e 0%, #0e2840 100%)', border: '1.5px solid rgba(252,211,77,0.18)' }}
-            onClick={() => onNavigate?.('discovery')}
-          >
-            <img src={base + 'art/tex-sternenmeer.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none" />
-            <div className="relative z-10 w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                 style={{ background: 'rgba(252,211,77,0.12)' }}>
-              <span className="material-symbols-outlined text-xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>timeline</span>
-            </div>
-            <div className="relative z-10 flex-1 min-w-0">
-              <p className="font-headline font-bold text-base text-white">
-                {lang === 'de' ? 'Abenteuer-Chronik' : 'Discovery Log'}
-              </p>
-              <p className="font-label text-xs" style={{ color: 'rgba(252,211,77,0.6)' }}>
-                {completedArcs.length > 0
-                  ? `${completedArcs.length} ${lang === 'de' ? 'Erinnerungen' : 'memories'}`
-                  : (lang === 'de' ? 'Deine Geschichte beginnt bald' : 'Your story begins soon')}
-              </p>
-            </div>
-            <span className="relative z-10 material-symbols-outlined" style={{ color: 'rgba(252,211,77,0.4)' }}>chevron_right</span>
-          </button>
         </div>
 
         {/* ═══ MOTTO ═══ */}

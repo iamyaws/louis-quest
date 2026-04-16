@@ -111,31 +111,29 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         </div>
       </div>
 
-      {/* ── Mini-Spiele Entry — gated by routine completion ── */}
+      {/* ── Mini-Spiele Entry — game card style, gated by routine completion ── */}
       <button onClick={() => gamesUnlocked ? onNavigate?.('games') : null}
-        className={`w-full rounded-2xl p-5 mb-8 flex items-center gap-4 transition-all text-left ${gamesUnlocked ? 'active:scale-[0.98]' : 'opacity-70'}`}
+        className={`w-full rounded-2xl p-5 mb-8 flex items-center gap-4 transition-all text-left ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
         style={{
           background: gamesUnlocked
-            ? 'linear-gradient(135deg, rgba(252,211,77,0.2), rgba(162,208,212,0.18))'
-            : 'rgba(0,0,0,0.03)',
-          border: gamesUnlocked ? '1.5px solid rgba(252,211,77,0.35)' : '1.5px solid rgba(0,0,0,0.08)',
-          filter: gamesUnlocked ? 'none' : 'grayscale(0.6)',
+            ? 'linear-gradient(160deg, #ecfdf5 0%, #6ee7b7 50%, #059669 100%)'
+            : 'rgba(0,0,0,0.04)',
+          filter: gamesUnlocked ? 'none' : 'grayscale(0.5) brightness(0.85)',
+          opacity: gamesUnlocked ? 1 : 0.55,
         }}>
-        <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
-             style={{ background: gamesUnlocked ? 'rgba(252,211,77,0.22)' : 'rgba(0,0,0,0.06)' }}>
-          <span className="material-symbols-outlined text-2xl" style={{ color: gamesUnlocked ? '#124346' : '#9ca3af', fontVariationSettings: "'FILL' 1" }}>
-            {gamesUnlocked ? 'sports_esports' : 'lock'}
-          </span>
-        </div>
+        <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>🎮</span>
         <div className="flex-1">
-          <h4 className={`font-headline font-bold text-lg ${gamesUnlocked ? 'text-on-surface' : 'text-on-surface-variant'}`}>{t('shop.miniGames')}</h4>
-          <p className="text-sm font-body" style={{ color: gamesUnlocked ? '#707979' : '#9ca3af' }}>
+          <h4 className="font-headline font-bold text-lg" style={{ color: gamesUnlocked ? '#064e3b' : '#6b7280' }}>{t('shop.miniGames')}</h4>
+          <p className="text-sm font-body mt-0.5" style={{ color: gamesUnlocked ? '#06553699' : '#9ca3af' }}>
             {gamesUnlocked ? t('shop.miniGames.subtitle') : 'Erst deine Aufgaben! 💪'}
           </p>
         </div>
-        <span className="material-symbols-outlined" style={{ color: gamesUnlocked ? '#124346' : '#d1d5db' }}>
-          {gamesUnlocked ? 'chevron_right' : 'lock'}
-        </span>
+        <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+             style={{ background: '#ffffff', border: '2.5px solid rgba(6,78,59,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+          <span className="material-symbols-outlined text-xl" style={{ color: '#064e3b', fontVariationSettings: "'FILL' 1" }}>
+            {gamesUnlocked ? 'play_arrow' : 'lock'}
+          </span>
+        </div>
       </button>
 
       {/* ── Family Adventures (HP currency) ── */}

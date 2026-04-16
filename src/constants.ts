@@ -406,7 +406,7 @@ export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
   // Fun rewards (HP — meaningful save-up loops for a ~200 HP/day earner)
   // Tiered for a 1st grader: Tier 0 (~half a day, instant win), Tier 1 (1 day),
   // Tier 2 (~2-3 days), Tier 3 (~1 week aspirational)
-  { id: "bel_sticker", name: "Glitzer-Sticker", emoji: "\u2728", cost: 50, active: true, currency: "hp" },
+  { id: "bel_coloring", name: "Ronki-Ausmalbild", emoji: "\u{1F3A8}", cost: 50, active: true, currency: "hp" },
   { id: "bel_candy", name: "Süßigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 100, active: true, currency: "hp" },
   { id: "bel_storytime", name: "Extra Gute-Nacht-Geschichte", emoji: "\u{1F4DA}", cost: 175, active: true, currency: "hp" },
   { id: "bel_evoboost", name: "Begleiter-Boost (+5 EP)", emoji: "\u{1F4AA}", cost: 250, active: true, currency: "hp" },

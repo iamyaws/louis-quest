@@ -7,7 +7,7 @@ import { SPECIAL_QUESTS } from '../data/specialQuests';
 
 const BOSS_TIER_COLORS = { tier1: '#34d399', tier2: '#f59e0b', tier3: '#ef4444' };
 
-function Stamp({ emoji, label, accentColor = '#fcd34d', index = 0 }) {
+function Stamp({ emoji, label, accentColor = '#fcd34d', index = 0, isNew = false }) {
   const tilts = [-2, 1.5, -1, 2.5, -1.5, 1, -2.5, 2, -1, 1.5];
   const tilt = tilts[index % tilts.length];
   return (
@@ -15,29 +15,47 @@ function Stamp({ emoji, label, accentColor = '#fcd34d', index = 0 }) {
       className="flex flex-col items-center gap-2 p-3 rounded-2xl relative overflow-hidden"
       style={{
         background: 'linear-gradient(160deg, #0c1a2e 0%, #0d1f1a 100%)',
-        border: `1.5px solid ${accentColor}30`,
-        boxShadow: `0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)`,
+        border: isNew ? `2px solid ${accentColor}` : `1.5px solid ${accentColor}30`,
+        boxShadow: isNew
+          ? `0 0 20px ${accentColor}50, 0 4px 12px rgba(0,0,0,0.3)`
+          : `0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)`,
         transform: `rotate(${tilt}deg)`,
         minWidth: 100,
+        animation: isNew ? 'pulse 2s ease-in-out infinite' : 'none',
       }}
     >
-      {/* Subtle warm glow behind emoji */}
+      {/* NEW badge */}
+      {isNew && (
+        <div className="absolute -top-0.5 -right-0.5 z-20 px-1.5 py-0.5 rounded-bl-lg rounded-tr-xl font-label font-bold"
+             style={{ background: '#ef4444', color: 'white', fontSize: 8, letterSpacing: '0.05em' }}>
+          NEU
+        </div>
+      )}
+      {/* Warm glow behind emoji — stronger for new */}
       <div style={{
         position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)',
         width: 60, height: 60, borderRadius: '50%',
-        background: `radial-gradient(circle, ${accentColor}20 0%, transparent 70%)`,
+        background: `radial-gradient(circle, ${accentColor}${isNew ? '40' : '20'} 0%, transparent 70%)`,
         pointerEvents: 'none',
       }} />
-      <span className="relative text-4xl leading-none select-none" style={{ filter: 'drop-shadow(0 0 6px rgba(252,211,77,0.4))' }}>{emoji}</span>
+      <span className="relative text-4xl leading-none select-none" style={{ filter: `drop-shadow(0 0 ${isNew ? '10px' : '6px'} ${accentColor}80)` }}>{emoji}</span>
       <p className="relative font-headline font-bold text-xs text-center leading-tight text-white" style={{ maxWidth: 80 }}>{label}</p>
       {/* Stamp border decoration */}
       <div style={{
         position: 'absolute', inset: 3, borderRadius: '0.85rem',
-        border: `1px dashed ${accentColor}20`,
+        border: `1px dashed ${accentColor}${isNew ? '40' : '20'}`,
         pointerEvents: 'none',
       }} />
     </div>
   );
+}
+
+const SEEN_KEY = 'ronki_seen_counts';
+function getSeenCounts() {
+  try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '{}'); } catch { return {}; }
+}
+function updateSeenCounts(counts) {
+  localStorage.setItem(SEEN_KEY, JSON.stringify(counts));
 }
 
 export default function MemoryWall() {
@@ -46,6 +64,21 @@ export default function MemoryWall() {
   const base = import.meta.env.BASE_URL;
 
   if (!state) return null;
+
+  // Track what's new — compare current counts vs last-seen counts
+  const seen = getSeenCounts();
+  const currentCounts = {
+    badges: (state.unlockedBadges || []).length,
+    quests: Object.keys(state.completedSpecialQuests || {}).length,
+    eggs: (state.collectedEggs || []).length,
+    bosses: [...new Set(state.bossTrophies || [])].length,
+  };
+  // Items beyond the last-seen count are "new"
+  const newBadgeStart = seen.badges || 0;
+  const newQuestStart = seen.quests || 0;
+  const newEggStart = seen.eggs || 0;
+  // Update seen counts on mount (so "new" only shows once)
+  React.useEffect(() => { updateSeenCounts(currentCounts); }, []);
 
   // Boss trophies — deduplicated
   const defeatedBossIds = [...new Set(state.bossTrophies || [])];
@@ -208,13 +241,14 @@ export default function MemoryWall() {
                   <span>🗺️</span> {lang === 'de' ? 'Entdeckungen' : 'Discoveries'}
                 </h2>
                 <div className="flex flex-wrap gap-4">
-                  {completedSQ.map((q) => (
+                  {completedSQ.map((q, qi) => (
                     <Stamp
                       key={q.id}
                       emoji={q.emoji}
                       label={lang === 'de' ? q.titleDe : q.titleEn}
                       accentColor="#fcd34d"
                       index={stampIndex++}
+                      isNew={qi >= newQuestStart}
                     />
                   ))}
                 </div>
@@ -228,13 +262,14 @@ export default function MemoryWall() {
                   <span>🥚</span> {lang === 'de' ? 'Ei-Sammlung' : 'Egg Collection'}
                 </h2>
                 <div className="flex flex-wrap gap-4">
-                  {(state.collectedEggs || []).map((egg, i) => (
+                  {(state.collectedEggs || []).map((egg, ei) => (
                     <Stamp
                       key={egg.triggerId}
                       emoji="🥚"
                       label={lang === 'de' ? egg.labelDe : egg.labelEn}
                       accentColor={egg.accentColor}
-                      index={stampIndex + i}
+                      index={stampIndex + ei}
+                      isNew={ei >= newEggStart}
                     />
                   ))}
                 </div>
