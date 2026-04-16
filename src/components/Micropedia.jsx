@@ -122,7 +122,7 @@ export default function Micropedia({ onNavigate }) {
           {/* Global counter */}
           <div className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full"
                style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
-            <span className="material-symbols-outlined text-sm" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>catching_pokemon</span>
+            <span className="text-sm">🐾</span>
             <span className="font-label font-bold text-sm" style={{ color: '#92400e' }}>
               {totalFound} / {totalCreatures}
             </span>

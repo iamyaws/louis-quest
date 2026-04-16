@@ -147,19 +147,18 @@ export default function RonkiProfile({ onNavigate }) {
             {/* Fun facts grid */}
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: lang === 'de' ? 'Spezies' : 'Species', value: FACTS.species[lang] || FACTS.species.de, icon: 'pets' },
-                { label: lang === 'de' ? 'Größe' : 'Height', value: FACTS.heights[stage], icon: 'straighten' },
-                { label: lang === 'de' ? 'Mag' : 'Likes', value: FACTS.likes[lang] || FACTS.likes.de, icon: 'favorite' },
-                { label: lang === 'de' ? 'Talent' : 'Talent', value: FACTS.talent[lang] || FACTS.talent.de, icon: 'star' },
+                { label: lang === 'de' ? 'Spezies' : 'Species', value: FACTS.species[lang] || FACTS.species.de, emoji: '🐲' },
+                { label: lang === 'de' ? 'Größe' : 'Height', value: FACTS.heights[stage], emoji: '📏' },
+                { label: lang === 'de' ? 'Mag' : 'Likes', value: FACTS.likes[lang] || FACTS.likes.de, emoji: '❤️' },
+                { label: lang === 'de' ? 'Talent' : 'Talent', value: FACTS.talent[lang] || FACTS.talent.de, emoji: '⭐' },
               ].map((fact, i) => (
-                <div key={i} className="rounded-xl p-4"
+                <div key={i} className="rounded-xl px-4 py-3"
                      style={{ background: 'rgba(18,67,70,0.03)', border: '1px solid rgba(18,67,70,0.06)' }}>
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <span className="material-symbols-outlined text-sm text-primary"
-                          style={{ fontVariationSettings: "'FILL' 1" }}>{fact.icon}</span>
-                    <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">{fact.label}</span>
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <span className="text-sm leading-none">{fact.emoji}</span>
+                    <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-wider">{fact.label}</span>
                   </div>
-                  <p className="font-body text-sm text-on-surface leading-snug">{fact.value}</p>
+                  <p className="font-headline font-bold text-sm text-on-surface leading-tight">{fact.value}</p>
                 </div>
               ))}
             </div>
