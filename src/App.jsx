@@ -24,6 +24,8 @@ import ScreenTimer from './components/ScreenTimer';
 import RonkiProfile from './components/RonkiProfile';
 import MemoryWall from './components/MemoryWall';
 import { useSpecialQuests } from './hooks/useSpecialQuests';
+import { useEggSystem } from './hooks/useEggSystem';
+import EggOverlay from './components/EggOverlay';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -34,6 +36,7 @@ function AppContent() {
   const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
 
   useSpecialQuests(); // side-effect only — silently completes special quests
+  useEggSystem(); // silently spawns eggs when trigger conditions are met
 
   // Scroll to top whenever the active view changes; also record first-time visits
   useEffect(() => {
@@ -119,6 +122,12 @@ function AppContent() {
         actions.claimGameReward('starfall');
         setView('games');
       }} />}
+      {state?.pendingEgg && state.pendingEgg.view === view && (
+        <EggOverlay
+          egg={state.pendingEgg}
+          onCollect={() => actions.collectEgg()}
+        />
+      )}
       <CompanionToast trigger={toastTrigger} />
       <Celebration />
       <ArcOfferCard />

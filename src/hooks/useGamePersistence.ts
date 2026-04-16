@@ -244,6 +244,11 @@ function applyDefaults(p: GameState): void {
   // Special / discovery quests
   if (!p.completedSpecialQuests) p.completedSpecialQuests = {};
   if (!p.viewsVisited) p.viewsVisited = [];
+  // Egg system
+  if (!p.pendingEgg) p.pendingEgg = null;
+  if (!p.collectedEggs) p.collectedEggs = [];
+  if (!p.eggTriggersFired) p.eggTriggersFired = {};
+  if (!p.gamesPlayedEver) p.gamesPlayedEver = [];
 }
 
 interface OnboardData {

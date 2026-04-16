@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import type { Quest, GameState, Boss } from '../types';
+import type { Quest, GameState, Boss, EggItem, CollectedEgg } from '../types';
 import type { FamilyConfig, DragonVariant } from '../types/familyConfig';
 import type { ArcEngineState, RoutineBeat } from '../arcs/types';
 import type { DreamHighlightsData, PrevDaySnapshot } from '../dream/types'; // used in applyDayTransition (Task 4)
@@ -75,6 +75,11 @@ export interface TaskState {
   totalQuestCompletions?: Record<string, number>;
   completedSpecialQuests?: Record<string, boolean>;
   viewsVisited?: string[];
+  // Egg system
+  pendingEgg?: EggItem | null;
+  collectedEggs?: CollectedEgg[];
+  eggTriggersFired?: Record<string, boolean>;
+  gamesPlayedEver?: string[];
 }
 
 interface TaskComputed {
@@ -111,6 +116,8 @@ interface TaskActions {
   patchState: (partial: Partial<TaskState>) => void;
   completeSpecialQuest: (id: string) => void;
   recordViewVisit: (view: string) => void;
+  spawnEgg: (egg: EggItem) => void;
+  collectEgg: () => void;
 }
 
 interface CelebrationEvent {
@@ -199,6 +206,10 @@ export function createInitialState(): TaskState {
     arcBeatAdvancedToday: false,
     completedSpecialQuests: {},
     viewsVisited: [],
+    pendingEgg: null,
+    collectedEggs: [],
+    eggTriggersFired: {},
+    gamesPlayedEver: [],
   };
 }
 
@@ -287,6 +298,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
           completedSpecialQuests: raw.completedSpecialQuests || {},
           viewsVisited: raw.viewsVisited || [],
+          pendingEgg: raw.pendingEgg || null,
+          collectedEggs: raw.collectedEggs || [],
+          eggTriggersFired: raw.eggTriggersFired || {},
+          gamesPlayedEver: raw.gamesPlayedEver || [],
         };
         // One-time migration: reset inflated HP from old economy
         if (!raw._v2_economy_reset) {
@@ -809,6 +824,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         ...prev,
         drachenEier: (prev.drachenEier || 0) + 1,
         gamesPlayedToday: [...played, gameId],
+        gamesPlayedEver: prev.gamesPlayedEver?.includes(gameId)
+          ? prev.gamesPlayedEver
+          : [...(prev.gamesPlayedEver || []), gameId],
       };
     });
   }, []);
@@ -872,6 +890,41 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Egg system actions ──
+  const spawnEgg = useCallback((egg: EggItem) => {
+    setState(prev => {
+      if (!prev) return prev;
+      if (prev.pendingEgg) return prev; // already one pending
+      if (prev.eggTriggersFired?.[egg.triggerId]) return prev; // already fired
+      return {
+        ...prev,
+        pendingEgg: egg,
+        eggTriggersFired: { ...(prev.eggTriggersFired || {}), [egg.triggerId]: true },
+      };
+    });
+  }, []);
+
+  const collectEgg = useCallback(() => {
+    setState(prev => {
+      if (!prev?.pendingEgg) return prev;
+      const egg = prev.pendingEgg;
+      return {
+        ...prev,
+        pendingEgg: null,
+        collectedEggs: [
+          ...(prev.collectedEggs || []),
+          {
+            triggerId: egg.triggerId,
+            labelDe: egg.labelDe,
+            labelEn: egg.labelEn,
+            accentColor: egg.accentColor,
+            collectedAt: Date.now(),
+          },
+        ],
+      };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -895,7 +948,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

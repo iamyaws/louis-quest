@@ -82,7 +82,8 @@ export default function MemoryWall() {
     completedMissionsCount >= 1 && { emoji: '🎯', label: `${completedMissionsCount} Missionen`, color: '#34d399' },
   ].filter(Boolean);
 
-  const totalStamps = defeatedBosses.length + earnedBadges.length + masteredQuests.length + milestoneStamps.length + completedSQ.length;
+  const collectedEggs = state.collectedEggs || [];
+  const totalStamps = defeatedBosses.length + earnedBadges.length + masteredQuests.length + milestoneStamps.length + completedSQ.length + collectedEggs.length;
   let stampIndex = 0;
 
   return (
@@ -215,6 +216,26 @@ export default function MemoryWall() {
                       label={lang === 'de' ? q.titleDe : q.titleEn}
                       accentColor="#fcd34d"
                       index={stampIndex++}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Egg Collection */}
+            {(state.collectedEggs || []).length > 0 && (
+              <section className="mb-8">
+                <h2 className="font-label font-bold text-xs uppercase tracking-widest text-outline mb-4 flex items-center gap-2">
+                  <span>🥚</span> {lang === 'de' ? 'Ei-Sammlung' : 'Egg Collection'}
+                </h2>
+                <div className="flex flex-wrap gap-4">
+                  {(state.collectedEggs || []).map((egg, i) => (
+                    <Stamp
+                      key={egg.triggerId}
+                      emoji="🥚"
+                      label={lang === 'de' ? egg.labelDe : egg.labelEn}
+                      accentColor={egg.accentColor}
+                      index={stampIndex + i}
                     />
                   ))}
                 </div>

@@ -170,6 +170,22 @@ export interface HeroTip {
   tip: string;
 }
 
+export interface EggItem {
+  triggerId: string;
+  view: string;        // which view to show the egg in
+  labelDe: string;
+  labelEn: string;
+  accentColor: string; // hex for glow
+}
+
+export interface CollectedEgg {
+  triggerId: string;
+  labelDe: string;
+  labelEn: string;
+  accentColor: string;
+  collectedAt: number;
+}
+
 export interface GameState {
   // ── Family config ──
   familyConfig?: FamilyConfig;
@@ -267,6 +283,11 @@ export interface GameState {
   // ── Special / Discovery Quests ──
   completedSpecialQuests?: Record<string, boolean>;
   viewsVisited?: string[];
+  // Egg system
+  pendingEgg?: EggItem | null;
+  collectedEggs?: CollectedEgg[];
+  eggTriggersFired?: Record<string, boolean>;
+  gamesPlayedEver?: string[]; // cumulative, never resets daily
 }
 
 export interface ComputedState {
