@@ -799,6 +799,29 @@ export default function Hub({ onNavigate }) {
           );
         })()}
 
+        {/* ── Memory Wall button ── */}
+        <button
+          className="w-full flex items-center gap-4 p-4 rounded-2xl active:scale-[0.98] transition-all text-left"
+          style={{
+            background: 'linear-gradient(135deg, rgba(12,26,46,0.06) 0%, rgba(252,211,77,0.04) 100%)',
+            border: '1px solid rgba(12,26,46,0.08)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          }}
+          onClick={() => onNavigate?.('memories')}
+        >
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+               style={{ background: 'linear-gradient(135deg, #0c1a2e, #0c3236)', boxShadow: '0 4px 10px rgba(12,26,46,0.3)' }}>
+            <span className="material-symbols-outlined text-xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-headline font-bold text-base text-on-surface">Erinnerungen</p>
+            <p className="font-label text-xs text-on-surface-variant">
+              {[...(state.bossTrophies?.length ? [`${[...new Set(state.bossTrophies)].length} Bosse`] : []), ...(state.unlockedBadges?.length ? [`${state.unlockedBadges.length} Abzeichen`] : [])].join(' · ') || 'Deine Geschichte beginnt hier'}
+            </p>
+          </div>
+          <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+        </button>
+
         {/* ── Widget Row: Leitstern + Weather ── */}
         <div className="grid grid-cols-2 gap-3">
 

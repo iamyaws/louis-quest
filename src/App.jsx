@@ -22,6 +22,7 @@ import StarCatcherGame from './components/StarCatcherGame';
 import CompanionToast from './components/CompanionToast';
 import ScreenTimer from './components/ScreenTimer';
 import RonkiProfile from './components/RonkiProfile';
+import MemoryWall from './components/MemoryWall';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -83,6 +84,7 @@ function AppContent() {
         {view === 'journal' && <Journal />}
         {view === 'kodex' && <HeldenKodex />}
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
+        {view === 'memories' && <MemoryWall />}
         {view === 'games' && <MiniGames onPlay={(id) => {
           if (id === 'memory') setView('memory');
           if (id === 'potion') setView('potion');
