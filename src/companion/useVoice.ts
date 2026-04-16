@@ -115,8 +115,9 @@ export function useVoice(): UseVoiceResult {
       historyRef.current = recordUse(picked.id, historyRef.current);
       saveHistory(historyRef.current);
       setLine(picked);
-      // Speak the line aloud so Louis doesn't need to read
-      TTS.speak(picked.text);
+      // TTS disabled — browser speechSynthesis sounds robotic and annoying.
+      // Phase 2: use ElevenLabs pre-generated audio files per voice line.
+      // TTS.speak(picked.text);
     },
     [state, weather, lang],
   );
