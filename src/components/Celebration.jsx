@@ -336,16 +336,42 @@ export default function Celebration() {
   const { t } = useTranslation();
   const { celebration, actions } = useTask();
   const [visible, setVisible] = useState(false);
+  const skipRef = useRef(false);
 
   useEffect(() => {
     if (celebration) {
+      // Reward tapering: based on days since onboarding, some celebrations
+      // are silently skipped in later phases. Evolution/chest always show.
+      if (celebration.type === 'victory' || celebration.type === 'levelUp') {
+        // Check habit phase — read onboardingDate from state directly
+        const state = celebration._state; // injected below
+        let daysSince = 0;
+        try {
+          const raw = localStorage.getItem('hdx2');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed.onboardingDate) {
+              daysSince = Math.floor((Date.now() - new Date(parsed.onboardingDate).getTime()) / 86400000);
+            }
+          }
+        } catch {}
+        // Phase 1 (days 1-7): always show. Phase 2 (8-21): 85%. Phase 3 (22-45): 50%. Phase 4 (46+): 15%.
+        const prob = daysSince <= 7 ? 1.0 : daysSince <= 21 ? 0.85 : daysSince <= 45 ? 0.5 : 0.15;
+        if (Math.random() > prob) {
+          // Silently dismiss — the reward was already given, just skip the animation
+          skipRef.current = true;
+          actions.dismissCelebration();
+          return;
+        }
+      }
+      skipRef.current = false;
       requestAnimationFrame(() => setVisible(true));
     } else {
       setVisible(false);
     }
   }, [celebration]);
 
-  if (!celebration) return null;
+  if (!celebration || skipRef.current) return null;
 
   const handleDismiss = () => {
     setVisible(false);

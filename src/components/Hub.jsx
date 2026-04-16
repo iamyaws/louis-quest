@@ -238,15 +238,6 @@ export default function Hub({ onNavigate }) {
           );
         })()}
 
-        {/* ── Heldenpunkte ── */}
-        <div className="flex justify-center">
-          <div className="flex items-center gap-2 px-6 py-3 rounded-full"
-               style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(16px)', border: '1px solid white', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
-            <Pearl size={24} />
-            <span className="font-extrabold font-label text-sm text-primary-container">{`${state.hp || 0} ${t('hub.boss.detail.heroPoints')}`}</span>
-          </div>
-        </div>
-
         {/* ── Login Bonus ── */}
         {!state.loginBonusClaimed && (
           <button
@@ -431,6 +422,20 @@ export default function Hub({ onNavigate }) {
             </button>
           );
         })()}
+
+        {/* ═══════════════════════════════════════════════════════════
+            SECONDARY ZONE — collapsed by default.
+            Everything below is "one tap deeper" so the primary view
+            stays: Companion → Routines → Bonus Quests. That's it.
+           ═══════════════════════════════════════════════════════════ */}
+        <details className="group">
+          <summary className="flex items-center justify-center gap-2 py-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden active:scale-[0.97] transition-all">
+            <span className="material-symbols-outlined text-on-surface-variant/40 text-lg group-open:rotate-180 transition-transform">expand_more</span>
+            <span className="font-label font-bold text-xs text-on-surface-variant/50 uppercase tracking-widest">
+              {lang === 'de' ? 'Mehr entdecken' : 'Discover more'}
+            </span>
+          </summary>
+          <div className="flex flex-col gap-6 pt-2">
 
         {/* ── Daily Check-in (collapsible mood + water) ── */}
         <details className="group rounded-2xl overflow-hidden"
@@ -1011,6 +1016,9 @@ export default function Hub({ onNavigate }) {
 
         {/* Clothing sheet — triggered by weather widget tap */}
         {showClothing && <ClothingSheet onClose={() => setShowClothing(false)} />}
+
+          </div>{/* end secondary zone content */}
+        </details>{/* end secondary zone */}
 
         {/* ── Bodhi leaf ── */}
         <div className="flex justify-center py-2 opacity-20">

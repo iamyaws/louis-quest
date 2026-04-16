@@ -5,6 +5,7 @@ import useWeather from '../hooks/useWeather';
 import { getCatStage } from '../utils/helpers';
 import { pickLine, recordUse, pruneHistory } from './VoiceEngine';
 import { linesFor } from './voiceLines';
+import TTS from '../utils/tts';
 import type { ArcLifecyclePhase } from '../arcs/types';
 import type {
   VoiceContext,
@@ -114,6 +115,8 @@ export function useVoice(): UseVoiceResult {
       historyRef.current = recordUse(picked.id, historyRef.current);
       saveHistory(historyRef.current);
       setLine(picked);
+      // Speak the line aloud so Louis doesn't need to read
+      TTS.speak(picked.text);
     },
     [state, weather, lang],
   );

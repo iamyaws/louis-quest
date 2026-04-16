@@ -123,14 +123,15 @@ describe('weekly missions', () => {
       expect(wm).toHaveProperty('goal');
       expect(wm).toHaveProperty('target');
       expect(wm).toHaveProperty('reward');
-      expect(wm.reward).toHaveProperty('type');
-      expect(wm.reward).toHaveProperty('amount');
+      expect(wm.reward).toHaveProperty('hp');
+      expect(wm.reward).toHaveProperty('evo');
     });
   });
 
-  it('weekly mission reward types are valid', () => {
+  it('weekly mission rewards are positive', () => {
     WEEKLY_MISSIONS.forEach(wm => {
-      expect(['hp', 'coins', 'xp']).toContain(wm.reward.type);
+      expect(wm.reward.hp).toBeGreaterThan(0);
+      expect(wm.reward.evo).toBeGreaterThanOrEqual(0);
     });
   });
 

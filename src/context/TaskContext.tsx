@@ -67,6 +67,7 @@ export interface TaskState {
   gamesPlayedToday: string[];
   birthdayEpic: { done: string[]; completed: boolean };
   poemQuest?: { done: string[]; completed: boolean; title?: string };
+  onboardingDate?: string; // ISO date string — set when onboarding completes
   familyConfig: FamilyConfig;
   _v2_economy_reset?: boolean;
   arcEngine?: ArcEngineState;
@@ -737,6 +738,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const updated = {
         ...prev,
         onboardingDone: true,
+        onboardingDate: prev.onboardingDate || new Date().toISOString().slice(0, 10),
         eggType: cfg?.eggType || prev.eggType,
         heroGender: cfg?.heroGender || prev.heroGender || null,
       };
