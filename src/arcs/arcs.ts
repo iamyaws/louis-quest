@@ -1,8 +1,14 @@
 import type { Arc } from './types';
 import { FIRST_ADVENTURE } from './first-adventure';
+import { LISTENING_GAME } from './listening-game';
+import { RONKIS_GARDEN } from './ronkis-garden';
+import { WEATHER_WALKER } from './weather-walker';
 
 export const ARCS: Arc[] = [
   FIRST_ADVENTURE,
+  LISTENING_GAME,
+  RONKIS_GARDEN,
+  WEATHER_WALKER,
 ];
 
 export function findArc(id: string): Arc | undefined {
