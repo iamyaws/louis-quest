@@ -71,7 +71,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                  backgroundPosition: 'center',
                }} />
           <div className="relative flex items-center gap-2 mb-2">
-            <Pearl size={20} />
+            <Pearl size={28} />
             <p className="font-label font-bold uppercase tracking-widest text-xs" style={{ color: '#7a4a05' }}>{t('hub.boss.detail.heroPoints')}</p>
           </div>
           <div className="relative flex items-baseline gap-1">
@@ -98,7 +98,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                  backgroundPosition: 'center',
                }} />
           <div className="relative flex items-center gap-2 mb-2">
-            <Hourglass size={20} dark />
+            <Hourglass size={28} dark />
             <p className="font-label font-bold uppercase tracking-widest text-xs" style={{ color: '#00513b' }}>{t('shop.screenMinutes')}</p>
           </div>
           <div className="relative flex items-baseline gap-1">
@@ -116,21 +116,21 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         className={`w-full rounded-2xl p-5 mb-8 flex items-center gap-4 transition-all text-left ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
         style={{
           background: gamesUnlocked
-            ? 'linear-gradient(160deg, #ecfdf5 0%, #6ee7b7 50%, #059669 100%)'
+            ? 'linear-gradient(160deg, #ede9fe 0%, #c4b5fd 50%, #7c3aed 100%)'
             : 'rgba(0,0,0,0.04)',
           filter: gamesUnlocked ? 'none' : 'grayscale(0.5) brightness(0.85)',
           opacity: gamesUnlocked ? 1 : 0.55,
         }}>
         <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>🎮</span>
         <div className="flex-1">
-          <h4 className="font-headline font-bold text-lg" style={{ color: gamesUnlocked ? '#064e3b' : '#6b7280' }}>{t('shop.miniGames')}</h4>
-          <p className="text-sm font-body mt-0.5" style={{ color: gamesUnlocked ? '#06553699' : '#9ca3af' }}>
+          <h4 className="font-headline font-bold text-lg" style={{ color: gamesUnlocked ? '#2e1065' : '#6b7280' }}>{t('shop.miniGames')}</h4>
+          <p className="text-sm font-body mt-0.5" style={{ color: gamesUnlocked ? '#2e106599' : '#9ca3af' }}>
             {gamesUnlocked ? t('shop.miniGames.subtitle') : 'Erst deine Aufgaben! 💪'}
           </p>
         </div>
         <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-             style={{ background: '#ffffff', border: '2.5px solid rgba(6,78,59,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-          <span className="material-symbols-outlined text-xl" style={{ color: '#064e3b', fontVariationSettings: "'FILL' 1" }}>
+             style={{ background: '#ffffff', border: '2.5px solid rgba(46,16,101,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+          <span className="material-symbols-outlined text-xl" style={{ color: '#2e1065', fontVariationSettings: "'FILL' 1" }}>
             {gamesUnlocked ? 'play_arrow' : 'lock'}
           </span>
         </div>

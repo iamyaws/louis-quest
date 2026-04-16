@@ -1,5 +1,5 @@
 import { PageMeta } from '../components/PageMeta';
-import { OrganizationSchema, SoftwareApplicationSchema } from '../components/JsonLd';
+import { OrganizationSchema, SoftwareApplicationSchema, FAQPageSchema } from '../components/JsonLd';
 import { PainterlyShell } from '../components/PainterlyShell';
 import { HeroVariantF } from '../components/HeroVariantF';
 import { Quote } from '../components/Quote';

@@ -17,7 +17,7 @@ export interface Quest {
   id: string;
   name: string;
   icon: string;
-  anchor: 'morning' | 'evening' | 'bedtime';
+  anchor: 'morning' | 'evening' | 'bedtime' | 'hobby';
   xp: number;
   minutes: number;
   done: boolean;

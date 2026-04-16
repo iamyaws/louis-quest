@@ -35,13 +35,19 @@ const base = import.meta.env.BASE_URL;
 export default function StarfighterGame({ onComplete }) {
   const { lang } = useTranslation();
   const canvasRef = useRef(null);
-  const [gameState, setGameState] = useState('menu'); // menu | playing | levelComplete | dead | finished
+  const [gameState, setGameState] = useState('menu'); // menu | playing | chooseUpgrade | levelComplete | dead
   const [level, setLevel] = useState(0);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
-  const [wave, setWave] = useState(0);
+  const livesRef = useRef(3);
+  // Weapon upgrades — accumulate across levels
+  const [laserCount, setLaserCount] = useState(1); // 1, 2, or 3
+  const [bulletSize, setBulletSize] = useState(4); // radius: 4, 7, or 10
 
   const stateRef = useRef({ playerX: W / 2, bullets: [], enemies: [], particles: [], lastFire: 0, targetX: W / 2, enemiesKilled: 0, waveEnemiesSpawned: 0, spawnTimer: 0 });
+
+  // Sync lives to ref so game loop doesn't reset on hit
+  useEffect(() => { livesRef.current = lives; }, [lives]);
 
   const levelData = LEVELS[level] || LEVELS[0];
 
@@ -131,13 +137,21 @@ export default function StarfighterGame({ onComplete }) {
       const dx = st.targetX - st.playerX;
       st.playerX += dx * 0.12 * dt;
 
-      // Auto-fire
+      // Auto-fire with weapon upgrades
       if (now - st.lastFire > FIRE_RATE) {
-        st.bullets.push({ x: st.playerX, y: H - 60 });
+        if (laserCount >= 3) {
+          st.bullets.push({ x: st.playerX - 10, y: H - 60, r: bulletSize });
+          st.bullets.push({ x: st.playerX, y: H - 65, r: bulletSize });
+          st.bullets.push({ x: st.playerX + 10, y: H - 60, r: bulletSize });
+        } else if (laserCount >= 2) {
+          st.bullets.push({ x: st.playerX - 7, y: H - 60, r: bulletSize });
+          st.bullets.push({ x: st.playerX + 7, y: H - 60, r: bulletSize });
+        } else {
+          st.bullets.push({ x: st.playerX, y: H - 60, r: bulletSize });
+        }
         st.lastFire = now;
         SFX.play('tap');
-        // Ronki "Piu!" every ~8th shot for flavor
-        if (st.bullets.length % 8 === 0) {
+        if (st.bullets.length % 10 === 0) {
           VoiceAudio.play(Math.random() > 0.5 ? 'sfx_pew' : 'sfx_pew2');
         }
       }
@@ -164,8 +178,9 @@ export default function StarfighterGame({ onComplete }) {
         // Check bullet collision
         for (let i = st.bullets.length - 1; i >= 0; i--) {
           const b = st.bullets[i];
+          const bRadius = b.r || BULLET_R;
           const dist = Math.hypot(b.x - e.x, b.y - e.y);
-          if (dist < ENEMY_R + BULLET_R) {
+          if (dist < ENEMY_R + bRadius) {
             st.bullets.splice(i, 1);
             e.hp--;
             addParticles(e.x, e.y, lvl.color);
@@ -212,12 +227,20 @@ export default function StarfighterGame({ onComplete }) {
 
       // ── Draw ──
 
-      // Bullets (golden bolts)
-      ctx.fillStyle = '#fcd34d';
+      // Bullets (golden bolts — size varies with upgrades)
       st.bullets.forEach(b => {
+        const r = b.r || BULLET_R;
+        ctx.fillStyle = r > 6 ? '#f97316' : '#fcd34d'; // orange for fireballs
         ctx.beginPath();
-        ctx.arc(b.x, b.y, BULLET_R, 0, Math.PI * 2);
+        ctx.arc(b.x, b.y, r, 0, Math.PI * 2);
         ctx.fill();
+        if (r > 6) {
+          // Fireball glow
+          ctx.fillStyle = 'rgba(249,115,22,0.3)';
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, r * 1.6, 0, Math.PI * 2);
+          ctx.fill();
+        }
       });
 
       // Enemies (colored circles with face)
@@ -269,13 +292,14 @@ export default function StarfighterGame({ onComplete }) {
       ctx.textAlign = 'left';
       ctx.fillText(`⭐ ${st.enemiesKilled}/${totalEnemies}`, 12, 24);
       ctx.textAlign = 'right';
-      for (let i = 0; i < lives; i++) {
+      for (let i = 0; i < livesRef.current; i++) {
         ctx.fillText('❤️', W - 12 - i * 22, 24);
       }
 
-      // Check level complete
+      // Check level complete — go to upgrade selection if there's a next level
       if (st.enemiesKilled >= totalEnemies && st.enemies.length === 0) {
-        setGameState('levelComplete');
+        const nextLvl = level + 1;
+        setGameState(nextLvl < LEVELS.length ? 'chooseUpgrade' : 'levelComplete');
         return;
       }
 
@@ -284,7 +308,7 @@ export default function StarfighterGame({ onComplete }) {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [gameState, level, lives]);
+  }, [gameState, level, laserCount, bulletSize]);
 
   // ── Menu ──
   if (gameState === 'menu') {
@@ -336,7 +360,79 @@ export default function StarfighterGame({ onComplete }) {
     );
   }
 
-  // ── Level Complete ──
+  // ── Choose Upgrade (between levels) ──
+  if (gameState === 'chooseUpgrade') {
+    const nextLevel = level + 1;
+    const canDoubleLaser = laserCount < 3;
+    const canBiggerFireball = bulletSize < 10;
+
+    const pickUpgrade = (type) => {
+      if (type === 'laser' && canDoubleLaser) setLaserCount(c => c + 1);
+      if (type === 'fireball' && canBiggerFireball) setBulletSize(s => s + 3);
+      VoiceAudio.play('sfx_wow');
+      SFX.play('coin');
+      setLevel(nextLevel);
+      setGameState('playing');
+    };
+
+    return (
+      <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center px-8"
+           style={{ background: 'linear-gradient(160deg, #0c1a2e, #0c3236)' }}>
+        <span className="text-5xl mb-3">⚡</span>
+        <h2 className="font-headline font-bold text-2xl text-white mb-1" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+          {lang === 'de' ? 'Level geschafft!' : 'Level cleared!'}
+        </h2>
+        <p className="font-body text-sm text-white/60 mb-2">
+          {levelData.name[lang] || levelData.name.de}
+        </p>
+        <p className="font-headline font-bold text-lg mb-8" style={{ color: '#fcd34d' }}>
+          {lang === 'de' ? 'Wähle eine Verbesserung!' : 'Choose an upgrade!'}
+        </p>
+
+        <div className="flex gap-4 w-full max-w-sm">
+          {/* Double Laser */}
+          <button
+            onClick={() => pickUpgrade('laser')}
+            disabled={!canDoubleLaser}
+            className="flex-1 rounded-2xl p-5 flex flex-col items-center gap-3 active:scale-95 transition-all text-center"
+            style={{
+              background: canDoubleLaser ? 'linear-gradient(160deg, #e0f2fe, #38bdf8)' : 'rgba(255,255,255,0.05)',
+              border: canDoubleLaser ? '2px solid rgba(56,189,248,0.4)' : '2px solid rgba(255,255,255,0.1)',
+              opacity: canDoubleLaser ? 1 : 0.4,
+            }}>
+            <span className="text-4xl">⚡</span>
+            <h3 className="font-headline font-bold text-base" style={{ color: canDoubleLaser ? '#0c4a6e' : '#666' }}>
+              {lang === 'de' ? 'Doppel-Laser' : 'Double Laser'}
+            </h3>
+            <p className="font-body text-xs" style={{ color: canDoubleLaser ? '#0c4a6e99' : '#666' }}>
+              {laserCount === 1 ? '1 → 2' : laserCount === 2 ? '2 → 3' : 'Max!'} {lang === 'de' ? 'Schüsse' : 'shots'}
+            </p>
+          </button>
+
+          {/* Bigger Fireball */}
+          <button
+            onClick={() => pickUpgrade('fireball')}
+            disabled={!canBiggerFireball}
+            className="flex-1 rounded-2xl p-5 flex flex-col items-center gap-3 active:scale-95 transition-all text-center"
+            style={{
+              background: canBiggerFireball ? 'linear-gradient(160deg, #fef3c7, #f97316)' : 'rgba(255,255,255,0.05)',
+              border: canBiggerFireball ? '2px solid rgba(249,115,22,0.4)' : '2px solid rgba(255,255,255,0.1)',
+              opacity: canBiggerFireball ? 1 : 0.4,
+            }}>
+            <span className="text-4xl">🔥</span>
+            <h3 className="font-headline font-bold text-base" style={{ color: canBiggerFireball ? '#7c2d12' : '#666' }}>
+              {lang === 'de' ? 'Feuerball' : 'Fireball'}
+            </h3>
+            <p className="font-body text-xs" style={{ color: canBiggerFireball ? '#7c2d1299' : '#666' }}>
+              {bulletSize === 4 ? 'Klein → Mittel' : bulletSize === 7 ? 'Mittel → Groß' : 'Max!'}
+            </p>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Level Complete (final level — no more upgrades) ──
   if (gameState === 'levelComplete') {
     const nextLevel = level + 1;
     const hasNext = nextLevel < LEVELS.length;
