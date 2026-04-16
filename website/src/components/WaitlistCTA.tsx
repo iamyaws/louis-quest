@@ -113,10 +113,10 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
           <span className="transition-transform group-hover:translate-x-0.5">→</span>
         </motion.button>
       </div>
-      <p className="text-xs opacity-75 pl-6">{copy.ctaHelper}</p>
-      <p className="mt-1 text-[0.65rem] text-center text-teal-dark/40">
+      <p className="text-xs opacity-60 pl-6">{copy.ctaHelper}</p>
+      <p className="mt-1 text-[0.65rem] text-center opacity-40">
         Mit dem Absenden stimmst du der{' '}
-        <a href="/datenschutz" className="underline hover:text-teal-dark/60">Datenschutzerklärung</a> zu.
+        <a href="/datenschutz" className="underline hover:opacity-70">Datenschutzerklärung</a> zu.
       </p>
       <AnimatePresence>
         {status.kind === 'invalid' && (
