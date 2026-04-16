@@ -124,7 +124,7 @@ export default function Impressum() {
 
             <Section heading="Bildnachweise">
               <p>
-                Illustrationen und Drachen-Artwork: Eigene Arbeiten. Avatare auf dieser Seite stammen von <a href="https://pravatar.cc/" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">pravatar.cc</a> (lizenzfreies Test-Avatar-API) und sind Platzhalter. Die abgebildeten Personen stehen in keinem Bezug zu den Aussagen.
+                Illustrationen und Drachen-Artwork wurden mit Unterstützung von KI-Bildgeneratoren (Midjourney) erstellt und anschließend von uns ausgewählt, bearbeitet und zusammengestellt. Testimonial-Avatare sind Platzhalter und zeigen keine realen Personen. Die abgebildeten Personen stehen in keinem Bezug zu den Aussagen.
               </p>
             </Section>
 

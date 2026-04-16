@@ -8,7 +8,6 @@ import { ArcStoryboard } from '../components/ArcStoryboard';
 import { IntrinsicMotivation } from '../components/IntrinsicMotivation';
 import { AntiFeatures } from '../components/AntiFeatures';
 import { FAQ } from '../components/FAQ';
-import { CountdownCTA } from '../components/CountdownCTA';
 import { Footer } from '../components/Footer';
 
 export default function Home() {
@@ -27,7 +26,6 @@ export default function Home() {
       <ArcStoryboard />
       <IntrinsicMotivation />
       <AntiFeatures />
-      <CountdownCTA />
       <FAQ />
       <Footer />
     </PainterlyShell>
