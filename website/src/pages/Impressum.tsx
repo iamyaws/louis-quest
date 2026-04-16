@@ -33,12 +33,12 @@ export default function Impressum() {
           <div className="mt-14 flex flex-col gap-12 text-[0.98rem] leading-[1.75] text-ink/85">
 
             <Section heading="Diensteanbieter">
-              <AddressBox>
+              <address className="not-italic">
                 Marc Förster<br />
                 Föhringer Allee 33<br />
                 85774 Unterföhring<br />
                 Deutschland
-              </AddressBox>
+              </address>
             </Section>
 
             <Section heading="Kontakt">
@@ -64,11 +64,11 @@ export default function Impressum() {
             </Section>
 
             <Section heading="Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV">
-              <AddressBox>
+              <address className="not-italic">
                 Marc Förster<br />
                 Föhringer Allee 33<br />
                 85774 Unterföhring
-              </AddressBox>
+              </address>
             </Section>
 
             <Section heading="EU-Streitschlichtung">
@@ -145,13 +145,5 @@ function Section({ heading, children }: { heading: string; children: React.React
       </h2>
       {children}
     </section>
-  );
-}
-
-function AddressBox({ children }: { children: React.ReactNode }) {
-  return (
-    <address className="not-italic rounded-xl bg-cream/60 backdrop-blur-sm border border-teal/15 p-4 text-ink/85">
-      {children}
-    </address>
   );
 }

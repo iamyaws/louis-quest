@@ -37,14 +37,14 @@ export default function Datenschutz() {
               <p>
                 Verantwortlicher für die Verarbeitung personenbezogener Daten auf dieser Website ist (Art. 4 Nr. 7 DSGVO):
               </p>
-              <AddressBox>
+              <address className="not-italic">
                 Marc Förster<br />
                 Föhringer Allee 33<br />
                 85774 Unterföhring<br />
                 Deutschland<br />
                 <br />
                 E-Mail: <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a>
-              </AddressBox>
+              </address>
               <p>
                 Weitere Pflichtangaben findest du im <Link to="/impressum" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">Impressum</Link>.
               </p>
@@ -176,12 +176,12 @@ export default function Datenschutz() {
               <p>
                 Du hast das Recht, dich mit einer Beschwerde an eine Datenschutz-Aufsichtsbehörde zu wenden, wenn du der Ansicht bist, dass wir gegen die DSGVO verstoßen. Zuständig ist in der Regel die Behörde des Bundeslandes, in dem du wohnst, oder die unseres Sitzes:
               </p>
-              <AddressBox>
+              <address className="not-italic">
                 Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)<br />
                 Promenade 18<br />
                 91522 Ansbach<br />
                 <a href="https://www.lda.bayern.de" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">www.lda.bayern.de</a>
-              </AddressBox>
+              </address>
               <p>
                 Eine Liste der deutschen Aufsichtsbehörden findest du bei der Bundesbeauftragten für den Datenschutz:{' '}
                 <a
@@ -245,13 +245,5 @@ function Section({ heading, children }: { heading: string; children: React.React
       </h2>
       {children}
     </section>
-  );
-}
-
-function AddressBox({ children }: { children: React.ReactNode }) {
-  return (
-    <address className="not-italic rounded-xl bg-cream/60 backdrop-blur-sm border border-teal/15 p-4 text-ink/85">
-      {children}
-    </address>
   );
 }
