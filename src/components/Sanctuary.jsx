@@ -54,17 +54,20 @@ export default function Sanctuary() {
     <div className="relative min-h-dvh pb-32">
       {/* Soft painted backdrop — contained gold halo + teal wash, fades to cream so cards stay readable */}
       <div className="fixed inset-0 -z-20" style={{ background: '#fff8f2' }} />
-      <div className="fixed inset-x-0 top-0 h-[60vh] -z-10 pointer-events-none transition-[filter] duration-700 ease-out"
-           style={{
-             backgroundImage: `url(${base}art/bg-teal-soft.webp)`,
-             backgroundSize: 'cover',
-             backgroundPosition: 'top center',
-             WebkitMaskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.75) 45%, transparent 100%)',
-             maskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.75) 45%, transparent 100%)',
-             opacity: 0.7,
-             filter: zones.activeZone.bgFilter,
-           }}
-           aria-hidden="true" />
+      {/* Biome backdrop — crossfades when zone changes */}
+      <div
+        className="fixed inset-x-0 top-0 h-[60vh] -z-10 pointer-events-none"
+        style={{
+          backgroundImage: `url(${base}${zones.activeZone.bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'top center',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.75) 45%, transparent 100%)',
+          maskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.75) 45%, transparent 100%)',
+          opacity: 0.65,
+          transition: 'background-image 0s, opacity 400ms ease',
+        }}
+        aria-hidden="true"
+      />
 
       <main className="px-5 max-w-lg mx-auto"
             style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>

@@ -25,6 +25,8 @@ export interface Zone {
   emoji: string;
   /** CSS filter applied to background image to tint the scene. */
   bgFilter: string;
+  /** Painted background image path (relative to BASE_URL). */
+  bgImage: string;
   /** Accent color used for the active pill and zone chip. */
   accent: string;
   unlockHintKey: string;
@@ -41,6 +43,7 @@ export const ZONES: Zone[] = [
     flavorKey: 'zone.sanctuary.flavor',
     emoji: '\u2728', // ✨
     bgFilter: 'none',
+    bgImage: 'art/bioms/101st-egg-center-of-the-world.webp',
     accent: '#124346',
     unlockHintKey: 'zone.sanctuary.unlockHint', // unused — always unlocked
     unlockThreshold: { field: 'catEvo', min: 0 },
@@ -50,7 +53,8 @@ export const ZONES: Zone[] = [
     nameKey: 'zone.meadow.name',
     flavorKey: 'zone.meadow.flavor',
     emoji: '\u{1F33F}', // 🌿
-    bgFilter: 'hue-rotate(-55deg) saturate(1.1)',
+    bgFilter: 'none',
+    bgImage: 'art/bioms/Morgenwald_dawn-forest.webp',
     accent: '#5a8a3e',
     unlockHintKey: 'zone.meadow.unlockHint',
     unlockThreshold: { field: 'catEvo', min: 3 },
@@ -60,7 +64,8 @@ export const ZONES: Zone[] = [
     nameKey: 'zone.cave.name',
     flavorKey: 'zone.cave.flavor',
     emoji: '\u{1F32B}\uFE0F', // 🌫️
-    bgFilter: 'hue-rotate(60deg) brightness(0.7) saturate(0.7)',
+    bgFilter: 'none',
+    bgImage: 'art/bioms/Sternenmeer_sea-of-stars.webp',
     accent: '#5a4a8a',
     unlockHintKey: 'zone.cave.unlockHint',
     unlockThreshold: { field: 'catEvo', min: 9 },
