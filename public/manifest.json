@@ -6,8 +6,8 @@
   "scope": "/Ronki/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#6D28D9",
-  "theme_color": "#6D28D9",
+  "background_color": "#124346",
+  "theme_color": "#124346",
   "categories": ["games", "kids", "education"],
   "icons": [
     {

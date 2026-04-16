@@ -491,6 +491,8 @@
   "common.hp": "HP",
 
   "hub.mood.label": "Mood",
+  "hub.commitment.label": "Yesterday you wanted to...",
+  "hub.commitment.hint": "How did it go? Log your day below ↓",
   "hub.loginBonus.title": "Welcome back!",
   "hub.loginBonus.subtitle": "Tap for your daily hero point",
   "hub.keepGoing": "Keep going, your dragon is growing!",

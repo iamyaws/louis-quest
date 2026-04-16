@@ -257,6 +257,66 @@ export default function Hub({ onNavigate }) {
           </button>
         )}
 
+        {state.familyConfig?.parentMessage?.body && (
+          <div
+            className="w-full p-5 rounded-2xl"
+            style={{
+              background: 'linear-gradient(135deg, #0c2a2e, #0f3236)',
+              border: '1px solid rgba(94,234,212,0.12)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+            }}
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0" aria-hidden="true">💌</span>
+              <div className="flex-1 min-w-0">
+                {state.familyConfig.parentMessage.title && (
+                  <p className="font-label text-xs uppercase tracking-widest mb-1"
+                     style={{ color: 'rgba(161,207,211,0.7)' }}>
+                    {state.familyConfig.parentMessage.title}
+                  </p>
+                )}
+                <p className="font-body text-sm leading-relaxed text-white">
+                  {state.familyConfig.parentMessage.body}
+                </p>
+                {state.familyConfig.parentMessage.signature && (
+                  <p className="font-body text-xs mt-2 italic"
+                     style={{ color: 'rgba(252,211,77,0.6)' }}>
+                    {state.familyConfig.parentMessage.signature}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {state.yesterdayCommitment && state.moodAM === null && (
+          <div
+            className="w-full p-4 rounded-2xl"
+            style={{
+              background: 'rgba(252,211,77,0.07)',
+              border: '1px solid rgba(252,211,77,0.22)',
+            }}
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-xl flex-shrink-0" aria-hidden="true">🌅</span>
+              <div>
+                <p
+                  className="font-label text-xs uppercase tracking-widest mb-1"
+                  style={{ color: '#b45309' }}
+                >
+                  {t('hub.commitment.label')}
+                </p>
+                <p className="font-body text-sm text-on-surface">
+                  {state.yesterdayCommitment.text}
+                </p>
+                <p className="font-label text-xs mt-1.5 text-on-surface-variant">
+                  {t('hub.commitment.hint')}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── Daily Summary Card ── */}
         <button onClick={() => onNavigate?.('quests')}
                 className="w-full p-6 rounded-2xl relative overflow-hidden text-left active:scale-[0.98] transition-transform"
