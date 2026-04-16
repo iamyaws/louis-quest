@@ -6,10 +6,10 @@ import useWeather, { getWeatherInfo, getClothingRecs } from '../hooks/useWeather
 import SFX from '../utils/sfx';
 
 const ANCHOR_META_BASE = {
-  morning: { icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)' },
-  evening: { icon: 'backpack', vacIcon: 'dark_mode', col: '#2d5a5e', bg: '#f0fdfa', border: 'rgba(45,90,94,0.1)' },
-  hobby: { icon: 'sports_soccer', col: '#059669', bg: '#ecfdf5', border: 'rgba(5,150,105,0.1)' },
-  bedtime: { icon: 'bedtime', col: '#4338ca', bg: '#eef2ff', border: 'rgba(67,56,202,0.1)' },
+  morning: { icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)', artFile: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_an_early_morning_sky._S_882cfbe3-5eac-4403-87a0-5c66602cf76b_2.webp' },
+  evening: { icon: 'backpack', vacIcon: 'dark_mode', col: '#2d5a5e', bg: '#f0fdfa', border: 'rgba(45,90,94,0.1)', artFile: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_bright_midday_sky._Wa_e8eca682-4eb9-4da2-8c93-a4cb25ba363d_1.webp' },
+  hobby: { icon: 'sports_soccer', col: '#059669', bg: '#ecfdf5', border: 'rgba(5,150,105,0.1)', artFile: 'art/bioms/Morgenwald_dawn-forest.webp' },
+  bedtime: { icon: 'bedtime', col: '#4338ca', bg: '#eef2ff', border: 'rgba(67,56,202,0.1)', artFile: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_deep_night_sky._Rich__c902cc19-afa0-4c99-a434-6e206610ddf9_0.webp' },
 };
 
 // Vacation quests share the same hints as their school counterparts
@@ -30,6 +30,8 @@ export default function TaskList() {
   };
 
   if (!state) return null;
+
+  const base = import.meta.env.BASE_URL;
 
   // Remap old stored quests that still have anchor:"evening" but belong to bedtime or hobby
   const BEDTIME_IDS = new Set(['s8', 's12', 's13', 's14', 's15', 'v10', 'v11', 'v12', 'v13']);
@@ -102,8 +104,24 @@ export default function TaskList() {
               }}
             >
               {/* ── Epic Header (Summary) ── */}
-              <summary className="p-6 cursor-pointer lotus-pattern list-none [&::-webkit-details-marker]:hidden">
-                <div className="flex justify-between items-center">
+              <summary className="p-6 cursor-pointer lotus-pattern list-none [&::-webkit-details-marker]:hidden relative overflow-hidden">
+                {/* Painted sky backdrop — low opacity so content stays readable */}
+                {meta.artFile && (
+                  <img
+                    src={base + meta.artFile}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                    style={{ opacity: 0.13, objectPosition: 'center 30%' }}
+                  />
+                )}
+                {/* Gradient overlay anchors left side text */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'linear-gradient(to right, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.65) 55%, rgba(255,255,255,0.4) 100%)' }}
+                />
+                <div className="relative z-10 flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     {secDone ? (
                       /* Companion approval avatar when routine is complete */
