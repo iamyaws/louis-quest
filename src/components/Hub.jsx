@@ -429,10 +429,10 @@ export default function Hub({ onNavigate }) {
             stays: Companion → Routines → Bonus Quests. That's it.
            ═══════════════════════════════════════════════════════════ */}
         <details className="group">
-          <summary className="flex items-center justify-center gap-2 py-3 px-6 mx-auto rounded-full cursor-pointer list-none [&::-webkit-details-marker]:hidden active:scale-[0.97] transition-all"
-                   style={{ background: 'rgba(18,67,70,0.06)', border: '1.5px solid rgba(18,67,70,0.12)', width: 'fit-content' }}>
-            <span className="material-symbols-outlined text-primary text-lg group-open:rotate-180 transition-transform">expand_more</span>
-            <span className="font-label font-bold text-sm text-primary uppercase tracking-wider">
+          <summary className="flex items-center justify-center gap-2 py-3.5 px-8 mx-auto rounded-full cursor-pointer list-none [&::-webkit-details-marker]:hidden active:scale-[0.97] transition-all"
+                   style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 4px 12px rgba(252,211,77,0.3), 0 2px 0 #d4a830', width: 'fit-content' }}>
+            <span className="material-symbols-outlined text-lg group-open:rotate-180 transition-transform" style={{ color: '#725b00' }}>expand_more</span>
+            <span className="font-headline font-bold text-sm uppercase tracking-wider">
               {lang === 'de' ? 'Mehr entdecken' : 'Discover more'}
             </span>
           </summary>

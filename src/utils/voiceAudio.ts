@@ -8,23 +8,34 @@ const MUTE_KEY = 'ronki_voice_mute';
 const BASE = import.meta.env.BASE_URL;
 
 let currentAudio: HTMLAudioElement | null = null;
+let delayTimer: ReturnType<typeof setTimeout> | null = null;
 
 const VoiceAudio = {
   /** Play a voice line by its ID (e.g., 'de_greet_01') */
-  play(lineId: string) {
+  play(lineId: string, delayMs = 0) {
     if (this.isMuted()) return;
     if (!lineId) return;
 
-    // Stop any currently playing line (don't overlap)
-    this.stop();
+    // Clear any pending delayed play
+    if (delayTimer) { clearTimeout(delayTimer); delayTimer = null; }
 
-    const src = `${BASE}audio/ronki/${lineId}.mp3`;
-    const audio = new Audio(src);
-    audio.volume = 0.8;
-    audio.play().catch(() => {
-      // File doesn't exist or autoplay blocked — fail silently
-    });
-    currentAudio = audio;
+    const doPlay = () => {
+      // Stop any currently playing line (don't overlap)
+      this.stop();
+      const src = `${BASE}audio/ronki/${lineId}.mp3`;
+      const audio = new Audio(src);
+      audio.volume = 0.85;
+      audio.play().catch(() => {
+        // File doesn't exist or autoplay blocked — fail silently
+      });
+      currentAudio = audio;
+    };
+
+    if (delayMs > 0) {
+      delayTimer = setTimeout(doPlay, delayMs);
+    } else {
+      doPlay();
+    }
   },
 
   /** Stop current playback */

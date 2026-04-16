@@ -10,7 +10,7 @@ import { Pearl } from './CurrencyIcons';
  * Header: portrait + name + stage pill
  * Tabs: About / Details / Traits
  * Memory card: last arc completed
- * Quick links: Micropedia + Discovery Log (both Phase 2)
+ * Quick links: Ronkis Freunde + Discovery Log (both Phase 2)
  */
 
 const DRAGON_ART = ['dragon-egg', 'dragon-baby', 'dragon-young', 'dragon-majestic', 'dragon-legendary'];
@@ -364,7 +364,7 @@ export default function RonkiProfile({ onNavigate }) {
 
         {/* ═══ QUICK LINKS ═══ */}
         <div className="flex flex-col gap-3 mt-8">
-          {/* Micropedia link (Phase 2) */}
+          {/* Ronkis Freunde link (Phase 2) */}
           <button
             className="w-full flex items-center gap-4 p-4 rounded-2xl active:scale-[0.98] transition-all text-left"
             style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)', border: '1.5px solid rgba(161,98,7,0.16)' }}
@@ -375,9 +375,9 @@ export default function RonkiProfile({ onNavigate }) {
               <span className="material-symbols-outlined text-xl" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>grid_view</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-headline font-bold text-base text-on-surface">Micropedia</p>
+              <p className="font-headline font-bold text-base text-on-surface">Ronkis Freunde</p>
               <p className="font-label text-xs text-on-surface-variant">
-                {lang === 'de' ? 'Kreaturen-Sammlung' : 'Creature collection'}
+                {lang === 'de' ? 'Entdecke neue Freunde!' : 'Discover new friends!'}
                 {' · '}{lang === 'de' ? 'Bald verfügbar' : 'Coming soon'}
               </p>
             </div>

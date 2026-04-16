@@ -114,10 +114,10 @@ export default function Micropedia({ onNavigate }) {
         <div className="text-center mb-6">
           <h1 className="font-headline font-bold text-2xl text-on-surface"
               style={{ fontFamily: 'Fredoka, sans-serif' }}>
-            Micropedia
+            {lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}
           </h1>
           <p className="font-body text-sm text-on-surface-variant mt-1">
-            {lang === 'de' ? 'Kreaturen-Sammlung' : 'Creature Collection'}
+            {lang === 'de' ? 'Entdecke neue Freunde!' : 'Discover new friends!'}
           </p>
           {/* Global counter */}
           <div className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full"

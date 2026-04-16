@@ -466,11 +466,11 @@ export default function StarCatcherGame({ onComplete }) {
 
             {/* Buttons */}
             <div className="flex gap-3 w-full">
-              <button onClick={() => { setPhase('idle'); initGame(); }}
-                className="flex-1 py-4 rounded-full font-headline font-bold text-lg active:scale-95 transition-all"
+              <CooldownButton delay={3} onClick={() => { setPhase('idle'); initGame(); }}
+                className="flex-1 py-4 rounded-full font-headline font-bold text-lg"
                 style={{ background: 'rgba(255,255,255,0.08)', color: '#a78bfa' }}>
                 {t('game.star.again')}
-              </button>
+              </CooldownButton>
               <CooldownButton delay={3} onClick={() => onComplete(reward)} icon="redeem"
                 className="flex-1 py-4 rounded-full font-headline font-bold text-lg text-white"
                 style={{ background: 'linear-gradient(135deg, #6d28d9, #a78bfa)', boxShadow: '0 8px 24px rgba(109,40,217,0.3)' }}>

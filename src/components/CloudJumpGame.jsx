@@ -399,11 +399,11 @@ export default function CloudJumpGame({ onComplete }) {
 
             {/* Buttons */}
             <div className="flex gap-3 w-full">
-              <button onClick={handleRestart}
-                className="flex-1 py-4 rounded-full font-headline font-bold text-lg active:scale-95 transition-all"
+              <CooldownButton delay={3} onClick={handleRestart}
+                className="flex-1 py-4 rounded-full font-headline font-bold text-lg"
                 style={{ background: 'rgba(18,67,70,0.06)', color: '#124346' }}>
                 {t('game.cloud.again')}
-              </button>
+              </CooldownButton>
               <CooldownButton delay={3} onClick={() => onComplete(reward)} icon="redeem"
                 className="flex-1 py-4 rounded-full font-headline font-bold text-lg text-white"
                 style={{ background: 'linear-gradient(135deg, #059669, #34d399)', boxShadow: '0 8px 24px rgba(5,150,105,0.2)' }}>

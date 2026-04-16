@@ -382,11 +382,11 @@ export default function StarfighterGame({ onComplete }) {
           {lang === 'de' ? `${score} Punkte — Versuch es nochmal!` : `${score} points — try again!`}
         </p>
         <div className="flex gap-3 w-full max-w-xs">
-          <button onClick={() => { setLives(3); setScore(0); setGameState('playing'); }}
-            className="flex-1 py-4 rounded-full font-headline font-bold text-base active:scale-95 transition-all"
+          <CooldownButton delay={3} onClick={() => { setLives(3); setScore(0); setGameState('playing'); }}
+            className="flex-1 py-4 rounded-full font-headline font-bold text-base"
             style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: '1.5px solid rgba(255,255,255,0.2)' }}>
             {lang === 'de' ? 'Nochmal' : 'Retry'}
-          </button>
+          </CooldownButton>
           <CooldownButton delay={2} onClick={() => onComplete(reward)} icon="redeem"
             className="flex-1 py-4 rounded-full font-headline font-bold text-base text-white"
             style={{ background: 'linear-gradient(135deg, #059669, #34d399)' }}>

@@ -117,7 +117,9 @@ export function useVoice(): UseVoiceResult {
       saveHistory(historyRef.current);
       setLine(picked);
       // Play the pre-generated ElevenLabs audio for this line
-      VoiceAudio.play(picked.id);
+      // Delay greeting lines so the kid settles into the view first
+      const isViewOpen = trigger === 'hub_open' || trigger === 'sanctuary_open';
+      VoiceAudio.play(picked.id, isViewOpen ? 1500 : 300);
     },
     [state, weather, lang],
   );
