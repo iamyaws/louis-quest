@@ -1,8 +1,254 @@
+import { Link } from 'react-router-dom';
+import { PageMeta } from '../components/PageMeta';
+import { PainterlyShell } from '../components/PainterlyShell';
+import { Footer } from '../components/Footer';
+
 export default function Datenschutz() {
   return (
-    <main>
-      <h1>Datenschutz</h1>
-      <p>Datenschutz placeholder.</p>
-    </main>
+    <PainterlyShell>
+      <PageMeta
+        title="Datenschutz: Ronki"
+        description="Wie wir mit deinen Daten umgehen. DSGVO-konform, EU-Hosting, kein Tracking."
+        canonicalPath="/datenschutz"
+      />
+      <main className="relative px-6 py-20 sm:py-28">
+        <article className="max-w-3xl mx-auto">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm text-teal-dark/70 hover:text-teal-dark transition-colors"
+          >
+            <span aria-hidden>←</span> Zurück zu Ronki
+          </Link>
+
+          <p className="mt-10 text-xs uppercase tracking-[0.2em] text-teal font-medium">
+            Rechtliches
+          </p>
+          <h1 className="mt-4 font-display font-bold text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-teal-dark">
+            Datenschutz&shy;erklärung
+          </h1>
+          <p className="mt-5 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
+            Wir erheben so wenige Daten wie möglich. Nur, was wir wirklich brauchen, um Ronki an den Start zu bringen. Kein Tracking, keine Werbepartner, keine Weitergabe an Dritte außerhalb der EU.
+          </p>
+          <p className="mt-3 text-sm text-ink/60">Stand: 15. April 2026</p>
+
+          <div className="mt-14 flex flex-col gap-12 text-[0.98rem] leading-[1.75] text-ink/85">
+
+            <Section heading="1. Verantwortlicher im Sinne der DSGVO">
+              <p>
+                Verantwortlicher für die Verarbeitung personenbezogener Daten auf dieser Website ist (Art. 4 Nr. 7 DSGVO):
+              </p>
+              <AddressBox>
+                [TODO vom Betreiber einzutragen: Vor- und Nachname / Firmenname]<br />
+                [TODO: Straße und Hausnummer]<br />
+                [TODO: PLZ und Ort]<br />
+                Deutschland<br />
+                <br />
+                E-Mail: hallo@ronki.de
+              </AddressBox>
+              <p>
+                Weitere Pflichtangaben findest du im <Link to="/impressum" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">Impressum</Link>.
+              </p>
+            </Section>
+
+            <Section heading="2. Was bedeuten diese Begriffe?">
+              <p>
+                Wir verwenden die Begriffe aus der DSGVO, namentlich „personenbezogene Daten", „Verarbeitung", „Verantwortlicher", „Auftragsverarbeiter", „Einwilligung" und so weiter, in der Bedeutung, die ihnen Art. 4 DSGVO gibt. Kurz gesagt: personenbezogene Daten sind alle Informationen, die sich direkt oder indirekt auf dich beziehen, etwa deine E-Mail, deine IP-Adresse oder das Gerät, mit dem du hier liest.
+              </p>
+            </Section>
+
+            <Section heading="3. Besuch dieser Website (Server-Logfiles)">
+              <p>
+                Wenn du diese Seite aufrufst, überträgt dein Browser technisch notwendige Daten an unseren Hosting-Provider. Diese werden in sogenannten Server-Logfiles gespeichert:
+              </p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>gekürzte oder vollständige IP-Adresse</li>
+                <li>Datum und Uhrzeit des Abrufs</li>
+                <li>aufgerufene Seite und übertragene Datenmenge</li>
+                <li>HTTP-Statuscode und Meldung über erfolgreichen Abruf</li>
+                <li>Browser-Typ und -Version, Betriebssystem</li>
+                <li>verweisende Seite (Referer), sofern vorhanden</li>
+              </ul>
+              <p>
+                <strong className="text-teal-dark">Zweck:</strong> Betrieb, Stabilität und Sicherheit der Website; Abwehr von Angriffen.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am sicheren Betrieb der Seite).
+              </p>
+              <p>
+                <strong className="text-teal-dark">Speicherdauer:</strong> maximal 14 Tage, danach werden die Logfiles automatisch gelöscht oder anonymisiert. Eine Zusammenführung dieser Daten mit anderen Datenquellen findet nicht statt.
+              </p>
+            </Section>
+
+            <Section heading="4. Warteliste (einmalige Start-Benachrichtigung)">
+              <p>
+                Wenn du dich auf unsere Warteliste einträgst, verarbeiten wir deine E-Mail-Adresse sowie die von dir verwendete Sprache, damit wir dir am Start-Tag in deiner Sprache Bescheid geben können.
+              </p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>E-Mail-Adresse (von dir eingegeben)</li>
+                <li>Sprache (derzeit automatisch „de")</li>
+                <li>Zeitpunkt der Anmeldung (technisch notwendig)</li>
+              </ul>
+              <p>
+                <strong className="text-teal-dark">Zweck:</strong> Eine einzige Benachrichtigung, wenn Ronki verfügbar ist. Kein Newsletter, keine Werbemails, keine Weitergabe an Dritte.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO, d. h. deine Einwilligung, die du mit dem Absenden des Formulars erteilst.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Speicherdauer:</strong> Bis zum Versand der Start-Benachrichtigung und für höchstens 30 Tage danach, um technische Zustellprobleme nachvollziehen zu können. Danach wird deine E-Mail-Adresse gelöscht. Auch davor kannst du deine Einwilligung jederzeit formlos per E-Mail an <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a> widerrufen; wir löschen dann umgehend deinen Eintrag.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Auftragsverarbeitung:</strong> Die Daten werden über einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO bei Supabase Inc. in der EU-Region gespeichert (siehe Abschnitt 7).
+              </p>
+            </Section>
+
+            <Section heading="5. Cookies und vergleichbare Technologien">
+              <p>
+                Diese Website setzt <strong className="text-teal-dark">keine Cookies</strong> zur Analyse, Wiedererkennung oder Werbung. Auch kein Local Storage oder Session Storage wird für Tracking-Zwecke genutzt.
+              </p>
+              <p>
+                Technisch notwendige Mechanismen, etwa ein kurzfristiger Eintrag im Browser-Speicher, der beim Absenden des Warteliste-Formulars verhindert, dass du versehentlich doppelt klickst, gelten nach § 25 Abs. 2 TTDSG als unbedingt erforderlich und benötigen keine Einwilligung.
+              </p>
+            </Section>
+
+            <Section heading="6. Eingebundene Dienste, Analytics, Werbung">
+              <p>
+                Diese Seite bindet <strong className="text-teal-dark">keine Dienste Dritter</strong> für Analytics, Werbung, Social-Media-Plugins oder Tracking ein. Wir nutzen:
+              </p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>kein Google Analytics, kein Plausible, kein Matomo</li>
+                <li>keine Meta/Facebook-Pixel, keine LinkedIn- oder TikTok-Tags</li>
+                <li>keine externen Schriftarten (Schriften sind lokal ausgeliefert)</li>
+                <li>keine Werbe-Netzwerke</li>
+              </ul>
+              <p>
+                Sollte sich das in Zukunft ändern, informieren wir dich an dieser Stelle transparent und holen, wo notwendig, deine Einwilligung ein.
+              </p>
+            </Section>
+
+            <Section heading="7. Empfänger der Daten und Auftragsverarbeiter">
+              <p>
+                Wir geben deine Daten nur an folgende sorgfältig ausgewählte Dienstleister weiter, die für uns als Auftragsverarbeiter tätig sind (Art. 28 DSGVO):
+              </p>
+              <ul className="list-disc pl-6 space-y-3">
+                <li>
+                  <strong className="text-teal-dark">Supabase Inc.:</strong> Datenbank und Backend für die Warteliste. Wir nutzen ausschließlich die EU-Region. Es besteht ein Auftragsverarbeitungsvertrag.<br />
+                  <span className="text-sm text-ink/65">Mehr: <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">supabase.com/privacy</a></span>
+                </li>
+                <li>
+                  <strong className="text-teal-dark">[TODO vom Betreiber einzutragen: Hosting-Provider]:</strong> Auslieferung der statischen Website-Inhalte und Server-Logfiles.<br />
+                  <span className="text-sm text-ink/65">Sitz: [TODO], AV-Vertrag abgeschlossen.</span>
+                </li>
+              </ul>
+              <p>
+                Eine Weitergabe an andere Dritte findet nicht statt, außer wir sind gesetzlich dazu verpflichtet (z. B. auf Anordnung einer Behörde).
+              </p>
+            </Section>
+
+            <Section heading="8. Datenübermittlung in Drittländer">
+              <p>
+                Alle oben genannten Auftragsverarbeiter speichern deine Daten in der Europäischen Union. Eine Übermittlung in Drittländer außerhalb der EU/des EWR findet <strong className="text-teal-dark">nicht statt</strong>.
+              </p>
+              <p>
+                Sollte sich das in Zukunft ändern, werden wir die Übermittlung nur auf Grundlage geeigneter Garantien nach Art. 44 ff. DSGVO durchführen, etwa EU-Standardvertragsklauseln, und dich an dieser Stelle darüber informieren.
+              </p>
+            </Section>
+
+            <Section heading="9. Deine Rechte als betroffene Person">
+              <p>
+                Nach der DSGVO hast du uns gegenüber folgende Rechte bezüglich deiner personenbezogenen Daten:
+              </p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li><strong className="text-teal-dark">Auskunft</strong> (Art. 15 DSGVO): du kannst jederzeit erfragen, welche Daten wir über dich verarbeiten.</li>
+                <li><strong className="text-teal-dark">Berichtigung</strong> (Art. 16 DSGVO): unrichtige Daten werden auf deinen Wunsch korrigiert.</li>
+                <li><strong className="text-teal-dark">Löschung</strong> (Art. 17 DSGVO, „Recht auf Vergessenwerden"): du kannst die Löschung verlangen.</li>
+                <li><strong className="text-teal-dark">Einschränkung der Verarbeitung</strong> (Art. 18 DSGVO).</li>
+                <li><strong className="text-teal-dark">Datenübertragbarkeit</strong> (Art. 20 DSGVO): Herausgabe deiner Daten in einem strukturierten, maschinenlesbaren Format.</li>
+                <li><strong className="text-teal-dark">Widerspruch</strong> (Art. 21 DSGVO): gegen Verarbeitungen auf Grundlage eines berechtigten Interesses.</li>
+                <li><strong className="text-teal-dark">Widerruf deiner Einwilligung</strong> (Art. 7 Abs. 3 DSGVO): jederzeit und ohne Angabe von Gründen, mit Wirkung für die Zukunft.</li>
+              </ul>
+              <p>
+                Um eines dieser Rechte auszuüben, reicht eine formlose Nachricht an <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a>. Für die Identifizierung können wir dich um einen Nachweis bitten, da wir deine Daten ja auch nicht an Dritte herausgeben wollen.
+              </p>
+            </Section>
+
+            <Section heading="10. Beschwerderecht bei einer Aufsichtsbehörde">
+              <p>
+                Du hast das Recht, dich mit einer Beschwerde an eine Datenschutz-Aufsichtsbehörde zu wenden, wenn du der Ansicht bist, dass wir gegen die DSGVO verstoßen. Zuständig ist in der Regel die Behörde des Bundeslandes, in dem du wohnst, oder die unseres Sitzes:
+              </p>
+              <AddressBox>
+                [TODO vom Betreiber einzutragen: zuständige Landesdatenschutzbehörde]
+              </AddressBox>
+              <p>
+                Eine Liste der deutschen Aufsichtsbehörden findest du bei der Bundesbeauftragten für den Datenschutz:{' '}
+                <a
+                  href="https://www.bfdi.bund.de/DE/Service/Anschriften/Laender/Laender-node.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-mustard underline-offset-4 hover:text-teal-dark break-words"
+                >
+                  bfdi.bund.de
+                </a>
+                .
+              </p>
+            </Section>
+
+            <Section heading="11. Automatisierte Entscheidungen, Profiling">
+              <p>
+                Wir setzen keine automatisierten Entscheidungsverfahren im Sinne des Art. 22 DSGVO ein. Es findet kein Profiling statt.
+              </p>
+            </Section>
+
+            <Section heading="12. Sicherheit">
+              <p>
+                Die Website wird ausschließlich über eine verschlüsselte TLS-Verbindung (HTTPS) ausgeliefert. Deine Daten werden auf Servern in der EU gespeichert und dort gegen unbefugten Zugriff nach aktuellem Stand der Technik geschützt.
+              </p>
+            </Section>
+
+            <Section heading="13. Kinder">
+              <p>
+                Ronki ist für Kinder im Grundschulalter gedacht; angemeldet werden aber ausschließlich Eltern oder Erziehungsberechtigte. Diese Website richtet sich an Erwachsene. Personen unter 16 Jahren sollten ohne Zustimmung der Erziehungsberechtigten keine personenbezogenen Daten an uns übermitteln.
+              </p>
+            </Section>
+
+            <Section heading="14. Änderungen dieser Erklärung">
+              <p>
+                Wir passen diese Datenschutzerklärung an, wenn sich Gesetze, Dienste oder Funktionen ändern. Wesentliche Änderungen kündigen wir, sofern deine E-Mail-Adresse bei uns gespeichert ist, per Nachricht an. Es gilt jeweils die Fassung mit dem oben genannten Stand.
+              </p>
+            </Section>
+
+          </div>
+
+          <div className="mt-16 rounded-2xl bg-cream/70 backdrop-blur-sm border border-teal/15 p-5 sm:p-6">
+            <p className="text-[0.7rem] uppercase tracking-[0.15em] text-teal/70 font-medium mb-2">
+              Kurz gesagt
+            </p>
+            <p className="text-sm sm:text-base text-ink/80 leading-relaxed">
+              Wir speichern deine E-Mail-Adresse, ausschließlich um dir am Start-Tag zu schreiben. Keine Werbung, kein Tracking, kein Verkauf an Dritte. Wenn du's dir anders überlegst, eine Mail an <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a> reicht.
+            </p>
+          </div>
+        </article>
+      </main>
+      <Footer />
+    </PainterlyShell>
+  );
+}
+
+function Section({ heading, children }: { heading: string; children: React.ReactNode }) {
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="font-display font-bold text-xl sm:text-2xl tracking-tight text-teal-dark">
+        {heading}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
+function AddressBox({ children }: { children: React.ReactNode }) {
+  return (
+    <address className="not-italic rounded-xl bg-cream/60 backdrop-blur-sm border border-teal/15 p-4 text-ink/85">
+      {children}
+    </address>
   );
 }
