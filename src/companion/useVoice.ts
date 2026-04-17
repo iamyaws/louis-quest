@@ -22,6 +22,19 @@ import type {
 const HISTORY_KEY = 'ronki_voice_history_v1';
 const BUBBLE_MS = 15000;
 
+// Mood index → MoodTag. Order must match MOOD_EMOJIS in src/constants.ts:
+// 0 → 😢 traurig, 1 → 😕 besorgt, 2 → 😐 okay, 3 → 🙂 gut, 4 → 😊 magisch, 5 → 🤩 müde
+const MOOD_INDEX_TO_TAG: (import('./types').MoodTag | null)[] = [
+  'traurig', 'besorgt', 'okay', 'gut', 'magisch', 'müde',
+];
+
+function moodFromState(s: any): import('./types').MoodTag | null {
+  // Prefer PM mood if set (later in the day = more current), fall back to AM
+  const idx = s.moodPM ?? s.moodAM;
+  if (idx === null || idx === undefined) return null;
+  return MOOD_INDEX_TO_TAG[idx] ?? null;
+}
+
 function loadHistory(): VoiceHistory {
   if (typeof localStorage === 'undefined') return {};
   try {
@@ -103,7 +116,7 @@ export function useVoice(): UseVoiceResult {
         trigger,
         timeOfDay: timeOfDay(),
         weather: weatherTag(weather),
-        mood: null, // wired in 1b from Buch mood
+        mood: moodFromState(s),
         stage: stageTag(s.catEvo || 0),
         questsCompletedToday,
         careAction: extras.careAction,
