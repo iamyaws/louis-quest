@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
+import { getCatStage } from '../utils/helpers';
+import FeedbackModal from './FeedbackModal';
 
 const PIN_CODE = '1234';
 const MOOD_EMOJIS = ['😢', '😕', '😐', '🙂', '😊', '🤩'];
@@ -22,13 +24,14 @@ function BodhiLeaf({ className = '' }) {
   );
 }
 
-export default function ParentalDashboard({ onClose }) {
+export default function ParentalDashboard({ onClose, currentView }) {
   const { state, actions } = useTask();
   const { t, lang, setLang } = useTranslation();
   const [pin, setPin] = useState('');
   const [authed, setAuthed] = useState(false);
   const [pinError, setPinError] = useState(false);
   const [tab, setTab] = useState('overview');
+  const [showFeedback, setShowFeedback] = useState(false);
   const DAY_LABELS = lang === 'en' ? DAY_LABELS_EN : DAY_LABELS_DE;
 
   if (!state) return null;
@@ -188,9 +191,18 @@ export default function ParentalDashboard({ onClose }) {
       <main className="relative z-10 px-6 pb-12 max-w-lg mx-auto flex flex-col gap-5">
         {tab === 'overview' && <OverviewTab state={state} lang={lang} />}
         {tab === 'family' && <FamilyTab state={state} actions={actions} lang={lang} />}
-        {tab === 'settings' && <SettingsTab lang={lang} setLang={setLang} t={t} actions={actions} state={state} />}
+        {tab === 'settings' && <SettingsTab lang={lang} setLang={setLang} t={t} actions={actions} state={state} onOpenFeedback={() => setShowFeedback(true)} />}
         <BodhiLeaf />
       </main>
+
+      {showFeedback && (
+        <FeedbackModal
+          onClose={() => setShowFeedback(false)}
+          currentView={currentView}
+          ronkiStage={getCatStage(state?.catEvo || 0)}
+          catEvo={state?.catEvo || 0}
+        />
+      )}
     </div>
   );
 }
@@ -777,7 +789,7 @@ function FieldRow({ label, children }) {
 // SETTINGS TAB (Language Toggle)
 // ═══════════════════════════════════════════════════════
 
-function SettingsTab({ lang, setLang, t, actions, state }) {
+function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
   const [pinPhase, setPinPhase] = useState(null); // null | 'current' | 'new' | 'confirm'
   const [pinInput, setPinInput] = useState('');
   const [newPin, setNewPin] = useState('');
@@ -917,6 +929,27 @@ function SettingsTab({ lang, setLang, t, actions, state }) {
             </button>
           </div>
         )}
+      </div>
+
+      {/* Feedback */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(252,211,77,0.18)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#a16207', fontVariationSettings: "'FILL' 1" }}>forum</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">Feedback an Marc</p>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Bug, Idee oder was komisch war? Schreib's auf — kommt direkt zu mir.
+        </p>
+        <button onClick={onOpenFeedback}
+          className="w-full py-3 rounded-xl font-label font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+          style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 4px 14px rgba(252,211,77,0.35)' }}>
+          <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>edit_note</span>
+          Feedback senden
+        </button>
       </div>
 
       {/* Reset */}

@@ -47,6 +47,11 @@ function AppContent() {
   const [discoveryToast, setDiscoveryToast] = useState(null);
   useMicropediaDiscovery((id) => setDiscoveryToast(id));
 
+  useEffect(() => {
+    // Flush any queued feedback from previous offline sessions
+    import('./utils/feedback').then(m => m.flushFeedbackQueue()).catch(() => {});
+  }, []);
+
   // Scroll to top whenever the active view changes; also record first-time visits
   useEffect(() => {
     // Belt-and-suspenders: works across iOS PWA, Android WebView, desktop
@@ -121,7 +126,7 @@ function AppContent() {
         }} />}
       </div>
       <NavBar active={view} onNavigate={setView} />
-      {showParental && <ParentalDashboard onClose={() => setShowParental(false)} />}
+      {showParental && <ParentalDashboard onClose={() => setShowParental(false)} currentView={view} />}
       {view === 'memory' && <MemoryGame onComplete={() => {
         actions.claimGameReward('memory'); // +1 screen min (once/day)
         setView('games');
