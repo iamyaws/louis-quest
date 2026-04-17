@@ -78,6 +78,7 @@ const BEATS: Beat[] = [
 export function ArcStoryboard() {
   return (
     <section
+      id="storyboard"
       className="relative border-t border-teal/10 px-6 py-24 sm:py-32"
       aria-labelledby="storyboard-heading"
     >
@@ -115,6 +116,22 @@ export function ArcStoryboard() {
             <BeatRow key={beat.time} beat={beat} flip={i % 2 === 1} index={i} />
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mt-16 text-center"
+        >
+          <a
+            href="/wie-es-funktioniert"
+            className="inline-flex items-center gap-2 text-sm font-display font-semibold text-teal hover:text-teal-dark transition-colors"
+          >
+            So funktioniert Ronki im Detail
+            <span className="transition-transform group-hover:translate-x-1">→</span>
+          </a>
+        </motion.div>
       </div>
     </section>
   );
@@ -188,8 +205,12 @@ function BeatRow({
           {/* Task list */}
           <ul className="flex flex-col gap-2">
             {beat.tasks.map((task, ti) => (
-              <li
+              <motion.li
                 key={ti}
+                initial={{ opacity: 0, x: -12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: ti * 0.1 }}
                 className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition-colors ${
                   task.done
                     ? 'bg-black/[0.02]'
@@ -197,20 +218,23 @@ function BeatRow({
                 }`}
                 style={!task.done ? { backgroundColor: beat.accentLight, outline: `1px solid ${beat.accent}22` } : undefined}
               >
-                <span
-                  className={`flex-none flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
-                    task.done
-                      ? 'text-white'
-                      : 'bg-transparent'
-                  }`}
-                  style={
-                    task.done
-                      ? { backgroundColor: beat.accent }
-                      : { border: `2px solid ${beat.accent}` }
-                  }
-                >
-                  {task.done ? '✓' : null}
-                </span>
+                {task.done ? (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 15, delay: ti * 0.1 + 0.2 }}
+                    className="flex-none flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold text-white"
+                    style={{ backgroundColor: beat.accent }}
+                  >
+                    ✓
+                  </motion.span>
+                ) : (
+                  <span
+                    className="flex-none flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold bg-transparent"
+                    style={{ border: `2px solid ${beat.accent}` }}
+                  />
+                )}
                 <span
                   className={`text-sm font-medium leading-none ${
                     task.done
@@ -228,16 +252,21 @@ function BeatRow({
                     Jetzt
                   </span>
                 )}
-              </li>
+              </motion.li>
             ))}
           </ul>
 
           {/* Progress bar */}
           <div className="mt-4">
             <div className="h-1.5 w-full rounded-full bg-black/[0.04] overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all"
+              <motion.div
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="h-full rounded-full"
                 style={{
+                  transformOrigin: 'left',
                   width: `${(doneCount / beat.tasks.length) * 100}%`,
                   backgroundColor: beat.accent,
                 }}

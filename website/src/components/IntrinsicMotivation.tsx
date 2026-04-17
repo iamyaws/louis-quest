@@ -96,6 +96,18 @@ export function IntrinsicMotivation() {
             </div>
           </motion.div>
         </div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="mt-12 text-sm text-ink/50 text-center"
+        >
+          Basierend auf Selbstbestimmungstheorie (Deci & Ryan), Fading Scaffolding (Vygotsky) und Montessori-Prinzipien.{' '}
+          <a href="/wissenschaft" className="underline decoration-teal/30 hover:text-teal-dark transition-colors">
+            Mehr erfahren →
+          </a>
+        </motion.p>
       </div>
     </section>
   );

@@ -108,6 +108,15 @@ export function HeroVariantF() {
             <TrustBadge label="Keine Streaks" />
             <TrustBadge label="Keine In-App-Käufe" />
           </motion.div>
+
+          {/* Secondary link to storyboard */}
+          <motion.a
+            {...fade(0.9)}
+            href="#storyboard"
+            className="mt-6 inline-flex items-center text-sm text-cream/50 hover:text-cream/80 transition-colors font-medium"
+          >
+            So sieht ein Tag aus →
+          </motion.a>
         </div>
 
         {/* Right column: character illustration (md+) */}
