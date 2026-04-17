@@ -138,6 +138,16 @@ const SFX = {
           g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.25);
           o.start(now + i * 0.12); o.stop(now + i * 0.12 + 0.25);
         });
+      } else if (type === "chime") {
+        // Gentle descending bedtime bell — three soft tones
+        [1047, 784, 659].forEach((f, i) => {
+          const o = ctx.createOscillator(); const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = "sine"; o.frequency.setValueAtTime(f, now + i * 0.18);
+          g.gain.setValueAtTime(0.12, now + i * 0.18);
+          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.18 + 0.7);
+          o.start(now + i * 0.18); o.stop(now + i * 0.18 + 0.7);
+        });
       }
     } catch (e) { /* silent fail */ }
   }
