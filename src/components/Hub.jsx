@@ -15,6 +15,7 @@ import ArcActiveBanner from './ArcActiveBanner';
 import BeatCompletionModal from './BeatCompletionModal';
 import DreamStrip from './DreamStrip';
 import ClothingSheet from './ClothingSheet';
+import CloudWaves from './CloudWaves';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -112,6 +113,10 @@ export default function Hub({ onNavigate }) {
         backgroundColor: '#fff8f2',
       }}
     >
+      {/* ── Drifting cloud layers — ambient ── */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+        <CloudWaves fill="253,248,240" opacity={1.2} />
+      </div>
 
       {/* ── Top Bar (matches TopBar component style) ── */}
       <header className="flex justify-between items-center px-6 pb-2"
