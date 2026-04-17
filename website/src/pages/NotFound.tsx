@@ -5,6 +5,14 @@ import { PageMeta } from '../components/PageMeta';
 export default function NotFound() {
   const reduced = useReducedMotion();
 
+  const drift = (dur: number, reverse = false) =>
+    reduced
+      ? {}
+      : {
+          animate: { x: reverse ? ['-50%', '0%'] : ['0%', '-50%'] },
+          transition: { duration: dur, repeat: Infinity, ease: 'linear' as const },
+        };
+
   return (
     <>
       <PageMeta
@@ -14,131 +22,153 @@ export default function NotFound() {
       />
 
       <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden bg-teal-dark">
-        {/* Gradient sky */}
+        {/* Sky gradient */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(180deg, #1A3C3F 0%, #2D5A5E 40%, #3E7478 65%, #50a082 100%)',
+              'linear-gradient(180deg, #162E30 0%, #1A3C3F 20%, #2D5A5E 45%, #3E7478 70%, #50a082 100%)',
           }}
         />
 
-        {/* Animated cloud/wave layers */}
+        {/* Subtle stars / sparkle dots */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-          {/* Cloud layer 1 — slow, back */}
-          <motion.div
-            className="absolute w-[200%] bottom-[18%]"
-            animate={reduced ? {} : { x: [0, '-50%'] }}
-            transition={{ duration: 35, repeat: Infinity, ease: 'linear' }}
-          >
-            <svg viewBox="0 0 2400 200" className="w-full h-32 sm:h-44">
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 rounded-full bg-cream/20"
+              style={{
+                left: `${8 + (i * 7.3) % 84}%`,
+                top: `${5 + (i * 11.7) % 35}%`,
+              }}
+              animate={reduced ? {} : { opacity: [0.1, 0.4, 0.1] }}
+              transition={{
+                duration: 2 + (i % 3),
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: i * 0.4,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Mustard glow behind dragon area */}
+        <div
+          className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(252,211,77,0.10) 0%, transparent 60%)' }}
+          aria-hidden
+        />
+
+        {/* ---- CLOUD LAYERS (filling bottom 2/3) ---- */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+
+          {/* Layer 1 — tall billowy clouds, far back, very slow */}
+          <motion.div className="absolute w-[200%] bottom-[45%]" {...drift(40)}>
+            <svg viewBox="0 0 2400 300" className="w-full h-40 sm:h-56 md:h-64" preserveAspectRatio="none">
               <path
-                d="M0,120 C200,60 400,160 600,100 C800,40 1000,140 1200,120 C1400,100 1600,50 1800,110 C2000,170 2200,80 2400,120 L2400,200 L0,200 Z"
+                d="M0,200 C100,120 200,180 350,130 C500,80 550,160 700,120 C850,80 950,50 1100,100 C1250,150 1300,80 1450,130 C1600,180 1700,90 1850,140 C2000,190 2100,100 2250,160 C2350,200 2400,150 2400,200 L2400,300 L0,300 Z"
+                fill="rgba(253,248,240,0.04)"
+              />
+            </svg>
+          </motion.div>
+
+          {/* Layer 2 — wide rounded bumps */}
+          <motion.div className="absolute w-[200%] bottom-[35%]" {...drift(32, true)}>
+            <svg viewBox="0 0 2400 280" className="w-full h-36 sm:h-48 md:h-56" preserveAspectRatio="none">
+              <path
+                d="M0,160 C180,80 280,200 500,140 C720,80 800,180 1000,120 C1200,60 1350,190 1500,140 C1650,90 1800,200 2000,130 C2200,60 2300,160 2400,160 L2400,280 L0,280 Z"
                 fill="rgba(253,248,240,0.06)"
               />
             </svg>
           </motion.div>
 
-          {/* Cloud layer 2 — medium speed, middle */}
-          <motion.div
-            className="absolute w-[200%] bottom-[10%]"
-            animate={reduced ? {} : { x: ['0%', '-50%'] }}
-            transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-          >
-            <svg viewBox="0 0 2400 200" className="w-full h-28 sm:h-36">
+          {/* Layer 3 — chunky cumulus shapes */}
+          <motion.div className="absolute w-[200%] bottom-[25%]" {...drift(26)}>
+            <svg viewBox="0 0 2400 260" className="w-full h-32 sm:h-44 md:h-52" preserveAspectRatio="none">
               <path
-                d="M0,80 C150,140 350,40 600,90 C850,140 1050,60 1200,80 C1350,100 1550,140 1800,70 C2050,0 2200,100 2400,80 L2400,200 L0,200 Z"
+                d="M0,140 C60,180 180,70 360,120 C540,170 620,60 800,110 C980,160 1060,50 1200,100 C1340,150 1460,70 1600,130 C1740,190 1860,80 2000,140 C2140,200 2260,90 2400,140 L2400,260 L0,260 Z"
                 fill="rgba(253,248,240,0.08)"
               />
             </svg>
           </motion.div>
 
-          {/* Cloud layer 3 — faster, front */}
-          <motion.div
-            className="absolute w-[200%] bottom-0"
-            animate={reduced ? {} : { x: ['-50%', '0%'] }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
-          >
-            <svg viewBox="0 0 2400 200" className="w-full h-24 sm:h-32">
+          {/* Layer 4 — softer rolling hills */}
+          <motion.div className="absolute w-[200%] bottom-[14%]" {...drift(22, true)}>
+            <svg viewBox="0 0 2400 220" className="w-full h-28 sm:h-40 md:h-48" preserveAspectRatio="none">
               <path
-                d="M0,100 C300,50 500,150 800,90 C1100,30 1300,130 1600,100 C1900,70 2100,120 2400,100 L2400,200 L0,200 Z"
-                fill="rgba(253,248,240,0.12)"
+                d="M0,100 C200,50 400,160 650,90 C900,20 1050,150 1200,100 C1350,50 1550,140 1800,80 C2050,20 2200,120 2400,100 L2400,220 L0,220 Z"
+                fill="rgba(253,248,240,0.10)"
               />
             </svg>
           </motion.div>
 
-          {/* Mustard glow — top */}
-          <div
-            className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full blur-3xl"
-            style={{ background: 'radial-gradient(circle, rgba(252,211,77,0.12) 0%, transparent 65%)' }}
-          />
+          {/* Layer 5 — thick front clouds */}
+          <motion.div className="absolute w-[200%] bottom-[4%]" {...drift(18)}>
+            <svg viewBox="0 0 2400 200" className="w-full h-24 sm:h-36 md:h-44" preserveAspectRatio="none">
+              <path
+                d="M0,80 C150,130 350,30 550,90 C750,150 900,50 1100,100 C1300,150 1450,40 1650,80 C1850,120 2050,50 2200,100 C2350,150 2400,80 2400,80 L2400,200 L0,200 Z"
+                fill="rgba(253,248,240,0.14)"
+              />
+            </svg>
+          </motion.div>
+
+          {/* Layer 6 — densest bottom fog */}
+          <motion.div className="absolute w-[200%] -bottom-[2%]" {...drift(14, true)}>
+            <svg viewBox="0 0 2400 160" className="w-full h-20 sm:h-28 md:h-36" preserveAspectRatio="none">
+              <path
+                d="M0,40 C200,90 450,20 700,60 C950,100 1100,30 1350,50 C1600,70 1750,100 2000,40 C2200,0 2350,70 2400,40 L2400,160 L0,160 Z"
+                fill="rgba(253,248,240,0.18)"
+              />
+            </svg>
+          </motion.div>
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 flex flex-col items-center text-center px-6">
-          {/* 404 — massive, ghosted */}
-          <motion.p
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="font-display font-extrabold text-[8rem] sm:text-[12rem] md:text-[16rem] leading-none text-cream/[0.07] select-none"
-          >
-            404
-          </motion.p>
-
-          {/* Dragon image — overlapping the 404 */}
+        {/* ---- CONTENT ---- */}
+        <div className="relative z-10 flex flex-col items-center text-center px-6 -mt-12 sm:-mt-16">
+          {/* Dragon floating above clouds */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="-mt-20 sm:-mt-28 md:-mt-36 mb-6 relative"
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="mb-8"
           >
             <motion.div
-              animate={reduced ? {} : { y: [0, -8, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              animate={reduced ? {} : { y: [0, -10, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
             >
               <div className="relative">
                 <div
                   aria-hidden
-                  className="absolute -inset-6 rounded-full blur-3xl"
-                  style={{ background: 'radial-gradient(circle, rgba(252,211,77,0.25) 0%, transparent 60%)' }}
+                  className="absolute -inset-8 rounded-full blur-3xl"
+                  style={{ background: 'radial-gradient(circle, rgba(252,211,77,0.20) 0%, transparent 55%)' }}
                 />
                 <img
                   src="/art/companion/dragon-404.webp"
                   alt="Ronki, der kleine Drache, schaut neugierig um eine Steinmauer."
                   width={280}
                   height={280}
-                  className="relative w-44 sm:w-52 md:w-64 rounded-2xl shadow-2xl"
+                  className="relative w-40 sm:w-52 md:w-60 rounded-2xl shadow-2xl"
                   style={{ boxShadow: '0 24px 64px rgba(0,0,0,0.4)' }}
                 />
               </div>
             </motion.div>
           </motion.div>
 
-          {/* Copy */}
+          {/* Pun headline */}
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
             className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-cream tracking-tight leading-tight"
           >
-            Ronki hat sich verflogen.
+            Verflogen. Aber nicht verloren.
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.55 }}
-            className="mt-4 text-base sm:text-lg text-cream/60 max-w-md leading-relaxed"
-          >
-            Diese Seite gibt es leider nicht. Aber keine Sorge. Der kleine Drache findet den Weg zurück.
-          </motion.p>
-
-          {/* Back button */}
+          {/* Button */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
+            transition={{ duration: 0.5, delay: 0.55 }}
           >
             <Link
               to="/"
