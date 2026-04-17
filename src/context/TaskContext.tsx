@@ -67,6 +67,8 @@ export interface TaskState {
   gamesPlayedToday: string[];
   birthdayEpic: { done: string[]; completed: boolean };
   earnedTraits: string[];
+  /** ISO date (YYYY-MM-DD) when evening ritual was last completed. Resets daily. */
+  eveningRitualCompletedAt?: string;
   /** Creatures discovered via useMicropediaDiscovery. One entry per unlock. */
   micropediaDiscovered?: Array<{ id: string; chapter: string; discoveredAt: string }>;
   poemQuest?: { done: string[]; completed: boolean; title?: string };
@@ -207,6 +209,7 @@ export function createInitialState(): TaskState {
     gamesPlayedToday: [],
     birthdayEpic: { done: [], completed: false },
     earnedTraits: [],
+    eveningRitualCompletedAt: undefined,
     micropediaDiscovered: [],
     familyConfig: DEFAULT_FAMILY_CONFIG,
     arcEngine: initialArcState(),
@@ -308,6 +311,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           gamesPlayedToday: raw.gamesPlayedToday || [],
           birthdayEpic: raw.birthdayEpic || { done: [], completed: false },
           earnedTraits: raw.earnedTraits || [],
+          eveningRitualCompletedAt: raw.eveningRitualCompletedAt || undefined,
           micropediaDiscovered: raw.micropediaDiscovered || [],
           familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
           completedSpecialQuests: raw.completedSpecialQuests || {},
