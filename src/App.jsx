@@ -29,7 +29,9 @@ import PoemQuest from './components/PoemQuest';
 import StarfighterGame from './components/StarfighterGame';
 import { useSpecialQuests } from './hooks/useSpecialQuests';
 import { useEggSystem } from './hooks/useEggSystem';
+import { useMicropediaDiscovery } from './hooks/useMicropediaDiscovery';
 import EggOverlay from './components/EggOverlay';
+import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -41,6 +43,9 @@ function AppContent() {
 
   useSpecialQuests(); // side-effect only — silently completes special quests
   useEggSystem(); // silently spawns eggs when trigger conditions are met
+
+  const [discoveryToast, setDiscoveryToast] = useState(null);
+  useMicropediaDiscovery((id) => setDiscoveryToast(id));
 
   // Scroll to top whenever the active view changes; also record first-time visits
   useEffect(() => {
@@ -157,6 +162,12 @@ function AppContent() {
             setScreenTimer(null);
           }}
           onDismiss={() => setScreenTimer(null)}
+        />
+      )}
+      {discoveryToast && (
+        <CreatureDiscoveryToast
+          creatureId={discoveryToast}
+          onDismiss={() => setDiscoveryToast(null)}
         />
       )}
     </>
