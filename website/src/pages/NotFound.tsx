@@ -52,6 +52,16 @@ export default function NotFound() {
           />
         </motion.div>
 
+        {/* 404 badge */}
+        <motion.span
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="mb-4 inline-block rounded-full bg-teal-dark/10 px-4 py-1.5 text-xs font-display font-bold text-teal-dark/60 uppercase tracking-[0.2em]"
+        >
+          404
+        </motion.span>
+
         {/* Copy */}
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
@@ -68,7 +78,7 @@ export default function NotFound() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-4 text-base sm:text-lg text-ink/70 max-w-md leading-relaxed"
         >
-          Diese Seite gibt es leider nicht. Aber keine Sorge&nbsp;&mdash; der kleine Drache findet den Weg&nbsp;zurück.
+          Diese Seite gibt es leider nicht. Aber keine Sorge. Der kleine Drache findet den Weg zurück.
         </motion.p>
 
         {/* Back button */}
