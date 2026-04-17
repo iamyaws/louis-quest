@@ -44,6 +44,7 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
   const [finished, setFinished] = useState(false);
   const intervalRef = useRef(null);
   const warningPlayed = useRef(false);
+  const firedThresholdsRef = useRef(new Set());
 
   // Countdown logic
   useEffect(() => {
@@ -53,11 +54,17 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
     }
     intervalRef.current = setInterval(() => {
       setRemaining(prev => {
+        const fired = firedThresholdsRef.current;
+
         if (prev <= 1) {
           clearInterval(intervalRef.current);
           setFinished(true);
           SFX.play('alarm');
           VoiceAudio.play('de_screen_done');
+          if (!fired.has('done')) {
+            fired.add('done');
+            VoiceAudio.play('de_screentime_done_01', 0);
+          }
           if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
           onFinish?.();
           return 0;
@@ -68,6 +75,23 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
         if (prev === 300) VoiceAudio.play('de_screen_5min');  // 5 min left
         if (prev === 120) VoiceAudio.play('de_screen_2min');  // 2 min left
         if (prev === 60) VoiceAudio.play('de_screen_1min');   // 1 min left
+
+        // Threshold-based ramp-down voice alerts (ref-deduped per session)
+        // 50% threshold — only for sessions >= 10 min, so short redemptions skip it
+        if (!fired.has('50') && totalSeconds >= 600 && prev <= totalSeconds * 0.5) {
+          fired.add('50');
+          VoiceAudio.play('de_screentime_50_01', 0);
+        }
+        // 20% threshold
+        if (!fired.has('20') && prev <= totalSeconds * 0.2) {
+          fired.add('20');
+          VoiceAudio.play('de_screentime_20_01', 0);
+        }
+        // 10% / last minute — fires when under 60s remaining
+        if (!fired.has('10') && prev <= 60) {
+          fired.add('10');
+          VoiceAudio.play('de_screentime_10_01', 0);
+        }
         // Eye care reminders every 10 minutes
         if (prev > 60 && prev % 600 === 0) {
           const eyeLines = ['de_screen_eyes', 'de_screen_eyes2', 'de_screen_eyes3'];
