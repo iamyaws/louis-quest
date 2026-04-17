@@ -156,6 +156,17 @@ export default function Hub({ onNavigate }) {
 
         <ArcActiveBanner onOpenBeat={setOpenBeat} />
 
+        {/* Arc cooldown hint — only shown when in cooldown */}
+        {inCooldown && !activeArc && !offeredArc && (
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full mx-auto"
+               style={{ background: 'rgba(252,211,77,0.12)', border: '1px solid rgba(252,211,77,0.25)', width: 'fit-content' }}>
+            <span className="text-base">💤</span>
+            <span className="font-label text-xs text-on-surface-variant">
+              {lang === 'de' ? 'Ronki ruht sich aus. Bald gibt es ein neues Abenteuer.' : 'Ronki is resting. A new adventure soon.'}
+            </span>
+          </div>
+        )}
+
         {/* ── Companion ── */}
         {(() => {
           const eggType = state.eggType || 'fire';
