@@ -61,9 +61,17 @@ export function useArc() {
       const lastId = next.completedArcIds[next.completedArcIds.length - 1];
       const narr = ARC_NARRATOR[lastId];
       if (narr) VoiceAudio.playNarrator(narr.outro, 1200);
+      // Grant traits from arc reward
+      const arc = findArc(lastId);
+      const traitIds = arc?.rewardOnComplete?.traitIds || [];
+      if (traitIds.length > 0) {
+        const currentTraits = (state as any)?.earnedTraits || [];
+        const merged = Array.from(new Set([...currentTraits, ...traitIds]));
+        actions.patchState({ earnedTraits: merged } as any);
+      }
     }
     return next;
-  }), []);
+  }), [state, actions]);
 
   const activeArc = useMemo(
     () => (arcState.activeArcId ? findArc(arcState.activeArcId) : null),
