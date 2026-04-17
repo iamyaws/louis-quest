@@ -6,22 +6,28 @@ import { Footer } from '../components/Footer';
 
 const CARDS = [
   {
-    num: '01',
+    index: '001',
     tag: 'MORGEN',
     title: 'Zähne putzen, Wasser trinken. Ronki erinnert leise.',
     image: '/art/routines/brushing-teeth.webp',
+    accent: '#d97706', // warm amber
+    accentBg: 'rgba(217,119,6,0.12)',
   },
   {
-    num: '02',
+    index: '002',
     tag: 'NACHMITTAG',
     title: 'Heute malen wir den Garten. Ronki hält die Stifte.',
     image: '/art/bioms/Naschgarten_temptaion-garden.webp',
+    accent: '#50a082', // sage
+    accentBg: 'rgba(80,160,130,0.12)',
   },
   {
-    num: '03',
+    index: '003',
     tag: 'ABEND',
     title: 'Das Ei wackelt. Drei Routinen geschafft.',
     image: '/art/companion/dragon-hatching.webp',
+    accent: '#2D5A5E', // teal
+    accentBg: 'rgba(45,90,94,0.12)',
   },
 ];
 
@@ -30,11 +36,10 @@ export default function AltRoutineCards() {
     <PainterlyShell>
       <PageMeta
         title="Ein Tag mit Ronki — Routinen-Karten"
-        description="Drei kleine Routinen: Morgen, Nachmittag, Abend. So begleitet Ronki dein Kind durch den Tag."
+        description="Drei kleine Routinen: Morgen, Nachmittag, Abend."
         noindex
       />
 
-      {/* ── Hero ── */}
       <section className="px-6 pt-32 pb-20 sm:pt-40 sm:pb-24">
         <div className="max-w-5xl mx-auto">
           <motion.div
@@ -46,7 +51,7 @@ export default function AltRoutineCards() {
               to="/"
               className="inline-flex items-center gap-2 text-sm text-teal-dark/60 hover:text-teal-dark transition-colors mb-8"
             >
-              <span aria-hidden>&larr;</span> Zurück
+              <span aria-hidden>←</span> Zurück
             </Link>
             <p className="text-xs uppercase tracking-[0.2em] text-teal font-medium mb-6">
               Drei kleine Routinen
@@ -58,46 +63,69 @@ export default function AltRoutineCards() {
         </div>
       </section>
 
-      {/* ── Cards grid ── */}
       <section className="px-6 pb-28 sm:pb-32">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {CARDS.map((card, i) => (
             <motion.article
-              key={card.num}
-              initial={{ opacity: 0, y: 24 }}
+              key={card.index}
+              initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-10%' }}
-              transition={{ duration: 0.6, delay: i * 0.12 }}
-              whileHover={{ scale: 1.02 }}
-              className="group rounded-2xl border border-teal/15 bg-cream/60 backdrop-blur-sm overflow-hidden transition-shadow duration-300 hover:shadow-lg hover:border-teal/30"
+              transition={{ duration: 0.6, delay: i * 0.12, ease: [0.2, 0.7, 0.2, 1] }}
+              whileHover={{ y: -6 }}
+              className="group relative flex flex-col rounded-[1.5rem] bg-white overflow-hidden cursor-default"
+              style={{
+                boxShadow: '0 4px 24px rgba(45,90,94,0.08), 0 1px 4px rgba(45,90,94,0.06)',
+              }}
             >
-              {/* Image */}
-              <div className="overflow-hidden">
-                <img
-                  src={card.image}
-                  alt=""
-                  loading="lazy"
-                  className="aspect-[4/3] w-full object-cover rounded-t-2xl transition-transform duration-500 group-hover:scale-[1.04]"
-                />
+              {/* Accent top bar */}
+              <div
+                className="h-1.5 w-full"
+                style={{ background: card.accent }}
+              />
+
+              {/* Index number — large, faded */}
+              <div className="px-5 pt-5 pb-2 flex items-start justify-between">
+                <span
+                  className="font-display font-extrabold text-5xl leading-none tracking-tight"
+                  style={{ color: card.accent, opacity: 0.15 }}
+                >
+                  {card.index}
+                </span>
+                <span
+                  className="mt-1 inline-flex items-center rounded-full px-3 py-1 text-[10px] font-display font-bold uppercase tracking-[0.15em]"
+                  style={{ backgroundColor: card.accentBg, color: card.accent }}
+                >
+                  {card.tag}
+                </span>
               </div>
 
-              {/* Content */}
-              <div className="p-5 sm:p-6">
-                {/* Number badge + tag */}
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="inline-flex items-center justify-center rounded-full bg-teal-dark/10 px-3 py-1 text-xs font-display font-bold text-teal-dark/70 tabular-nums">
-                    {card.num}
-                  </span>
-                  <span className="text-xs uppercase tracking-[0.15em] text-sage font-display font-semibold">
-                    {card.tag}
-                  </span>
+              {/* Image — large, dominant */}
+              <div className="px-4 pb-2">
+                <div className="overflow-hidden rounded-xl">
+                  <img
+                    src={card.image}
+                    alt=""
+                    loading="lazy"
+                    className="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                  />
                 </div>
-
-                {/* Title */}
-                <h2 className="font-display font-bold text-base sm:text-lg leading-snug text-teal-dark">
-                  {card.title}
-                </h2>
               </div>
+
+              {/* Title */}
+              <div className="px-5 pt-3 pb-6 flex-1 flex items-start">
+                <p className="font-display font-bold text-base sm:text-lg leading-snug text-teal-dark">
+                  {card.title}
+                </p>
+              </div>
+
+              {/* Hover glow at bottom */}
+              <div
+                className="absolute bottom-0 inset-x-0 h-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{
+                  background: `linear-gradient(to top, ${card.accentBg}, transparent)`,
+                }}
+              />
             </motion.article>
           ))}
         </div>
