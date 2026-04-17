@@ -128,18 +128,9 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_trait_curious_01',   text: 'Du stellst immer die besten Fragen. Was fragst du dich heute?', triggers: ['idle'], requiredTraits: ['curious'] },
   { id: 'de_trait_multi_01',     text: 'Du hast schon so viele Wesenszüge. Du wirst ein großer Held.', triggers: ['hub_open'], requireAllTraits: ['brave', 'gentle', 'patient', 'mapmaker'] },
 
-  // ═══════════════════════════════════════
-  // STAMINA STATES — Ronki's energy for minigames
-  // ═══════════════════════════════════════
-  { id: 'de_stamina_low_01',       text: 'Puh, ich werde langsam müde vom Fliegen. Aber einmal noch geht bestimmt.', triggers: ['hub_open'], cooldownHours: 6 },
-  { id: 'de_stamina_exhausted_01', text: 'Ich bin ganz platt. Kannst du ein bisschen ohne mich spielen?',           triggers: ['hub_open'], cooldownHours: 6 },
-  { id: 'de_stamina_restored_01',  text: 'Ausgeruht! Lass uns wieder losziehen.',                                    triggers: ['hub_open'], cooldownHours: 2 },
-
-  // ═══════════════════════════════════════
-  // SCREEN-TIME RAMP-DOWN — pacing the end of a reward session
-  // ═══════════════════════════════════════
-  { id: 'de_screentime_50_01',  text: 'Wir haben noch ein bisschen Zeit zusammen. Worauf hast du Lust?', triggers: ['idle'], cooldownHours: 1 },
-  { id: 'de_screentime_20_01',  text: 'Gleich ist unsere Zeit um. Willst du noch etwas Besonderes machen?', triggers: ['idle'], cooldownHours: 1 },
-  { id: 'de_screentime_10_01',  text: 'Noch eine Minute, dann ist Pause. Du machst das super.', triggers: ['idle'], cooldownHours: 1 },
-  { id: 'de_screentime_done_01', text: 'Gut gemacht! Bis später.', triggers: ['idle'], cooldownHours: 1 },
+  // NOTE: de_stamina_* and de_screentime_* audio files exist in public/audio/ronki/
+  // and are played directly via VoiceAudio.play(id) from MiniGames.jsx and ScreenTimer.jsx.
+  // They are NOT registered here because that would make the VoiceEngine pick them
+  // randomly on hub_open/idle triggers — Ronki would say "Ich bin ganz platt" even
+  // when fully rested. Direct play bypasses the line bank by design.
 ];

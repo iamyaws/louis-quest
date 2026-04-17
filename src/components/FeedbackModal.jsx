@@ -113,7 +113,7 @@ export default function FeedbackModal({ onClose, currentView, ronkiStage, catEvo
             maxLength={1000}
             rows={5}
             disabled={sending}
-            placeholder="Was war heute komisch oder cool? Schreib alles auf was dir auffällt."
+            placeholder="Was ist dir aufgefallen? Bug, Idee, Beobachtung..."
             className="w-full px-4 py-3 rounded-2xl font-body text-base text-on-surface outline-none transition-all resize-none focus:ring-2 focus:ring-primary/20"
             style={{
               background: 'rgba(255,255,255,0.8)',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 /**
  * ChapterAmbient — decorative CSS/SVG overlay keyed to chapter.
@@ -86,17 +86,26 @@ function WaterRipples({ color }) {
 }
 
 function DreamStars({ color }) {
+  // Random positions memoized so they don't jitter on parent re-renders
+  const stars = useMemo(() => (
+    [0, 1, 2, 3, 4, 5].map(() => ({
+      top: Math.random() * 80,
+      left: Math.random() * 90,
+      duration: 2 + Math.random() * 2,
+      delay: Math.random() * 2,
+    }))
+  ), []);
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[0, 1, 2, 3, 4, 5].map(i => (
+      {stars.map((s, i) => (
         <div key={i} className="absolute rounded-full"
           style={{
-            top: `${Math.random() * 80}%`,
-            left: `${Math.random() * 90}%`,
+            top: `${s.top}%`,
+            left: `${s.left}%`,
             width: 3, height: 3,
             background: color,
             boxShadow: `0 0 6px ${color}`,
-            animation: `starTwinkle ${2 + Math.random() * 2}s ease-in-out infinite ${Math.random() * 2}s`,
+            animation: `starTwinkle ${s.duration}s ease-in-out infinite ${s.delay}s`,
           }} />
       ))}
       <style>{`

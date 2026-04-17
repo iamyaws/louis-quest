@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { useTranslation } from '../i18n/LanguageContext';
+import { useTask } from '../context/TaskContext';
 import { useGameAccess } from '../hooks/useGameAccess';
 import { useRonkiStamina } from '../hooks/useRonkiStamina';
+import { getCatStage } from '../utils/helpers';
 import StaminaExhausted from './StaminaExhausted';
 import VoiceAudio from '../utils/voiceAudio';
+
+// Module-level cooldown so stamina voice line doesn't repeat every Games mount
+let lastStaminaVoiceMs = 0;
+const STAMINA_VOICE_COOLDOWN_MS = 30 * 60 * 1000; // 30 min
 
 const GAMES = [
   {
@@ -62,20 +68,27 @@ const GAMES = [
 
 export default function MiniGames({ onPlay }) {
   const { t } = useTranslation();
+  const { state } = useTask();
   const { unlocked, reason } = useGameAccess();
   const stamina = useRonkiStamina();
   const [showExhausted, setShowExhausted] = useState(false);
   const voiceFiredRef = useRef(false);
 
-  // Fire stamina voice line once per mount
+  const catStage = getCatStage(state?.catEvo || 0);
+
+  // Fire stamina voice line at most once per mount AND throttled to 30min cross-mount
   useEffect(() => {
     if (voiceFiredRef.current) return;
+    const now = Date.now();
+    if (now - lastStaminaVoiceMs < STAMINA_VOICE_COOLDOWN_MS) return;
     if (stamina.exhausted) {
       VoiceAudio.play('de_stamina_exhausted_01', 600);
       voiceFiredRef.current = true;
+      lastStaminaVoiceMs = now;
     } else if (stamina.low) {
       VoiceAudio.play('de_stamina_low_01', 800);
       voiceFiredRef.current = true;
+      lastStaminaVoiceMs = now;
     }
   }, [stamina.exhausted, stamina.low]);
 
@@ -171,6 +184,7 @@ export default function MiniGames({ onPlay }) {
       {showExhausted && (
         <StaminaExhausted
           nextRechargeMin={stamina.nextRechargeMin}
+          stage={catStage}
           onClose={() => setShowExhausted(false)}
         />
       )}
