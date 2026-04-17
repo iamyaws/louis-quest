@@ -56,7 +56,9 @@ export default function RonkiProfile({ onNavigate }) {
   const daysTogether = state.totalTaskDays || 0;
   const heroName = state.familyConfig?.heroName || 'Louis';
   const completedArcs = state.arcEngine?.completedArcIds || [];
-  const earnedTraits = TRAIT_POOL.filter(tr => tr.when(state));
+  const stateTraits = state.earnedTraits || [];
+  // Combine: traits granted by arcs (state) + milestone-inferred (legacy visual feedback)
+  const earnedTraits = TRAIT_POOL.filter(tr => stateTraits.includes(tr.id) || tr.when(state));
 
   // Next evo threshold
   const THRESHOLDS = [0, 3, 9, 18, 30];
