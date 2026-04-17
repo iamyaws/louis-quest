@@ -22,6 +22,12 @@ export function matchesContext(line: VoiceLine, ctx: VoiceContext): boolean {
   }
   if (line.arcPhase && line.arcPhase !== ctx.arcPhase) return false;
   if (line.minQuestsToday != null && ctx.questsCompletedToday < line.minQuestsToday) return false;
+  // Trait gate — if line requires traits, at least one must be earned
+  if (line.requiredTraits && line.requiredTraits.length > 0) {
+    const earned = ctx.earnedTraits || [];
+    const hasAny = line.requiredTraits.some(t => earned.includes(t));
+    if (!hasAny) return false;
+  }
   return true;
 }
 

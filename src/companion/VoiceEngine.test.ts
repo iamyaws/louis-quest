@@ -10,6 +10,7 @@ const baseCtx: VoiceContext = {
   stage: 'baby',
   questsCompletedToday: 0,
   lang: 'de',
+  earnedTraits: [],
 };
 
 const L = (overrides: Partial<VoiceLine>): VoiceLine => ({
@@ -151,6 +152,7 @@ describe('pickLine mood filtering', () => {
     stage: 'baby',
     questsCompletedToday: 0,
     lang: 'de',
+    earnedTraits: [],
   };
 
   it('includes mood-tagged lines when mood matches', () => {
@@ -166,5 +168,28 @@ describe('pickLine mood filtering', () => {
   it('excludes mood-tagged lines when mood is null', () => {
     const picked = pickLine({ ...baseCtx, mood: null }, lines, {});
     expect(picked?.id).toBe('generic');
+  });
+});
+
+describe('pickLine trait gating', () => {
+  const lines: VoiceLine[] = [
+    { id: 'generic',   text: 'hi', triggers: ['hub_open'] },
+    { id: 'brave',     text: 'you are brave', triggers: ['hub_open'], requiredTraits: ['brave'] },
+    { id: 'gentle',    text: 'so gentle', triggers: ['hub_open'], requiredTraits: ['gentle'] },
+  ];
+  const baseCtx: VoiceContext = {
+    trigger: 'hub_open', timeOfDay: 'morning', weather: null, mood: null,
+    stage: 'baby', questsCompletedToday: 0, lang: 'de', earnedTraits: [],
+  };
+
+  it('excludes trait-gated lines when trait not earned', () => {
+    const picked = pickLine(baseCtx, lines, {});
+    expect(picked?.id).toBe('generic');
+  });
+
+  it('includes trait-gated lines when trait earned', () => {
+    const picked = pickLine({ ...baseCtx, earnedTraits: ['brave'] }, lines, {});
+    expect(['generic', 'brave']).toContain(picked?.id);
+    expect(picked?.id).not.toBe('gentle');
   });
 });
