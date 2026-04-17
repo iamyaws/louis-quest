@@ -99,4 +99,20 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_identity_02', text: 'Die Schmetterlinge sagen, du bist der mutigste Held, den sie kennen.', triggers: ['quest_complete'], minQuestsToday: 2 },
   { id: 'de_identity_03', text: 'Weißt du was? Du bist jemand, auf den man sich verlassen kann. Das hab ich gemerkt.', triggers: ['hub_open'] },
   { id: 'de_identity_04', text: 'Die Wiese erzählt Geschichten über dich. Lauter gute!', triggers: ['sanctuary_open'] },
+
+  // ═══════════════════════════════════════
+  // MOOD-AWARE — soft responses when Louis is down, upbeat when happy
+  // ═══════════════════════════════════════
+  { id: 'de_mood_sad_01',   text: 'Hey... ich bin heute auch ein bisschen leise. Sollen wir zusammen sein?', triggers: ['hub_open'], mood: ['traurig', 'besorgt'] },
+  { id: 'de_mood_sad_02',   text: 'Manchmal sind Tage einfach so. Ich bin da.', triggers: ['hub_open'], mood: ['traurig'] },
+  { id: 'de_mood_sad_03',   text: 'Ich hab dich gesehen. Du bist stark, auch wenn es sich nicht so anfühlt.', triggers: ['hub_open'], mood: ['traurig', 'besorgt'] },
+  { id: 'de_mood_sad_04',   text: 'Weißt du was hilft? Eine Umarmung. Ich kann leider keine geben — aber stell dir eine vor.', triggers: ['hub_open', 'sanctuary_open'], mood: ['traurig'] },
+  { id: 'de_mood_tired_01', text: 'Ich gähne auch. Lass uns heute langsam machen.', triggers: ['hub_open'], mood: ['müde'] },
+  { id: 'de_mood_tired_02', text: 'Müde sein ist okay. Dann ruhen wir uns aus.', triggers: ['hub_open'], mood: ['müde'] },
+  { id: 'de_mood_happy_01', text: 'Wow! Du strahlst heute! Was ist passiert?', triggers: ['hub_open'], mood: ['magisch', 'gut'] },
+  { id: 'de_mood_happy_02', text: 'Ich spüre deine gute Laune. Bin mit angesteckt!', triggers: ['hub_open'], mood: ['magisch'] },
+  { id: 'de_mood_happy_03', text: 'So ein schöner Tag in dir! Nimmst du mich mit?', triggers: ['hub_open', 'sanctuary_open'], mood: ['magisch', 'gut'] },
+  { id: 'de_mood_okay_01',  text: 'Mittendrin ist auch gut. Nicht jeder Tag muss funkeln.', triggers: ['hub_open'], mood: ['okay'] },
+  { id: 'de_mood_worried_01', text: 'Ist was passiert? Du kannst mir erzählen — oder einfach da sein.', triggers: ['hub_open'], mood: ['besorgt'] },
+  { id: 'de_mood_worried_02', text: 'Ich bin leise. Dann ist der Kopf freier.', triggers: ['hub_open'], mood: ['besorgt'] },
 ];
