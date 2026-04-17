@@ -127,4 +127,11 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_trait_mapmaker_01',  text: 'Der Kartenmacher ist zurück! Was entdeckst du heute?', triggers: ['hub_open'], requiredTraits: ['mapmaker'] },
   { id: 'de_trait_curious_01',   text: 'Du stellst immer die besten Fragen. Was fragst du dich heute?', triggers: ['idle'], requiredTraits: ['curious'] },
   { id: 'de_trait_multi_01',     text: 'Du hast schon so viele Wesenszüge. Du wirst ein großer Held.', triggers: ['hub_open'], requireAllTraits: ['brave', 'gentle', 'patient', 'mapmaker'] },
+
+  // ═══════════════════════════════════════
+  // STAMINA STATES — Ronki's energy for minigames
+  // ═══════════════════════════════════════
+  { id: 'de_stamina_low_01',       text: 'Puh, ich werde langsam müde vom Fliegen. Aber einmal noch geht bestimmt.', triggers: ['hub_open'], cooldownHours: 6 },
+  { id: 'de_stamina_exhausted_01', text: 'Ich bin ganz platt. Kannst du ein bisschen ohne mich spielen?',           triggers: ['hub_open'], cooldownHours: 6 },
+  { id: 'de_stamina_restored_01',  text: 'Ausgeruht! Lass uns wieder losziehen.',                                    triggers: ['hub_open'], cooldownHours: 2 },
 ];
