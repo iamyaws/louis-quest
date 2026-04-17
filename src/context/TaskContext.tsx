@@ -69,6 +69,10 @@ export interface TaskState {
   earnedTraits: string[];
   /** ISO date (YYYY-MM-DD) when evening ritual was last completed. Resets daily. */
   eveningRitualCompletedAt?: string;
+  /** Current Ronki stamina for minigames (0-5). Recharges +1 per 40min real-time. */
+  ronkiStamina?: number;
+  /** ISO timestamp of the last stamina update (used for lazy recharge). */
+  ronkiStaminaUpdatedAt?: string;
   /** Creatures discovered via useMicropediaDiscovery. One entry per unlock. */
   micropediaDiscovered?: Array<{ id: string; chapter: string; discoveredAt: string }>;
   poemQuest?: { done: string[]; completed: boolean; title?: string };
@@ -116,6 +120,8 @@ interface TaskActions {
   addHP: (amount: number) => void;
   claimGameReward: (gameId: string) => void;
   addScreenMinutes: (amount: number) => void;
+  consumeStamina: () => void;
+  restoreStamina: () => void;
   equipGear: (gearId: string) => void;
   unequipGear: (slot: 'head' | 'back' | 'neck') => void;
   updateBirthdayEpic: (data: { done: string[]; completed: boolean }) => void;
@@ -210,6 +216,8 @@ export function createInitialState(): TaskState {
     birthdayEpic: { done: [], completed: false },
     earnedTraits: [],
     eveningRitualCompletedAt: undefined,
+    ronkiStamina: 5,
+    ronkiStaminaUpdatedAt: new Date().toISOString(),
     micropediaDiscovered: [],
     familyConfig: DEFAULT_FAMILY_CONFIG,
     arcEngine: initialArcState(),
@@ -312,6 +320,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           birthdayEpic: raw.birthdayEpic || { done: [], completed: false },
           earnedTraits: raw.earnedTraits || [],
           eveningRitualCompletedAt: raw.eveningRitualCompletedAt || undefined,
+          ronkiStamina: raw.ronkiStamina ?? 5,
+          ronkiStaminaUpdatedAt: raw.ronkiStaminaUpdatedAt || new Date().toISOString(),
           micropediaDiscovered: raw.micropediaDiscovered || [],
           familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
           completedSpecialQuests: raw.completedSpecialQuests || {},
@@ -506,6 +516,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       journalSaved: false,
       bossDmgToday: 0,
       gamesPlayedToday: [],
+      ronkiStamina: 5,
+      ronkiStaminaUpdatedAt: new Date().toISOString(),
       dreamHighlights,
       bossKilledToday: false,
       arcBeatAdvancedToday: false,
@@ -855,6 +867,29 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, drachenEier: (prev.drachenEier || 0) + amount } : prev);
   }, []);
 
+  // ── Stamina actions ──
+  const consumeStamina = useCallback(() => {
+    setState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        ronkiStamina: Math.max(0, (prev.ronkiStamina ?? 5) - 1),
+        ronkiStaminaUpdatedAt: new Date().toISOString(),
+      };
+    });
+  }, []);
+
+  const restoreStamina = useCallback(() => {
+    setState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        ronkiStamina: 5,
+        ronkiStaminaUpdatedAt: new Date().toISOString(),
+      };
+    });
+  }, []);
+
   const equipGear = useCallback((gearId: string) => {
     setState(prev => {
       if (!prev) return prev;
@@ -967,7 +1002,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
