@@ -8,7 +8,6 @@ import { ArcStoryboard } from '../components/ArcStoryboard';
 import { IntrinsicMotivation } from '../components/IntrinsicMotivation';
 import { AntiFeatures } from '../components/AntiFeatures';
 import { FAQ } from '../components/FAQ';
-import { ClosingCTA } from '../components/ClosingCTA';
 import { Footer } from '../components/Footer';
 
 export default function Home() {
@@ -57,7 +56,6 @@ export default function Home() {
         ]}
       />
       <FAQ />
-      <ClosingCTA />
       <Footer />
     </PainterlyShell>
   );
