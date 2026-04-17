@@ -25,6 +25,8 @@ export interface VoiceContext {
   careAction?: CareAction;
   arcPhase?: ArcLifecyclePhase;
   lang: 'de' | 'en';
+  /** Trait IDs Louis has earned from completed arcs. */
+  earnedTraits: string[];
 }
 
 export interface VoiceLine {
@@ -41,6 +43,8 @@ export interface VoiceLine {
   minQuestsToday?: number;
   cooldownHours?: number; // default 24
   weight?: number; // default 1
+  /** Require at least one of these traits to be earned for this line to fire. */
+  requiredTraits?: string[];
 }
 
 export type VoiceHistory = Record<string, number>; // lineId -> unix ms of last use
