@@ -24,7 +24,7 @@ function getDonePhrase(anchor, t) {
 }
 
 const ANCHOR_META_BASE = {
-  morning: { icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)', artFile: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_an_early_morning_sky._S_882cfbe3-5eac-4403-87a0-5c66602cf76b_2.webp' },
+  morning: { icon: 'light_mode', col: '#d97706', bg: '#fffbeb', border: 'rgba(217,119,6,0.1)', artFile: 'art/routines/morning-prep.webp' },
   evening: { icon: 'backpack', vacIcon: 'dark_mode', col: '#2d5a5e', bg: '#f0fdfa', border: 'rgba(45,90,94,0.1)', artFile: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_bright_midday_sky._Wa_e8eca682-4eb9-4da2-8c93-a4cb25ba363d_1.webp' },
   hobby: { icon: 'sports_soccer', col: '#059669', bg: '#ecfdf5', border: 'rgba(5,150,105,0.1)', artFile: 'art/bioms/Morgenwald_dawn-forest.webp' },
   bedtime: { icon: 'bedtime', col: '#4338ca', bg: '#eef2ff', border: 'rgba(67,56,202,0.1)', artFile: 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_deep_night_sky._Rich__c902cc19-afa0-4c99-a434-6e206610ddf9_0.webp' },

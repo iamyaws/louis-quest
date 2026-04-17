@@ -83,8 +83,16 @@ export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
   const dashOffset = C * (remaining / duration);
 
   return (
-    <div className="fixed inset-0 z-[600] flex flex-col items-center justify-center"
+    <div className="fixed inset-0 z-[600] flex flex-col items-center justify-center overflow-hidden"
          style={{ background: 'linear-gradient(160deg, #0c3236 0%, #124346 50%, #1a5e52 100%)' }}>
+
+      {/* Painted bathroom scene backdrop */}
+      <img src={base + 'art/routines/brushing-teeth.webp'} alt=""
+           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+           style={{ opacity: 0.35, objectPosition: 'center top' }} />
+      {/* Darken overlay to keep counter readable */}
+      <div className="absolute inset-0 pointer-events-none"
+           style={{ background: 'linear-gradient(180deg, rgba(12,50,54,0.4) 0%, rgba(12,50,54,0.75) 60%, rgba(12,50,54,0.85) 100%)' }} />
 
       {/* Floating bubbles decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

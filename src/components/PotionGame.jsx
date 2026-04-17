@@ -142,12 +142,20 @@ export default function PotionGame({ onComplete }) {
 
   // ── Game screen ──
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col" style={{ background: '#fff8f2' }}>
+    <div className="fixed inset-0 z-[100] flex flex-col overflow-hidden"
+         style={{ background: '#fff8f2' }}>
+      {/* Painted studio background */}
+      <img src={base + 'art/games/colormix/bg-studio.webp'} alt=""
+           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+           style={{ opacity: 0.35 }} />
+      <div className="absolute inset-0 pointer-events-none"
+           style={{ background: 'linear-gradient(180deg, rgba(255,248,242,0.7) 0%, rgba(255,248,242,0.85) 100%)' }} />
+
       {/* Header */}
-      <header className="flex items-center justify-between p-4"
+      <header className="relative flex items-center justify-between p-4"
               style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary text-2xl">palette</span>
+          <span className="text-2xl">🎨</span>
           <h1 className="text-xl font-bold tracking-tight text-primary font-headline">
             {lang === 'de' ? 'Farbmixer' : 'Color Mix'}
           </h1>
@@ -158,29 +166,31 @@ export default function PotionGame({ onComplete }) {
         </button>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6">
+      <main className="relative flex-1 flex flex-col items-center justify-center px-6">
         {/* Round counter */}
         <div className="flex gap-1.5 mb-6">
           {TARGETS.map((_, i) => (
             <div key={i} className="w-3 h-3 rounded-full transition-all"
                  style={{
-                   background: i < round ? '#34d399' : i === round ? '#fcd34d' : 'rgba(0,0,0,0.08)',
+                   background: i < round ? '#34d399' : i === round ? '#fcd34d' : 'rgba(0,0,0,0.15)',
                    boxShadow: i === round ? '0 0 8px rgba(252,211,77,0.5)' : 'none',
                  }} />
           ))}
         </div>
 
-        {/* Ronki says */}
-        <div className="px-5 py-3 rounded-2xl mb-6 flex items-center gap-3"
-             style={{ background: 'rgba(18,67,70,0.05)', border: '1px solid rgba(18,67,70,0.08)' }}>
-          <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-white shadow-sm">
-            <img src={base + 'art/companion/dragon-baby.webp'} alt="Ronki" className="w-full h-full object-cover" />
+        {/* Ronki painter + speech — uses the painted sprite */}
+        <div className="flex items-end gap-3 mb-6">
+          <img src={base + 'art/games/colormix/ronki-painter.webp'} alt="Ronki"
+               className="w-20 h-20 object-contain select-none shrink-0"
+               style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))' }} />
+          <div className="px-4 py-3 rounded-2xl flex items-center gap-2 max-w-xs"
+               style={{ background: 'rgba(255,255,255,0.92)', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+            <p className="font-body text-sm text-on-surface">
+              {lang === 'de'
+                ? `Misch mir ${target.label.de}! ${target.emoji}`
+                : `Mix me ${target.label.en}! ${target.emoji}`}
+            </p>
           </div>
-          <p className="font-body text-sm text-on-surface">
-            {lang === 'de'
-              ? `Misch mir ${target.label.de}! ${target.emoji}`
-              : `Mix me ${target.label.en}! ${target.emoji}`}
-          </p>
         </div>
 
         {/* Target color display */}
