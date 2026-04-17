@@ -2,11 +2,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
+import { prerenderMeta } from './vite-plugin-prerender-meta';
 
 export default defineConfig({
   root: path.resolve(__dirname),
   base: '/',
-  plugins: [tailwindcss(), react()],
+  plugins: [tailwindcss(), react(), prerenderMeta()],
   server: {
     port: 5174,
     open: true,
