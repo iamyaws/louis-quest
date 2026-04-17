@@ -12,6 +12,12 @@ export function PainterlyShell({ children }: Props) {
 
   return (
     <div className="relative min-h-screen bg-cream text-ink selection:bg-mustard selection:text-teal-dark">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-full focus:bg-teal-dark focus:text-cream focus:font-display focus:font-semibold focus:text-sm focus:shadow-lg"
+      >
+        Zum Hauptinhalt springen
+      </a>
       <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
         <motion.div
           style={reduced ? undefined : { y: washY, x: washX }}
@@ -42,7 +48,7 @@ export function PainterlyShell({ children }: Props) {
         className="fixed top-0 left-0 right-0 z-50 h-[2px] origin-left bg-gradient-to-r from-mustard via-sage to-teal"
       />
 
-      <div className="relative z-10">{children}</div>
+      <div id="main-content" className="relative z-10">{children}</div>
     </div>
   );
 }
