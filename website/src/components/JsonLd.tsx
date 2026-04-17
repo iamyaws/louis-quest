@@ -18,9 +18,10 @@ export function OrganizationSchema() {
         '@context': 'https://schema.org',
         '@type': 'Organization',
         name: 'Ronki',
-        url: 'https://ronki.de',
+        url: 'https://www.ronki.de',
+        logo: 'https://www.ronki.de/favicon-192.png',
         description:
-          'Ronki ist ein digitaler Drachen-Gefaehrte, der Kinder spielerisch durch ihre taeglichen Routinen begleitet. Ohne Werbung, ohne Dark Patterns.',
+          'Ronki ist ein digitaler Drachen-Gefährte, der Kinder spielerisch durch ihre täglichen Routinen begleitet. Ohne Werbung, ohne Dark Patterns.',
       }}
     />
   );
