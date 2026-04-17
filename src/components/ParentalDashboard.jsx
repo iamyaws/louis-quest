@@ -3,6 +3,7 @@ import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { getCatStage } from '../utils/helpers';
+import { useRonkiStamina } from '../hooks/useRonkiStamina';
 import FeedbackModal from './FeedbackModal';
 
 const PIN_CODE = '1234';
@@ -796,7 +797,15 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
   const [pinMsg, setPinMsg] = useState(null); // { ok: bool, text: string }
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetDone, setResetDone] = useState(false);
+  const [staminaFed, setStaminaFed] = useState(false);
+  const stamina = useRonkiStamina();
   const storedPin = () => localStorage.getItem('ronki_pin') || PIN_CODE;
+
+  const handleFeedRonki = () => {
+    actions?.restoreStamina?.();
+    setStaminaFed(true);
+    setTimeout(() => setStaminaFed(false), 1800);
+  };
 
   const handlePinDigit = (d) => {
     const next = pinInput + d;
@@ -951,6 +960,48 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
           Feedback senden
         </button>
       </div>
+
+      {/* Ronki füttern — restores stamina manually (only shown when < 5) */}
+      {stamina.current < stamina.max && (
+        <div className="rounded-2xl p-5"
+             style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                 style={{ background: 'rgba(252,211,77,0.18)' }}>
+              <span className="material-symbols-outlined text-lg" style={{ color: '#a16207', fontVariationSettings: "'FILL' 1" }}>bolt</span>
+            </div>
+            <p className="font-label font-bold text-sm text-on-surface">Ronki füttern</p>
+          </div>
+          <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+            Setzt Ronkis Energie auf 5 zurück. Für Belohnungstage.
+          </p>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">Energie:</span>
+            <div className="flex gap-1">
+              {[0,1,2,3,4].map(i => (
+                <span key={i} className="text-sm select-none"
+                      style={{ filter: i < stamina.current ? 'none' : 'grayscale(1) opacity(0.35)' }}>
+                  ⚡
+                </span>
+              ))}
+            </div>
+            <span className="font-label font-bold text-xs text-on-surface ml-1">{stamina.current}/{stamina.max}</span>
+          </div>
+          {staminaFed ? (
+            <div className="flex items-center justify-center gap-2 py-3">
+              <span className="material-symbols-outlined text-lg" style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+              <span className="font-label font-bold text-sm" style={{ color: '#059669' }}>Ronki ist wieder fit!</span>
+            </div>
+          ) : (
+            <button onClick={handleFeedRonki}
+              className="w-full py-3 rounded-xl font-label font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+              style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 4px 14px rgba(252,211,77,0.35)' }}>
+              <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
+              Ronki füttern (+Energie)
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Reset */}
       <div className="rounded-2xl p-5"
