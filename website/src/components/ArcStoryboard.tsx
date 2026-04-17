@@ -53,7 +53,7 @@ export function ArcStoryboard() {
           transition={{ duration: 0.7 }}
           className="font-display font-bold text-4xl sm:text-5xl lg:text-6xl leading-[1.1] tracking-tight text-teal-dark max-w-3xl"
         >
-          Ein Tag. Drei ruhige <em className="italic text-sage">Momente</em>.
+          Ein Tag. Drei ruhige <em className="italic text-sage whitespace-nowrap">Routinen</em> für dein Kind.
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}

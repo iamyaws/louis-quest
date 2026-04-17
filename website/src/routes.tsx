@@ -17,6 +17,8 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const HomeModern = lazy(() => import('./pages/HomeModern'));
 const HomeV2 = lazy(() => import('./pages/HomeV2'));
 const HomeV3 = lazy(() => import('./pages/HomeV3'));
+const AltFeatureHighlight = lazy(() => import('./pages/AltFeatureHighlight'));
+const AltRoutineCards = lazy(() => import('./pages/AltRoutineCards'));
 
 function PageLoader() {
   return (
@@ -40,6 +42,8 @@ export function AppRoutes() {
         <Route path="/datenschutz" element={<Datenschutz />} />
         <Route path="/agb" element={<AGB />} />
         <Route path="/hero-compare" element={<HeroCompare />} />
+        <Route path="/alt/highlight" element={<AltFeatureHighlight />} />
+        <Route path="/alt/routines" element={<AltRoutineCards />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
