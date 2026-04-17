@@ -115,4 +115,16 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_mood_okay_01',  text: 'Mittendrin ist auch gut. Nicht jeder Tag muss funkeln.', triggers: ['hub_open'], mood: ['okay'] },
   { id: 'de_mood_worried_01', text: 'Ist was passiert? Du kannst mir erzählen — oder einfach da sein.', triggers: ['hub_open'], mood: ['besorgt'] },
   { id: 'de_mood_worried_02', text: 'Ich bin leise. Dann ist der Kopf freier.', triggers: ['hub_open'], mood: ['besorgt'] },
+
+  // ═══════════════════════════════════════
+  // TRAIT-GATED — identity language (Atomic Habits)
+  // Unlock after earning the named trait from an arc completion
+  // ═══════════════════════════════════════
+  { id: 'de_trait_brave_01',     text: 'Du bist jemand, der nicht aufgibt. Das weiß ich jetzt.', triggers: ['hub_open', 'quest_complete'], requiredTraits: ['brave'] },
+  { id: 'de_trait_brave_02',     text: 'Mutig sein heißt nicht, keine Angst zu haben. Du weißt das.', triggers: ['hub_open'], requiredTraits: ['brave'] },
+  { id: 'de_trait_gentle_01',    text: 'Deine Ruhe tut allen gut. Auch mir.', triggers: ['hub_open', 'sanctuary_open'], requiredTraits: ['gentle'] },
+  { id: 'de_trait_patient_01',   text: 'Du wartest geduldig — das können nicht alle. Ich lerne von dir.', triggers: ['hub_open'], requiredTraits: ['patient'] },
+  { id: 'de_trait_mapmaker_01',  text: 'Der Kartenmacher ist zurück! Was entdeckst du heute?', triggers: ['hub_open'], requiredTraits: ['mapmaker'] },
+  { id: 'de_trait_curious_01',   text: 'Du stellst immer die besten Fragen. Was fragst du dich heute?', triggers: ['idle'], requiredTraits: ['curious'] },
+  { id: 'de_trait_multi_01',     text: 'Du hast schon so viele Wesenszüge. Du wirst ein großer Held.', triggers: ['hub_open'], requiredTraits: ['brave', 'gentle', 'patient', 'mapmaker'] },
 ];
