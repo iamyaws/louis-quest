@@ -6,11 +6,14 @@ import useWeather, { getWeatherInfo, getClothingRecs } from '../hooks/useWeather
 import SFX from '../utils/sfx';
 import { useSpecialQuests } from '../hooks/useSpecialQuests';
 import ToothbrushTimer from './ToothbrushTimer';
+import ToothBrushGuide from './ToothBrushGuide';
 import ClothingSheet from './ClothingSheet';
 import VoiceAudio from '../utils/voiceAudio';
 
 // Quest IDs that trigger the toothbrush timer
 const TEETH_QUEST_IDS = new Set(['s3', 's12', 'v3', 'v10']);
+// Evening brushing uses the guided 6-zone screen; morning keeps the simple timer
+const TEETH_GUIDE_IDS = new Set(['s12', 'v10']);
 
 // Pick a completion phrase that varies by anchor and day — same phrase per
 // anchor all day (consistent), but rotates daily so it never feels stale.
@@ -509,16 +512,28 @@ export default function TaskList({ onNavigate }) {
 
       {/* ── Toothbrush Timer Overlay ── */}
       {teethTimerQuestId && (
-        <ToothbrushTimer
-          duration={120}
-          onFinish={() => {
-            actions.complete(teethTimerQuestId);
-            SFX.play('coin');
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            setTeethTimerQuestId(null);
-          }}
-          onSkip={() => setTeethTimerQuestId(null)}
-        />
+        TEETH_GUIDE_IDS.has(teethTimerQuestId) ? (
+          <ToothBrushGuide
+            onFinish={() => {
+              actions.complete(teethTimerQuestId);
+              SFX.play('coin');
+              if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+              setTeethTimerQuestId(null);
+            }}
+            onCancel={() => setTeethTimerQuestId(null)}
+          />
+        ) : (
+          <ToothbrushTimer
+            duration={120}
+            onFinish={() => {
+              actions.complete(teethTimerQuestId);
+              SFX.play('coin');
+              if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+              setTeethTimerQuestId(null);
+            }}
+            onSkip={() => setTeethTimerQuestId(null)}
+          />
+        )
       )}
     </div>
   );
