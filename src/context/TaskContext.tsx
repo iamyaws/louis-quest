@@ -66,6 +66,7 @@ export interface TaskState {
   totalTasksDone: number;
   gamesPlayedToday: string[];
   birthdayEpic: { done: string[]; completed: boolean };
+  earnedTraits: string[];
   poemQuest?: { done: string[]; completed: boolean; title?: string };
   onboardingDate?: string; // ISO date string — set when onboarding completes
   familyConfig: FamilyConfig;
@@ -203,6 +204,7 @@ export function createInitialState(): TaskState {
     totalTasksDone: 0,
     gamesPlayedToday: [],
     birthdayEpic: { done: [], completed: false },
+    earnedTraits: [],
     familyConfig: DEFAULT_FAMILY_CONFIG,
     arcEngine: initialArcState(),
     bossKilledToday: false,
@@ -302,6 +304,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           totalTasksDone: raw.totalTasksDone || 0,
           gamesPlayedToday: raw.gamesPlayedToday || [],
           birthdayEpic: raw.birthdayEpic || { done: [], completed: false },
+          earnedTraits: raw.earnedTraits || [],
           familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
           completedSpecialQuests: raw.completedSpecialQuests || {},
           viewsVisited: raw.viewsVisited || [],
