@@ -129,22 +129,27 @@ function AppContent() {
       {showParental && <ParentalDashboard onClose={() => setShowParental(false)} currentView={view} />}
       {view === 'memory' && <MemoryGame onComplete={() => {
         actions.claimGameReward('memory'); // +1 screen min (once/day)
+        actions.consumeStamina();
         setView('games');
       }} />}
       {view === 'potion' && <PotionGame onComplete={() => {
         actions.claimGameReward('potion');
+        actions.consumeStamina();
         setView('games');
       }} />}
       {view === 'clouds' && <CloudJumpGame onComplete={() => {
         actions.claimGameReward('clouds');
+        actions.consumeStamina();
         setView('games');
       }} />}
       {view === 'starfall' && <StarCatcherGame onComplete={() => {
         actions.claimGameReward('starfall');
+        actions.consumeStamina();
         setView('games');
       }} />}
       {view === 'starfighter' && <StarfighterGame onComplete={(reward) => {
         if (reward?.hp > 0) actions.addHP(reward.hp);
+        actions.consumeStamina();
         setView('games');
       }} />}
       {state?.pendingEgg && state.pendingEgg.view === view && (

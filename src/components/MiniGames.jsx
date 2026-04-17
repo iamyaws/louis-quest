@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useGameAccess } from '../hooks/useGameAccess';
+import { useRonkiStamina } from '../hooks/useRonkiStamina';
+import StaminaExhausted from './StaminaExhausted';
+import VoiceAudio from '../utils/voiceAudio';
 
 const GAMES = [
   {
@@ -60,6 +63,30 @@ const GAMES = [
 export default function MiniGames({ onPlay }) {
   const { t } = useTranslation();
   const { unlocked, reason } = useGameAccess();
+  const stamina = useRonkiStamina();
+  const [showExhausted, setShowExhausted] = useState(false);
+  const voiceFiredRef = useRef(false);
+
+  // Fire stamina voice line once per mount
+  useEffect(() => {
+    if (voiceFiredRef.current) return;
+    if (stamina.exhausted) {
+      VoiceAudio.play('de_stamina_exhausted_01', 600);
+      voiceFiredRef.current = true;
+    } else if (stamina.low) {
+      VoiceAudio.play('de_stamina_low_01', 800);
+      voiceFiredRef.current = true;
+    }
+  }, [stamina.exhausted, stamina.low]);
+
+  const handleTileClick = (game) => {
+    if (!game.ready || !unlocked) return;
+    if (stamina.exhausted) {
+      setShowExhausted(true);
+      return;
+    }
+    onPlay(game.id);
+  };
 
   return (
     <div className="px-6 pb-8">
@@ -86,6 +113,17 @@ export default function MiniGames({ onPlay }) {
         </div>
       )}
 
+      {/* Stamina low warning — shows when stamina is low but not exhausted */}
+      {unlocked && stamina.low && !stamina.exhausted && (
+        <div className="mb-6 px-5 py-3 rounded-full flex items-center gap-3"
+             style={{ background: 'linear-gradient(135deg, #fef3c7, #fde68a)', border: '1.5px solid rgba(217,119,6,0.25)' }}>
+          <span className="text-xl select-none">😴</span>
+          <p className="font-body text-sm font-bold" style={{ color: '#78350f' }}>
+            Ronki wird langsam müde ...
+          </p>
+        </div>
+      )}
+
       {/* Game cards — light, clean, emoji-forward */}
       <div className="flex flex-col gap-4">
         {GAMES.map(game => (
@@ -96,9 +134,9 @@ export default function MiniGames({ onPlay }) {
               background: game.bg,
               cursor: unlocked && game.ready ? 'pointer' : 'not-allowed',
               filter: unlocked ? 'none' : 'grayscale(0.5) brightness(0.85)',
-              opacity: unlocked ? 1 : 0.55,
+              opacity: !unlocked ? 0.55 : (stamina.exhausted ? 0.4 : 1),
             }}
-            onClick={() => game.ready && unlocked && onPlay(game.id)}
+            onClick={() => handleTileClick(game)}
           >
             <span className="text-5xl select-none shrink-0 leading-none"
                   style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>
@@ -129,6 +167,13 @@ export default function MiniGames({ onPlay }) {
 
       {/* ── Bestenliste (High Scores) — viewable without playing ── */}
       <HighScoreBoard />
+
+      {showExhausted && (
+        <StaminaExhausted
+          nextRechargeMin={stamina.nextRechargeMin}
+          onClose={() => setShowExhausted(false)}
+        />
+      )}
     </div>
   );
 }
