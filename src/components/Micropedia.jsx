@@ -92,9 +92,15 @@ export default function Micropedia({ onNavigate }) {
   const [expandedChapter, setExpandedChapter] = useState('forest');
   const [selectedCreature, setSelectedCreature] = useState(null);
 
-  // Merge seed creatures (always visible in Phase 1) with future arc discoveries
+  // Only creatures Louis has actually discovered via useMicropediaDiscovery
   const dynamicDiscovered = state?.micropediaDiscovered || [];
-  const discovered = [...SEED_CREATURES, ...dynamicDiscovered.filter(d => !SEED_CREATURES.find(s => s.id === d.id))];
+  // Enrich each discovered ID with full creature data (name, art, flavor) from SEED_CREATURES lookup
+  const discovered = dynamicDiscovered
+    .map(d => {
+      const seed = SEED_CREATURES.find(s => s.id === d.id);
+      return seed ? { ...seed, discoveredAt: d.discoveredAt } : null;
+    })
+    .filter(Boolean);
   const totalCreatures = CHAPTERS.reduce((sum, ch) => sum + ch.creatureCount, 0);
   const totalFound = discovered.length;
 
