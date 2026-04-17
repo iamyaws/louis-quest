@@ -110,39 +110,52 @@ export default function PoemQuest({ onBack }) {
           </span>
         </button>
 
-        {/* Header with illustration */}
-        <div className="rounded-2xl overflow-hidden mb-6 relative"
-             style={{ background: 'linear-gradient(135deg, #124346, #2d5a5e)' }}>
-          <div className="px-6 py-5 flex items-center gap-4">
-            <div className="flex-1 z-10">
-              <p className="font-label font-bold text-xs uppercase tracking-widest mb-1" style={{ color: 'rgba(252,211,77,0.7)' }}>
-                {lang === 'de' ? 'Spezial-Quest' : 'Special Quest'}
-              </p>
-              <h1 className="font-headline font-bold text-2xl text-white"
-                  style={{ fontFamily: 'Fredoka, sans-serif' }}>
-                {lang === 'de' ? '📖 Mein Gedicht' : '📖 My Poem'}
-              </h1>
-              <p className="font-body text-sm mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                {lang === 'de' ? '7 Tage bis zur Aufführung' : '7 days to the performance'}
-              </p>
-            </div>
-            {/* Progress ring */}
-            <div className="relative w-16 h-16 shrink-0">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
-                <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="5" />
-                <circle cx="32" cy="32" r="26" fill="none"
-                        stroke="#fcd34d" strokeWidth="5" strokeLinecap="round"
-                        strokeDasharray="163.4" strokeDashoffset={163.4 - pct * 163.4} />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-headline font-bold text-lg text-white">{doneCount}/{DAYS.length}</span>
+        {/* Header with painted illustration */}
+        {(() => {
+          // Pick the best art for current progress (days 1, 5, 7 have art)
+          const artDay = doneCount >= 6 ? 7 : doneCount >= 4 ? 5 : 1;
+          return (
+            <div className="rounded-2xl overflow-hidden mb-6 relative"
+                 style={{ background: 'linear-gradient(135deg, #124346, #2d5a5e)' }}>
+              {/* Painted hero image */}
+              <div className="relative w-full" style={{ aspectRatio: '1 / 1', maxHeight: '240px' }}>
+                <img src={`${base}art/quests/poem-day-${artDay}.webp`} alt=""
+                     className="w-full h-full object-cover" />
+                {/* Dark gradient overlay at bottom for text legibility */}
+                <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+                     style={{ background: 'linear-gradient(to top, rgba(12,50,54,0.95), transparent)' }} />
+              </div>
+              {/* Text + progress overlaid on bottom */}
+              <div className="px-5 py-4 flex items-center gap-4 -mt-14 relative z-10">
+                <div className="flex-1">
+                  <p className="font-label font-bold text-xs uppercase tracking-widest mb-1" style={{ color: 'rgba(252,211,77,0.9)' }}>
+                    {lang === 'de' ? 'Spezial-Quest' : 'Special Quest'}
+                  </p>
+                  <h1 className="font-headline font-bold text-2xl text-white"
+                      style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>
+                    {lang === 'de' ? 'Mein Gedicht' : 'My Poem'}
+                  </h1>
+                  <p className="font-body text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                    {lang === 'de' ? '7 Tage bis zur Aufführung' : '7 days to the performance'}
+                  </p>
+                </div>
+                {/* Progress ring */}
+                <div className="relative w-16 h-16 shrink-0"
+                     style={{ background: 'rgba(12,50,54,0.85)', borderRadius: '50%', backdropFilter: 'blur(8px)' }}>
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="5" />
+                    <circle cx="32" cy="32" r="26" fill="none"
+                            stroke="#fcd34d" strokeWidth="5" strokeLinecap="round"
+                            strokeDasharray="163.4" strokeDashoffset={163.4 - pct * 163.4} />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="font-headline font-bold text-sm text-white">{doneCount}/{DAYS.length}</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          {/* Glow */}
-          <div className="absolute bottom-0 right-8 w-20 h-12 rounded-full blur-2xl opacity-30 pointer-events-none"
-               style={{ background: '#fcd34d' }} />
-        </div>
+          );
+        })()}
 
         {/* Day cards */}
         <div className="relative pl-8">
