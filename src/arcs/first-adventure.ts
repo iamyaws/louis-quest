@@ -49,6 +49,7 @@ export const FIRST_ADVENTURE: Arc = {
   rewardOnComplete: {
     xp: 50,
     coins: 10,
+    traitIds: ['mapmaker'],
     // Phase 2: add eggId + decorId
   },
   cooldownHours: 48,
