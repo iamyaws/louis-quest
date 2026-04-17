@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import PWAInstallSheet from './PWAInstallSheet';
+import VoiceAudio from '../utils/voiceAudio';
 
 const base = import.meta.env.BASE_URL;
 
@@ -534,6 +535,8 @@ export default function Onboarding({ onComplete }) {
                 heroName: heroName.trim() || undefined,
                 heroGender,
               };
+              // Drachenmutter meets the child — plays before the app loads
+              VoiceAudio.playNarrator('narrator_intro_meet', 400);
               // If already installed as PWA, launch immediately
               if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
                 onComplete(cfg);

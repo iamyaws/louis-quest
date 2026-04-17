@@ -13,6 +13,15 @@ import {
 import { findArc } from './arcs';
 import { loadArcEngineState } from './persistence';
 import type { ArcEngineState } from './types';
+import VoiceAudio from '../utils/voiceAudio';
+
+// Map arc IDs to their Drachenmutter narrator audio files
+const ARC_NARRATOR: Record<string, { intro: string; outro: string }> = {
+  'first-adventure': { intro: 'arc_first_intro', outro: 'arc_first_outro' },
+  'listening-game':  { intro: 'arc_listen_intro', outro: 'arc_listen_outro' },
+  'ronkis-garden':   { intro: 'arc_garden_intro', outro: 'arc_garden_outro' },
+  'weather-walker':  { intro: 'arc_weather_intro', outro: 'arc_weather_outro' },
+};
 
 export function useArc() {
   const { state, actions } = useTask();
@@ -35,9 +44,26 @@ export function useArc() {
   }, [state]);
 
   const offer = useCallback(() => setArcState(s => offerNextArc(s)), []);
-  const accept = useCallback(() => setArcState(s => acceptOffer(s)), []);
+  const accept = useCallback(() => setArcState(s => {
+    const next = acceptOffer(s);
+    // Play Drachenmutter intro when arc begins
+    const narr = next.activeArcId ? ARC_NARRATOR[next.activeArcId] : null;
+    if (narr) VoiceAudio.playNarrator(narr.intro, 800);
+    return next;
+  }), []);
   const decline = useCallback(() => setArcState(s => declineOffer(s)), []);
-  const advance = useCallback((beatId: string) => setArcState(s => advanceBeat(s, beatId)), []);
+  const advance = useCallback((beatId: string) => setArcState(s => {
+    const prev = s;
+    const next = advanceBeat(s, beatId);
+    // Play Drachenmutter outro when arc just completed
+    const justCompleted = next.completedArcIds.length > prev.completedArcIds.length;
+    if (justCompleted) {
+      const lastId = next.completedArcIds[next.completedArcIds.length - 1];
+      const narr = ARC_NARRATOR[lastId];
+      if (narr) VoiceAudio.playNarrator(narr.outro, 1200);
+    }
+    return next;
+  }), []);
 
   const activeArc = useMemo(
     () => (arcState.activeArcId ? findArc(arcState.activeArcId) : null),
