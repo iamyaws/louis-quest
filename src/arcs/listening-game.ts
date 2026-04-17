@@ -48,5 +48,5 @@ export const LISTENING_GAME: Arc = {
     coins: 12,
     traitIds: ['gentle'],
   },
-  cooldownHours: 48,
+  cooldownHours: 24,
 };

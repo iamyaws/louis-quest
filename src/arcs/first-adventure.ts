@@ -52,5 +52,5 @@ export const FIRST_ADVENTURE: Arc = {
     traitIds: ['mapmaker'],
     // Phase 2: add eggId + decorId
   },
-  cooldownHours: 48,
+  cooldownHours: 24,
 };

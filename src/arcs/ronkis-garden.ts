@@ -49,5 +49,5 @@ export const RONKIS_GARDEN: Arc = {
     coins: 10,
     traitIds: ['patient'],
   },
-  cooldownHours: 48,
+  cooldownHours: 24,
 };

@@ -49,5 +49,5 @@ export const WEATHER_WALKER: Arc = {
     coins: 10,
     traitIds: ['brave'],
   },
-  cooldownHours: 48,
+  cooldownHours: 24,
 };
