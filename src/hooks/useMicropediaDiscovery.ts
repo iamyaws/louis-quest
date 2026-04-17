@@ -35,7 +35,7 @@ export const CREATURE_TRIGGERS: DiscoveryTrigger[] = [
   { id: 'dream_1', chapter: 'dream', condition: s => (s.journalHistory || []).length >= 3 },
   { id: 'dream_2', chapter: 'dream', condition: s => (s.arcEngine?.completedArcIds || []).length >= 2 },
   // Hearth — relationship-driven
-  { id: 'hearth_0', chapter: 'hearth', condition: s => (s.totalTaskDays || 0) >= 3 },
+  { id: 'hearth_0', chapter: 'hearth', condition: s => (s.catEvo || 0) >= 2 },
 ];
 
 type DiscoveredEntry = { id: string; chapter: string; discoveredAt: string };

@@ -126,5 +126,5 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_trait_patient_01',   text: 'Du wartest geduldig — das können nicht alle. Ich lerne von dir.', triggers: ['hub_open'], requiredTraits: ['patient'] },
   { id: 'de_trait_mapmaker_01',  text: 'Der Kartenmacher ist zurück! Was entdeckst du heute?', triggers: ['hub_open'], requiredTraits: ['mapmaker'] },
   { id: 'de_trait_curious_01',   text: 'Du stellst immer die besten Fragen. Was fragst du dich heute?', triggers: ['idle'], requiredTraits: ['curious'] },
-  { id: 'de_trait_multi_01',     text: 'Du hast schon so viele Wesenszüge. Du wirst ein großer Held.', triggers: ['hub_open'], requiredTraits: ['brave', 'gentle', 'patient', 'mapmaker'] },
+  { id: 'de_trait_multi_01',     text: 'Du hast schon so viele Wesenszüge. Du wirst ein großer Held.', triggers: ['hub_open'], requireAllTraits: ['brave', 'gentle', 'patient', 'mapmaker'] },
 ];

@@ -28,6 +28,12 @@ export function matchesContext(line: VoiceLine, ctx: VoiceContext): boolean {
     const hasAny = line.requiredTraits.some(t => earned.includes(t));
     if (!hasAny) return false;
   }
+  // requireAllTraits — every listed trait must be earned (for "many traits" lines)
+  if (line.requireAllTraits && line.requireAllTraits.length > 0) {
+    const earned = ctx.earnedTraits || [];
+    const hasAll = line.requireAllTraits.every(t => earned.includes(t));
+    if (!hasAll) return false;
+  }
   return true;
 }
 

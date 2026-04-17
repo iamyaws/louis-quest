@@ -45,6 +45,8 @@ export interface VoiceLine {
   weight?: number; // default 1
   /** Require at least one of these traits to be earned for this line to fire. */
   requiredTraits?: string[];
+  /** Require ALL of these traits to be earned (used for "you have many traits" lines). */
+  requireAllTraits?: string[];
 }
 
 export type VoiceHistory = Record<string, number>; // lineId -> unix ms of last use

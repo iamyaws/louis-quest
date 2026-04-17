@@ -370,7 +370,7 @@ export default function StarfighterGame({ onComplete }) {
             const unlocked = i === 0 || score > 0; // Phase 2: track per-level completion
             return (
               <button key={i}
-                onClick={() => { setLevel(i); setLives(3); setWave(0); setGameState('playing'); }}
+                onClick={() => { setLevel(i); setLives(3); setScore(0); setGameState('playing'); }}
                 className="flex items-center gap-3 p-3 rounded-xl text-left active:scale-[0.97] transition-all"
                 style={{
                   background: 'rgba(255,255,255,0.06)',
