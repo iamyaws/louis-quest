@@ -2,6 +2,10 @@ import type { VoiceLine } from '../types';
 
 // 30 English lines — same IDs, same triggers, natural translation not mechanical.
 // Keep the curious-younger-friend feel intact.
+//
+// NOTE: Mood-aware lines are currently German-only (see lines/de.ts `de_mood_*`).
+// English users fall back to generic mood-agnostic greetings when a mood is set.
+// If English becomes a primary audience, port the 12 mood-tagged lines here.
 
 export const linesEn: VoiceLine[] = [
   // ── Greetings ──
