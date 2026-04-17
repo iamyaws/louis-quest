@@ -1,6 +1,7 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { submitWaitlistEmail, isValidEmail } from '../lib/waitlist';
+import { supabase } from '../lib/supabase';
 import { getLaunchCopy, LaunchState } from '../config/launch-state';
 import { Confetti } from './primitives/Confetti';
 
@@ -44,6 +45,16 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
   const [email, setEmail] = useState('');
   const [focused, setFocused] = useState(false);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
+  const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.rpc('waitlist_count').then(({ data, error }) => {
+      if (!error && typeof data === 'number' && data > 0) {
+        setWaitlistCount(data);
+      }
+    });
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -78,6 +89,11 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
         >
           Du bist dabei. Wir melden uns einmal, am Start-Tag.
         </motion.p>
+        {waitlistCount !== null && waitlistCount > 1 && (
+          <p className="text-[0.65rem] text-center opacity-35">
+            Du bist einer von {waitlistCount}.
+          </p>
+        )}
       </div>
     );
   }
@@ -114,6 +130,11 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
         </motion.button>
       </div>
       <p className="text-xs opacity-60 pl-6">{copy.ctaHelper}</p>
+      {waitlistCount !== null && waitlistCount > 1 && (
+        <p className="text-[0.65rem] text-center opacity-35">
+          {waitlistCount} Eltern auf der Warteliste.
+        </p>
+      )}
       <p className="mt-1 text-[0.65rem] text-center opacity-40">
         Mit dem Absenden stimmst du der{' '}
         <a href="/datenschutz" className="underline hover:opacity-70">Datenschutzerklärung</a> zu.

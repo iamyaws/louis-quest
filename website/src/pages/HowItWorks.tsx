@@ -46,6 +46,7 @@ export default function HowItWorks() {
         title="Wie Ronki funktioniert: Routinen mit einem Drachen-Gefährten"
         description="So begleitet Ronki dein Kind durch den Tag: vom Morgen bis zum Abend, mit sanfter Begleitung statt Druck. Ein Drache, der sich überflüssig macht."
         canonicalPath="/wie-es-funktioniert"
+        ogImage="https://www.ronki.de/og-wie-es-funktioniert.jpg"
       />
 
       {/* ── Hero ── */}

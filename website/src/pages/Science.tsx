@@ -70,6 +70,7 @@ export default function Science() {
         title="Wissenschaftlicher Hintergrund: Ronki"
         description="Welche Forschung hinter Ronki steckt: Selbstbestimmungstheorie, Fading Scaffolding und Montessori. Und warum wir bewusst auf Dark Patterns verzichten."
         canonicalPath="/wissenschaft"
+        ogImage="https://www.ronki.de/og-wissenschaft.jpg"
       />
 
       <section className="px-6 pt-32 pb-24 sm:pt-40 sm:pb-28">
