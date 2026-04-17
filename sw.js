@@ -1,4 +1,4 @@
-const CACHE_NAME = "ronki-v3";
+const CACHE_NAME = "ronki-v4";
 const PRECACHE_URLS = [
   "/Ronki/",
   "/Ronki/index.html",
