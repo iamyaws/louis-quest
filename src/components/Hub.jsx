@@ -172,8 +172,9 @@ export default function Hub({ onNavigate }) {
           const isEgg = catStage === 0;
 
           // Painted campfire scene — contained illustration (not wallpaper).
-          // Per-stage variants can swap in under `campfire/lager-stage{N}.png`.
-          const sceneSrc = `art/campfire/lager-stage1.png`;
+          // Per-stage variants. Only stage 1 exists currently; fallback for others
+          // is stage 1 until more art is generated. Stages 2-5 noted in Notion.
+          const sceneSrc = `art/campfire/lager-stage${catStage + 1}.png`;
 
           return (
             <section
@@ -197,6 +198,12 @@ export default function Hub({ onNavigate }) {
                   className="w-full h-auto companion-breathe select-none"
                   style={{ filter: 'drop-shadow(0 14px 22px rgba(18,67,70,0.22))' }}
                   draggable={false}
+                  onError={(e) => {
+                    // Fallback to stage 1 if this stage's art isn't generated yet
+                    if (!e.target.src.endsWith('lager-stage1.png')) {
+                      e.target.src = base + 'art/campfire/lager-stage1.png';
+                    }
+                  }}
                 />
 
                 {/* Fade-to-cream at the bottom so the illustration dissolves into the page */}

@@ -1,9 +1,21 @@
 import React, { useEffect, useState } from 'react';
 
 const IOS_STEPS = [
-  { icon: 'ios_share', text: "Tippe auf 'Teilen' unten in Safari" },
-  { icon: 'add_box',   text: "Wähle 'Zum Homescreen'" },
-  { icon: 'check_circle', text: 'Fertig! Ronki ist installiert 🎉' },
+  {
+    icon: 'ios_share',
+    title: 'Teilen-Knopf antippen',
+    text: 'Am unteren Rand von Safari — das kleine Viereck mit dem Pfeil nach oben.',
+  },
+  {
+    icon: 'add_box',
+    title: 'Zum Home-Bildschirm',
+    text: 'Scrolle nach unten und wähle „Zum Home-Bildschirm" aus der Liste.',
+  },
+  {
+    icon: 'check_circle',
+    title: 'Hinzufügen antippen',
+    text: 'Oben rechts auf „Hinzufügen" — dann erscheint Ronki auf eurem Bildschirm! 🎉',
+  },
 ];
 
 /**
@@ -57,17 +69,25 @@ export default function PWAInstallSheet({ isIOS, androidPrompt, onInstall, onSki
         {/* ── iOS instructions ── */}
         {isIOS && (
           <>
-            <div className="flex flex-col gap-3 mb-7">
+            <div className="flex flex-col gap-4 mb-7">
               {IOS_STEPS.map((s, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 relative"
                        style={{ background: 'rgba(18,67,70,0.08)' }}>
                     <span className="material-symbols-outlined text-lg text-primary"
                           style={{ fontVariationSettings: i === 2 ? "'FILL' 1" : undefined }}>
                       {s.icon}
                     </span>
+                    {/* step number badge */}
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center font-label font-bold text-white"
+                          style={{ background: '#fcd34d', color: '#725b00', fontSize: 10 }}>
+                      {i + 1}
+                    </span>
                   </div>
-                  <p className="font-body text-sm text-on-surface leading-snug">{s.text}</p>
+                  <div className="flex-1 min-w-0 pt-0.5">
+                    <p className="font-headline font-bold text-sm text-on-surface leading-tight">{s.title}</p>
+                    <p className="font-body text-xs text-on-surface-variant leading-snug mt-0.5">{s.text}</p>
+                  </div>
                 </div>
               ))}
             </div>

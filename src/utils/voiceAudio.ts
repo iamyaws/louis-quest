@@ -11,6 +11,22 @@ let currentAudio: HTMLAudioElement | null = null;
 let delayTimer: ReturnType<typeof setTimeout> | null = null;
 
 const VoiceAudio = {
+  /** Play a Drachenmutter narrator line (from /audio/narrator/*.mp3) */
+  playNarrator(lineId: string, delayMs = 600) {
+    if (this.isMuted()) return;
+    if (!lineId) return;
+    if (delayTimer) { clearTimeout(delayTimer); delayTimer = null; }
+    const doPlay = () => {
+      this.stop();
+      const src = `${BASE}audio/narrator/${lineId}.mp3`;
+      const audio = new Audio(src);
+      audio.volume = 0.9;
+      audio.play().catch(() => {});
+      currentAudio = audio;
+    };
+    delayTimer = setTimeout(doPlay, delayMs);
+  },
+
   /** Play a voice line by its ID (e.g., 'de_greet_01') */
   play(lineId: string, delayMs = 0) {
     if (this.isMuted()) return;
