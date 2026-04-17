@@ -1,34 +1,79 @@
 import { motion } from 'motion/react';
 
-const BEATS = [
+/* ------------------------------------------------------------------ */
+/* Data                                                                */
+/* ------------------------------------------------------------------ */
+
+interface Task {
+  label: string;
+  done: boolean;
+}
+
+interface Beat {
+  time: string;
+  icon: string;
+  title: string;
+  body: string;
+  accent: string;
+  accentLight: string;
+  wash: string;
+  tasks: Task[];
+  progress: string;
+}
+
+const BEATS: Beat[] = [
   {
     time: 'Morgen',
-    title: 'Ronki wartet schon am Becher.',
-    body: 'Sieben Uhr. Louis kommt verschlafen ins Bad. Der Drache sitzt schon neben seinem Lieblingsbecher. „Komm, zuerst die Zähne", sagt Ronki. „Dann hol ich dir Wasser nach." Louis putzt. Niemand muss nachfragen.',
-    image: '/art/routines/getting-ready.webp',
-    imageAlt: 'Ein Junge macht sich mit seinem Drachen bereit für den Tag.',
-    accent: '#FCD34D',
-    wash: 'rgba(252, 211, 77, 0.28)',
+    icon: '☀️',
+    title: 'Drei von vier geschafft. Ohne Nachfragen.',
+    body: 'Sieben Uhr. Louis kommt verschlafen ins Bad. Ronki zeigt ihm die Liste: Gesicht waschen, anziehen, frühstücken, Tasche packen. Drei Haken schon drin. Fehlt nur noch die Tasche. Niemand muss rufen.',
+    accent: '#d97706',
+    accentLight: 'rgba(217,119,6,0.10)',
+    wash: 'rgba(217,119,6,0.08)',
+    tasks: [
+      { label: 'Gesicht waschen', done: true },
+      { label: 'Anziehen', done: true },
+      { label: 'Frühstücken', done: true },
+      { label: 'Tasche packen', done: false },
+    ],
+    progress: '7:12',
   },
   {
     time: 'Nachmittag',
-    title: 'Heute zeichnen wir den Garten.',
-    body: '„Ich kenn nur den Garten hier bei mir", sagt Ronki. „Wie sieht deiner aus?" Louis holt Papier, malt den Apfelbaum und die Schnecke am Zaun. Später fotografiert er die Karte und tippt: geschafft.',
-    image: '/art/bioms/Naschgarten_temptaion-garden.webp',
-    imageAlt: 'Der Naschgarten, warmer Nachmittag zwischen Äpfeln und Blüten.',
+    icon: '🎨',
+    title: 'Malen, Fußball, Gedicht. Sein Nachmittag.',
+    body: 'Nach der Schule gehört der Tag Louis. Ronki schlägt drei Sachen vor. Was davon drankommt, entscheidet er selbst. Heute war Fußball-Training. Das Bild kommt morgen. Das Gedicht übt er abends.',
     accent: '#50A082',
-    wash: 'rgba(80, 160, 130, 0.26)',
+    accentLight: 'rgba(80,160,130,0.10)',
+    wash: 'rgba(80,160,130,0.08)',
+    tasks: [
+      { label: 'Bild malen', done: true },
+      { label: 'Fußball Training', done: true },
+      { label: 'Gedicht üben', done: false },
+    ],
+    progress: '15:30',
   },
   {
     time: 'Abend',
-    title: 'Das Ei wackelt heute zum ersten Mal.',
-    body: 'Vor dem Lichtausmachen geht Louis nochmal zu Ronki. Kein Muss, nur wenn er mag. Drei Mini-Haustiere schlafen schon. Das Ei wackelt zum ersten Mal im Nest, weil Louis diese Woche drei Karten gemalt hat. „Bis morgen, Ronki." Der Drache macht das Licht am Nest aus.',
-    image: '/art/companion/dragon-hatching.webp',
-    imageAlt: 'Das wackelnde Ei im Nest, kurz vor dem Schlüpfen.',
-    accent: '#2D5A5E',
-    wash: 'rgba(45, 90, 94, 0.22)',
+    icon: '🌙',
+    title: 'Zähne, Pyjama, Licht aus. Ronki schläft schon.',
+    body: 'Abendroutine. Zähne putzen, Gesicht waschen, Pyjama an. Drei von vier erledigt. Das Licht macht Louis gleich selbst aus. Ronki liegt schon im Nest. „Bis morgen." Niemand muss dreimal rufen.',
+    accent: '#4338ca',
+    accentLight: 'rgba(67,56,202,0.10)',
+    wash: 'rgba(67,56,202,0.08)',
+    tasks: [
+      { label: 'Zähne putzen', done: true },
+      { label: 'Gesicht waschen', done: true },
+      { label: 'Pyjama an', done: true },
+      { label: 'Licht aus', done: false },
+    ],
+    progress: '19:45',
   },
 ];
+
+/* ------------------------------------------------------------------ */
+/* Section                                                             */
+/* ------------------------------------------------------------------ */
 
 export function ArcStoryboard() {
   return (
@@ -62,7 +107,7 @@ export function ArcStoryboard() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mt-6 text-base sm:text-lg text-ink/70 max-w-2xl leading-relaxed"
         >
-          Kein straffer Plan, kein Minutenzähler. Drei ruhige Szenen, in denen ein kleiner Drache einfach da ist. Mitläuft. Mitdenkt. Und mit der Zeit zum Freund wird, dem dein Kind etwas anvertraut.
+          Kein straffer Plan, kein Minutenzähler. Ronki zeigt deinem Kind, was heute dran ist. Was geschafft ist, sieht es selbst. Was noch fehlt, auch.
         </motion.p>
 
         <div className="mt-20 flex flex-col gap-24 sm:gap-28">
@@ -75,50 +120,134 @@ export function ArcStoryboard() {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* BeatRow                                                             */
+/* ------------------------------------------------------------------ */
+
 function BeatRow({
   beat,
   flip,
   index,
 }: {
-  beat: typeof BEATS[number];
+  beat: Beat;
   flip: boolean;
   index: number;
 }) {
+  const doneCount = beat.tasks.filter(t => t.done).length;
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-15%' }}
       transition={{ duration: 0.8, delay: 0.05, ease: [0.2, 0.7, 0.2, 1] }}
-      className={`grid gap-10 sm:gap-14 md:grid-cols-[1.05fr_1fr] items-center ${
+      className={`grid gap-10 sm:gap-14 md:grid-cols-[1fr_1.1fr] items-center ${
         flip ? 'md:[&>*:first-child]:order-2' : ''
       }`}
     >
+      {/* Routine card */}
       <figure className="relative">
         <div
           aria-hidden
-          className="absolute -inset-6 rounded-[2.5rem] blur-3xl opacity-70"
+          className="absolute -inset-6 rounded-[2.5rem] blur-3xl opacity-60"
           style={{ backgroundColor: beat.wash }}
         />
         <div
-          className="relative aspect-[5/4] overflow-hidden rounded-[2rem] ring-1 ring-inset ring-teal/10"
-          style={{ boxShadow: '0 30px 60px -30px rgba(45,90,94,0.35)' }}
+          className="relative rounded-[1.5rem] bg-white p-5 sm:p-6 ring-1 ring-inset ring-black/[0.04]"
+          style={{ boxShadow: '0 20px 50px -20px rgba(45,90,94,0.20), 0 4px 16px -4px rgba(45,90,94,0.08)' }}
+          role="img"
+          aria-label={`${beat.time}routine: ${doneCount} von ${beat.tasks.length} erledigt`}
         >
-          <img
-            src={beat.image}
-            alt={beat.imageAlt}
-            width={800}
-            height={640}
-            loading={index === 0 ? 'eager' : 'lazy'}
-            className="h-full w-full object-cover"
-          />
+          {/* Accent top bar */}
           <div
-            aria-hidden
-            className="absolute inset-0 bg-gradient-to-tr from-cream/30 via-transparent to-transparent"
+            className="absolute inset-x-0 top-0 h-1 rounded-t-[1.5rem]"
+            style={{ background: beat.accent }}
           />
+
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-5 mt-1">
+            <span className="text-xl" aria-hidden>{beat.icon}</span>
+            <div className="flex-1">
+              <p className="font-display font-bold text-teal-dark text-sm sm:text-base leading-tight">
+                {beat.time}routine
+              </p>
+              <p className="text-xs text-ink/40 mt-0.5">Heute, {beat.progress}</p>
+            </div>
+            <span
+              className="flex items-center gap-1.5 text-xs font-display font-bold rounded-full px-2.5 py-1"
+              style={{ backgroundColor: beat.accentLight, color: beat.accent }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ backgroundColor: beat.accent }}
+              />
+              {doneCount}/{beat.tasks.length}
+            </span>
+          </div>
+
+          {/* Task list */}
+          <ul className="flex flex-col gap-2">
+            {beat.tasks.map((task, ti) => (
+              <li
+                key={ti}
+                className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition-colors ${
+                  task.done
+                    ? 'bg-black/[0.02]'
+                    : ''
+                }`}
+                style={!task.done ? { backgroundColor: beat.accentLight, outline: `1px solid ${beat.accent}22` } : undefined}
+              >
+                <span
+                  className={`flex-none flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
+                    task.done
+                      ? 'text-white'
+                      : 'bg-transparent'
+                  }`}
+                  style={
+                    task.done
+                      ? { backgroundColor: beat.accent }
+                      : { border: `2px solid ${beat.accent}` }
+                  }
+                >
+                  {task.done ? '✓' : null}
+                </span>
+                <span
+                  className={`text-sm font-medium leading-none ${
+                    task.done
+                      ? 'text-ink/40 line-through'
+                      : 'text-teal-dark'
+                  }`}
+                >
+                  {task.label}
+                </span>
+                {!task.done && (
+                  <span
+                    className="ml-auto text-[10px] font-display font-bold uppercase tracking-wide"
+                    style={{ color: beat.accent }}
+                  >
+                    Jetzt
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+
+          {/* Progress bar */}
+          <div className="mt-4">
+            <div className="h-1.5 w-full rounded-full bg-black/[0.04] overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all"
+                style={{
+                  width: `${(doneCount / beat.tasks.length) * 100}%`,
+                  backgroundColor: beat.accent,
+                }}
+              />
+            </div>
+          </div>
         </div>
       </figure>
 
+      {/* Text */}
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <span
