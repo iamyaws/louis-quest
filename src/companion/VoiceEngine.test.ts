@@ -135,3 +135,36 @@ describe('recordUse + pruneHistory', () => {
     expect(pruned).toEqual({ recent: h.recent });
   });
 });
+
+describe('pickLine mood filtering', () => {
+  const lines: VoiceLine[] = [
+    { id: 'generic', text: 'hi', triggers: ['hub_open'] },
+    { id: 'sad',     text: 'sad', triggers: ['hub_open'], mood: ['traurig'] },
+    { id: 'happy',   text: 'yay', triggers: ['hub_open'], mood: ['magisch'] },
+  ];
+
+  const baseCtx: VoiceContext = {
+    trigger: 'hub_open',
+    timeOfDay: 'morning',
+    weather: null,
+    mood: null,
+    stage: 'baby',
+    questsCompletedToday: 0,
+    lang: 'de',
+  };
+
+  it('includes mood-tagged lines when mood matches', () => {
+    const picked = pickLine({ ...baseCtx, mood: 'traurig' }, lines, {});
+    expect(['generic', 'sad']).toContain(picked?.id);
+  });
+
+  it('excludes mood-tagged lines when mood does not match', () => {
+    const picked = pickLine({ ...baseCtx, mood: 'magisch' }, lines, {});
+    expect(picked?.id).not.toBe('sad');
+  });
+
+  it('excludes mood-tagged lines when mood is null', () => {
+    const picked = pickLine({ ...baseCtx, mood: null }, lines, {});
+    expect(picked?.id).toBe('generic');
+  });
+});
