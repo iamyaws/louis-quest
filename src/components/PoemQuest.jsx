@@ -112,8 +112,8 @@ export default function PoemQuest({ onBack }) {
 
         {/* Header with painted illustration */}
         {(() => {
-          // Pick the best art for current progress (days 1, 5, 7 have art)
-          const artDay = doneCount >= 6 ? 7 : doneCount >= 4 ? 5 : 1;
+          // Show the art for the current active day (or final day if complete)
+          const artDay = Math.min(doneCount + 1, 7);
           return (
             <div className="rounded-2xl overflow-hidden mb-6 relative"
                  style={{ background: 'linear-gradient(135deg, #124346, #2d5a5e)' }}>
