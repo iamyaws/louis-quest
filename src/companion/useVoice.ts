@@ -122,6 +122,7 @@ export function useVoice(): UseVoiceResult {
         careAction: extras.careAction,
         arcPhase: extras.arcPhase,
         lang: (lang === 'en' ? 'en' : 'de'),
+        earnedTraits: s.earnedTraits || [],
       };
 
       const picked = pickLine(ctx, linesFor(ctx.lang), historyRef.current);
