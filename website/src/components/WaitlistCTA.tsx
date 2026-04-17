@@ -4,6 +4,7 @@ import { submitWaitlistEmail, isValidEmail } from '../lib/waitlist';
 import { supabase } from '../lib/supabase';
 import { getLaunchCopy, LaunchState } from '../config/launch-state';
 import { Confetti } from './primitives/Confetti';
+import { WaitlistScreener } from './WaitlistScreener';
 
 type Status =
   | { kind: 'idle' }
@@ -46,6 +47,8 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
   const [focused, setFocused] = useState(false);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
+  const [screenerDismissed, setScreenerDismissed] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -67,6 +70,7 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
     setStatus({ kind: 'submitting' });
     const result = await submitWaitlistEmail(email);
     if (result.ok) {
+      setSubmittedEmail(email.trim().toLowerCase());
       setStatus({ kind: 'success' });
       setEmail('');
       return;
@@ -85,14 +89,21 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-lg font-display font-semibold text-teal-dark py-4"
+          className="text-lg font-display font-semibold py-4"
         >
-          Du bist dabei. Wir melden uns einmal, am Start-Tag.
+          Du bist dabei. Wir melden uns, wenn es für euch losgeht.
         </motion.p>
         {waitlistCount !== null && waitlistCount > 1 && (
-          <p className="text-[0.65rem] text-center opacity-35">
+          <p className="text-[0.65rem] opacity-40 mb-2">
             Du bist einer von {waitlistCount}.
           </p>
+        )}
+        {submittedEmail && !screenerDismissed && (
+          <WaitlistScreener
+            email={submittedEmail}
+            onComplete={() => setScreenerDismissed(true)}
+            onSkip={() => setScreenerDismissed(true)}
+          />
         )}
       </div>
     );

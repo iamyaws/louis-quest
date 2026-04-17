@@ -13,8 +13,8 @@ const COPY: Record<LaunchState, LaunchCopy> = {
   waitlist: {
     ctaLabel: 'Bin dabei',
     ctaAction: 'waitlist',
-    ctaHelper: 'Eine einzige E-Mail, am Start-Tag. Danach hörst du von uns nichts mehr.',
-    footerMicro: 'Ronki startet bald. Trag dich ein und erfahre es unter den Ersten.',
+    ctaHelper: 'Wir öffnen Ronki in kleinen Gruppen. Trag dich ein, wir melden uns, wenn ihr dran seid.',
+    footerMicro: 'Ronki öffnet bald in kleinen Gruppen. Trag dich ein und sei früh dabei.',
   },
   live: {
     ctaLabel: 'Kostenlos testen',
