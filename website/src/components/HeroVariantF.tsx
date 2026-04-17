@@ -110,55 +110,67 @@ export function HeroVariantF() {
           </motion.div>
         </div>
 
-        {/* Right column: character illustration (md+) */}
+        {/* Right column: illustration + app preview stacked (md+) */}
         <div className="hidden md:flex items-center justify-center">
           <motion.div
             initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.45, ease: [0.2, 0.7, 0.2, 1] }}
+            className="relative"
           >
             <motion.div
               animate={reduced ? {} : { y: [-3, 3, -3] }}
               transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <div className="relative">
-                {/* Warm glow behind image */}
-                <div
-                  aria-hidden
-                  className="absolute -inset-8 rounded-full blur-3xl opacity-30"
-                  style={{ background: 'radial-gradient(circle, #FCD34D 0%, transparent 70%)' }}
-                />
-                <img
-                  src="/art/routines/brushing-teeth.webp"
-                  alt="Ein Junge und sein Drache Ronki beim Zähneputzen — fröhlich, im Abenteuer-Stil gemalt."
-                  width={480}
-                  height={480}
-                  className="relative w-[340px] lg:w-[420px] xl:w-[480px] rounded-[2rem] shadow-2xl"
-                  style={{
-                    boxShadow: '0 32px 72px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.2)',
-                  }}
-                />
-              </div>
+              {/* Warm glow */}
+              <div
+                aria-hidden
+                className="absolute -inset-8 rounded-full blur-3xl opacity-25"
+                style={{ background: 'radial-gradient(circle, #FCD34D 0%, transparent 70%)' }}
+              />
+
+              {/* Illustration card — back */}
+              <img
+                src="/art/routines/brushing-teeth.webp"
+                alt="Ein Junge und sein Drache Ronki beim Zähneputzen."
+                width={380}
+                height={380}
+                className="relative w-[280px] lg:w-[320px] xl:w-[360px] rounded-[1.5rem] shadow-2xl"
+                style={{ boxShadow: '0 24px 56px rgba(0,0,0,0.35)' }}
+              />
+
+              {/* App routine card — overlapping bottom-right */}
+              <motion.div
+                initial={reduced ? { opacity: 1 } : { opacity: 0, x: 20, y: 10 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.8, ease: [0.2, 0.7, 0.2, 1] }}
+                className="absolute -bottom-6 -right-8 lg:-right-12 w-[220px] lg:w-[240px]"
+              >
+                <RoutinePreviewCard />
+              </motion.div>
             </motion.div>
           </motion.div>
         </div>
       </div>
 
-      {/* Mobile illustration — below copy */}
+      {/* Mobile: both cards stacked */}
       <motion.div
         {...fade(0.5)}
         className="relative z-10 mt-8 flex md:hidden justify-center w-full"
       >
-        <img
-          src="/art/routines/brushing-teeth.webp"
-          alt="Ein Junge und sein Drache Ronki beim Zähneputzen."
-          width={320}
-          height={320}
-          className="w-64 sm:w-72 rounded-[1.5rem] shadow-2xl"
-          style={{
-            boxShadow: '0 24px 56px rgba(0,0,0,0.35), 0 6px 20px rgba(0,0,0,0.18)',
-          }}
-        />
+        <div className="relative">
+          <img
+            src="/art/routines/brushing-teeth.webp"
+            alt="Ein Junge und sein Drache Ronki beim Zähneputzen."
+            width={280}
+            height={280}
+            className="w-56 sm:w-64 rounded-[1.5rem] shadow-2xl"
+            style={{ boxShadow: '0 20px 48px rgba(0,0,0,0.3)' }}
+          />
+          <div className="absolute -bottom-4 -right-4 w-[180px] sm:w-[200px]">
+            <RoutinePreviewCard compact />
+          </div>
+        </div>
       </motion.div>
 
       {/* Scroll hint */}
@@ -191,5 +203,101 @@ function TrustBadge({ label }: { label: string }) {
       <span aria-hidden className="h-1 w-1 rounded-full bg-cream/30" />
       {label}
     </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* RoutinePreviewCard — mock of the real app task list                  */
+/* ------------------------------------------------------------------ */
+
+function RoutinePreviewCard({ compact = false }: { compact?: boolean }) {
+  const items = [
+    { label: 'Zähne putzen', done: true, icon: '🪥' },
+    { label: 'Anziehen', done: true, icon: '👕' },
+    { label: 'Tasche packen', done: false, icon: '🎒' },
+  ];
+  const doneCount = items.filter(i => i.done).length;
+
+  return (
+    <div
+      className={`rounded-2xl bg-cream shadow-2xl overflow-hidden select-none ${
+        compact ? 'p-3.5' : 'p-4'
+      }`}
+      style={{ boxShadow: '0 20px 50px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.15)' }}
+      role="img"
+      aria-label="Vorschau der Ronki-App: Morgenroutine"
+    >
+      {/* Top accent bar */}
+      <div
+        className="absolute inset-x-0 top-0 h-1 rounded-t-2xl"
+        style={{ background: 'linear-gradient(90deg, #d97706 0%, #FCD34D 100%)' }}
+      />
+
+      {/* Header */}
+      <div className={`flex items-center gap-2 ${compact ? 'mb-3' : 'mb-3.5'}`}>
+        <span className="text-sm" aria-hidden>☀️</span>
+        <div className="flex-1 min-w-0">
+          <p className={`font-display font-bold text-teal-dark leading-tight ${compact ? 'text-xs' : 'text-sm'}`}>
+            Morgenroutine
+          </p>
+          <p className={`text-teal/50 ${compact ? 'text-[10px]' : 'text-xs'}`}>Heute, 7:15</p>
+        </div>
+        <span className={`flex items-center gap-1 font-display font-bold text-sage ${compact ? 'text-[10px]' : 'text-xs'}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-sage animate-pulse" />
+          Aktiv
+        </span>
+      </div>
+
+      {/* Task items */}
+      <ul className={`flex flex-col ${compact ? 'gap-1.5' : 'gap-2'}`}>
+        {items.map((item, i) => (
+          <li
+            key={i}
+            className={`flex items-center gap-2 rounded-xl ${compact ? 'px-2.5 py-1.5' : 'px-3 py-2'} ${
+              item.done
+                ? 'bg-teal-dark/[0.06]'
+                : 'bg-mustard/10 ring-1 ring-mustard/20'
+            }`}
+          >
+            <span
+              className={`flex-none flex items-center justify-center rounded-full text-[8px] font-bold ${
+                compact ? 'w-4 h-4' : 'w-5 h-5'
+              } ${
+                item.done ? 'bg-teal text-cream' : 'ring-2 ring-mustard bg-transparent'
+              }`}
+            >
+              {item.done ? '✓' : null}
+            </span>
+            <span className={`flex-1 font-medium leading-none ${
+              compact ? 'text-[11px]' : 'text-xs'
+            } ${
+              item.done ? 'text-teal-dark/60 line-through decoration-teal/30' : 'text-teal-dark'
+            }`}>
+              {item.label}
+            </span>
+            <span className={compact ? 'text-[10px]' : 'text-xs'} aria-hidden>{item.icon}</span>
+          </li>
+        ))}
+      </ul>
+
+      {/* Progress */}
+      <div className={`${compact ? 'mt-2.5' : 'mt-3'}`}>
+        <div className="flex justify-between items-center mb-1">
+          <span className={`text-teal/50 font-medium ${compact ? 'text-[9px]' : 'text-[10px]'}`}>Fortschritt</span>
+          <span className={`font-display font-bold text-teal-dark ${compact ? 'text-[10px]' : 'text-xs'}`}>
+            {doneCount}/{items.length}
+          </span>
+        </div>
+        <div className={`w-full rounded-full bg-teal/10 overflow-hidden ${compact ? 'h-1' : 'h-1.5'}`}>
+          <div
+            className="h-full rounded-full"
+            style={{
+              width: `${(doneCount / items.length) * 100}%`,
+              background: 'linear-gradient(90deg, #d97706 0%, #FCD34D 100%)',
+            }}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
