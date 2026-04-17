@@ -25,6 +25,11 @@ const SEED_CREATURES = [
   { id: 'dream_2', chapter: 'dream', name: { de: 'Sternenschatten', en: 'Starshadow' }, art: 'art/micropedia/creatures/creature-10.webp', flavor: { de: 'Vom Sternenmeer hierher gereist.', en: 'Traveled here from the sea of stars.' } },
   { id: 'hearth_0', chapter: 'hearth', name: { de: 'Goldauge', en: 'Goldeye' }, art: 'art/micropedia/creatures/creature-7.webp', flavor: { de: 'Sitzt am liebsten am warmen Kamin.', en: 'Loves sitting by the warm fireplace.' } },
   { id: 'sky_0', chapter: 'sky', name: { de: 'Sturmflügel', en: 'Stormwing' }, art: 'art/micropedia/creatures/creature-8.webp', flavor: { de: 'Reitet auf Gewitterwolken.', en: 'Rides on thunderclouds.' } },
+  // ── Water chapter (newly added) ──
+  { id: 'water_0', chapter: 'water', name: { de: 'Perlenfisch', en: 'Pearlfish' },   art: 'art/micropedia/creatures/creature-water-1.webp', flavor: { de: 'Seine Schuppen leuchten wie Perlen im Mondlicht.', en: 'Scales glow like pearls in moonlight.' } },
+  { id: 'water_1', chapter: 'water', name: { de: 'Wellentänzer', en: 'Wavedancer' }, art: 'art/micropedia/creatures/creature-water-2.webp', flavor: { de: 'Tanzt auf Seerosen, wenn niemand hinsieht.', en: 'Dances on lily pads when nobody looks.' } },
+  { id: 'water_2', chapter: 'water', name: { de: 'Muscheljuwel', en: 'Shellgem' },   art: 'art/micropedia/creatures/creature-water-3.webp', flavor: { de: 'Trägt einen Kristall auf dem Rücken.', en: 'Carries a crystal on its back.' } },
+  { id: 'water_3', chapter: 'water', name: { de: 'Nebelkrabbe', en: 'Mistcrab' },    art: 'art/micropedia/creatures/creature-water-4.webp', flavor: { de: 'Erscheint nur im Morgennebel.', en: 'Appears only in morning mist.' } },
 ];
 
 // ── Chapter definitions ──

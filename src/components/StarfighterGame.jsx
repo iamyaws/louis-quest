@@ -14,12 +14,12 @@ import VoiceAudio from '../utils/voiceAudio';
  */
 
 const LEVELS = [
-  { name: { de: 'Wald',          en: 'Forest' },       color: '#059669', enemies: 4,  speed: 1.0, waves: 3 },
-  { name: { de: 'Wolken',        en: 'Clouds' },       color: '#0ea5e9', enemies: 5,  speed: 1.2, waves: 3 },
-  { name: { de: 'Sternenmeer',   en: 'Stars' },        color: '#6d28d9', enemies: 6,  speed: 1.4, waves: 3 },
-  { name: { de: 'Vulkan',        en: 'Volcano' },      color: '#dc2626', enemies: 7,  speed: 1.6, waves: 3 },
-  { name: { de: 'Kristallpalast', en: 'Crystal Palace' }, color: '#0891b2', enemies: 8, speed: 1.8, waves: 3 },
-  { name: { de: 'Traumwelt ⭐',  en: 'Dream World ⭐' }, color: '#a855f7', enemies: 10, speed: 2.0, waves: 4, bonus: true },
+  { name: { de: 'Wald',          en: 'Forest' },       color: '#059669', enemies: 4,  speed: 1.0, waves: 3, bg: 'art/games/starfighter/bg-forest.webp' },
+  { name: { de: 'Wolken',        en: 'Clouds' },       color: '#0ea5e9', enemies: 5,  speed: 1.2, waves: 3, bg: 'art/games/starfighter/bg-clouds.webp' },
+  { name: { de: 'Sternenmeer',   en: 'Stars' },        color: '#6d28d9', enemies: 6,  speed: 1.4, waves: 3, bg: 'art/games/starfighter/bg-stars.webp' },
+  { name: { de: 'Vulkan',        en: 'Volcano' },      color: '#dc2626', enemies: 7,  speed: 1.6, waves: 3, bg: 'art/games/starfighter/bg-volcano.webp' },
+  { name: { de: 'Kristallpalast', en: 'Crystal Palace' }, color: '#0891b2', enemies: 8, speed: 1.8, waves: 3, bg: 'art/games/starfighter/bg-crystal.webp' },
+  { name: { de: 'Traumwelt ⭐',  en: 'Dream World ⭐' }, color: '#a855f7', enemies: 10, speed: 2.0, waves: 4, bonus: true, bg: 'art/games/starfighter/bg-dream.webp' },
 ];
 
 const W = 360;
@@ -45,6 +45,23 @@ export default function StarfighterGame({ onComplete }) {
   const [bulletSize, setBulletSize] = useState(4); // radius: 4, 7, or 10
 
   const stateRef = useRef({ playerX: W / 2, bullets: [], enemies: [], particles: [], lastFire: 0, targetX: W / 2, enemiesKilled: 0, waveEnemiesSpawned: 0, spawnTimer: 0 });
+  const shipImgRef = useRef(null);
+  const bgImgRef = useRef(null);
+
+  // Preload ship sprite once
+  useEffect(() => {
+    const img = new Image();
+    img.src = base + 'art/games/starfighter/ronki-ship.webp';
+    img.onload = () => { shipImgRef.current = img; };
+  }, []);
+
+  // Preload level background when level changes
+  useEffect(() => {
+    if (!levelData.bg) { bgImgRef.current = null; return; }
+    const img = new Image();
+    img.src = base + levelData.bg;
+    img.onload = () => { bgImgRef.current = img; };
+  }, [level, levelData.bg]);
 
   // Sync lives to ref so game loop doesn't reset on hit
   useEffect(() => { livesRef.current = lives; }, [lives]);
@@ -125,8 +142,19 @@ export default function StarfighterGame({ onComplete }) {
       ctx.fillStyle = '#0c1a2e';
       ctx.fillRect(0, 0, W, H);
 
-      // Stars background
-      for (let i = 0; i < 30; i++) {
+      // Level background image — scrolls vertically for parallax
+      const bgImg = bgImgRef.current;
+      if (bgImg) {
+        const bgScroll = (now * 0.03) % H;
+        ctx.drawImage(bgImg, 0, -bgScroll, W, H);
+        ctx.drawImage(bgImg, 0, H - bgScroll, W, H);
+        // Dark overlay to keep enemies/bullets readable
+        ctx.fillStyle = 'rgba(12,26,46,0.45)';
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // Foreground twinkle stars (always on)
+      for (let i = 0; i < 20; i++) {
         const sx = (i * 127 + level * 37) % W;
         const sy = ((i * 89 + now * 0.02 * (1 + i % 3)) % H);
         ctx.fillStyle = `rgba(255,255,255,${0.2 + (i % 5) * 0.1})`;
@@ -270,20 +298,32 @@ export default function StarfighterGame({ onComplete }) {
       });
       ctx.globalAlpha = 1;
 
-      // Player (Ronki — orange triangle for now, replace with sprite later)
+      // Player (Ronki flying) — painted sprite with engine glow behind
       const px = st.playerX;
       const py = H - 50;
-      ctx.fillStyle = '#f97316';
+      // Glow halo behind sprite
+      ctx.fillStyle = 'rgba(252,211,77,0.35)';
       ctx.beginPath();
-      ctx.moveTo(px, py - PLAYER_H / 2);
-      ctx.lineTo(px - PLAYER_W / 2, py + PLAYER_H / 2);
-      ctx.lineTo(px + PLAYER_W / 2, py + PLAYER_H / 2);
-      ctx.closePath();
+      ctx.arc(px, py, PLAYER_W * 0.75 + Math.sin(now * 0.008) * 2, 0, Math.PI * 2);
       ctx.fill();
-      // Engine glow
+      const shipImg = shipImgRef.current;
+      if (shipImg) {
+        const size = PLAYER_W * 1.8;
+        ctx.drawImage(shipImg, px - size / 2, py - size / 2, size, size);
+      } else {
+        // Fallback triangle while sprite loads
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath();
+        ctx.moveTo(px, py - PLAYER_H / 2);
+        ctx.lineTo(px - PLAYER_W / 2, py + PLAYER_H / 2);
+        ctx.lineTo(px + PLAYER_W / 2, py + PLAYER_H / 2);
+        ctx.closePath();
+        ctx.fill();
+      }
+      // Engine glow trail below
       ctx.fillStyle = '#fcd34d';
       ctx.beginPath();
-      ctx.arc(px, py + PLAYER_H / 2 + 4, 4 + Math.sin(now * 0.01) * 2, 0, Math.PI * 2);
+      ctx.arc(px, py + PLAYER_H / 2 + 6, 4 + Math.sin(now * 0.01) * 2, 0, Math.PI * 2);
       ctx.fill();
 
       // HUD
