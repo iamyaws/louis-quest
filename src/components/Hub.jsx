@@ -16,6 +16,7 @@ import BeatCompletionModal from './BeatCompletionModal';
 import DreamStrip from './DreamStrip';
 import ClothingSheet from './ClothingSheet';
 import CloudWaves from './CloudWaves';
+import EveningRitual from './EveningRitual';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -67,6 +68,19 @@ export default function Hub({ onNavigate }) {
   const [openBeat, setOpenBeat] = useState(null);
   const [showDream, setShowDream] = useState(false);
   const [showClothing, setShowClothing] = useState(false);
+  const [showEveningRitual, setShowEveningRitual] = useState(false);
+
+  // Trigger evening ritual when: evening + all bedtime quests done + hasn't happened today yet
+  useEffect(() => {
+    const hour = new Date().getHours();
+    const today = new Date().toISOString().slice(0, 10);
+    const alreadyDone = state?.eveningRitualCompletedAt === today;
+    const bedtimeQuests = (state?.quests || []).filter(q => q.anchor === 'bedtime' && !q.sideQuest);
+    const bedtimeDone = bedtimeQuests.length > 0 && bedtimeQuests.every(q => q.done);
+    if (hour >= 18 && bedtimeDone && !alreadyDone && !showEveningRitual) {
+      setShowEveningRitual(true);
+    }
+  }, [state?.quests, state?.eveningRitualCompletedAt]);
   // Only show dream indicator when there are non-ambient highlights worth seeing
   const pendingDream = Boolean(
     state?.dreamHighlights &&
@@ -1065,6 +1079,13 @@ export default function Hub({ onNavigate }) {
               dreamHighlights: { ...state.dreamHighlights, seen: true },
             });
           }}
+        />
+      )}
+
+      {showEveningRitual && (
+        <EveningRitual
+          stage={getCatStage(state?.catEvo || 0)}
+          onClose={() => setShowEveningRitual(false)}
         />
       )}
     </div>
