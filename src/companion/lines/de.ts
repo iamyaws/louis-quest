@@ -134,4 +134,12 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_stamina_low_01',       text: 'Puh, ich werde langsam müde vom Fliegen. Aber einmal noch geht bestimmt.', triggers: ['hub_open'], cooldownHours: 6 },
   { id: 'de_stamina_exhausted_01', text: 'Ich bin ganz platt. Kannst du ein bisschen ohne mich spielen?',           triggers: ['hub_open'], cooldownHours: 6 },
   { id: 'de_stamina_restored_01',  text: 'Ausgeruht! Lass uns wieder losziehen.',                                    triggers: ['hub_open'], cooldownHours: 2 },
+
+  // ═══════════════════════════════════════
+  // SCREEN-TIME RAMP-DOWN — pacing the end of a reward session
+  // ═══════════════════════════════════════
+  { id: 'de_screentime_50_01',  text: 'Wir haben noch ein bisschen Zeit zusammen. Worauf hast du Lust?', triggers: ['idle'], cooldownHours: 1 },
+  { id: 'de_screentime_20_01',  text: 'Gleich ist unsere Zeit um. Willst du noch etwas Besonderes machen?', triggers: ['idle'], cooldownHours: 1 },
+  { id: 'de_screentime_10_01',  text: 'Noch eine Minute, dann ist Pause. Du machst das super.', triggers: ['idle'], cooldownHours: 1 },
+  { id: 'de_screentime_done_01', text: 'Gut gemacht! Bis später.', triggers: ['idle'], cooldownHours: 1 },
 ];
