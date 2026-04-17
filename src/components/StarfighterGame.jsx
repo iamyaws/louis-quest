@@ -48,6 +48,8 @@ export default function StarfighterGame({ onComplete }) {
   const shipImgRef = useRef(null);
   const bgImgRef = useRef(null);
 
+  const levelData = LEVELS[level] || LEVELS[0];
+
   // Preload ship sprite once
   useEffect(() => {
     const img = new Image();
@@ -57,16 +59,15 @@ export default function StarfighterGame({ onComplete }) {
 
   // Preload level background when level changes
   useEffect(() => {
-    if (!levelData.bg) { bgImgRef.current = null; return; }
+    const bgPath = levelData?.bg;
+    if (!bgPath) { bgImgRef.current = null; return; }
     const img = new Image();
-    img.src = base + levelData.bg;
+    img.src = base + bgPath;
     img.onload = () => { bgImgRef.current = img; };
-  }, [level, levelData.bg]);
+  }, [level, levelData?.bg]);
 
   // Sync lives to ref so game loop doesn't reset on hit
   useEffect(() => { livesRef.current = lives; }, [lives]);
-
-  const levelData = LEVELS[level] || LEVELS[0];
 
   // ── Touch/mouse controls ──
   const handlePointerMove = useCallback((e) => {
