@@ -44,11 +44,11 @@ export default function NotFound() {
             }}
           />
           <img
-            src="/art/companion/dragon-baby.webp"
-            alt=""
-            width={280}
-            height={280}
-            className="relative w-48 sm:w-56 md:w-64 h-auto drop-shadow-[0_24px_36px_rgba(45,90,94,0.2)]"
+            src="/art/companion/dragon-404.webp"
+            alt="Ronki, der kleine Drache, schaut neugierig um eine Steinmauer."
+            width={320}
+            height={320}
+            className="relative w-52 sm:w-60 md:w-72 h-auto rounded-2xl drop-shadow-[0_24px_36px_rgba(45,90,94,0.25)]"
           />
         </motion.div>
 
