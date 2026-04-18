@@ -1,26 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
+import { SEED_BY_ID } from '../data/creatures';
 import VoiceAudio from '../utils/voiceAudio';
 import SFX from '../utils/sfx';
 
 const base = import.meta.env.BASE_URL;
-
-// Mirror of SEED_CREATURES in Micropedia.jsx — for name/art lookup
-const CREATURE_META = {
-  forest_0: { name: { de: 'Glutfunke', en: 'Emberspark' },     art: 'art/micropedia/creatures/creature-1.webp' },
-  forest_1: { name: { de: 'Moostänzer', en: 'Mossdancer' },    art: 'art/micropedia/creatures/creature-2.webp' },
-  forest_2: { name: { de: 'Knorrbart', en: 'Gnarlfang' },      art: 'art/micropedia/creatures/creature-3.webp' },
-  forest_3: { name: { de: 'Rotling', en: 'Redling' },          art: 'art/micropedia/creatures/creature-6.webp' },
-  sky_0:    { name: { de: 'Sturmflügel', en: 'Stormwing' },    art: 'art/micropedia/creatures/creature-8.webp' },
-  water_0:  { name: { de: 'Perlenfisch', en: 'Pearlfish' },    art: 'art/micropedia/creatures/creature-water-1.webp' },
-  water_1:  { name: { de: 'Wellentänzer', en: 'Wavedancer' },  art: 'art/micropedia/creatures/creature-water-2.webp' },
-  water_2:  { name: { de: 'Muscheljuwel', en: 'Shellgem' },    art: 'art/micropedia/creatures/creature-water-3.webp' },
-  water_3:  { name: { de: 'Nebelkrabbe', en: 'Mistcrab' },     art: 'art/micropedia/creatures/creature-water-4.webp' },
-  dream_0:  { name: { de: 'Lichtflüstern', en: 'Glowwhisper' },art: 'art/micropedia/creatures/creature-4.webp' },
-  dream_1:  { name: { de: 'Nachtflügel', en: 'Nightwing' },    art: 'art/micropedia/creatures/creature-9.webp' },
-  dream_2:  { name: { de: 'Sternenschatten', en: 'Starshadow' },art: 'art/micropedia/creatures/creature-10.webp' },
-  hearth_0: { name: { de: 'Goldauge', en: 'Goldeye' },         art: 'art/micropedia/creatures/creature-7.webp' },
-};
 
 export default function CreatureDiscoveryToast({ creatureId, onDismiss }) {
   const { lang } = useTranslation();
@@ -39,7 +23,7 @@ export default function CreatureDiscoveryToast({ creatureId, onDismiss }) {
   }, [creatureId]);
 
   if (!creatureId) return null;
-  const meta = CREATURE_META[creatureId];
+  const meta = SEED_BY_ID.get(creatureId);
   if (!meta) return null;
 
   const name = meta.name[lang] || meta.name.de;

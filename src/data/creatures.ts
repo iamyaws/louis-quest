@@ -1,18 +1,73 @@
-/** Per-creature enrichment content for the Freunde detail view.
- *  Tone: warm, specific, sensory. Kid-friendly (6-year-old). German only (DE market).
- *  Voice: Ronki's own, a curious older friend, never lectures.
+/** Creature + chapter data — single source of truth for Freunde (Micropedia).
+ *  Imported by Micropedia (grid + detail modal) and CreatureDiscoveryToast.
+ *  Tone for authored content: warm, specific, sensory. Kid-friendly (6-year-old).
+ *  Voice: Ronki's — curious older friend, never lectures.
  */
+
+// ── Creature seed data ──
+
+export interface CreatureSeed {
+  id: string;
+  chapter: 'forest' | 'sky' | 'water' | 'dream' | 'hearth';
+  name: { de: string; en: string };
+  art: string;
+  flavor: { de: string; en: string };
+}
+
+export const SEED_CREATURES: readonly CreatureSeed[] = [
+  { id: 'forest_0', chapter: 'forest', name: { de: 'Glutfunke',       en: 'Emberspark' },  art: 'art/micropedia/creatures/creature-1.webp',       flavor: { de: 'Gefunden am ersten Tag im Wald.',                     en: 'Found on the first day in the forest.' } },
+  { id: 'forest_1', chapter: 'forest', name: { de: 'Moostänzer',      en: 'Mossdancer' },  art: 'art/micropedia/creatures/creature-2.webp',       flavor: { de: 'Tanzt zwischen den Farnen, wenn niemand hinsieht.',   en: 'Dances between the ferns when nobody looks.' } },
+  { id: 'forest_2', chapter: 'forest', name: { de: 'Knorrbart',       en: 'Gnarlfang' },   art: 'art/micropedia/creatures/creature-3.webp',       flavor: { de: 'Sieht grimmig aus, ist aber ganz sanft.',             en: 'Looks fierce, but is quite gentle.' } },
+  { id: 'forest_3', chapter: 'forest', name: { de: 'Rotling',         en: 'Redling' },     art: 'art/micropedia/creatures/creature-6.webp',       flavor: { de: 'Versteckt sich unter Pilzen.',                        en: 'Hides under mushrooms.' } },
+  { id: 'sky_0',    chapter: 'sky',    name: { de: 'Sturmflügel',     en: 'Stormwing' },   art: 'art/micropedia/creatures/creature-8.webp',       flavor: { de: 'Reitet auf Gewitterwolken.',                          en: 'Rides on thunderclouds.' } },
+  { id: 'water_0',  chapter: 'water',  name: { de: 'Perlenfisch',     en: 'Pearlfish' },   art: 'art/micropedia/creatures/creature-water-1.webp', flavor: { de: 'Seine Schuppen leuchten wie Perlen im Mondlicht.',    en: 'Scales glow like pearls in moonlight.' } },
+  { id: 'water_1',  chapter: 'water',  name: { de: 'Wellentänzer',    en: 'Wavedancer' },  art: 'art/micropedia/creatures/creature-water-2.webp', flavor: { de: 'Tanzt auf Seerosen, wenn niemand hinsieht.',          en: 'Dances on lily pads when nobody looks.' } },
+  { id: 'water_2',  chapter: 'water',  name: { de: 'Muscheljuwel',    en: 'Shellgem' },    art: 'art/micropedia/creatures/creature-water-3.webp', flavor: { de: 'Trägt einen Kristall auf dem Rücken.',                en: 'Carries a crystal on its back.' } },
+  { id: 'water_3',  chapter: 'water',  name: { de: 'Nebelkrabbe',     en: 'Mistcrab' },    art: 'art/micropedia/creatures/creature-water-4.webp', flavor: { de: 'Erscheint nur im Morgennebel.',                       en: 'Appears only in morning mist.' } },
+  { id: 'dream_0',  chapter: 'dream',  name: { de: 'Lichtflüstern',   en: 'Glowwhisper' }, art: 'art/micropedia/creatures/creature-4.webp',       flavor: { de: 'Erscheint nur im Mondlicht.',                         en: 'Appears only in moonlight.' } },
+  { id: 'dream_1',  chapter: 'dream',  name: { de: 'Nachtflügel',     en: 'Nightwing' },   art: 'art/micropedia/creatures/creature-9.webp',       flavor: { de: 'Fliegt durch die Träume mutiger Kinder.',             en: 'Flies through the dreams of brave children.' } },
+  { id: 'dream_2',  chapter: 'dream',  name: { de: 'Sternenschatten', en: 'Starshadow' },  art: 'art/micropedia/creatures/creature-10.webp',      flavor: { de: 'Vom Sternenmeer hierher gereist.',                    en: 'Traveled here from the sea of stars.' } },
+  { id: 'hearth_0', chapter: 'hearth', name: { de: 'Goldauge',        en: 'Goldeye' },     art: 'art/micropedia/creatures/creature-7.webp',       flavor: { de: 'Sitzt am liebsten am warmen Kamin.',                  en: 'Loves sitting by the warm fireplace.' } },
+];
+
+/** O(1) lookup map — build once at module load, not per-render. */
+export const SEED_BY_ID: Map<string, CreatureSeed> = new Map(SEED_CREATURES.map(s => [s.id, s]));
+
+// ── Chapter definitions ──
+
+export type ChapterId = 'forest' | 'sky' | 'water' | 'dream' | 'hearth';
+
+export interface Chapter {
+  id: ChapterId;
+  nameKey: { de: string; en: string };
+  icon: string;
+  color: string;
+  bgGradient: string;
+  border: string;
+  headerArt: string;
+  creatureCount: number;
+}
+
+export const CHAPTERS: readonly Chapter[] = [
+  { id: 'forest', nameKey: { de: 'Wald',    en: 'Forest' }, icon: 'forest',      color: '#059669', bgGradient: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)', border: 'rgba(5,150,105,0.2)',  headerArt: 'art/micropedia/chapter-forest.webp', creatureCount: 12 },
+  { id: 'sky',    nameKey: { de: 'Himmel',  en: 'Sky' },    icon: 'cloud',       color: '#0ea5e9', bgGradient: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', border: 'rgba(14,165,233,0.2)', headerArt: 'art/micropedia/chapter-sky.webp',    creatureCount: 12 },
+  { id: 'water',  nameKey: { de: 'Wasser',  en: 'Water' },  icon: 'water_drop',  color: '#0891b2', bgGradient: 'linear-gradient(135deg, #ecfeff 0%, #cffafe 100%)', border: 'rgba(8,145,178,0.2)', headerArt: 'art/micropedia/chapter-water.webp',  creatureCount: 12 },
+  { id: 'dream',  nameKey: { de: 'Traum',   en: 'Dream' },  icon: 'nights_stay', color: '#7c3aed', bgGradient: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)', border: 'rgba(124,58,237,0.2)',headerArt: 'art/micropedia/chapter-dream.webp',  creatureCount: 12 },
+  { id: 'hearth', nameKey: { de: 'Zuhause', en: 'Hearth' }, icon: 'fireplace',   color: '#d97706', bgGradient: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)', border: 'rgba(217,119,6,0.2)', headerArt: 'art/micropedia/chapter-hearth.webp', creatureCount: 12 },
+];
+
+// ── Authored enrichment content ──
 
 export interface CreatureContent {
   id: string;
-  ronkiNote: string;         // one sentence in Ronki's voice
-  favoritePlace: string;     // short string
-  favoriteFood: string;      // short string
-  funFacts: string[];        // 2-3 kid-friendly trivia strings
-  howMet: string;            // 2-3 sentences in Ronki's voice
-  secret: string;            // one sentence
-  likes: string[];           // 3-5 short strings
-  dislikes: string[];        // 2-3 short strings
+  ronkiNote: string;
+  favoritePlace: string;
+  favoriteFood: string;
+  funFacts: string[];
+  howMet: string;
+  secret: string;
+  likes: string[];
+  dislikes: string[];
 }
 
 export const CREATURE_CONTENT: Record<string, CreatureContent> = {

@@ -1,105 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
-import { CREATURE_CONTENT } from '../data/creatures';
+import { CREATURE_CONTENT, SEED_BY_ID, CHAPTERS } from '../data/creatures';
 import ChapterAmbient from './ChapterAmbient';
 
-// German month names for discovered date
-const MONTHS_DE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-
+/** Format an ISO discovery timestamp in the app's language. */
 function formatDiscoveredDate(iso, lang) {
   if (!iso) return null;
   const d = new Date(iso);
   if (isNaN(d.getTime())) return null;
-  if (lang === 'de') {
-    return `Entdeckt am ${d.getDate()}. ${MONTHS_DE[d.getMonth()]} ${d.getFullYear()}`;
-  }
-  return `Discovered on ${d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+  const formatted = d.toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+  return lang === 'de' ? `Entdeckt am ${formatted}` : `Discovered on ${formatted}`;
 }
 
 /**
- * Micropedia — creature collection grid, patterned on Finch's bestiary.
- *
- * Phase 1 (skeleton): chapter headers + silhouette placeholders.
- * Phase 2: actual creature data tied to arc discoveries, painted portraits.
- *
- * Chapters: Forest / Sky / Water / Dream / Hearth
- * Each chapter holds ~12 creatures. Grid shows silhouettes until discovered.
+ * Micropedia — creature collection grid (Freunde).
+ * Chapters: Forest / Sky / Water / Dream / Hearth.
  */
 
 const base = import.meta.env.BASE_URL;
-
-// ── Seed creatures (Phase 1: static data; Phase 2: arc-discovery driven) ──
-const SEED_CREATURES = [
-  { id: 'forest_0', chapter: 'forest', name: { de: 'Glutfunke', en: 'Emberspark' }, art: 'art/micropedia/creatures/creature-1.webp', flavor: { de: 'Gefunden am ersten Tag im Wald.', en: 'Found on the first day in the forest.' } },
-  { id: 'forest_1', chapter: 'forest', name: { de: 'Moostänzer', en: 'Mossdancer' }, art: 'art/micropedia/creatures/creature-2.webp', flavor: { de: 'Tanzt zwischen den Farnen, wenn niemand hinsieht.', en: 'Dances between the ferns when nobody looks.' } },
-  { id: 'forest_2', chapter: 'forest', name: { de: 'Knorrbart', en: 'Gnarlfang' }, art: 'art/micropedia/creatures/creature-3.webp', flavor: { de: 'Sieht grimmig aus, ist aber ganz sanft.', en: 'Looks fierce, but is quite gentle.' } },
-  { id: 'forest_3', chapter: 'forest', name: { de: 'Rotling', en: 'Redling' }, art: 'art/micropedia/creatures/creature-6.webp', flavor: { de: 'Versteckt sich unter Pilzen.', en: 'Hides under mushrooms.' } },
-  { id: 'dream_0', chapter: 'dream', name: { de: 'Lichtflüstern', en: 'Glowwhisper' }, art: 'art/micropedia/creatures/creature-4.webp', flavor: { de: 'Erscheint nur im Mondlicht.', en: 'Appears only in moonlight.' } },
-  { id: 'dream_1', chapter: 'dream', name: { de: 'Nachtflügel', en: 'Nightwing' }, art: 'art/micropedia/creatures/creature-9.webp', flavor: { de: 'Fliegt durch die Träume mutiger Kinder.', en: 'Flies through the dreams of brave children.' } },
-  { id: 'dream_2', chapter: 'dream', name: { de: 'Sternenschatten', en: 'Starshadow' }, art: 'art/micropedia/creatures/creature-10.webp', flavor: { de: 'Vom Sternenmeer hierher gereist.', en: 'Traveled here from the sea of stars.' } },
-  { id: 'hearth_0', chapter: 'hearth', name: { de: 'Goldauge', en: 'Goldeye' }, art: 'art/micropedia/creatures/creature-7.webp', flavor: { de: 'Sitzt am liebsten am warmen Kamin.', en: 'Loves sitting by the warm fireplace.' } },
-  { id: 'sky_0', chapter: 'sky', name: { de: 'Sturmflügel', en: 'Stormwing' }, art: 'art/micropedia/creatures/creature-8.webp', flavor: { de: 'Reitet auf Gewitterwolken.', en: 'Rides on thunderclouds.' } },
-  // ── Water chapter (newly added) ──
-  { id: 'water_0', chapter: 'water', name: { de: 'Perlenfisch', en: 'Pearlfish' },   art: 'art/micropedia/creatures/creature-water-1.webp', flavor: { de: 'Seine Schuppen leuchten wie Perlen im Mondlicht.', en: 'Scales glow like pearls in moonlight.' } },
-  { id: 'water_1', chapter: 'water', name: { de: 'Wellentänzer', en: 'Wavedancer' }, art: 'art/micropedia/creatures/creature-water-2.webp', flavor: { de: 'Tanzt auf Seerosen, wenn niemand hinsieht.', en: 'Dances on lily pads when nobody looks.' } },
-  { id: 'water_2', chapter: 'water', name: { de: 'Muscheljuwel', en: 'Shellgem' },   art: 'art/micropedia/creatures/creature-water-3.webp', flavor: { de: 'Trägt einen Kristall auf dem Rücken.', en: 'Carries a crystal on its back.' } },
-  { id: 'water_3', chapter: 'water', name: { de: 'Nebelkrabbe', en: 'Mistcrab' },    art: 'art/micropedia/creatures/creature-water-4.webp', flavor: { de: 'Erscheint nur im Morgennebel.', en: 'Appears only in morning mist.' } },
-];
-
-// ── Chapter definitions ──
-const CHAPTERS = [
-  {
-    id: 'forest',
-    nameKey: { de: 'Wald', en: 'Forest' },
-    icon: 'forest',
-    color: '#059669',
-    bgGradient: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
-    border: 'rgba(5,150,105,0.2)',
-    headerArt: 'art/micropedia/chapter-forest.webp',
-    creatureCount: 12,
-  },
-  {
-    id: 'sky',
-    nameKey: { de: 'Himmel', en: 'Sky' },
-    icon: 'cloud',
-    color: '#0ea5e9',
-    bgGradient: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-    border: 'rgba(14,165,233,0.2)',
-    headerArt: 'art/micropedia/chapter-sky.webp',
-    creatureCount: 12,
-  },
-  {
-    id: 'water',
-    nameKey: { de: 'Wasser', en: 'Water' },
-    icon: 'water_drop',
-    color: '#0891b2',
-    bgGradient: 'linear-gradient(135deg, #ecfeff 0%, #cffafe 100%)',
-    border: 'rgba(8,145,178,0.2)',
-    headerArt: 'art/micropedia/chapter-water.webp',
-    creatureCount: 12,
-  },
-  {
-    id: 'dream',
-    nameKey: { de: 'Traum', en: 'Dream' },
-    icon: 'nights_stay',
-    color: '#7c3aed',
-    bgGradient: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)',
-    border: 'rgba(124,58,237,0.2)',
-    headerArt: 'art/micropedia/chapter-dream.webp',
-    creatureCount: 12,
-  },
-  {
-    id: 'hearth',
-    nameKey: { de: 'Zuhause', en: 'Hearth' },
-    icon: 'fireplace',
-    color: '#d97706',
-    bgGradient: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-    border: 'rgba(217,119,6,0.2)',
-    headerArt: 'art/micropedia/chapter-hearth.webp',
-    creatureCount: 12,
-  },
-];
+const NEW_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export default function Micropedia({ onNavigate }) {
   const { lang } = useTranslation();
@@ -107,15 +29,22 @@ export default function Micropedia({ onNavigate }) {
   const [expandedChapter, setExpandedChapter] = useState('forest');
   const [selectedCreature, setSelectedCreature] = useState(null);
 
-  // Only creatures Louis has actually discovered via useMicropediaDiscovery
-  const dynamicDiscovered = state?.micropediaDiscovered || [];
-  // Enrich each discovered ID with full creature data (name, art, flavor) from SEED_CREATURES lookup
-  const discovered = dynamicDiscovered
-    .map(d => {
-      const seed = SEED_CREATURES.find(s => s.id === d.id);
-      return seed ? { ...seed, discoveredAt: d.discoveredAt } : null;
-    })
-    .filter(Boolean);
+  // Enrich discovered IDs with seed data once per state change (O(n) via Map lookup)
+  const { discovered, foundById } = useMemo(() => {
+    const raw = state?.micropediaDiscovered || [];
+    const enriched = [];
+    const byId = new Map();
+    for (const d of raw) {
+      const seed = SEED_BY_ID.get(d.id);
+      if (!seed) continue;
+      const discoveredAtMs = d.discoveredAt ? new Date(d.discoveredAt).getTime() : 0;
+      const entry = { ...seed, discoveredAt: d.discoveredAt, discoveredAtMs };
+      enriched.push(entry);
+      byId.set(seed.id, entry);
+    }
+    return { discovered: enriched, foundById: byId };
+  }, [state?.micropediaDiscovered]);
+
   const totalCreatures = CHAPTERS.reduce((sum, ch) => sum + ch.creatureCount, 0);
   const totalFound = discovered.length;
 
@@ -226,8 +155,8 @@ export default function Micropedia({ onNavigate }) {
                     <div className="grid grid-cols-3 gap-3">
                       {Array.from({ length: chapter.creatureCount }, (_, i) => {
                         const creatureId = `${chapter.id}_${i}`;
-                        const found = chapterDiscovered.find(d => d.id === creatureId);
-                        const isNew = found && Date.now() - new Date(found.discoveredAt || 0).getTime() < 24 * 60 * 60 * 1000;
+                        const found = foundById.get(creatureId);
+                        const isNew = found && Date.now() - found.discoveredAtMs < NEW_WINDOW_MS;
                         return (
                           <div key={i} className="relative">
                             <button
