@@ -165,6 +165,10 @@ interface TaskActions {
   spawnEgg: (egg: EggItem) => void;
   collectEgg: () => void;
   fireCelebration: () => void;
+  createQuestLine: (ql: ParentQuestLine) => void;
+  updateQuestLine: (id: string, patch: Partial<ParentQuestLine>) => void;
+  completeQuestLineDay: (questLineId: string, dayId: string) => void;
+  archiveQuestLine: (id: string) => void;
 }
 
 interface CelebrationEvent {
@@ -1026,6 +1030,53 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Parent-created quest-line actions ──
+  const createQuestLine = useCallback((ql: ParentQuestLine) => {
+    setState(prev => {
+      if (!prev) return prev;
+      return { ...prev, parentQuestLines: [...(prev.parentQuestLines || []), ql] };
+    });
+  }, []);
+
+  const updateQuestLine = useCallback((id: string, patch: Partial<ParentQuestLine>) => {
+    setState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        parentQuestLines: (prev.parentQuestLines || []).map(q => q.id === id ? { ...q, ...patch } : q),
+      };
+    });
+  }, []);
+
+  const completeQuestLineDay = useCallback((questLineId: string, dayId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const updated = (prev.parentQuestLines || []).map(q => {
+        if (q.id !== questLineId) return q;
+        if (q.completedDayIds.includes(dayId)) return q;
+        const newDone = [...q.completedDayIds, dayId];
+        const allDone = newDone.length >= q.days.length;
+        return {
+          ...q,
+          completedDayIds: newDone,
+          completed: allDone,
+          completedAt: allDone ? new Date().toISOString() : q.completedAt,
+        };
+      });
+      return { ...prev, parentQuestLines: updated };
+    });
+  }, []);
+
+  const archiveQuestLine = useCallback((id: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        parentQuestLines: (prev.parentQuestLines || []).map(q => q.id === id ? { ...q, archived: true } : q),
+      };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -1049,7 +1100,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
