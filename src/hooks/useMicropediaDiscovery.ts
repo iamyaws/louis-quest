@@ -23,8 +23,9 @@ export const CREATURE_TRIGGERS: DiscoveryTrigger[] = [
   { id: 'forest_1', chapter: 'forest', condition: s => (s.totalTasksDone || 0) >= 3 },
   { id: 'forest_2', chapter: 'forest', condition: s => (s.totalTasksDone || 0) >= 10 },
   { id: 'forest_3', chapter: 'forest', condition: s => (s.arcEngine?.completedArcIds || []).includes('first-adventure') },
-  // Baumbart — rewards deep habit formation (30+ tasks done)
-  { id: 'forest_4', chapter: 'forest', condition: s => (s.totalTasksDone || 0) >= 30 },
+  // Baumbart — rewards consistent habit formation (15+ tasks done).
+  // Lowered from 30 so Muster-Memory (hosted by Baumbart) isn't dormant for weeks.
+  { id: 'forest_4', chapter: 'forest', condition: s => (s.totalTasksDone || 0) >= 15 },
   // Mr. Shroom — unlocks after completing the Pilzhüter reunion arc (Freund-arc engagement)
   { id: 'forest_5', chapter: 'forest', condition: s => (s.freundArcsCompleted || []).includes('freund-pilzhueter') },
   // Pilz-Jeti — rewards closing the day well (3+ evening ritual completions, tracked via journalGratitude)

@@ -33,7 +33,7 @@ const getHostName = (hostId) => {
 };
 
 export default function ForscherEcke({ onPlayGame }) {
-  const { state } = useTask();
+  const { state, actions } = useTask();
   const [lockedHint, setLockedHint] = useState(null);   // game.id flash
   const [baldToast, setBaldToast] = useState(null);     // game.id flash
   const [introFor, setIntroFor] = useState(null);       // game object
@@ -86,6 +86,9 @@ export default function ForscherEcke({ onPlayGame }) {
   const handleAcceptIntro = () => {
     if (!introFor) return;
     const gameId = introFor.id;
+    // Record first-play: distinct from badge earn (recorded on completion).
+    // Lets us track "started but bailed" for future analytics/observation.
+    actions.recordMintGamePlay?.(gameId);
     setIntroFor(null);
     onPlayGame?.(gameId);
   };
