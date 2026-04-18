@@ -5,6 +5,7 @@ import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { getCatStage } from '../utils/helpers';
 import { useRonkiStamina } from '../hooks/useRonkiStamina';
 import FeedbackModal from './FeedbackModal';
+import QuestLineEditor from './QuestLineEditor';
 
 const PIN_CODE = '1234';
 const MOOD_EMOJIS = ['😢', '😕', '😐', '🙂', '😊', '🤩'];
@@ -164,15 +165,16 @@ export default function ParentalDashboard({ onClose, currentView }) {
       </header>
 
       {/* Tab Bar */}
-      <div className="relative z-10 flex gap-2 px-6 py-3">
+      <div className="relative z-10 flex gap-2 px-6 py-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
         {[
           { id: 'overview', label: t('parent.tab.overview'), icon: 'dashboard' },
           { id: 'family', label: t('parent.tab.family'), icon: 'family_restroom' },
+          { id: 'questlines', label: t('parent.tab.questlines'), icon: 'flag' },
           { id: 'settings', label: t('parent.tab.settings'), icon: 'settings' },
         ].map(tb => (
           <button key={tb.id}
             onClick={() => setTab(tb.id)}
-            className="flex-1 py-3 rounded-full font-label font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300"
+            className="flex-1 min-w-max py-3 px-4 rounded-full font-label font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300"
             style={{
               background: tab === tb.id ? '#124346' : 'rgba(255,255,255,0.6)',
               backdropFilter: tab !== tb.id ? 'blur(12px)' : undefined,
@@ -192,6 +194,7 @@ export default function ParentalDashboard({ onClose, currentView }) {
       <main className="relative z-10 px-6 pb-12 max-w-lg mx-auto flex flex-col gap-5">
         {tab === 'overview' && <OverviewTab state={state} lang={lang} />}
         {tab === 'family' && <FamilyTab state={state} actions={actions} lang={lang} />}
+        {tab === 'questlines' && <QuestLineEditor />}
         {tab === 'settings' && <SettingsTab lang={lang} setLang={setLang} t={t} actions={actions} state={state} onOpenFeedback={() => setShowFeedback(true)} />}
         <BodhiLeaf />
       </main>
