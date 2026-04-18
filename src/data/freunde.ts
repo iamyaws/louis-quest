@@ -39,7 +39,7 @@ export const FREUNDE: FreundMeta[] = [
   {
     id: 'tiefentaucher',
     chapter: 'water',
-    name: { de: 'Der Tiefentaucher', en: 'The Deep Diver' },
+    name: { de: 'Die Tiefentaucherin', en: 'The Deep Diver' },
     portrait: 'art/freunde/tiefentaucher.webp',
     skillName: { de: 'Gefühle benennen', en: 'Naming feelings' },
     unlockThreshold: 2,
