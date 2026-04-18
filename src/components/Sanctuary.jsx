@@ -70,8 +70,7 @@ export default function Sanctuary({ onNavigate }) {
         aria-hidden="true"
       />
 
-      <main className="px-5 max-w-lg mx-auto"
-            style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
+      <main className="px-5 max-w-lg mx-auto pt-6">
 
         {/* Zone selector — lets Louis wander between Sanctuary / Meadow / Nebel-Höhle */}
         <div className="mb-4">

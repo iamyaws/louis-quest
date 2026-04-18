@@ -4,10 +4,35 @@ import React from 'react';
  * AlphaBanner — small persistent strip at the top of the app that sets
  * expectations for early testers. Parent-focused message; kids ignore it.
  * Includes a feedback mailto link so testers always know where to send it.
+ *
+ * Publishes its own height as the CSS variable `--alpha-banner-h` on
+ * `document.documentElement` so fixed-top headers can offset themselves below
+ * it without overlapping.
  */
 export default function AlphaBanner() {
+  const ref = React.useRef(null);
+
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const update = () => {
+      root.style.setProperty('--alpha-banner-h', `${el.offsetHeight}px`);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener('resize', update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', update);
+      root.style.removeProperty('--alpha-banner-h');
+    };
+  }, []);
+
   return (
     <div
+      ref={ref}
       role="note"
       className="sticky top-0 inset-x-0 z-[60] bg-[#0F2C2E] text-white/85 border-b border-white/10"
       style={{

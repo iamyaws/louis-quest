@@ -113,7 +113,7 @@ function AppContent() {
       )}
       <div className={`min-h-dvh max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
            style={{
-             paddingTop: ['hub', 'care'].includes(view) ? 0 : 'calc(72px + env(safe-area-inset-top, 0px))',
+             paddingTop: ['hub', 'care'].includes(view) ? 0 : '72px',
              paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
            }}>
         {view === 'quests' && (

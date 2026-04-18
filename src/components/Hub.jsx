@@ -127,8 +127,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
       </div>
 
       {/* ── Top Bar (matches TopBar component style) ── */}
-      <header className="flex justify-between items-center px-6 pb-2"
-              style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
+      <header className="flex justify-between items-center px-6 pb-2 pt-6">
         <button onClick={() => onNavigate?.('ronki')} className="flex items-center gap-2 active:scale-95 transition-all">
           <div className="relative">
             <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden shadow-sm"
