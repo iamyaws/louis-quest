@@ -8,6 +8,7 @@ import { useSpecialQuests } from '../hooks/useSpecialQuests';
 import ToothbrushTimer from './ToothbrushTimer';
 import ToothBrushGuide from './ToothBrushGuide';
 import ClothingSheet from './ClothingSheet';
+import QuestLineCard from './QuestLineCard';
 import VoiceAudio from '../utils/voiceAudio';
 
 // Quest IDs that trigger the toothbrush timer
@@ -36,7 +37,7 @@ const ANCHOR_META_BASE = {
 // Vacation quests share the same hints as their school counterparts
 const HINT_ALIAS = { v1: 's1', v3: 's3', v4: 's4', v2: 's2', v5b: 's6b', v6: 's8', v7: 'sq_zimmer', v10: 's12', v11: 's13', v12: 's14', v13: 's15' };
 
-export default function TaskList({ onNavigate }) {
+export default function TaskList({ onNavigate, onOpenQuestLine }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct, byGroup } = computed;
   const { weather } = useWeather();
@@ -102,6 +103,21 @@ export default function TaskList({ onNavigate }) {
       <section className="mb-5">
         <h2 className="text-xl font-bold font-headline text-on-surface">{t('task.section.title')}</h2>
       </section>
+
+      {/* ── Parent-created quest-lines (top of list, up to 3) ── */}
+      {(() => {
+        const activeQuestLines = (state?.parentQuestLines || [])
+          .filter(q => !q.completed && !q.archived)
+          .slice(0, 3);
+        if (!activeQuestLines.length) return null;
+        return (
+          <div className="mb-5">
+            {activeQuestLines.map(ql => (
+              <QuestLineCard key={ql.id} questLine={ql} onOpen={onOpenQuestLine} />
+            ))}
+          </div>
+        );
+      })()}
 
       {/* ── Active Quest-Line Banner (Poem, Birthday, etc.) ── */}
       {state?.poemQuest && !state.poemQuest.completed ? (

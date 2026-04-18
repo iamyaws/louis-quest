@@ -27,6 +27,7 @@ import MemoryWall from './components/MemoryWall';
 import DiscoveryLog from './components/DiscoveryLog';
 import Micropedia from './components/Micropedia';
 import PoemQuest from './components/PoemQuest';
+import QuestLineView from './components/QuestLineView';
 import StarfighterGame from './components/StarfighterGame';
 import { useSpecialQuests } from './hooks/useSpecialQuests';
 import { useEggSystem } from './hooks/useEggSystem';
@@ -38,6 +39,7 @@ function AppContent() {
   const { t } = useTranslation();
   const { state, actions, loading, toastTrigger } = useTask();
   const [view, setView] = useState('hub');
+  const [activeQuestLineId, setActiveQuestLineId] = useState(null);
   const [showParental, setShowParental] = useState(false);
   const longPressTimer = useRef(null);
   const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
@@ -107,7 +109,15 @@ function AppContent() {
              paddingTop: ['hub', 'care'].includes(view) ? 0 : 'calc(72px + env(safe-area-inset-top, 0px))',
              paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
            }}>
-        {view === 'quests' && <TaskList onNavigate={setView} />}
+        {view === 'quests' && (
+          <TaskList
+            onNavigate={setView}
+            onOpenQuestLine={(id) => {
+              setActiveQuestLineId(id);
+              setView('questline');
+            }}
+          />
+        )}
         {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} onOpenParental={() => setShowParental(true)} />}
         {view === 'hub' && <Hub onNavigate={setView} />}
         {view === 'care' && <Sanctuary onNavigate={setView} />}
@@ -118,6 +128,12 @@ function AppContent() {
         {view === 'discovery' && <DiscoveryLog onNavigate={setView} />}
         {view === 'micropedia' && <Micropedia onNavigate={setView} />}
         {view === 'poem' && <PoemQuest onBack={() => setView('quests')} />}
+        {view === 'questline' && activeQuestLineId && (
+          <QuestLineView
+            questLineId={activeQuestLineId}
+            onBack={() => { setActiveQuestLineId(null); setView('quests'); }}
+          />
+        )}
         {view === 'games' && <MiniGames onPlay={(id) => setView(id)} />}
       </div>
       <NavBar active={view} onNavigate={setView} />
