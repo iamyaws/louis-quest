@@ -51,6 +51,9 @@ export interface Arc {
   beats: Beat[];
   rewardOnComplete: ArcReward;
   cooldownHours: number;    // default 48
+  /** When set, this arc is a Freund reunion arc. Drives Hub card branding and
+   *  Freunde-specific completion tracking. */
+  freundId?: string;
 }
 
 export type ArcLifecyclePhase =
