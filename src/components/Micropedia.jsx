@@ -249,7 +249,8 @@ export default function Micropedia({ onNavigate }) {
                      style={{ background: 'linear-gradient(to top, #fff8f2, transparent)' }} />
                 {/* Close */}
                 <button onClick={() => setSelectedCreature(null)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center z-10"
+                  aria-label="Schließen"
+                  className="absolute top-4 right-4 w-11 h-11 rounded-full flex items-center justify-center z-10"
                   style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)' }}>
                   <span className="material-symbols-outlined text-white">close</span>
                 </button>
@@ -322,11 +323,11 @@ export default function Micropedia({ onNavigate }) {
                       <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.03)' }}>
                         <div className="flex items-center gap-1 mb-1">
                           <span className="text-sm">🏠</span>
-                          <h4 className="font-label font-bold text-[10px] uppercase tracking-wider text-on-surface-variant">
+                          <h4 className="font-label font-bold text-xs uppercase tracking-wider text-on-surface-variant">
                             {lang === 'de' ? 'Lieblingsort' : 'Favorite place'}
                           </h4>
                         </div>
-                        <p className="font-body text-xs text-on-surface leading-snug">
+                        <p className="font-body text-sm text-on-surface leading-snug">
                           {content.favoritePlace}
                         </p>
                       </div>
@@ -335,11 +336,11 @@ export default function Micropedia({ onNavigate }) {
                       <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.03)' }}>
                         <div className="flex items-center gap-1 mb-1">
                           <span className="text-sm">🍯</span>
-                          <h4 className="font-label font-bold text-[10px] uppercase tracking-wider text-on-surface-variant">
+                          <h4 className="font-label font-bold text-xs uppercase tracking-wider text-on-surface-variant">
                             {lang === 'de' ? 'Lieblingsessen' : 'Favorite food'}
                           </h4>
                         </div>
-                        <p className="font-body text-xs text-on-surface leading-snug">
+                        <p className="font-body text-sm text-on-surface leading-snug">
                           {content.favoriteFood}
                         </p>
                       </div>
@@ -374,14 +375,14 @@ export default function Micropedia({ onNavigate }) {
                       <div>
                         <div className="flex items-center gap-1 mb-2">
                           <span className="text-sm">❤️</span>
-                          <h4 className="font-label font-bold text-[10px] uppercase tracking-wider text-on-surface-variant">
+                          <h4 className="font-label font-bold text-xs uppercase tracking-wider text-on-surface-variant">
                             {lang === 'de' ? 'Mag' : 'Likes'}
                           </h4>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
                           {content.likes.map((like, i) => (
                             <span key={i}
-                              className="font-label text-[11px] px-2 py-0.5 rounded-full"
+                              className="font-label text-xs px-2.5 py-1 rounded-full"
                               style={{
                                 background: `${chapterColor}15`,
                                 color: chapterColor,
@@ -397,14 +398,14 @@ export default function Micropedia({ onNavigate }) {
                       <div>
                         <div className="flex items-center gap-1 mb-2">
                           <span className="text-sm">🚫</span>
-                          <h4 className="font-label font-bold text-[10px] uppercase tracking-wider text-on-surface-variant">
+                          <h4 className="font-label font-bold text-xs uppercase tracking-wider text-on-surface-variant">
                             {lang === 'de' ? 'Mag nicht' : 'Dislikes'}
                           </h4>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
                           {content.dislikes.map((d, i) => (
                             <span key={i}
-                              className="font-label text-[11px] px-2 py-0.5 rounded-full"
+                              className="font-label text-xs px-2.5 py-1 rounded-full"
                               style={{
                                 background: 'rgba(0,0,0,0.04)',
                                 color: 'rgba(0,0,0,0.55)',
@@ -423,7 +424,7 @@ export default function Micropedia({ onNavigate }) {
                 {content?.secret && (
                   <div className="mt-4 pt-4"
                        style={{ borderTop: '1px dashed rgba(0,0,0,0.08)' }}>
-                    <p className="font-body text-xs text-on-surface-variant/70 leading-relaxed italic flex gap-1.5">
+                    <p className="font-body text-sm text-on-surface-variant/80 leading-relaxed italic flex gap-1.5">
                       <span>🤫</span>
                       <span className="flex-1">{content.secret}</span>
                     </p>

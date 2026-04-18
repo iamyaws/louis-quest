@@ -57,11 +57,12 @@ export default function ToothBrushGuide({ onFinish, onCancel }) {
 
       <div className="flex gap-2 mb-2">
         {ZONES.map((_, i) => (
-          <div key={i} className="rounded-full transition-all"
+          <div key={i} className="rounded-full"
                style={{
                  width: i === zoneIdx ? 14 : 10,
                  height: i === zoneIdx ? 14 : 10,
                  background: i < zoneIdx ? '#10b981' : i === zoneIdx ? '#0ea5e9' : 'rgba(12,74,110,0.15)',
+                 transition: 'width 300ms ease, height 300ms ease, background 300ms ease',
                }} />
         ))}
       </div>
@@ -70,7 +71,7 @@ export default function ToothBrushGuide({ onFinish, onCancel }) {
       </p>
 
       <button onClick={onCancel}
-        className="font-label text-sm text-[#0c4a6e]/40 active:opacity-70 py-2 px-4">
+        className="font-label text-sm text-[#0c4a6e]/40 active:opacity-70 py-3 px-6 min-h-[44px]">
         Abbrechen
       </button>
     </div>

@@ -20,10 +20,10 @@ export default function StaminaExhausted({ nextRechargeMin, stage = 1, onClose }
         Ronki ist platt
       </h2>
       <p className="font-body text-base text-white/70 text-center leading-relaxed mb-8 max-w-xs">
-        Erholt sich in {nextRechargeMin} Minuten. Probier etwas anderes aus!
+        Erholt sich in {nextRechargeMin} {nextRechargeMin === 1 ? 'Minute' : 'Minuten'}. Probier etwas anderes aus!
       </p>
       <button onClick={e => { e.stopPropagation(); onClose?.(); }}
-        className="px-8 py-3 rounded-full font-label font-bold text-sm"
+        className="px-8 py-3.5 rounded-full font-label font-bold text-base min-h-[48px]"
         style={{ background: '#fcd34d', color: '#725b00' }}>
         Ronki schlafen lassen
       </button>

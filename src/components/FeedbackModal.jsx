@@ -228,7 +228,7 @@ export default function FeedbackModal({ onClose, currentView, ronkiStage, catEvo
                       animation: 'fb-spin 0.8s linear infinite',
                     }}
                   />
-                  Senden...
+                  Senden…
                 </>
               ) : (
                 <>
