@@ -14,6 +14,7 @@ import Onboarding from './components/Onboarding';
 import ParentalDashboard from './components/ParentalDashboard';
 import Celebration from './components/Celebration';
 import ArcOfferCard from './components/ArcOfferCard';
+import FreundCallbackCard from './components/FreundCallbackCard';
 import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
@@ -151,6 +152,7 @@ function AppContent() {
       <CompanionToast trigger={toastTrigger} />
       <Celebration />
       <ArcOfferCard />
+      <FreundCallbackCard />
       {screenTimer && (
         <ScreenTimer
           totalSeconds={screenTimer.totalSeconds}
