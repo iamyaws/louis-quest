@@ -20,6 +20,8 @@ import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
 import CloudJumpGame from './components/CloudJumpGame';
 import StarCatcherGame from './components/StarCatcherGame';
+import ZahlenjagdGame from './components/ZahlenjagdGame';
+import MusterMemoryGame from './components/MusterMemoryGame';
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
@@ -43,7 +45,6 @@ function AppContent() {
   const [view, setView] = useState('hub');
   const [activeQuestLineId, setActiveQuestLineId] = useState(null);
   const [activeMintGame, setActiveMintGame] = useState(null); // MINT game id when view==='mint-game'
-  const [mintToast, setMintToast] = useState(null); // Phase A placeholder toast message
   const [showParental, setShowParental] = useState(false);
   const longPressTimer = useRef(null);
   const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
@@ -127,12 +128,8 @@ function AppContent() {
           <Hub
             onNavigate={setView}
             onPlayMint={(gameId) => {
-              // Phase A scaffolding: actual games ship in Phase B. For now, flash
-              // a "Bald kommt das Spiel!" toast and stay on the Hub. Phase B will
-              // swap this callback for: setActiveMintGame(gameId); setView('mint-game').
               setActiveMintGame(gameId);
-              setMintToast('Bald kommt das Spiel!');
-              setTimeout(() => setMintToast(null), 2400);
+              setView('mint-game');
             }}
           />
         )}
@@ -151,26 +148,23 @@ function AppContent() {
           />
         )}
         {view === 'games' && <MiniGames onPlay={(id) => setView(id)} />}
-        {view === 'mint-game' && (
-          // Phase A placeholder — Phase B replaces this with the actual game
-          // component dispatched from activeMintGame (e.g. 'zahlenjagd' → <Zahlenjagd />).
-          <div className="px-6 pt-24 pb-32 flex flex-col items-center text-center">
-            <p className="text-6xl mb-6">🔬</p>
-            <h2 className="font-headline font-bold text-2xl text-on-surface mb-3"
-                style={{ fontFamily: 'Fredoka, sans-serif' }}>
-              {activeMintGame ? `Spiel: ${activeMintGame}` : 'Forscher-Ecke'}
-            </h2>
-            <p className="font-body text-base text-on-surface-variant max-w-xs">
-              Bald kommt das Abenteuer!
-            </p>
-            <button
-              onClick={() => { setActiveMintGame(null); setView('hub'); }}
-              className="mt-8 px-10 py-4 rounded-full font-label font-bold text-base min-h-[48px] active:scale-95 transition-transform"
-              style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 6px 18px rgba(252,211,77,0.4)' }}
-            >
-              Zurück
-            </button>
-          </div>
+        {view === 'mint-game' && activeMintGame && (
+          <>
+            {activeMintGame === 'zahlenjagd' && (
+              <ZahlenjagdGame onComplete={(reward) => {
+                if (reward?.hp > 0) actions.addHP(reward.hp);
+                setActiveMintGame(null);
+                setView('hub');
+              }} />
+            )}
+            {activeMintGame === 'muster-memory' && (
+              <MusterMemoryGame onComplete={(reward) => {
+                if (reward?.hp > 0) actions.addHP(reward.hp);
+                setActiveMintGame(null);
+                setView('hub');
+              }} />
+            )}
+          </>
         )}
       </div>
       <NavBar active={view} onNavigate={setView} />
@@ -229,21 +223,6 @@ function AppContent() {
           creatureId={discoveryToast}
           onDismiss={() => setDiscoveryToast(null)}
         />
-      )}
-      {mintToast && (
-        <div
-          className="fixed left-1/2 -translate-x-1/2 z-[550] px-5 py-3 rounded-full font-label font-bold text-sm flex items-center gap-2"
-          style={{
-            bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
-            background: '#fcd34d',
-            color: '#725b00',
-            boxShadow: '0 8px 24px rgba(252,211,77,0.4)',
-            border: '1.5px solid #d4a830',
-          }}
-        >
-          <span aria-hidden="true">⏳</span>
-          <span>{mintToast}</span>
-        </div>
       )}
     </>
   );
