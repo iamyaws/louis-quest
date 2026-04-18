@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
-import { getCatStage } from '../utils/helpers';
+import { getCatStage, getDragonArt } from '../utils/helpers';
 import { ARCS, findArc } from '../arcs/arcs';
 import { Pearl } from './CurrencyIcons';
 
@@ -13,7 +13,6 @@ import { Pearl } from './CurrencyIcons';
  * Quick links: Ronkis Freunde + Discovery Log (both Phase 2)
  */
 
-const DRAGON_ART = ['dragon-egg', 'dragon-baby', 'dragon-young', 'dragon-majestic', 'dragon-legendary'];
 const STAGE_NAMES_DE = ['Ei', 'Baby', 'Jungtier', 'Stolz', 'Legendär'];
 const STAGE_NAMES_EN = ['Egg', 'Baby', 'Juvenile', 'Proud', 'Legendary'];
 const STAGE_COLORS = ['#94a3b8', '#34d399', '#0ea5e9', '#f59e0b', '#a855f7'];
@@ -50,7 +49,7 @@ export default function RonkiProfile({ onNavigate }) {
 
   const evo = state.catEvo || 0;
   const stage = getCatStage(evo);
-  const artFile = DRAGON_ART[stage] || 'dragon-baby';
+  const artFile = getDragonArt(stage);
   const stageName = (lang === 'en' ? STAGE_NAMES_EN : STAGE_NAMES_DE)[stage];
   const stageColor = STAGE_COLORS[stage];
   const daysTogether = state.totalTaskDays || 0;

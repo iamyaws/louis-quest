@@ -2,9 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import CooldownButton from './CooldownButton';
-import { getCatStage } from '../utils/helpers';
-
-const DRAGON_ART = ['dragon-egg', 'dragon-baby', 'dragon-young', 'dragon-majestic', 'dragon-legendary'];
+import { getCatStage, DRAGON_ART } from '../utils/helpers';
 
 // ── Confetti Canvas ──
 function ConfettiCanvas() {

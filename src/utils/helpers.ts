@@ -65,6 +65,16 @@ export function getCatStage(catEvo: number): number {
   return 0;
 }
 
+/** Filename stems for Ronki art, indexed by stage (0..4). */
+export const DRAGON_ART: readonly string[] = [
+  'dragon-egg', 'dragon-baby', 'dragon-young', 'dragon-majestic', 'dragon-legendary',
+];
+
+/** Safe lookup: returns baby art for unknown stages. */
+export function getDragonArt(stage: number): string {
+  return DRAGON_ART[stage] || 'dragon-baby';
+}
+
 export function getCatStageProg(catEvo: number): { cur: number; need: number; stage: number; maxStage: boolean } {
   const s = getCatStage(catEvo);
   const cur = CAT_STAGES[s].threshold;

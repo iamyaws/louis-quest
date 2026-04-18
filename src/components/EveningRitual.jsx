@@ -19,8 +19,9 @@ import SFX from '../utils/sfx';
  *   - Bedtime quests are done
  *   - eveningRitualCompletedAt !== today
  */
+import { getDragonArt } from '../utils/helpers';
+
 const base = import.meta.env.BASE_URL;
-const DRAGON_ART = ['dragon-egg', 'dragon-baby', 'dragon-young', 'dragon-majestic', 'dragon-legendary'];
 
 export default function EveningRitual({ stage = 1, onClose }) {
   const { state, actions } = useTask();
@@ -72,7 +73,7 @@ export default function EveningRitual({ stage = 1, onClose }) {
     onClose?.();
   };
 
-  const artFile = DRAGON_ART[stage] || 'dragon-baby';
+  const artFile = getDragonArt(stage);
 
   return (
     <div className="fixed inset-0 z-[600] flex flex-col items-center justify-center overflow-hidden"

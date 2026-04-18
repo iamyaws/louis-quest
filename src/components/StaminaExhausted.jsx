@@ -1,10 +1,10 @@
 import React from 'react';
+import { getDragonArt } from '../utils/helpers';
 
 const base = import.meta.env.BASE_URL;
-const DRAGON_ART = ['dragon-egg', 'dragon-baby', 'dragon-young', 'dragon-majestic', 'dragon-legendary'];
 
 export default function StaminaExhausted({ nextRechargeMin, stage = 1, onClose }) {
-  const artFile = DRAGON_ART[stage] || 'dragon-baby';
+  const artFile = getDragonArt(stage);
   return (
     <div className="fixed inset-0 z-[400] flex flex-col items-center justify-center px-8"
          style={{ background: 'linear-gradient(160deg, #1e1b4b 0%, #0f172a 100%)' }}

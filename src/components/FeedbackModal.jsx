@@ -2,7 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { submitFeedback } from '../utils/feedback';
 
 const base = typeof import.meta !== 'undefined' ? import.meta.env.BASE_URL : '/';
-const APP_VERSION = (typeof import.meta !== 'undefined' && import.meta.env?.MODE) || '1.0.0';
+// Real app version when VITE_APP_VERSION is injected at build time, else build mode.
+const APP_VERSION =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_APP_VERSION) ||
+  (typeof import.meta !== 'undefined' && import.meta.env?.MODE) ||
+  'dev';
 
 /**
  * FeedbackModal — Feedback an Marc schicken (parents/testers only).
@@ -19,6 +23,7 @@ export default function FeedbackModal({ onClose, currentView, ronkiStage, catEvo
   const [sending, setSending] = useState(false);
   const [statusMsg, setStatusMsg] = useState(null); // { ok: bool, text: string }
   const textareaRef = useRef(null);
+  const closeTimerRef = useRef(null);
 
   // Escape key closes the modal
   useEffect(() => {
@@ -27,10 +32,13 @@ export default function FeedbackModal({ onClose, currentView, ronkiStage, catEvo
     return () => window.removeEventListener('keydown', onKey);
   }, [sending, onClose]);
 
-  // Autofocus on mount
+  // Autofocus on mount, clear any pending close timer on unmount
   useEffect(() => {
     const t = setTimeout(() => textareaRef.current?.focus(), 100);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
   }, []);
 
   const canSend = message.trim().length >= 3 && !sending;
@@ -48,10 +56,10 @@ export default function FeedbackModal({ onClose, currentView, ronkiStage, catEvo
     });
     if (result.ok) {
       setStatusMsg({ ok: true, text: 'Danke! ✓' });
-      setTimeout(() => onClose?.(), 2000);
+      closeTimerRef.current = setTimeout(() => onClose?.(), 2000);
     } else {
       setStatusMsg({ ok: false, text: 'Ging nicht. Zwischengespeichert für später.' });
-      setTimeout(() => onClose?.(), 3000);
+      closeTimerRef.current = setTimeout(() => onClose?.(), 3000);
     }
   };
 
