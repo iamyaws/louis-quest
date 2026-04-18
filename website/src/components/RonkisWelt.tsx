@@ -42,6 +42,20 @@ const FREUNDE: Freund[] = [
     accent: '#2D5A5E',
   },
   {
+    name: 'Brückenbauer',
+    subtitle: 'Wenn Freunde sich streiten',
+    blurb: 'Er baut kleine Brücken, wo Worte fehlen.',
+    image: '/art/freunde/brueckenbauer.webp',
+    accent: '#b45309',
+  },
+  {
+    name: 'Flackerfuchs',
+    subtitle: 'Wenn etwas Freude macht',
+    blurb: 'Er tanzt mit, wenn dein Kind lacht.',
+    image: '/art/freunde/flackerfuchs.webp',
+    accent: '#c2410c',
+  },
+  {
     name: 'Pilzhüter',
     subtitle: 'Wenn alles wuselt',
     blurb: 'Er atmet langsam, und dein Kind darf mitatmen.',
@@ -79,11 +93,11 @@ export function RonkisWelt() {
             <em className="italic text-sage">Ronki hat Freunde.</em>
           </h2>
           <p className="mt-6 text-base sm:text-lg text-ink/70 max-w-2xl leading-relaxed">
-            Fünf Begleiter, die an den richtigen Momenten des Tages auftauchen. Nicht als Feature-Liste. Als Figuren, die ein Kind gern wiedertrifft.
+            Sieben Begleiter, die an den richtigen Momenten des Tages auftauchen. Nicht als Feature-Liste. Als Figuren, die ein Kind gern wiedertrifft.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-5 sm:gap-6">
           {FREUNDE.map((f, i) => (
             <motion.figure
               key={f.name}

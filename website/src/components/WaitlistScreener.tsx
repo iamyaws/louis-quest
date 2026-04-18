@@ -53,6 +53,37 @@ export function WaitlistScreener({ email, onComplete, onSkip }: Props) {
   }
 
   if (status === 'done') {
+    // If willing_to_test === 'ja', invite them directly to the alpha app.
+    if (willingToTest === 'ja') {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mt-4 rounded-2xl border-2 border-mustard/40 bg-mustard/10 p-5 sm:p-6 shadow-sm"
+        >
+          <p className="text-xs uppercase tracking-[0.15em] font-display font-bold opacity-80 mb-2">
+            Du bist dabei · Frühzugang
+          </p>
+          <p className="font-display font-bold text-lg leading-tight mb-3">
+            Ronki ist schon online. Probiert es aus.
+          </p>
+          <p className="text-sm opacity-75 leading-relaxed mb-4">
+            Es ist eine frühe Version, die sich noch verändert. Wenn etwas hakt, schreib uns kurz an{' '}
+            <a href="mailto:hallo@ronki.de" className="underline hover:opacity-100">hallo@ronki.de</a>.
+          </p>
+          <a
+            href="https://app.ronki.de"
+            className="inline-flex items-center gap-2 rounded-full bg-teal-dark px-5 py-3 text-cream font-display font-bold text-sm shadow-sm hover:shadow-md hover:bg-teal transition-all"
+          >
+            Zur frühen Version
+            <span aria-hidden>→</span>
+          </a>
+        </motion.div>
+      );
+    }
+
+    // Otherwise: polite thanks, we'll reach out later.
     return (
       <motion.div
         initial={{ opacity: 0 }}
