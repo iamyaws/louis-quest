@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { getCatStage, getDragonArt } from '../utils/helpers';
 import { ARCS, findArc } from '../arcs/arcs';
 import { Pearl } from './CurrencyIcons';
+import { SEED_BY_ID, CHAPTERS } from '../data/creatures';
 
 /**
  * Companion Profile — patterned on Finch's Piper page.
@@ -64,6 +65,23 @@ export default function RonkiProfile({ onNavigate }) {
   const nextThreshold = THRESHOLDS[stage + 1];
   const evoPct = nextThreshold ? Math.min(100, ((evo - THRESHOLDS[stage]) / (nextThreshold - THRESHOLDS[stage])) * 100) : 100;
 
+  // Freunde preview — last 4 discoveries, enriched from seeds
+  const { recentFreunde, totalFound, totalCreatures } = useMemo(() => {
+    const raw = state.micropediaDiscovered || [];
+    const sorted = [...raw]
+      .sort((a, b) => {
+        const ta = a.discoveredAt ? new Date(a.discoveredAt).getTime() : 0;
+        const tb = b.discoveredAt ? new Date(b.discoveredAt).getTime() : 0;
+        return tb - ta;
+      });
+    const recent = sorted
+      .slice(0, 4)
+      .map(d => SEED_BY_ID.get(d.id))
+      .filter(Boolean);
+    const total = CHAPTERS.reduce((sum, ch) => sum + ch.creatureCount, 0);
+    return { recentFreunde: recent, totalFound: raw.length, totalCreatures: total };
+  }, [state.micropediaDiscovered]);
+
   return (
     <div className="relative min-h-dvh pb-32">
       {/* Cream base */}
@@ -100,6 +118,54 @@ export default function RonkiProfile({ onNavigate }) {
             {lang === 'de' ? 'Mystischer Begleiter' : 'Mystical Companion'}
           </p>
         </div>
+
+        {/* ═══ FREUNDE HERO CARD ═══ */}
+        <button
+          onClick={() => onNavigate?.('micropedia')}
+          className="w-full rounded-2xl p-4 mb-5 active:scale-[0.98] transition-transform text-left"
+          style={{
+            background: 'linear-gradient(135deg, #fff8f2 0%, #fef3c7 100%)',
+            border: '1.5px solid rgba(252,211,77,0.3)',
+            boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
+          }}
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <span className="material-symbols-outlined text-2xl"
+                  style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>
+              groups
+            </span>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-headline font-bold text-base text-on-surface">
+                {lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}
+              </h3>
+              <p className="font-label text-xs text-on-surface-variant">
+                {totalFound} / {totalCreatures} {lang === 'de' ? 'entdeckt' : 'found'}
+              </p>
+            </div>
+            <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+          </div>
+          {recentFreunde.length > 0 && (
+            <div className="flex gap-2 mt-1">
+              {recentFreunde.slice(0, 4).map(f => (
+                <div key={f.id}
+                     className="w-12 h-12 rounded-xl overflow-hidden"
+                     style={{ border: '2px solid rgba(255,255,255,0.6)' }}>
+                  {f.art ? (
+                    <img src={base + f.art} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center"
+                         style={{ background: 'rgba(252,211,77,0.18)' }}>
+                      <span className="material-symbols-outlined text-base"
+                            style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>
+                        pets
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </button>
 
         {/* ═══ TAB BAR ═══ */}
         <div className="flex gap-1 p-1 rounded-full mb-6"
@@ -355,37 +421,6 @@ export default function RonkiProfile({ onNavigate }) {
             </div>
           </div>
         )}
-
-        {/* ═══ QUICK LINKS ═══ */}
-        <div className="flex flex-col gap-3 mt-8">
-          {/* Ronkis Freunde — prominent card */}
-          <button
-            className="w-full rounded-2xl p-5 active:scale-[0.98] transition-all text-left relative overflow-hidden"
-            style={{
-              background: 'linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%)',
-              border: '2px solid rgba(161,98,7,0.2)',
-              boxShadow: '0 6px 20px rgba(252,211,77,0.35), 0 2px 0 #d4a830',
-            }}
-            onClick={() => onNavigate?.('micropedia')}
-          >
-            <div className="flex items-center gap-4">
-              <span className="text-4xl select-none">🐾</span>
-              <div className="flex-1">
-                <h3 className="font-headline font-bold text-xl" style={{ color: '#78350f' }}>
-                  {lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}
-                </h3>
-                <p className="font-body text-sm mt-0.5" style={{ color: '#92400e' }}>
-                  {lang === 'de' ? '9 Freunde warten auf dich!' : '9 friends waiting for you!'}
-                </p>
-              </div>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                   style={{ background: 'rgba(255,255,255,0.4)' }}>
-                <span className="material-symbols-outlined text-xl" style={{ color: '#78350f' }}>arrow_forward</span>
-              </div>
-            </div>
-          </button>
-
-        </div>
 
         {/* ═══ MOTTO ═══ */}
         <div className="flex justify-center mt-8 mb-4">
