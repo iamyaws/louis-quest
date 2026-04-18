@@ -77,6 +77,8 @@ export default function BaumPoseBeat({ onComplete }) {
 function TreePoseSVG({ wobble }) {
   return (
     <svg viewBox="0 0 200 260" className="w-40 h-52"
+         role="img"
+         aria-label="Kind in Baum-Pose"
          style={wobble ? { animation: 'treeWobble 3s ease-in-out infinite' } : undefined}>
       {/* Arms up as branches */}
       <path d="M 100 90 L 60 30" stroke="#065f46" strokeWidth="10" strokeLinecap="round" fill="none" />

@@ -105,9 +105,9 @@ export function useArc() {
       const arc = findArc(lastId);
       const traitIds = arc?.rewardOnComplete?.traitIds || [];
       if (traitIds.length > 0) {
-        const currentTraits = (state as any)?.earnedTraits || [];
+        const currentTraits = state?.earnedTraits || [];
         const merged = Array.from(new Set([...currentTraits, ...traitIds]));
-        actions.patchState({ earnedTraits: merged } as any);
+        actions.patchState({ earnedTraits: merged });
       }
     } else if (next.activeArcId) {
       // Not yet complete — play per-beat narration for the NEW active beat (if any)

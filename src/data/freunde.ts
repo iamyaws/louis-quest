@@ -66,4 +66,3 @@ export const FREUNDE: FreundMeta[] = [
 ];
 
 export const FREUND_BY_ID: Map<string, FreundMeta> = new Map(FREUNDE.map(f => [f.id, f]));
-export const FREUND_BY_CHAPTER: Map<string, FreundMeta> = new Map(FREUNDE.map(f => [f.chapter, f]));

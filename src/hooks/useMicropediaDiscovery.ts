@@ -45,7 +45,7 @@ export function useMicropediaDiscovery(onDiscover?: (id: string) => void) {
 
   useEffect(() => {
     if (!state) return;
-    const discovered: DiscoveredEntry[] = (state as any).micropediaDiscovered || [];
+    const discovered: DiscoveredEntry[] = state.micropediaDiscovered || [];
     const discoveredIds = new Set(discovered.map(d => d.id));
     const newOnes = CREATURE_TRIGGERS.filter(t => !discoveredIds.has(t.id) && t.condition(state));
 
@@ -56,7 +56,7 @@ export function useMicropediaDiscovery(onDiscover?: (id: string) => void) {
       ...discovered,
       ...newOnes.map(t => ({ id: t.id, chapter: t.chapter, discoveredAt: now })),
     ];
-    actions.patchState({ micropediaDiscovered: next } as any);
+    actions.patchState({ micropediaDiscovered: next });
 
     // Notify UI of the first new discovery (toast one at a time)
     if (onDiscover && newOnes.length > 0) {
