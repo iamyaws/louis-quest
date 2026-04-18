@@ -846,18 +846,24 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Mini-game reward: +1 screen minute per unique game per day (max 4) ──
+  /** Mark a minigame complete: grant daily reward (once/day) AND consume 1 stamina.
+   *  Stamina always drops on completion, even for repeat plays of the same game. */
   const claimGameReward = useCallback((gameId: string) => {
     setState(prev => {
       if (!prev) return prev;
       const played = prev.gamesPlayedToday || [];
-      if (played.includes(gameId)) return prev; // already claimed today
+      const alreadyClaimed = played.includes(gameId);
       return {
         ...prev,
-        drachenEier: (prev.drachenEier || 0) + 1,
-        gamesPlayedToday: [...played, gameId],
+        // Reward only on first claim of the day
+        drachenEier: alreadyClaimed ? prev.drachenEier : (prev.drachenEier || 0) + 1,
+        gamesPlayedToday: alreadyClaimed ? played : [...played, gameId],
         gamesPlayedEver: prev.gamesPlayedEver?.includes(gameId)
           ? prev.gamesPlayedEver
           : [...(prev.gamesPlayedEver || []), gameId],
+        // Stamina always drops — the dopamine cost of playing, not of claiming
+        ronkiStamina: Math.max(0, (prev.ronkiStamina ?? 5) - 1),
+        ronkiStaminaUpdatedAt: new Date().toISOString(),
       };
     });
   }, []);

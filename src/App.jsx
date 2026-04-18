@@ -117,39 +117,29 @@ function AppContent() {
         {view === 'discovery' && <DiscoveryLog onNavigate={setView} />}
         {view === 'micropedia' && <Micropedia onNavigate={setView} />}
         {view === 'poem' && <PoemQuest onBack={() => setView('quests')} />}
-        {view === 'games' && <MiniGames onPlay={(id) => {
-          if (id === 'memory') setView('memory');
-          if (id === 'potion') setView('potion');
-          if (id === 'clouds') setView('clouds');
-          if (id === 'starfall') setView('starfall');
-          if (id === 'starfighter') setView('starfighter');
-        }} />}
+        {view === 'games' && <MiniGames onPlay={(id) => setView(id)} />}
       </div>
       <NavBar active={view} onNavigate={setView} />
       {showParental && <ParentalDashboard onClose={() => setShowParental(false)} currentView={view} />}
       {view === 'memory' && <MemoryGame onComplete={() => {
-        actions.claimGameReward('memory'); // +1 screen min (once/day)
-        actions.consumeStamina();
+        actions.claimGameReward('memory');
         setView('games');
       }} />}
       {view === 'potion' && <PotionGame onComplete={() => {
         actions.claimGameReward('potion');
-        actions.consumeStamina();
         setView('games');
       }} />}
       {view === 'clouds' && <CloudJumpGame onComplete={() => {
         actions.claimGameReward('clouds');
-        actions.consumeStamina();
         setView('games');
       }} />}
       {view === 'starfall' && <StarCatcherGame onComplete={() => {
         actions.claimGameReward('starfall');
-        actions.consumeStamina();
         setView('games');
       }} />}
       {view === 'starfighter' && <StarfighterGame onComplete={(reward) => {
         if (reward?.hp > 0) actions.addHP(reward.hp);
-        actions.consumeStamina();
+        actions.claimGameReward('starfighter');
         setView('games');
       }} />}
       {state?.pendingEgg && state.pendingEgg.view === view && (
