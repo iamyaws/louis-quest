@@ -25,6 +25,18 @@ const ROUTES: RouteMeta[] = [
     ogImage: '/og-wissenschaft.jpg',
   },
   {
+    path: '/faq',
+    title: 'Häufige Fragen zu Ronki',
+    description:
+      'Antworten auf die häufigsten Fragen von Eltern zu Ronki: Geräte, Alter, Datenschutz, Preis und was das Alpha-Programm bedeutet.',
+  },
+  {
+    path: '/fuer-eltern',
+    title: 'Für Eltern: Ronki',
+    description:
+      'Sechs ehrliche Antworten auf die Fragen, die Eltern sich zu Ronki stellen: Bildschirmzeit, Datenschutz, Motivation, Preis und Alpha.',
+  },
+  {
     path: '/impressum',
     title: 'Impressum: Ronki',
     description: 'Anbieterkennzeichnung nach § 5 DDG und § 18 MStV.',

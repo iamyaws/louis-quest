@@ -25,6 +25,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.ronki.de/faq</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.ronki.de/impressum</loc>
     <lastmod>2026-04-17</lastmod>
     <changefreq>yearly</changefreq>

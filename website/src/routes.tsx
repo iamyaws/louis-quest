@@ -8,6 +8,7 @@ import Home from './pages/Home';
 const HowItWorks = lazy(() => import('./pages/HowItWorks'));
 const Science = lazy(() => import('./pages/Science'));
 const FuerEltern = lazy(() => import('./pages/FuerEltern'));
+const FAQ_Page = lazy(() => import('./pages/FAQ_Page'));
 const Impressum = lazy(() => import('./pages/Impressum'));
 const Datenschutz = lazy(() => import('./pages/Datenschutz'));
 const AGB = lazy(() => import('./pages/AGB'));
@@ -40,6 +41,7 @@ export function AppRoutes() {
         <Route path="/wie-es-funktioniert" element={<HowItWorks />} />
         <Route path="/wissenschaft" element={<Science />} />
         <Route path="/fuer-eltern" element={<FuerEltern />} />
+        <Route path="/faq" element={<FAQ_Page />} />
         <Route path="/impressum" element={<Impressum />} />
         <Route path="/datenschutz" element={<Datenschutz />} />
         <Route path="/agb" element={<AGB />} />
