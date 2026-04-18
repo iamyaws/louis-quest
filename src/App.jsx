@@ -100,7 +100,6 @@ function AppContent() {
 
   return (
     <>
-      <AlphaBanner />
       {!['hub', 'care'].includes(view) && (
         <div onTouchStart={handleLongPressStart} onTouchEnd={handleLongPressEnd}
              onMouseDown={handleLongPressStart} onMouseUp={handleLongPressEnd} onMouseLeave={handleLongPressEnd}>
@@ -261,6 +260,7 @@ class ErrorBoundaryInner extends React.Component {
 export default function App() {
   return (
     <ErrorBoundary>
+      <AlphaBanner />
       <AuthProvider>
         <AuthGate />
       </AuthProvider>
