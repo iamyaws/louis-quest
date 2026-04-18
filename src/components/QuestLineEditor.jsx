@@ -228,8 +228,10 @@ function FormMode({ lang, templateId, editingQL, onSave, onCancel, actions }) {
 
   const [title, setTitle] = useState(editingQL?.title || '');
   const [subtitle, setSubtitle] = useState(editingQL?.subtitle || '');
+  // Event template REQUIRES a target date so we prefill to +7 days.
+  // Learn template marks it "optional" so we leave it empty — no UX lie.
   const [targetDate, setTargetDate] = useState(
-    editingQL?.targetDate || (templateId === 'event' || templateId === 'learn' ? addDaysISO(7) : '')
+    editingQL?.targetDate || (templateId === 'event' ? addDaysISO(7) : '')
   );
   const [prepItems, setPrepItems] = useState(() => {
     const base = ['', '', ''];

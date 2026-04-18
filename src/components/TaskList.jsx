@@ -104,17 +104,25 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
         <h2 className="text-xl font-bold font-headline text-on-surface">{t('task.section.title')}</h2>
       </section>
 
-      {/* ── Parent-created quest-lines (top of list, up to 3) ── */}
+      {/* ── Parent-created quest-lines (top of list, show up to 3) ── */}
       {(() => {
-        const activeQuestLines = (state?.parentQuestLines || [])
-          .filter(q => !q.completed && !q.archived)
-          .slice(0, 3);
-        if (!activeQuestLines.length) return null;
+        const allActive = (state?.parentQuestLines || [])
+          .filter(q => !q.completed && !q.archived);
+        if (!allActive.length) return null;
+        const shown = allActive.slice(0, 3);
+        const remainder = allActive.length - shown.length;
         return (
           <div className="mb-5">
-            {activeQuestLines.map(ql => (
+            {shown.map(ql => (
               <QuestLineCard key={ql.id} questLine={ql} onOpen={onOpenQuestLine} />
             ))}
+            {remainder > 0 && (
+              <p className="font-label text-xs text-on-surface-variant/70 text-center italic mt-2">
+                {remainder === 1
+                  ? 'Noch eine Quest-Linie wartet. Frag Mama oder Papa.'
+                  : `Noch ${remainder} Quest-Linien warten. Frag Mama oder Papa.`}
+              </p>
+            )}
           </div>
         );
       })()}

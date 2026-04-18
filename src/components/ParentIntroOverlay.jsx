@@ -45,23 +45,22 @@ export default function ParentIntroOverlay() {
           border: '1.5px solid rgba(255,255,255,0.6)',
         }}
       >
-        {/* Drachenmutter portrait */}
+        {/* Drachenmutter portrait — fallback icon renders first (behind img),
+            so if the img 404s and hides itself, the icon is already visible. */}
         <div className="relative w-full aspect-[4/3] overflow-hidden"
              style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' }}>
-          <img
-            src={`${base}art/companion/drachenmutter.webp`}
-            alt=""
-            className="w-full h-full object-cover"
-            onError={(e) => { e.target.style.display = 'none'; }}
-          />
-          {/* Fallback icon if image 404s */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none"
-               style={{ zIndex: -1 }}>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="material-symbols-outlined"
                   style={{ fontSize: 96, color: 'rgba(146,64,14,0.35)', fontVariationSettings: "'FILL' 1" }}>
               family_restroom
             </span>
           </div>
+          <img
+            src={`${base}art/companion/drachenmutter.webp`}
+            alt=""
+            className="relative w-full h-full object-cover"
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
         </div>
 
         {/* Copy + CTA */}

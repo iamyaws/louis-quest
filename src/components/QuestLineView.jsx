@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
@@ -44,11 +44,13 @@ export default function QuestLineView({ questLineId, onBack }) {
 
   const ql = (state?.parentQuestLines || []).find(q => q.id === questLineId);
 
-  // Quest-line not found — bail out immediately
-  if (!ql) {
-    if (typeof onBack === 'function') onBack();
-    return null;
-  }
+  // Quest-line not found — schedule the parent navigation via effect
+  // so we don't setState during render (React anti-pattern).
+  useEffect(() => {
+    if (!ql && typeof onBack === 'function') onBack();
+  }, [ql, onBack]);
+
+  if (!ql) return null;
 
   // Archived — show a quiet state + back button
   if (ql.archived) {
