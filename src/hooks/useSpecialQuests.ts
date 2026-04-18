@@ -94,28 +94,35 @@ export function useSpecialQuests() {
       }
     }
 
-    // 2. Callback scheduling: when beat 3 just advanced (engine now at beat 4),
-    //    force-complete the arc and schedule the callback for 5-7 days later.
-    if (
-      arcEngine.phase === 'active' &&
-      arcEngine.activeArcId &&
-      arcEngine.activeBeatIndex === 3
-    ) {
+    // 2. Callback scheduling: when the FINAL beat just advanced (engine past
+    //    the last routine beat), force-complete the arc and schedule the
+    //    callback for 5-7 days later. Works for Freund arcs of any beat count.
+    if (arcEngine.phase === 'active' && arcEngine.activeArcId) {
       const arc = findArc(arcEngine.activeArcId);
       const freundId = arc?.freundId;
-      if (arc && freundId && FREUND_BY_ID.has(freundId)) {
+      // For Freund arcs the "active-beat past the penultimate" point triggers
+      // the pre-callback completion. Current pilot: 4 beats, trigger at idx 3.
+      const isFreundArc = !!(arc && freundId && FREUND_BY_ID.has(freundId));
+      const atCallbackBoundary = arc && arcEngine.activeBeatIndex === arc.beats.length - 1;
+      if (isFreundArc && atCallbackBoundary) {
         const alreadyPending = callbacksPending.some(cb => cb.freundId === freundId);
         if (!alreadyPending) {
           const scheduleAt = new Date(
             Date.now() + (5 + Math.random() * 2) * 24 * 3600 * 1000
           ).toISOString();
           const completedEngine = completeArc(arcEngine, arc);
+          // Grant traits now (we bypass useArc.advance(), which normally does it)
+          const traitIds = arc?.rewardOnComplete?.traitIds || [];
+          const mergedTraits = traitIds.length > 0
+            ? Array.from(new Set([...(state.earnedTraits || []), ...traitIds]))
+            : undefined;
           actions.patchState({
             arcEngine: completedEngine,
             freundCallbacksPending: [
               ...callbacksPending,
               { freundId, triggerAt: scheduleAt },
             ],
+            ...(mergedTraits ? { earnedTraits: mergedTraits } : {}),
           });
           return;
         }

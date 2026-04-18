@@ -4,7 +4,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 import { getCatStage, getDragonArt } from '../utils/helpers';
 import { ARCS, findArc } from '../arcs/arcs';
 import { Pearl } from './CurrencyIcons';
-import { SEED_BY_ID, CHAPTERS } from '../data/creatures';
+import { SEED_BY_ID, SEED_CREATURES } from '../data/creatures';
 
 /**
  * Companion Profile — patterned on Finch's Piper page.
@@ -55,7 +55,16 @@ export default function RonkiProfile({ onNavigate }) {
   const stageColor = STAGE_COLORS[stage];
   const daysTogether = state.totalTaskDays || 0;
   const heroName = state.familyConfig?.heroName || 'Louis';
-  const completedArcs = state.arcEngine?.completedArcIds || [];
+  // Freund arcs don't count as "complete" until the delayed callback (beat 4)
+  // has fired. Until then, they live in engine.completedArcIds but not in
+  // freundArcsCompleted — so we filter them out here to avoid spoiling the
+  // delayed-return moment in the profile.
+  const freundArcsDone = state.freundArcsCompleted || [];
+  const completedArcs = (state.arcEngine?.completedArcIds || []).filter(arcId => {
+    const arc = findArc(arcId);
+    if (arc?.freundId) return freundArcsDone.includes(arcId);
+    return true;
+  });
   const stateTraits = state.earnedTraits || [];
   // Combine: traits granted by arcs (state) + milestone-inferred (legacy visual feedback)
   const earnedTraits = TRAIT_POOL.filter(tr => stateTraits.includes(tr.id) || tr.when(state));
@@ -65,7 +74,9 @@ export default function RonkiProfile({ onNavigate }) {
   const nextThreshold = THRESHOLDS[stage + 1];
   const evoPct = nextThreshold ? Math.min(100, ((evo - THRESHOLDS[stage]) / (nextThreshold - THRESHOLDS[stage])) * 100) : 100;
 
-  // Freunde preview — last 4 discoveries, enriched from seeds
+  // Freunde preview — last 4 discoveries, enriched from seeds.
+  // Denominator = SEED_CREATURES.length (what Louis can actually find today),
+  // not the 60-slot grid ceiling which is aspirational.
   const { recentFreunde, totalFound, totalCreatures } = useMemo(() => {
     const raw = state.micropediaDiscovered || [];
     const sorted = [...raw]
@@ -78,8 +89,7 @@ export default function RonkiProfile({ onNavigate }) {
       .slice(0, 4)
       .map(d => SEED_BY_ID.get(d.id))
       .filter(Boolean);
-    const total = CHAPTERS.reduce((sum, ch) => sum + ch.creatureCount, 0);
-    return { recentFreunde: recent, totalFound: raw.length, totalCreatures: total };
+    return { recentFreunde: recent, totalFound: raw.length, totalCreatures: SEED_CREATURES.length };
   }, [state.micropediaDiscovered]);
 
   return (
