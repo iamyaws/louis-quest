@@ -5,6 +5,7 @@ import { HeroVariantF } from '../components/HeroVariantF';
 import { BeforeAfter } from '../components/BeforeAfter';
 import { UeberMich } from '../components/UeberMich';
 import { ArcStoryboard } from '../components/ArcStoryboard';
+import { RonkisWelt } from '../components/RonkisWelt';
 import { IntrinsicMotivation } from '../components/IntrinsicMotivation';
 import { AntiFeatures } from '../components/AntiFeatures';
 import { PWAInstall } from '../components/PWAInstall';
@@ -25,6 +26,7 @@ export default function Home() {
       <BeforeAfter />
       <UeberMich />
       <ArcStoryboard />
+      <RonkisWelt />
       <IntrinsicMotivation />
       <AntiFeatures />
       <PWAInstall />
