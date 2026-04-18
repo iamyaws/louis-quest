@@ -63,13 +63,13 @@ const STEPS_DESKTOP: Step[] = [
   },
   {
     step: '2',
-    title: 'Install-Symbol',
-    body: 'Klicke auf das Install-Symbol in der Adressleiste.',
+    title: 'Installieren',
+    body: 'Klicke auf das kleine Symbol rechts in der Adresszeile.',
   },
   {
     step: '3',
-    title: 'Bestätigen',
-    body: 'Bestätige, und Ronki läuft wie eine eigenständige App.',
+    title: 'Fertig',
+    body: 'Bestätige, und Ronki läuft wie eine ganz normale App.',
   },
 ];
 
@@ -134,17 +134,17 @@ export function PWAInstall() {
 
         <div className="relative z-10 text-center max-w-3xl mx-auto">
           <p className="text-[0.65rem] uppercase tracking-[0.15em] text-cream/70 font-semibold mb-4">
-            Kein App Store nötig
+            So wird die Installation aussehen
           </p>
           <h2
             id="pwa-heading"
             className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl text-cream leading-tight mb-5"
           >
-            Kein Store. Kein Tracking.{' '}
-            <em className="italic text-mustard">Direkt auf dem Handy.</em>
+            Kein App Store.{' '}
+            <em className="italic text-mustard">Einmal antippen, fertig.</em>
           </h2>
           <p className="text-base sm:text-lg text-cream/70 leading-relaxed mb-10 max-w-xl mx-auto">
-            Ronki läuft direkt im Browser und lässt sich in Sekunden auf deinem Startbildschirm installieren. Keine Drittanbieter-Tracker, kein Store-Bloat, keine Werbung. Nur eine direkte Verbindung von uns zu euch.
+            Ronki öffnest du im Browser und legst es einmal auf den Startbildschirm. Danach ist es wie jede andere App: ein Symbol, das dein Kind antippt. Keine Werbung, keine Tracker, kein Download.
           </p>
 
           {/* Platform badge */}
@@ -166,7 +166,7 @@ export function PWAInstall() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.2 + i * 0.1 }}
-                className="relative bg-cream/[0.06] backdrop-blur-sm rounded-2xl p-6 border border-cream/10 text-left"
+                className="relative bg-cream/[0.06] backdrop-blur-sm rounded-2xl p-6 border border-cream/10 text-left [hyphens:none]"
               >
                 <div
                   className="w-9 h-9 rounded-full bg-mustard text-teal-dark font-display font-bold text-sm flex items-center justify-center mb-4"

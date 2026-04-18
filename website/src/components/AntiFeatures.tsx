@@ -75,7 +75,7 @@ export function AntiFeatures() {
                       whileInView={{ scaleX: 1 }}
                       viewport={{ once: true, margin: '-10%' }}
                       transition={{ duration: 0.7, delay: i * 0.08 + 0.4, ease: EASE_OUT }}
-                      className="absolute left-0 top-1/2 h-[2.5px] w-full origin-left bg-mustard/70"
+                      className="absolute left-0 top-1/2 h-[3px] w-full origin-left bg-teal-dark/75 rounded-full"
                     />
                   </p>
                   <p className="mt-3 text-sm sm:text-base opacity-75 leading-relaxed max-w-xl text-ink">
