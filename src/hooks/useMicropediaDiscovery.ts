@@ -32,6 +32,8 @@ export const CREATURE_TRIGGERS: DiscoveryTrigger[] = [
   { id: 'forest_6', chapter: 'forest', condition: s => (s.journalGratitude || []).length >= 3 },
   // Sky — game exploration
   { id: 'sky_0', chapter: 'sky', condition: s => (s.viewsVisited || []).includes('games') },
+  // Larson — rewards minigame exploration (any mini-game played ever)
+  { id: 'sky_1', chapter: 'sky', condition: s => (s.gamesPlayedEver || []).length >= 1 },
   // Water — care + journal
   { id: 'water_0', chapter: 'water', condition: s => (s.dailyWaterCount || 0) >= 6 },
   { id: 'water_1', chapter: 'water', condition: s => (s.journalHistory || []).length >= 1 },
@@ -41,8 +43,14 @@ export const CREATURE_TRIGGERS: DiscoveryTrigger[] = [
   { id: 'dream_0', chapter: 'dream', condition: s => s.moodAM !== null && s.moodAM !== undefined },
   { id: 'dream_1', chapter: 'dream', condition: s => (s.journalHistory || []).length >= 3 },
   { id: 'dream_2', chapter: 'dream', condition: s => (s.arcEngine?.completedArcIds || []).length >= 2 },
+  // Brie — rewards deep journaling (5+ entries, the "you dream often" signal)
+  { id: 'dream_3', chapter: 'dream', condition: s => (s.journalHistory || []).length >= 5 },
   // Hearth — relationship-driven
   { id: 'hearth_0', chapter: 'hearth', condition: s => (s.catEvo || 0) >= 2 },
+  // Firecracker — rewards 5+ evening rituals (deep bedtime habit, the "you end days well" signal)
+  { id: 'hearth_1', chapter: 'hearth', condition: s => (s.journalGratitude || []).length >= 5 },
+  // Doktor Funkel — special: unlocks when all 5 MINT badges earned (Forscher-Funkel achievement)
+  { id: 'hearth_2', chapter: 'hearth', condition: s => !!s.forscherFunkelUnlocked },
 ];
 
 type DiscoveredEntry = { id: string; chapter: string; discoveredAt: string };

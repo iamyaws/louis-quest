@@ -22,6 +22,10 @@ export const SEED_CREATURES: readonly CreatureSeed[] = [
   { id: 'forest_4', chapter: 'forest', name: { de: 'Baumbart',        en: 'Treebeard' },   art: 'art/micropedia/creatures/baumbart.webp',         flavor: { de: 'Flüstert mit den Wurzeln, hört den Wäldern zu.',       en: 'Whispers with roots, listens to forests.' } },
   { id: 'forest_5', chapter: 'forest', name: { de: 'Mr. Shroom',      en: 'Mr. Shroom' },  art: 'art/micropedia/creatures/mr-shroom.webp',        flavor: { de: 'Trägt immer einen Hut. Manchmal zwei.',               en: 'Always wears a hat. Sometimes two.' } },
   { id: 'forest_6', chapter: 'forest', name: { de: 'Pilz-Jeti',       en: 'Mushroom Yeti' },art: 'art/micropedia/creatures/pilz-jeti.webp',        flavor: { de: 'Groß, plüschig, schüchtern. Hinterlässt fluffige Spuren.', en: 'Big, fluffy, shy. Leaves fluffy tracks.' } },
+  { id: 'sky_1',    chapter: 'sky',    name: { de: 'Larson',          en: 'Larson' },       art: 'art/micropedia/creatures/larson.webp',           flavor: { de: 'Fliegt Loopings, wenn keiner guckt.',                 en: 'Flies loops when no one is watching.' } },
+  { id: 'dream_3',  chapter: 'dream',  name: { de: 'Brie',            en: 'Brie' },         art: 'art/micropedia/creatures/brie.webp',             flavor: { de: 'Sammelt träumende Gedanken in einem Krug.',           en: 'Collects dreaming thoughts in a jar.' } },
+  { id: 'hearth_1', chapter: 'hearth', name: { de: 'Firecracker',     en: 'Firecracker' },  art: 'art/micropedia/creatures/firecracker.webp',      flavor: { de: 'Knistert vor Freude. Ganz sanft.',                    en: 'Crackles with joy. Very gently.' } },
+  { id: 'hearth_2', chapter: 'hearth', name: { de: 'Doktor Funkel',   en: 'Dr. Sparkle' },  art: 'art/micropedia/creatures/doktor-funkel.webp',    flavor: { de: 'Forscher, Freund, Funkel. Nur für echte Knobel-Meister.', en: 'Researcher, friend, spark. For true puzzle-masters only.' } },
   { id: 'sky_0',    chapter: 'sky',    name: { de: 'Sturmflügel',     en: 'Stormwing' },   art: 'art/micropedia/creatures/creature-8.webp',       flavor: { de: 'Reitet auf Gewitterwolken.',                          en: 'Rides on thunderclouds.' } },
   { id: 'water_0',  chapter: 'water',  name: { de: 'Perlenfisch',     en: 'Pearlfish' },   art: 'art/micropedia/creatures/creature-water-1.webp', flavor: { de: 'Seine Schuppen leuchten wie Perlen im Mondlicht.',    en: 'Scales glow like pearls in moonlight.' } },
   { id: 'water_1',  chapter: 'water',  name: { de: 'Wellentänzer',    en: 'Wavedancer' },  art: 'art/micropedia/creatures/creature-water-2.webp', flavor: { de: 'Tanzt auf Seerosen, wenn niemand hinsieht.',          en: 'Dances on lily pads when nobody looks.' } },
@@ -325,5 +329,65 @@ export const CREATURE_CONTENT: Record<string, CreatureContent> = {
     secret: 'Er träumt immer vom gleichen warmen Kissen.',
     likes: ['Kaminfeuer', 'weiche Decken', 'lange Nickerchen'],
     dislikes: ['kalter Boden', 'offene Fenster'],
+  },
+
+  hearth_1: {
+    id: 'hearth_1',
+    ronkiNote: 'Firecracker knistert leise vor Freude. Nicht laut. Nie laut.',
+    favoritePlace: 'Zwischen den Holzscheiten',
+    favoriteFood: 'Funken und Honig',
+    funFacts: [
+      'Er kann ganz klein werden, wenn er schläft.',
+      'Seine Funken sind warm, aber verbrennen nicht.',
+    ],
+    howMet: 'Wir saßen am Kamin und dachten, wir wären allein. Dann hat jemand ganz leise geknistert. Er saß zwischen den Holzscheiten und winkte.',
+    secret: 'Er tanzt manchmal auf einem einzigen Funken.',
+    likes: ['ruhige Abende', 'dein Lachen', 'Kaminfeuer'],
+    dislikes: ['Zugluft', 'nasses Holz'],
+  },
+
+  hearth_2: {
+    id: 'hearth_2',
+    ronkiNote: 'Doktor Funkel. Er taucht nur auf, wenn jemand wirklich klug geworden ist.',
+    favoritePlace: 'Sein winziges Labor unter der Eiche',
+    favoriteFood: 'Tee aus Sternenmoos',
+    funFacts: [
+      'Seine Lupe zeigt Dinge, die man sonst nicht sieht.',
+      'Er hat 23 Notizbücher. Angeblich 24.',
+    ],
+    howMet: 'Du hast alle fünf Knobel-Abenteuer geschafft. Am Ende stand Doktor Funkel einfach da, schaute durch seine Lupe und sagte: "Ah. Du bist angekommen."',
+    secret: 'Sein Funkeln kommt von einem winzigen Stern, den er gefangen hat.',
+    likes: ['kluge Fragen', 'stille Entdeckungen', 'das erste Licht am Morgen'],
+    dislikes: ['Hektik', 'Langeweile'],
+  },
+
+  sky_1: {
+    id: 'sky_1',
+    ronkiNote: 'Larson dreht Loopings, wenn niemand zuguckt. Aber ich guck hin.',
+    favoritePlace: 'Hoch oben, zwischen den Wolken',
+    favoriteFood: 'Wind mit einem Schuss Sonne',
+    funFacts: [
+      'Er kann rückwärts fliegen.',
+      'Sein Lachen klingt wie fernes Glockenspiel.',
+    ],
+    howMet: 'Eines Morgens, als der Himmel besonders blau war, flog Larson direkt über uns einen Looping. Und noch einen. Wir haben beide gelacht. Seitdem kommt er manchmal vorbei.',
+    secret: 'Er rettet abstürzende Blütenblätter und bringt sie zurück.',
+    likes: ['Aufwind', 'blaue Himmel', 'mutige Abenteuer'],
+    dislikes: ['Windstille', 'dicke Regenwolken'],
+  },
+
+  dream_3: {
+    id: 'dream_3',
+    ronkiNote: 'Brie sammelt Träume. Nicht alle. Nur die besonders schönen.',
+    favoritePlace: 'Zwischen den Sternen und den Wolken',
+    favoriteFood: 'Mondlicht im Krug',
+    funFacts: [
+      'Sie hat Krüge in allen Farben. Jeder für eine andere Traum-Art.',
+      'Sie vergisst nie einen Traum, den sie gesammelt hat.',
+    ],
+    howMet: 'Nachdem du oft und oft geträumt hast, kam Brie vorbei. "Deine Träume sind schön", hat sie gesagt und einen kleinen Krug aufgemacht. Ein warmes Licht kam heraus.',
+    secret: 'Einer ihrer Krüge wartet nur auf deinen nächsten schönen Traum.',
+    likes: ['ruhige Nächte', 'leise Stimmen', 'warme Erinnerungen'],
+    dislikes: ['laute Träume', 'zerbrochene Krüge'],
   },
 };
