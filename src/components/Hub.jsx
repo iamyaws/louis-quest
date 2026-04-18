@@ -16,6 +16,8 @@ import BeatCompletionModal from './BeatCompletionModal';
 import ClothingSheet from './ClothingSheet';
 import CloudWaves from './CloudWaves';
 import EveningRitual from './EveningRitual';
+import Gefuehlsecke from './Gefuehlsecke';
+import GefuehlsecheHeart from './GefuehlsecheHeart';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -67,6 +69,7 @@ export default function Hub({ onNavigate }) {
   const [openBeat, setOpenBeat] = useState(null);
   const [showClothing, setShowClothing] = useState(false);
   const [showEveningRitual, setShowEveningRitual] = useState(false);
+  const [showGefuehlsecke, setShowGefuehlsecke] = useState(false);
 
   // Trigger evening ritual when: evening + all bedtime quests done + hasn't happened today yet
   useEffect(() => {
@@ -147,10 +150,13 @@ export default function Hub({ onNavigate }) {
             </div>
           </div>
         </button>
-        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
-             style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
-          <Pearl size={20} />
-          <span className="text-primary font-bold text-sm font-label">{state.hp || 0}</span>
+        <div className="flex items-center gap-2">
+          <GefuehlsecheHeart onOpen={() => setShowGefuehlsecke(true)} />
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
+               style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
+            <Pearl size={20} />
+            <span className="text-primary font-bold text-sm font-label">{state.hp || 0}</span>
+          </div>
         </div>
       </header>
 
@@ -1044,6 +1050,10 @@ export default function Hub({ onNavigate }) {
           stage={getCatStage(state?.catEvo || 0)}
           onClose={() => setShowEveningRitual(false)}
         />
+      )}
+
+      {showGefuehlsecke && (
+        <Gefuehlsecke onClose={() => setShowGefuehlsecke(false)} />
       )}
     </div>
   );
