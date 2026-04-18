@@ -108,6 +108,14 @@ export interface TaskState {
   parentQuestLines?: ParentQuestLine[];
   /** Set once Louis dismisses the parent-zone intro overlay. */
   louisSeenParentIntro?: boolean;
+  /** Entries logged each time Louis uses Gefühlsecke. Tracks feeling patterns for parents (future). */
+  feelingsLog?: Array<{ ts: string; feeling: 'gut' | 'wuetend' | 'traurig' | 'aengstlich' | 'muede'; note?: string }>;
+  /** MINT game badges Louis has earned (one per game, awarded on first completion). */
+  mintBadgesEarned?: string[];
+  /** MINT games Louis has played at least once (first-play tracker, separate from badges). */
+  mintGamesPlayed?: string[];
+  /** True when all 5 MINT badges earned — unlocks the Forscher-Funkel bonus creature. */
+  forscherFunkelUnlocked?: boolean;
   poemQuest?: { done: string[]; completed: boolean; title?: string };
   onboardingDate?: string; // ISO date string — set when onboarding completes
   familyConfig: FamilyConfig;
@@ -169,6 +177,9 @@ interface TaskActions {
   updateQuestLine: (id: string, patch: Partial<ParentQuestLine>) => void;
   completeQuestLineDay: (questLineId: string, dayId: string) => void;
   archiveQuestLine: (id: string) => void;
+  logFeeling: (feeling: 'gut' | 'wuetend' | 'traurig' | 'aengstlich' | 'muede', note?: string) => void;
+  claimMintBadge: (badgeId: string, gameId: string) => void;
+  recordMintGamePlay: (gameId: string) => void;
 }
 
 interface CelebrationEvent {
@@ -260,6 +271,10 @@ export function createInitialState(): TaskState {
     freundCallbacksPending: [],
     parentQuestLines: [],
     louisSeenParentIntro: false,
+    feelingsLog: [],
+    mintBadgesEarned: [],
+    mintGamesPlayed: [],
+    forscherFunkelUnlocked: false,
     familyConfig: DEFAULT_FAMILY_CONFIG,
     arcEngine: initialArcState(),
     bossKilledToday: false,
@@ -368,6 +383,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           freundCallbacksPending: raw.freundCallbacksPending || [],
           parentQuestLines: raw.parentQuestLines || [],
           louisSeenParentIntro: raw.louisSeenParentIntro ?? false,
+          feelingsLog: raw.feelingsLog || [],
+          mintBadgesEarned: raw.mintBadgesEarned || [],
+          mintGamesPlayed: raw.mintGamesPlayed || [],
+          forscherFunkelUnlocked: raw.forscherFunkelUnlocked ?? false,
           familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
           completedSpecialQuests: raw.completedSpecialQuests || {},
           viewsVisited: raw.viewsVisited || [],
@@ -1077,6 +1096,42 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Gefühlsecke: log a feeling check-in ──
+  const logFeeling = useCallback((feeling: 'gut' | 'wuetend' | 'traurig' | 'aengstlich' | 'muede', note?: string) => {
+    setState(prev => prev ? {
+      ...prev,
+      feelingsLog: [...(prev.feelingsLog || []), { ts: new Date().toISOString(), feeling, note }],
+    } : prev);
+  }, []);
+
+  // ── Forscher-Ecke: claim a MINT badge (idempotent) ──
+  const claimMintBadge = useCallback((badgeId: string, gameId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const badges = prev.mintBadgesEarned || [];
+      const played = prev.mintGamesPlayed || [];
+      const newBadges = badges.includes(badgeId) ? badges : [...badges, badgeId];
+      const newPlayed = played.includes(gameId) ? played : [...played, gameId];
+      const allComplete = newBadges.length >= 5;
+      return {
+        ...prev,
+        mintBadgesEarned: newBadges,
+        mintGamesPlayed: newPlayed,
+        forscherFunkelUnlocked: allComplete,
+      };
+    });
+  }, []);
+
+  // ── Forscher-Ecke: record first play of a MINT game (idempotent, no badge) ──
+  const recordMintGamePlay = useCallback((gameId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const played = prev.mintGamesPlayed || [];
+      if (played.includes(gameId)) return prev;
+      return { ...prev, mintGamesPlayed: [...played, gameId] };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -1100,7 +1155,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
