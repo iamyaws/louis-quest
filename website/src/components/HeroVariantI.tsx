@@ -1,29 +1,31 @@
 import { motion, useReducedMotion } from 'motion/react';
+import type { Transition } from 'motion/react';
 import { WaitlistCTA } from './WaitlistCTA';
 import { LAUNCH_STATE } from '../config/launch-state';
+import { EASE_OUT_QUINT } from '../lib/motion';
 
 /** Variant I — Stacked Editorial. Bold typographic sculpture with cascading headline lines,
  *  dragon accent, two-column layout on desktop, and editorial trust pills. */
 export function HeroVariantI() {
   const reduced = useReducedMotion();
 
-  const slide = (delay: number, xOffset = 0) =>
-    reduced
-      ? { initial: { opacity: 1, y: 0, x: 0 }, animate: { opacity: 1, y: 0, x: 0 } }
-      : {
-          initial: { opacity: 0, y: 28, x: xOffset },
-          animate: { opacity: 1, y: 0, x: 0 },
-          transition: { duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] },
-        };
+  const slide = (delay: number, xOffset = 0) => {
+    const transition: Transition = reduced
+      ? { duration: 0 }
+      : { duration: 0.75, delay, ease: EASE_OUT_QUINT };
+    return reduced
+      ? { initial: { opacity: 1, y: 0, x: 0 }, animate: { opacity: 1, y: 0, x: 0 }, transition }
+      : { initial: { opacity: 0, y: 28, x: xOffset }, animate: { opacity: 1, y: 0, x: 0 }, transition };
+  };
 
-  const fade = (delay: number) =>
-    reduced
-      ? { initial: { opacity: 1 }, animate: { opacity: 1 } }
-      : {
-          initial: { opacity: 0 },
-          animate: { opacity: 1 },
-          transition: { duration: 0.6, delay, ease: 'easeOut' },
-        };
+  const fade = (delay: number) => {
+    const transition: Transition = reduced
+      ? { duration: 0 }
+      : { duration: 0.6, delay, ease: 'easeOut' };
+    return reduced
+      ? { initial: { opacity: 1 }, animate: { opacity: 1 }, transition }
+      : { initial: { opacity: 0 }, animate: { opacity: 1 }, transition };
+  };
 
   const TRUST_PILLS = ['Keine Werbung', 'Keine Streaks', 'DSGVO-konform'] as const;
 

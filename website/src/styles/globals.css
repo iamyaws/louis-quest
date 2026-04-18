@@ -92,6 +92,16 @@ body {
   font-feature-settings: "ss01", "cv11";
 }
 
+/* Prevent widow/orphan words on headlines. Keeps last line from sitting alone. */
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+/* Smoother line breaks for body copy. */
+p {
+  text-wrap: pretty;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-mustard);
   outline-offset: 2px;

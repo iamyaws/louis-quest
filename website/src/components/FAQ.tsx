@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { EASE_OUT } from '../lib/motion';
 
 const ITEMS = [
   {
@@ -82,7 +83,7 @@ export function FAQ() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: [0.2, 0.7, 0.2, 1] }}
+                      transition={{ duration: 0.3, ease: EASE_OUT }}
                     >
                       <p className="px-6 pb-5 text-sm sm:text-base text-ink/65 leading-relaxed">
                         {item.a}

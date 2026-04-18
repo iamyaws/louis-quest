@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { WaitlistCTAModern } from './WaitlistCTAModern';
 import { LAUNCH_STATE } from '../../config/launch-state';
+import { EASE_OUT } from '../../lib/motion';
 
 const WORDS = ['Ronki', 'trägt', 'die', 'Routine', 'mit.'];
 
@@ -35,7 +36,7 @@ export function HeroModern() {
               key={`${word}-${i}`}
               initial={{ opacity: 0, y: '0.3em', filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 0.9, delay: 0.1 + i * 0.08, ease: [0.2, 0.7, 0.2, 1] }}
+              transition={{ duration: 0.9, delay: 0.1 + i * 0.08, ease: EASE_OUT }}
               className="inline-block mr-[0.2em]"
             >
               {word}

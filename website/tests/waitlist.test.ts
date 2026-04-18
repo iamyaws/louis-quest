@@ -7,7 +7,9 @@ vi.mock('../src/lib/supabase', () => ({
   },
 }));
 
-import { supabase } from '../src/lib/supabase';
+import { supabase as supabaseMaybe } from '../src/lib/supabase';
+// supabase is non-null in tests because we mocked it above
+const supabase = supabaseMaybe!;
 
 describe('isValidEmail', () => {
   it('accepts valid emails', () => {

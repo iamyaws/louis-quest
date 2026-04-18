@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { HeroHighlight } from './primitives/HeroHighlight';
 import { LAUNCH_STATE } from '../config/launch-state';
 import { WaitlistCTA as _WaitlistCTA } from './WaitlistCTA';
+import { EASE_OUT } from '../lib/motion';
 
 /** Trust pillars shown beneath the CTA buttons */
 const TRUST_PILLARS = ['Keine Werbung', 'Keine Streaks', 'Keine In-App-K\u00e4ufe'] as const;
@@ -24,7 +25,7 @@ export function HeroVariantG() {
       : {
           initial: { opacity: 0, y: 22 },
           animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.72, delay, ease: [0.2, 0.7, 0.2, 1] },
+          transition: { duration: 0.72, delay, ease: EASE_OUT },
         };
 
   function scrollToWaitlist(e: React.MouseEvent<HTMLAnchorElement>) {

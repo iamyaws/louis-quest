@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { WaitlistCTA } from './WaitlistCTA';
 import { LAUNCH_STATE } from '../config/launch-state';
+import { EASE_OUT } from '../lib/motion';
 
 /** Variant F — Dark hero with character art + story-driven B+E copy. */
 export function HeroVariantF() {
@@ -12,7 +13,7 @@ export function HeroVariantF() {
       : {
           initial: { opacity: 0, y: 20 },
           animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.7, delay, ease: [0.2, 0.7, 0.2, 1] },
+          transition: { duration: 0.7, delay, ease: EASE_OUT },
         };
 
   return (
@@ -72,7 +73,7 @@ export function HeroVariantF() {
                 className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm bg-mustard/30"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ duration: 0.6, delay: reduced ? 0 : 0.9, ease: [0.2, 0.7, 0.2, 1] }}
+                transition={{ duration: 0.6, delay: reduced ? 0 : 0.9, ease: EASE_OUT }}
                 style={{ originX: 0 }}
               />
             </span>
@@ -124,7 +125,7 @@ export function HeroVariantF() {
           <motion.div
             initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.45, ease: [0.2, 0.7, 0.2, 1] }}
+            transition={{ duration: 0.8, delay: 0.45, ease: EASE_OUT }}
           >
             <motion.div
               animate={reduced ? {} : { y: [-3, 3, -3] }}

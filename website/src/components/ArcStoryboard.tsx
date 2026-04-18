@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { EASE_OUT } from '../lib/motion';
 
 /* ------------------------------------------------------------------ */
 /* Data                                                                */
@@ -157,7 +158,7 @@ function BeatRow({
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-15%' }}
-      transition={{ duration: 0.8, delay: 0.05, ease: [0.2, 0.7, 0.2, 1] }}
+      transition={{ duration: 0.8, delay: 0.05, ease: EASE_OUT }}
       className={`grid gap-10 sm:gap-14 md:grid-cols-[1fr_1.1fr] items-center ${
         flip ? 'md:[&>*:first-child]:order-2' : ''
       }`}

@@ -65,13 +65,13 @@ export function Footer() {
                 Navigation
               </p>
               <nav aria-label="Footer" className="flex flex-col gap-2 text-sm">
-                <Link to="/" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-1.5">
+                <Link to="/" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Start
                 </Link>
-                <Link to="/wie-es-funktioniert" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-1.5">
+                <Link to="/wie-es-funktioniert" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Wie es funktioniert
                 </Link>
-                <Link to="/wissenschaft" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-1.5">
+                <Link to="/wissenschaft" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Wissenschaft
                 </Link>
               </nav>
@@ -81,13 +81,13 @@ export function Footer() {
                 Rechtliches
               </p>
               <nav aria-label="Rechtliches" className="flex flex-col gap-2 text-sm">
-                <Link to="/impressum" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-1.5">
+                <Link to="/impressum" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Impressum
                 </Link>
-                <Link to="/datenschutz" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-1.5">
+                <Link to="/datenschutz" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Datenschutz
                 </Link>
-                <Link to="/agb" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-1.5">
+                <Link to="/agb" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   AGB
                 </Link>
               </nav>

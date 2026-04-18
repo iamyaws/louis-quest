@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { EASE_OUT } from '../../lib/motion';
 
 const PILLARS = [
   {
@@ -54,7 +55,7 @@ export function PillarsModern() {
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-10%' }}
-              transition={{ duration: 0.7, delay: i * 0.12, ease: [0.2, 0.7, 0.2, 1] }}
+              transition={{ duration: 0.7, delay: i * 0.12, ease: EASE_OUT }}
               whileHover={{ y: -6 }}
               className="group relative rounded-3xl border border-white/10 bg-white/[0.02] p-8 overflow-hidden backdrop-blur-sm transition-colors hover:border-white/20"
             >

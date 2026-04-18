@@ -29,7 +29,7 @@ export default function AGB() {
           <p className="mt-5 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
             Die Spielregeln für die Nutzung von Ronki, so kurz und klar wie möglich.
           </p>
-          <p className="mt-3 text-sm text-ink/60">Stand: April 2026</p>
+          <p className="mt-3 text-sm text-ink/60">Stand: 17. April 2026</p>
 
           <div className="mt-14 flex flex-col gap-12 text-[0.98rem] leading-[1.75] text-ink/85">
 
@@ -98,17 +98,17 @@ export default function AGB() {
                 Sollten einzelne Bestimmungen unwirksam sein, bleiben die übrigen Bestimmungen davon unberührt.
               </p>
               <p className="text-sm text-ink/60">
-                Stand: April 2026
+                Stand: 17. April 2026
               </p>
             </Section>
 
           </div>
 
-          <div className="mt-16 rounded-2xl bg-cream/70 backdrop-blur-sm border border-teal/15 p-5 sm:p-6">
-            <p className="text-[0.7rem] uppercase tracking-[0.15em] text-teal/70 font-medium mb-2">
+          <div className="mt-16 border-t border-teal/15 pt-8">
+            <p className="text-[0.7rem] uppercase tracking-[0.15em] text-teal/70 font-medium mb-3">
               Kurz gesagt
             </p>
-            <p className="text-sm sm:text-base text-ink/80 leading-relaxed">
+            <p className="text-base sm:text-lg text-ink/80 leading-relaxed max-w-2xl">
               Ronki ist kostenlos, respektvoll und für Kinder gemacht. Wir speichern nur das Nötigste und ändern diese Bedingungen nur, wenn es einen guten Grund gibt. Fragen? <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a>.
             </p>
           </div>

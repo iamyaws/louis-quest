@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
+import { EASE_OUT } from '../lib/motion';
 
 const FEATURED = {
   text: '„Ronki nimmt uns tausend Diskussionen ab. Mein Sohn kümmert sich mit dem Drachen um seine Routinen, und er fühlt sich dabei selbstständig. Nicht kontrolliert."',
@@ -197,7 +198,7 @@ function TestimonialsCarousel({ items }: { items: typeof TESTIMONIALS }) {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-10%' }}
-                transition={{ duration: 0.7, delay: (i % 3) * 0.08, ease: [0.2, 0.7, 0.2, 1] }}
+                transition={{ duration: 0.7, delay: (i % 3) * 0.08, ease: EASE_OUT }}
                 className="h-full rounded-2xl bg-cream/70 backdrop-blur-sm border border-teal/10 p-6 flex flex-col gap-5"
                 style={{ boxShadow: '0 1px 0 rgba(45,90,94,0.04), 0 20px 40px -30px rgba(45,90,94,0.2)' }}
               >

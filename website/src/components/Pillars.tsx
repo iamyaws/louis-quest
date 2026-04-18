@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { SpotlightCard } from './primitives/SpotlightCard';
+import { EASE_OUT } from '../lib/motion';
 
 const PILLARS = [
   {
@@ -58,7 +59,7 @@ export function Pillars() {
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-10%' }}
-              transition={{ duration: 0.7, delay: i * 0.12, ease: [0.2, 0.7, 0.2, 1] }}
+              transition={{ duration: 0.7, delay: i * 0.12, ease: EASE_OUT }}
               whileHover={{ y: -6 }}
             >
               <SpotlightCard

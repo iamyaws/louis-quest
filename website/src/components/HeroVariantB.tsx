@@ -2,19 +2,13 @@ import { motion, useReducedMotion } from 'motion/react';
 import { HeroHighlight } from './primitives/HeroHighlight';
 import { WaitlistCTA } from './WaitlistCTA';
 import { LAUNCH_STATE } from '../config/launch-state';
+import { fadeUp } from '../lib/motion';
 
 /** Variant B — Centered & Clean. No image, editorial typography, maximum whitespace. */
 export function HeroVariantB() {
   const reduced = useReducedMotion();
 
-  const fade = (delay: number) =>
-    reduced
-      ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 } }
-      : {
-          initial: { opacity: 0, y: 20 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.7, delay, ease: [0.2, 0.7, 0.2, 1] },
-        };
+  const fade = (delay: number) => fadeUp(delay, reduced);
 
   return (
     <section className="relative flex flex-col items-center justify-center min-h-[88vh] px-6 pt-24 pb-20 sm:pt-32 sm:pb-24 overflow-hidden">

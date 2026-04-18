@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { WaitlistCTA } from './WaitlistCTA';
 import { LAUNCH_STATE } from '../config/launch-state';
+import { EASE_OUT } from '../lib/motion';
 
 export function HeroV2() {
   const reduced = useReducedMotion();
@@ -11,7 +12,7 @@ export function HeroV2() {
         aria-hidden
         initial={{ opacity: 0, y: 30 }}
         animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, delay: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
+        transition={{ duration: 1.2, delay: 0.6, ease: EASE_OUT }}
         className="pointer-events-none absolute right-[-4%] bottom-0 w-[42vw] max-w-[480px] hidden lg:block"
       >
         <div
@@ -39,7 +40,7 @@ export function HeroV2() {
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.15, ease: [0.2, 0.7, 0.2, 1] }}
+          transition={{ duration: 0.8, delay: 0.15, ease: EASE_OUT }}
           className="font-display font-extrabold text-[12vw] sm:text-[9vw] lg:text-[7.5rem] xl:text-[8.5rem] leading-[0.95] tracking-tight text-teal-dark max-w-[14ch]"
         >
           Morgens ohne Kampf.

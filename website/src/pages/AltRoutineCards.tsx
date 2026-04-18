@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { PageMeta } from '../components/PageMeta';
 import { PainterlyShell } from '../components/PainterlyShell';
 import { Footer } from '../components/Footer';
+import { EASE_OUT } from '../lib/motion';
 
 const CARDS = [
   {
@@ -71,7 +72,7 @@ export default function AltRoutineCards() {
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-10%' }}
-              transition={{ duration: 0.6, delay: i * 0.12, ease: [0.2, 0.7, 0.2, 1] }}
+              transition={{ duration: 0.6, delay: i * 0.12, ease: EASE_OUT }}
               whileHover={{ y: -6 }}
               className="group relative flex flex-col rounded-[1.5rem] bg-white overflow-hidden cursor-default"
               style={{

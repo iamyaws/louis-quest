@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { WaitlistCTA } from './WaitlistCTA';
 import { LAUNCH_STATE } from '../config/launch-state';
+import { EASE_OUT } from '../lib/motion';
 
 export function ClosingCTA() {
   return (
@@ -17,7 +18,7 @@ export function ClosingCTA() {
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-10%' }}
-          transition={{ duration: 0.8, ease: [0.2, 0.7, 0.2, 1] }}
+          transition={{ duration: 0.8, ease: EASE_OUT }}
           className="w-20 h-20 object-contain mb-6"
         />
 

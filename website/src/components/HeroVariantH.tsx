@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { HeroHighlight } from './primitives/HeroHighlight';
 import { WaitlistCTA } from './WaitlistCTA';
 import { LAUNCH_STATE } from '../config/launch-state';
+import { EASE_OUT } from '../lib/motion';
 
 /** Variant H — Floating Biomes. Dark teal background with painterly biome art
  *  peeking through gently floating circular shapes around the edges. */
@@ -80,7 +81,7 @@ export function HeroVariantH() {
       : {
           initial: { opacity: 0, y: 22 },
           animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.75, delay, ease: [0.2, 0.7, 0.2, 1] },
+          transition: { duration: 0.75, delay, ease: EASE_OUT },
         };
 
   return (

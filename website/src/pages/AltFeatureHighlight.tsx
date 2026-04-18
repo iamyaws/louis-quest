@@ -3,6 +3,7 @@ import { PainterlyShell } from '../components/PainterlyShell';
 import { PageMeta } from '../components/PageMeta';
 import { WaitlistCTA } from '../components/WaitlistCTA';
 import { LAUNCH_STATE } from '../config/launch-state';
+import { EASE_OUT } from '../lib/motion';
 
 /* ------------------------------------------------------------------ */
 /*  Staggered inline-image text lines                                  */
@@ -56,7 +57,7 @@ const fadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 20 } as const,
   whileInView: { opacity: 1, y: 0 } as const,
   viewport: { once: true, margin: '-10%' as const },
-  transition: { duration: 0.55, delay, ease: [0.2, 0.7, 0.2, 1] as const },
+  transition: { duration: 0.55, delay, ease: EASE_OUT },
 });
 
 /* ================================================================== */

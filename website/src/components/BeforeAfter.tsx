@@ -40,7 +40,7 @@ export function BeforeAfter() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-10%' }}
             transition={{ duration: 0.7 }}
-            className="rounded-2xl border-2 border-teal/15 bg-cream/50 backdrop-blur-sm p-7 sm:p-8 flex flex-col"
+            className="rounded-2xl border border-teal/15 bg-cream p-7 sm:p-8 flex flex-col"
           >
             <span className="inline-flex self-end items-center px-3 py-1 rounded-full bg-sage/20 text-sage text-xs font-bold uppercase tracking-wider mb-6">
               Der alte Weg
@@ -77,7 +77,7 @@ export function BeforeAfter() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-10%' }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="rounded-2xl border-2 border-teal/30 bg-teal-dark p-7 sm:p-8 text-cream shadow-xl flex flex-col"
+            className="rounded-2xl border border-teal/30 bg-teal-dark p-7 sm:p-8 text-cream shadow-xl flex flex-col"
             style={{ boxShadow: '0 25px 50px -20px rgba(45,90,94,0.4)' }}
           >
             <span className="inline-flex self-end items-center px-3 py-1 rounded-full bg-mustard/90 text-teal-dark text-xs font-bold uppercase tracking-wider mb-6">
