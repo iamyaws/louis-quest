@@ -22,6 +22,8 @@ import CloudJumpGame from './components/CloudJumpGame';
 import StarCatcherGame from './components/StarCatcherGame';
 import ZahlenjagdGame from './components/ZahlenjagdGame';
 import MusterMemoryGame from './components/MusterMemoryGame';
+import WurzelLabyrinthGame from './components/WurzelLabyrinthGame';
+import PilzWaageGame from './components/PilzWaageGame';
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
@@ -159,6 +161,20 @@ function AppContent() {
             )}
             {activeMintGame === 'muster-memory' && (
               <MusterMemoryGame onComplete={(reward) => {
+                if (reward?.hp > 0) actions.addHP(reward.hp);
+                setActiveMintGame(null);
+                setView('hub');
+              }} />
+            )}
+            {activeMintGame === 'wurzel-labyrinth' && (
+              <WurzelLabyrinthGame onComplete={(reward) => {
+                if (reward?.hp > 0) actions.addHP(reward.hp);
+                setActiveMintGame(null);
+                setView('hub');
+              }} />
+            )}
+            {activeMintGame === 'pilz-waage' && (
+              <PilzWaageGame onComplete={(reward) => {
                 if (reward?.hp > 0) actions.addHP(reward.hp);
                 setActiveMintGame(null);
                 setView('hub');

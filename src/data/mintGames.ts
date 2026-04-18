@@ -62,7 +62,7 @@ export const MINT_GAMES: MintGame[] = [
     hostId: 'forest_6', // Pilz-Jeti
     unlockCheck: (s) => (s.micropediaDiscovered || []).some(d => d.id === 'forest_6'),
     introLine: 'Ich kenne die versteckten Pfade. Willst du sie finden?',
-    implemented: false, // Wave 2.6
+    implemented: true,
   },
   {
     id: 'pilz-waage',
@@ -73,7 +73,7 @@ export const MINT_GAMES: MintGame[] = [
     hostId: 'pilzhueter', // Pilzhüter Freund
     unlockCheck: (s) => (s.freundArcsCompleted || []).includes('freund-pilzhueter'),
     introLine: 'Komm, bring die Pilze ins Gleichgewicht.',
-    implemented: false, // Wave 2.6
+    implemented: true,
   },
   {
     id: 'kristall-sortierer',
