@@ -21,6 +21,7 @@ import PotionGame from './components/PotionGame';
 import CloudJumpGame from './components/CloudJumpGame';
 import StarCatcherGame from './components/StarCatcherGame';
 import CompanionToast from './components/CompanionToast';
+import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
 import RonkiProfile from './components/RonkiProfile';
 import MemoryWall from './components/MemoryWall';
@@ -166,6 +167,11 @@ function AppContent() {
         />
       )}
       <CompanionToast trigger={toastTrigger} />
+      {state &&
+        state.onboardingDone &&
+        !state.louisSeenParentIntro &&
+        (state.totalTasksDone || 0) >= 3 &&
+        view === 'hub' && <ParentIntroOverlay />}
       <Celebration />
       <ArcOfferCard />
       <FreundCallbackCard />
