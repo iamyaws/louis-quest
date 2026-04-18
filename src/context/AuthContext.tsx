@@ -124,20 +124,17 @@ export function LoginScreen() {
       <div className="absolute bottom-0 right-0 w-full h-1/3 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
-        {/* Ronki hero + egg */}
+        {/* Ronki logo — word mark with boy + dragon egg */}
         <div className="flex flex-col items-center mb-10">
           <div className="relative mb-4">
-            <div className="absolute inset-0 rounded-full opacity-20" style={{ background: '#fcd34d', filter: 'blur(32px)' }} />
+            <div className="absolute inset-0 rounded-full opacity-25" style={{ background: '#fcd34d', filter: 'blur(48px)' }} />
             <img
-              src={`${import.meta.env.BASE_URL}art/hero-character.svg`}
+              src={`${import.meta.env.BASE_URL}art/logo/ronki-logo-hero.webp`}
               alt="Ronki"
-              className="relative z-10 w-48 h-auto drop-shadow-xl rounded-2xl"
+              className="relative z-10 w-64 sm:w-72 h-auto drop-shadow-xl rounded-2xl"
             />
           </div>
-          <h2 className="font-headline font-extrabold text-2xl text-on-surface text-center">
-            {mode === 'login' ? t('auth.welcomeBack') : t('auth.becomeHero')}
-          </h2>
-          <p className="font-body text-on-surface-variant mt-1 text-base opacity-80">
+          <p className="font-body text-on-surface-variant mt-2 text-base opacity-80 text-center">
             {mode === 'login' ? t('auth.heroJourney') : t('auth.createAccount')}
           </p>
         </div>

@@ -74,6 +74,9 @@ export function Footer() {
                 <Link to="/wissenschaft" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Wissenschaft
                 </Link>
+                <Link to="/fuer-eltern" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
+                  Für Eltern
+                </Link>
               </nav>
             </div>
             <div>
