@@ -141,7 +141,7 @@ export function PWAInstall() {
             className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl text-cream leading-tight mb-5"
           >
             Kein App Store.{' '}
-            <em className="italic text-mustard">Einmal antippen, fertig.</em>
+            <em className="italic text-mustard inline-block">Einmal antippen, fertig.</em>
           </h2>
           <p className="text-base sm:text-lg text-cream/70 leading-relaxed mb-10 max-w-xl mx-auto">
             Ronki öffnest du im Browser und legst es einmal auf den Startbildschirm. Danach ist es wie jede andere App: ein Symbol, das dein Kind antippt. Keine Werbung, keine Tracker, kein Download.

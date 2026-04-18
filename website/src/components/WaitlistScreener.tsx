@@ -70,12 +70,12 @@ export function WaitlistScreener({ email, onComplete, onSkip }: Props) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4 }}
-      className="mt-4 rounded-2xl border border-current/10 bg-current/[0.03] p-5 sm:p-6"
+      className="mt-4 rounded-2xl border border-current/20 bg-current/[0.08] p-5 sm:p-6 shadow-sm"
     >
-      <p className="text-xs uppercase tracking-[0.15em] opacity-50 font-medium mb-1">
+      <p className="text-xs uppercase tracking-[0.15em] opacity-70 font-medium mb-2">
         30 Sekunden, optional
       </p>
-      <h3 className="font-display font-bold text-lg leading-tight mb-5">
+      <h3 className="font-display font-bold text-lg leading-tight mb-5 opacity-100">
         Magst du uns helfen, Ronki besser zu machen?
       </h3>
 
@@ -111,7 +111,7 @@ export function WaitlistScreener({ email, onComplete, onSkip }: Props) {
             disabled={!canSubmit}
             whileHover={canSubmit ? { scale: 1.02 } : undefined}
             whileTap={canSubmit ? { scale: 0.97 } : undefined}
-            className="inline-flex items-center gap-2 rounded-full bg-teal px-5 py-2.5 text-cream font-display font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed shadow-sm hover:shadow-md transition-shadow"
+            className="inline-flex items-center gap-2 rounded-full bg-mustard px-5 py-2.5 text-teal-dark font-display font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md transition-shadow"
           >
             {status === 'submitting' ? '…' : 'Abschicken'}
             <span>→</span>
@@ -119,7 +119,7 @@ export function WaitlistScreener({ email, onComplete, onSkip }: Props) {
           <button
             type="button"
             onClick={onSkip}
-            className="text-xs opacity-50 hover:opacity-80 transition-opacity"
+            className="text-xs opacity-70 hover:opacity-100 transition-opacity font-medium"
           >
             Überspringen
           </button>
@@ -134,7 +134,7 @@ export function WaitlistScreener({ email, onComplete, onSkip }: Props) {
 function Question({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs font-display font-semibold opacity-70 mb-2">{label}</p>
+      <p className="text-xs font-display font-semibold opacity-85 mb-2.5">{label}</p>
       {children}
     </div>
   );
@@ -157,10 +157,10 @@ function PillGroup<T extends string>({ options, value, onChange }: PillGroupProp
               key={opt.value}
               type="button"
               onClick={() => onChange(opt.value)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-display font-semibold transition-all ${
+              className={`rounded-full px-3.5 py-2 text-xs font-display font-semibold transition-all ${
                 selected
-                  ? 'bg-teal text-cream shadow-sm'
-                  : 'bg-current/10 hover:bg-current/20'
+                  ? 'bg-mustard text-teal-dark shadow-sm'
+                  : 'bg-current/15 ring-1 ring-current/20 hover:bg-current/25'
               }`}
             >
               {opt.label}

@@ -35,6 +35,7 @@ import { useEggSystem } from './hooks/useEggSystem';
 import { useMicropediaDiscovery } from './hooks/useMicropediaDiscovery';
 import EggOverlay from './components/EggOverlay';
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
+import AlphaBanner from './components/AlphaBanner';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -99,6 +100,7 @@ function AppContent() {
 
   return (
     <>
+      <AlphaBanner />
       {!['hub', 'care'].includes(view) && (
         <div onTouchStart={handleLongPressStart} onTouchEnd={handleLongPressEnd}
              onMouseDown={handleLongPressStart} onMouseUp={handleLongPressEnd} onMouseLeave={handleLongPressEnd}>
