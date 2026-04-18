@@ -3,6 +3,7 @@ import { OrganizationSchema, SoftwareApplicationSchema, FAQPageSchema } from '..
 import { PainterlyShell } from '../components/PainterlyShell';
 import { HeroVariantF } from '../components/HeroVariantF';
 import { BeforeAfter } from '../components/BeforeAfter';
+import { UeberMich } from '../components/UeberMich';
 import { ArcStoryboard } from '../components/ArcStoryboard';
 import { IntrinsicMotivation } from '../components/IntrinsicMotivation';
 import { AntiFeatures } from '../components/AntiFeatures';
@@ -22,6 +23,7 @@ export default function Home() {
       <SoftwareApplicationSchema />
       <HeroVariantF />
       <BeforeAfter />
+      <UeberMich />
       <ArcStoryboard />
       <IntrinsicMotivation />
       <AntiFeatures />
