@@ -75,6 +75,10 @@ export interface TaskState {
   ronkiStaminaUpdatedAt?: string;
   /** Creatures discovered via useMicropediaDiscovery. One entry per unlock. */
   micropediaDiscovered?: Array<{ id: string; chapter: string; discoveredAt: string }>;
+  /** Freund reunion arcs Louis has completed end-to-end (all 4 beats). */
+  freundArcsCompleted?: string[];
+  /** Scheduled callback beats waiting to fire 5-7 days after beat 3. */
+  freundCallbacksPending?: Array<{ freundId: string; triggerAt: string }>;
   poemQuest?: { done: string[]; completed: boolean; title?: string };
   onboardingDate?: string; // ISO date string — set when onboarding completes
   familyConfig: FamilyConfig;
@@ -219,6 +223,8 @@ export function createInitialState(): TaskState {
     ronkiStamina: 5,
     ronkiStaminaUpdatedAt: new Date().toISOString(),
     micropediaDiscovered: [],
+    freundArcsCompleted: [],
+    freundCallbacksPending: [],
     familyConfig: DEFAULT_FAMILY_CONFIG,
     arcEngine: initialArcState(),
     bossKilledToday: false,
@@ -323,6 +329,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           ronkiStamina: raw.ronkiStamina ?? 5,
           ronkiStaminaUpdatedAt: raw.ronkiStaminaUpdatedAt || new Date().toISOString(),
           micropediaDiscovered: raw.micropediaDiscovered || [],
+          freundArcsCompleted: raw.freundArcsCompleted || [],
+          freundCallbacksPending: raw.freundCallbacksPending || [],
           familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
           completedSpecialQuests: raw.completedSpecialQuests || {},
           viewsVisited: raw.viewsVisited || [],
