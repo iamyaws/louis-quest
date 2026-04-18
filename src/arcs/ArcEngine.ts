@@ -30,6 +30,18 @@ export function offerNextArc(state: ArcEngineState): ArcEngineState {
 }
 
 /**
+ * Transitions idle -> offered with an explicit arc id. Used by Freund reunion
+ * arcs which are gated by chapter-discovery unlocks rather than the default
+ * pickNextArc order. No-op if not idle, in cooldown, or arc already completed.
+ */
+export function offerArcById(state: ArcEngineState, arcId: string): ArcEngineState {
+  if (isInCooldown(state)) return state;
+  if (state.phase !== 'idle') return state;
+  if (state.completedArcIds.includes(arcId)) return state;
+  return touch({ ...state, phase: 'offered', offeredArcId: arcId });
+}
+
+/**
  * Transitions offered -> active. Throws if not in offered phase — callers
  * should guard.
  */
