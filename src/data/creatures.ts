@@ -36,6 +36,18 @@ export const SEED_CREATURES: readonly CreatureSeed[] = [
 /** O(1) lookup map — build once at module load, not per-render. */
 export const SEED_BY_ID: Map<string, CreatureSeed> = new Map(SEED_CREATURES.map(s => [s.id, s]));
 
+/**
+ * Sprite path for a creature — transparent-background version for floating use
+ * (celebrations, egg rewards, toasts, games). Returns the parallel sprite file
+ * inside the `sprites/` subdirectory, next to the painterly original.
+ * Example: art/micropedia/creatures/baumbart.webp → art/micropedia/creatures/sprites/baumbart.webp
+ */
+export function getCreatureSpritePath(seed: Pick<CreatureSeed, 'art'>): string {
+  const parts = seed.art.split('/');
+  const filename = parts.pop() as string;
+  return [...parts, 'sprites', filename].join('/');
+}
+
 // ── Chapter definitions ──
 
 export type ChapterId = 'forest' | 'sky' | 'water' | 'dream' | 'hearth';

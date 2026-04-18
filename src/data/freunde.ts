@@ -66,3 +66,15 @@ export const FREUNDE: FreundMeta[] = [
 ];
 
 export const FREUND_BY_ID: Map<string, FreundMeta> = new Map(FREUNDE.map(f => [f.id, f]));
+
+/**
+ * Sprite path for a Freund — transparent-background version for floating use
+ * (reunion cards where the portrait sits over chapter ambient, callbacks, etc.).
+ * Returns the parallel sprite file inside the `sprites/` subdirectory.
+ * Example: art/freunde/pilzhueter.webp → art/freunde/sprites/pilzhueter.webp
+ */
+export function getFreundSpritePath(freund: Pick<FreundMeta, 'portrait'>): string {
+  const parts = freund.portrait.split('/');
+  const filename = parts.pop() as string;
+  return [...parts, 'sprites', filename].join('/');
+}
