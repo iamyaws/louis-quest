@@ -6,6 +6,7 @@ import { BeforeAfter } from '../components/BeforeAfter';
 import { ArcStoryboard } from '../components/ArcStoryboard';
 import { IntrinsicMotivation } from '../components/IntrinsicMotivation';
 import { AntiFeatures } from '../components/AntiFeatures';
+import { PWAInstall } from '../components/PWAInstall';
 import { FAQ } from '../components/FAQ';
 import { Footer } from '../components/Footer';
 
@@ -24,6 +25,7 @@ export default function Home() {
       <ArcStoryboard />
       <IntrinsicMotivation />
       <AntiFeatures />
+      <PWAInstall />
       <FAQPageSchema
         items={[
           {
