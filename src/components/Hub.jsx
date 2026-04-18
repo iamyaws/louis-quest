@@ -18,6 +18,7 @@ import CloudWaves from './CloudWaves';
 import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
 import GefuehlsecheHeart from './GefuehlsecheHeart';
+import ForscherEcke from './ForscherEcke';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -46,7 +47,7 @@ const BOSS_ART = {
   flimmerfux:   { full: 'art/boss-flimmerfux_the-flicker-fox-fullpower.webp', defeated: 'art/boss-flimmerfux_the-flicker-fox-defeated.webp' },
 };
 
-export default function Hub({ onNavigate }) {
+export default function Hub({ onNavigate, onPlayMint }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct } = computed;
   const { t, lang } = useTranslation();
@@ -436,6 +437,9 @@ export default function Hub({ onNavigate }) {
             </button>
           );
         })()}
+
+        {/* ── Forscher-Ecke — appears only when at least one MINT game is unlocked ── */}
+        <ForscherEcke onPlayGame={(gameId) => onPlayMint?.(gameId)} />
 
         {/* ═══════════════════════════════════════════════════════════
             SECONDARY ZONE — collapsed by default.
