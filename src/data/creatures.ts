@@ -19,6 +19,9 @@ export const SEED_CREATURES: readonly CreatureSeed[] = [
   { id: 'forest_1', chapter: 'forest', name: { de: 'Moostänzer',      en: 'Mossdancer' },  art: 'art/micropedia/creatures/creature-2.webp',       flavor: { de: 'Tanzt zwischen den Farnen, wenn niemand hinsieht.',   en: 'Dances between the ferns when nobody looks.' } },
   { id: 'forest_2', chapter: 'forest', name: { de: 'Knorrbart',       en: 'Gnarlfang' },   art: 'art/micropedia/creatures/creature-3.webp',       flavor: { de: 'Sieht grimmig aus, ist aber ganz sanft.',             en: 'Looks fierce, but is quite gentle.' } },
   { id: 'forest_3', chapter: 'forest', name: { de: 'Rotling',         en: 'Redling' },     art: 'art/micropedia/creatures/creature-6.webp',       flavor: { de: 'Versteckt sich unter Pilzen.',                        en: 'Hides under mushrooms.' } },
+  { id: 'forest_4', chapter: 'forest', name: { de: 'Baumbart',        en: 'Treebeard' },   art: 'art/micropedia/creatures/baumbart.webp',         flavor: { de: 'Flüstert mit den Wurzeln, hört den Wäldern zu.',       en: 'Whispers with roots, listens to forests.' } },
+  { id: 'forest_5', chapter: 'forest', name: { de: 'Mr. Shroom',      en: 'Mr. Shroom' },  art: 'art/micropedia/creatures/mr-shroom.webp',        flavor: { de: 'Trägt immer einen Hut. Manchmal zwei.',               en: 'Always wears a hat. Sometimes two.' } },
+  { id: 'forest_6', chapter: 'forest', name: { de: 'Pilz-Jeti',       en: 'Mushroom Yeti' },art: 'art/micropedia/creatures/pilz-jeti.webp',        flavor: { de: 'Groß, plüschig, schüchtern. Hinterlässt fluffige Spuren.', en: 'Big, fluffy, shy. Leaves fluffy tracks.' } },
   { id: 'sky_0',    chapter: 'sky',    name: { de: 'Sturmflügel',     en: 'Stormwing' },   art: 'art/micropedia/creatures/creature-8.webp',       flavor: { de: 'Reitet auf Gewitterwolken.',                          en: 'Rides on thunderclouds.' } },
   { id: 'water_0',  chapter: 'water',  name: { de: 'Perlenfisch',     en: 'Pearlfish' },   art: 'art/micropedia/creatures/creature-water-1.webp', flavor: { de: 'Seine Schuppen leuchten wie Perlen im Mondlicht.',    en: 'Scales glow like pearls in moonlight.' } },
   { id: 'water_1',  chapter: 'water',  name: { de: 'Wellentänzer',    en: 'Wavedancer' },  art: 'art/micropedia/creatures/creature-water-2.webp', flavor: { de: 'Tanzt auf Seerosen, wenn niemand hinsieht.',          en: 'Dances on lily pads when nobody looks.' } },
@@ -130,6 +133,51 @@ export const CREATURE_CONTENT: Record<string, CreatureContent> = {
     secret: 'Er sammelt heimlich bunte Blätter und legt sie in Reihen.',
     likes: ['süße Beeren', 'weiches Moos', 'leises Flüstern'],
     dislikes: ['große Schatten', 'plötzliches Licht'],
+  },
+
+  forest_4: {
+    id: 'forest_4',
+    ronkiNote: 'Baumbart redet nicht viel. Aber wenn er redet, hört der ganze Wald zu.',
+    favoritePlace: 'Die älteste Eiche im Wald',
+    favoriteFood: 'Morgentau',
+    funFacts: [
+      'Sein Bart wächst seit hundert Sommern.',
+      'Wenn er niest, fallen Eicheln vom Baum.',
+    ],
+    howMet: 'Du hast so oft dran gearbeitet, Tag für Tag. Irgendwann hat Baumbart zu mir gesagt: "Der kleine Mensch ist dran geblieben. Zeig ihn mir." Und da war er, langsam aus dem Stamm heraus.',
+    secret: 'Er kennt den Namen jedes Baums im Wald.',
+    likes: ['Ruhe', 'Regen auf Blättern', 'Kinder die gut zuhören'],
+    dislikes: ['laute Stimmen', 'Hektik'],
+  },
+
+  forest_5: {
+    id: 'forest_5',
+    ronkiNote: 'Mr. Shroom hat für jede Stimmung einen anderen Hut. Heute trägt er einen sonnigen.',
+    favoritePlace: 'Unter der größten Kastanie',
+    favoriteFood: 'Sporen-Tee',
+    funFacts: [
+      'Er hat 47 Hüte. Angeblich.',
+      'Wenn er lacht, wackelt sein Hut.',
+    ],
+    howMet: 'Nachdem du und Pilzhüter euch wiedergetroffen habt, kam Mr. Shroom um die Ecke. Er hat den Hut gelüftet und gesagt: "Freunde vom Pilzhüter sind auch meine Freunde."',
+    secret: 'Er schreibt nachts kleine Briefe und versteckt sie unter Pilzen.',
+    likes: ['gute Manieren', 'Tee bei Sonnenaufgang', 'Hüte'],
+    dislikes: ['Hektik', 'nasse Hüte'],
+  },
+
+  forest_6: {
+    id: 'forest_6',
+    ronkiNote: 'Pilz-Jeti ist riesig und ganz schüchtern. Er versteckt sich, wenn man schnell geht.',
+    favoritePlace: 'Der tiefste Teil des Waldes',
+    favoriteFood: 'Kaltes Moos',
+    funFacts: [
+      'Sein Fell ist eigentlich ein Pilz.',
+      'Er läuft rückwärts, wenn er nervös wird.',
+    ],
+    howMet: 'Du hast deine Abende so oft ruhig ausklingen lassen. An einem besonders stillen Abend ist Pilz-Jeti aus dem Dickicht gekommen. "Ich mag Kinder, die gut Abschied vom Tag nehmen", hat er leise gebrummt.',
+    secret: 'Er spricht nur leise, weil er Angst hat, die Bäume aufzuwecken.',
+    likes: ['Ruhe', 'tiefe Schatten', 'Bettzeit'],
+    dislikes: ['plötzliche Bewegungen', 'grelles Licht'],
   },
 
   sky_0: {

@@ -23,6 +23,12 @@ export const CREATURE_TRIGGERS: DiscoveryTrigger[] = [
   { id: 'forest_1', chapter: 'forest', condition: s => (s.totalTasksDone || 0) >= 3 },
   { id: 'forest_2', chapter: 'forest', condition: s => (s.totalTasksDone || 0) >= 10 },
   { id: 'forest_3', chapter: 'forest', condition: s => (s.arcEngine?.completedArcIds || []).includes('first-adventure') },
+  // Baumbart — rewards deep habit formation (30+ tasks done)
+  { id: 'forest_4', chapter: 'forest', condition: s => (s.totalTasksDone || 0) >= 30 },
+  // Mr. Shroom — unlocks after completing the Pilzhüter reunion arc (Freund-arc engagement)
+  { id: 'forest_5', chapter: 'forest', condition: s => (s.freundArcsCompleted || []).includes('freund-pilzhueter') },
+  // Pilz-Jeti — rewards closing the day well (3+ evening ritual completions, tracked via journalGratitude)
+  { id: 'forest_6', chapter: 'forest', condition: s => (s.journalGratitude || []).length >= 3 },
   // Sky — game exploration
   { id: 'sky_0', chapter: 'sky', condition: s => (s.viewsVisited || []).includes('games') },
   // Water — care + journal
