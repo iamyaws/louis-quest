@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
 import { SPECIAL_QUESTS } from '../data/specialQuests';
+import { FREUNDE, FREUND_BY_ID } from '../data/freunde';
+import { findArc } from '../arcs/arcs';
+import { offerArcById, completeArc, initialArcState } from '../arcs/ArcEngine';
 import type { TaskState } from '../context/TaskContext';
+import type { ArcEngineState } from '../arcs/types';
 
 function checkTrigger(trigger: string, state: TaskState): boolean {
   switch (trigger) {
@@ -19,6 +23,13 @@ function checkTrigger(trigger: string, state: TaskState): boolean {
   }
 }
 
+/** Days between two ISO date strings (YYYY-MM-DD). */
+function daysSince(isoDate: string): number {
+  const then = new Date(isoDate).getTime();
+  const now = Date.now();
+  return Math.floor((now - then) / (24 * 3600 * 1000));
+}
+
 export function useSpecialQuests() {
   const { state, actions } = useTask();
 
@@ -32,6 +43,91 @@ export function useSpecialQuests() {
       }
     });
   }, [state]);
+
+  // ── Freund reunion arcs: unlock triggers + callback scheduling ──
+  //
+  // Integration notes:
+  // - Offering an arc: we mutate state.arcEngine directly via patchState(),
+  //   applying the pure offerArcById() transition. useArc's own hook hydrates
+  //   from state.arcEngine whenever state changes, so this propagates cleanly.
+  // - Callback pattern: STANDALONE STATE. The arc engine only runs beats 1-3.
+  //   When beat 3 (pil-b3-realife) advances the engine to beat 4, we detect
+  //   the beatIndex=3 state and force-complete the arc here, then schedule
+  //   the callback in freundCallbacksPending. Beat 4 is rendered later by a
+  //   Phase B component reading freundCallbacksPending + beat 4's i18n keys —
+  //   no mid-arc engine restart needed. When Phase B dismisses the callback,
+  //   it patches freundArcsCompleted + freundCallbacksPending directly.
+  //   Tradeoff: engine's completedArcIds contains the arc before the visual
+  //   callback fires. Acceptable because the user-facing "done" state is
+  //   freundArcsCompleted, not completedArcIds.
+  useEffect(() => {
+    if (!state) return;
+
+    const arcEngine: ArcEngineState = state.arcEngine || initialArcState();
+    const freundArcsCompleted = state.freundArcsCompleted || [];
+    const callbacksPending = state.freundCallbacksPending || [];
+
+    // 1. Unlock trigger: offer the arc if chapter threshold met
+    for (const freund of FREUNDE) {
+      if (!freund.implemented) continue;
+      const arcId = `freund-${freund.id}`;
+      if (freundArcsCompleted.includes(arcId)) continue;
+      if (arcEngine.completedArcIds.includes(arcId)) continue;
+      if (arcEngine.activeArcId === arcId) continue;
+      if (arcEngine.offeredArcId === arcId) continue;
+      if (arcEngine.phase !== 'idle') continue;
+
+      // Gate: onboarding at least 1 day ago
+      if (!state.onboardingDate) continue;
+      if (daysSince(state.onboardingDate) < 1) continue;
+
+      // Gate: enough creatures in this chapter discovered
+      const discovered = state.micropediaDiscovered || [];
+      const chapterCount = discovered.filter(d => d.chapter === freund.chapter).length;
+      if (chapterCount < freund.unlockThreshold) continue;
+
+      // All gates passed — offer the arc
+      const nextEngine = offerArcById(arcEngine, arcId);
+      if (nextEngine !== arcEngine) {
+        actions.patchState({ arcEngine: nextEngine });
+        return; // one offer per effect pass
+      }
+    }
+
+    // 2. Callback scheduling: when beat 3 just advanced (engine now at beat 4),
+    //    force-complete the arc and schedule the callback for 5-7 days later.
+    if (
+      arcEngine.phase === 'active' &&
+      arcEngine.activeArcId &&
+      arcEngine.activeBeatIndex === 3
+    ) {
+      const arc = findArc(arcEngine.activeArcId);
+      const freundId = arc?.freundId;
+      if (arc && freundId && FREUND_BY_ID.has(freundId)) {
+        const alreadyPending = callbacksPending.some(cb => cb.freundId === freundId);
+        if (!alreadyPending) {
+          const scheduleAt = new Date(
+            Date.now() + (5 + Math.random() * 2) * 24 * 3600 * 1000
+          ).toISOString();
+          const completedEngine = completeArc(arcEngine, arc);
+          actions.patchState({
+            arcEngine: completedEngine,
+            freundCallbacksPending: [
+              ...callbacksPending,
+              { freundId, triggerAt: scheduleAt },
+            ],
+          });
+          return;
+        }
+      }
+    }
+
+    // 3. Callback firing: entries whose triggerAt has passed are picked up
+    //    by the Phase B UI component (which reads freundCallbacksPending and
+    //    filters by triggerAt <= now). No engine transition here — the UI
+    //    dismissal action will move the arc into freundArcsCompleted and
+    //    drop the pending entry.
+  }, [state, actions]);
 
   const completed = state?.completedSpecialQuests || {};
   const totalDone = Object.values(completed).filter(Boolean).length;
