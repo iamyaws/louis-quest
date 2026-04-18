@@ -23,6 +23,31 @@ export interface JournalEntry {
   mood: number | null;
 }
 
+// ── Parent-created quest-lines ──
+export interface ParentQuestLine {
+  id: string;
+  templateId: 'learn' | 'event' | 'skill';
+  title: string;
+  subtitle?: string;
+  emoji?: string;
+  createdAt: string;
+  targetDate?: string;
+  days: QuestLineDay[];
+  completedDayIds: string[];
+  completed: boolean;
+  completedAt?: string;
+  archived?: boolean;
+}
+
+export interface QuestLineDay {
+  id: string;
+  dayNumber: number;
+  icon?: string;
+  title: string;
+  description: string;
+  isMilestone?: boolean;
+}
+
 // ── Minimal state shape for the task list ──
 export interface TaskState {
   quests: Quest[];
@@ -79,6 +104,10 @@ export interface TaskState {
   freundArcsCompleted?: string[];
   /** Scheduled callback beats waiting to fire 5-7 days after beat 3. */
   freundCallbacksPending?: Array<{ freundId: string; triggerAt: string }>;
+  /** Parent-created quest-lines. Lifecycle: active → completed → (optionally) archived. */
+  parentQuestLines?: ParentQuestLine[];
+  /** Set once Louis dismisses the parent-zone intro overlay. */
+  louisSeenParentIntro?: boolean;
   poemQuest?: { done: string[]; completed: boolean; title?: string };
   onboardingDate?: string; // ISO date string — set when onboarding completes
   familyConfig: FamilyConfig;
@@ -225,6 +254,8 @@ export function createInitialState(): TaskState {
     micropediaDiscovered: [],
     freundArcsCompleted: [],
     freundCallbacksPending: [],
+    parentQuestLines: [],
+    louisSeenParentIntro: false,
     familyConfig: DEFAULT_FAMILY_CONFIG,
     arcEngine: initialArcState(),
     bossKilledToday: false,
@@ -331,6 +362,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           micropediaDiscovered: raw.micropediaDiscovered || [],
           freundArcsCompleted: raw.freundArcsCompleted || [],
           freundCallbacksPending: raw.freundCallbacksPending || [],
+          parentQuestLines: raw.parentQuestLines || [],
+          louisSeenParentIntro: raw.louisSeenParentIntro ?? false,
           familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
           completedSpecialQuests: raw.completedSpecialQuests || {},
           viewsVisited: raw.viewsVisited || [],
