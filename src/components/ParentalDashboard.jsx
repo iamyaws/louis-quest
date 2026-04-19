@@ -220,8 +220,123 @@ function OverviewTab({ state, lang }) {
   const completionPct = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0;
   const totalOrbs = state.orbs ? Object.values(state.orbs).reduce((a, b) => a + b, 0) : 0;
 
+  // ─── Build the curator summary: what will the child actually see today? ───
+  // Pulled from D3 (Kartenstapel) — parents are curators, not spectators. The
+  // dashboard's first job is to answer "what's queued for today" at a glance.
+  const activeQuestLines = (state.parentQuestLines || []).filter(ql => !ql.completed && !ql.archived);
+  const activeArcId = state.arcEngine?.activeArcId;
+  const offeredArcId = state.arcEngine?.offeredArcId;
+  const activeMissions = (state.activeMissions || []);
+  const parentMsgOn = !!state.familyConfig?.parentMessage?.enabled && !!state.familyConfig?.parentMessage?.body;
+  const poemActive = !!state.poemQuest && !state.poemQuest.completed;
+
+  const items = [];
+  // Daily routine summary — always first, grounds everything else
+  items.push({
+    icon: 'check_circle',
+    title: `${totalToday} Aufgaben heute`,
+    sub: completedToday > 0 ? `${completedToday} bereits erledigt` : 'Noch nichts erledigt',
+    color: '#059669',
+    bg: 'rgba(5,150,105,0.08)',
+  });
+  // Active parent-created quest-lines — Gedicht, Hausaufgaben etc.
+  activeQuestLines.forEach(ql => {
+    const dayN = (ql.completedDayIds?.length || 0) + 1;
+    items.push({
+      icon: 'flag',
+      title: `${ql.emoji || '📋'} ${ql.title}`,
+      sub: `Tag ${dayN} von ${ql.days.length}`,
+      color: '#6d28d9',
+      bg: 'rgba(109,40,217,0.08)',
+    });
+  });
+  // Legacy PoemQuest (only if mid-progress; CTA was removed earlier today)
+  if (poemActive) {
+    const dayN = (state.poemQuest.done?.length || 0) + 1;
+    items.push({
+      icon: 'menu_book',
+      title: '📖 Mein Gedicht',
+      sub: `Tag ${dayN} von 7`,
+      color: '#059669',
+      bg: 'rgba(5,150,105,0.08)',
+    });
+  }
+  // Active arc — the Freund adventure Louis is in the middle of
+  if (activeArcId) {
+    items.push({
+      icon: 'auto_stories',
+      title: 'Abenteuer läuft',
+      sub: 'Freund-Arc aktiv',
+      color: '#b45309',
+      bg: 'rgba(180,83,9,0.08)',
+    });
+  } else if (offeredArcId) {
+    items.push({
+      icon: 'email',
+      title: 'Abenteuer wartet',
+      sub: 'Neuer Arc wird angeboten',
+      color: '#b45309',
+      bg: 'rgba(180,83,9,0.08)',
+    });
+  }
+  // Active missions
+  if (activeMissions.length > 0) {
+    items.push({
+      icon: 'rocket_launch',
+      title: `${activeMissions.length} Epische Mission${activeMissions.length > 1 ? 'en' : ''}`,
+      sub: 'Mehrtägige Herausforderung',
+      color: '#dc2626',
+      bg: 'rgba(220,38,38,0.08)',
+    });
+  }
+  // Parent message banner
+  if (parentMsgOn) {
+    const preview = state.familyConfig.parentMessage.body.slice(0, 40);
+    items.push({
+      icon: 'mail',
+      title: 'Botschaft an',
+      sub: `„${preview}${state.familyConfig.parentMessage.body.length > 40 ? '…' : ''}"`,
+      color: '#735c00',
+      bg: 'rgba(115,92,0,0.08)',
+    });
+  }
+
   return (
     <>
+      {/* ─── Heute zeigen wir Louis ─── */}
+      <div className="rounded-2xl p-5 mm-card" style={{
+        background: 'linear-gradient(160deg, #fffbeb 0%, #fef3c7 60%, #fde68a 100%)',
+        border: '1.5px solid rgba(217,119,6,0.2)',
+        boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
+      }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="material-symbols-outlined text-xl" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>today</span>
+          <h3 className="font-headline font-bold text-base" style={{ color: '#78350f' }}>
+            Heute zeigen wir {state.familyConfig?.childName || 'deinem Kind'}:
+          </h3>
+        </div>
+        <div className="flex flex-col gap-2">
+          {items.map((it, i) => (
+            <div key={i} className="flex items-center gap-3 p-3 rounded-xl"
+                 style={{ background: it.bg, border: `1px solid ${it.color}22` }}>
+              <span className="material-symbols-outlined text-xl shrink-0"
+                    style={{ color: it.color, fontVariationSettings: "'FILL' 1" }}>{it.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-label font-bold text-sm leading-tight" style={{ color: '#1f2937' }}>
+                  {it.title}
+                </p>
+                <p className="font-body text-xs truncate mt-0.5" style={{ color: '#4b5563' }}>
+                  {it.sub}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="font-body text-xs italic mt-3 text-center" style={{ color: '#92400e99' }}>
+          Du bestimmst, was im Kartenstapel landet. Feinheiten in den Tabs unten.
+        </p>
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4">
         {/* Completion Rate — Hero Card */}
