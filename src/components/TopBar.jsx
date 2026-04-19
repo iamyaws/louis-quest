@@ -2,6 +2,7 @@ import React from 'react';
 import { useTask } from '../context/TaskContext';
 import { Pearl } from './CurrencyIcons';
 import { useTranslation } from '../i18n/LanguageContext';
+import { isDevMode } from '../utils/mode';
 
 export default function TopBar({ onNavigate }) {
   const { state, computed } = useTask();
@@ -11,6 +12,7 @@ export default function TopBar({ onNavigate }) {
   const xpPct = xpProgress.need > 0 ? Math.min(1, xpProgress.cur / xpProgress.need) : 0;
   const heroName = state?.familyConfig?.childName || t('topbar.heroFallback');
   const heroAvatar = state?.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
+  const dev = isDevMode();
 
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl"
@@ -24,22 +26,26 @@ export default function TopBar({ onNavigate }) {
                  style={{ border: '2px solid rgba(18,67,70,0.15)' }}>
               <img src={import.meta.env.BASE_URL + heroAvatar} alt={heroName} className="w-full h-full object-cover" />
             </div>
-            {/* Level badge — golden circle */}
-            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shadow-md"
-                 style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', border: '2px solid white', color: '#1a1a1a', lineHeight: 1 }}>
-              {level}
-            </div>
+            {/* Level badge — golden circle (dev only) */}
+            {dev && (
+              <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shadow-md"
+                   style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', border: '2px solid white', color: '#1a1a1a', lineHeight: 1 }}>
+                {level}
+              </div>
+            )}
           </div>
           <div className="flex flex-col">
             <span className="font-headline text-lg font-bold text-primary leading-tight">{heroName}</span>
-            {/* XP progress bar */}
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
-                <div className="h-full rounded-full transition-all duration-500"
-                     style={{ width: `${xpPct * 100}%`, background: 'linear-gradient(90deg, #124346, #5eead4)' }} />
+            {/* XP progress bar (dev only) */}
+            {dev && (
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
+                  <div className="h-full rounded-full transition-all duration-500"
+                       style={{ width: `${xpPct * 100}%`, background: 'linear-gradient(90deg, #124346, #5eead4)' }} />
+                </div>
+                <span className="font-label text-xs text-outline">{xpProgress.cur}/{xpProgress.need}</span>
               </div>
-              <span className="font-label text-xs text-outline">{xpProgress.cur}/{xpProgress.need}</span>
-            </div>
+            )}
           </div>
         </button>
 
