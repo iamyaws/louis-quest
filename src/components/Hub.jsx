@@ -20,6 +20,7 @@ import Gefuehlsecke from './Gefuehlsecke';
 import GefuehlsecheHeart from './GefuehlsecheHeart';
 import ForscherEcke from './ForscherEcke';
 import AttentionGlow from './AttentionGlow';
+import { MINT_GAMES } from '../data/mintGames';
 import { useAttentionFlag } from '../hooks/useAttentionFlag';
 import StaminaIndicator from './StaminaIndicator';
 import ZeigMomentCard from './ZeigMomentCard';
@@ -473,22 +474,29 @@ export default function Hub({ onNavigate, onPlayMint }) {
           );
         })()}
 
-        {/* ── Forscher-Ecke — appears only when at least one MINT game is unlocked ── */}
-        <AttentionGlow
-          active={!forscherSeen}
-          seenKey="forscher-ecke-first-seen"
-          accent="#059669"
-          intensity="medium"
-          badgeLabel="NEU"
-          voiceLineId="de_forscher_new_01"
-        >
-          <ForscherEcke
-            onPlayGame={(gameId) => {
-              markForscherSeen();
-              onPlayMint?.(gameId);
-            }}
-          />
-        </AttentionGlow>
+        {/* ── Forscher-Ecke — only render (and decorate) when at least one MINT game is actually unlocked.
+               This avoids a stray NEU badge floating when ForscherEcke would return null internally. ── */}
+        {(() => {
+          const anyUnlocked = MINT_GAMES.some(g => g.unlockCheck(state));
+          if (!anyUnlocked) return null;
+          return (
+            <AttentionGlow
+              active={!forscherSeen}
+              seenKey="forscher-ecke-first-seen"
+              accent="#059669"
+              intensity="medium"
+              badgeLabel="NEU"
+              voiceLineId="de_forscher_new_01"
+            >
+              <ForscherEcke
+                onPlayGame={(gameId) => {
+                  markForscherSeen();
+                  onPlayMint?.(gameId);
+                }}
+              />
+            </AttentionGlow>
+          );
+        })()}
 
         {/* ═══════════════════════════════════════════════════════════
             SECONDARY ZONE — collapsed by default.
