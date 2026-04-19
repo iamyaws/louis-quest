@@ -9,6 +9,7 @@ import { useVoice } from '../companion/useVoice';
 import VoiceBubble from './VoiceBubble';
 import { useZones } from '../world/useZones';
 import ZoneSelector from './ZoneSelector';
+import { isDevMode } from '../utils/mode';
 
 const STAGES = [
   { name: 'Ei', emoji: '🥚', threshold: 0 },
@@ -299,10 +300,12 @@ export default function Sanctuary({ onNavigate }) {
           </div>
         </section>
 
-        {/* ── Gear Vault — hidden until player has at least 1 gear item ── */}
-        {(state.equippedGear && Object.values(state.equippedGear).some(Boolean)) || (state.gearInventory || []).length > 0
-          ? <GearVault />
-          : null}
+        {/* ── Gear Vault — dev only, and only when player has at least 1 gear item ── */}
+        {isDevMode() && (
+          (state.equippedGear && Object.values(state.equippedGear).some(Boolean)) || (state.gearInventory || []).length > 0
+            ? <GearVault />
+            : null
+        )}
 
         {/* ── Wachstums-Orbs — hidden for now, de-emphasized until Phase 2 rework ── */}
         {/* <OrbsSection state={state} nextStage={nextStage} progressPct={progressPct} evo={evo} /> */}

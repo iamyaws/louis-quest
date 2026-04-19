@@ -3,6 +3,7 @@ import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import CooldownButton from './CooldownButton';
 import { getCatStage, DRAGON_ART } from '../utils/helpers';
+import { isDevMode } from '../utils/mode';
 
 // ── Confetti Canvas ──
 function ConfettiCanvas() {
@@ -338,6 +339,13 @@ export default function Celebration() {
 
   useEffect(() => {
     if (celebration) {
+      // Public mode: skip levelUp celebrations entirely (RPG-flavored surface).
+      // State already updated; just don't show the modal to Louis.
+      if (celebration.type === 'levelUp' && !isDevMode()) {
+        skipRef.current = true;
+        actions.dismissCelebration();
+        return;
+      }
       // Reward tapering: based on days since onboarding, some celebrations
       // are silently skipped in later phases. Evolution/chest always show.
       if (celebration.type === 'victory' || celebration.type === 'levelUp') {

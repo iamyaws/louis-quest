@@ -3,6 +3,7 @@ import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { WEEKLY_MISSIONS } from '../constants';
 import BirthdayEpic from './BirthdayEpic';
+import { isDevMode } from '../utils/mode';
 
 const TAG_STYLES = {
   emerald: { bg: 'rgba(16,185,129,0.1)', color: '#065f46' },
@@ -133,6 +134,9 @@ export default function EpicMissions() {
   const [showBirthday, setShowBirthday] = useState(false);
   const base = import.meta.env.BASE_URL;
   if (!state) return null;
+  // Public mode hides Epic Missions (RPG-y surface). State keeps running;
+  // activeMissions progress still accumulates silently.
+  if (!isDevMode()) return null;
 
   const activeMissions = state.activeMissions || [];
   const completedMissions = state.completedMissions || [];
