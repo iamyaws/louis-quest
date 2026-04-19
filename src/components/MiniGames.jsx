@@ -70,7 +70,8 @@ const GAMES = [
 export default function MiniGames({ onPlay }) {
   const { t } = useTranslation();
   const { state } = useTask();
-  const { unlocked, reason } = useGameAccess();
+  const access = useGameAccess();
+  const { unlocked, reason, withinTimeWindow, windowStartHour, windowEndHour } = access;
   const stamina = useRonkiStamina();
   const [showExhausted, setShowExhausted] = useState(false);
   const voiceFiredRef = useRef(false);
@@ -117,19 +118,61 @@ export default function MiniGames({ onPlay }) {
         </div>
       </section>
 
-      {/* Gate banner — shown when games are locked */}
+      {/* Gate banner — shown when games are locked. Two distinct reasons:
+           time-window (Ronki sleeps outside play hours) OR routine-not-done. */}
       {!unlocked && (
         <div className="mb-6 p-5 rounded-2xl flex items-center gap-4"
-             style={{ background: 'linear-gradient(135deg, #fef3c7, #fffbeb)', border: '1.5px solid rgba(217,119,6,0.2)' }}>
+             style={{
+               background: !withinTimeWindow
+                 ? 'linear-gradient(135deg, #e0e7ff, #eef2ff)'
+                 : 'linear-gradient(135deg, #fef3c7, #fffbeb)',
+               border: !withinTimeWindow
+                 ? '1.5px solid rgba(99,102,241,0.25)'
+                 : '1.5px solid rgba(217,119,6,0.2)',
+             }}>
           <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-               style={{ background: 'rgba(217,119,6,0.12)' }}>
-            <span className="material-symbols-outlined text-2xl" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>lock</span>
+               style={{
+                 background: !withinTimeWindow
+                   ? 'rgba(99,102,241,0.14)'
+                   : 'rgba(217,119,6,0.12)',
+               }}>
+            <span className="material-symbols-outlined text-2xl"
+                  style={{
+                    color: !withinTimeWindow ? '#4338ca' : '#b45309',
+                    fontVariationSettings: "'FILL' 1",
+                  }}>
+              {!withinTimeWindow ? (reason === 'timeAfter' ? 'bedtime' : 'schedule') : 'lock'}
+            </span>
           </div>
           <div>
-            <p className="font-headline font-bold text-base text-on-surface">Erst deine Aufgaben!</p>
-            <p className="font-body text-sm text-on-surface-variant mt-0.5">
-              Schließe eine Routine ab, dann darfst du spielen. 💪
-            </p>
+            {reason === 'timeBefore' && (
+              <>
+                <p className="font-headline font-bold text-base text-on-surface">
+                  Noch zu früh zum Spielen
+                </p>
+                <p className="font-body text-sm text-on-surface-variant mt-0.5">
+                  Spielzeit öffnet um {windowStartHour} Uhr. Ronki wartet noch. ⏰
+                </p>
+              </>
+            )}
+            {reason === 'timeAfter' && (
+              <>
+                <p className="font-headline font-bold text-base text-on-surface">
+                  Ronki ist müde
+                </p>
+                <p className="font-body text-sm text-on-surface-variant mt-0.5">
+                  Spielzeit ist vorbei. Morgen ab {windowStartHour} Uhr wieder. 🌙
+                </p>
+              </>
+            )}
+            {withinTimeWindow && reason === 'noSection' && (
+              <>
+                <p className="font-headline font-bold text-base text-on-surface">Erst deine Aufgaben!</p>
+                <p className="font-body text-sm text-on-surface-variant mt-0.5">
+                  Schließe eine Routine ab, dann darfst du spielen. 💪
+                </p>
+              </>
+            )}
           </div>
         </div>
       )}
