@@ -20,6 +20,10 @@ import type { VoiceLine } from '../types';
  *   - de_slowdown_02: "Langsam, kleiner Flitzer. Es gibt viel zu entdecken."
  *   - de_slowdown_03: "Pssst. Nicht alles rennt davon."
  * MVP wires only de_slowdown_01. Rotation added later when audio exists.
+ *
+ * AttentionGlow announcement lines (fired once per seen-key via AttentionGlow prop):
+ *   - de_forscher_new_01: "Hey, ich hab was Neues entdeckt! Komm mal hin, guck dir das an."
+ * Ships silent (VoiceAudio.play fails gracefully); Marc generates MP3 later.
  */
 
 export const linesDe: VoiceLine[] = [

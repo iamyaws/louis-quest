@@ -19,6 +19,8 @@ import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
 import GefuehlsecheHeart from './GefuehlsecheHeart';
 import ForscherEcke from './ForscherEcke';
+import AttentionGlow from './AttentionGlow';
+import { useAttentionFlag } from '../hooks/useAttentionFlag';
 import StaminaIndicator from './StaminaIndicator';
 import ZeigMomentCard from './ZeigMomentCard';
 
@@ -74,6 +76,9 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const [showEveningRitual, setShowEveningRitual] = useState(false);
   const [showGefuehlsecke, setShowGefuehlsecke] = useState(false);
   const [zeigBlock, setZeigBlock] = useState(null); // 'morning' | 'evening' | 'bedtime'
+
+  // Attention: Forscher-Ecke glows on first appearance. Fades after Louis taps a game.
+  const [forscherSeen, markForscherSeen] = useAttentionFlag('forscher-ecke-first-seen');
 
   // Trigger evening ritual when: evening + all bedtime quests done + hasn't happened today yet
   useEffect(() => {
@@ -469,7 +474,21 @@ export default function Hub({ onNavigate, onPlayMint }) {
         })()}
 
         {/* ── Forscher-Ecke — appears only when at least one MINT game is unlocked ── */}
-        <ForscherEcke onPlayGame={(gameId) => onPlayMint?.(gameId)} />
+        <AttentionGlow
+          active={!forscherSeen}
+          seenKey="forscher-ecke-first-seen"
+          accent="#059669"
+          intensity="medium"
+          badgeLabel="NEU"
+          voiceLineId="de_forscher_new_01"
+        >
+          <ForscherEcke
+            onPlayGame={(gameId) => {
+              markForscherSeen();
+              onPlayMint?.(gameId);
+            }}
+          />
+        </AttentionGlow>
 
         {/* ═══════════════════════════════════════════════════════════
             SECONDARY ZONE — collapsed by default.
