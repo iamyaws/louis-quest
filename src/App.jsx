@@ -82,6 +82,21 @@ function AppContent() {
       // proportionally when the user stores unused time.
       totalMinutes: reward.minutes,
     });
+    // Append a Funkelzeit-Verlauf entry (capped at last 200 for long-term use).
+    // actualUsed is left undefined; it gets filled on Store or stays empty if
+    // the timer runs out / is dismissed.
+    const prior = state?.funkelzeitLog || [];
+    actions.patchState({
+      funkelzeitLog: [
+        ...prior,
+        {
+          ts: new Date().toISOString(),
+          minutes: reward.minutes,
+          cost: reward.cost,
+          rewardName: reward.name,
+        },
+      ].slice(-200),
+    });
   };
 
   if (loading) {
@@ -236,6 +251,17 @@ function AppContent() {
             if (refundMinutes > 0) actions.addScreenMinutes(refundMinutes);
             // Funkelzeit-usage refund: unused minutes don't count against the daily cap.
             if (refundTimeMinutes > 0) actions.refundFunkelzeitUsage(refundTimeMinutes);
+            // Patch last log entry with actualUsed = total runtime minus refunded
+            // minutes, so the Verlauf shows what Louis really consumed.
+            const log = state?.funkelzeitLog || [];
+            if (log.length > 0) {
+              const last = log[log.length - 1];
+              const totalMin = screenTimer.totalMinutes ?? (screenTimer.totalSeconds / 60);
+              const actualUsed = Math.max(0, Math.round(totalMin - refundTimeMinutes));
+              actions.patchState({
+                funkelzeitLog: [...log.slice(0, -1), { ...last, actualUsed }],
+              });
+            }
             setScreenTimer(null);
           }}
           onDismiss={() => setScreenTimer(null)}

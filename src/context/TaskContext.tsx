@@ -134,6 +134,16 @@ export interface TaskState {
   gamesPlayedEver?: string[];
   /** Minutes of Funkelzeit consumed today. Resets at daily transition. */
   funkelzeitMinutesToday?: number;
+  /** Log of Funkelzeit redemptions (last ~60-90 days kept, capped at 200 entries).
+   *  Used by ParentalDashboard "Funkelzeit-Verlauf" and lets parents see what
+   *  Louis actually redeemed vs. what he used. */
+  funkelzeitLog?: Array<{
+    ts: string;          // ISO timestamp when timer started
+    minutes: number;     // reward.minutes — how many minutes were redeemed
+    cost: number;        // reward.cost — cost in drachenEier/screen-minutes
+    rewardName: string;  // Belohnungsbank reward name (localized string)
+    actualUsed?: number; // minutes actually used (filled in on Store action)
+  }>;
 }
 
 interface TaskComputed {

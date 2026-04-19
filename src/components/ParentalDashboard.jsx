@@ -958,6 +958,9 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
         </div>
       </div>
 
+      {/* Funkelzeit-Verlauf — log of all activations */}
+      <FunkelzeitVerlaufCard log={state?.funkelzeitLog || []} />
+
       {/* Zähneputzen-Modus */}
       <div className="rounded-2xl p-5"
            style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
@@ -1195,5 +1198,86 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
         )}
       </div>
     </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// FUNKELZEIT-VERLAUF CARD
+// ═══════════════════════════════════════════════════════
+
+/** Relative-day label for recent dates, full date for older ones. */
+function formatLogDate(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  const yd = new Date(now); yd.setDate(yd.getDate() - 1);
+  const isYesterday = d.toDateString() === yd.toDateString();
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  if (sameDay) return `Heute ${hh}:${mm}`;
+  if (isYesterday) return `Gestern ${hh}:${mm}`;
+  const day = d.getDate();
+  const month = d.toLocaleDateString('de-DE', { month: 'long' });
+  return `${day}. ${month} ${hh}:${mm}`;
+}
+
+function FunkelzeitVerlaufCard({ log }) {
+  const entries = [...log].reverse(); // most recent first
+  return (
+    <div className="rounded-2xl p-5"
+         style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+             style={{ background: 'rgba(0,206,201,0.12)' }}>
+          <span className="material-symbols-outlined text-lg" style={{ color: '#00827e', fontVariationSettings: "'FILL' 1" }}>history</span>
+        </div>
+        <p className="font-label font-bold text-sm text-on-surface">Funkelzeit-Verlauf</p>
+      </div>
+      <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+        Jede Aktivierung in chronologischer Reihenfolge. Letzte {log.length > 0 ? log.length : 0} Einträge.
+      </p>
+
+      {entries.length === 0 ? (
+        <div className="py-6 text-center">
+          <p className="font-body text-sm text-on-surface-variant italic">Noch keine Aktivierung.</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2 max-h-80 overflow-y-auto pr-1"
+             style={{ scrollbarWidth: 'thin' }}>
+          {entries.map((entry, i) => {
+            const used = entry.actualUsed;
+            // Show actual-used only if it's a meaningful reduction from planned
+            const showUsed = used !== undefined && used !== null && used < entry.minutes;
+            return (
+              <div key={entry.ts + '_' + i}
+                   className="flex items-center gap-3 p-3 rounded-xl"
+                   style={{ background: 'rgba(0,206,201,0.04)', border: '1px solid rgba(0,150,150,0.1)' }}>
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                     style={{ background: 'rgba(0,206,201,0.12)' }}>
+                  <span className="material-symbols-outlined text-base"
+                        style={{ color: '#00827e', fontVariationSettings: "'FILL' 1" }}>hourglass_top</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-label font-bold text-sm text-on-surface truncate">{entry.rewardName}</p>
+                  <p className="font-label text-xs text-on-surface-variant mt-0.5">
+                    {formatLogDate(entry.ts)}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-headline font-bold text-base" style={{ color: '#00827e', lineHeight: 1 }}>
+                    {entry.minutes} Min.
+                  </p>
+                  {showUsed && (
+                    <p className="font-label text-[10px] text-on-surface-variant mt-1 whitespace-nowrap">
+                      tatsächlich: {used} Min.
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
