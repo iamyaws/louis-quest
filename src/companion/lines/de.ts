@@ -11,6 +11,15 @@ import type { VoiceLine } from '../types';
  * From day 14+, identity-language lines unlock:
  * "Ronki hat den Glühwürmchen erzählt, dass du immer deine Zähne putzt!"
  * These shift motivation from external reward to self-concept (Atomic Habits).
+ *
+ * TODO — audio to generate (ElevenLabs; quota-gated). Lines intentionally NOT
+ * registered in the bank because they're played directly by useQuietAttention
+ * (not trigger-matched). Once MP3s land in /public/audio/ronki/, they play
+ * automatically — no code change needed here.
+ *   - de_slowdown_01: "Wow, du bist aber schnell! Schau nochmal."
+ *   - de_slowdown_02: "Langsam, kleiner Flitzer. Es gibt viel zu entdecken."
+ *   - de_slowdown_03: "Pssst. Nicht alles rennt davon."
+ * MVP wires only de_slowdown_01. Rotation added later when audio exists.
  */
 
 export const linesDe: VoiceLine[] = [

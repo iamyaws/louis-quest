@@ -37,6 +37,7 @@ import StarfighterGame from './components/StarfighterGame';
 import { useSpecialQuests } from './hooks/useSpecialQuests';
 import { useEggSystem } from './hooks/useEggSystem';
 import { useMicropediaDiscovery } from './hooks/useMicropediaDiscovery';
+import { useQuietAttention } from './hooks/useQuietAttention';
 import EggOverlay from './components/EggOverlay';
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import AlphaBanner from './components/AlphaBanner';
@@ -53,6 +54,7 @@ function AppContent() {
 
   useSpecialQuests(); // side-effect only — silently completes special quests
   useEggSystem(); // silently spawns eggs when trigger conditions are met
+  useQuietAttention(view); // gentle voice brake when Louis zooms through screens
 
   const [discoveryToast, setDiscoveryToast] = useState(null);
   useMicropediaDiscovery((id) => setDiscoveryToast(id));
