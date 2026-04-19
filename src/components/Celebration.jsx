@@ -339,9 +339,11 @@ export default function Celebration() {
 
   useEffect(() => {
     if (celebration) {
-      // Public mode: skip levelUp celebrations entirely (RPG-flavored surface).
-      // State already updated; just don't show the modal to Louis.
-      if (celebration.type === 'levelUp' && !isDevMode()) {
+      // Public mode: skip RPG-flavored celebrations entirely (levelUp +
+      // evolution "Ronki hat sich verändert!"). State still updates under
+      // the hood; just don't show modals that contradict the "one stable
+      // companion, no ladder" framing Marc wants in public mode.
+      if ((celebration.type === 'levelUp' || celebration.type === 'evolution') && !isDevMode()) {
         skipRef.current = true;
         actions.dismissCelebration();
         return;
