@@ -15,6 +15,10 @@ export interface FreundMeta {
   unlockThreshold: number;
   /** Whether this Freund's arc is built and shippable. Pilot = pilzhueter only. */
   implemented: boolean;
+  /** ElevenLabs voice ID used for this Freund's narration. Picked via voice-casting
+   *  review (voice-samples/). When undefined, arc audio gen falls back to Bella
+   *  (Drachenmutter) — shared narrator mode. */
+  voiceId?: string;
 }
 
 export const FREUNDE: FreundMeta[] = [
@@ -26,6 +30,7 @@ export const FREUNDE: FreundMeta[] = [
     skillName: { de: 'Baum-Pose', en: 'Tree Pose' },
     unlockThreshold: 2,
     implemented: true,
+    voiceId: 'pqHfZKP75CvOlQylNhV4', // Bill — deep older
   },
   {
     id: 'windreiterin',
@@ -35,6 +40,7 @@ export const FREUNDE: FreundMeta[] = [
     skillName: { de: 'Box-Atmung', en: 'Box Breathing' },
     unlockThreshold: 3,
     implemented: false,
+    voiceId: 'cgSgspJ2msm6clMCkdW9', // Jessica — confident
   },
   {
     id: 'tiefentaucher',
@@ -53,6 +59,7 @@ export const FREUNDE: FreundMeta[] = [
     skillName: { de: 'Kurze Meditation', en: 'Brief meditation' },
     unlockThreshold: 3,
     implemented: false,
+    voiceId: 'XrExE9yKIg1WjnnlVkGX', // Matilda — dreamy settings
   },
   {
     id: 'lichtbringerin',
@@ -71,6 +78,7 @@ export const FREUNDE: FreundMeta[] = [
     skillName: { de: 'Funken finden', en: 'Spark finding' },
     unlockThreshold: 3,
     implemented: false,
+    voiceId: 'TX3LPaxmHKxFdv7VOQHJ', // Liam — expressive young
   },
   {
     id: 'brueckenbauer',
