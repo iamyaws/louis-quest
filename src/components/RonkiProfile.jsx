@@ -6,6 +6,7 @@ import { ARCS, findArc } from '../arcs/arcs';
 import { Pearl } from './CurrencyIcons';
 import { SEED_BY_ID, SEED_CREATURES } from '../data/creatures';
 import { isDevMode } from '../utils/mode';
+import { getVariant } from '../data/companionVariants';
 
 /**
  * Companion Profile — patterned on Finch's Piper page.
@@ -114,11 +115,22 @@ export default function RonkiProfile({ onNavigate }) {
               <img src={`${base}art/companion/${artFile}.webp`} alt="Ronki"
                    className="w-full h-full object-cover" />
             </div>
-            {/* Stage badge */}
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full font-label font-bold text-xs uppercase tracking-widest text-white"
-                 style={{ background: stageColor, boxShadow: `0 2px 8px ${stageColor}50` }}>
-              {stageName}
-            </div>
+            {/* Identity badge — stage name in dev mode (evolution RPG),
+                 variant name in public mode (stable one-companion identity). */}
+            {dev ? (
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full font-label font-bold text-xs uppercase tracking-widest text-white"
+                   style={{ background: stageColor, boxShadow: `0 2px 8px ${stageColor}50` }}>
+                {stageName}
+              </div>
+            ) : state.companionVariant ? (
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full font-label font-bold text-xs uppercase tracking-widest text-white"
+                   style={{
+                     background: getVariant(state.companionVariant).borderColor,
+                     boxShadow: `0 2px 8px ${getVariant(state.companionVariant).glowColor}`,
+                   }}>
+                {getVariant(state.companionVariant).name[lang] || getVariant(state.companionVariant).name.de}
+              </div>
+            ) : null}
           </div>
 
           {/* Name */}

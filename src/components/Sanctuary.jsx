@@ -112,10 +112,14 @@ export default function Sanctuary({ onNavigate }) {
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#22c55e' }} />
               {allCareDone ? t('care.status.loved') : t('care.status.happy')}
             </div>
-            <div className="px-3 py-1 rounded-full shadow-sm font-label text-xs font-bold text-primary"
-                 style={{ background: 'rgba(255,255,255,0.9)' }}>
-              {stageName(currentStage)}
-            </div>
+            {/* Stage pill — dev only. Public mode keeps Ronki's identity stable
+                 (one companion, no ladder). */}
+            {isDevMode() && (
+              <div className="px-3 py-1 rounded-full shadow-sm font-label text-xs font-bold text-primary"
+                   style={{ background: 'rgba(255,255,255,0.9)' }}>
+                {stageName(currentStage)}
+              </div>
+            )}
           </div>
 
           {voice.line && (
@@ -138,14 +142,20 @@ export default function Sanctuary({ onNavigate }) {
               >
                 {zones.activeZone.emoji} {t(zones.activeZone.flavorKey)}
               </p>
-              <div className="h-3 w-full rounded-full overflow-hidden shadow-inner mt-3"
-                   style={{ background: 'rgba(255,255,255,0.5)' }}>
-                <div className="h-full rounded-full" style={{ width: progressPct + '%', background: 'linear-gradient(90deg, #124346, #2d5a5e)' }} />
-              </div>
-              {nextStage && (
-                <p className="text-xs font-label text-on-surface-variant mt-2">
-                  {t('care.stepsTo', { count: nextStage.threshold - evo, name: stageName(currentStage + 1) })}
-                </p>
+              {/* Evolution progress bar — dev only. Care mechanics still run
+                   in public (hunger, thirst, play) but without a stage ladder. */}
+              {isDevMode() && (
+                <>
+                  <div className="h-3 w-full rounded-full overflow-hidden shadow-inner mt-3"
+                       style={{ background: 'rgba(255,255,255,0.5)' }}>
+                    <div className="h-full rounded-full" style={{ width: progressPct + '%', background: 'linear-gradient(90deg, #124346, #2d5a5e)' }} />
+                  </div>
+                  {nextStage && (
+                    <p className="text-xs font-label text-on-surface-variant mt-2">
+                      {t('care.stepsTo', { count: nextStage.threshold - evo, name: stageName(currentStage + 1) })}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -327,7 +337,9 @@ export default function Sanctuary({ onNavigate }) {
           </div>
         </button>
 
-        {/* Evolution Path — Vertical Winding */}
+        {/* Evolution Path — dev only. This is the biggest surface that makes
+             Ronki feel like a progression ladder; public mode hides it entirely. */}
+        {isDevMode() && (
         <section className="rounded-2xl p-6 relative overflow-hidden"
                  style={{ background: 'rgba(255,255,255,0.75)', border: '1px solid white', boxShadow: '0 8px 32px -4px rgba(0,0,0,0.1)' }}>
           <h3 className="font-headline font-bold text-xl mb-6 flex items-center gap-2">
@@ -406,6 +418,7 @@ export default function Sanctuary({ onNavigate }) {
             })}
           </div>
         </section>
+        )}
 
       </main>
     </div>

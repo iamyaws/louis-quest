@@ -23,6 +23,7 @@ import { MINT_GAMES } from '../data/mintGames';
 import { useAttentionFlag } from '../hooks/useAttentionFlag';
 import ZeigMomentCard from './ZeigMomentCard';
 import { isDevMode } from '../utils/mode';
+import { getVariant } from '../data/companionVariants';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -291,17 +292,30 @@ export default function Hub({ onNavigate, onPlayMint }) {
                 </div>
               </div>
 
-              {/* Stage nameplate — painted banner under the scene */}
-              <div className="-mt-4 relative z-10 px-5 py-1.5 rounded-full"
-                   style={{
-                     background: 'rgba(255,248,242,0.95)',
-                     border: '1px solid rgba(18,67,70,0.15)',
-                     boxShadow: '0 6px 14px -4px rgba(18,67,70,0.18), inset 0 1px 0 rgba(255,255,255,0.9)',
-                   }}>
-                <p className="font-bold text-[11px] font-label uppercase tracking-[0.22em] text-primary-container whitespace-nowrap">
-                  {t('hub.companion.stage', { stage: stageNum })} · {stageName}
-                </p>
-              </div>
+              {/* Nameplate — stage in dev mode (RPG flavor), variant name in
+                   public mode (stable one-companion identity). Suppressed when
+                   neither is meaningful. */}
+              {(() => {
+                const variant = state.companionVariant ? getVariant(state.companionVariant) : null;
+                const label = isDevMode()
+                  ? `${t('hub.companion.stage', { stage: stageNum })} · ${stageName}`
+                  : variant
+                    ? (variant.name[lang] || variant.name.de)
+                    : null;
+                if (!label) return null;
+                return (
+                  <div className="-mt-4 relative z-10 px-5 py-1.5 rounded-full"
+                       style={{
+                         background: 'rgba(255,248,242,0.95)',
+                         border: '1px solid rgba(18,67,70,0.15)',
+                         boxShadow: '0 6px 14px -4px rgba(18,67,70,0.18), inset 0 1px 0 rgba(255,255,255,0.9)',
+                       }}>
+                    <p className="font-bold text-[11px] font-label uppercase tracking-[0.22em] text-primary-container whitespace-nowrap">
+                      {label}
+                    </p>
+                  </div>
+                );
+              })()}
             </section>
           );
         })()}
