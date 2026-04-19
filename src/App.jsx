@@ -41,6 +41,7 @@ import { useQuietAttention } from './hooks/useQuietAttention';
 import EggOverlay from './components/EggOverlay';
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import AlphaBanner from './components/AlphaBanner';
+import CompanionVariantMigration from './components/CompanionVariantMigration';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -238,6 +239,11 @@ function AppContent() {
         !state.louisSeenParentIntro &&
         (state.totalTasksDone || 0) >= 3 &&
         view === 'hub' && <ParentIntroOverlay />}
+      {/* One-shot variant migration for pre-variant saves (Louis). Unmounts
+          itself by writing state.companionVariant; won't re-appear. */}
+      {state && state.onboardingDone && !state.companionVariant && (
+        <CompanionVariantMigration />
+      )}
       <Celebration />
       <ArcOfferCard />
       <FreundCallbackCard />

@@ -150,6 +150,9 @@ export interface TaskState {
   /** Per-block count of confirmations seen. Teaching period fades once each
    *  block hits 14 (Louis has internalized the habit). */
   zeigMomentCounts?: { morning?: number; evening?: number; bedtime?: number };
+  /** One of COMPANION_VARIANTS.id — Louis's picked colorway at onboarding.
+   *  Undefined for saves that pre-date the variant system (triggers migration). */
+  companionVariant?: string;
 }
 
 interface TaskComputed {
@@ -170,7 +173,7 @@ interface TaskActions {
   petCompanion: () => void;
   playCompanion: () => void;
   collectLoginBonus: () => void;
-  completeOnboarding: (cfg?: { eggType?: string; dragonVariant?: DragonVariant; heroName?: string; heroGender?: string }) => void;
+  completeOnboarding: (cfg?: { eggType?: string; dragonVariant?: DragonVariant; companionVariant?: string; heroName?: string; heroGender?: string }) => void;
   saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
   redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
   dismissCelebration: () => void;
@@ -416,6 +419,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           eggTriggersFired: raw.eggTriggersFired || {},
           gamesPlayedEver: raw.gamesPlayedEver || [],
           funkelzeitMinutesToday: raw.funkelzeitMinutesToday || 0,
+          // Intentionally left as-is: undefined on pre-variant saves triggers
+          // the one-time CompanionVariantMigration modal. Once set, it sticks.
+          companionVariant: (raw as any).companionVariant,
         };
         // One-time migration: reset inflated HP from old economy
         if (!raw._v2_economy_reset) {
@@ -842,7 +848,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const completeOnboarding = useCallback((cfg?: { eggType?: string; dragonVariant?: DragonVariant; heroName?: string; heroGender?: string }) => {
+  const completeOnboarding = useCallback((cfg?: { eggType?: string; dragonVariant?: DragonVariant; companionVariant?: string; heroName?: string; heroGender?: string }) => {
     setState(prev => {
       if (!prev) return prev;
       const updated = {
@@ -851,6 +857,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         onboardingDate: prev.onboardingDate || new Date().toISOString().slice(0, 10),
         eggType: cfg?.eggType || prev.eggType,
         heroGender: cfg?.heroGender || prev.heroGender || null,
+        // Piece 3: one-pick-forever colorway. Only set if the onboarding flow
+        // actually passed one through (re-pick flow + initial onboarding do).
+        companionVariant: cfg?.companionVariant || prev.companionVariant,
       };
       const familyConfigPatch: Partial<FamilyConfig> = {};
       if (cfg?.heroName) familyConfigPatch.childName = cfg.heroName;
