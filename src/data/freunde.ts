@@ -56,6 +56,8 @@ export const FREUNDE: FreundMeta[] = [
     skillName: { de: 'Gefühle benennen', en: 'Naming feelings' },
     unlockThreshold: 2,
     implemented: false,
+    voiceId: 'AZnzlk1XvdvUeBnXmlld', // Domi — childlike (Marc: "could be a little more childlike but fine")
+    voiceSettings: { stability: 0.45, similarity_boost: 0.75, style: 0.55 },
   },
   {
     id: 'sternenweberin',
@@ -98,6 +100,8 @@ export const FREUNDE: FreundMeta[] = [
     skillName: { de: 'Streit entspannen', en: 'Easing conflicts' },
     unlockThreshold: 4,
     implemented: false,
+    voiceId: 'yoZ06aMxZJJ28mfd3POQ', // Sam — calm-young
+    voiceSettings: { stability: 0.72, similarity_boost: 0.72, style: 0.25 },
   },
 ];
 
