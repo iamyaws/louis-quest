@@ -24,6 +24,7 @@ import { MINT_GAMES } from '../data/mintGames';
 import { useAttentionFlag } from '../hooks/useAttentionFlag';
 import StaminaIndicator from './StaminaIndicator';
 import ZeigMomentCard from './ZeigMomentCard';
+import { isDevMode } from '../utils/mode';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -161,6 +162,24 @@ export default function Hub({ onNavigate, onPlayMint }) {
         <CloudWaves fill="253,248,240" opacity={1.2} />
       </div>
 
+      {/* ── DEV badge (dev mode only, top-right, unobtrusive) ── */}
+      {isDevMode() && (
+        <div
+          className="fixed z-[100] px-2 py-0.5 rounded-md font-label font-bold text-[10px] uppercase tracking-widest pointer-events-none select-none"
+          style={{
+            top: 'calc(env(safe-area-inset-top, 0px) + 6px)',
+            right: 'calc(env(safe-area-inset-right, 0px) + 6px)',
+            background: 'rgba(18,67,70,0.55)',
+            color: 'rgba(255,255,255,0.85)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(8px)',
+          }}
+          aria-hidden="true"
+        >
+          DEV
+        </div>
+      )}
+
       {/* ── Top Bar (matches TopBar component style) ── */}
       <header className="flex justify-between items-center px-6 pb-2"
               style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
@@ -170,20 +189,24 @@ export default function Hub({ onNavigate, onPlayMint }) {
                  style={{ border: '2px solid rgba(18,67,70,0.15)' }}>
               <img src={base + heroAvatar} alt={heroName} className="w-full h-full object-cover" />
             </div>
-            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shadow-md"
-                 style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', border: '2px solid white', color: '#1a1a1a', lineHeight: 1 }}>
-              {level}
-            </div>
+            {isDevMode() && (
+              <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shadow-md"
+                   style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', border: '2px solid white', color: '#1a1a1a', lineHeight: 1 }}>
+                {level}
+              </div>
+            )}
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-headline font-bold text-primary leading-tight">{heroName}</span>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
-                <div className="h-full rounded-full transition-all duration-500"
-                     style={{ width: `${xpPct}%`, background: 'linear-gradient(90deg, #124346, #5eead4)' }} />
+            {isDevMode() && (
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.1)' }}>
+                  <div className="h-full rounded-full transition-all duration-500"
+                       style={{ width: `${xpPct}%`, background: 'linear-gradient(90deg, #124346, #5eead4)' }} />
+                </div>
+                <span className="font-label text-xs text-outline">{lvlProg.cur}/{lvlProg.need}</span>
               </div>
-              <span className="font-label text-xs text-outline">{lvlProg.cur}/{lvlProg.need}</span>
-            </div>
+            )}
           </div>
         </button>
         <div className="flex items-center gap-2">
@@ -632,7 +655,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
         </details>
 
         {/* ── Boss Card (compact with tappable portrait) ── */}
-        {state.boss && (() => {
+        {isDevMode() && state.boss && (() => {
           const bd = BOSSES.find(b => b.id === state.boss.id);
           if (!bd) return null;
           const defeated = state.boss.hp <= 0;
@@ -953,8 +976,8 @@ export default function Hub({ onNavigate, onPlayMint }) {
         })()}
 
 
-        {/* ── Latest Achievement Spotlight ── */}
-        {(() => {
+        {/* ── Latest Achievement Spotlight — dev only (links into Kodex) ── */}
+        {isDevMode() && (() => {
           const unlocked = state.unlockedBadges || [];
           if (unlocked.length === 0) return null;
           const latestId = unlocked[unlocked.length - 1];
@@ -1009,10 +1032,11 @@ export default function Hub({ onNavigate, onPlayMint }) {
           <span className="relative z-10 material-symbols-outlined" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
         </button>
 
-        {/* ── Widget Row: Leitstern + Weather ── */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* ── Widget Row: Leitstern (dev only) + Weather ── */}
+        <div className={isDevMode() ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-3'}>
 
           {/* Leitstern widget — mirrors weather layout: emoji left, text right */}
+          {isDevMode() && (
           <button
             className="px-4 py-3 rounded-2xl flex items-center gap-3 transition-all active:scale-[0.97] relative overflow-hidden"
             style={{
@@ -1046,6 +1070,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
                  style={{ color: 'rgba(252,211,77,0.65)' }}>Helden-Kodex</p>
             </div>
           </button>
+          )}
 
           {/* Weather widget — taps open clothing sheet */}
           <button
