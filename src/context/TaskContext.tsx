@@ -132,6 +132,8 @@ export interface TaskState {
   collectedEggs?: CollectedEgg[];
   eggTriggersFired?: Record<string, boolean>;
   gamesPlayedEver?: string[];
+  /** Minutes of Funkelzeit consumed today. Resets at daily transition. */
+  funkelzeitMinutesToday?: number;
 }
 
 interface TaskComputed {
@@ -161,6 +163,8 @@ interface TaskActions {
   addHP: (amount: number) => void;
   claimGameReward: (gameId: string) => void;
   addScreenMinutes: (amount: number) => void;
+  addFunkelzeitUsage: (minutes: number) => void;
+  refundFunkelzeitUsage: (minutes: number) => void;
   consumeStamina: () => void;
   restoreStamina: () => void;
   equipGear: (gearId: string) => void;
@@ -285,6 +289,7 @@ export function createInitialState(): TaskState {
     collectedEggs: [],
     eggTriggersFired: {},
     gamesPlayedEver: [],
+    funkelzeitMinutesToday: 0,
   };
 }
 
@@ -394,6 +399,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           collectedEggs: raw.collectedEggs || [],
           eggTriggersFired: raw.eggTriggersFired || {},
           gamesPlayedEver: raw.gamesPlayedEver || [],
+          funkelzeitMinutesToday: raw.funkelzeitMinutesToday || 0,
         };
         // One-time migration: reset inflated HP from old economy
         if (!raw._v2_economy_reset) {
@@ -585,6 +591,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       dreamHighlights,
       bossKilledToday: false,
       arcBeatAdvancedToday: false,
+      funkelzeitMinutesToday: 0,
     };
   }
 
@@ -937,6 +944,24 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, drachenEier: (prev.drachenEier || 0) + amount } : prev);
   }, []);
 
+  // ── Funkelzeit daily usage tracking (for 'strikt' mode cap) ──
+  // Called when a Funkelzeit timer starts: commits the full reward minutes.
+  const addFunkelzeitUsage = useCallback((minutes: number) => {
+    setState(prev => prev ? {
+      ...prev,
+      funkelzeitMinutesToday: Math.max(0, (prev.funkelzeitMinutesToday || 0) + minutes),
+    } : prev);
+  }, []);
+
+  // Called when user stores unused timer: refunds the unused minutes against
+  // the daily usage counter (parallels drachenEier refund).
+  const refundFunkelzeitUsage = useCallback((minutes: number) => {
+    setState(prev => prev ? {
+      ...prev,
+      funkelzeitMinutesToday: Math.max(0, (prev.funkelzeitMinutesToday || 0) - minutes),
+    } : prev);
+  }, []);
+
   // ── Stamina actions ──
   const consumeStamina = useCallback(() => {
     setState(prev => {
@@ -1155,7 +1180,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

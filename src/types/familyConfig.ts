@@ -47,6 +47,8 @@ export function pronouns(p: Pronouns) {
   }
 }
 
+export type FunkelzeitMode = 'entspannt' | 'normal' | 'strikt' | 'none';
+
 export interface FamilyConfig {
   childName: string;
   childBirthday?: string;  // ISO date
@@ -58,6 +60,10 @@ export interface FamilyConfig {
   familyMotto: string;
   affirmation: string;
   dragonVariant?: DragonVariant;
+  /** How restrictive the screen-time reward system is. Default 'entspannt' = current behavior. */
+  funkelzeitMode?: FunkelzeitMode;
+  /** Daily cap in minutes for 'strikt' mode. Default 30. */
+  funkelzeitDailyCapMin?: number;
 }
 
 // ── Louis's family as the default template ──
@@ -94,4 +100,6 @@ export const DEFAULT_FAMILY_CONFIG: FamilyConfig = {
   },
   familyMotto: 'Lieb sein. Sich Mühe geben.\u00A0Zusammen sein.',
   affirmation: 'Ich bin geliebt, so wie ich bin.',
+  funkelzeitMode: 'entspannt',
+  funkelzeitDailyCapMin: 30,
 };

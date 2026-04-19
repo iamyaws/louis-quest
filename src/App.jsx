@@ -78,6 +78,9 @@ function AppContent() {
       totalSeconds: reward.minutes * 60,
       cost: reward.cost,
       rewardName: reward.name,
+      // Preserve the full reward runtime so we can refund Funkelzeit-usage
+      // proportionally when the user stores unused time.
+      totalMinutes: reward.minutes,
     });
   };
 
@@ -229,8 +232,10 @@ function AppContent() {
           cost={screenTimer.cost}
           rewardName={screenTimer.rewardName}
           onFinish={() => {}}
-          onStore={({ refundMinutes }) => {
+          onStore={({ refundMinutes, refundTimeMinutes }) => {
             if (refundMinutes > 0) actions.addScreenMinutes(refundMinutes);
+            // Funkelzeit-usage refund: unused minutes don't count against the daily cap.
+            if (refundTimeMinutes > 0) actions.refundFunkelzeitUsage(refundTimeMinutes);
             setScreenTimer(null);
           }}
           onDismiss={() => setScreenTimer(null)}

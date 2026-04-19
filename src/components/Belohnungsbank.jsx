@@ -4,6 +4,7 @@ import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { Pearl, Hourglass } from './CurrencyIcons';
 import BelohnungRedeemModal from './BelohnungRedeemModal';
+import FunkelzeitParentConfirm from './FunkelzeitParentConfirm';
 import { useGameAccess } from '../hooks/useGameAccess';
 
 const ICON_MAP = {
@@ -20,9 +21,57 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
   const screenMin = state?.drachenEier || 0; // Screen minutes (repurposed from eggs)
 
   const [redeemTarget, setRedeemTarget] = useState(null);
+  // Funkelzeit parent-confirm state — the chosen reward waiting for parent approval
+  const [funkelzeitConfirm, setFunkelzeitConfirm] = useState(null);
+  // Cap-reached banner (with override link) — only in 'strikt' mode
+  const [capReached, setCapReached] = useState(null);
+
+  // ── Funkelzeit mode (parental) ──
+  const funkelzeitMode = state?.familyConfig?.funkelzeitMode || 'entspannt';
+  const dailyCapMin = state?.familyConfig?.funkelzeitDailyCapMin ?? 30;
+  const usedToday = state?.funkelzeitMinutesToday || 0;
 
   const familyRewards = DEFAULT_BELOHNUNGEN.filter(b => b.active && (b.currency || 'hp') === 'hp');
-  const screenRewards = DEFAULT_BELOHNUNGEN.filter(b => b.active && b.currency === 'eggs');
+  // Screen-time rewards are hidden entirely when mode === 'none'
+  const screenRewards = funkelzeitMode === 'none'
+    ? []
+    : DEFAULT_BELOHNUNGEN.filter(b => b.active && b.currency === 'eggs');
+
+  /**
+   * Central Funkelzeit-redeem entry: runs the mode-specific gate before
+   * committing currency + starting the timer.
+   *
+   * - entspannt: start immediately (current behavior)
+   * - normal: open parent-confirm overlay, no cap
+   * - strikt: check cap; if over, show cap-reached with override; else parent-confirm
+   * - none: screen rewards are hidden, so this path never fires
+   */
+  const handleScreenRewardTap = (reward) => {
+    if (!reward || timerActive) return;
+    if (screenMin < reward.cost) return;
+
+    if (funkelzeitMode === 'entspannt') {
+      commitFunkelzeitStart(reward);
+      return;
+    }
+
+    if (funkelzeitMode === 'strikt') {
+      if (usedToday + reward.minutes > dailyCapMin) {
+        setCapReached(reward);
+        return;
+      }
+    }
+    // normal + strikt (under cap) share the parent-confirm flow
+    setFunkelzeitConfirm(reward);
+  };
+
+  const commitFunkelzeitStart = (reward) => {
+    actions.redeemReward('eggs', reward.cost);
+    actions.addFunkelzeitUsage(reward.minutes);
+    onStartTimer?.(reward);
+    setFunkelzeitConfirm(null);
+    setCapReached(null);
+  };
 
   return (
     <div className="px-6 pb-32">
@@ -186,6 +235,28 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         </div>
       )}
 
+      {/* ── Mode 'none' notice — screen-time rewards disabled ── */}
+      {funkelzeitMode === 'none' && (
+        <div className="mb-8 rounded-2xl p-5"
+             style={{
+               background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)',
+               border: '1.5px solid rgba(124,58,237,0.2)',
+             }}>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                 style={{ background: 'rgba(124,58,237,0.12)' }}>
+              <span className="material-symbols-outlined text-2xl" style={{ color: '#7c3aed', fontVariationSettings: "'FILL' 1" }}>nature</span>
+            </div>
+            <div className="flex-1">
+              <h4 className="font-label font-bold text-base text-on-surface">Keine Bildschirmzeit als Belohnung.</h4>
+              <p className="font-body text-xs text-on-surface-variant mt-0.5 leading-relaxed">
+                Heute zählen andere Dinge mehr.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Digital Time (Screen minutes currency) ── */}
       {screenRewards.length > 0 && (
         <div className="mb-8">
@@ -231,10 +302,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                       style={{ background: canAfford && !blocked ? '#00CEC9' : '#e8e1da', color: canAfford && !blocked ? 'white' : '#7b7486' }}
                       disabled={!canAfford || blocked}
                       onClick={() => {
-                        if (canAfford && !blocked) {
-                          actions.redeemReward('eggs', reward.cost);
-                          onStartTimer?.(reward);
-                        }
+                        if (canAfford && !blocked) handleScreenRewardTap(reward);
                       }}
                     >
                       {blocked ? t('shop.timerRunning') : canAfford ? t('shop.redeem') : t('shop.tooFew')}
@@ -288,6 +356,85 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
           }}
           onDismiss={() => setRedeemTarget(null)}
         />
+      )}
+
+      {/* ── Funkelzeit parent-confirm overlay (modes: normal + strikt under cap) ── */}
+      {funkelzeitConfirm && (
+        <FunkelzeitParentConfirm
+          reward={{ ...funkelzeitConfirm, name: t('bel.' + funkelzeitConfirm.id) }}
+          onApprove={() => commitFunkelzeitStart(funkelzeitConfirm)}
+          onDismiss={() => setFunkelzeitConfirm(null)}
+        />
+      )}
+
+      {/* ── Funkelzeit daily-cap reached (strikt mode) with parent override ── */}
+      {capReached && (
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setCapReached(null); }}
+          className="fixed inset-0 z-[650] flex items-center justify-center px-5 overflow-y-auto py-8"
+          style={{ background: 'rgba(10,20,22,0.7)', backdropFilter: 'blur(8px)' }}
+        >
+          <div
+            className="w-full max-w-md rounded-3xl overflow-hidden relative"
+            style={{
+              background: '#fff8f1',
+              boxShadow: '0 24px 64px rgba(0,0,0,0.28)',
+              border: '1px solid rgba(255,255,255,0.9)',
+            }}
+          >
+            <div className="px-6 pt-10 pb-8 flex flex-col items-center text-center">
+              <div
+                className="w-20 h-20 rounded-full mb-5 flex items-center justify-center"
+                style={{ background: 'rgba(186,26,26,0.08)', border: '1px solid rgba(186,26,26,0.15)' }}
+              >
+                <span
+                  className="material-symbols-outlined text-4xl"
+                  style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}
+                >
+                  bedtime
+                </span>
+              </div>
+              <h2
+                className="font-headline font-bold text-on-surface leading-tight"
+                style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '1.5rem' }}
+              >
+                Heute ist Schluss mit Funkelzeit.
+              </h2>
+              <p
+                className="font-body text-on-surface-variant mt-3 leading-relaxed"
+                style={{ fontSize: '1rem' }}
+              >
+                Morgen wieder!
+              </p>
+              <p
+                className="font-label text-xs text-on-surface-variant mt-4 uppercase tracking-widest"
+              >
+                Heute genutzt: {usedToday} / {dailyCapMin} Min.
+              </p>
+
+              <button
+                onClick={() => setCapReached(null)}
+                className="mt-8 w-full py-4 rounded-full font-label font-bold text-base min-h-[48px] active:scale-95 transition-transform"
+                style={{ background: '#124346', color: 'white' }}
+              >
+                Okay
+              </button>
+
+              {/* Parent override link — small, ghost-style, trust-based */}
+              <button
+                onClick={() => {
+                  const reward = capReached;
+                  setCapReached(null);
+                  setFunkelzeitConfirm(reward);
+                }}
+                className="mt-3 font-label text-xs underline active:opacity-70"
+                style={{ color: '#9ca3af' }}
+              >
+                Eltern-Override
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -121,12 +121,16 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
     SFX.play('coin');
     VoiceAudio.play('sfx_celebrate');
     clearInterval(intervalRef.current);
-    // Proportional refund: remaining/total * cost, rounded down
+    // Proportional refund in pearls (currency): remaining/total * cost, rounded down
     const refundMinutes = Math.floor((remaining / totalSeconds) * cost);
+    // Proportional refund in wall-clock minutes (for Funkelzeit daily-usage tracking).
+    // Rounded to the nearest whole minute so usage counter stays clean.
+    const totalMinutes = totalSeconds / 60;
+    const refundTimeMinutes = Math.round((remaining / totalSeconds) * totalMinutes);
     // Show big flash before dismissing
     setRefundFlash(refundMinutes);
     setTimeout(() => {
-      onStore?.({ refundMinutes });
+      onStore?.({ refundMinutes, refundTimeMinutes });
     }, 2200);
   }, [remaining, totalSeconds, cost, onStore]);
 

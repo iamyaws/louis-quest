@@ -850,8 +850,103 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
 
   const pinPrompts = { current: 'Aktuellen PIN eingeben', new: 'Neuen PIN wählen (4 Ziffern)', confirm: 'PIN wiederholen' };
 
+  // ── Funkelzeit mode state (pulled from live familyConfig, no draft) ──
+  const fzMode = state?.familyConfig?.funkelzeitMode || 'entspannt';
+  const fzCap = state?.familyConfig?.funkelzeitDailyCapMin ?? 30;
+  const setFzMode = (next) => {
+    const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
+    actions?.updateFamilyConfig?.({ ...config, funkelzeitMode: next });
+  };
+  const setFzCap = (mins) => {
+    const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
+    actions?.updateFamilyConfig?.({ ...config, funkelzeitDailyCapMin: mins });
+  };
+  const FZ_MODES = [
+    { id: 'entspannt', emoji: '😌', label: 'Entspannt', desc: 'Louis aktiviert Funkelzeit frei.' },
+    { id: 'normal', emoji: '👋', label: 'Normal: Eltern-OK', desc: "Eltern tippen 'Los!' bevor Funkelzeit startet." },
+    { id: 'strikt', emoji: '🛑', label: 'Strikt: mit Tages-Limit', desc: 'Eltern-OK und maximal {N} Minuten pro Tag.' },
+    { id: 'none', emoji: '🚫', label: 'Keine Funkelzeit', desc: 'Bildschirmzeit wird nicht als Belohnung genutzt.' },
+  ];
+
   return (
     <>
+      {/* Funkelzeit Mode */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(0,206,201,0.12)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#00827e', fontVariationSettings: "'FILL' 1" }}>hourglass_top</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">Funkelzeit-Modus</p>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Wie streng sollen Bildschirmzeit-Belohnungen sein?
+        </p>
+        <div className="flex flex-col gap-2.5">
+          {FZ_MODES.map(m => {
+            const active = fzMode === m.id;
+            const desc = m.id === 'strikt'
+              ? m.desc.replace('{N}', String(fzCap))
+              : m.desc;
+            return (
+              <div key={m.id}>
+                <button
+                  onClick={() => setFzMode(m.id)}
+                  className="w-full flex items-start gap-3 p-4 rounded-2xl text-left active:scale-[0.98] transition-all"
+                  style={{
+                    background: active ? 'rgba(0,206,201,0.08)' : 'rgba(255,255,255,0.6)',
+                    border: active ? '1.5px solid rgba(0,150,150,0.35)' : '1.5px solid rgba(0,0,0,0.08)',
+                    boxShadow: active ? '0 3px 12px rgba(0,150,150,0.12)' : 'none',
+                  }}
+                >
+                  <span className="text-2xl mt-0.5" aria-hidden="true">{m.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-label font-bold text-sm text-on-surface">{m.label}</p>
+                      {active && (
+                        <span className="material-symbols-outlined text-sm"
+                              style={{ color: '#00827e', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      )}
+                    </div>
+                    <p className="font-body text-xs text-on-surface-variant mt-1 leading-relaxed">{desc}</p>
+                  </div>
+                </button>
+
+                {/* Strikt mode: inline cap slider */}
+                {m.id === 'strikt' && active && (
+                  <div className="mt-2 p-4 rounded-2xl"
+                       style={{ background: 'rgba(0,206,201,0.06)', border: '1px solid rgba(0,150,150,0.18)' }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+                        Tages-Limit
+                      </span>
+                      <span className="font-headline font-bold text-base" style={{ color: '#00827e' }}>
+                        {fzCap} Min.
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="10"
+                      max="60"
+                      step="5"
+                      value={fzCap}
+                      onChange={e => setFzCap(parseInt(e.target.value, 10) || 30)}
+                      className="w-full"
+                      style={{ accentColor: '#00827e' }}
+                    />
+                    <div className="flex justify-between mt-1">
+                      <span className="font-label text-xs text-on-surface-variant/60">10</span>
+                      <span className="font-label text-xs text-on-surface-variant/60">60</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Language */}
       <div className="rounded-2xl p-5"
            style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
