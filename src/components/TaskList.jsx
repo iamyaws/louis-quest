@@ -127,8 +127,12 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
         );
       })()}
 
-      {/* ── Active Quest-Line Banner (Poem, Birthday, etc.) ── */}
-      {state?.poemQuest && !state.poemQuest.completed ? (
+      {/* ── Active Poem Quest Banner ──
+       *   Legacy surface from before quest-line templates existed. The 'NEU! Gedicht lernen'
+       *   CTA for starting a fresh poem quest was removed (parents now use the generic
+       *   Lern-Projekt quest-line template for poems, Einmaleins, Referate, etc.).
+       *   The active banner stays so Louis (and anyone mid-quest) can finish what they started. */}
+      {state?.poemQuest && !state.poemQuest.completed && (
         <button onClick={() => onNavigate?.('poem')}
           className="w-full rounded-2xl p-5 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
           style={{ background: 'linear-gradient(160deg, #ecfdf5 0%, #6ee7b7 50%, #059669 100%)' }}>
@@ -145,27 +149,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
             <span className="material-symbols-outlined text-xl" style={{ color: '#064e3b', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
           </div>
         </button>
-      ) : !state?.poemQuest ? (
-        /* Poem quest not started yet — game-card style with bouncing NEU! */
-        <button onClick={() => {
-            actions.patchState({ poemQuest: { done: [], completed: false, title: 'Mein Gedicht' } });
-            onNavigate?.('poem');
-          }}
-          className="w-full rounded-2xl p-5 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
-          style={{ background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)' }}>
-          <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>📖</span>
-          <div className="flex-1">
-            <p className="font-label font-bold text-xs uppercase tracking-widest animate-bounce inline-block"
-               style={{ color: '#ef4444', animationDuration: '1.5s' }}>Neu!</p>
-            <h4 className="font-headline font-bold text-lg" style={{ color: '#78350f' }}>Gedicht lernen</h4>
-            <p className="font-body text-sm mt-0.5" style={{ color: '#78350f99' }}>7-Tage-Quest — Tippe zum Starten!</p>
-          </div>
-          <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-               style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-            <span className="material-symbols-outlined text-xl" style={{ color: '#78350f', fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-          </div>
-        </button>
-      ) : null}
+      )}
 
       {/* ── Epic Quest Groups ── */}
       <div className="flex flex-col gap-5">
