@@ -250,7 +250,10 @@ export const BOSSES: import('./types').BossTemplate[] = [
 
 export const ANCHORS: Record<string, { label: string; icon: string; col: string }> = {
   morning: { label: "Bereit f\u00FCr den Tag", icon: "\u{1F305}", col: "#F97316" },
-  evening: { label: "Schul-Vorbereitung", icon: "\u{1F392}", col: "#6D28D9" },
+  // "Für Morgen" — reframed from "Schul-Vorbereitung"/"Abend-Routine" per Marc's
+  // feedback. Same content (Brotdose, Schultasche, Unterschriften, Hausaufgaben,
+  // lesen) but future-focused framing reads kid-friendlier. Icon stays schoolbag.
+  evening: { label: "F\u00FCr Morgen", icon: "\u{1F392}", col: "#6D28D9" },
   hobby: { label: "Hobbys", icon: "\u26BD", col: "#059669" },
   bedtime: { label: "Gute Nacht", icon: "\u{1F319}", col: "#6d28d9" },
 };

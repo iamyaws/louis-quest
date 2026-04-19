@@ -48,7 +48,7 @@
   "mood.tired": "Tired",
 
   "anchor.morning": "Ready for the Day",
-  "anchor.evening": "School Prep",
+  "anchor.evening": "For Tomorrow",
   "anchor.hobby": "Hobbies",
   "anchor.bedtime": "Good Night",
 
@@ -118,9 +118,9 @@
   "task.sideQuest": "Bonus Quest",
   "task.morning.title": "Morning Routine",
   "task.morning.subtitle": "Morning Tasks",
-  "task.evening.title": "School Prep",
-  "task.evening.vacTitle": "Evening Routine",
-  "task.evening.subtitle": "School Tasks",
+  "task.evening.title": "For Tomorrow",
+  "task.evening.vacTitle": "For Tomorrow",
+  "task.evening.subtitle": "Backpack, homework, signatures",
   "task.evening.vacSubtitle": "Evening Tasks",
   "task.hobby.title": "Hobbies",
   "task.hobby.subtitle": "Free-time Activities",
