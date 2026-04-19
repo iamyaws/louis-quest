@@ -11,6 +11,12 @@ interface RouteMeta {
 
 const ROUTES: RouteMeta[] = [
   {
+    path: '/en',
+    title: 'Ronki. The morning routine companion for kids.',
+    description:
+      'Ronki is a dragon companion that reminds your child of their daily routines. No streaks, no ads, no dark patterns. Built by a parent, for parents.',
+  },
+  {
     path: '/wie-es-funktioniert',
     title: 'So funktioniert Ronki',
     description:

@@ -6,9 +6,22 @@ type Props = {
   ogImage?: string;
   canonicalPath?: string;
   noindex?: boolean;
+  /** Language variants for hreflang tags. Use { de: '/', en: '/en' } on pages
+   *  that have a translation. Omit on pages that only exist in one language. */
+  alternates?: { de?: string; en?: string };
+  /** BCP-47 language code for og:locale + html lang. Defaults to 'de'. */
+  locale?: 'de' | 'en';
 };
 
-export function PageMeta({ title, description, ogImage, canonicalPath, noindex }: Props) {
+export function PageMeta({
+  title,
+  description,
+  ogImage,
+  canonicalPath,
+  noindex,
+  alternates,
+  locale = 'de',
+}: Props) {
   useEffect(() => {
     const resolvedImage = ogImage || 'https://www.ronki.de/og-ronki.jpg';
     const resolvedUrl = canonicalPath ? `https://www.ronki.de${canonicalPath}` : undefined;
@@ -18,7 +31,7 @@ export function PageMeta({ title, description, ogImage, canonicalPath, noindex }
     setMeta('og:title', title, 'property');
     setMeta('og:description', description, 'property');
     setMeta('og:type', 'website', 'property');
-    setMeta('og:locale', 'de_DE', 'property');
+    setMeta('og:locale', locale === 'en' ? 'en_US' : 'de_DE', 'property');
     setMeta('og:image', resolvedImage, 'property');
     if (resolvedUrl) setMeta('og:url', resolvedUrl, 'property');
 
@@ -43,9 +56,28 @@ export function PageMeta({ title, description, ogImage, canonicalPath, noindex }
       }
       link.href = `https://www.ronki.de${canonicalPath}`;
     }
-  }, [title, description, ogImage, canonicalPath, noindex]);
+
+    // Clear existing hreflang links from prior pages, then set current ones.
+    document
+      .querySelectorAll<HTMLLinkElement>('link[rel="alternate"][hreflang]')
+      .forEach((l) => l.remove());
+    if (alternates) {
+      if (alternates.de) setHreflang('de', alternates.de);
+      if (alternates.en) setHreflang('en', alternates.en);
+      // x-default points to the primary language variant (German = original audience)
+      if (alternates.de) setHreflang('x-default', alternates.de);
+    }
+  }, [title, description, ogImage, canonicalPath, noindex, alternates, locale]);
 
   return null;
+}
+
+function setHreflang(lang: string, path: string) {
+  const link = document.createElement('link');
+  link.rel = 'alternate';
+  link.hreflang = lang;
+  link.href = `https://www.ronki.de${path}`;
+  document.head.appendChild(link);
 }
 
 function setMeta(name: string, content: string, attr: 'name' | 'property' = 'name') {

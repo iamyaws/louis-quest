@@ -13,6 +13,7 @@ const Vorlagen = lazy(() => import('./pages/Vorlagen'));
 const VorlageMorgen = lazy(() => import('./pages/VorlageMorgen'));
 const VorlageAbend = lazy(() => import('./pages/VorlageAbend'));
 const VorlageKleineGeschwister = lazy(() => import('./pages/VorlageKleineGeschwister'));
+const HomeEN = lazy(() => import('./pages/HomeEN'));
 const Impressum = lazy(() => import('./pages/Impressum'));
 const Datenschutz = lazy(() => import('./pages/Datenschutz'));
 const AGB = lazy(() => import('./pages/AGB'));
@@ -50,6 +51,7 @@ export function AppRoutes() {
         <Route path="/vorlagen/morgenroutine" element={<VorlageMorgen />} />
         <Route path="/vorlagen/abendroutine" element={<VorlageAbend />} />
         <Route path="/vorlagen/kleine-geschwister" element={<VorlageKleineGeschwister />} />
+        <Route path="/en" element={<HomeEN />} />
         <Route path="/impressum" element={<Impressum />} />
         <Route path="/datenschutz" element={<Datenschutz />} />
         <Route path="/agb" element={<AGB />} />

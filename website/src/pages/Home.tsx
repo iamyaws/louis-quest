@@ -19,6 +19,8 @@ export default function Home() {
         title="Ronki: Der Drachen-Gefährte für Kinder-Routinen"
         description="Ronki trägt die Routine mit. Ein Drachen-Gefährte, der Kinder durch den Alltag begleitet. Ohne Streaks, ohne Werbung, ohne Dark Patterns."
         canonicalPath="/"
+        locale="de"
+        alternates={{ de: '/', en: '/en' }}
       />
       <OrganizationSchema />
       <SoftwareApplicationSchema />

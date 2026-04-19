@@ -107,10 +107,16 @@ export function Footer() {
               </p>
               <a
                 href="mailto:hallo@ronki.de"
-                className="text-sm text-teal-dark/75 hover:text-teal-dark transition-colors"
+                className="text-sm text-teal-dark/75 hover:text-teal-dark transition-colors block mb-4"
               >
                 hallo@ronki.de
               </a>
+              <Link
+                to="/en"
+                className="inline-flex items-center gap-2 text-xs font-display font-semibold text-teal-dark/60 hover:text-teal-dark transition-colors"
+              >
+                <span aria-hidden>🇬🇧</span> English version
+              </Link>
             </div>
           </div>
 
