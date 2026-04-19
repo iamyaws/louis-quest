@@ -1,6 +1,6 @@
-export type LaunchState = 'waitlist' | 'live';
+export type LaunchState = 'waitlist' | 'beta' | 'live';
 
-export const LAUNCH_STATE: LaunchState = 'waitlist';
+export const LAUNCH_STATE: LaunchState = 'beta';
 
 export type LaunchCopy = {
   ctaLabel: string;
@@ -15,6 +15,12 @@ const COPY: Record<LaunchState, LaunchCopy> = {
     ctaAction: 'waitlist',
     ctaHelper: 'Wir öffnen Ronki in kleinen Gruppen. Trag dich ein, wir melden uns, wenn ihr dran seid.',
     footerMicro: 'Ronki öffnet bald in kleinen Gruppen. Trag dich ein und sei früh dabei.',
+  },
+  beta: {
+    ctaLabel: 'Frühzugang anfordern',
+    ctaAction: 'waitlist',
+    ctaHelper: 'Die frühe Version läuft bereits. Trag dich ein und sag uns, wo\u2019s bei euch klemmt. Wir melden uns meist innerhalb von 48 Stunden.',
+    footerMicro: 'Ronki ist in der frühen Version. Trag dich ein für Frühzugang.',
   },
   live: {
     ctaLabel: 'Kostenlos testen',

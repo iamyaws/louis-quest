@@ -122,9 +122,18 @@ export default function Impressum() {
               </p>
             </Section>
 
-            <Section heading="Bildnachweise">
+            <Section heading="Bildnachweise & KI-Transparenz">
               <p>
-                Illustrationen und Drachen-Artwork wurden mit Unterstützung von KI-Bildgeneratoren (Midjourney) erstellt und anschließend von uns ausgewählt, bearbeitet und zusammengestellt. Testimonial-Avatare sind Platzhalter und zeigen keine realen Personen. Die abgebildeten Personen stehen in keinem Bezug zu den Aussagen.
+                Große Teile der Bild-Inhalte auf dieser Website, insbesondere die Drachen-Figur Ronki, die Szenen-Bilder (Morgenwald, Naschgarten, Sternenmeer, Sonnenglast, Wolkengrat) sowie die sieben Begleit-Charaktere (Sternenweberin, Tiefentaucherin, Brückenbauer, Flackerfuchs, Lichtbringerin, Pilzhüter, Windreiterin), wurden mit Unterstützung generativer KI-Systeme erstellt, namentlich Midjourney (midjourney.com) und Google Gemini / Imagen. Wir haben die Ergebnisse ausgewählt, nachbearbeitet, zusammengestellt und in den gestalterischen Gesamtkontext dieser Website gesetzt.
+              </p>
+              <p>
+                Nach aktueller Rechtslage genießen rein KI-generierte Bilder in Deutschland grundsätzlich keinen urheberrechtlichen Schutz (§ 2 Abs. 2 UrhG), da es an einer persönlichen geistigen Schöpfung fehlt. Soweit wir durch eigene kreative Bearbeitung, Auswahl oder Montage ein schutzfähiges Werk geschaffen haben, beanspruchen wir das Urheberrecht ausschließlich an dieser Bearbeitung, nicht am KI-Ausgangsbild.
+              </p>
+              <p>
+                Die abgebildeten Figuren und Szenen stellen keine realen Personen, Orte oder Ereignisse dar. Sollte dennoch unbeabsichtigt eine Ähnlichkeit mit realen Personen oder geschützten Werken entstanden sein, bitten wir um einen kurzen Hinweis an <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a>. Wir prüfen und ersetzen entsprechende Inhalte umgehend.
+              </p>
+              <p>
+                Das Foto von Marc Förster im „Über den Macher"-Bereich ist ein echtes Personenfoto und nicht KI-generiert. Avatar-Grafiken auf älteren oder Test-Varianten der Website sind Platzhalter und zeigen keine realen Personen; etwaige Aussagen daneben stehen in keinem Bezug zu den abgebildeten Avataren.
               </p>
             </Section>
 
