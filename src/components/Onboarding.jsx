@@ -1,62 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import PWAInstallSheet from './PWAInstallSheet';
 import VoiceAudio from '../utils/voiceAudio';
+import { COMPANION_VARIANTS, DEFAULT_VARIANT_ID, getVariant } from '../data/companionVariants';
 
 const base = import.meta.env.BASE_URL;
 
-// Three painterly dragon eggs. Each hatches into the same dragon species
-// with a different visual expression: color palette, wing shape, horn style.
-// Louis picks one at onboarding — the emotional anchor — and this choice
-// is stored as state.familyConfig.dragonVariant for lifetime identity.
-const EGGS = [
-  {
-    id: 'ember',
-    nameKey: 'onboarding.egg.ember.name',
-    descKey: 'onboarding.egg.ember.desc',
-    // TODO(phase-1-art): replace with painterly egg-ember.webp
-    img: 'art/onboarding/egg-fire.webp',
-    glowColor: 'rgba(239,68,68,0.25)',
-    iconBg: 'rgba(239,68,68,0.12)',
-    borderColor: '#ef4444',
-    variant: { palette: 'ember', wings: 'rounded', horns: 'short' },
-  },
-  {
-    id: 'moss',
-    nameKey: 'onboarding.egg.moss.name',
-    descKey: 'onboarding.egg.moss.desc',
-    // TODO(phase-1-art): replace with painterly egg-moss.webp
-    img: 'art/onboarding/egg-golden.webp',
-    glowColor: 'rgba(52,168,128,0.25)',
-    iconBg: 'rgba(52,168,128,0.14)',
-    borderColor: '#34a880',
-    variant: { palette: 'moss', wings: 'pointed', horns: 'curved' },
-  },
-  {
-    id: 'dusk',
-    nameKey: 'onboarding.egg.dusk.name',
-    descKey: 'onboarding.egg.dusk.desc',
-    // TODO(phase-1-art): replace with painterly egg-dusk.webp
-    img: 'art/onboarding/egg-spirit.webp',
-    glowColor: 'rgba(109,40,217,0.25)',
-    iconBg: 'rgba(109,40,217,0.12)',
-    borderColor: '#6d28d9',
-    variant: { palette: 'dusk', wings: 'feathered', horns: 'spiraled' },
-  },
-];
+// Six Ronki colorways. Louis picks one at onboarding; that choice is the
+// companion's lifetime identity (stored as state.companionVariant). Louis's
+// feedback on evolution stages — they felt like a progression ladder, not
+// one stable friend — is why this replaces the 3-egg + evolution flow in
+// public mode. Evolution is kept intact for dev-mode users.
+const TOTAL_STEPS = 7;
 
-const TOTAL_STEPS = 6;
-
-export default function Onboarding({ onComplete }) {
+export default function Onboarding({ onComplete, startStep = 0 }) {
   const { t, lang, setLang } = useTranslation();
-  const [step, setStep] = useState(0);
-  const [selectedEgg, setSelectedEgg] = useState(1);
+  const [step, setStep] = useState(startStep);
+  const [selectedVariantId, setSelectedVariantId] = useState(DEFAULT_VARIANT_ID);
   const [heroName, setHeroName] = useState('');
   const [heroGender, setHeroGender] = useState('boy'); // 'boy' | 'girl'
   const { isIOS, androidPrompt, promptInstall } = usePWAInstall();
   const [showPWA, setShowPWA] = useState(false);
   const [pendingCfg, setPendingCfg] = useState(null);
+
+  const selectedVariant = getVariant(selectedVariantId);
 
   // ── Progress bar (top) ──
   const ProgressBar = () => (
@@ -341,7 +310,8 @@ export default function Onboarding({ onComplete }) {
   }
 
   // ══════════════════════════════════════════
-  // Step 3: Egg selection (was step 2)
+  // Step 3: Egg pick — 6 variants in a 2×3 grid
+  // (CSS gradients until Marc's egg art lands)
   // ══════════════════════════════════════════
   if (step === 3) {
     return (
@@ -350,48 +320,59 @@ export default function Onboarding({ onComplete }) {
           <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
-        <div className="relative z-10 flex-1 overflow-y-auto pb-40 px-8"
+        <div className="relative z-10 flex-1 overflow-y-auto pb-40 px-6"
              style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))', scrollbarWidth: 'none' }}>
           <div className="max-w-lg mx-auto flex flex-col items-center gap-5">
             <ProgressBar />
 
-            {/* Three eggs overview illustration */}
-            <div className="relative w-full max-w-xs">
-              <img src={base + 'art/onboarding/three-eggs.webp'} alt="Drei Eier"
-                   className="w-full h-auto rounded-2xl"
-                   style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.25))' }} />
-            </div>
-
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-2 px-2">
               <h2 className="text-3xl font-bold text-white"
-                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>{t('onboarding.egg.title')}</h2>
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
+                {t('onboarding.egg.title')}
+              </h2>
               <p className="text-white/75 text-base leading-relaxed">
                 {t('onboarding.egg.hint')}
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 w-full">
-              {EGGS.map((egg, i) => {
-                const selected = i === selectedEgg;
+            {/* 2×3 grid — big tappable tiles */}
+            <div className="grid grid-cols-2 gap-4 w-full">
+              {COMPANION_VARIANTS.map((v) => {
+                const selected = v.id === selectedVariantId;
+                const label = t(`onboarding.egg.variant.${v.id}.name`);
                 return (
-                  <button key={egg.id}
-                    onClick={() => setSelectedEgg(i)}
-                    className="relative flex items-center gap-4 bg-white rounded-2xl p-5 text-left active:scale-[0.98] transition-all duration-300"
+                  <button
+                    key={v.id}
+                    onClick={() => setSelectedVariantId(v.id)}
+                    className="relative flex flex-col items-center gap-3 bg-white rounded-3xl p-4 pt-5 text-center active:scale-[0.97] transition-all duration-300"
                     style={{
-                      boxShadow: selected ? `0 0 30px -5px ${egg.glowColor}` : '0 2px 8px rgba(0,0,0,0.06)',
-                      border: selected ? `2.5px solid ${egg.borderColor}` : '2px solid transparent',
-                    }}>
-                    <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0"
-                         style={{ background: egg.iconBg }}>
-                      <img src={base + egg.img} alt={t(egg.nameKey)} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-headline text-xl font-bold text-on-surface">{t(egg.nameKey)}</h3>
-                      <p className="text-sm text-on-surface-variant">{t(egg.descKey)}</p>
-                    </div>
+                      boxShadow: selected
+                        ? `0 0 28px -4px ${v.glowColor}, 0 8px 24px rgba(0,0,0,0.1)`
+                        : '0 2px 8px rgba(0,0,0,0.08)',
+                      border: selected ? `3px solid ${v.borderColor}` : '2px solid transparent',
+                    }}
+                    aria-label={label}
+                  >
+                    {/* Egg placeholder — CSS gradient ellipse */}
+                    <div
+                      className="w-20 h-24"
+                      style={{
+                        background: v.eggGradient,
+                        borderRadius: '50% 50% 48% 48% / 58% 58% 42% 42%',
+                        boxShadow: `inset -6px -10px 18px rgba(0,0,0,0.15), inset 6px 8px 16px rgba(255,255,255,0.35)`,
+                      }}
+                      aria-hidden="true"
+                    />
+                    <h3 className="font-headline text-base font-bold text-on-surface leading-tight">
+                      {label}
+                    </h3>
                     {selected && (
-                      <span className="material-symbols-outlined text-xl shrink-0"
-                            style={{ color: egg.borderColor, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      <span
+                        className="absolute top-2 right-2 material-symbols-outlined text-xl"
+                        style={{ color: v.borderColor, fontVariationSettings: "'FILL' 1" }}
+                      >
+                        check_circle
+                      </span>
                     )}
                   </button>
                 );
@@ -400,11 +381,12 @@ export default function Onboarding({ onComplete }) {
           </div>
         </div>
 
-        {/* Bottom nav */}
-        <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-8" style={{ background: 'linear-gradient(to top, rgba(12,50,54,0.95) 40%, transparent)' }}>
+        {/* Bottom nav — "This is my egg!" triggers hatch animation */}
+        <nav className="fixed bottom-0 left-0 w-full z-50 pb-8 px-8"
+             style={{ background: 'linear-gradient(to top, rgba(12,50,54,0.95) 40%, transparent)' }}>
           <div className="max-w-xs mx-auto flex flex-col gap-3">
             <PrimaryButton onClick={() => setStep(4)}>
-              {t('onboarding.egg.choose', { name: t(EGGS[selectedEgg].nameKey) })}
+              {t('onboarding.egg.confirm')}
               <span className="material-symbols-outlined">arrow_forward</span>
             </PrimaryButton>
           </div>
@@ -414,9 +396,23 @@ export default function Onboarding({ onComplete }) {
   }
 
   // ══════════════════════════════════════════
-  // Step 4: Wachse zusammen (was step 3)
+  // Step 4: Hatch animation (NEW)
+  // Wobble ~1.2s → crack → reveal → auto-advance
   // ══════════════════════════════════════════
   if (step === 4) {
+    return <HatchStep
+      variant={selectedVariant}
+      heroName={heroName.trim()}
+      t={t}
+      ProgressBar={ProgressBar}
+      onDone={() => setStep(5)}
+    />;
+  }
+
+  // ══════════════════════════════════════════
+  // Step 5: Wachse zusammen (was step 4)
+  // ══════════════════════════════════════════
+  if (step === 5) {
     return (
       <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
         {/* Background */}
@@ -449,7 +445,7 @@ export default function Onboarding({ onComplete }) {
 
           {/* CTA */}
           <div className="mt-12 w-full max-w-xs">
-            <PrimaryButton onClick={() => setStep(5)}>
+            <PrimaryButton onClick={() => setStep(6)}>
               {t('onboarding.continue')}
               <span className="material-symbols-outlined">arrow_forward</span>
             </PrimaryButton>
@@ -465,7 +461,7 @@ export default function Onboarding({ onComplete }) {
   }
 
   // ══════════════════════════════════════════
-  // Step 5: Quick guide + launch (was step 4)
+  // Step 6: Quick guide + launch (was step 5)
   // ══════════════════════════════════════════
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden font-body bg-background">
@@ -476,22 +472,22 @@ export default function Onboarding({ onComplete }) {
         <div className="max-w-lg mx-auto flex flex-col items-center gap-8">
           <ProgressBar />
 
-          {/* Egg reveal */}
+          {/* Ronki reveal — hatched companion sprite in the variant colorway */}
           <div className="text-center space-y-4">
             <div className="relative w-48 h-48 mx-auto">
               <img src={base + 'art/onboarding/reveal-burst.webp'} alt=""
                    className="absolute inset-0 w-full h-full object-cover rounded-full opacity-60" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden"
-                     style={{ boxShadow: `0 0 30px ${EGGS[selectedEgg].glowColor}` }}>
-                  <img src={base + EGGS[selectedEgg].img} alt={t(EGGS[selectedEgg].nameKey)}
+                <div className="w-28 h-28 rounded-2xl overflow-hidden"
+                     style={{ boxShadow: `0 0 30px ${selectedVariant.glowColor}` }}>
+                  <img src={base + selectedVariant.spritePath} alt={selectedVariant.name[lang] || selectedVariant.name.de}
                        className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
             <h2 className="text-3xl font-bold text-on-surface"
                 style={{ fontFamily: 'Fredoka, sans-serif' }}>
-              {t('onboarding.launch.title', { name: heroName.trim() || t('topbar.heroFallback'), egg: t(EGGS[selectedEgg].nameKey) })}
+              {t('onboarding.launch.title', { name: heroName.trim() || t('topbar.heroFallback'), egg: selectedVariant.name[lang] || selectedVariant.name.de })}
             </h2>
             <p className="text-on-surface-variant text-base leading-relaxed max-w-xs mx-auto">
               {t('onboarding.adventure')}
@@ -530,8 +526,7 @@ export default function Onboarding({ onComplete }) {
           <button onClick={() => {
               localStorage.setItem('ronki_tour_done', '1');
               const cfg = {
-                eggType: EGGS[selectedEgg].id,
-                dragonVariant: EGGS[selectedEgg].variant,
+                companionVariant: selectedVariantId,
                 heroName: heroName.trim() || undefined,
                 heroGender,
               };
@@ -569,6 +564,175 @@ export default function Onboarding({ onComplete }) {
           }}
         />
       )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// HatchStep — wobble → crack → reveal (~3s)
+// Uses motion/react for smooth transforms. Auto-advances via onDone.
+// Stages:
+//   0–1200ms: wobble (rotate ±4°)
+//   1200–1700ms: crack (egg splits — two halves pull apart)
+//   1700–3000ms: reveal (sprite scales up + fades, egg halves fade out)
+//   3000ms: onDone → parent bumps step
+// ══════════════════════════════════════════
+function HatchStep({ variant, heroName, t, ProgressBar, onDone }) {
+  const [phase, setPhase] = useState('wobble'); // 'wobble' | 'crack' | 'reveal'
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase('crack'), 1200);
+    const t2 = setTimeout(() => setPhase('reveal'), 1700);
+    const t3 = setTimeout(() => onDone(), 3000);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+    // onDone is stable per render in parent (passed inline); we intentionally
+    // only run the timeline once per mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
+      <div className="fixed inset-0 z-0">
+        <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
+      </div>
+
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center">
+        <ProgressBar />
+
+        {/* Title — swaps when the reveal hits */}
+        <div className="max-w-md space-y-3 mb-8 min-h-[92px]">
+          {phase !== 'reveal' ? (
+            <>
+              <h1 className="font-display text-3xl font-bold text-white tracking-tight leading-tight"
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
+                {t('onboarding.hatch.title')}
+              </h1>
+              <p className="text-white/75 text-lg leading-relaxed">
+                {t('onboarding.hatch.subtitle')}
+              </p>
+            </>
+          ) : (
+            <motion.h1
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="font-display text-3xl font-bold text-white tracking-tight leading-tight"
+              style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}
+            >
+              {t('onboarding.hatch.revealed', { name: heroName || t('topbar.heroFallback') })}
+            </motion.h1>
+          )}
+        </div>
+
+        {/* Stage */}
+        <div className="relative w-56 h-64 flex items-center justify-center">
+          {/* Glow behind everything */}
+          <div
+            className="absolute inset-0 blur-3xl rounded-full scale-125"
+            style={{ background: variant.glowColor }}
+            aria-hidden="true"
+          />
+
+          {/* Sprite reveal — appears as the egg cracks open */}
+          <AnimatePresence>
+            {phase === 'reveal' && (
+              <motion.img
+                key="sprite"
+                src={base + variant.spritePath}
+                alt=""
+                initial={{ scale: 0.4, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute w-44 h-44 object-contain z-10"
+                style={{ filter: `drop-shadow(0 8px 24px ${variant.glowColor})` }}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Egg — wobbles, then splits into two halves */}
+          <div className="relative w-40 h-48 z-0">
+            {phase === 'wobble' && (
+              <motion.div
+                initial={{ rotate: 0 }}
+                animate={{ rotate: [0, -4, 4, -3, 3, 0] }}
+                transition={{ duration: 1.2, ease: 'easeInOut', times: [0, 0.18, 0.4, 0.6, 0.8, 1] }}
+                className="w-full h-full"
+                style={{
+                  background: variant.eggGradient,
+                  borderRadius: '50% 50% 48% 48% / 58% 58% 42% 42%',
+                  boxShadow: `inset -8px -14px 22px rgba(0,0,0,0.2), inset 8px 10px 18px rgba(255,255,255,0.35), 0 12px 32px rgba(0,0,0,0.25)`,
+                }}
+              />
+            )}
+
+            {(phase === 'crack' || phase === 'reveal') && (
+              <>
+                {/* Top half — drifts up and slightly left */}
+                <motion.div
+                  initial={{ y: 0, x: 0, rotate: 0, opacity: 1 }}
+                  animate={
+                    phase === 'reveal'
+                      ? { y: -70, x: -20, rotate: -18, opacity: 0 }
+                      : { y: -10, x: -6, rotate: -6, opacity: 1 }
+                  }
+                  transition={{ duration: phase === 'reveal' ? 1.2 : 0.4, ease: 'easeOut' }}
+                  className="absolute top-0 left-0 w-full h-1/2 overflow-hidden"
+                  style={{ transformOrigin: 'bottom center' }}
+                >
+                  <div
+                    className="w-full h-[200%]"
+                    style={{
+                      background: variant.eggGradient,
+                      borderRadius: '50% 50% 48% 48% / 58% 58% 42% 42%',
+                      boxShadow: `inset -8px -14px 22px rgba(0,0,0,0.2), inset 8px 10px 18px rgba(255,255,255,0.35)`,
+                    }}
+                    aria-hidden="true"
+                  />
+                </motion.div>
+
+                {/* Bottom half — drifts down and slightly right */}
+                <motion.div
+                  initial={{ y: 0, x: 0, rotate: 0, opacity: 1 }}
+                  animate={
+                    phase === 'reveal'
+                      ? { y: 60, x: 20, rotate: 14, opacity: 0 }
+                      : { y: 10, x: 6, rotate: 6, opacity: 1 }
+                  }
+                  transition={{ duration: phase === 'reveal' ? 1.2 : 0.4, ease: 'easeOut' }}
+                  className="absolute bottom-0 left-0 w-full h-1/2 overflow-hidden"
+                  style={{ transformOrigin: 'top center' }}
+                >
+                  <div
+                    className="w-full h-[200%] -translate-y-1/2"
+                    style={{
+                      background: variant.eggGradient,
+                      borderRadius: '50% 50% 48% 48% / 58% 58% 42% 42%',
+                      boxShadow: `inset -8px -14px 22px rgba(0,0,0,0.2), inset 8px 10px 18px rgba(255,255,255,0.35)`,
+                    }}
+                    aria-hidden="true"
+                  />
+                </motion.div>
+
+                {/* Bright split line flash between the halves on crack */}
+                {phase === 'crack' && (
+                  <motion.div
+                    initial={{ opacity: 0, scaleX: 0.3 }}
+                    animate={{ opacity: [0, 1, 0], scaleX: [0.3, 1, 1] }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute top-1/2 left-0 w-full h-[3px] -translate-y-1/2 rounded-full"
+                    style={{ background: 'white', boxShadow: '0 0 18px rgba(255,255,255,0.9)' }}
+                    aria-hidden="true"
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
