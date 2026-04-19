@@ -37,6 +37,12 @@ const ROUTES: RouteMeta[] = [
       'Sechs ehrliche Antworten auf die Fragen, die Eltern sich zu Ronki stellen: Bildschirmzeit, Datenschutz, Motivation, Preis und Alpha.',
   },
   {
+    path: '/vorlagen',
+    title: 'Vorlagen zum Ausdrucken: Ronki',
+    description:
+      'Druckbare Routinen-Vorlagen für Kinder. Morgenroutine, Abendroutine und eine einfache Version für kleine Geschwister. Zum Ausmalen, kostenlos, ohne Anmeldung.',
+  },
+  {
     path: '/impressum',
     title: 'Impressum: Ronki',
     description: 'Anbieterkennzeichnung nach § 5 DDG und § 18 MStV.',

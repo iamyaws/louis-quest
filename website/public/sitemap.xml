@@ -31,6 +31,30 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.ronki.de/vorlagen</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.ronki.de/vorlagen/morgenroutine</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.ronki.de/vorlagen/abendroutine</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.ronki.de/vorlagen/kleine-geschwister</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://www.ronki.de/impressum</loc>
     <lastmod>2026-04-17</lastmod>
     <changefreq>yearly</changefreq>

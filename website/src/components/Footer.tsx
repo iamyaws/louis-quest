@@ -80,6 +80,9 @@ export function Footer() {
                 <Link to="/faq" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Häufige Fragen
                 </Link>
+                <Link to="/vorlagen" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
+                  Vorlagen zum Ausdrucken
+                </Link>
               </nav>
             </div>
             <div>
