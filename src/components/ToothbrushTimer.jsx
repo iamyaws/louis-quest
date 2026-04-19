@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
+import { useTask } from '../context/TaskContext';
+import { getVariant } from '../data/companionVariants';
 
 /**
  * ToothbrushTimer — 2-3 minute countdown with animated dragon.
@@ -24,6 +26,9 @@ const STAGES = [
 const base = import.meta.env.BASE_URL;
 
 export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
+  const { state } = useTask();
+  const variant = getVariant(state?.companionVariant);
+
   const [remaining, setRemaining] = useState(duration);
   const [finished, setFinished] = useState(false);
   const intervalRef = useRef(null);
@@ -124,10 +129,11 @@ export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-24 h-24 rounded-full overflow-hidden"
-                 style={{ border: '3px solid rgba(252,211,77,0.4)', boxShadow: '0 0 20px rgba(252,211,77,0.2)' }}>
-              <img src={base + 'art/companion/dragon-baby.webp'} alt="Ronki"
+                 style={{ border: `3px solid ${variant.borderColor}66`, boxShadow: `0 0 20px ${variant.glowColor}` }}>
+              <img src={base + variant.spritePath} alt="Ronki"
                    className="w-full h-full object-cover"
-                   style={{ transform: finished ? 'scale(1.1)' : 'none', transition: 'transform 0.5s' }} />
+                   style={{ transform: finished ? 'scale(1.1)' : 'none', transition: 'transform 0.5s' }}
+                   onError={(e) => { e.target.src = base + 'art/companion/dragon-young.webp'; }} />
             </div>
           </div>
         </div>
@@ -170,7 +176,7 @@ export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}>
           <p className="font-body text-sm text-white/70 italic">
             {finished
-              ? 'Ronki strahlt — deine Zähne glänzen! 🐉'
+              ? 'Ronki strahlt — deine Zähne glänzen! ✨'
               : stageIdx === 0 ? 'Los geht\'s! Oben links anfangen 🪥'
               : stageIdx === 1 ? 'Super! Jetzt die andere Seite oben 💪'
               : stageIdx === 2 ? 'Weiter unten — du schaffst das! 🌟'
@@ -187,7 +193,7 @@ export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
           </button>
         ) : (
           <p className="font-label text-xs text-white/30 mt-4">
-            Weiterputzen — Ronki passt auf! 🐉
+            Weiterputzen — Ronki passt auf! ✨
           </p>
         )}
       </div>
