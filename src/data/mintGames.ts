@@ -26,6 +26,13 @@ export interface MintGame {
   unlockCheck: (state: Partial<TaskState>) => boolean;
   /** Ronki's intro line when the host presents the game. German, kid-friendly. */
   introLine: string;
+  /**
+   * Optional: narrator audio line id (served from /audio/narrator/{id}.mp3) that
+   * voices the intro. When present, FreundIntroModal gates the "Los geht's!"
+   * button until the audio finishes. If absent / muted / file missing, button
+   * appears after a short fallback wait.
+   */
+  introAudioId?: string;
   /** Whether this game is built + shippable. Set true incrementally across waves. */
   implemented: boolean;
 }

@@ -27,6 +27,42 @@ const VoiceAudio = {
     delayTimer = setTimeout(doPlay, delayMs);
   },
 
+  /**
+   * Play a narrator line with a callback on playback end.
+   *
+   * `onEnded` fires in two situations:
+   *   - audio finishes naturally (`ended` event)
+   *   - audio failed to load / autoplay blocked / was interrupted (via `error`
+   *     event). Callers treat this as "we tried, move on" — never leave UI
+   *     gated forever because a file is missing.
+   *
+   * Always fires onEnded at most once.
+   */
+  playNarratorWithCallback(lineId: string, delayMs = 600, onEnded?: () => void) {
+    if (this.isMuted()) { onEnded?.(); return; }
+    if (!lineId) { onEnded?.(); return; }
+    if (delayTimer) { clearTimeout(delayTimer); delayTimer = null; }
+
+    let fired = false;
+    const fireOnce = () => {
+      if (fired) return;
+      fired = true;
+      onEnded?.();
+    };
+
+    const doPlay = () => {
+      this.stop();
+      const src = `${BASE}audio/narrator/${lineId}.mp3`;
+      const audio = new Audio(src);
+      audio.volume = 0.9;
+      audio.addEventListener('ended', fireOnce);
+      audio.addEventListener('error', fireOnce);
+      audio.play().catch(() => { fireOnce(); });
+      currentAudio = audio;
+    };
+    delayTimer = setTimeout(doPlay, delayMs);
+  },
+
   /** Play a voice line by its ID (e.g., 'de_greet_01') */
   play(lineId: string, delayMs = 0) {
     if (this.isMuted()) return;

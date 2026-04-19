@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FREUND_BY_ID, getFreundSpritePath } from '../data/freunde';
 import { SEED_BY_ID, getCreatureSpritePath } from '../data/creatures';
 import { MINT_GAME_BY_ID } from '../data/mintGames';
+import VoiceAudio from '../utils/voiceAudio';
 
 /**
  * FreundIntroModal — reusable overlay for "a Freund hosts a game".
@@ -17,10 +18,19 @@ import { MINT_GAME_BY_ID } from '../data/mintGames';
  */
 const base = typeof import.meta !== 'undefined' ? import.meta.env.BASE_URL : '/';
 
+/** Minimum wait before "Los geht's!" appears, in ms. Fallback when audio fails. */
+const INTRO_MIN_WAIT_MS = 3000;
+
 export default function FreundIntroModal({ gameId, onAccept, onDismiss }) {
   const game = MINT_GAME_BY_ID.get(gameId);
   const freund = game ? FREUND_BY_ID.get(game.hostId) : null;
   const creature = game && !freund ? SEED_BY_ID.get(game.hostId) : null;
+
+  // Voice-gating: "Los geht's!" button is muted until intro voice ends or
+  // min-wait elapses (whichever later). Muted mode skips the gate entirely.
+  const muted = VoiceAudio.isMuted();
+  const [voiceFinished, setVoiceFinished] = useState(muted);
+  const [minWaitElapsed, setMinWaitElapsed] = useState(muted);
 
   // Escape key dismisses
   useEffect(() => {
@@ -29,7 +39,36 @@ export default function FreundIntroModal({ gameId, onAccept, onDismiss }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [onDismiss]);
 
+  // Play intro narrator audio (if any) + track end for button activation.
+  useEffect(() => {
+    if (!game) return;
+
+    if (VoiceAudio.isMuted()) {
+      setVoiceFinished(true);
+      setMinWaitElapsed(true);
+      return;
+    }
+
+    setVoiceFinished(false);
+    setMinWaitElapsed(false);
+
+    const waitTimer = setTimeout(() => setMinWaitElapsed(true), INTRO_MIN_WAIT_MS);
+
+    if (game.introAudioId) {
+      VoiceAudio.playNarratorWithCallback(game.introAudioId, 300, () =>
+        setVoiceFinished(true),
+      );
+    } else {
+      // No audio wired — just let the min-wait gate the button.
+      setVoiceFinished(true);
+    }
+
+    return () => clearTimeout(waitTimer);
+  }, [game?.id, game?.introAudioId]);
+
   if (!game) return null;
+
+  const acceptUnlocked = voiceFinished && minWaitElapsed;
 
   const hostName = freund?.name.de || creature?.name.de || game.hostId;
   const spritePath = freund
@@ -135,8 +174,16 @@ export default function FreundIntroModal({ gameId, onAccept, onDismiss }) {
           <div className="flex flex-col gap-3 mt-8 w-full">
             <button
               onClick={onAccept}
-              className="w-full py-4 rounded-full font-label font-bold text-base min-h-[48px] active:scale-95 transition-transform"
-              style={{ background: '#059669', color: 'white', boxShadow: '0 6px 18px rgba(5,150,105,0.35)' }}
+              disabled={!acceptUnlocked}
+              aria-hidden={!acceptUnlocked}
+              className="w-full py-4 rounded-full font-label font-bold text-base min-h-[48px] active:scale-95 transition-all duration-300"
+              style={{
+                background: '#059669',
+                color: 'white',
+                boxShadow: acceptUnlocked ? '0 6px 18px rgba(5,150,105,0.35)' : 'none',
+                opacity: acceptUnlocked ? 1 : 0.3,
+                pointerEvents: acceptUnlocked ? 'auto' : 'none',
+              }}
             >
               Los geht's!
             </button>

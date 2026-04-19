@@ -14,32 +14,7 @@ import { findArc } from './arcs';
 import { loadArcEngineState } from './persistence';
 import type { ArcEngineState } from './types';
 import VoiceAudio from '../utils/voiceAudio';
-
-// Drachenmutter narrator audio map.
-// - intro: plays on arc accept (beat 1 reveal)
-// - outro: plays on arc complete via advance()
-// - beats: per-beat-id audio played when that beat becomes active via advance()
-//   (used by Freund arcs where each beat has its own narration)
-interface ArcNarrator {
-  intro?: string;
-  outro?: string;
-  beats?: Record<string, string>;
-}
-
-const ARC_NARRATOR: Record<string, ArcNarrator> = {
-  'first-adventure': { intro: 'arc_first_intro', outro: 'arc_first_outro' },
-  'listening-game':  { intro: 'arc_listen_intro', outro: 'arc_listen_outro' },
-  'ronkis-garden':   { intro: 'arc_garden_intro', outro: 'arc_garden_outro' },
-  'weather-walker':  { intro: 'arc_weather_intro', outro: 'arc_weather_outro' },
-  'freund-pilzhueter': {
-    intro: 'arc_pilzhueter_b1_intro',
-    // No outro — the delayed callback (b4) IS the emotional finale, played by FreundCallbackCard
-    beats: {
-      'pil-b2-pose':    'arc_pilzhueter_b2_gift',
-      'pil-b3-realife': 'arc_pilzhueter_b3_realife',
-    },
-  },
-};
+import { ARC_NARRATOR } from './narratorMap';
 
 export function useArc() {
   const { state, actions } = useTask();

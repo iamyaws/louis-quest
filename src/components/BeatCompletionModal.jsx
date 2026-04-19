@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useArc } from '../arcs/useArc';
 import BaumPoseBeat from './BaumPoseBeat';
+import VoiceAudio from '../utils/voiceAudio';
+import { resolveBeatNarratorLine } from '../arcs/narratorMap';
 
 /**
  * Registry for per-beat custom UI. Keyed by beat id so future Freunde skills
@@ -13,17 +15,71 @@ const CRAFT_BEAT_COMPONENTS = {
   'pil-b2-pose': BaumPoseBeat,
 };
 
+/** Minimum wait before "Weiter" appears on a lore beat, in ms. */
+const LORE_MIN_WAIT_MS = 3000;
+
 /**
  * Modal for self-reporting completion of a craft or lore beat.
  * - Craft beats show title + steps checklist + "I did it" button
  *   (or a custom component if registered in CRAFT_BEAT_COMPONENTS)
  * - Lore beats show the lore paragraph + "Done reading" button
  *
+ * Voice-gating for lore beats: the "Fertig gelesen" button is muted until
+ * the Drachenmutter narrator finishes speaking the lore text, or 3s have
+ * passed (whichever is later). Prevents speed-clicking past the story.
+ * Muted mode skips the gate entirely — no artificial waits for parents
+ * who keep audio off.
+ *
  * Routine beats do not open this modal; they complete via the quest tick.
  */
 export default function BeatCompletionModal({ beat, onClose }) {
   const { t } = useTranslation();
-  const { advance } = useArc();
+  const { advance, activeArc } = useArc();
+
+  const isLore = beat?.kind === 'lore';
+  const isMuted = isLore ? VoiceAudio.isMuted() : true; // non-lore beats never gate
+
+  // Voice-gating state: only meaningful for lore beats when audio is on.
+  // When muted, start in the "finished" state so button renders immediately.
+  const [voiceFinished, setVoiceFinished] = useState(isMuted);
+  const [minWaitElapsed, setMinWaitElapsed] = useState(isMuted);
+
+  useEffect(() => {
+    if (!beat) return;
+    if (!isLore) return;
+
+    // Muted: skip gating. State already initialized unlocked.
+    if (VoiceAudio.isMuted()) {
+      setVoiceFinished(true);
+      setMinWaitElapsed(true);
+      return;
+    }
+
+    // Reset gate each time a new lore beat opens.
+    setVoiceFinished(false);
+    setMinWaitElapsed(false);
+
+    // Minimum wait so muted-failed / missing-file paths still show the button.
+    const waitTimer = setTimeout(() => setMinWaitElapsed(true), LORE_MIN_WAIT_MS);
+
+    // Fire narrator audio for this lore beat. The useArc advance() already
+    // triggered audio when we advanced INTO this beat — but modal mount is
+    // when the text is actually on screen, so we replay here with a callback
+    // to track end-of-audio. VoiceAudio.stop() runs inside playNarratorWithCallback
+    // so any stale line is cut cleanly.
+    const beatIndex = activeArc?.beats.findIndex(b => b.id === beat.id) ?? -1;
+    const line = resolveBeatNarratorLine(activeArc?.id, beat.id, beatIndex);
+
+    if (!line) {
+      // No narrator line known for this lore beat — don't block the kid.
+      setVoiceFinished(true);
+      return () => clearTimeout(waitTimer);
+    }
+
+    VoiceAudio.playNarratorWithCallback(line, 300, () => setVoiceFinished(true));
+
+    return () => clearTimeout(waitTimer);
+  }, [beat, isLore, activeArc]);
 
   if (!beat) return null;
 
@@ -51,6 +107,9 @@ export default function BeatCompletionModal({ beat, onClose }) {
       </div>
     );
   }
+
+  // Lore beat: "Weiter" button is gated until voice finishes AND min wait elapses.
+  const weiterUnlocked = !isLore || (voiceFinished && minWaitElapsed);
 
   return (
     <div className="fixed inset-0 z-[260] bg-black/50 flex items-center justify-center p-6 overflow-y-auto">
@@ -102,7 +161,13 @@ export default function BeatCompletionModal({ beat, onClose }) {
           </button>
           <button
             onClick={handleDone}
-            className="flex-1 bg-primary text-white py-4 rounded-2xl font-label font-bold text-lg"
+            disabled={!weiterUnlocked}
+            aria-hidden={!weiterUnlocked}
+            className="flex-1 bg-primary text-white py-4 rounded-2xl font-label font-bold text-lg transition-opacity duration-300"
+            style={{
+              opacity: weiterUnlocked ? 1 : 0.3,
+              pointerEvents: weiterUnlocked ? 'auto' : 'none',
+            }}
           >
             {beat.kind === 'craft' ? t('beat.didIt') : t('beat.doneReading')}
           </button>
