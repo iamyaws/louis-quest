@@ -63,6 +63,24 @@ export const FREUNDE: FreundMeta[] = [
     unlockThreshold: 4,
     implemented: false,
   },
+  {
+    id: 'flackerfuchs',
+    chapter: 'hearth',
+    name: { de: 'Flackerfuchs', en: 'Flicker Fox' },
+    portrait: 'art/freunde/flackerfuchs.webp',
+    skillName: { de: 'Funken finden', en: 'Spark finding' },
+    unlockThreshold: 3,
+    implemented: false,
+  },
+  {
+    id: 'brueckenbauer',
+    chapter: 'hearth',
+    name: { de: 'Der Brückenbauer', en: 'The Bridge Builder' },
+    portrait: 'art/freunde/brueckenbauer.webp',
+    skillName: { de: 'Streit entspannen', en: 'Easing conflicts' },
+    unlockThreshold: 4,
+    implemented: false,
+  },
 ];
 
 export const FREUND_BY_ID: Map<string, FreundMeta> = new Map(FREUNDE.map(f => [f.id, f]));
