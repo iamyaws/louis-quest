@@ -19,6 +19,7 @@ import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
 import GefuehlsecheHeart from './GefuehlsecheHeart';
 import ForscherEcke from './ForscherEcke';
+import StaminaIndicator from './StaminaIndicator';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -153,6 +154,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
         </button>
         <div className="flex items-center gap-2">
           <GefuehlsecheHeart onOpen={() => setShowGefuehlsecke(true)} />
+          <StaminaIndicator />
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
                style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
             <Pearl size={20} />
