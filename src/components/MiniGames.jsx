@@ -6,6 +6,7 @@ import { useGameAccess } from '../hooks/useGameAccess';
 import { useRonkiStamina } from '../hooks/useRonkiStamina';
 import { getCatStage } from '../utils/helpers';
 import StaminaExhausted from './StaminaExhausted';
+import StaminaIndicator from './StaminaIndicator';
 import VoiceAudio from '../utils/voiceAudio';
 
 // Module-level cooldown so stamina voice line doesn't repeat every Games mount
@@ -103,10 +104,17 @@ export default function MiniGames({ onPlay }) {
 
   return (
     <div className="px-6 pb-8">
-      {/* Header */}
+      {/* Header — stamina pill lives here now (moved off Hub per public-mode cleanup) */}
       <section className="mb-8">
-        <h2 className="font-headline text-4xl font-bold text-primary tracking-tight">{t('game.header')}</h2>
-        <p className="font-body text-on-surface-variant text-lg mt-1">{t('game.subtitle')}</p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <h2 className="font-headline text-4xl font-bold text-primary tracking-tight">{t('game.header')}</h2>
+            <p className="font-body text-on-surface-variant text-lg mt-1">{t('game.subtitle')}</p>
+          </div>
+          <div className="shrink-0 mt-2">
+            <StaminaIndicator />
+          </div>
+        </div>
       </section>
 
       {/* Gate banner — shown when games are locked */}

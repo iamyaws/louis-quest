@@ -17,12 +17,10 @@ import ClothingSheet from './ClothingSheet';
 import CloudWaves from './CloudWaves';
 import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
-import GefuehlsecheHeart from './GefuehlsecheHeart';
 import ForscherEcke from './ForscherEcke';
 import AttentionGlow from './AttentionGlow';
 import { MINT_GAMES } from '../data/mintGames';
 import { useAttentionFlag } from '../hooks/useAttentionFlag';
-import StaminaIndicator from './StaminaIndicator';
 import ZeigMomentCard from './ZeigMomentCard';
 import { isDevMode } from '../utils/mode';
 
@@ -209,14 +207,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
             )}
           </div>
         </button>
-        <div className="flex items-center gap-2">
-          <GefuehlsecheHeart onOpen={() => setShowGefuehlsecke(true)} />
-          <StaminaIndicator />
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
-               style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
-            <Pearl size={20} />
-            <span className="text-primary font-bold text-sm font-label">{state.hp || 0}</span>
-          </div>
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
+             style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
+          <Pearl size={20} />
+          <span className="text-primary font-bold text-sm font-label">{state.hp || 0}</span>
         </div>
       </header>
 
@@ -587,7 +581,15 @@ export default function Hub({ onNavigate, onPlayMint }) {
                   {/* Display order: positive first [Gut, Magisch, Okay] then negative [Traurig, Besorgt, Müde] */}
                   <div className="flex flex-wrap justify-center gap-3">
                     {[3, 4, 2, 0, 1, 5].map((idx) => (
-                      <button key={idx} onClick={() => { SFX.play("pop"); actions.setMood("moodAM", idx); }}
+                      <button key={idx} onClick={() => {
+                          SFX.play("pop");
+                          actions.setMood("moodAM", idx);
+                          // Sad/worried/tired → invite deeper feelings talk via Gefühlsecke.
+                          // Consolidates the old floating-heart widget into the mood log itself.
+                          if (idx === 0 || idx === 1 || idx === 5) {
+                            setTimeout(() => setShowGefuehlsecke(true), 400);
+                          }
+                        }}
                         className="w-[60px] h-[60px] text-3xl rounded-2xl transition-all active:scale-90 flex items-center justify-center"
                         style={{ background: 'rgba(252,211,77,0.08)', border: '2px solid rgba(252,211,77,0.2)', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
                         {MOOD_EMOJIS[idx]}
