@@ -3,6 +3,7 @@ import BadgeGrid from './BadgeGrid';
 import { useTask } from '../context/TaskContext';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { useTranslation } from '../i18n/LanguageContext';
+import { isDevMode } from '../utils/mode';
 
 const TRAITS = [
   { emoji: '💪', key: 'kodex.trait.best' },
@@ -87,14 +88,16 @@ export default function HeldenKodex() {
         </div>
       </section>
 
-      {/* ── Badge Collection ── */}
-      <section className="mt-10 space-y-4">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
-          <h2 className="text-xl font-bold font-headline">{t('kodex.badges')}</h2>
-        </div>
-        <BadgeGrid />
-      </section>
+      {/* ── Badge Collection (dev only — RPG achievement flavor) ── */}
+      {isDevMode() && (
+        <section className="mt-10 space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
+            <h2 className="text-xl font-bold font-headline">{t('kodex.badges')}</h2>
+          </div>
+          <BadgeGrid />
+        </section>
+      )}
 
       {/* ── Parent Message Card ── */}
       <section

@@ -5,6 +5,7 @@ import { getCatStage, getDragonArt } from '../utils/helpers';
 import { ARCS, findArc } from '../arcs/arcs';
 import { Pearl } from './CurrencyIcons';
 import { SEED_BY_ID, SEED_CREATURES } from '../data/creatures';
+import { isDevMode } from '../utils/mode';
 
 /**
  * Companion Profile — patterned on Finch's Piper page.
@@ -45,6 +46,7 @@ export default function RonkiProfile({ onNavigate }) {
   const { t, lang } = useTranslation();
   const { state } = useTask();
   const [tab, setTab] = useState('about');
+  const dev = isDevMode();
 
   if (!state) return null;
 
@@ -177,6 +179,27 @@ export default function RonkiProfile({ onNavigate }) {
           )}
         </button>
 
+        {/* ═══ HELDEN-KODEX BUTTON (public mode — small entry point to lighter Kodex page) ═══ */}
+        {!dev && (
+          <button
+            onClick={() => onNavigate?.('kodex')}
+            className="w-full rounded-2xl px-4 py-3 mb-5 flex items-center gap-3 active:scale-[0.98] transition-transform text-left"
+            style={{
+              background: 'rgba(18,67,70,0.05)',
+              border: '1.5px solid rgba(18,67,70,0.12)',
+            }}
+          >
+            <span className="material-symbols-outlined text-xl shrink-0"
+                  style={{ color: '#124346', fontVariationSettings: "'FILL' 1" }}>
+              favorite
+            </span>
+            <span className="flex-1 font-headline font-bold text-sm text-primary">
+              {lang === 'de' ? 'Was einen Helden ausmacht' : 'What makes a hero'}
+            </span>
+            <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+          </button>
+        )}
+
         {/* ═══ TAB BAR ═══ */}
         <div className="flex gap-1 p-1 rounded-full mb-6"
              style={{ background: 'rgba(18,67,70,0.06)' }}>
@@ -269,7 +292,8 @@ export default function RonkiProfile({ onNavigate }) {
         {/* ═══ DETAILS TAB ═══ */}
         {tab === 'details' && (
           <div className="flex flex-col gap-5">
-            {/* Evolution progress */}
+            {/* Evolution progress (dev only — hides the "next stage" nudge for public) */}
+            {dev && (
             <div className="rounded-2xl p-5"
                  style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <div className="flex items-center justify-between mb-3">
@@ -299,6 +323,7 @@ export default function RonkiProfile({ onNavigate }) {
                 </p>
               )}
             </div>
+            )}
 
             {/* Stats grid */}
             <div className="grid grid-cols-3 gap-3">
