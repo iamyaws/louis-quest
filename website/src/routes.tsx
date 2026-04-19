@@ -14,6 +14,14 @@ const VorlageMorgen = lazy(() => import('./pages/VorlageMorgen'));
 const VorlageAbend = lazy(() => import('./pages/VorlageAbend'));
 const VorlageKleineGeschwister = lazy(() => import('./pages/VorlageKleineGeschwister'));
 const HomeEN = lazy(() => import('./pages/HomeEN'));
+const Ratgeber = lazy(() => import('./pages/Ratgeber'));
+const RatgeberMorgenTroedeln = lazy(() => import('./pages/ratgeber/MorgenTroedeln'));
+const RatgeberStickerChartAlternative = lazy(() => import('./pages/ratgeber/StickerChartAlternative'));
+const RatgeberDarkPatternsKinderApps = lazy(() => import('./pages/ratgeber/DarkPatternsKinderApps'));
+const RatgeberAbendroutineGrundschulkind = lazy(() => import('./pages/ratgeber/AbendroutineGrundschulkind'));
+const RatgeberZaehneputzenOhneStreit = lazy(() => import('./pages/ratgeber/ZaehneputzenOhneStreit'));
+const RatgeberEinschulungSelbststaendigkeit = lazy(() => import('./pages/ratgeber/EinschulungSelbststaendigkeit'));
+const RatgeberMorgenroutineGrundschulkind = lazy(() => import('./pages/ratgeber/MorgenroutineGrundschulkind'));
 const Impressum = lazy(() => import('./pages/Impressum'));
 const Datenschutz = lazy(() => import('./pages/Datenschutz'));
 const AGB = lazy(() => import('./pages/AGB'));
@@ -51,6 +59,14 @@ export function AppRoutes() {
         <Route path="/vorlagen/morgenroutine" element={<VorlageMorgen />} />
         <Route path="/vorlagen/abendroutine" element={<VorlageAbend />} />
         <Route path="/vorlagen/kleine-geschwister" element={<VorlageKleineGeschwister />} />
+        <Route path="/ratgeber" element={<Ratgeber />} />
+        <Route path="/ratgeber/morgen-troedeln" element={<RatgeberMorgenTroedeln />} />
+        <Route path="/ratgeber/sticker-chart-alternative" element={<RatgeberStickerChartAlternative />} />
+        <Route path="/ratgeber/dark-patterns-kinder-apps" element={<RatgeberDarkPatternsKinderApps />} />
+        <Route path="/ratgeber/abendroutine-grundschulkind" element={<RatgeberAbendroutineGrundschulkind />} />
+        <Route path="/ratgeber/zaehneputzen-ohne-streit" element={<RatgeberZaehneputzenOhneStreit />} />
+        <Route path="/ratgeber/einschulung-selbststaendigkeit" element={<RatgeberEinschulungSelbststaendigkeit />} />
+        <Route path="/ratgeber/morgenroutine-grundschulkind" element={<RatgeberMorgenroutineGrundschulkind />} />
         <Route path="/en" element={<HomeEN />} />
         <Route path="/impressum" element={<Impressum />} />
         <Route path="/datenschutz" element={<Datenschutz />} />
