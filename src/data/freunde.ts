@@ -19,6 +19,10 @@ export interface FreundMeta {
    *  review (voice-samples/). When undefined, arc audio gen falls back to Bella
    *  (Drachenmutter) — shared narrator mode. */
   voiceId?: string;
+  /** ElevenLabs voice settings for this Freund — matters when the same voice ID
+   *  is reused across Freunde with different tuning (e.g. Jessica-confident for
+   *  Windreiterin vs Jessica-warm-glow for Lichtbringerin). */
+  voiceSettings?: { stability: number; similarity_boost: number; style: number };
 }
 
 export const FREUNDE: FreundMeta[] = [
@@ -31,6 +35,7 @@ export const FREUNDE: FreundMeta[] = [
     unlockThreshold: 2,
     implemented: true,
     voiceId: 'pqHfZKP75CvOlQylNhV4', // Bill — deep older
+    voiceSettings: { stability: 0.72, similarity_boost: 0.70, style: 0.25 },
   },
   {
     id: 'windreiterin',
@@ -40,7 +45,8 @@ export const FREUNDE: FreundMeta[] = [
     skillName: { de: 'Box-Atmung', en: 'Box Breathing' },
     unlockThreshold: 3,
     implemented: false,
-    voiceId: 'cgSgspJ2msm6clMCkdW9', // Jessica — confident
+    voiceId: 'cgSgspJ2msm6clMCkdW9', // Jessica — confident tuning
+    voiceSettings: { stability: 0.55, similarity_boost: 0.70, style: 0.45 },
   },
   {
     id: 'tiefentaucher',
@@ -59,7 +65,8 @@ export const FREUNDE: FreundMeta[] = [
     skillName: { de: 'Kurze Meditation', en: 'Brief meditation' },
     unlockThreshold: 3,
     implemented: false,
-    voiceId: 'XrExE9yKIg1WjnnlVkGX', // Matilda — dreamy settings
+    voiceId: 'XrExE9yKIg1WjnnlVkGX', // Matilda — dreamy tuning
+    voiceSettings: { stability: 0.60, similarity_boost: 0.70, style: 0.55 },
   },
   {
     id: 'lichtbringerin',
@@ -69,6 +76,8 @@ export const FREUNDE: FreundMeta[] = [
     skillName: { de: 'Freundschaftsregeln', en: 'Friendship rules' },
     unlockThreshold: 4,
     implemented: false,
+    voiceId: 'cgSgspJ2msm6clMCkdW9', // Jessica — warm-glow tuning (same speaker as Windreiterin, different settings)
+    voiceSettings: { stability: 0.58, similarity_boost: 0.75, style: 0.40 },
   },
   {
     id: 'flackerfuchs',
@@ -79,6 +88,7 @@ export const FREUNDE: FreundMeta[] = [
     unlockThreshold: 3,
     implemented: false,
     voiceId: 'TX3LPaxmHKxFdv7VOQHJ', // Liam — expressive young
+    voiceSettings: { stability: 0.45, similarity_boost: 0.75, style: 0.50 },
   },
   {
     id: 'brueckenbauer',
