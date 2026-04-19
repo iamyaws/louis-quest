@@ -9,7 +9,7 @@ export interface QuestLineInput {
 }
 
 export interface QuestLineTemplate {
-  id: 'learn' | 'event' | 'skill';
+  id: 'learn' | 'event' | 'skill' | 'homework';
   emoji: string;
   title: { de: string; en: string };
   description: { de: string; en: string };
@@ -105,5 +105,26 @@ export const SKILL_TEMPLATE: QuestLineTemplate = {
   },
 };
 
-export const QUEST_LINE_TEMPLATES: QuestLineTemplate[] = [LEARN_TEMPLATE, EVENT_TEMPLATE, SKILL_TEMPLATE];
+// T4 — Hausaufgaben (single-session, parent check-in at the end)
+export const HAUSAUFGABEN_TEMPLATE: QuestLineTemplate = {
+  id: 'homework',
+  emoji: '📝',
+  title: { de: 'Hausaufgaben', en: 'Homework' },
+  description: {
+    de: 'Für einzelne Hausaufgaben-Sessions. Leg das Handy weg, Timer läuft, Ronki meldet sich wenn fertig. Eltern schauen am Ende drüber.',
+    en: 'For individual homework sessions. Phone goes away, timer runs, Ronki announces when done. Parents check at the end.',
+  },
+  scheduleKind: 'daily',
+  defaultDurationDays: 1, // homework is typically a single-session quest
+  dayGenerator: ({ title, subtitle }) => {
+    const focus = title || 'Hausaufgaben';
+    return [
+      { id: uid(), dayNumber: 1, icon: '📝', title: 'Hinsetzen', description: 'Such dir deinen Platz. Stifte raus. Handy weg.' },
+      { id: uid(), dayNumber: 2, icon: '⏱️', title: 'Los geht\'s', description: `Jetzt ${focus}. Ronki wartet im Hintergrund.` },
+      { id: uid(), dayNumber: 3, icon: '🌟', title: 'Fertig!', description: 'Zeig Mama oder Papa. Du hast es geschafft.' },
+    ];
+  },
+};
+
+export const QUEST_LINE_TEMPLATES: QuestLineTemplate[] = [LEARN_TEMPLATE, EVENT_TEMPLATE, SKILL_TEMPLATE, HAUSAUFGABEN_TEMPLATE];
 export const TEMPLATE_BY_ID: Map<string, QuestLineTemplate> = new Map(QUEST_LINE_TEMPLATES.map(t => [t.id, t]));
