@@ -33,9 +33,11 @@ import { useTask } from '../context/TaskContext';
 
 // Default play window. Tuned to overlap after-school + pre-evening-routine
 // on a school day. One clear rule a first-grader can internalize:
-// "Spiele 13–18 Uhr."
+// "Spiele 13–19:30 Uhr."
 const PLAY_WINDOW_START_HOUR = 13;
-const PLAY_WINDOW_END_HOUR = 18;
+const PLAY_WINDOW_START_MINUTE = 0;
+const PLAY_WINDOW_END_HOUR = 19;
+const PLAY_WINDOW_END_MINUTE = 30;
 
 export interface GameAccessState {
   unlocked: boolean;
@@ -49,8 +51,12 @@ export interface GameAccessState {
   withinTimeWindow: boolean;
   /** Configured window start hour (24h) — useful for copy like "öffnet um 13 Uhr" */
   windowStartHour: number;
+  /** Configured window start minute (0-59) */
+  windowStartMinute: number;
   /** Configured window end hour (24h) — useful for copy */
   windowEndHour: number;
+  /** Configured window end minute (0-59) — supports non-hour boundaries like 19:30 */
+  windowEndMinute: number;
 }
 
 function readDevMode(): boolean {
@@ -72,11 +78,19 @@ function readDevMode(): boolean {
 export function useGameAccess(): GameAccessState {
   const { state, computed } = useTask();
 
-  // Re-evaluate on the minute so a locked state flips open at 13:00 sharp
-  // without requiring another state change to trigger a re-render.
-  const [currentHour, setCurrentHour] = useState(() => new Date().getHours());
+  // Re-evaluate on the minute so a locked state flips open/closed exactly
+  // at the boundary (e.g. 19:30) without needing another state change to
+  // trigger a re-render. Tracked as minutes-since-midnight since the window
+  // supports non-hour boundaries.
+  const [minutesOfDay, setMinutesOfDay] = useState(() => {
+    const n = new Date();
+    return n.getHours() * 60 + n.getMinutes();
+  });
   useEffect(() => {
-    const tick = () => setCurrentHour(new Date().getHours());
+    const tick = () => {
+      const n = new Date();
+      setMinutesOfDay(n.getHours() * 60 + n.getMinutes());
+    };
     const id = setInterval(tick, 60_000);
     return () => clearInterval(id);
   }, []);
@@ -89,8 +103,10 @@ export function useGameAccess(): GameAccessState {
       sectionsComplete: 0,
       withinTimeWindow: false,
       windowStartHour: PLAY_WINDOW_START_HOUR,
+      windowStartMinute: PLAY_WINDOW_START_MINUTE,
       windowEndHour: PLAY_WINDOW_END_HOUR,
-    };
+      windowEndMinute: PLAY_WINDOW_END_MINUTE,
+    } as const;
 
     if (!state?.quests) {
       return { ...base, unlocked: false, reason: 'loading' };
@@ -114,10 +130,13 @@ export function useGameAccess(): GameAccessState {
     if (bedtimeDone) sectionsComplete++;
     if (hobbyDone) sectionsComplete++;
 
-    // Time window — dev mode bypasses so iteration isn't blocked by clock
+    // Time window — minute-precise so we can land on boundaries like 19:30.
+    // Dev mode bypasses so iteration isn't blocked by clock.
     const devBypass = readDevMode();
+    const startMins = PLAY_WINDOW_START_HOUR * 60 + PLAY_WINDOW_START_MINUTE;
+    const endMins = PLAY_WINDOW_END_HOUR * 60 + PLAY_WINDOW_END_MINUTE;
     const withinTimeWindow = devBypass
-      || (currentHour >= PLAY_WINDOW_START_HOUR && currentHour < PLAY_WINDOW_END_HOUR);
+      || (minutesOfDay >= startMins && minutesOfDay < endMins);
 
     const sectionOk = sectionsComplete >= 1;
     const unlocked = withinTimeWindow && sectionOk;
@@ -127,7 +146,7 @@ export function useGameAccess(): GameAccessState {
     // 21:00 when the real blocker is it being bedtime.
     let reason: string;
     if (!withinTimeWindow) {
-      reason = currentHour < PLAY_WINDOW_START_HOUR ? 'timeBefore' : 'timeAfter';
+      reason = minutesOfDay < startMins ? 'timeBefore' : 'timeAfter';
     } else if (!sectionOk) {
       reason = 'noSection';
     } else if (allDone) {
@@ -149,7 +168,9 @@ export function useGameAccess(): GameAccessState {
       sectionsComplete,
       withinTimeWindow,
       windowStartHour: PLAY_WINDOW_START_HOUR,
+      windowStartMinute: PLAY_WINDOW_START_MINUTE,
       windowEndHour: PLAY_WINDOW_END_HOUR,
+      windowEndMinute: PLAY_WINDOW_END_MINUTE,
     };
-  }, [state?.quests, computed.allDone, currentHour]);
+  }, [state?.quests, computed.allDone, minutesOfDay]);
 }
