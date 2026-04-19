@@ -323,7 +323,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
           </button>
         )}
 
-        {state.familyConfig?.parentMessage?.body && (
+        {state.familyConfig?.parentMessage?.enabled && state.familyConfig?.parentMessage?.body && (
           <div
             className="w-full p-5 rounded-2xl"
             style={{

@@ -25,6 +25,10 @@ export interface RecurringActivity {
 }
 
 export interface ParentMessage {
+  /** Whether the message surfaces in-app. Default false — parents opt in from
+   *  the dashboard. Keeps the Hub uncluttered until a parent actively writes
+   *  something meant to be seen. */
+  enabled?: boolean;
   title: string;
   body: string;
   signature: string;
@@ -105,6 +109,7 @@ export const DEFAULT_FAMILY_CONFIG: FamilyConfig = {
     },
   ],
   parentMessage: {
+    enabled: false, // parents opt in from the dashboard — default is quiet
     title: 'Botschaft für dich',
     body: 'Fehler sind okay. Deine Familie ist immer für dich da. 🧡',
     signature: 'Wir haben dich lieb.',

@@ -99,7 +99,8 @@ export default function HeldenKodex() {
         </section>
       )}
 
-      {/* ── Parent Message Card ── */}
+      {/* ── Parent Message Card (only when parent has opted in) ── */}
+      {msg?.enabled && msg?.body && (
       <section
         className="mt-10 rounded-xl p-8 relative overflow-hidden"
         style={{
@@ -141,6 +142,7 @@ export default function HeldenKodex() {
           filter_vintage
         </span>
       </section>
+      )}
     </div>
   );
 }

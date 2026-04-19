@@ -545,9 +545,28 @@ function FamilyTab({ state, actions, lang }) {
       </SectionCard>
 
       {/* Parent Message */}
-      <SectionCard icon="mail" title="Eltern-Nachricht" subtitle={draft.parentMessage.title}
+      <SectionCard icon="mail" title="Eltern-Nachricht"
+        subtitle={draft.parentMessage.enabled ? draft.parentMessage.title : 'Aus — wird nicht angezeigt'}
         expanded={expandedSection === 'message'} onToggle={() => toggle('message')} tint="#735c00">
         <div className="space-y-4">
+          {/* Enable toggle — default off so Hub stays quiet until a parent opts in */}
+          <label className="flex items-start gap-3 p-4 rounded-2xl cursor-pointer active:scale-[0.99] transition-all"
+                 style={{
+                   background: draft.parentMessage.enabled ? 'rgba(252,211,77,0.14)' : 'rgba(0,0,0,0.03)',
+                   border: `1.5px solid ${draft.parentMessage.enabled ? 'rgba(217,119,6,0.3)' : 'rgba(0,0,0,0.08)'}`,
+                 }}>
+            <input
+              type="checkbox"
+              checked={!!draft.parentMessage.enabled}
+              onChange={e => update('parentMessage.enabled', e.target.checked)}
+              className="mt-0.5 w-5 h-5 accent-amber-600 shrink-0" />
+            <div className="flex-1">
+              <p className="font-label font-bold text-sm text-on-surface">Nachricht auf dem Hub zeigen</p>
+              <p className="font-body text-xs text-on-surface-variant leading-relaxed mt-0.5">
+                Standardmäßig aus. Nur aktivieren, wenn du wirklich etwas sagen willst — sonst bleibt der Hub ruhig.
+              </p>
+            </div>
+          </label>
           <FieldRow label="Titel">
             <TextInput value={draft.parentMessage.title} onChange={v => update('parentMessage.title', v)} placeholder="z.B. Botschaft für Louis" />
           </FieldRow>
