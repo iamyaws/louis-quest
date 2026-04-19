@@ -265,6 +265,11 @@ export default function RatgeberZaehneputzenOhneStreit() {
       <h2>Was wir bei Ronki anders machen</h2>
 
       <p>
+        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
+        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
+      </p>
+
+      <p>
         Kurzer Teil. Zähneputzen ist einer der Top-drei-Reibungspunkte in
         Grundschulfamilien, und entsprechend einer der Schritte, für die
         Ronki von Anfang an eine gute Unterstützung sein sollte. Ronki

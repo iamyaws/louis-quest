@@ -41,8 +41,10 @@ export type WillingToTest = 'ja' | 'vielleicht' | 'später';
 
 export interface ScreenerData {
   email: string;
-  childAge: ChildAge;
-  challenge: Challenge;
+  /** Comma-joined ChildAge values to support parents with multiple children. */
+  childAge: string;
+  /** Comma-joined Challenge values. */
+  challenge: string;
   willingToTest: WillingToTest;
 }
 

@@ -37,17 +37,29 @@ const TEST_OPTIONS: { value: WillingToTest; label: string }[] = [
 ];
 
 export function WaitlistScreener({ email, onComplete, onSkip }: Props) {
-  const [childAge, setChildAge] = useState<ChildAge | null>(null);
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [childAges, setChildAges] = useState<ChildAge[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [willingToTest, setWillingToTest] = useState<WillingToTest | null>(null);
   const [status, setStatus] = useState<Status>('idle');
 
-  const canSubmit = childAge && challenge && willingToTest && status === 'idle';
+  const toggleAge = (v: ChildAge) =>
+    setChildAges((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
+  const toggleChallenge = (v: Challenge) =>
+    setChallenges((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
+
+  const canSubmit =
+    childAges.length > 0 && challenges.length > 0 && willingToTest !== null && status === 'idle';
 
   async function handleSubmit() {
-    if (!canSubmit || !childAge || !challenge || !willingToTest) return;
+    if (!canSubmit || !willingToTest) return;
     setStatus('submitting');
-    await submitScreener({ email, childAge, challenge, willingToTest });
+    // Store multi-selections as comma-joined strings in the existing Supabase columns.
+    await submitScreener({
+      email,
+      childAge: childAges.join(','),
+      challenge: challenges.join(','),
+      willingToTest,
+    });
     setStatus('done');
     onComplete?.();
   }
@@ -111,19 +123,19 @@ export function WaitlistScreener({ email, onComplete, onSkip }: Props) {
       </h3>
 
       <div className="flex flex-col gap-5">
-        <Question label="Wie alt ist dein Kind?">
-          <PillGroup
+        <Question label="Wie alt sind eure Kinder?" hint="mehrere möglich">
+          <MultiPillGroup
             options={AGE_OPTIONS}
-            value={childAge}
-            onChange={setChildAge}
+            values={childAges}
+            onToggle={toggleAge}
           />
         </Question>
 
-        <Question label="Wobei würde Ronki euch am meisten helfen?">
-          <PillGroup
+        <Question label="Wobei würde Ronki euch am meisten helfen?" hint="mehrere möglich">
+          <MultiPillGroup
             options={CHALLENGE_OPTIONS}
-            value={challenge}
-            onChange={setChallenge}
+            values={challenges}
+            onToggle={toggleChallenge}
           />
         </Question>
 
@@ -162,10 +174,25 @@ export function WaitlistScreener({ email, onComplete, onSkip }: Props) {
 
 /* ------------------------------------------------------------------ */
 
-function Question({ label, children }: { label: string; children: React.ReactNode }) {
+function Question({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
-      <p className="text-xs font-display font-semibold opacity-85 mb-2.5">{label}</p>
+      <p className="text-xs font-display font-semibold opacity-85 mb-2.5">
+        {label}
+        {hint && (
+          <span className="ml-2 text-[0.65rem] font-medium opacity-60 normal-case">
+            {hint}
+          </span>
+        )}
+      </p>
       {children}
     </div>
   );
@@ -199,6 +226,52 @@ function PillGroup<T extends string>({ options, value, onChange }: PillGroupProp
           );
         })}
       </AnimatePresence>
+    </div>
+  );
+}
+
+interface MultiPillGroupProps<T extends string> {
+  options: { value: T; label: string }[];
+  values: T[];
+  onToggle: (v: T) => void;
+}
+
+function MultiPillGroup<T extends string>({ options, values, onToggle }: MultiPillGroupProps<T>) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((opt) => {
+        const selected = values.includes(opt.value);
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            role="checkbox"
+            aria-checked={selected}
+            onClick={() => onToggle(opt.value)}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-display font-semibold transition-all ${
+              selected
+                ? 'bg-mustard text-teal-dark shadow-sm'
+                : 'bg-current/15 ring-1 ring-current/20 hover:bg-current/25'
+            }`}
+          >
+            <span
+              aria-hidden
+              className={`inline-flex h-3 w-3 shrink-0 items-center justify-center rounded-[3px] transition-colors ${
+                selected
+                  ? 'bg-teal-dark text-mustard'
+                  : 'bg-transparent ring-1 ring-current/35'
+              }`}
+            >
+              {selected && (
+                <svg viewBox="0 0 10 10" className="h-2 w-2" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1.5 5.5 L4 7.5 L8.5 2.5" />
+                </svg>
+              )}
+            </span>
+            {opt.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

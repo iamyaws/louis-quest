@@ -423,6 +423,13 @@ export default function RatgeberDarkPatternsKinderApps() {
       <h2>Ronki macht diese Entscheidungen so</h2>
 
       <p>
+        Ein Wort zur Sprache vorweg: was andere Apps Routine oder Habit
+        nennen, nennen wir bei Ronki tägliches Ritual. Eine Routine führst
+        du aus. Ein Ritual lebt ihr gemeinsam. Das klingt nach Sprache, ist
+        aber Produktentscheidung.
+      </p>
+
+      <p>
         Ich bin der Meinung, ich sollte das offen machen, nicht nur, weil es
         transparent ist, sondern weil du so siehst, was Umsetzung in der
         Praxis heißt.

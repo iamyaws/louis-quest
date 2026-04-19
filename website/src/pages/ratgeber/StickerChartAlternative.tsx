@@ -325,6 +325,11 @@ export default function RatgeberStickerChartAlternative() {
       <h2>Was wir bei Ronki anders machen</h2>
 
       <p>
+        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
+        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
+      </p>
+
+      <p>
         Kurzer Teil, kein Verkaufsgespräch. Ronki ist eine App, die die
         Routine des Kindes sichtbar macht. Der Drachen-Begleiter bestätigt
         (<em>fertig</em>), er belohnt nicht. Keine Punkte, keine Streaks,

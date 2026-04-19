@@ -275,6 +275,13 @@ export default function RatgeberEinschulungSelbststaendigkeit() {
       </p>
 
       <p>
+        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
+        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
+        Bei Einschulung geht es genau darum: nicht um Tracking, sondern um
+        den Rhythmus, in dem ihr als Familie Alltag baut.
+      </p>
+
+      <p>
         Ronki, unsere App, ist kein Schulstoff. Ronki ist ein Werkzeug für
         den Routine-Muskel, also für das Sequenzieren von
         Alltagsaufgaben. Genau die Fähigkeit, die Schule in den ersten

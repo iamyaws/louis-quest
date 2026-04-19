@@ -222,13 +222,13 @@ export function RatgeberArticle({
           <div className="grid sm:grid-cols-[1.1fr_1fr] gap-10 items-center">
             <div>
               <p className="text-[0.7rem] uppercase tracking-[0.2em] text-mustard/80 font-semibold mb-4">
-                Wenn das bei euch hängt
+                Ritual statt Routine
               </p>
               <h2 className="font-display font-bold text-2xl sm:text-3xl leading-tight mb-4">
-                Ronki öffnen wir in kleinen Gruppen.
+                Ronki macht aus der Routine ein tägliches Ritual.
               </h2>
               <p className="text-cream/70 leading-relaxed">
-                Kein Store, kein Download, keine Werbung. Trag dich ein und sag uns, wo's bei euch gerade klemmt. Wir melden uns.
+                Eine Routine führst du aus. Ein Ritual lebt ihr gemeinsam. Wir öffnen Ronki in kleinen Gruppen. Kein Store, kein Download, keine Werbung. Trag dich ein und sag uns, wo's bei euch gerade klemmt.
               </p>
             </div>
             <div className="text-cream">

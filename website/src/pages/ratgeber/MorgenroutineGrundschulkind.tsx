@@ -323,6 +323,11 @@ export default function RatgeberMorgenroutineGrundschulkind() {
       <h2>Was wir bei Ronki machen</h2>
 
       <p>
+        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
+        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
+      </p>
+
+      <p>
         Kurzer Teil. Ronki ist eine App, die diese Reihenfolge für dein
         Kind sichtbar macht. Bildbasiert, mit einem Drachen-Begleiter.
         Das Kind hakt die Schritte selbst ab, in seinem Tempo, ohne

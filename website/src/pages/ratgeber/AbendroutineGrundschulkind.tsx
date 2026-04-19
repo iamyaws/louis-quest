@@ -326,6 +326,11 @@ export default function RatgeberAbendroutineGrundschulkind() {
       <h2>Was wir bei Ronki anders machen</h2>
 
       <p>
+        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
+        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
+      </p>
+
+      <p>
         Kurzer Teil, weil die Routine nicht von einer App kommt, sondern
         von euch. Viele Eltern, die Ronki ausprobieren, fangen beim Abend
         an, nicht beim Morgen. Der Schmerz ist abends oft greifbarer: am

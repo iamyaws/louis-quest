@@ -192,8 +192,8 @@ export function HeroVariantF() {
 
 function TrustBadge({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center gap-2 text-sm text-cream/50 font-medium">
-      <span aria-hidden className="h-1 w-1 rounded-full bg-cream/30" />
+    <span className="inline-flex items-center gap-2 text-sm text-cream/85 font-semibold">
+      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-mustard" />
       {label}
     </span>
   );
