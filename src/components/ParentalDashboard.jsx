@@ -868,6 +868,17 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     { id: 'none', emoji: '🚫', label: 'Keine Funkelzeit', desc: 'Bildschirmzeit wird nicht als Belohnung genutzt.' },
   ];
 
+  // ── Zähneputzen-Modus (tooth-brush UI mode) ──
+  const tbMode = state?.familyConfig?.toothBrushDefaultMode || 'tasche';
+  const setTbMode = (next) => {
+    const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
+    actions?.updateFamilyConfig?.({ ...config, toothBrushDefaultMode: next });
+  };
+  const TB_MODES = [
+    { id: 'tasche', emoji: '📱', label: 'Tasche (empfohlen)', desc: 'Handy weglegen, Ronki meldet sich.' },
+    { id: 'schau',  emoji: '🦷', label: 'Schau-Modus',        desc: 'Illustrierter Guide mit Zonen-Bildern.' },
+  ];
+
   return (
     <>
       {/* Funkelzeit Mode */}
@@ -942,6 +953,49 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
                   </div>
                 )}
               </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Zähneputzen-Modus */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(14,165,233,0.12)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#0369a1', fontVariationSettings: "'FILL' 1" }}>brush</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">Zähneputzen-Modus</p>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Tasche: Handy weglegen, Ronki meldet sich. Schau-Modus: Illustrierter Guide mit Zonen-Bildern.
+        </p>
+        <div className="flex flex-col gap-2.5">
+          {TB_MODES.map(m => {
+            const active = tbMode === m.id;
+            return (
+              <button key={m.id}
+                onClick={() => setTbMode(m.id)}
+                className="w-full flex items-start gap-3 p-4 rounded-2xl text-left active:scale-[0.98] transition-all"
+                style={{
+                  background: active ? 'rgba(14,165,233,0.08)' : 'rgba(255,255,255,0.6)',
+                  border: active ? '1.5px solid rgba(14,165,233,0.35)' : '1.5px solid rgba(0,0,0,0.08)',
+                  boxShadow: active ? '0 3px 12px rgba(14,165,233,0.12)' : 'none',
+                }}
+              >
+                <span className="text-2xl mt-0.5" aria-hidden="true">{m.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-label font-bold text-sm text-on-surface">{m.label}</p>
+                    {active && (
+                      <span className="material-symbols-outlined text-sm"
+                            style={{ color: '#0369a1', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                    )}
+                  </div>
+                  <p className="font-body text-xs text-on-surface-variant mt-1 leading-relaxed">{m.desc}</p>
+                </div>
+              </button>
             );
           })}
         </div>

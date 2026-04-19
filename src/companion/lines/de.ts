@@ -142,4 +142,16 @@ export const linesDe: VoiceLine[] = [
   // They are NOT registered here because that would make the VoiceEngine pick them
   // randomly on hub_open/idle triggers — Ronki would say "Ich bin ganz platt" even
   // when fully rested. Direct play bypasses the line bank by design.
+  //
+  // TODO — Ab-in-die-Tasche tooth-brush audio to generate (ElevenLabs; quota-gated).
+  // Played directly from ToothBrushGuide.jsx on each 30s zone transition — also
+  // NOT registered here for the same reason as stamina/screentime. Until these
+  // audio files exist, the component falls back to a short SFX 'pop' beep.
+  //   - de_brush_zone_1: "Jetzt oben rechts außen."
+  //   - de_brush_zone_2: "Oben links außen."
+  //   - de_brush_zone_3: "Oben hinten — rauf und runter."
+  //   - de_brush_zone_4: "Unten rechts außen."
+  //   - de_brush_zone_5: "Unten links außen."
+  //   - de_brush_zone_6: "Zunge. Sanft."
+  //   - de_brush_done_01: "Fertig! Super gemacht."
 ];

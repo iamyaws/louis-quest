@@ -49,6 +49,11 @@ export function pronouns(p: Pronouns) {
 
 export type FunkelzeitMode = 'entspannt' | 'normal' | 'strikt' | 'none';
 
+/** How the ToothBrushGuide presents itself.
+ *  - 'tasche' (default): dark calm screen, audio cues, encourages putting the phone down.
+ *  - 'schau': illustrated zone guide with visible countdown (backup/learning mode). */
+export type ToothBrushMode = 'tasche' | 'schau';
+
 export interface FamilyConfig {
   childName: string;
   childBirthday?: string;  // ISO date
@@ -64,6 +69,8 @@ export interface FamilyConfig {
   funkelzeitMode?: FunkelzeitMode;
   /** Daily cap in minutes for 'strikt' mode. Default 30. */
   funkelzeitDailyCapMin?: number;
+  /** Which tooth-brush UI mode to show by default. Default 'tasche'. */
+  toothBrushDefaultMode?: ToothBrushMode;
 }
 
 // ── Louis's family as the default template ──
@@ -102,4 +109,5 @@ export const DEFAULT_FAMILY_CONFIG: FamilyConfig = {
   affirmation: 'Ich bin geliebt, so wie ich bin.',
   funkelzeitMode: 'entspannt',
   funkelzeitDailyCapMin: 30,
+  toothBrushDefaultMode: 'tasche',
 };
