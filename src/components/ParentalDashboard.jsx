@@ -879,6 +879,20 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     { id: 'schau',  emoji: '🦷', label: 'Schau-Modus',        desc: 'Illustrierter Guide mit Zonen-Bildern.' },
   ];
 
+  // ── Zeig-Moment toggle + counter reset ──
+  const zmEnabled = state?.familyConfig?.zeigMomentEnabled !== false; // default on
+  const zmCounts = state?.zeigMomentCounts || {};
+  const setZmEnabled = (next) => {
+    const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
+    actions?.updateFamilyConfig?.({ ...config, zeigMomentEnabled: next });
+  };
+  const resetZmCounts = () => {
+    actions?.patchState?.({
+      zeigMomentCounts: { morning: 0, evening: 0, bedtime: 0 },
+      zeigMomentShownDates: {},
+    });
+  };
+
   return (
     <>
       {/* Funkelzeit Mode */}
@@ -1002,6 +1016,49 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
             );
           })}
         </div>
+      </div>
+
+      {/* Zeig-Moment */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(252,211,77,0.18)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#a16207', fontVariationSettings: "'FILL' 1" }}>star</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">Zeig-Moment</p>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Nach jeder Routine erinnert Ronki Louis daran, Mama oder Papa zu zeigen, was er geschafft hat. Nach 14 Mal pro Block verblasst die Erinnerung.
+        </p>
+        <div className="flex items-center justify-between mb-4 p-4 rounded-2xl"
+             style={{ background: 'rgba(252,211,77,0.06)', border: '1px solid rgba(161,98,7,0.15)' }}>
+          <div>
+            <p className="font-label font-bold text-sm text-on-surface">{zmEnabled ? 'An' : 'Aus'}</p>
+            <p className="font-label text-xs text-on-surface-variant mt-0.5">
+              Morgen {zmCounts.morning || 0}/14 · Nachmittag {zmCounts.evening || 0}/14 · Abend {zmCounts.bedtime || 0}/14
+            </p>
+          </div>
+          <button
+            onClick={() => setZmEnabled(!zmEnabled)}
+            className="relative w-14 h-8 rounded-full transition-all active:scale-95"
+            style={{
+              background: zmEnabled ? '#fcd34d' : 'rgba(0,0,0,0.12)',
+              boxShadow: zmEnabled ? '0 2px 8px rgba(252,211,77,0.35)' : 'none',
+            }}
+            aria-label={zmEnabled ? 'Zeig-Moment ausschalten' : 'Zeig-Moment einschalten'}
+          >
+            <span className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
+                  style={{ transform: zmEnabled ? 'translateX(24px)' : 'translateX(0)' }} />
+          </button>
+        </div>
+        <button
+          onClick={resetZmCounts}
+          className="w-full py-3 rounded-xl font-label font-bold text-sm active:scale-[0.98] transition-all"
+          style={{ background: 'rgba(18,67,70,0.05)', color: '#124346', border: '1.5px solid rgba(18,67,70,0.1)' }}
+        >
+          Zähler zurücksetzen (Lernphase neu starten)
+        </button>
       </div>
 
       {/* Language */}

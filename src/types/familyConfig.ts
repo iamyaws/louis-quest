@@ -71,6 +71,10 @@ export interface FamilyConfig {
   funkelzeitDailyCapMin?: number;
   /** Which tooth-brush UI mode to show by default. Default 'tasche'. */
   toothBrushDefaultMode?: ToothBrushMode;
+  /** When true (default), show a "zeig mama/papa"-confirmation after each routine
+   *  block (morning/evening/bedtime) for the first 14 completions per block.
+   *  Parents can switch off if not needed. */
+  zeigMomentEnabled?: boolean;
 }
 
 // ── Louis's family as the default template ──
@@ -110,4 +114,5 @@ export const DEFAULT_FAMILY_CONFIG: FamilyConfig = {
   funkelzeitMode: 'entspannt',
   funkelzeitDailyCapMin: 30,
   toothBrushDefaultMode: 'tasche',
+  zeigMomentEnabled: true,
 };

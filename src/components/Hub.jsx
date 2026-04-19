@@ -20,6 +20,7 @@ import Gefuehlsecke from './Gefuehlsecke';
 import GefuehlsecheHeart from './GefuehlsecheHeart';
 import ForscherEcke from './ForscherEcke';
 import StaminaIndicator from './StaminaIndicator';
+import ZeigMomentCard from './ZeigMomentCard';
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -72,6 +73,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const [showClothing, setShowClothing] = useState(false);
   const [showEveningRitual, setShowEveningRitual] = useState(false);
   const [showGefuehlsecke, setShowGefuehlsecke] = useState(false);
+  const [zeigBlock, setZeigBlock] = useState(null); // 'morning' | 'evening' | 'bedtime'
 
   // Trigger evening ritual when: evening + all bedtime quests done + hasn't happened today yet
   useEffect(() => {
@@ -84,6 +86,32 @@ export default function Hub({ onNavigate, onPlayMint }) {
       setShowEveningRitual(true);
     }
   }, [state?.quests, state?.eveningRitualCompletedAt]);
+
+  // Trigger "Zeig-Moment" once per block per day when every main quest in that
+  // block is done. Fades for good after THRESHOLD (14) confirmations.
+  useEffect(() => {
+    if (!state) return;
+    if (zeigBlock) return;
+    const enabled = state?.familyConfig?.zeigMomentEnabled !== false; // default on
+    if (!enabled) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const counts = state?.zeigMomentCounts || {};
+    const shown = state?.zeigMomentShownDates || {};
+    const hour = new Date().getHours();
+
+    const checkBlock = (block, hourWindow) => {
+      if (!hourWindow(hour)) return false;
+      if (shown[block] === today) return false;
+      if ((counts[block] || 0) >= 14) return false;
+      const quests = (state.quests || []).filter(q => q.anchor === block && !q.sideQuest);
+      if (quests.length === 0) return false;
+      return quests.every(q => q.done);
+    };
+
+    if (checkBlock('morning', h => h >= 6 && h < 12)) { setZeigBlock('morning'); return; }
+    if (checkBlock('evening', h => h >= 12 && h < 18)) { setZeigBlock('evening'); return; }
+    if (checkBlock('bedtime', h => h >= 18 || h < 6)) { setZeigBlock('bedtime'); return; }
+  }, [state?.quests, state?.zeigMomentShownDates, state?.zeigMomentCounts, state?.familyConfig?.zeigMomentEnabled, zeigBlock]);
 
   // Ronki greets Louis once when Hub mounts.
   useEffect(() => {
@@ -1060,6 +1088,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
 
       {showGefuehlsecke && (
         <Gefuehlsecke onClose={() => setShowGefuehlsecke(false)} />
+      )}
+
+      {zeigBlock && (
+        <ZeigMomentCard block={zeigBlock} onClose={() => setZeigBlock(null)} />
       )}
     </div>
   );

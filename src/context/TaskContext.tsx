@@ -144,6 +144,12 @@ export interface TaskState {
     rewardName: string;  // Belohnungsbank reward name (localized string)
     actualUsed?: number; // minutes actually used (filled in on Store action)
   }>;
+  /** ISO dates when the "zeig mama/papa"-confirmation was shown for each
+   *  routine block. One per block per day to prevent re-triggering. */
+  zeigMomentShownDates?: { morning?: string; evening?: string; bedtime?: string };
+  /** Per-block count of confirmations seen. Teaching period fades once each
+   *  block hits 14 (Louis has internalized the habit). */
+  zeigMomentCounts?: { morning?: number; evening?: number; bedtime?: number };
 }
 
 interface TaskComputed {
