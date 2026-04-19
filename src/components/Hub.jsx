@@ -222,16 +222,23 @@ export default function Hub({ onNavigate, onPlayMint }) {
 
         <ArcActiveBanner onOpenBeat={setOpenBeat} />
 
-        {/* Arc cooldown hint — only shown when in cooldown */}
-        {inCooldown && !activeArc && !offeredArc && (
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full mx-auto"
-               style={{ background: 'rgba(252,211,77,0.12)', border: '1px solid rgba(252,211,77,0.25)', width: 'fit-content' }}>
-            <span className="text-base">💤</span>
-            <span className="font-label text-xs text-on-surface-variant">
-              {lang === 'de' ? 'Ronki ruht sich aus. Bald gibt es ein neues Abenteuer.' : 'Ronki is resting. A new adventure soon.'}
-            </span>
-          </div>
-        )}
+        {/* ── Time-aware greeting — soft whisper above the campfire ──
+             Doubles down on the campfire as the emotional surface: a personal
+             "Guten Morgen, Louis" grounds the scene before Ronki enters view.
+             Uses the i18n greeting keys that existed but were never wired up. */}
+        {(() => {
+          const hour = new Date().getHours();
+          const greetKey = hour < 11 ? 'hub.greeting.morning'
+            : hour < 17 ? 'hub.greeting.afternoon'
+            : 'hub.greeting.evening';
+          return (
+            <div className="flex justify-center -mb-2">
+              <p className="font-body text-sm italic" style={{ color: '#2d5a5e99' }}>
+                {t(greetKey)}, {heroName}
+              </p>
+            </div>
+          );
+        })()}
 
         {/* ── Companion ── */}
         {(() => {
@@ -322,6 +329,19 @@ export default function Hub({ onNavigate, onPlayMint }) {
             </section>
           );
         })()}
+
+        {/* Arc cooldown hint — relocated BELOW the companion scene so it
+             doesn't compete with the campfire for above-the-fold space.
+             It's a soft status, not a primary surface. */}
+        {inCooldown && !activeArc && !offeredArc && (
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full mx-auto"
+               style={{ background: 'rgba(252,211,77,0.12)', border: '1px solid rgba(252,211,77,0.25)', width: 'fit-content' }}>
+            <span className="text-base">💤</span>
+            <span className="font-label text-xs text-on-surface-variant">
+              {lang === 'de' ? 'Ronki ruht sich aus. Bald gibt es ein neues Abenteuer.' : 'Ronki is resting. A new adventure soon.'}
+            </span>
+          </div>
+        )}
 
         {/* ── Login Bonus ── */}
         {!state.loginBonusClaimed && (
