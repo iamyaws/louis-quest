@@ -137,9 +137,9 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_trait_brave_02',     text: 'Mutig sein heißt nicht, keine Angst zu haben. Du weißt das.', triggers: ['hub_open'], requiredTraits: ['brave'] },
   { id: 'de_trait_gentle_01',    text: 'Deine Ruhe tut allen gut. Auch mir.', triggers: ['hub_open', 'sanctuary_open'], requiredTraits: ['gentle'] },
   { id: 'de_trait_patient_01',   text: 'Du wartest geduldig — das können nicht alle. Ich lerne von dir.', triggers: ['hub_open'], requiredTraits: ['patient'] },
-  { id: 'de_trait_mapmaker_01',  text: 'Der Kartenmacher ist zurück! Was entdeckst du heute?', triggers: ['hub_open'], requiredTraits: ['mapmaker'] },
+  { id: 'de_trait_mapmaker_01',  text: 'Der Entdecker ist zurück! Was findest du heute?', triggers: ['hub_open'], requiredTraits: ['mapmaker'] },
   { id: 'de_trait_curious_01',   text: 'Du stellst immer die besten Fragen. Was fragst du dich heute?', triggers: ['idle'], requiredTraits: ['curious'] },
-  { id: 'de_trait_multi_01',     text: 'Du hast schon so viele Wesenszüge. Du wirst ein großer Held.', triggers: ['hub_open'], requireAllTraits: ['brave', 'gentle', 'patient', 'mapmaker'] },
+  { id: 'de_trait_multi_01',     text: 'Du hast schon so viele Stärken. Du wirst ein großer Held.', triggers: ['hub_open'], requireAllTraits: ['brave', 'gentle', 'patient', 'mapmaker'] },
 
   // NOTE: de_stamina_* and de_screentime_* audio files exist in public/audio/ronki/
   // and are played directly via VoiceAudio.play(id) from MiniGames.jsx and ScreenTimer.jsx.

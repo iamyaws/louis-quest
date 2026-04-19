@@ -32,13 +32,15 @@ const FACTS = {
 };
 
 // Trait seeds — Phase 2 will earn these from arcs. For now, derive from milestones.
+// Labels kept to first-grade-readable German (per Marc: "wesenszüge und sanftmütig
+// are not really words that kids know"). "Stärken" replaces the "Wesenszüge" frame.
 const TRAIT_POOL = [
   { id: 'brave', label: { de: 'Mutig', en: 'Brave' }, icon: 'shield', color: '#f59e0b', when: (s) => (s.arcEngine?.completedArcIds?.length || 0) >= 1 },
-  { id: 'gentle', label: { de: 'Sanftmütig', en: 'Gentle' }, icon: 'favorite', color: '#f472b6', when: (s) => (s.catEvo || 0) >= 3 },
+  { id: 'gentle', label: { de: 'Lieb', en: 'Kind' }, icon: 'favorite', color: '#f472b6', when: (s) => (s.catEvo || 0) >= 3 },
   { id: 'curious', label: { de: 'Neugierig', en: 'Curious' }, icon: 'explore', color: '#0ea5e9', when: (s) => true },
   { id: 'loyal', label: { de: 'Treu', en: 'Loyal' }, icon: 'handshake', color: '#34d399', when: (s) => (s.totalTaskDays || 0) >= 3 },
   { id: 'dreamer', label: { de: 'Träumer', en: 'Dreamer' }, icon: 'auto_awesome', color: '#a855f7', when: (s) => (s.journalHistory?.length || 0) >= 3 },
-  { id: 'mapmaker', label: { de: 'Kartenmacher', en: 'Mapmaker' }, icon: 'map', color: '#fb923c', when: (s) => (s.arcEngine?.completedArcIds || []).includes('first-adventure') },
+  { id: 'mapmaker', label: { de: 'Entdecker', en: 'Explorer' }, icon: 'map', color: '#fb923c', when: (s) => (s.arcEngine?.completedArcIds || []).includes('first-adventure') },
 ];
 
 const base = import.meta.env.BASE_URL;
@@ -195,20 +197,33 @@ export default function RonkiProfile({ onNavigate }) {
         {!dev && (
           <button
             onClick={() => onNavigate?.('kodex')}
-            className="w-full rounded-2xl px-4 py-3 mb-5 flex items-center gap-3 active:scale-[0.98] transition-transform text-left"
+            className="w-full rounded-2xl p-5 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
             style={{
-              background: 'rgba(18,67,70,0.05)',
-              border: '1.5px solid rgba(18,67,70,0.12)',
+              background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)',
+              boxShadow: '0 4px 16px rgba(252,211,77,0.3)',
             }}
           >
-            <span className="material-symbols-outlined text-xl shrink-0"
-                  style={{ color: '#124346', fontVariationSettings: "'FILL' 1" }}>
-              favorite
-            </span>
-            <span className="flex-1 font-headline font-bold text-sm text-primary">
-              {lang === 'de' ? 'Was einen Helden ausmacht' : 'What makes a hero'}
-            </span>
-            <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+            {/* Heart in a white circle — clear icon affordance, pops off the gold */}
+            <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                 style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.15)', boxShadow: '0 2px 8px rgba(120,53,15,0.12)' }}>
+              <span className="material-symbols-outlined text-2xl"
+                    style={{ color: '#dc2626', fontVariationSettings: "'FILL' 1" }}>
+                favorite
+              </span>
+            </div>
+            <div className="flex-1">
+              <p className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: '#78350f' }}>
+                {lang === 'de' ? 'Für Helden' : 'For heroes'}
+              </p>
+              <h4 className="font-headline font-bold text-lg leading-tight" style={{ color: '#78350f' }}>
+                {lang === 'de' ? 'Was einen Helden ausmacht' : 'What makes a hero'}
+              </h4>
+            </div>
+            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+                 style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+              <span className="material-symbols-outlined text-xl"
+                    style={{ color: '#78350f', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+            </div>
           </button>
         )}
 
@@ -218,7 +233,7 @@ export default function RonkiProfile({ onNavigate }) {
           {[
             { id: 'about', label: lang === 'de' ? 'Über' : 'About', icon: 'info' },
             { id: 'details', label: 'Details', icon: 'analytics' },
-            { id: 'traits', label: lang === 'de' ? 'Wesen' : 'Traits', icon: 'psychology' },
+            { id: 'traits', label: lang === 'de' ? 'Stärken' : 'Strengths', icon: 'psychology' },
           ].map(tb => (
             <button key={tb.id}
               onClick={() => setTab(tb.id)}
@@ -436,8 +451,8 @@ export default function RonkiProfile({ onNavigate }) {
               </div>
               <p className="font-body text-xs text-on-surface-variant mt-4 italic leading-relaxed">
                 {lang === 'de'
-                  ? 'Ronki entdeckt neue Wesenszüge bei jedem Abenteuer.'
-                  : 'Ronki discovers new traits with every adventure.'}
+                  ? 'Ronki wird bei jedem Abenteuer stärker.'
+                  : 'Ronki grows stronger with every adventure.'}
               </p>
             </div>
 
@@ -461,7 +476,7 @@ export default function RonkiProfile({ onNavigate }) {
                 ))}
                 {TRAIT_POOL.filter(tr => !tr.when(state)).length === 0 && (
                   <p className="font-body text-sm text-on-surface-variant italic">
-                    {lang === 'de' ? 'Alle Wesenszüge entdeckt!' : 'All traits discovered!'}
+                    {lang === 'de' ? 'Alle Stärken entdeckt!' : 'All strengths discovered!'}
                   </p>
                 )}
               </div>
