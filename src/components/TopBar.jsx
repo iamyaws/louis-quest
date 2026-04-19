@@ -15,8 +15,8 @@ export default function TopBar({ onNavigate }) {
   const dev = isDevMode();
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl"
-            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+    <header className="fixed w-full z-50 bg-surface/80 backdrop-blur-xl"
+            style={{ top: 'var(--alpha-banner-h, 0px)' }}>
       <div className="flex justify-between items-center px-6 py-3 w-full max-w-lg mx-auto">
         {/* Left: Hero Avatar + Level badge + Name */}
         <button onClick={() => onNavigate?.('ronki')}

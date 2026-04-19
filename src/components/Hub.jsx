@@ -161,12 +161,14 @@ export default function Hub({ onNavigate, onPlayMint }) {
         <CloudWaves fill="253,248,240" opacity={1.2} />
       </div>
 
-      {/* ── DEV badge (dev mode only, top-right, unobtrusive) ── */}
+      {/* ── DEV badge (dev mode only, top-right, unobtrusive).
+           Sits below AlphaBanner via --alpha-banner-h so it doesn't get
+           clipped by the banner on scroll=0. */}
       {isDevMode() && (
         <div
           className="fixed z-[100] px-2 py-0.5 rounded-md font-label font-bold text-[10px] uppercase tracking-widest pointer-events-none select-none"
           style={{
-            top: 'calc(env(safe-area-inset-top, 0px) + 6px)',
+            top: 'calc(var(--alpha-banner-h, 0px) + 6px)',
             right: 'calc(env(safe-area-inset-right, 0px) + 6px)',
             background: 'rgba(18,67,70,0.55)',
             color: 'rgba(255,255,255,0.85)',
@@ -179,9 +181,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
         </div>
       )}
 
-      {/* ── Top Bar (matches TopBar component style) ── */}
-      <header className="flex justify-between items-center px-6 pb-2"
-              style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
+      {/* ── Top Bar (matches TopBar component style).
+           AlphaBanner above absorbs iOS safe-area-inset-top — no need to
+           re-pad for the notch here. */}
+      <header className="flex justify-between items-center px-6 pb-2 pt-6">
         <button onClick={() => onNavigate?.('ronki')} className="flex items-center gap-2 active:scale-95 transition-all">
           <div className="relative">
             <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden shadow-sm"

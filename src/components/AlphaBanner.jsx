@@ -1,13 +1,38 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 /**
  * AlphaBanner — small persistent strip at the top of the app that sets
  * expectations for early testers. Parent-focused message; kids ignore it.
  * Includes a feedback mailto link so testers always know where to send it.
+ *
+ * Publishes its own rendered height to the CSS variable `--alpha-banner-h`
+ * on the document root so downstream fixed headers (TopBar, Hub's internal
+ * header) can offset by exactly the banner's height — including the iOS
+ * safe-area-inset-top which the banner absorbs. Without this, `fixed top-0`
+ * headers render ON TOP of the sticky banner at scroll=0 and clip avatars.
  */
 export default function AlphaBanner() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const publish = () => {
+      document.documentElement.style.setProperty('--alpha-banner-h', `${node.offsetHeight}px`);
+    };
+    publish();
+    const ro = new ResizeObserver(publish);
+    ro.observe(node);
+    window.addEventListener('resize', publish);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', publish);
+      document.documentElement.style.removeProperty('--alpha-banner-h');
+    };
+  }, []);
+
   return (
     <div
+      ref={ref}
       role="note"
       className="sticky top-0 inset-x-0 z-[60] bg-[#0F2C2E] text-white/85 border-b border-white/10"
       style={{

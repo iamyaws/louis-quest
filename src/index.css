@@ -110,6 +110,13 @@
 }
 
 @layer base {
+  :root {
+    /* Default AlphaBanner height used by fixed headers (TopBar, Hub header, DEV badge).
+       AlphaBanner.jsx overrides this on mount via ResizeObserver — including the iOS
+       safe-area-inset-top which the banner absorbs. The default 28px covers desktop
+       first-paint before the observer fires; iOS is handled by the JS measurement. */
+    --alpha-banner-h: 28px;
+  }
   html, body, #root {
     height: 100dvh;
     width: 100%;

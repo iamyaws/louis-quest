@@ -134,7 +134,10 @@ function AppContent() {
       )}
       <div className={`min-h-dvh max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
            style={{
-             paddingTop: ['hub', 'care'].includes(view) ? 0 : 'calc(72px + env(safe-area-inset-top, 0px))',
+             // AlphaBanner publishes its own height to --alpha-banner-h (handles
+             // iOS safe-area-inset-top internally). TopBar sits below it via the
+             // same variable. Content pad = banner + 72px TopBar on non-hub views.
+             paddingTop: ['hub', 'care'].includes(view) ? 0 : 'calc(var(--alpha-banner-h, 0px) + 72px)',
              paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
            }}>
         {view === 'quests' && (
