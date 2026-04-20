@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { PageMeta } from '../components/PageMeta';
 import { PainterlyShell } from '../components/PainterlyShell';
 import { Footer } from '../components/Footer';
-import { WaitlistCTA } from '../components/WaitlistCTA';
-import { LAUNCH_STATE } from '../config/launch-state';
+import { FeedbackForm } from '../components/FeedbackForm';
 import { EASE_OUT } from '../lib/motion';
 
 /* ------------------------------------------------------------------ */
@@ -300,33 +299,32 @@ export default function FuerEltern() {
             className="rounded-3xl border border-teal/15 bg-cream/60 backdrop-blur-sm p-8 sm:p-10"
           >
             <p className="text-[0.7rem] uppercase tracking-[0.2em] text-teal-dark/60 font-semibold mb-5">
-              Noch etwas auf dem Herzen?
+              Helft uns, den nächsten Artikel zu planen
             </p>
             <h2
               id="cta-heading"
               className="font-display font-bold text-2xl sm:text-3xl leading-[1.12] tracking-tight text-teal-dark mb-5"
             >
-              Fragen, die hier fehlen? Schreibt uns.
+              Welche Frage haben wir nicht beantwortet?
             </h2>
             <p className="text-base sm:text-lg text-ink/75 leading-relaxed max-w-2xl mb-8">
-              Wenn euch etwas unklar ist, oder wenn ihr eine Sorge habt, die
-              wir hier nicht beantworten: eine formlose Mail an{' '}
+              Der Ratgeber wächst mit den Fragen, die wir von Eltern bekommen.
+              Schreibt uns, was hier noch fehlt, welche Sorge euch gerade
+              umtreibt oder welches Thema ihr als nächstes lesen wollt. Wir
+              antworten persönlich und planen damit, worüber wir als Nächstes
+              schreiben.
+            </p>
+            <FeedbackForm source="fuer-eltern" />
+            <p className="text-xs text-ink/55 mt-6 pt-6 border-t border-teal/10 leading-relaxed">
+              Lieber per E-Mail? Schreibt direkt an{' '}
               <a
                 href="mailto:hallo@ronki.de"
                 className="font-display font-semibold text-teal-dark underline decoration-teal/30 underline-offset-4 hover:decoration-teal hover:text-teal transition-colors"
               >
                 hallo@ronki.de
-              </a>{' '}
-              reicht. Wir antworten persönlich.
+              </a>
+              . Landet beim gleichen Marc, wird gleich gelesen.
             </p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-6 pt-6 border-t border-teal/10">
-              <p className="font-display font-semibold text-lg sm:text-xl text-teal-dark flex-1 leading-snug">
-                Wenn Ronki startet, sagen wir Bescheid. Einmal, ohne Spam.
-              </p>
-              <div className="w-full sm:w-auto sm:min-w-[320px] shrink-0">
-                <WaitlistCTA launchState={LAUNCH_STATE} />
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
