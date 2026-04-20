@@ -98,12 +98,67 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
     if (navigator.vibrate) navigator.vibrate(80);
   };
 
-  return (
-    <div className="px-6 pb-32">
+  // Hero name + today's weekday for the personalised header.
+  const heroName = state.familyConfig?.childName || t('topbar.heroFallback');
+  const weekday = new Date().toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { weekday: 'long' });
 
-      {/* ── Header ── */}
+  // Use the same midday sky asset as the Hub's ambient backdrop. 0.5 opacity
+  // gives a soft bluish wash that fades cleanly into the cream content.
+  const SKY_FILE = 'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_bright_midday_sky._Wa_e8eca682-4eb9-4da2-8c93-a4cb25ba363d_1.webp';
+
+  return (
+    <div className="relative px-6 pb-32">
+
+      {/* ── Bluish sky wash at top ──
+             Ambient gradient so the Aufgaben page lives in the same painted
+             world as the Hub. 280px tall, fades into cream below. Design
+             reference: Ronki Aufgaben Polish.html (.sky at 0.75 opacity). ── */}
+      <div className="absolute left-0 right-0 top-0 overflow-hidden pointer-events-none"
+           style={{ height: 280, zIndex: 0 }}
+           aria-hidden="true">
+        <img src={base + SKY_FILE} alt=""
+             className="w-full h-full object-cover"
+             style={{ objectPosition: 'center 30%', opacity: 0.55 }}
+             draggable={false} />
+        <div className="absolute inset-x-0 bottom-0 h-24"
+             style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(255,248,242,0.55) 50%, #fff8f2 100%)' }} />
+      </div>
+
+      {/* Relative wrapper so all content floats above the sky backdrop */}
+      <div className="relative" style={{ zIndex: 1 }}>
+
+      {/* ── Personalised header + overall progress bar ──
+             Moved up from the Bento card at the bottom so Louis gets an
+             orienting "where am I today" signal in the first fold. Design
+             reference: Ronki Aufgaben Polish.html ("ein Fortschritt, nicht
+             fünf"). ── */}
       <section className="mb-5">
-        <h2 className="text-xl font-bold font-headline text-on-surface">{t('task.section.title')}</h2>
+        <p className="font-label font-bold text-[11px] uppercase tracking-[0.22em] mb-2"
+           style={{ color: '#b45309' }}>
+          {lang === 'de' ? 'Heute' : 'Today'} · {weekday}
+        </p>
+        <h1 className="font-headline font-bold text-2xl text-on-surface leading-tight"
+            style={{ letterSpacing: '-0.015em' }}>
+          {allDone
+            ? <>{lang === 'de' ? 'Alles geschafft, ' : 'All done, '}<em className="not-italic text-secondary">{heroName}</em>.</>
+            : <>{lang === 'de' ? 'Deine Aufgaben, ' : 'Your tasks, '}<em className="not-italic text-secondary">{heroName}</em>.</>}
+        </h1>
+        <div className="flex items-center gap-3 mt-3">
+          <div className="flex-1 h-2 rounded-full overflow-hidden"
+               style={{ background: 'rgba(18,67,70,0.12)', boxShadow: 'inset 0 1px 2px rgba(18,67,70,0.15)' }}>
+            <div className="h-full rounded-full transition-all duration-700"
+                 style={{
+                   width: `${pct * 100}%`,
+                   background: allDone
+                     ? 'linear-gradient(90deg, #34d399 0%, #059669 100%)'
+                     : 'linear-gradient(90deg, #fcd34d 0%, #f59e0b 100%)',
+                   boxShadow: '0 0 8px rgba(252,211,77,0.4)',
+                 }} />
+          </div>
+          <span className="font-label font-bold text-xs shrink-0 text-on-surface-variant">
+            <b className="text-primary text-sm">{done}</b> {lang === 'de' ? 'von' : 'of'} {total}
+          </span>
+        </div>
       </section>
 
       {/* ── Parent-created quest-lines (top of list, show up to 3) ── */}
@@ -229,24 +284,27 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="relative w-12 h-12 flex items-center justify-center">
-                      <svg className="w-full h-full -rotate-90">
-                        <circle cx="24" cy="24" fill="transparent" r="20"
-                                stroke="rgba(204,195,215,0.2)" strokeWidth="4" />
-                        <circle cx="24" cy="24" fill="transparent" r="20"
+                    {/* Smaller chapter ring (36px) — the overall progress
+                         bar at the top now owns the big "where am I today"
+                         signal, so per-chapter rings can be quieter. */}
+                    <div className="relative w-9 h-9 flex items-center justify-center">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" fill="transparent" r="14"
+                                stroke="rgba(18,67,70,0.14)" strokeWidth="3" />
+                        <circle cx="18" cy="18" fill="transparent" r="14"
                                 stroke={secDone ? '#34d399' : '#fcd34d'}
-                                strokeWidth="4" strokeLinecap="round"
-                                strokeDasharray="125.6"
-                                strokeDashoffset={125.6 - (doneCount / quests.length) * 125.6} />
+                                strokeWidth="3" strokeLinecap="round"
+                                strokeDasharray="88"
+                                strokeDashoffset={88 - (doneCount / quests.length) * 88} />
                       </svg>
-                      <span className={`absolute text-xs font-bold font-label ${secDone ? 'text-emerald-dark' : ''}`}>
+                      <span className={`absolute text-[10px] font-bold font-label ${secDone ? 'text-emerald-dark' : ''}`}>
                         {secDone ? (
-                          <span className="material-symbols-outlined text-base text-emerald-dark" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
+                          <span className="material-symbols-outlined text-emerald-dark" style={{ fontVariationSettings: "'FILL' 1", fontSize: 13 }}>check</span>
                         ) : `${doneCount}/${quests.length}`}
                       </span>
                     </div>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center group-open:rotate-180 transition-transform ${secDone ? 'bg-emerald-dark' : 'bg-primary'}`}>
-                      <span className="material-symbols-outlined text-white text-lg">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center group-open:rotate-180 transition-transform ${secDone ? 'bg-emerald-dark' : 'bg-primary'}`}>
+                      <span className="material-symbols-outlined text-white" style={{ fontSize: 16 }}>
                         expand_more
                       </span>
                     </div>
@@ -282,18 +340,36 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
 
                       return (
                         <div key={q.id} className="flex gap-3 relative">
-                          {/* Step indicator + connector line */}
+                          {/* Step indicator + connector line.
+                               Design-ref: dashed "path" connector before done,
+                               solid emerald after. Pulse glow on the next-up
+                               step draws the eye. */}
                           <div className="flex flex-col items-center" style={{ width: 32 }}>
                             <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
                                  style={{
-                                   background: fullyDone ? '#34d399' : isNext ? '#fcd34d' : '#e8e1da',
-                                   color: fullyDone ? 'white' : '#1e1b17',
-                                   boxShadow: isNext ? '0 0 0 3px rgba(252,211,77,0.3)' : 'none',
+                                   background: fullyDone ? '#34d399' : isNext ? '#fcd34d' : 'rgba(18,67,70,0.08)',
+                                   color: fullyDone ? 'white' : isNext ? '#725b00' : 'rgba(18,67,70,0.55)',
+                                   border: fullyDone
+                                     ? '1.5px solid #34d399'
+                                     : isNext
+                                     ? '1.5px solid #b45309'
+                                     : '1.5px solid rgba(18,67,70,0.14)',
+                                   boxShadow: isNext
+                                     ? '0 0 0 3px rgba(252,211,77,0.25), 0 2px 6px -1px rgba(252,211,77,0.5)'
+                                     : fullyDone
+                                     ? '0 2px 6px -1px rgba(52,211,153,0.45)'
+                                     : 'none',
                                  }}>
                               {fullyDone ? '✓' : idx + 1}
                             </div>
                             {!isLast && (
-                              <div className="flex-1 w-0.5 my-1" style={{ background: fullyDone ? '#34d399' : '#e8e1da', minHeight: 12 }} />
+                              <div className="flex-1 w-0.5 my-1"
+                                   style={{
+                                     minHeight: 12,
+                                     background: fullyDone
+                                       ? 'linear-gradient(180deg, #34d399 0%, rgba(52,211,153,0.4) 100%)'
+                                       : 'repeating-linear-gradient(180deg, rgba(18,67,70,0.18) 0 4px, transparent 4px 8px)',
+                                   }} />
                             )}
                           </div>
 
@@ -311,7 +387,15 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
                                   <div className="flex-1">
                                     <p className="font-bold font-label line-through text-on-surface/50">{t('quest.' + q.id)}</p>
                                   </div>
-                                  <span className="font-bold font-label text-xs" style={{ color: '#34d399' }}>+{q.xp} HP</span>
+                                  <span className="font-label font-extrabold text-[11px] shrink-0 whitespace-nowrap"
+                                        style={{
+                                          background: 'rgba(52,211,153,0.14)',
+                                          color: '#059669',
+                                          border: '1px solid rgba(5,150,105,0.15)',
+                                          padding: '6px 9px',
+                                          borderRadius: 8,
+                                          letterSpacing: '0.04em',
+                                        }}>+{q.xp} HP</span>
                                 </div>
                                 {/* Weather hint persists after completion */}
                                 {isAnziehen && todayWeather && weatherInfo && (
@@ -368,7 +452,15 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
                                     </p>
                                   )}
                                 </div>
-                                <span className="font-bold font-label text-xs text-primary">+{q.xp} HP</span>
+                                <span className="font-label font-extrabold text-[11px] shrink-0 whitespace-nowrap"
+                                      style={{
+                                        background: 'rgba(252,211,77,0.22)',
+                                        color: '#b45309',
+                                        border: '1px solid rgba(180,83,9,0.18)',
+                                        padding: '6px 9px',
+                                        borderRadius: 8,
+                                        letterSpacing: '0.04em',
+                                      }}>+{q.xp} HP</span>
                               </div>
                             )}
                           </div>
@@ -382,7 +474,9 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
           );
         })}
 
-        {/* ── Side Quests ── */}
+        {/* ── Bonus Quests — 2-per-row grid ("als Einladung" per design).
+               Compact cards so the bonus feels like small invitations, not
+               a wall of checkboxes. Each card still taps to complete. ── */}
         {(() => {
           const sideQuests = (state.quests || []).filter(q => q.sideQuest);
           if (!sideQuests.length) return null;
@@ -393,46 +487,57 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
                        border: '1.5px solid rgba(115,92,0,0.18)',
                        boxShadow: '0 2px 12px rgba(115,92,0,0.08)',
                      }}>
-              <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-                <div className="w-1.5 h-7 rounded-full" style={{ background: '#735c00' }} />
-                <h2 className="font-headline text-xl text-on-surface">{t('task.bonus')}</h2>
+              <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-6 rounded-full" style={{ background: '#735c00' }} />
+                  <h2 className="font-headline text-lg text-on-surface">{t('task.bonus')}</h2>
+                </div>
+                <span className="font-label font-bold text-xs" style={{ color: '#735c00' }}>
+                  {sideQuests.filter(q => q.done).length}/{sideQuests.length}
+                </span>
               </div>
-              <div className="flex flex-col">
-                {sideQuests.map((q, idx) => (
-                  <div key={q.id}
-                    className={`flex items-center gap-4 px-4 py-3.5 transition-all ${q.done ? 'opacity-60' : ''}`}
+              <div className="grid grid-cols-2 gap-2.5 px-4 pb-4">
+                {sideQuests.map(q => (
+                  <button key={q.id}
+                    onClick={() => !q.done && handleComplete(q.id)}
+                    disabled={q.done}
+                    className={`flex flex-col items-start gap-2 p-3 rounded-xl transition-all text-left active:scale-[0.97] ${q.done ? 'opacity-70' : ''}`}
                     style={{
-                      borderTop: idx > 0 ? '1px solid rgba(115,92,0,0.1)' : undefined,
+                      background: q.done
+                        ? 'rgba(52,211,153,0.1)'
+                        : 'rgba(255,255,255,0.85)',
+                      border: q.done
+                        ? '1.5px solid rgba(52,211,153,0.35)'
+                        : '1.5px solid rgba(115,92,0,0.2)',
+                      boxShadow: q.done
+                        ? 'none'
+                        : '0 2px 6px rgba(115,92,0,0.08)',
+                      cursor: q.done ? 'default' : 'pointer',
                     }}
+                    aria-label={q.done ? t('quest.' + q.id) : `${t('quest.' + q.id)} ${t('task.complete')}`}
                   >
-                    {q.done ? (
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-                           style={{ background: '#34d399' }}>
-                        <span className="material-symbols-outlined text-white text-xl"
-                              style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                      </div>
-                    ) : (
-                      <button
-                        className="w-12 h-12 rounded-full border-[2.5px] flex items-center justify-center shrink-0 transition-all hover:border-secondary cursor-pointer active:scale-90"
-                        style={{ borderColor: '#735c00', background: 'rgba(252,211,77,0.06)', boxShadow: '0 0 0 3px rgba(252,211,77,0.12)' }}
-                        onClick={() => handleComplete(q.id)}
-                        aria-label={`${t('quest.' + q.id)} ${t('task.complete')}`}
-                      >
-                        <span className="material-symbols-outlined text-secondary/40 text-lg">radio_button_unchecked</span>
-                      </button>
-                    )}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">{q.icon}</span>
-                        <p className={`text-lg font-bold font-label ${q.done ? 'line-through text-on-surface/50' : 'text-on-surface'}`}>
-                          {t('quest.' + q.id)}
-                        </p>
-                      </div>
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-2xl leading-none select-none">{q.icon}</span>
+                      {q.done ? (
+                        <span className="material-symbols-outlined text-lg"
+                              style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>
+                          check_circle
+                        </span>
+                      ) : (
+                        <span className="material-symbols-outlined text-base"
+                              style={{ color: 'rgba(115,92,0,0.45)' }}>
+                          add_circle
+                        </span>
+                      )}
                     </div>
-                    <div className={`font-bold font-label text-xs ${q.done ? 'text-emerald-dark' : 'text-secondary'}`}>
-                      +{q.xp} HP
-                    </div>
-                  </div>
+                    <p className={`font-label font-bold text-sm leading-tight ${q.done ? 'text-on-surface/55 line-through' : 'text-on-surface'}`}>
+                      {t('quest.' + q.id)}
+                    </p>
+                    <span className="font-label font-bold text-[11px]"
+                          style={{ color: q.done ? '#059669' : '#735c00' }}>
+                      +{q.xp} HP · {t('task.bonus')}
+                    </span>
+                  </button>
                 ))}
               </div>
             </section>
@@ -520,6 +625,8 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
           <path d="M60 10C60 10 75 40 110 40C110 40 80 55 80 90C80 90 60 110 60 110C60 110 40 90 40 90C40 90 10 55 10 40C10 40 45 40 60 10Z" fill="#124346" />
         </svg>
       </div>
+
+      </div>{/* close z-index:1 content wrapper (sky sits behind it) */}
 
       {/* ── Weather Outfit Modal ── */}
       {showWeather && <ClothingSheet onClose={() => setShowWeather(false)} />}

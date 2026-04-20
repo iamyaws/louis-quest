@@ -50,13 +50,24 @@ export default function QuestLineCard({ questLine, onOpen }) {
   return (
     <button
       onClick={() => onOpen?.(ql.id)}
-      className="w-full rounded-2xl p-5 mb-3 flex items-stretch gap-4 active:scale-[0.98] transition-all text-left"
+      className="relative w-full rounded-2xl p-5 mb-3 flex items-stretch gap-4 active:scale-[0.98] transition-all text-left overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #fff8f2 0%, #fef3c7 100%)',
-        border: '1.5px solid rgba(252,211,77,0.45)',
-        boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
+        // Dashed gold border + radial warm-light glow. Signals "this one was
+        // made by Mama or Papa" visually, mirrors the design reference.
+        background:
+          'radial-gradient(circle at 90% 0%, rgba(252,211,77,0.22), transparent 60%), ' +
+          'linear-gradient(180deg, #ffffff 0%, #fffaf0 100%)',
+        border: '1.5px dashed rgba(180,83,9,0.45)',
+        boxShadow: '0 8px 20px -8px rgba(180,83,9,0.2)',
       }}
     >
+      {/* "Von Mama" stamp — absolutely placed so the headline can breathe */}
+      <span className="absolute top-3 right-4 font-label font-extrabold uppercase"
+            style={{ fontSize: 9, letterSpacing: '0.22em', color: 'rgba(180,83,9,0.6)' }}
+            aria-hidden="true">
+        {lang === 'de' ? 'Von Mama' : 'From Mum'}
+      </span>
+
       {/* Emoji column */}
       <div className="flex items-start">
         <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.1))' }}>
