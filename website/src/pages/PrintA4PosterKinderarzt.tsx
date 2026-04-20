@@ -26,8 +26,8 @@ export default function PrintA4PosterKinderarzt() {
         heroSrc: '/art/companion/dragon-baby.webp',
         heroAlt: 'Kleiner freundlicher Drache, Begleiter für Grundschulkinder.',
         phoneScreenshot: {
-          src: '/art/app/journal-mood.png',
-          caption: 'Stimmungs-Check am Tagesende.',
+          src: '/art/app/aufgaben-uebersicht.png',
+          caption: 'Der Tag als sichtbare Abfolge.',
         },
         qrPath: '/wissenschaft',
         ctaHeading: 'Forschung, Quellen und Praxis:',
