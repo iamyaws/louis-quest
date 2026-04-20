@@ -99,65 +99,104 @@ Wichtig: nicht den Fehler machen, am ersten Tag zehn Routinen anzulegen. Ronki i
 
 ## 3. Welcome-E-Mail an Frühzugang-Teilnehmer
 
-Diese Mail geht an Eltern, die sich über das Formular auf `ronki.de` eingetragen UND beim Screener „Ja, gern" bei der Test-Bereitschaft angeklickt haben.
+Zwei Vorlagen, je nach Zielgruppe. Beide sind **Plaintext**, direkt copy-paste-fähig in Gmail / Apple Mail / Outlook. Keine Markdown-Formatierung, keine HTML-Spielereien, weil die auf älteren Clients kaputt aussehen und der Gesamtton dann bastelig wirkt.
 
-Sie soll sich persönlich anfühlen, aber funktioniert auch als Template. Platzhalter in `[eckigen Klammern]` bitte vor dem Versand ersetzen.
+**Platzhalter in `[eckigen Klammern]` vor dem Versand ersetzen.**
 
----
+### Vorlage 1 · Kurz & persönlich
 
-**Betreff:** Ronki-Frühzugang für euch · wir melden uns kurz
-
-**An:** [adresse@beispiel.de]
-
-**Von:** Marc Förster <hallo@ronki.de>
+Für Eltern, die du persönlich kennst oder die im Screener offensichtlich sehr motiviert sind (z. B. langer Freitext in „Etwas anderes"). Minimale Reibung, kurzer Ton, persönlicher Einstieg.
 
 ---
 
-Hallo [Vorname oder „ihr beiden"],
+```
+Betreff: Ronki-Frühzugang für euch
 
-danke, dass ihr euch für den Frühzugang eingetragen habt. Ich bin Marc, ich baue Ronki zusammen mit meinem Sohn Louis. Ihr seid in der allerersten Gruppe.
 
-**Wie ihr einsteigt:**
+Hey [Vorname],
 
-Ronki läuft direkt im Browser, kein App-Store, kein Download. Einmal `app.ronki.de` öffnen und auf den Startbildschirm legen. Danach fühlt sich Ronki wie jede andere App an.
+danke fürs Eintragen auf der Ronki-Warteliste. Ihr seid in der ersten Gruppe, die es ausprobieren kann.
 
-Je nach Gerät:
+Ronki läuft direkt im Browser: einfach app.ronki.de öffnen und auf den Startbildschirm legen. Schritte pro Gerät (iPhone, Android, Fire Tablet, Desktop) findet ihr auf ronki.de/installieren.
 
-- **iPhone / iPad:** Safari öffnen, `app.ronki.de`, das Teilen-Symbol antippen, „Zum Home-Bildschirm".
-- **Android (Chrome):** Chrome öffnen, `app.ronki.de`. Unten erscheint nach ein paar Sekunden ein Installations-Fenster. Falls nicht: im ⋮-Menü auf „App installieren".
-- **Fire Tablet:** Am einfachsten Chrome aus dem Amazon Appstore installieren (kostenlos) und wie bei Android vorgehen. Silk funktioniert auch, ist aber eingeschränkter.
-
-Eine ausführlichere Anleitung pro Gerät schicke ich euch gern auf Nachfrage. Oder ihr schaut auf `ronki.de/installieren` (bald online).
-
-**Was euch erwartet:**
-
-- Ronki ist eine frühe Version. Manches ist bewusst noch nicht da, manches wird sich verändern, manches bricht kurz weg.
-- Es gibt keine Werbung, keine Streaks, keine In-App-Käufe. Keine Push-Benachrichtigungen.
-- Ihr richtet das Elternprofil ein, legt eine Routine an (Morgen oder Abend genügt für den Start), und dann übernimmt dein Kind.
-
-**Was wir uns von euch wünschen:**
-
-1. **Probiert es drei bis sieben Tage aus.** Länger wenn ihr wollt, aber eine Woche reicht für ein erstes Gefühl.
-2. **Sagt uns ehrlich, was klemmt.** Wenn ein Bildschirm komisch aussieht, eine Formulierung Unsinn ist oder euer Kind nach zwei Tagen den Spaß verloren hat, sind das für uns die wichtigsten Signale.
-3. **Antwortet einfach direkt auf diese Mail.** Kein Formular, kein Ticket-System. Ich lese jede Antwort selbst.
-
-Wenn Ronki für euch gerade nicht passt, sagt uns auch das. Das ist kein Problem. Wir wollen lieber hören „nicht für uns" als euch in eine App reindrücken, die für euer Kind nicht gedacht ist.
+Wenn etwas hakt, unklar ist oder euer Kind es nicht mag, antwortet einfach direkt auf diese Mail. Ich lese jede Antwort selbst.
 
 Danke fürs Mitmachen.
 
 Marc
 
+--
 Marc Förster
 hallo@ronki.de
 ronki.de
 
-**P. S.** Ronki ist ein tägliches Ritual, kein Routine-Tracker. Wenn euer Kind nach zwei oder drei Monaten den Drachen fast nicht mehr braucht, haben wir unseren Job gemacht. Das ist ein richtig schlechtes Engagement-Metric. Aber ein verdammt gutes Erziehungs-Metric.
+P.S. Ronki ist ein tägliches Ritual, kein Routine-Tracker. Wenn euer Kind nach zwei oder drei Monaten den Drachen fast nicht mehr braucht, haben wir unseren Job gemacht. Ein richtig schlechtes Engagement-Metric. Aber ein verdammt gutes Erziehungs-Metric.
+
+--
+Du erhältst diese E-Mail, weil du dich auf ronki.de für den Frühzugang zu Ronki eingetragen hast. Antwort mit "unsubscribe" genügt, wir löschen dich sofort aus der Liste. Details: ronki.de/datenschutz · ronki.de/impressum
+```
 
 ---
 
-**Rechtlicher Kurz-Hinweis** (unten in die Signatur, klein):
+### Vorlage 2 · Ausführlich & warm
 
-> Du erhältst diese E-Mail, weil du dich auf `ronki.de` für den Frühzugang zu Ronki eingetragen hast. Wenn du keine weitere Post von uns möchtest, antworte kurz mit „unsubscribe" und wir löschen dich aus der Liste. Impressum und Datenschutz unter `ronki.de/impressum` bzw. `ronki.de/datenschutz`.
+Für Eltern, die du nicht persönlich kennst. Gibt mehr Kontext über den Alpha-Stand, was sie erwartet, was du dir wünschst. Länger, aber immer noch knapp genug für den schnellen Überflug.
+
+---
+
+```
+Betreff: Dein Frühzugang zu Ronki · wir melden uns kurz
+
+
+Hallo [Vorname],
+
+danke, dass du dich für den Frühzugang zu Ronki eingetragen hast. Ich bin Marc, ich baue Ronki zusammen mit meinem Sohn Louis. Ihr seid in einer der ersten Gruppen, die es ausprobieren kann.
+
+Wie ihr einsteigt:
+
+Ronki läuft direkt im Browser unter app.ronki.de. Kein App-Store, kein Download. Einmal die Seite öffnen, einmal auf den Startbildschirm legen, danach fühlt sich Ronki an wie jede andere App.
+
+Ausführliche Schritte pro Gerät (iPhone, iPad, Android mit Chrome oder Samsung Internet, Amazon Fire Tablet, Desktop) habe ich hier gesammelt: ronki.de/installieren
+
+Was euch erwartet:
+
+- Ronki ist eine frühe Version. Manches ist bewusst minimal, manches wird sich verändern.
+- Keine Werbung, keine Streaks, keine In-App-Käufe, keine Push-Benachrichtigungen.
+- Elternprofil einrichten, eine Routine anlegen (Morgen oder Abend reicht zum Start), dann übernimmt dein Kind.
+
+Was wir uns von euch wünschen:
+
+1. Probiert es drei bis sieben Tage aus. Nicht länger, nicht kürzer. Eine Woche reicht für ein erstes Gefühl.
+2. Sagt uns ehrlich, was hakt. Wenn ein Bildschirm komisch aussieht, eine Formulierung Unsinn ist oder euer Kind nach zwei Tagen den Spaß verloren hat: das sind für uns die wichtigsten Signale.
+3. Antwortet einfach direkt auf diese Mail. Kein Formular, kein Ticket-System. Ich lese jede Antwort selbst.
+
+Wenn Ronki für euch gerade nicht passt, sagt uns auch das. Das ist kein Problem. Wir wollen lieber ein ehrliches "nicht für uns" hören als Eltern in eine App reindrücken, die für ihr Kind nicht gedacht ist.
+
+Danke fürs Mitmachen.
+
+Marc
+
+--
+Marc Förster
+hallo@ronki.de
+ronki.de
+
+P.S. Ronki ist ein tägliches Ritual, kein Routine-Tracker. Wenn euer Kind nach zwei oder drei Monaten den Drachen fast nicht mehr braucht, haben wir unseren Job gemacht. Als Gamer-Vater weiß ich: das ist ein richtig schlechtes Engagement-Metric. Aber ein verdammt gutes Erziehungs-Metric.
+
+--
+Du erhältst diese E-Mail, weil du dich auf ronki.de für den Frühzugang zu Ronki eingetragen hast. Wenn du keine weitere Post von uns möchtest, antworte kurz mit "unsubscribe" und wir löschen dich sofort aus der Liste. Impressum und Datenschutz: ronki.de/impressum · ronki.de/datenschutz
+```
+
+---
+
+### Versand-Checkliste (vor dem ersten echten Empfänger)
+
+- [ ] Schick die Vorlage zuerst an dich selbst. In Gmail, Apple Mail und Outlook einmal prüfen, dass nichts umbricht oder komisch aussieht.
+- [ ] Absender-Name auf „Marc Förster" setzen, nicht „hallo@ronki.de". Fühlt sich weniger Bulk an.
+- [ ] Reply-To: ebenfalls `hallo@ronki.de`. Antworten landen dann sauber im gemeinsamen Postfach.
+- [ ] BCC-Feld nutzen, niemals die Empfänger als CC. DSGVO-Minimum: keine fremden Adressen sichtbar.
+- [ ] Wenn ihr mehrere Adressen gleichzeitig anschreibt: einzeln verschicken oder BCC. Niemals Mailinglisten-Tools für die ersten fünf, das zerstört die persönliche Wirkung.
+- [ ] Nach 3 Tagen: kurze Rückfrage „konntet ihr installieren, klappt was nicht?" (optional, nicht aufdrängend).
 
 ---
 

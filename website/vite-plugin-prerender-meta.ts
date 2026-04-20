@@ -45,6 +45,12 @@ const ROUTES: RouteMeta[] = [
     ogImage: '/og-fuer-eltern.jpg',
   },
   {
+    path: '/installieren',
+    title: 'Ronki installieren · iPhone, Android, Fire Tablet, Desktop',
+    description:
+      'So legt ihr Ronki auf den Startbildschirm: Schritt-für-Schritt-Anleitung für iPhone, iPad, Android (Chrome, Samsung, Firefox), Amazon Fire Tablet und Desktop. Ohne App-Store, ohne Download.',
+  },
+  {
     path: '/vorlagen',
     title: 'Vorlagen zum Ausdrucken: Ronki',
     description:
