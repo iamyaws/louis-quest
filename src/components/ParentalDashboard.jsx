@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
@@ -6,6 +6,7 @@ import { getCatStage } from '../utils/helpers';
 import { useRonkiStamina } from '../hooks/useRonkiStamina';
 import FeedbackModal from './FeedbackModal';
 import QuestLineEditor from './QuestLineEditor';
+import VoiceAudio from '../utils/voiceAudio';
 
 const PIN_CODE = '1234';
 const MOOD_EMOJIS = ['😢', '😕', '😐', '🙂', '😊', '🤩'];
@@ -40,6 +41,19 @@ export default function ParentalDashboard({ onClose, currentView, preauthorized 
   const [tab, setTab] = useState('overview');
   const [showFeedback, setShowFeedback] = useState(false);
   const DAY_LABELS = lang === 'en' ? DAY_LABELS_EN : DAY_LABELS_DE;
+  const tabBarRef = useRef(null);
+
+  // Keep the active tab pill in view on every switch. Only matters when the
+  // container actually overflows (very narrow phones); on wider screens the
+  // flex row already fits and this is a no-op.
+  useEffect(() => {
+    const bar = tabBarRef.current;
+    if (!bar) return;
+    const active = bar.querySelector(`[data-tab-id="${tab}"]`);
+    if (active && typeof active.scrollIntoView === 'function') {
+      active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, [tab]);
 
   if (!state) return null;
 
@@ -169,8 +183,13 @@ export default function ParentalDashboard({ onClose, currentView, preauthorized 
         </button>
       </header>
 
-      {/* Tab Bar */}
-      <div className="relative z-10 flex gap-2 px-6 py-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+      {/* Tab Bar — compact pills so all 4 fit on a 375px phone without
+          horizontal scroll. Icon size, padding, gap and label size are all
+          shrunk vs. the old tappable-but-clipped layout. Active tab also
+          scrolls into view as a belt-and-braces fallback for narrower
+          viewports (<360px) where even compact pills overflow. */}
+      <div ref={tabBarRef}
+           className="relative z-10 flex gap-1.5 px-3 py-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
         {[
           { id: 'overview', label: t('parent.tab.overview'), icon: 'dashboard' },
           { id: 'family', label: t('parent.tab.family'), icon: 'family_restroom' },
@@ -178,8 +197,9 @@ export default function ParentalDashboard({ onClose, currentView, preauthorized 
           { id: 'settings', label: t('parent.tab.settings'), icon: 'settings' },
         ].map(tb => (
           <button key={tb.id}
+            data-tab-id={tb.id}
             onClick={() => setTab(tb.id)}
-            className="flex-1 min-w-max py-3 px-4 rounded-full font-label font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300"
+            className="flex-1 min-w-0 py-2 px-2 rounded-full font-label font-bold text-xs flex items-center justify-center gap-1 transition-all duration-300 whitespace-nowrap"
             style={{
               background: tab === tb.id ? '#124346' : 'rgba(255,255,255,0.6)',
               backdropFilter: tab !== tb.id ? 'blur(12px)' : undefined,
@@ -187,11 +207,11 @@ export default function ParentalDashboard({ onClose, currentView, preauthorized 
               color: tab === tb.id ? '#ffffff' : '#707979',
               boxShadow: tab === tb.id ? '0 4px 16px rgba(18,67,70,0.2)' : 'none',
             }}>
-            <span className="material-symbols-outlined text-lg"
+            <span className="material-symbols-outlined text-base shrink-0"
                   style={{ fontVariationSettings: tab === tb.id ? "'FILL' 1" : undefined }}>
               {tb.icon}
             </span>
-            {tb.label}
+            <span className="truncate">{tb.label}</span>
           </button>
         ))}
       </div>
@@ -472,7 +492,23 @@ function OverviewTab({ state, lang, t }) {
 // ═══════════════════════════════════════════════════════
 function FamilyTab({ state, actions, lang }) {
   const DAY_LABELS = lang === 'en' ? DAY_LABELS_EN : DAY_LABELS_DE;
-  const config = state.familyConfig || DEFAULT_FAMILY_CONFIG;
+  // Merge with DEFAULT so partial/legacy configs (e.g. from older state where only
+  // childName + parentMessage were saved) don't crash on `.siblings.length` etc.
+  // The reducer should also guarantee this, but defence-in-depth keeps the
+  // dashboard from throwing if anyone writes a partial config in the future.
+  const rawConfig = state.familyConfig || {};
+  const config = {
+    ...DEFAULT_FAMILY_CONFIG,
+    ...rawConfig,
+    siblings: Array.isArray(rawConfig.siblings) ? rawConfig.siblings : DEFAULT_FAMILY_CONFIG.siblings,
+    dailyHabits: Array.isArray(rawConfig.dailyHabits) ? rawConfig.dailyHabits : DEFAULT_FAMILY_CONFIG.dailyHabits,
+    recurringActivities: Array.isArray(rawConfig.recurringActivities) ? rawConfig.recurringActivities : DEFAULT_FAMILY_CONFIG.recurringActivities,
+    parentMessage: (rawConfig.parentMessage && typeof rawConfig.parentMessage === 'object')
+      ? { ...DEFAULT_FAMILY_CONFIG.parentMessage, ...rawConfig.parentMessage }
+      : DEFAULT_FAMILY_CONFIG.parentMessage,
+    familyMotto: typeof rawConfig.familyMotto === 'string' ? rawConfig.familyMotto : DEFAULT_FAMILY_CONFIG.familyMotto,
+    affirmation: typeof rawConfig.affirmation === 'string' ? rawConfig.affirmation : DEFAULT_FAMILY_CONFIG.affirmation,
+  };
   const [draft, setDraft] = useState(() => JSON.parse(JSON.stringify(config)));
   const [saved, setSaved] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
@@ -1018,6 +1054,13 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     { id: 'schau',  emoji: '🦷', label: 'Schau-Modus',        desc: 'Illustrierter Guide mit Zonen-Bildern.' },
   ];
 
+  // ── Voice-Lines mute toggle ──
+  const [voiceMuted, setVoiceMutedState] = useState(VoiceAudio.isMuted());
+  const toggleVoiceMute = (next) => {
+    VoiceAudio.setMuted(next);
+    setVoiceMutedState(next);
+  };
+
   // ── Zeig-Moment toggle + counter reset ──
   const zmEnabled = state?.familyConfig?.zeigMomentEnabled !== false; // default on
   const zmCounts = state?.zeigMomentCounts || {};
@@ -1198,6 +1241,44 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
         >
           Zähler zurücksetzen (Lernphase neu starten)
         </button>
+      </div>
+
+      {/* Voice-Lines (Ronki spricht) */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(109,40,217,0.12)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#6d28d9', fontVariationSettings: "'FILL' 1" }}>
+              {voiceMuted ? 'volume_off' : 'volume_up'}
+            </span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">Ronkis Stimme</p>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Ronki kommentiert spontan Stimmung, Wetter und Aufgaben. Wir optimieren die Sprüche gerade — stumm schalten, bis sie sich richtig anfühlen.
+        </p>
+        <div className="flex items-center justify-between p-4 rounded-2xl"
+             style={{ background: 'rgba(109,40,217,0.06)', border: '1px solid rgba(109,40,217,0.15)' }}>
+          <div>
+            <p className="font-label font-bold text-sm text-on-surface">{voiceMuted ? 'Stumm' : 'An'}</p>
+            <p className="font-label text-xs text-on-surface-variant mt-0.5">
+              {voiceMuted ? 'Keine Sprechblasen, kein Audio.' : 'Sprechblasen und Audio aktiv.'}
+            </p>
+          </div>
+          <button
+            onClick={() => toggleVoiceMute(!voiceMuted)}
+            className="relative w-14 h-8 rounded-full transition-all active:scale-95"
+            style={{
+              background: !voiceMuted ? '#6d28d9' : 'rgba(0,0,0,0.12)',
+              boxShadow: !voiceMuted ? '0 2px 8px rgba(109,40,217,0.35)' : 'none',
+            }}
+            aria-label={voiceMuted ? 'Ronkis Stimme einschalten' : 'Ronkis Stimme stumm schalten'}
+          >
+            <span className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
+                  style={{ transform: !voiceMuted ? 'translateX(24px)' : 'translateX(0)' }} />
+          </button>
+        </div>
       </div>
 
       {/* Language */}

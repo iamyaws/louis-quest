@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { MOOD_EMOJIS } from '../constants';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -34,16 +35,6 @@ const DAILY_PROMPTS = [
   "Was war dein mutigstes Abenteuer heute?",
 ];
 
-const AFFIRMATIONS = [
-  "Du bist genau richtig, so wie du bist. 💜",
-  "Jeder Tag ist ein neues Abenteuer — und du bist der Held. ✨",
-  "Du machst die Welt ein bisschen bunter. 🌈",
-  "Morgen wartet schon das nächste Abenteuer auf dich. 🌟",
-  "Du bist mutig, stark und wunderbar. 💪",
-  "Schlaf gut — Ronki passt auf dich auf. 🐉",
-  "Heute war ein guter Tag. Morgen wird noch besser. 🌻",
-];
-
 function getDailyIndex(arr) {
   const day = Math.floor(Date.now() / 86400000);
   return day % arr.length;
@@ -63,13 +54,16 @@ export default function Journal({ onNavigate, onOpenParental }) {
   const gratitudeLabels = [t('journal.gratitude.family'), t('journal.gratitude.friends'), t('journal.gratitude.play'), t('journal.gratitude.food'), t('journal.gratitude.nature'), t('journal.gratitude.school'), t('journal.gratitude.ronki')];
   const achievementLabels = [t('journal.achievement.quest'), t('journal.achievement.fed'), t('journal.achievement.outside'), t('journal.achievement.read'), t('journal.achievement.helped')];
   const dailyPrompts = Array.from({length: 7}, (_, i) => t(`journal.prompt.${i + 1}`));
-  const affirmations = Array.from({length: 7}, (_, i) => t(`journal.affirmation.${i + 1}`));
   const [gratitude, setGratitude] = useState(state?.journalGratitude || []);
   const [dayEmoji, setDayEmoji] = useState(state?.journalDayEmoji ?? null);
   const [achievements, setAchievements] = useState(state?.journalAchievements || []);
   const [memory, setMemory] = useState(state?.journalMemory || '');
   const [bookOpen, setBookOpen] = useState(!state?.journalSaved);
   const [viewingEntry, setViewingEntry] = useState(null); // date string of old entry being viewed
+  // Zuklapp-Feier overlay (v3 lines 1894–1960): a small celebration card
+  // appears on save BEFORE the closed-summary view, with a nodding Ronki
+  // and HP pills. On dismiss we flip bookOpen → false and continue.
+  const [overlayOpen, setOverlayOpen] = useState(false);
 
   if (!state) return null;
 
@@ -78,7 +72,6 @@ export default function Journal({ onNavigate, onOpenParental }) {
   };
 
   const todayPrompt = dailyPrompts[getDailyIndex(dailyPrompts)];
-  const todayAffirmation = affirmations[getDailyIndex(affirmations)];
   const base = import.meta.env.BASE_URL;
   const history = [...(state.journalHistory || [])].sort((a, b) => b.date.localeCompare(a.date));
   const hasTodayContent = memory || gratitude.length > 0 || dayEmoji !== null || achievements.length > 0;
@@ -89,8 +82,28 @@ export default function Journal({ onNavigate, onOpenParental }) {
     SFX.play('pop');
     const encouragements = ['de_journal_done_01', 'de_journal_done_02', 'de_journal_done_03'];
     setTimeout(() => VoiceAudio.play(encouragements[Math.floor(Math.random() * encouragements.length)]), 800);
+    // v3 Zuklapp-Feier: show the celebration overlay first, then bookOpen
+    // flips only when the child taps "Schön!". Keeps the ritual felt.
+    setOverlayOpen(true);
+  };
+
+  const dismissOverlay = () => {
+    SFX.play('tap');
+    setOverlayOpen(false);
     setBookOpen(false);
   };
+
+  // v3 line 1994: close-book CTA gates on ≥2 filled fields. Count what the
+  // child has put in today (mood, memo, gratitude, dayEmoji, achievements)
+  // and show a soft fill-bar hint under the button when < 2.
+  const filledCount = [
+    state.moodAM !== null,
+    memory.length > 0,
+    gratitude.length > 0,
+    dayEmoji !== null,
+    achievements.length > 0,
+  ].filter(Boolean).length;
+  const canClose = filledCount >= 2;
 
   const handleReopen = () => {
     SFX.play('tap');
@@ -153,8 +166,8 @@ export default function Journal({ onNavigate, onOpenParental }) {
             </div>
             <img src={base + 'art/hero-journal.webp'}
                  alt=""
-                 className="w-24 h-auto -mb-3 -mr-1"
-                 style={{ filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.4))' }} />
+                 className="h-auto -mb-3 -mr-1"
+                 style={{ width: 100, filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.4))' }} />
           </div>
           <div className="absolute bottom-0 right-8 w-24 h-16 rounded-full blur-2xl opacity-30 pointer-events-none"
                style={{ background: '#f59e0b' }} />
@@ -243,26 +256,56 @@ export default function Journal({ onNavigate, onOpenParental }) {
       ) : (
         /* ══ OPEN BOOK — full editor ══ */
         <>
-          {/* ── Journal Info Card ── */}
-          <section className="mb-6 rounded-2xl overflow-hidden"
-                   style={{ background: 'linear-gradient(135deg, #0c3236, #124346)' }}>
-            <div className="p-5 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                     style={{ background: 'rgba(252,211,77,0.12)', border: '1px solid rgba(252,211,77,0.28)', boxShadow: '0 0 16px rgba(252,211,77,0.12)' }}>
-                  <span className="material-symbols-outlined text-white text-3xl"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>auto_stories</span>
-                </div>
-                <div>
-                  <p className="font-label font-bold text-xs uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('journal.bookOpen')}</p>
-                  <p className="text-2xl font-black font-headline text-white">{t('journal.yourDay')}</p>
-                </div>
+          {/* ── Today strip (v3 .today-strip lines 1593–1629).
+               Grid 48/1fr/auto, solid #124346 (no gradient), radius 18,
+               padding 14/16. Icon tile 48×48 rounded 14 on translucent
+               gold. Title "DEIN TAG" at weight 500/18 (not 900/2xl).
+               Right cluster is HEUTE eyebrow + gold date — no extra
+               "BUCH IST OFFEN" line (dropped in v3). ── */}
+          <section className="mb-6 overflow-hidden"
+                   style={{
+                     background: '#124346',
+                     borderRadius: 18,
+                     boxShadow: '0 8px 18px -10px rgba(18,67,70,0.4)',
+                     color: '#fef3c7',
+                   }}>
+            <div style={{ padding: '14px 16px', display: 'grid', gridTemplateColumns: '48px 1fr auto', gap: 12, alignItems: 'center' }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: 14,
+                background: 'rgba(252,211,77,0.18)',
+                border: '1px solid rgba(252,211,77,0.3)',
+                display: 'grid', placeItems: 'center',
+              }}>
+                <span className="material-symbols-outlined"
+                      style={{ color: '#fcd34d', fontSize: 24, fontVariationSettings: "'FILL' 1, 'wght' 500" }}>
+                  auto_stories
+                </span>
               </div>
-              <div className="text-right">
-                <p className="font-label text-xs font-bold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('common.today')}</p>
-                <p className="text-sm font-bold font-label" style={{ color: '#fcd34d' }}>
+              <div>
+                <h2 style={{
+                  margin: 0,
+                  fontFamily: 'Fredoka, sans-serif',
+                  fontWeight: 500, fontSize: 18, lineHeight: 1,
+                  letterSpacing: '-0.01em', color: '#fff',
+                }}>
+                  {t('journal.yourDay')}
+                </h2>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{
+                  display: 'block',
+                  fontWeight: 800, fontSize: 9, lineHeight: 1,
+                  letterSpacing: '0.24em', textTransform: 'uppercase',
+                  color: 'rgba(254,243,199,0.55)', marginBottom: 3,
+                }}>
+                  {t('common.today')}
+                </span>
+                <b style={{
+                  fontWeight: 700, fontSize: 13, lineHeight: 1,
+                  color: '#fcd34d', letterSpacing: '0.02em',
+                }}>
                   {new Date().toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}
-                </p>
+                </b>
               </div>
             </div>
           </section>
@@ -314,20 +357,40 @@ export default function Journal({ onNavigate, onOpenParental }) {
             </div>
           </section>
 
-          {/* ── Daily Memory Prompt ── */}
+          {/* ── Daily Memory Prompt — v3 .memo spec (lines 1709–1724).
+               min-height 84 (not 100), padding 12/14/22 so counter sits
+               inside, border rgba(180,83,9,0.18) warm, counter absolutely
+               positioned inside bottom-right in weight 700. ── */}
           <section className="mb-6 rounded-2xl p-6"
                    style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline mb-2">{t('journal.memory.title')}</h3>
             <p className="font-body text-base text-primary font-bold mb-4">{todayPrompt}</p>
-            <textarea
-              className="w-full rounded-xl p-4 font-body text-base text-on-surface resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-              style={{ background: 'rgba(252,211,77,0.08)', border: '1.5px solid rgba(18,67,70,0.15)', minHeight: 100 }}
-              placeholder={t('journal.memory.placeholder')}
-              value={memory}
-              onChange={e => setMemory(e.target.value)}
-              maxLength={300}
-            />
-            <p className="text-right font-label text-xs text-outline mt-1">{memory.length}/300</p>
+            <div style={{ position: 'relative' }}>
+              <textarea
+                className="w-full font-body text-on-surface resize-none focus:outline-none transition-all"
+                style={{
+                  minHeight: 84,
+                  padding: '12px 14px 22px',
+                  background: 'rgba(252,211,77,0.08)',
+                  border: '1px solid rgba(180,83,9,0.18)',
+                  borderRadius: 16,
+                  fontSize: 13, lineHeight: 1.5, fontWeight: 500,
+                  color: '#124346',
+                }}
+                placeholder={t('journal.memory.placeholder')}
+                value={memory}
+                onChange={e => setMemory(e.target.value)}
+                maxLength={300}
+              />
+              <span style={{
+                position: 'absolute', bottom: 8, right: 14,
+                fontWeight: 700, fontSize: 11, lineHeight: 1,
+                color: '#2d5a5e', letterSpacing: '0.02em',
+                pointerEvents: 'none',
+              }}>
+                {memory.length}/300
+              </span>
+            </div>
           </section>
 
           {/* ── Gedanken Heute ── */}
@@ -340,26 +403,46 @@ export default function Journal({ onNavigate, onOpenParental }) {
               <label className="font-label text-xs font-bold text-primary block uppercase tracking-wide mb-3">
                 {t('journal.gratitude.title')}
               </label>
-              {/* Polish v2 .chip spec: flat pill, no rotation, no offset
-                   shadow (audit call-out — the v1 "handmade sticker" look
-                   was dropped). Rounded-full, padding 8/14, weight 700. */}
-              <div className="flex flex-wrap gap-2">
-                {GRATITUDE.map((g, i) => (
-                  <button key={g}
-                    className="font-label font-bold uppercase rounded-full transition-all active:scale-95"
-                    style={{
-                      padding: '8px 14px',
-                      fontSize: 12,
-                      letterSpacing: '0.04em',
-                      background: gratitude.includes(g) ? '#124346' : '#ffffff',
-                      color: gratitude.includes(g) ? '#fef3c7' : '#124346',
-                      border: gratitude.includes(g)
-                        ? '1.5px solid #124346'
-                        : '1.5px solid rgba(18,67,70,0.12)',
-                    }}
-                    onClick={() => toggleItem(gratitude, setGratitude, g)}
-                  >{gratitudeLabels[i]}</button>
-                ))}
+              {/* v3 .chip (lines 1728–1744): 12px/700/.06em/uppercase,
+                   gap-1.5 (6px), selected prepends a 14px filled gold
+                   Material check icon (2px right margin). */}
+              <div className="flex flex-wrap gap-1.5">
+                {GRATITUDE.map((g, i) => {
+                  const selected = gratitude.includes(g);
+                  return (
+                    <button key={g}
+                      className="font-label rounded-full transition-all active:scale-95 inline-flex items-center"
+                      style={{
+                        padding: '8px 14px',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        gap: 5,
+                        background: selected ? '#124346' : '#ffffff',
+                        color: selected ? '#fef3c7' : '#124346',
+                        border: selected
+                          ? '1.5px solid #124346'
+                          : '1.5px solid rgba(18,67,70,0.12)',
+                        boxShadow: selected ? '0 4px 10px -3px rgba(18,67,70,0.35)' : 'none',
+                      }}
+                      onClick={() => toggleItem(gratitude, setGratitude, g)}
+                    >
+                      {selected && (
+                        <span className="material-symbols-outlined"
+                              style={{
+                                fontSize: 14,
+                                color: '#fcd34d',
+                                marginRight: 2,
+                                fontVariationSettings: "'FILL' 1, 'wght' 700",
+                              }}>
+                          check
+                        </span>
+                      )}
+                      {gratitudeLabels[i]}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -368,41 +451,44 @@ export default function Journal({ onNavigate, onOpenParental }) {
               <label className="font-label text-xs font-bold text-primary block uppercase tracking-wide mb-3">
                 {t('journal.dayEmoji.title')}
               </label>
-              {/* Day emoji grid — selected tile gets a sparkle ✨ crown
-                   anchored top-right with an 1.8s sparkle pulse (Polish
-                   .emoji-crown spec; previously missing — backlog fix). */}
-              <div className="grid grid-cols-3 gap-3 p-4 rounded-2xl"
-                   style={{ background: 'rgba(18,67,70,0.05)', border: '1px solid rgba(18,67,70,0.1)' }}>
+              {/* v3 .emoji-grid (lines 1751–1781): panel padding 12,
+                   tile radius 14, emoji 34px, no shadow/border on
+                   unselected tiles. Selected uses cream→amber gradient
+                   + rgba(180,83,9,0.35) border, NO scale(1.08). Crown:
+                   fontSize 16, color #b45309, rotate -5deg → 5deg. */}
+              <div className="grid grid-cols-3"
+                   style={{ gap: 8, padding: 12, borderRadius: 16, background: 'rgba(18,67,70,0.04)' }}>
                 {DAY_EMOJIS.map((e, i) => {
                   const selected = dayEmoji === i;
                   return (
                     <button key={i}
-                      className="relative aspect-square flex items-center justify-center text-3xl transition-all active:scale-95"
+                      className="relative flex items-center justify-center transition-all active:scale-95"
                       style={{
-                        borderRadius: 16,
+                        aspectRatio: '1 / 1',
+                        borderRadius: 14,
                         background: selected
                           ? 'linear-gradient(160deg, #fffdf5, #fef3c7)'
-                          : 'rgba(255,255,255,0.5)',
+                          : '#ffffff',
                         border: selected
                           ? '1.5px solid rgba(180,83,9,0.35)'
-                          : '1px solid transparent',
+                          : '1.5px solid transparent',
                         boxShadow: selected
                           ? '0 8px 18px -6px rgba(180,83,9,0.3)'
-                          : '0 1px 3px rgba(0,0,0,0.05)',
-                        transform: selected ? 'scale(1.08)' : 'scale(1)',
+                          : 'none',
                       }}
                       onClick={() => { SFX.play('tap'); setDayEmoji(i); }}
                     >
-                      <span>{e}</span>
+                      <span style={{ fontSize: 34, lineHeight: 1 }}>{e}</span>
                       {selected && (
                         <span aria-hidden="true"
                               style={{
                                 position: 'absolute',
                                 top: -6,
                                 right: -6,
-                                fontSize: 18,
+                                fontSize: 16,
+                                color: '#b45309',
+                                textShadow: '0 2px 4px rgba(252,211,77,0.6)',
                                 animation: 'emojiSparkle 1.8s ease-in-out infinite',
-                                filter: 'drop-shadow(0 2px 4px rgba(180,83,9,0.35))',
                               }}>
                           ✨
                         </span>
@@ -413,8 +499,8 @@ export default function Journal({ onNavigate, onOpenParental }) {
               </div>
               <style>{`
                 @keyframes emojiSparkle {
-                  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
-                  50% { transform: scale(1.2) rotate(15deg); opacity: 0.85; }
+                  0%, 100% { transform: scale(1) rotate(-5deg); opacity: 1; }
+                  50% { transform: scale(1.15) rotate(5deg); opacity: 0.85; }
                 }
               `}</style>
             </div>
@@ -424,29 +510,118 @@ export default function Journal({ onNavigate, onOpenParental }) {
               <label className="font-label text-xs font-bold text-primary block uppercase tracking-wide mb-3">
                 {t('journal.achievements.title')}
               </label>
-              <div className="flex flex-wrap gap-3">
-                {ACHIEVEMENTS.map((a, i) => (
-                  <button key={a}
-                    className={`px-4 py-2 rounded-full font-label text-xs font-bold uppercase transition-all active:scale-95 ${
-                      achievements.includes(a) ? 'bg-primary text-white' : 'text-primary'
-                    }`}
-                    style={!achievements.includes(a) ? {
-                      background: 'rgba(252,211,77,0.06)', border: '1px solid rgba(252,211,77,0.25)',
-                    } : undefined}
-                    onClick={() => toggleItem(achievements, setAchievements, a)}
-                  >{achievementLabels[i]}</button>
-                ))}
+              {/* v3 .chip parity: 6px gap, .06em tracking, gold check
+                   icon prepended on selected state. */}
+              <div className="flex flex-wrap gap-1.5">
+                {ACHIEVEMENTS.map((a, i) => {
+                  const selected = achievements.includes(a);
+                  return (
+                    <button key={a}
+                      className="font-label rounded-full transition-all active:scale-95 inline-flex items-center"
+                      style={{
+                        padding: '8px 14px',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        gap: 5,
+                        background: selected ? '#124346' : '#ffffff',
+                        color: selected ? '#fef3c7' : '#124346',
+                        border: selected
+                          ? '1.5px solid #124346'
+                          : '1.5px solid rgba(18,67,70,0.12)',
+                        boxShadow: selected ? '0 4px 10px -3px rgba(18,67,70,0.35)' : 'none',
+                      }}
+                      onClick={() => toggleItem(achievements, setAchievements, a)}
+                    >
+                      {selected && (
+                        <span className="material-symbols-outlined"
+                              style={{
+                                fontSize: 14,
+                                color: '#fcd34d',
+                                marginRight: 2,
+                                fontVariationSettings: "'FILL' 1, 'wght' 700",
+                              }}>
+                          check
+                        </span>
+                      )}
+                      {achievementLabels[i]}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Save = close the book */}
-            <div className="flex justify-center mt-6">
-              <button className="px-12 py-4 rounded-full font-label font-black text-lg flex items-center gap-3 transition-all active:scale-95"
-                      style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 12px 24px rgba(252,211,77,0.4)' }}
-                      onClick={handleSave}>
-                {t('journal.save')}
-                <span className="material-symbols-outlined text-2xl">menu_book</span>
-              </button>
+            {/* v3 close-book CTA (lines 1783–1817, 1994).
+                 Hard-disable was cruel. When < 2 fields filled: soft
+                 variant (cream bg, non-uppercase, column layout) with a
+                 3px gold filled-bar showing progress toward the gate +
+                 warm hint text. When ≥ 2: full gold CTA with book icon. */}
+            <div className="flex flex-col items-center mt-6 gap-3">
+              {canClose ? (
+                <button
+                  className="inline-flex items-center justify-center transition-all active:scale-[0.98]"
+                  style={{
+                    width: '100%',
+                    gap: 10,
+                    padding: '18px 20px',
+                    borderRadius: 999,
+                    background: 'linear-gradient(160deg, #fcd34d 0%, #f59e0b 100%)',
+                    color: '#2a2005',
+                    fontFamily: 'var(--f-label, Nunito, sans-serif)',
+                    fontWeight: 800, fontSize: 14, lineHeight: 1,
+                    letterSpacing: '0.12em', textTransform: 'uppercase',
+                    boxShadow: '0 10px 22px -6px rgba(252,211,77,0.5)',
+                  }}
+                  onClick={handleSave}>
+                  <span className="material-symbols-outlined"
+                        style={{ fontSize: 18, fontVariationSettings: "'FILL' 1, 'wght' 500" }}>
+                    menu_book
+                  </span>
+                  {t('journal.save')}
+                </button>
+              ) : (
+                <>
+                  <button
+                    className="flex flex-col items-center justify-center"
+                    style={{
+                      width: '100%',
+                      padding: '14px 18px',
+                      borderRadius: 999,
+                      background: 'rgba(18,67,70,0.08)',
+                      color: '#6b655b',
+                      fontFamily: 'var(--f-label, Nunito, sans-serif)',
+                      fontWeight: 700, fontSize: 14, lineHeight: 1,
+                      letterSpacing: '0.04em',
+                      gap: 6,
+                      cursor: 'default',
+                    }}
+                    disabled
+                    aria-disabled="true">
+                    {t('journal.save')}
+                  </button>
+                  <div style={{
+                    width: '80%', height: 3, borderRadius: 999,
+                    background: 'rgba(18,67,70,0.12)', overflow: 'hidden',
+                  }}>
+                    <span style={{
+                      display: 'block', height: '100%',
+                      width: `${Math.min(100, (filledCount / 5) * 100)}%`,
+                      background: 'linear-gradient(90deg, #fcd34d, #f59e0b)',
+                      borderRadius: 999,
+                      transition: 'width .4s ease',
+                    }} />
+                  </div>
+                  <p className="font-label"
+                     style={{
+                       fontSize: 11, color: '#6b655b',
+                       letterSpacing: '0.04em', textAlign: 'center',
+                       margin: 0,
+                     }}>
+                    {t('journal.fillHint')} ({filledCount}/5)
+                  </p>
+                </>
+              )}
             </div>
           </section>
         </>
@@ -485,25 +660,51 @@ export default function Journal({ onNavigate, onOpenParental }) {
                 {lang === 'de' ? 'letzte 7 Tage' : 'last 7 days'}
               </span>
             </div>
-            <div className="grid grid-cols-7 gap-2">
+            {/* v3 .kalender-strip (lines 1838–1864). Portrait 1/1.2
+                 tiles. TODAY → solid #124346 bg + gold #fcd34d border,
+                 weekday label in gold, emoji dimmed to rgba(254,243,199,.4).
+                 Past tiles keep the warm-gold wash. Empty days stay muted. */}
+            <div className="grid grid-cols-7" style={{ gap: 4 }}>
               {days.map((d, i) => {
-                const tint = d.mood !== null ? MOOD_COLORS[d.mood].tint : '#fffaf2';
-                const ink = d.mood !== null ? MOOD_COLORS[d.mood].ink : 'rgba(123,116,134,0.45)';
+                const hasMood = d.mood !== null;
+                let bg, borderColor, emojiColor, labelColor, emojiSize = 16;
+                if (d.isToday) {
+                  bg = '#124346';
+                  borderColor = '#fcd34d';
+                  emojiColor = 'rgba(254,243,199,0.4)';
+                  labelColor = '#fcd34d';
+                } else if (hasMood) {
+                  bg = 'rgba(252,211,77,0.12)';
+                  borderColor = 'transparent';
+                  emojiColor = 'inherit';
+                  labelColor = '#6b655b';
+                } else {
+                  bg = 'rgba(18,67,70,0.04)';
+                  borderColor = 'transparent';
+                  emojiColor = 'rgba(18,67,70,0.25)';
+                  labelColor = '#6b655b';
+                  emojiSize = 12;
+                }
                 return (
                   <div key={i}
-                       className="flex flex-col items-center justify-center rounded-xl transition-transform"
+                       className="flex flex-col items-center justify-center"
                        style={{
-                         aspectRatio: '1/1',
-                         background: tint,
-                         border: d.isToday ? '2px solid #124346' : '1px solid rgba(0,0,0,0.04)',
-                         boxShadow: d.isToday ? '0 4px 12px -4px rgba(18,67,70,0.3)' : '0 1px 2px rgba(0,0,0,0.04)',
+                         aspectRatio: '1 / 1.2',
+                         borderRadius: 10,
+                         background: bg,
+                         border: `1px solid ${borderColor}`,
+                         boxShadow: d.isToday ? '0 4px 10px -4px rgba(18,67,70,0.35)' : 'none',
+                         gap: 2,
                        }}>
-                    <span style={{ fontSize: 22, lineHeight: 1 }}>
-                      {d.mood !== null ? MOOD_EMOJIS[d.mood] : '·'}
-                    </span>
-                    <span className="font-label font-bold uppercase"
-                          style={{ fontSize: 9, color: ink, letterSpacing: '0.08em', marginTop: 3 }}>
+                    <span className="font-label uppercase"
+                          style={{
+                            fontSize: 8, fontWeight: 800, lineHeight: 1,
+                            letterSpacing: '0.1em', color: labelColor,
+                          }}>
                       {d.label}
+                    </span>
+                    <span style={{ fontSize: emojiSize, lineHeight: 1, color: emojiColor }}>
+                      {hasMood ? MOOD_EMOJIS[d.mood] : '·'}
                     </span>
                   </div>
                 );
@@ -562,30 +763,57 @@ export default function Journal({ onNavigate, onOpenParental }) {
             {history.map(entry => (
               <button key={entry.date}
                 onClick={() => { SFX.play('tap'); setViewingEntry(viewingEntry === entry.date ? null : entry.date); }}
-                className="w-full text-left rounded-2xl p-4 transition-all active:scale-[0.98]"
+                className="w-full text-left transition-all active:scale-[0.98]"
                 style={{
                   background: viewingEntry === entry.date ? 'rgba(18,67,70,0.04)' : '#ffffff',
-                  border: viewingEntry === entry.date ? '1.5px solid rgba(18,67,70,0.12)' : '1px solid rgba(0,0,0,0.06)',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                  border: viewingEntry === entry.date ? '1.5px solid rgba(18,67,70,0.12)' : '1px solid rgba(18,67,70,0.08)',
+                  borderRadius: 16,
+                  padding: '12px 14px 12px 12px',
                 }}>
-                {/* Header row — mood + day emoji + date + chevron */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {entry.mood !== null && <span className="text-xl">{MOOD_EMOJIS[entry.mood]}</span>}
-                    {entry.dayEmoji !== null && <span className="text-xl">{DAY_EMOJIS[entry.dayEmoji]}</span>}
-                    <span className="font-headline font-semibold text-sm"
-                          style={{ color: '#124346', letterSpacing: '-0.005em' }}>
+                {/* v3 .past-entry (lines 1867–1892): 32/24/1fr/20 grid.
+                     Mood 24px, extra dayEmoji 16px @ 70% opacity,
+                     date label 12/700/.02em, memory snippet on its own
+                     line 12/500. */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '32px 24px 1fr 20px',
+                  gap: 10,
+                  alignItems: 'center',
+                }}>
+                  <span style={{ fontSize: 24, lineHeight: 1, textAlign: 'center' }}>
+                    {entry.mood !== null ? MOOD_EMOJIS[entry.mood] : ''}
+                  </span>
+                  <span style={{ fontSize: 16, lineHeight: 1, opacity: 0.7, textAlign: 'center' }}>
+                    {entry.dayEmoji !== null ? DAY_EMOJIS[entry.dayEmoji] : ''}
+                  </span>
+                  <div>
+                    <b className="font-label uppercase block"
+                       style={{
+                         fontSize: 12, fontWeight: 700, lineHeight: 1.1,
+                         color: '#124346', letterSpacing: '0.02em',
+                         marginBottom: 2,
+                       }}>
                       {formatDate(entry.date)}
-                    </span>
+                    </b>
+                    {viewingEntry !== entry.date && entry.memory && (
+                      <span className="font-body"
+                            style={{
+                              fontSize: 12, fontWeight: 500, lineHeight: 1.2,
+                              color: '#6b655b',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 1,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                            }}>
+                        „{entry.memory}"
+                      </span>
+                    )}
                   </div>
-                  <span className="material-symbols-outlined text-sm" style={{ color: '#6b655b' }}>
+                  <span className="material-symbols-outlined"
+                        style={{ color: '#6b655b', fontSize: 18, textAlign: 'center' }}>
                     {viewingEntry === entry.date ? 'expand_less' : 'chevron_right'}
                   </span>
                 </div>
-                {/* Memory preview (collapsed) */}
-                {viewingEntry !== entry.date && entry.memory && (
-                  <p className="font-body text-xs text-on-surface-variant italic truncate mt-1">„{entry.memory}"</p>
-                )}
                 {/* Expanded detail */}
                 {viewingEntry === entry.date && (
                   <div className="mt-3 pt-3 flex flex-col gap-3" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
@@ -629,15 +857,10 @@ export default function Journal({ onNavigate, onOpenParental }) {
         </section>
       )}
 
-      {/* ── Closing Affirmation ── */}
-      <section className="mb-8 rounded-2xl p-6 text-center"
-               style={{ background: 'linear-gradient(135deg, rgba(18,67,70,0.07), rgba(252,211,77,0.12))', border: '1px solid rgba(18,67,70,0.08)' }}>
-        <span className="material-symbols-outlined text-3xl text-primary mb-3 block"
-              style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-        <p className="font-headline text-lg font-bold text-on-surface leading-relaxed">
-          {todayAffirmation}
-        </p>
-      </section>
+      {/* v3 drops the separate Affirmation card — the rotating Ronki
+           voice line at save handles the "felt" closing moment, and v3
+           keeps the end of the scroll clean.  Privacy badge kept for
+           kid-trust (Louis readability memo). */}
 
       {/* ── Privacy Badge ── */}
       <div className="flex justify-center items-center gap-2 py-6" style={{ color: 'rgba(123,116,134,0.5)' }}>
@@ -646,6 +869,132 @@ export default function Journal({ onNavigate, onOpenParental }) {
       </div>
       </div>
       </div>
+
+      {/* ── Zuklapp-Feier overlay (v3 lines 1894–1960).
+             Teal-dim backdrop w/ 8px blur, cream-gradient card with 24px
+             radius spring entrance, 90×90 nodding Ronki (hero-journal img
+             reused), HP reward pills, "Schön!" dismiss CTA. Shown between
+             handleSave → setBookOpen(false) so the ritual has a moment. ── */}
+      <AnimatePresence>
+        {overlayOpen && (
+          <motion.div
+            key="close-overlay"
+            className="fixed inset-0 grid place-items-center"
+            style={{
+              zIndex: 100,
+              background: 'rgba(18,67,70,0.5)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              padding: 24,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            onClick={dismissOverlay}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="close-overlay-title">
+            <motion.div
+              className="text-center"
+              style={{
+                width: '100%',
+                maxWidth: 300,
+                padding: '22px 22px 18px',
+                borderRadius: 24,
+                background: 'linear-gradient(160deg, #fff 0%, #fffaf0 100%)',
+                boxShadow: '0 20px 40px -12px rgba(0,0,0,0.4)',
+              }}
+              initial={{ opacity: 0, scale: 0.9, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 5 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 22, mass: 0.8 }}
+              onClick={e => e.stopPropagation()}>
+              {/* Nodding Ronki — reuse hero-journal art (no new asset needed).
+                   1.2s rotate -3deg ↔ 3deg with a tiny y-float. */}
+              <div style={{
+                width: 90, height: 90, margin: '0 auto 14px',
+                display: 'grid', placeItems: 'center',
+                animation: 'ronkiNod 1.2s ease-in-out infinite',
+              }}>
+                <img src={base + 'art/hero-journal.webp'}
+                     alt=""
+                     style={{
+                       width: '100%', height: '100%', objectFit: 'contain',
+                       filter: 'drop-shadow(0 6px 10px rgba(180,83,9,0.3))',
+                     }} />
+              </div>
+              <h3 id="close-overlay-title"
+                  style={{
+                    margin: '0 0 6px',
+                    fontFamily: 'Fredoka, sans-serif',
+                    fontWeight: 500, fontSize: 20, lineHeight: 1.15,
+                    color: '#124346', letterSpacing: '-0.015em',
+                  }}>
+                {t('journal.celebrateTitle')}
+              </h3>
+              <p style={{
+                margin: '0 0 14px',
+                fontWeight: 500, fontSize: 13, lineHeight: 1.4,
+                color: '#6b655b',
+              }}>
+                {t('journal.celebrateBody')}
+              </p>
+              <div className="flex flex-wrap justify-center"
+                   style={{ gap: 6, marginBottom: 16 }}>
+                <span className="inline-flex items-center font-label"
+                      style={{
+                        gap: 5,
+                        padding: '6px 12px', borderRadius: 999,
+                        background: 'rgba(252,211,77,0.2)',
+                        border: '1px solid rgba(180,83,9,0.2)',
+                        fontWeight: 800, fontSize: 11, lineHeight: 1,
+                        letterSpacing: '0.06em', color: '#b45309',
+                      }}>
+                  <span className="material-symbols-outlined"
+                        style={{ fontSize: 14, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                    favorite
+                  </span>
+                  {t('journal.celebrateHp')}
+                </span>
+                <span className="inline-flex items-center font-label"
+                      style={{
+                        gap: 5,
+                        padding: '6px 12px', borderRadius: 999,
+                        background: 'rgba(147,51,234,0.12)',
+                        border: '1px solid rgba(147,51,234,0.22)',
+                        fontWeight: 800, fontSize: 11, lineHeight: 1,
+                        letterSpacing: '0.06em', color: '#7e22ce',
+                      }}>
+                  <span className="material-symbols-outlined"
+                        style={{ fontSize: 14, color: '#7e22ce', fontVariationSettings: "'FILL' 1" }}>
+                    bookmark
+                  </span>
+                  {t('journal.celebrateChapter')}
+                </span>
+              </div>
+              <button
+                onClick={dismissOverlay}
+                className="w-full active:scale-[0.98] transition-transform font-label"
+                style={{
+                  padding: '14px 20px', borderRadius: 999,
+                  background: '#124346', color: '#fef3c7',
+                  fontWeight: 800, fontSize: 12, lineHeight: 1,
+                  letterSpacing: '0.14em', textTransform: 'uppercase',
+                  boxShadow: '0 6px 14px -4px rgba(18,67,70,0.4)',
+                }}>
+                {t('journal.celebrateDone')}
+              </button>
+            </motion.div>
+            <style>{`
+              @keyframes ronkiNod {
+                0%, 100% { transform: rotate(-3deg); }
+                50% { transform: rotate(3deg) translateY(-2px); }
+              }
+            `}</style>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

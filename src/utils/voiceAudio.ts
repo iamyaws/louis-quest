@@ -99,17 +99,21 @@ const VoiceAudio = {
     }
   },
 
-  /** Check mute state */
   isMuted(): boolean {
-    return localStorage.getItem(MUTE_KEY) === '1';
+    if (typeof localStorage === 'undefined') return true;
+    return localStorage.getItem(MUTE_KEY) !== '0';
   },
 
-  /** Toggle mute */
-  toggleMute(): boolean {
-    const muted = !this.isMuted();
+  setMuted(muted: boolean): void {
+    if (typeof localStorage === 'undefined') return;
     localStorage.setItem(MUTE_KEY, muted ? '1' : '0');
     if (muted) this.stop();
-    return muted;
+  },
+
+  toggleMute(): boolean {
+    const next = !this.isMuted();
+    this.setMuted(next);
+    return next;
   },
 };
 

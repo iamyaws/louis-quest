@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { QUEST_LINE_TEMPLATES, TEMPLATE_BY_ID } from '../data/questLineTemplates';
+import { QUEST_LINE_PRESETS, buildQuestLineFromPreset } from '../data/questLinePresets';
 
 // ── Helper: generate a stable quest-line ID ──
 function genQuestLineId() {
@@ -34,6 +35,13 @@ export default function QuestLineEditor() {
     setSelectedTemplate(null);
     setEditingId(null);
     setMode('picking-template');
+  };
+
+  // One-tap preset → instantiate a full quest-line immediately. No form, no
+  // template picker. Parents wanted less friction for the common cases.
+  const handleUsePreset = (preset) => {
+    const ql = buildQuestLineFromPreset(preset, lang);
+    actions.createQuestLine(ql);
   };
 
   const handlePickTemplate = (id) => {
@@ -117,7 +125,14 @@ export default function QuestLineEditor() {
         </Section>
       )}
 
-      {/* Primary CTA */}
+      {/* Preset gallery — one-tap concrete quest-lines for the most common
+          7-8yo scenarios. Tapping creates the quest-line immediately; parents
+          can still rename or tweak beats afterwards via the edit flow. */}
+      <PresetGallery lang={lang} onUse={handleUsePreset} />
+
+      {/* Primary CTA — still here for parents who want to start from scratch
+          with one of the 4 category templates (Lernen / Ereignis /
+          Fertigkeit / Hausaufgaben). */}
       <button onClick={handleCreateNew}
         className="w-full py-4 rounded-full font-headline font-bold text-base flex items-center justify-center gap-3 active:scale-95 transition-all duration-200"
         style={{
@@ -156,6 +171,119 @@ export default function QuestLineEditor() {
             ))}
           </div>
         </CollapsibleSection>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// PRESET GALLERY — one-tap concrete quest-lines
+// ═══════════════════════════════════════════════════════
+function PresetGallery({ lang, onUse }) {
+  const [confirmId, setConfirmId] = useState(null);
+  const active = QUEST_LINE_PRESETS.find(p => p.id === confirmId);
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3 px-1">
+        <span className="material-symbols-outlined text-primary text-base"
+              style={{ fontVariationSettings: "'FILL' 1" }}>
+          bolt
+        </span>
+        <h3 className="font-label font-bold text-xs uppercase tracking-widest text-outline">
+          Aus Vorlage erstellen
+        </h3>
+      </div>
+      <p className="font-body text-sm text-on-surface-variant mb-3 leading-relaxed px-1">
+        Einmal tippen, fertig. Typische Abenteuer für 7- bis 8-Jährige.
+      </p>
+      <div className="grid grid-cols-2 gap-2.5">
+        {QUEST_LINE_PRESETS.map(p => (
+          <button key={p.id} onClick={() => setConfirmId(p.id)}
+            className="text-left rounded-2xl p-3 flex flex-col gap-1.5 transition-all active:scale-[0.97]"
+            style={{
+              background: '#ffffff',
+              border: '1.5px solid rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+              borderRadius: '1.1rem',
+            }}>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl shrink-0" aria-hidden="true">{p.emoji}</span>
+              <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-wider">
+                {p.beats.length} Schritte
+              </span>
+            </div>
+            <h4 className="font-headline font-bold text-sm text-on-surface leading-tight">
+              {p.title[lang] || p.title.de}
+            </h4>
+            <p className="font-body text-xs text-on-surface-variant leading-relaxed line-clamp-2">
+              {p.description[lang] || p.description.de}
+            </p>
+          </button>
+        ))}
+      </div>
+
+      {/* Confirm modal — shows the beats so parents know what's in the box
+          before they hit Anlegen. Cancels restore state to nothing picked. */}
+      {active && (
+        <div className="fixed inset-0 z-[400] bg-black/40 flex items-end sm:items-center justify-center p-4"
+             onClick={() => setConfirmId(null)}>
+          <div className="w-full max-w-md rounded-3xl p-6 space-y-4 max-h-[80vh] overflow-y-auto"
+               onClick={e => e.stopPropagation()}
+               style={{ background: '#fff8f1', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 16px 48px rgba(0,0,0,0.2)' }}>
+            <div className="flex items-start gap-3">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+                   style={{ background: 'rgba(18,67,70,0.06)' }}>
+                <span className="text-3xl">{active.emoji}</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-headline font-bold text-lg text-on-surface">
+                  {active.title[lang] || active.title.de}
+                </h3>
+                <p className="font-body text-sm text-on-surface-variant mt-1 leading-relaxed">
+                  {active.description[lang] || active.description.de}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {active.beats.map((b, i) => (
+                <div key={b.id} className="rounded-xl p-3 flex items-start gap-3"
+                     style={{ background: '#ffffff', border: '1.5px solid rgba(18,67,70,0.08)' }}>
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                       style={{ background: 'rgba(252,211,77,0.2)' }}>
+                    <span className="text-lg">{b.icon}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-headline font-bold text-sm text-on-surface">
+                        {i + 1}. {b.title}
+                      </p>
+                      <span className="font-label font-bold text-xs shrink-0"
+                            style={{ color: '#a16207' }}>{b.xp} XP</span>
+                    </div>
+                    <p className="font-body text-xs text-on-surface-variant mt-0.5 leading-relaxed">
+                      {b.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button onClick={() => setConfirmId(null)}
+                className="flex-1 py-3 rounded-full font-label font-bold text-sm transition-all active:scale-[0.98]"
+                style={{ background: 'rgba(18,67,70,0.05)', color: '#124346', border: '1.5px solid rgba(18,67,70,0.1)' }}>
+                Abbrechen
+              </button>
+              <button onClick={() => { onUse(active); setConfirmId(null); }}
+                className="flex-1 py-3 rounded-full font-headline font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 4px 14px rgba(252,211,77,0.35)' }}>
+                <span className="material-symbols-outlined text-base"
+                      style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
+                Anlegen
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

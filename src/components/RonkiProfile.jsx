@@ -8,6 +8,8 @@ import { SEED_BY_ID, SEED_CREATURES } from '../data/creatures';
 import { isDevMode } from '../utils/mode';
 import { getVariant } from '../data/companionVariants';
 import SFX from '../utils/sfx';
+import { useGameAccess } from '../hooks/useGameAccess';
+import { biomeBackground } from '../utils/biomeBackgrounds';
 
 /**
  * Companion Profile — patterned on Finch's Piper page.
@@ -49,6 +51,7 @@ const base = import.meta.env.BASE_URL;
 export default function RonkiProfile({ onNavigate }) {
   const { t, lang } = useTranslation();
   const { state, actions } = useTask();
+  const { unlocked: gamesUnlocked } = useGameAccess();
   const [tab, setTab] = useState('about');
   const dev = isDevMode();
 
@@ -110,13 +113,14 @@ export default function RonkiProfile({ onNavigate }) {
 
   return (
     <div className="relative min-h-dvh pb-32">
-      {/* Viewport-level ambient sky (Hub pattern) — unified atmosphere
-           across all tabs. Same cream-over-sky gradient as Hub, Aufgaben,
-           Laden, Buch so the top chrome never sits on a cream band. The
-           cream-brush texture stays on top for the painterly feel. */}
+      {/* Biome-tinted forest-sage backdrop — Ronki = earthy biome where
+           the companion lives. Cream wash dominates at the fold; sage
+           green tint bleeds through at the top giving this tab its own
+           creature-world mood. Cream-brush texture stays on top of the
+           biome tint for painterly depth. */}
       <div className="fixed inset-0 pointer-events-none -z-20"
            style={{
-             background: `linear-gradient(rgba(255,248,242,0.35) 0%, rgba(255,248,242,0.55) 40%, rgba(255,248,242,0.88) 75%, #fff8f2 100%), url(${base}art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_bright_midday_sky._Wa_e8eca682-4eb9-4da2-8c93-a4cb25ba363d_1.webp) center top / cover no-repeat`,
+             background: biomeBackground('care'),
              backgroundColor: '#fff8f2',
            }}
            aria-hidden="true" />
@@ -216,6 +220,71 @@ export default function RonkiProfile({ onNavigate }) {
             </button>
           ))}
         </section>
+
+        {/* ═══ SPIELE MIT RONKI — mini-games gate (moved from Laden Apr 2026).
+             Games are companion content, not a third economy, so they live
+             with Ronki now. Same unlock rule as before (useGameAccess: one
+             routine section done + inside play window). Polish v2 .mini-gate
+             styling: 48px teal icon tile, 34×34 lock/open square on the right,
+             teal family throughout. ═══ */}
+        <button
+          onClick={() => gamesUnlocked ? onNavigate?.('games') : null}
+          disabled={!gamesUnlocked}
+          className={`w-full grid items-center text-left mb-5 transition-all ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
+          style={{
+            gridTemplateColumns: '48px 1fr auto',
+            gap: 12,
+            padding: '12px 14px',
+            borderRadius: 18,
+            background: gamesUnlocked
+              ? 'linear-gradient(160deg, #f0fdfa 0%, #ccfbf1 100%)'
+              : 'linear-gradient(160deg, #f0fdfa 0%, rgba(94,234,212,0.25) 100%)',
+            border: gamesUnlocked
+              ? '1.5px solid rgba(13,148,136,0.35)'
+              : '1.5px dashed rgba(13,148,136,0.35)',
+            opacity: gamesUnlocked ? 1 : 0.88,
+          }}
+        >
+          {/* 48px teal icon tile — always shows games controller; lock sits on right */}
+          <div className="flex items-center justify-center shrink-0"
+               style={{
+                 width: 48,
+                 height: 48,
+                 borderRadius: 14,
+                 background: 'linear-gradient(160deg, #5eead4, #0d9488)',
+                 boxShadow: '0 4px 10px -3px rgba(13,148,136,0.4), inset 0 1px 0 rgba(255,255,255,0.35)',
+               }}>
+            <span className="material-symbols-outlined"
+                  style={{ fontSize: 24, color: '#fff', fontVariationSettings: "'FILL' 1, 'wght' 500" }}>
+              sports_esports
+            </span>
+          </div>
+
+          {/* Body: title + subtitle; teal text */}
+          <div className="min-w-0">
+            <p style={{ margin: '0 0 2px', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 14, lineHeight: 1.1, color: '#0f766e' }}>
+              {t('ronki.playWithRonki')}
+            </p>
+            <span style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 600, fontSize: 11, lineHeight: 1.3, color: '#0d9488', opacity: 0.9 }}>
+              {gamesUnlocked ? t('ronki.playWithRonki.subtitle') : t('ronki.playWithRonki.locked')}
+            </span>
+          </div>
+
+          {/* 34×34 rounded-square lock/open icon — muted teal locked, solid teal open */}
+          <div className="flex items-center justify-center shrink-0"
+               style={{
+                 width: 34,
+                 height: 34,
+                 borderRadius: 12,
+                 background: gamesUnlocked ? '#0d9488' : 'rgba(13,148,136,0.15)',
+                 color: gamesUnlocked ? '#ccfbf1' : '#0d9488',
+               }}>
+            <span className="material-symbols-outlined"
+                  style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>
+              {gamesUnlocked ? 'lock_open' : 'lock'}
+            </span>
+          </div>
+        </button>
 
         {/* ═══ FREUNDE HERO CARD ═══ */}
         <button

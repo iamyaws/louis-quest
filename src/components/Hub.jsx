@@ -200,8 +200,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
     <div className="relative min-h-dvh pb-32" style={{ backgroundColor: '#fff8f2' }}>
 
       {/* ═════════════════════════════════════════════════════════════════
-         A · AMBIENT PAGE BACKGROUND (fixed) — sky per time-of-day + clouds
-         Stays behind everything; content + scene layer above via z-index.
+         A · AMBIENT PAGE BACKGROUND (fixed) — Hub keeps its time-of-day
+         sky variation (dawn/midday/golden/night). This already gives the
+         Lager its own strong identity independent of the biome tint
+         system the other tabs use.
          ═════════════════════════════════════════════════════════════════ */}
       <div className="fixed inset-0 pointer-events-none"
            style={{

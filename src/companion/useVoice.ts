@@ -107,6 +107,7 @@ export function useVoice(): UseVoiceResult {
 
   const say = useCallback(
     (trigger: Trigger, extras: SayExtras = {}) => {
+      if (VoiceAudio.isMuted()) return;
       const s: any = state || {};
       const questsCompletedToday = Array.isArray(s.quests)
         ? s.quests.filter((q: any) => q.done).length

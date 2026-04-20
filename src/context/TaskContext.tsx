@@ -412,7 +412,26 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           mintBadgesEarned: raw.mintBadgesEarned || [],
           mintGamesPlayed: raw.mintGamesPlayed || [],
           forscherFunkelUnlocked: raw.forscherFunkelUnlocked ?? false,
-          familyConfig: raw.familyConfig || DEFAULT_FAMILY_CONFIG,
+          // Merge with DEFAULT so legacy saves that only persisted a subset of
+          // familyConfig keys (e.g. {childName, parentMessage}) still get a
+          // full, valid config on boot — otherwise FamilyTab would crash trying
+          // to read .length on missing arrays like `siblings`/`dailyHabits`.
+          familyConfig: {
+            ...DEFAULT_FAMILY_CONFIG,
+            ...(raw.familyConfig || {}),
+            siblings: Array.isArray(raw.familyConfig?.siblings)
+              ? raw.familyConfig.siblings
+              : DEFAULT_FAMILY_CONFIG.siblings,
+            dailyHabits: Array.isArray(raw.familyConfig?.dailyHabits)
+              ? raw.familyConfig.dailyHabits
+              : DEFAULT_FAMILY_CONFIG.dailyHabits,
+            recurringActivities: Array.isArray(raw.familyConfig?.recurringActivities)
+              ? raw.familyConfig.recurringActivities
+              : DEFAULT_FAMILY_CONFIG.recurringActivities,
+            parentMessage: (raw.familyConfig?.parentMessage && typeof raw.familyConfig.parentMessage === 'object')
+              ? { ...DEFAULT_FAMILY_CONFIG.parentMessage, ...raw.familyConfig.parentMessage }
+              : DEFAULT_FAMILY_CONFIG.parentMessage,
+          },
           completedSpecialQuests: raw.completedSpecialQuests || {},
           viewsVisited: raw.viewsVisited || [],
           pendingEgg: raw.pendingEgg || null,

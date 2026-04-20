@@ -11,6 +11,7 @@ import ClothingSheet from './ClothingSheet';
 import QuestLineCard from './QuestLineCard';
 import TopBar from './TopBar';
 import VoiceAudio from '../utils/voiceAudio';
+import { biomeBackground } from '../utils/biomeBackgrounds';
 
 // Quest IDs that trigger the toothbrush timer
 const TEETH_QUEST_IDS = new Set(['s3', 's12', 'v3', 'v10']);
@@ -110,20 +111,17 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
   return (
     <div className="relative px-6 pb-32">
 
-      {/* ── Viewport-level ambient sky (Hub pattern).
-             Marc's feedback: old absolute-within-view sky left a cream
-             band above the TopBar because the App.jsx wrapper has
-             paddingTop for the alpha banner and the sky never reached
-             into that zone. This matches Hub.jsx exactly — fixed inset-0
-             with a cream gradient *over* the sky image so the blue reads
-             strongly at the top and gently fades to full cream at the
-             bottom of the viewport. The sky now covers the entire
-             screen (behind the alpha banner) so the TopBar pills float
-             on atmosphere with no seam. ── */}
+      {/* ── Biome-tinted morning-sky backdrop.
+             Rituale gets the "morning ritual sky" biome: soft blue with
+             cloud depth. Cream wash dominates at the fold so chapter
+             cards read cleanly, but the blue tint bleeds through at the
+             TopBar zone giving this tab its own distinct mood — matches
+             the per-tab palette system (Lager amber, Rituale blue, Laden
+             gold, Tagebuch teal, Ronki sage). See utils/biomeBackgrounds.js. ── */}
       <div className="fixed inset-0 pointer-events-none"
            style={{
              zIndex: 0,
-             background: `linear-gradient(rgba(255,248,242,0.35) 0%, rgba(255,248,242,0.55) 40%, rgba(255,248,242,0.88) 75%, #fff8f2 100%), url(${base}${SKY_FILE}) center top / cover no-repeat`,
+             background: biomeBackground('quests'),
              backgroundColor: '#fff8f2',
            }}
            aria-hidden="true" />
