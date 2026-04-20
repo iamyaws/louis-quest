@@ -26,6 +26,20 @@ Both share the root `package.json` and `node_modules`. The website has its own V
 - Palette: teal-dark `#1A3C3F`, teal `#2D5A5E`, sage `#50a082`, mustard `#FCD34D`, cream `#FDF8F0`, ink
 - Custom Vite plugin: `vite-plugin-prerender-meta.ts` generates 18 static HTML variants per route for social crawlers
 
+## App legal pages (app.ronki.de)
+
+Distinct from the marketing site's legal pages. Lives in `src/pages/`:
+
+- `Impressum.jsx` — mirrors marketing Impressum (same Marc, Unterföhring); adds Bildnachweise & KI-Transparenz for in-app art assets.
+- `Datenschutz.jsx` — app-specific, covers: Google OAuth (Google Ireland as Auftragsverarbeiter, USA mother-company SCC), Supabase EU-region + Vercel EU-edge, Art. 8 DSGVO children's data with parent-as-consent-holder, TTDSG § 25 Abs. 2 Nr. 2 for localStorage/SW as technically necessary. 72-hour SLA for child-data deletion requests.
+- `Nutzungsbedingungen.jsx` — Alpha-status disclaimer, Kardinalspflichten-carveout in § 8 Haftung, 30-day email notice for ToS changes, München Gerichtsstand (except consumer forum).
+
+Routing setup in `src/main.jsx`: BrowserRouter wraps everything; `/impressum`, `/datenschutz`, `/nutzungsbedingungen` sit OUTSIDE the AuthProvider so parents can read them pre-consent (required for DSGVO Art. 13 compliance). All other paths fall through to `App` via catch-all `*` route.
+
+LoginScreen (`src/context/AuthContext.tsx`) renders a small footer with links to all three pages across all login/signup/magic-link states.
+
+When you touch any of these pages, cross-check: does the marketing-site equivalent at `ronki.de/impressum` / `/datenschutz` / `/agb` need the same update? They share the Marc-Unterföhring anbieter block but diverge on scope (marketing ≠ app).
+
 ## Supabase schema
 
 ### `public.waitlist` (pre-launch signups + screener)
