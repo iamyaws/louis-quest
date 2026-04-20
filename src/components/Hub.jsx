@@ -271,10 +271,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
          ═════════════════════════════════════════════════════════════════ */}
       <header className="relative px-6 pt-6 pb-2" style={{ zIndex: 10 }}>
         <button onClick={() => onNavigate?.('ronki')}
-                className="flex items-center gap-2.5 active:scale-95 transition-all rounded-full"
-                style={{ background: 'rgba(255,255,255,0.92)', padding: '6px 14px 6px 6px', boxShadow: '0 4px 14px rgba(0,0,0,0.16)' }}>
+                className="flex items-center gap-3 active:scale-95 transition-all rounded-full"
+                style={{ background: 'rgba(255,255,255,0.92)', padding: '6px 20px 6px 6px', boxShadow: '0 4px 14px rgba(0,0,0,0.16)' }}>
           <div className="relative">
-            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center"
+            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center shrink-0"
                  style={{ background: 'rgba(18,67,70,0.1)', border: '1px solid rgba(18,67,70,0.18)' }}>
               <img src={base + heroAvatar} alt={heroName} className="w-full h-full object-cover" />
             </div>
@@ -285,9 +285,9 @@ export default function Hub({ onNavigate, onPlayMint }) {
               </div>
             )}
           </div>
-          <div className="flex flex-col leading-tight">
-            <span className="text-sm font-headline font-bold text-primary">{heroName}</span>
-            <span className="text-[10px] font-label font-semibold uppercase tracking-[0.16em] text-on-surface-variant mt-0.5">
+          <div className="flex flex-col leading-tight min-w-0">
+            <span className="text-sm font-headline font-bold text-primary whitespace-nowrap">{heroName}</span>
+            <span className="text-[10px] font-label font-semibold uppercase tracking-[0.16em] text-on-surface-variant mt-0.5 whitespace-nowrap">
               {t('hub.streakDay', { n: state.streak || 1 })}
             </span>
           </div>
