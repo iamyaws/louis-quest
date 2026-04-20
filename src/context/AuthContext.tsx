@@ -428,6 +428,22 @@ export function LoginScreen() {
             </button>
           </>
         )}
+
+        {/* Legal footer — visible pre-auth so parents can read
+            Datenschutz/Nutzungsbedingungen BEFORE creating an account */}
+        <footer className="mt-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-on-surface-variant/70">
+          <a href="/impressum" className="hover:text-primary underline-offset-4 hover:underline font-label">
+            Impressum
+          </a>
+          <span aria-hidden className="opacity-40">·</span>
+          <a href="/datenschutz" className="hover:text-primary underline-offset-4 hover:underline font-label">
+            Datenschutz
+          </a>
+          <span aria-hidden className="opacity-40">·</span>
+          <a href="/nutzungsbedingungen" className="hover:text-primary underline-offset-4 hover:underline font-label">
+            Nutzungsbedingungen
+          </a>
+        </footer>
       </div>
     </div>
   );
