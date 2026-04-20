@@ -103,10 +103,13 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         </div>
       </section>
 
-      {/* ── Dual Balance Cards — painterly parchment + sage palette ── */}
+      {/* ── Dual Balance Cards — painterly parchment + sage palette.
+             Design refinement (Ronki Laden Polish.html): job-labels under
+             each currency so the two economies read clearly without a
+             separate legend. "HP für Dinge, Funkelzeit für Bildschirm." ── */}
       <div className="grid grid-cols-2 gap-4 mb-8">
         {/* HP Balance — gilded parchment */}
-        <div className="p-6 rounded-2xl relative overflow-hidden"
+        <div className="p-5 rounded-2xl relative overflow-hidden"
              style={{
                background: 'linear-gradient(140deg, #fef3c7 0%, #fcd34d 55%, #eab308 100%)',
                border: '1.5px solid rgba(161, 98, 7, 0.25)',
@@ -119,21 +122,24 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                  backgroundSize: 'cover',
                  backgroundPosition: 'center',
                }} />
-          <div className="relative flex items-center gap-2 mb-2">
-            <Pearl size={28} />
-            <p className="font-label font-bold uppercase tracking-widest text-xs" style={{ color: '#7a4a05' }}>{t('hub.boss.detail.heroPoints')}</p>
+          <div className="relative flex items-center gap-2 mb-1">
+            <Pearl size={24} />
+            <p className="font-label font-bold uppercase tracking-widest text-[11px]" style={{ color: '#7a4a05' }}>{t('hub.boss.detail.heroPoints')}</p>
           </div>
           <div className="relative flex items-baseline gap-1">
-            <span className="text-4xl font-headline font-bold" style={{ color: '#3b2802' }}>{hp}</span>
+            <span className="text-3xl font-headline font-bold" style={{ color: '#3b2802' }}>{hp}</span>
             <span className="text-sm font-label font-bold" style={{ color: '#7a4a05' }}>HP</span>
           </div>
-          <div className="absolute -bottom-3 -right-3 opacity-20">
+          <p className="relative font-body mt-2 leading-snug" style={{ fontSize: 11, color: '#7a4a05', opacity: 0.85 }}>
+            Für Belohnungen aus dem Leben
+          </p>
+          <div className="absolute -bottom-4 -right-4 opacity-15">
             <Pearl size={64} />
           </div>
         </div>
 
         {/* Screen Minutes Balance — painted sage/teal */}
-        <div className="p-6 rounded-2xl relative overflow-hidden"
+        <div className="p-5 rounded-2xl relative overflow-hidden"
              style={{
                background: 'linear-gradient(140deg, #d1eae2 0%, #86d7b6 55%, #4ca88c 100%)',
                border: '1.5px solid rgba(0, 81, 59, 0.25)',
@@ -146,44 +152,25 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                  backgroundSize: 'cover',
                  backgroundPosition: 'center',
                }} />
-          <div className="relative flex items-center gap-2 mb-2">
-            <Hourglass size={28} dark />
-            <p className="font-label font-bold uppercase tracking-widest text-xs" style={{ color: '#00513b' }}>{t('shop.screenMinutes')}</p>
+          <div className="relative flex items-center gap-2 mb-1">
+            <Hourglass size={24} dark />
+            <p className="font-label font-bold uppercase tracking-widest text-[11px]" style={{ color: '#00513b' }}>{t('shop.screenMinutes')}</p>
           </div>
           <div className="relative flex items-baseline gap-1">
-            <span className="text-4xl font-headline font-bold" style={{ color: '#00291d' }}>{screenMin}</span>
+            <span className="text-3xl font-headline font-bold" style={{ color: '#00291d' }}>{screenMin}</span>
             <span className="text-sm font-label font-bold" style={{ color: '#00513b' }}>MIN</span>
           </div>
-          <div className="absolute -bottom-3 -right-3 opacity-20">
+          <p className="relative font-body mt-2 leading-snug" style={{ fontSize: 11, color: '#00513b', opacity: 0.85 }}>
+            Für Bildschirm-Zeit
+          </p>
+          <div className="absolute -bottom-4 -right-4 opacity-15">
             <Hourglass size={64} dark />
           </div>
         </div>
       </div>
 
-      {/* ── Mini-Spiele Entry — game card style, gated by routine completion ── */}
-      <button onClick={() => gamesUnlocked ? onNavigate?.('games') : null}
-        className={`w-full rounded-2xl p-5 mb-8 flex items-center gap-4 transition-all text-left ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
-        style={{
-          background: gamesUnlocked
-            ? 'linear-gradient(160deg, #ede9fe 0%, #c4b5fd 50%, #7c3aed 100%)'
-            : 'rgba(0,0,0,0.04)',
-          filter: gamesUnlocked ? 'none' : 'grayscale(0.5) brightness(0.85)',
-          opacity: gamesUnlocked ? 1 : 0.55,
-        }}>
-        <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>🎮</span>
-        <div className="flex-1">
-          <h4 className="font-headline font-bold text-lg" style={{ color: gamesUnlocked ? '#2e1065' : '#6b7280' }}>{t('shop.miniGames')}</h4>
-          <p className="text-sm font-body mt-0.5" style={{ color: gamesUnlocked ? '#2e106599' : '#9ca3af' }}>
-            {gamesUnlocked ? t('shop.miniGames.subtitle') : 'Erst deine Aufgaben! 💪'}
-          </p>
-        </div>
-        <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-             style={{ background: '#ffffff', border: '2.5px solid rgba(46,16,101,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-          <span className="material-symbols-outlined text-xl" style={{ color: '#2e1065', fontVariationSettings: "'FILL' 1" }}>
-            {gamesUnlocked ? 'play_arrow' : 'lock'}
-          </span>
-        </div>
-      </button>
+      {/* Mini-Spiele moved into the Digitale Zeit section below — see
+           design note: it's screen content, not a third economy. */}
 
       {/* ── Family Adventures (HP currency) ── */}
       {familyRewards.length > 0 && (
@@ -212,21 +199,39 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                       <h4 className="font-label font-bold text-lg text-on-surface leading-tight">{t('bel.' + reward.id)}</h4>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(161,98,7,0.12)' }}>
-                    <div className="flex items-center gap-1.5">
-                      <Pearl size={16} />
-                      <span className="text-on-surface font-bold font-label">{reward.cost} HP</span>
+                  <div className="pt-3" style={{ borderTop: '1px solid rgba(161,98,7,0.12)' }}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Pearl size={16} />
+                        <span className="text-on-surface font-bold font-label">{reward.cost} HP</span>
+                      </div>
+                      {canAfford ? (
+                        <button
+                          className="font-label font-bold py-2 px-6 rounded-full text-sm transition-all active:scale-95"
+                          style={{ background: '#fcd34d', color: '#725b00' }}
+                          onClick={() => setRedeemTarget({ ...reward, name: t('bel.' + reward.id) })}
+                        >
+                          {t('shop.redeem')}
+                        </button>
+                      ) : (
+                        <span className="font-label font-bold text-xs whitespace-nowrap" style={{ color: '#b45309' }}>
+                          Noch <b style={{ color: '#92400e' }}>{reward.cost - hp}</b> HP
+                        </span>
+                      )}
                     </div>
-                    <button
-                      className={`font-label font-bold py-2 px-6 rounded-full text-sm transition-all active:scale-95 ${
-                        canAfford ? '' : 'opacity-50 cursor-not-allowed'
-                      }`}
-                      style={{ background: canAfford ? '#fcd34d' : '#e8e1da', color: canAfford ? '#725b00' : '#7b7486' }}
-                      disabled={!canAfford}
-                      onClick={() => { if (canAfford) setRedeemTarget({ ...reward, name: t('bel.' + reward.id) }); }}
-                    >
-                      {canAfford ? t('shop.redeem') : t('shop.tooFew')}
-                    </button>
+                    {/* Positive-framed progress toward unlocking — "fast geschafft"
+                         beats "zu wenig" for a 7-year-old. Design-ref .reward-bar. */}
+                    {!canAfford && (
+                      <div className="mt-2.5 h-1.5 rounded-full overflow-hidden"
+                           style={{ background: 'rgba(161,98,7,0.12)' }}>
+                        <div className="h-full rounded-full transition-all duration-700"
+                             style={{
+                               width: `${Math.min(100, (hp / reward.cost) * 100)}%`,
+                               background: 'linear-gradient(90deg, #fcd34d, #f59e0b)',
+                               boxShadow: '0 0 6px rgba(252,211,77,0.5)',
+                             }} />
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -257,12 +262,43 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         </div>
       )}
 
-      {/* ── Digital Time (Screen minutes currency) ── */}
+      {/* ── Digital Time (Screen minutes currency) ──
+             Mini-Spiele now sits at the top of this section (design refactor:
+             it's screen-content, belongs with "Digitale Zeit" not between
+             currencies and rewards). ── */}
       {screenRewards.length > 0 && (
         <div className="mb-8">
           <h3 className="font-label font-bold text-sm uppercase tracking-widest text-on-surface px-2 mb-4">
             {t('shop.digitalTime')}
           </h3>
+
+          {/* Mini-Spiele gate — gated by routine completion (useGameAccess).
+               Sits above the screen-reward list as the first piece of
+               screen-content Louis can reach. */}
+          <button onClick={() => gamesUnlocked ? onNavigate?.('games') : null}
+            className={`w-full rounded-2xl p-5 mb-4 flex items-center gap-4 transition-all text-left ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
+            style={{
+              background: gamesUnlocked
+                ? 'linear-gradient(160deg, #ede9fe 0%, #c4b5fd 50%, #7c3aed 100%)'
+                : 'rgba(0,0,0,0.04)',
+              filter: gamesUnlocked ? 'none' : 'grayscale(0.5) brightness(0.85)',
+              opacity: gamesUnlocked ? 1 : 0.55,
+            }}>
+            <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>🎮</span>
+            <div className="flex-1">
+              <h4 className="font-headline font-bold text-lg" style={{ color: gamesUnlocked ? '#2e1065' : '#6b7280' }}>{t('shop.miniGames')}</h4>
+              <p className="text-sm font-body mt-0.5" style={{ color: gamesUnlocked ? '#2e106599' : '#9ca3af' }}>
+                {gamesUnlocked ? t('shop.miniGames.subtitle') : 'Erst deine Aufgaben! 💪'}
+              </p>
+            </div>
+            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+                 style={{ background: '#ffffff', border: '2.5px solid rgba(46,16,101,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+              <span className="material-symbols-outlined text-xl" style={{ color: '#2e1065', fontVariationSettings: "'FILL' 1" }}>
+                {gamesUnlocked ? 'play_arrow' : 'lock'}
+              </span>
+            </div>
+          </button>
+
           <div className="flex flex-col gap-4">
             {screenRewards.map(reward => {
               const canAfford = screenMin >= reward.cost;
@@ -290,23 +326,42 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(0,150,150,0.12)' }}>
-                    <div className="flex items-center gap-1.5">
-                      <Hourglass size={16} />
-                      <span className="font-bold font-label" style={{ color: '#00827e' }}>{reward.cost} Min.</span>
+                  <div className="pt-3" style={{ borderTop: '1px solid rgba(0,150,150,0.12)' }}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Hourglass size={16} />
+                        <span className="font-bold font-label" style={{ color: '#00827e' }}>{reward.cost} Min.</span>
+                      </div>
+                      {canAfford && !blocked ? (
+                        <button
+                          className="font-label font-bold py-2 px-6 rounded-full text-sm transition-all active:scale-95"
+                          style={{ background: '#00CEC9', color: 'white' }}
+                          onClick={() => handleScreenRewardTap(reward)}
+                        >
+                          {t('shop.redeem')}
+                        </button>
+                      ) : blocked ? (
+                        <span className="font-label font-bold text-xs whitespace-nowrap" style={{ color: '#0e7490' }}>
+                          {t('shop.timerRunning')}
+                        </span>
+                      ) : (
+                        <span className="font-label font-bold text-xs whitespace-nowrap" style={{ color: '#0e7490' }}>
+                          Noch <b style={{ color: '#155e75' }}>{reward.cost - screenMin}</b> Min
+                        </span>
+                      )}
                     </div>
-                    <button
-                      className={`font-label font-bold py-2 px-6 rounded-full text-sm transition-all active:scale-95 ${
-                        canAfford && !blocked ? '' : 'opacity-50 cursor-not-allowed'
-                      }`}
-                      style={{ background: canAfford && !blocked ? '#00CEC9' : '#e8e1da', color: canAfford && !blocked ? 'white' : '#7b7486' }}
-                      disabled={!canAfford || blocked}
-                      onClick={() => {
-                        if (canAfford && !blocked) handleScreenRewardTap(reward);
-                      }}
-                    >
-                      {blocked ? t('shop.timerRunning') : canAfford ? t('shop.redeem') : t('shop.tooFew')}
-                    </button>
+                    {/* Positive-framed progress toward the next screen reward */}
+                    {!canAfford && !blocked && (
+                      <div className="mt-2.5 h-1.5 rounded-full overflow-hidden"
+                           style={{ background: 'rgba(0,150,150,0.12)' }}>
+                        <div className="h-full rounded-full transition-all duration-700"
+                             style={{
+                               width: `${Math.min(100, (screenMin / reward.cost) * 100)}%`,
+                               background: 'linear-gradient(90deg, #5eead4, #0d9488)',
+                               boxShadow: '0 0 6px rgba(14,165,152,0.45)',
+                             }} />
+                      </div>
+                    )}
                   </div>
                 </div>
               );

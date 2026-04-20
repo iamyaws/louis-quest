@@ -16,9 +16,27 @@ const TAB_KEYS = [
 export default function NavBar({ active = 'quests', onNavigate }) {
   const { t } = useTranslation();
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 bg-surface/80 backdrop-blur-xl rounded-t-[2rem] shadow-[0_-8px_24px_rgba(30,27,23,0.06)]">
-      <div className="flex justify-around items-center px-4 pt-4 max-w-lg mx-auto"
-           style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))' }}>
+    <nav
+      className="fixed bottom-0 left-0 w-full z-50"
+      style={{
+        // Design-adapted nav (Ronki *.Polish.html). Cream glass with heavy
+        // blur+saturate, rounded-top, softer downward shadow so the bar
+        // feels like a floating shelf instead of a hard footer.
+        background: 'rgba(255,248,242,0.92)',
+        backdropFilter: 'blur(20px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        boxShadow: '0 -12px 28px -12px rgba(18,67,70,0.18)',
+      }}
+    >
+      <div
+        className="flex justify-around items-center max-w-lg mx-auto"
+        style={{
+          padding: '14px 18px',
+          paddingBottom: 'max(22px, env(safe-area-inset-bottom, 22px))',
+        }}
+      >
         {TAB_KEYS.map(tab => {
           const isActive = tab.id === active;
           const label = t(tab.key);
@@ -27,19 +45,42 @@ export default function NavBar({ active = 'quests', onNavigate }) {
               key={tab.id}
               aria-label={label}
               onClick={() => onNavigate?.(tab.id)}
-              className={`flex flex-col items-center justify-center min-w-[60px] min-h-[60px] px-4 py-2 transition-all duration-300 ${
+              className="flex flex-col items-center transition-all duration-300 active:scale-95"
+              style={
                 isActive
-                  ? 'bg-primary text-white rounded-full shadow-lg'
-                  : 'text-on-surface-variant hover:text-primary'
-              }`}
+                  ? {
+                      // Horizontal pill with teal gradient + warm shadow.
+                      // Wider, flatter than our old circular pill — reads as
+                      // "you are here" without shouting.
+                      gap: 4,
+                      padding: '10px 16px',
+                      minWidth: 52,
+                      borderRadius: 22,
+                      background: 'linear-gradient(180deg, #2d5a5e 0%, #124346 100%)',
+                      color: '#ffffff',
+                      boxShadow: '0 8px 18px -6px rgba(18,67,70,0.4)',
+                    }
+                  : {
+                      gap: 4,
+                      padding: '8px 6px',
+                      minWidth: 52,
+                      color: '#6b655b',
+                    }
+              }
             >
               <span
-                className="material-symbols-outlined text-2xl"
-                style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                className="material-symbols-outlined"
+                style={{
+                  fontSize: 22,
+                  fontVariationSettings: isActive ? "'FILL' 1, 'wght' 500" : "'FILL' 0, 'wght' 400",
+                }}
               >
                 {tab.icon}
               </span>
-              <span className="font-label text-sm font-semibold tracking-wide uppercase mt-1">
+              <span
+                className="font-label font-bold uppercase"
+                style={{ fontSize: 9, letterSpacing: '0.14em', lineHeight: 1 }}
+              >
                 {label}
               </span>
             </button>
