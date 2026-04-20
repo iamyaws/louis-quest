@@ -279,16 +279,38 @@ export default function Hub({ onNavigate, onPlayMint }) {
           statusText={expeditionStatusText}
           statusSub={expeditionStatusSub}
           greetingText={(() => {
+            // Ronki's first-person mood quip — matches the Feature
+            // Previews pattern ("Ich bin heute voller Vorfreude."). The
+            // time-of-day "Guten Morgen" greeting is now in the
+            // Lagerfeuer section header below the scene, so the bubble
+            // is Ronki's VOICE instead (redundancy avoided).
             const hr = new Date().getHours();
-            const k = hr < 11 ? 'hub.greeting.morning' : hr < 17 ? 'hub.greeting.afternoon' : 'hub.greeting.evening';
-            const base = `${t(k)}, ${heroName}!`;
-            // Append a warm weather line in the morning so the weather
-            // info lives IN Ronki's bubble (Marc's reorder — we removed
-            // the separate weather chip). Tapping the bubble opens the
-            // ClothingSheet for a "what to wear today" view.
+            const dayIdx = Math.floor(Date.now() / 86_400_000);
+            const MORNING_QUIPS = [
+              'Ich bin heute voller Vorfreude.',
+              'Der Tag riecht gut — findest du nicht?',
+              'Was machen wir heute zuerst?',
+              'Ich hab die halbe Nacht geträumt.',
+            ];
+            const AFTERNOON_QUIPS = [
+              'Das Feuer wärmt so schön.',
+              'Ich hab auf dich gewartet.',
+              'Setz dich, erzähl was.',
+              'Das ist ein guter Tag.',
+            ];
+            const EVENING_QUIPS = [
+              'Die Sterne kommen raus.',
+              'Heute war viel los, oder?',
+              'Ich mag diese leise Stunde.',
+              'Gleich schlafen wir gut.',
+            ];
+            const pool = hr < 11 ? MORNING_QUIPS : hr < 17 ? AFTERNOON_QUIPS : EVENING_QUIPS;
+            const base = pool[dayIdx % pool.length];
+            // Morning: append a weather nudge so clothing tips are one
+            // tap away without a separate weather chip.
             if (weather?.current && hr < 11) {
               const wi = getWeatherInfo(weather.current.weatherCode);
-              return `${base} ${wi.emoji} Heute ${weather.current.temp}° — tippe für Kleidungs-Tipps.`;
+              return `${base} ${wi.emoji} Heute ${weather.current.temp}° — tippe für Tipps.`;
             }
             return base;
           })()}
@@ -376,15 +398,42 @@ export default function Hub({ onNavigate, onPlayMint }) {
       </header>
 
       {/* ═════════════════════════════════════════════════════════════════
-         D · MAIN CONTENT — layers over scene (z-10), pt gives breathing
-         room so the painted scene reads before content covers it.
+         D · MAIN CONTENT — layers below scene now. paddingTop pushes the
+         first card past the scene's 340px so Ronki + campfire are fully
+         visible above (Marc call-out). The Lagerfeuer section title acts
+         as the page-structure break between "scene" and "cards".
          ═════════════════════════════════════════════════════════════════ */}
       <main className="relative px-6 max-w-lg mx-auto flex flex-col gap-4"
-            style={{ zIndex: 10, paddingTop: 184 }}>
+            style={{ zIndex: 10, paddingTop: 340 }}>
 
-        {/* Weather chip removed — it now lives entirely inside Ronki's
-             morning speech bubble on the scene (tap-to-open ClothingSheet
-             via onBubbleTap). Voice bubble + nameplate stay. */}
+        {/* ── Lagerfeuer section title (tight version).
+               Marc's first pass felt "excessive" — too much vertical space
+               between scene and title. This rebuild sits the kicker/title
+               RIGHT below the scene's cream fade (no floating gap) and
+               tightens typography: 22px title (was 26), tighter kicker
+               tracking (0.22em was 0.28em). Matches the Claude Design
+               Feature Preview reference Marc shared. ── */}
+        {(() => {
+          const hr = new Date().getHours();
+          const greet = hr < 11 ? 'Guten Morgen'
+            : hr < 17 ? 'Guten Tag'
+            : 'Guten Abend';
+          return (
+            <section className="text-center flex flex-col items-center"
+                     style={{ gap: 3, marginTop: -8, marginBottom: 4 }}>
+              <p className="font-label font-extrabold uppercase"
+                 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 10, letterSpacing: '0.22em', color: '#b45309' }}>
+                Lagerfeuer
+              </p>
+              <h1 className="font-headline"
+                  style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 500, fontSize: 22, letterSpacing: '-0.015em', color: '#124346', lineHeight: 1.15 }}>
+                {greet}.
+              </h1>
+            </section>
+          );
+        })()}
+
+        {/* Weather chip removed — lives in Ronki's morning bubble now. */}
         <section className="flex flex-col items-center gap-2">
           {voice.line && (
             <div className="w-full max-w-md px-2 mt-1">
