@@ -110,28 +110,23 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
   return (
     <div className="relative px-6 pb-32">
 
-      {/* ── Bluish sky wash at top ──
-             Extended to 560px at 0.72 opacity with objectPosition shifted
-             down so the blue-heavy middle reads into the fold. Marc's
-             feedback: the old 280px/0.55 strip made the TopBar sit on
-             what felt like a cream band — extending the sky up so the
-             pills float on atmosphere instead. Longer bottom fade (200px)
-             softly lands the sky into cream before the first chapter
-             card. Polish Aufgaben .sky spec: 0.75 opacity, full-height
-             ambient fade. ── */}
-      <div className="absolute left-0 right-0 top-0 overflow-hidden pointer-events-none"
-           style={{ height: 560, zIndex: 0 }}
-           aria-hidden="true">
-        <img src={base + SKY_FILE} alt=""
-             className="w-full h-full object-cover"
-             style={{ objectPosition: 'center 55%', opacity: 0.72 }}
-             draggable={false} />
-        <div className="absolute inset-x-0 bottom-0"
-             style={{
-               height: 200,
-               background: 'linear-gradient(to bottom, transparent 0%, rgba(255,248,242,0.45) 45%, rgba(255,248,242,0.85) 80%, #fff8f2 100%)',
-             }} />
-      </div>
+      {/* ── Viewport-level ambient sky (Hub pattern).
+             Marc's feedback: old absolute-within-view sky left a cream
+             band above the TopBar because the App.jsx wrapper has
+             paddingTop for the alpha banner and the sky never reached
+             into that zone. This matches Hub.jsx exactly — fixed inset-0
+             with a cream gradient *over* the sky image so the blue reads
+             strongly at the top and gently fades to full cream at the
+             bottom of the viewport. The sky now covers the entire
+             screen (behind the alpha banner) so the TopBar pills float
+             on atmosphere with no seam. ── */}
+      <div className="fixed inset-0 pointer-events-none"
+           style={{
+             zIndex: 0,
+             background: `linear-gradient(rgba(255,248,242,0.35) 0%, rgba(255,248,242,0.55) 40%, rgba(255,248,242,0.88) 75%, #fff8f2 100%), url(${base}${SKY_FILE}) center top / cover no-repeat`,
+             backgroundColor: '#fff8f2',
+           }}
+           aria-hidden="true" />
 
       {/* Relative wrapper so all content floats above the sky backdrop */}
       <div className="relative" style={{ zIndex: 1 }}>
