@@ -117,6 +117,14 @@ export function Footer() {
               >
                 hallo@ronki.de
               </a>
+              <a
+                href="https://ko-fi.com/ronkiapp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-teal-dark/75 hover:text-teal-dark transition-colors block mb-4"
+              >
+                <span aria-hidden>☕</span> Einen Kaffee ausgeben
+              </a>
               <Link
                 to="/en"
                 className="inline-flex items-center gap-2 text-xs font-display font-semibold text-teal-dark/60 hover:text-teal-dark transition-colors"
