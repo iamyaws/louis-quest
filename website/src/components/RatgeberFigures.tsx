@@ -470,8 +470,8 @@ export function TroedelLoop() {
     { angle: 180, label: 'Kind verlangsamt', body: 'Tank leer' },
   ];
   const cx = 340;
-  const cy = 220;
-  const r = 130;
+  const cy = 225;
+  const r = 170;
 
   return (
     <FigureWrap
