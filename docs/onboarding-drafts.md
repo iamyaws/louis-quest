@@ -202,41 +202,76 @@ Du erhältst diese E-Mail, weil du dich auf ronki.de für den Frühzugang zu Ron
 
 ## 4. WhatsApp-Share für persönliche Kontakte
 
-Zwei Versionen: eine kurze für „hey probier mal"-Nachrichten an einzelne Eltern, und eine etwas längere wenn du etwas mehr Kontext geben willst.
+Diese Nachrichten sind dafür gebaut, dass der Empfänger sie in dem Moment, in dem er sie liest, auch umsetzt. Kein „speicher ich mir für später" (= nie). Drei Zutaten:
 
-### Kurzversion (3 Zeilen)
+- **Persönlich,** nicht wie eine Produktankündigung
+- **Kein „Frühzugang"-Label** (fühlt sich nach Beta-Test an und schafft Zögern). Lieber: „Ronki ist online, probier's."
+- **Install in drei Schritten,** eine Screen-Höhe max, direkt im Text
 
-```
-Hey! Ich baue gerade mit Louis eine kleine Kinder-App namens Ronki.
-Läuft direkt im Browser unter app.ronki.de, kein Store-Download nötig.
-Wenn du Lust hast reinzugucken, freu ich mich über Feedback. Mehr Kontext: ronki.de
-```
+### Vorlage A · Persönliche Einzel-Nachricht (Standard)
 
-### Mit-Installations-Hinweis-Version
-
-```
-Hey! Kurz: Ich baue seit ein paar Monaten mit Louis eine Kinder-App namens Ronki.
-Soll helfen, dass Morgen- und Abendroutine bei uns zuhause weniger anstrengend werden.
-Kein App-Store, keine Werbung, keine Streaks.
-
-Wir sind im Frühzugang, ihr könnt es direkt ausprobieren:
-
-📱 iPhone/iPad: Safari öffnen → app.ronki.de → Teilen-Symbol → „Zum Home-Bildschirm"
-📱 Android: Chrome öffnen → app.ronki.de → „Installieren" tippen wenn's unten vorschlägt
-📱 Fire Tablet: Silk oder Chrome → app.ronki.de → Menü → „Zum Startbildschirm"
-
-Mehr Hintergrund: ronki.de
-
-Wenn's bei euch was taugt, freu ich mich über Rückmeldung. Wenn nicht, auch.
-— Marc
-```
-
-### Ultra-kurz für Gruppenchats
+Platzhalter:
+- `[Name]` = der Vorname des Empfängers
+- `[Kind]` = Name ihres Kindes
+- `[ANKER]` = die konkrete Sache, über die ihr mal gesprochen habt („die Morgen", „Zähneputzen", „Abends bis der Arzt kommt", „Hausaufgaben-Kampf"). Macht die Nachricht persönlich statt generisch.
 
 ```
-Ronki-Frühzugang läuft. app.ronki.de im Browser öffnen, auf den Home-Bildschirm legen, fertig.
-Mehr auf ronki.de. Feedback willkommen.
+Hey [Name],
+
+Ronki ist online. Die kleine Drachen-App, an der ich seit Monaten mit Louis
+bastele. Würde mich freuen, wenn [Kind] sie mal ausprobiert.
+
+Ehrlich 30 Sekunden Setup:
+
+1. Auf dem Handy oder Tablet app.ronki.de öffnen
+2. iPhone: Teilen-Symbol → „Zum Home-Bildschirm"
+   Android (Chrome): unten kommt „Installieren" antippen
+   Fire Tablet: Silk-Menü oder Chrome → „Zum Startbildschirm"
+3. Elternprofil und eine Routine einrichten. Ich würde bei euch
+   [ANKER] nehmen zum Start.
+
+Mehr Kontext, falls ihr wollt: ronki.de
+
+Wenn's nach 3-4 Tagen bei [Kind] was verändert oder auch nicht:
+schreib einfach hier zurück. Nix Formelles. Ruf mich gern auch an
+wenn's schneller geht.
+
+Danke dir 🐉
+Marc
 ```
+
+### Vorlage B · Ultra-kurz (wenn ihr gerade schon drüber geredet habt)
+
+```
+Wie besprochen: app.ronki.de auf dem Handy öffnen und auf den Startbildschirm
+legen (iPhone: Teilen → „Zum Home-Bildschirm"; Android Chrome: unten
+„Installieren" antippen).
+
+Probier's 3-4 Tage bei [Kind] und sag mir was du denkst. 🐉
+```
+
+### Vorlage C · Eltern-Gruppenchat
+
+Für Chats wie Kita-Eltern, Schul-Eltern, Sportverein. Weniger persönlich, mehr „wenn's euch interessiert":
+
+```
+Kurze Sache: Ich bastle seit Monaten an einer kleinen Kinder-App namens
+Ronki, gemeinsam mit Louis. Geht online. Falls euch die Morgen- oder
+Abendroutine zu Hause auch zermürbt: app.ronki.de im Browser öffnen,
+auf den Startbildschirm legen, fertig. Keine Werbung, keine Streaks, kein
+Store.
+
+Mehr Kontext: ronki.de · Feedback gern direkt an mich.
+
+Marc
+```
+
+### Versand-Tipps
+
+- **Einzelne Nachrichten, kein Bulk.** Copy-paste ist OK, aber jede Nachricht bewusst an eine Person, nicht an eine Liste. Broadcast-Listen fühlen sich für den Empfänger nie persönlich an, egal was drinsteht.
+- **Anker wirklich setzen.** Wenn du nicht weißt, was bei den Empfängern klemmt, nimm „morgens" als Default, das trifft fast immer. Aber je spezifischer der Anker, desto stärker landet die Nachricht.
+- **Nach 3-4 Tagen kurz zurückfragen.** „Hey, hat's geklappt mit Ronki?" ist keine Werbung, das ist Nachfassen wie bei jedem anderen Tipp, den du jemandem gibst. Macht Feedback wahrscheinlich.
+- **Abends oder Sonntags senden,** wenn Eltern Kopf für das Thema haben. Montagmorgen in die Hektik = wegklicken.
 
 ---
 
