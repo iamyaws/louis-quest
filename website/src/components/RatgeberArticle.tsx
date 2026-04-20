@@ -6,6 +6,7 @@ import { PainterlyShell } from './PainterlyShell';
 import { Footer } from './Footer';
 import { WaitlistCTA } from './WaitlistCTA';
 import { RatgeberFiguresStyles } from './RatgeberFigures';
+import { FeedbackForm } from './FeedbackForm';
 import { LAUNCH_STATE } from '../config/launch-state';
 import { EASE_OUT } from '../lib/motion';
 
@@ -272,6 +273,28 @@ export function RatgeberArticle({
           </div>
         </section>
       )}
+
+      {/* ─────────── Feedback / content-planning ─────────── */}
+      <section className="px-6 py-20 sm:py-24 border-t border-teal/10 bg-cream/30">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-xs uppercase tracking-[0.2em] text-teal font-medium mb-4">
+            Was fehlt dir zu diesem Thema?
+          </p>
+          <h2 className="font-display font-bold text-2xl sm:text-3xl leading-tight tracking-tight text-teal-dark mb-4">
+            Sag uns, was wir noch schreiben sollen.
+          </h2>
+          <p className="text-base text-ink/70 leading-relaxed mb-8">
+            Wir planen die nächsten Artikel anhand der Fragen, die Eltern uns
+            schicken. Welche Seite des Themas haben wir hier nicht abgedeckt?
+            Welcher Fall trifft auf euch nicht zu?
+          </p>
+          <FeedbackForm
+            source={`ratgeber/${slug}`}
+            label="Was fehlt dir an diesem Artikel?"
+            placeholder={'Zum Beispiel: \u201EIhr schreibt \u00fcber Grundschulkinder, aber unser J\u00fcngster ist vier und bekommt alles mit.\u201C'}
+          />
+        </div>
+      </section>
 
       <Footer />
 

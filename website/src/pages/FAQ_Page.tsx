@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { PageMeta } from '../components/PageMeta';
 import { PainterlyShell } from '../components/PainterlyShell';
 import { Footer } from '../components/Footer';
+import { FeedbackForm } from '../components/FeedbackForm';
 import { FAQPageSchema } from '../components/JsonLd';
 import { EASE_OUT } from '../lib/motion';
 
@@ -207,17 +208,28 @@ export default function FAQ_Page() {
               Noch Fragen?
             </p>
             <h2 className="font-display font-bold text-3xl sm:text-4xl leading-[1.1] tracking-tight text-teal-dark mb-6">
-              Schreibt uns.
+              Eure Frage fehlt hier? Schreibt sie uns.
             </h2>
             <p className="text-base sm:text-lg text-ink/75 leading-relaxed mb-10 max-w-xl mx-auto">
-              Wir lesen jede Mail selbst. Ohne Ticket-System, ohne Chatbot, ohne Warteschleife.
+              Wir lesen jede Nachricht selbst. Ohne Ticket-System, ohne Chatbot, ohne Warteschleife. Eure Frage landet in der Liste, aus der wir den nächsten FAQ-Eintrag schreiben.
             </p>
-            <a
-              href="mailto:hallo@ronki.de"
-              className="inline-block rounded-full bg-teal-dark text-cream px-8 py-4 font-display font-semibold text-base shadow-sm hover:bg-teal transition-colors"
-            >
-              hallo@ronki.de
-            </a>
+            <div className="max-w-xl mx-auto text-left">
+              <FeedbackForm
+                source="faq"
+                label="Was würdet ihr noch gerne wissen?"
+                placeholder={'Zum Beispiel: \u201EFunktioniert Ronki offline?\u201C oder \u201EWie geht ihr mit mehreren Kindern um?\u201C'}
+              />
+            </div>
+            <p className="text-xs text-ink/55 mt-8 max-w-xl mx-auto leading-relaxed">
+              Lieber per E-Mail? Dann schreibt direkt an{' '}
+              <a
+                href="mailto:hallo@ronki.de"
+                className="font-display font-semibold text-teal-dark underline decoration-teal/30 underline-offset-4 hover:decoration-teal hover:text-teal transition-colors"
+              >
+                hallo@ronki.de
+              </a>
+              . Landet bei Marc persönlich.
+            </p>
             <div className="mt-12 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm">
               <Link
                 to="/"
