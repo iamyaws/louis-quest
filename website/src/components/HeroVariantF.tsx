@@ -54,10 +54,10 @@ export function HeroVariantF() {
           {/* Eyebrow */}
           <motion.p
             {...fade(0.1)}
-            className="text-sm uppercase tracking-[0.18em] text-cream/60 mb-8 font-medium"
+            className="text-sm uppercase tracking-[0.18em] text-cream/70 mb-8 font-semibold"
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-mustard align-middle mr-3 animate-pulse" />
-            Bald verfügbar · 2026
+            Beta offen · Frühzugang
           </motion.p>
 
           {/* Headline — B copy */}
@@ -92,12 +92,13 @@ export function HeroVariantF() {
             <WaitlistCTA launchState={LAUNCH_STATE} />
           </motion.div>
 
-          {/* Secondary hook — E copy */}
+          {/* Secondary hook — Ritual framing (option C) */}
           <motion.p
             {...fade(0.7)}
-            className="mt-6 text-base sm:text-lg font-display font-semibold text-mustard/80 italic"
+            className="mt-6 text-base sm:text-lg font-display font-semibold text-mustard/90 italic leading-snug"
           >
-            Was, wenn dein Kind die Routine selbst will?
+            Routinen optimiert man. Rituale lebt man. Ronki ist für den
+            Unterschied gebaut.
           </motion.p>
 
           {/* Trust indicators */}
@@ -139,7 +140,7 @@ export function HeroVariantF() {
                 />
                 <img
                   src="/art/routines/brushing-teeth.webp"
-                  alt="Ein Junge und sein Drache Ronki beim Zähneputzen — fröhlich, im Abenteuer-Stil gemalt."
+                  alt="Ein Junge und sein Drache Ronki beim Zähneputzen, fröhlich, im Abenteuer-Stil gemalt."
                   width={520}
                   height={520}
                   className="relative w-[360px] lg:w-[440px] xl:w-[500px] rounded-[2rem] shadow-2xl"

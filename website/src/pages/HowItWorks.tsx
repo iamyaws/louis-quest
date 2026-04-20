@@ -73,8 +73,10 @@ export default function HowItWorks() {
             <p className="mt-6 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
               Ronki ist kein Belohnungssystem und kein Bildschirm-Babysitter,
               sondern ein kleiner Drache, der dein Kind durch den Alltag
-              begleitet. Und sich Schritt für Schritt zurückzieht, sobald die
-              Routine sitzt.
+              begleitet. Aus einer Routine, die dein Kind abarbeiten muss, wird
+              ein tägliches Ritual, das ihr gemeinsam lebt. Routinen optimiert
+              man. Rituale lebt man. Ronki ist für den Unterschied gebaut, und
+              zieht sich Schritt für Schritt zurück, sobald das Ritual sitzt.
             </p>
           </motion.div>
         </div>

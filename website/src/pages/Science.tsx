@@ -67,22 +67,22 @@ interface Source {
 
 const SOURCES: Source[] = [
   {
-    title: 'klicksafe — Dark Patterns, Manipulation im Netz',
+    title: 'klicksafe: Dark Patterns, Manipulation im Netz',
     note: 'EU-Initiative für Medienkompetenz, vom BMFSFJ gefördert.',
     url: 'https://www.klicksafe.de/',
   },
   {
-    title: 'Verbraucherzentrale — Lootboxen und Glücksspiel-Mechaniken',
+    title: 'Verbraucherzentrale: Lootboxen und Glücksspiel-Mechaniken',
     note: 'Warum variable Belohnungen bei Kindern besonders wirken.',
     url: 'https://www.verbraucherzentrale.de/',
   },
   {
-    title: 'BzKJ — Kinder- und Jugendmedienschutz',
+    title: 'BzKJ: Kinder- und Jugendmedienschutz',
     note: 'Die Bundeszentrale sammelt Forschung zu digitalen Risiken.',
     url: 'https://www.bzkj.de/',
   },
   {
-    title: 'Norwegian Consumer Council — „Insert Coin" (2022)',
+    title: 'Norwegian Consumer Council: „Insert Coin" (2022)',
     note: 'Meistzitierter Report zu Dark Patterns in Spielen für Kinder.',
     url: 'https://www.forbrukerradet.no/',
   },
@@ -123,6 +123,14 @@ export default function Science() {
               Wir haben zuerst gelesen.{' '}
               <em className="italic text-sage">Dann programmiert.</em>
             </h1>
+            <p className="mt-8 text-base sm:text-lg text-ink/75 leading-relaxed max-w-2xl">
+              Ronki ist kein Produktivitäts-Werkzeug und kein Disziplin-Helfer.
+              Er begleitet das tägliche Ritual deines Kindes, also die kleine
+              Abfolge von Zähne, Anziehen, Ranzen, die jeden Morgen wieder
+              stattfindet. Leise, ohne Streaks, ohne Druck. Ein Ritual gehört
+              dem, der es lebt. Jede Entscheidung, die wir für Ronki getroffen
+              haben, stützt sich deshalb auf Forschung statt auf Konversion.
+            </p>
           </motion.div>
         </div>
       </section>
@@ -158,6 +166,11 @@ export default function Science() {
               </p>
               <p className="font-display font-semibold text-teal-dark">
                 Ronki ist bewusst in die andere Richtung gebaut.
+              </p>
+              <p>
+                Statt Aufmerksamkeit zu extrahieren, begleitet er ein tägliches
+                Ritual. Das Ritual gehört dem Kind, nicht der App. Und es wird
+                leiser, je besser es sitzt.
               </p>
             </div>
           </motion.div>

@@ -202,7 +202,9 @@ export default function FuerEltern() {
               className="mt-6 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed"
             >
               Wir kennen das Gefühl. Noch eine Kinder-App, die Gutes verspricht
-              und das Gegenteil tut. Deshalb reden wir hier nicht über
+              und das Gegenteil tut. Ronki ist anders gebaut: kein
+              Routine-Tracker, sondern ein Begleiter für ein tägliches Ritual,
+              das eurem Kind gehört. Hier reden wir deshalb nicht über
               Features, sondern über die Dinge, die ihr wirklich wissen wollt,
               bevor ihr Ronki in die Hände eures Kindes gebt.
             </motion.p>
