@@ -75,12 +75,24 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
   };
 
   return (
-    <div className="pb-32" style={{ backgroundColor: '#fff8f2', minHeight: '100dvh' }}>
+    <div className="relative pb-32" style={{ minHeight: '100dvh' }}>
 
-      {/* TopBar sits ABOVE the hero card on the cream page background
-           (Polish .bb-hero spec: hero is a floating 26px-rounded gold
-           card inside outer margin, TopBar is *not* inside it). Audit
-           call-out fixed the old dark-teal bleed. */}
+      {/* Viewport-level ambient sky (Hub pattern) — no more cream band
+           above the TopBar. Cream-over-sky gradient lets blue read at the
+           top and fades to full cream before reward cards. Matches the
+           shared atmosphere used on Hub + Aufgaben. */}
+      <div className="fixed inset-0 pointer-events-none"
+           style={{
+             zIndex: 0,
+             background: `linear-gradient(rgba(255,248,242,0.35) 0%, rgba(255,248,242,0.55) 40%, rgba(255,248,242,0.88) 75%, #fff8f2 100%), url(${import.meta.env.BASE_URL}art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_bright_midday_sky._Wa_e8eca682-4eb9-4da2-8c93-a4cb25ba363d_1.webp) center top / cover no-repeat`,
+             backgroundColor: '#fff8f2',
+           }}
+           aria-hidden="true" />
+
+      {/* Relative wrapper so all content floats above the sky backdrop */}
+      <div className="relative" style={{ zIndex: 1 }}>
+
+      {/* TopBar sits ABOVE the hero card on the sky backdrop. */}
       <TopBar onNavigate={onNavigate} view="shop" onOpenParental={onOpenParental} />
 
       {/* ── Gilded hero card — cream→amber→gold radial gradient matching
@@ -502,6 +514,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
           </div>
         </div>
       )}
+      </div>
       </div>
     </div>
   );

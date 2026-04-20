@@ -110,8 +110,16 @@ export default function RonkiProfile({ onNavigate }) {
 
   return (
     <div className="relative min-h-dvh pb-32">
-      {/* Cream base */}
-      <div className="fixed inset-0 -z-20" style={{ background: '#fff8f2' }} />
+      {/* Viewport-level ambient sky (Hub pattern) — unified atmosphere
+           across all tabs. Same cream-over-sky gradient as Hub, Aufgaben,
+           Laden, Buch so the top chrome never sits on a cream band. The
+           cream-brush texture stays on top for the painterly feel. */}
+      <div className="fixed inset-0 pointer-events-none -z-20"
+           style={{
+             background: `linear-gradient(rgba(255,248,242,0.35) 0%, rgba(255,248,242,0.55) 40%, rgba(255,248,242,0.88) 75%, #fff8f2 100%), url(${base}art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_bright_midday_sky._Wa_e8eca682-4eb9-4da2-8c93-a4cb25ba363d_1.webp) center top / cover no-repeat`,
+             backgroundColor: '#fff8f2',
+           }}
+           aria-hidden="true" />
       <img src={base + 'art/bg-cream-brush.webp'} alt="" className="fixed inset-0 w-full h-full object-cover opacity-20 pointer-events-none -z-10" />
 
       <main className="px-5 max-w-lg mx-auto"

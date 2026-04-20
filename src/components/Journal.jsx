@@ -101,11 +101,20 @@ export default function Journal({ onNavigate, onOpenParental }) {
   const selectedEntry = viewingEntry ? history.find(e => e.date === viewingEntry) : null;
 
   return (
-    <div className="relative pb-32" style={{ backgroundColor: '#fff8f2', minHeight: '100dvh' }}>
-      {/* Page bg — subtle navy texture stays (Buch is read against a calm,
-           slightly darker backdrop). Design reference v2 keeps the dark-teal
-           header card and renames the book to "Abenteuer-Buch". */}
-      <img src={base + 'art/bg-navy-night.png'} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none opacity-20" />
+    <div className="relative pb-32" style={{ minHeight: '100dvh' }}>
+      {/* Viewport-level ambient sky (Hub pattern) — same cream-over-sky
+           backdrop as Hub/Aufgaben/Laden so the TopBar pills never sit
+           on a cream band. The dark-teal journal hero card sits as a
+           floating tile on top. */}
+      <div className="fixed inset-0 pointer-events-none"
+           style={{
+             zIndex: 0,
+             background: `linear-gradient(rgba(255,248,242,0.35) 0%, rgba(255,248,242,0.55) 40%, rgba(255,248,242,0.88) 75%, #fff8f2 100%), url(${base}art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_bright_midday_sky._Wa_e8eca682-4eb9-4da2-8c93-a4cb25ba363d_1.webp) center top / cover no-repeat`,
+             backgroundColor: '#fff8f2',
+           }}
+           aria-hidden="true" />
+      {/* Relative wrapper so all content floats above the sky backdrop */}
+      <div className="relative" style={{ zIndex: 1 }}>
 
       {/* TopBar sits ABOVE the hero card on cream page bg (Polish v2
            .journal-hero spec: hero is a 24px-rounded teal card in 16px
@@ -634,6 +643,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
       <div className="flex justify-center items-center gap-2 py-6" style={{ color: 'rgba(123,116,134,0.5)' }}>
         <span className="material-symbols-outlined text-sm">lock</span>
         <span className="font-label text-xs font-bold uppercase tracking-widest">{t('journal.privacy')}</span>
+      </div>
       </div>
       </div>
     </div>
