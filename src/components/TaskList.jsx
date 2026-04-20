@@ -294,27 +294,33 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {/* Smaller chapter ring (36px) — the overall progress
-                         bar at the top now owns the big "where am I today"
-                         signal, so per-chapter rings can be quieter. */}
-                    <div className="relative w-9 h-9 flex items-center justify-center">
-                      <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" fill="transparent" r="14"
-                                stroke="rgba(18,67,70,0.14)" strokeWidth="3" />
-                        <circle cx="18" cy="18" fill="transparent" r="14"
+                    {/* Chapter ring — Polish spec 28px (audit #4: old 36px
+                         donuts were too big). Stroke 2.5, radius 11. */}
+                    <div className="relative w-7 h-7 flex items-center justify-center">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 28 28">
+                        <circle cx="14" cy="14" fill="transparent" r="11"
+                                stroke="rgba(18,67,70,0.14)" strokeWidth="2.5" />
+                        <circle cx="14" cy="14" fill="transparent" r="11"
                                 stroke={secDone ? '#34d399' : '#fcd34d'}
-                                strokeWidth="3" strokeLinecap="round"
-                                strokeDasharray="88"
-                                strokeDashoffset={88 - (doneCount / quests.length) * 88} />
+                                strokeWidth="2.5" strokeLinecap="round"
+                                strokeDasharray="69.1"
+                                strokeDashoffset={69.1 - (doneCount / quests.length) * 69.1} />
                       </svg>
-                      <span className={`absolute text-[10px] font-bold font-label ${secDone ? 'text-emerald-dark' : ''}`}>
+                      <span className="absolute font-bold font-label"
+                            style={{ fontSize: 9 }}>
                         {secDone ? (
-                          <span className="material-symbols-outlined text-emerald-dark" style={{ fontVariationSettings: "'FILL' 1", fontSize: 13 }}>check</span>
+                          <span className="material-symbols-outlined" style={{ color: '#059669', fontVariationSettings: "'FILL' 1", fontSize: 11 }}>check</span>
                         ) : `${doneCount}/${quests.length}`}
                       </span>
                     </div>
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center group-open:rotate-180 transition-transform ${secDone ? 'bg-emerald-dark' : 'bg-primary'}`}>
-                      <span className="material-symbols-outlined text-white" style={{ fontSize: 16 }}>
+                    {/* Chevron — Polish .chev spec: quiet 28×28 cream tile,
+                         not solid primary pill (audit #13). */}
+                    <div className="w-7 h-7 rounded-[10px] flex items-center justify-center group-open:rotate-180 transition-transform"
+                         style={{
+                           background: 'rgba(255,255,255,0.7)',
+                           border: '1px solid rgba(18,67,70,0.08)',
+                         }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#124346' }}>
                         expand_more
                       </span>
                     </div>
@@ -445,19 +451,31 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                                 )}
                               </div>
                             ) : (
-                              /* ── Active task ── */
+                              /* ── Active task — Polish .qcard + .qcard.next
+                                   spec: next-card uses gold border+glow +
+                                   cream gradient (audit #9). Anchor icon
+                                   tile 44×44 radius 14 regardless of state
+                                   (audit #6). ── */
                               <div
-                                className={`w-full flex items-center gap-3 rounded-xl transition-all text-left cursor-pointer active:scale-[0.97] ${isNext ? 'p-5' : 'p-4'}`}
+                                className={`w-full flex items-center gap-3 transition-all text-left cursor-pointer active:scale-[0.97]`}
                                 style={{
-                                  background: '#ffffff',
-                                  border: isNext ? '2px solid rgba(18,67,70,0.18)' : '1px solid rgba(0,0,0,0.06)',
-                                  boxShadow: isNext ? '0 4px 16px rgba(18,67,70,0.10), 0 0 0 3px rgba(252,211,77,0.12)' : '0 1px 4px rgba(0,0,0,0.04)',
+                                  background: isNext
+                                    ? 'linear-gradient(180deg, #ffffff 0%, #fffaf0 100%)'
+                                    : '#ffffff',
+                                  border: isNext
+                                    ? '1.5px solid rgba(252,211,77,0.55)'
+                                    : '1px solid rgba(0,0,0,0.06)',
+                                  boxShadow: isNext
+                                    ? '0 10px 22px -8px rgba(252,211,77,0.4)'
+                                    : '0 1px 4px rgba(0,0,0,0.04)',
+                                  padding: isNext ? '16px' : '12px 14px',
+                                  borderRadius: 14,
                                 }}
                                 onClick={() => canTap && handleComplete(q.id)}
                               >
-                                <div className={`${isNext ? 'w-14 h-14' : 'w-11 h-11'} rounded-2xl flex items-center justify-center shrink-0 transition-all`}
-                                     style={{ background: `${meta.col}${isNext ? '18' : '12'}` }}>
-                                  <span className={isNext ? 'text-2xl' : 'text-lg'}>{q.icon}</span>
+                                <div className="w-11 h-11 flex items-center justify-center shrink-0 transition-all"
+                                     style={{ background: `${meta.col}18`, borderRadius: 14 }}>
+                                  <span className="text-xl">{q.icon}</span>
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-bold font-label text-on-surface">{t('quest.' + q.id)}</p>
@@ -483,6 +501,9 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                                     </p>
                                   )}
                                 </div>
+                                {/* XP pill — routine cards show bare "+N"
+                                     per Polish .qxp (audit #10). Only bonus
+                                     cards carry the "HP · BONUS" suffix. */}
                                 <span className="font-label font-extrabold text-[11px] shrink-0 whitespace-nowrap"
                                       style={{
                                         background: 'rgba(252,211,77,0.22)',
@@ -491,7 +512,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                                         padding: '6px 9px',
                                         borderRadius: 8,
                                         letterSpacing: '0.04em',
-                                      }}>+{q.xp} HP</span>
+                                      }}>+{q.xp}</span>
                               </div>
                             )}
                           </div>

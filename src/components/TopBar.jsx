@@ -27,8 +27,11 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
               // fold. Transparent (no bg on the header itself); the pills
               // already have backdrop-blur cream bodies, so the bar reads
               // as "floating elements over the sky" rather than a band.
-              padding: '6px 16px 8px',
-              paddingTop: 'calc(6px + env(safe-area-inset-top, 0px))',
+              // Restored to Polish .topbar spec: 10/20/14 padding. The
+              // earlier 6/16/8 tightening looked cramped (audit call-out).
+              // Safe-area-top still added to paddingTop for PWA edge-to-edge.
+              padding: '10px 20px 14px',
+              paddingTop: 'calc(10px + env(safe-area-inset-top, 0px))',
             }}>
       <div className="flex justify-between items-center gap-3">
         {/* Left: back-pill to Lager. Design .back-pill spec exactly. */}

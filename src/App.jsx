@@ -25,6 +25,7 @@ import ZahlenjagdGame from './components/ZahlenjagdGame';
 import MusterMemoryGame from './components/MusterMemoryGame';
 import WurzelLabyrinthGame from './components/WurzelLabyrinthGame';
 import PilzWaageGame from './components/PilzWaageGame';
+import KristallSortiererGame from './components/KristallSortiererGame';
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
@@ -214,6 +215,13 @@ function AppContent() {
       )}
       {view === 'mint-game' && activeMintGame === 'pilz-waage' && (
         <PilzWaageGame onComplete={(reward) => {
+          if (reward?.hp > 0) actions.addHP(reward.hp);
+          setActiveMintGame(null);
+          setView('hub');
+        }} />
+      )}
+      {view === 'mint-game' && activeMintGame === 'kristall-sortierer' && (
+        <KristallSortiererGame onComplete={(reward) => {
           if (reward?.hp > 0) actions.addHP(reward.hp);
           setActiveMintGame(null);
           setView('hub');

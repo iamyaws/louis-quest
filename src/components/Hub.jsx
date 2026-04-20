@@ -266,17 +266,22 @@ export default function Hub({ onNavigate, onPlayMint }) {
       </div>
 
       {/* ═════════════════════════════════════════════════════════════════
-         C · TOP BAR — slim hero pill. No HP pill on this view.
-         Floats over the painted scene.
+         C · TOP BAR — avatar-pill (left) + HP pill (right).
+         Floats over the painted scene. Polish .topbar spec: balanced
+         layout. Audit call-out: Marc flagged missing HP pill on Hub —
+         added here so every view has consistent top chrome. The right HP
+         pill matches Polish .hp spec (cream→amber gradient, 22px pearl,
+         primary number + gold-ink label below).
          ═════════════════════════════════════════════════════════════════ */}
-      <header className="relative px-6 pt-6 pb-2" style={{ zIndex: 10 }}>
+      <header className="relative flex justify-between items-center gap-3"
+              style={{
+                zIndex: 10,
+                padding: '10px 20px 14px',
+                paddingTop: 'calc(10px + env(safe-area-inset-top, 0px))',
+              }}>
         <button onClick={() => onNavigate?.('ronki')}
-                className="inline-flex items-center active:scale-95 transition-all rounded-full"
+                className="inline-flex items-center active:scale-95 transition-all rounded-full shrink-0"
                 style={{
-                  // Matches design .avatar-pill spec from the uploaded
-                  // Ronki *.Polish.html files — consistent across Hub,
-                  // Aufgaben, Laden, Buch so the top bar reads as one
-                  // design system.
                   background: 'rgba(255,248,242,0.82)',
                   backdropFilter: 'blur(14px) saturate(160%)',
                   WebkitBackdropFilter: 'blur(14px) saturate(160%)',
@@ -308,6 +313,30 @@ export default function Hub({ onNavigate, onPlayMint }) {
             </span>
           </div>
         </button>
+
+        {/* HP pill — Polish .hp spec. Tall "N / HELDENPUNKTE" shape,
+             cream→amber vertical gradient, 22px pearl, primary-teal
+             number + gold-ink label below. Proud score, not chip. */}
+        <div className="flex items-center rounded-full shrink-0"
+             style={{
+               background: 'linear-gradient(180deg, #fff8e1 0%, #fde68a 100%)',
+               border: '1px solid rgba(180,83,9,0.25)',
+               padding: '7px 14px 7px 9px',
+               gap: 8,
+               boxShadow: '0 4px 12px -4px rgba(252,211,77,0.6), inset 0 1px 0 rgba(255,255,255,0.7)',
+             }}>
+          <Pearl size={22} />
+          <div className="flex flex-col leading-none">
+            <b className="font-label font-extrabold"
+               style={{ color: '#124346', fontSize: 16, letterSpacing: '-0.01em', lineHeight: 1 }}>
+              {state.hp || 0}
+            </b>
+            <span className="font-label font-semibold uppercase"
+                  style={{ fontSize: 10, letterSpacing: '0.16em', color: '#725b00', marginTop: 3, lineHeight: 1 }}>
+              {lang === 'de' ? 'Heldenpunkte' : 'Hero points'}
+            </span>
+          </div>
+        </div>
       </header>
 
       {/* ═════════════════════════════════════════════════════════════════

@@ -101,44 +101,57 @@ export default function Journal({ onNavigate, onOpenParental }) {
   const selectedEntry = viewingEntry ? history.find(e => e.date === viewingEntry) : null;
 
   return (
-    <div className="relative px-6 pb-32">
+    <div className="relative pb-32" style={{ backgroundColor: '#fff8f2', minHeight: '100dvh' }}>
       {/* Page bg — subtle navy texture stays (Buch is read against a calm,
            slightly darker backdrop). Design reference v2 keeps the dark-teal
            header card and renames the book to "Abenteuer-Buch". */}
       <img src={base + 'art/bg-navy-night.png'} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none opacity-20" />
 
-      {/* ── Hero header — dark teal card, renamed to "Abenteuer-Buch".
-             TopBar (back-pill + parent lock) sits INSIDE the card so the
-             cream pills float over the dark teal surface, Hub-pattern. ── */}
-      <section className="mb-6 -mx-6 -mt-6">
-        <div className="relative rounded-b-3xl overflow-hidden"
-             style={{ background: 'linear-gradient(135deg, #0c3236, #124346)' }}>
-          <TopBar onNavigate={onNavigate} view="journal" onOpenParental={onOpenParental} />
-          <div className="flex items-end px-6 pt-2 pb-5">
-            <div className="flex-1 z-10 pb-2">
-              <h1 className="text-3xl font-headline text-white mb-1"
+      {/* TopBar sits ABOVE the hero card on cream page bg (Polish v2
+           .journal-hero spec: hero is a 24px-rounded teal card in 16px
+           outer margin, TopBar is outside above it). Audit fix for the
+           prior full-bleed dark-teal slab. */}
+      <TopBar onNavigate={onNavigate} view="journal" onOpenParental={onOpenParental} />
+
+      {/* ── Hero card — floating dark teal tile with 24px rounded corners,
+             16px outer margin, 22px/500 headline, 100px hero img. Matches
+             Polish v2 .journal-hero spec exactly. ── */}
+      <section style={{ padding: '6px 16px 0' }}>
+        <div className="relative overflow-hidden"
+             style={{
+               background: 'linear-gradient(135deg, #0c3236, #124346)',
+               borderRadius: 24,
+               boxShadow: '0 16px 36px -14px rgba(12,50,54,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
+             }}>
+          <div className="flex items-end" style={{ padding: '18px 20px 16px' }}>
+            <div className="flex-1 z-10 pb-1">
+              <h1 className="font-headline mb-0.5"
                   style={{
                     fontFamily: 'Fredoka, sans-serif',
                     fontWeight: 500,
+                    fontSize: 22,
                     letterSpacing: '-0.015em',
+                    color: '#fff',
+                    lineHeight: 1.1,
                     textShadow: '0 2px 8px rgba(0,0,0,0.3)',
                   }}>
                 {lang === 'de' ? 'Abenteuer-Buch' : 'Adventure Book'}
               </h1>
-              <p className="font-body text-sm leading-relaxed"
-                 style={{ color: 'rgba(255,255,255,0.65)' }}>
+              <p className="font-body leading-snug"
+                 style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.35 }}>
                 {lang === 'de' ? 'Dein Tagebuch voller Erinnerungen' : 'Your journal full of memories'}
               </p>
             </div>
             <img src={base + 'art/hero-journal.webp'}
                  alt=""
-                 className="w-32 h-auto -mb-5 -mr-2 drop-shadow-2xl"
-                 style={{ filter: 'brightness(1.1)' }} />
+                 className="w-24 h-auto -mb-3 -mr-1"
+                 style={{ filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.4))' }} />
           </div>
           <div className="absolute bottom-0 right-8 w-24 h-16 rounded-full blur-2xl opacity-30 pointer-events-none"
                style={{ background: '#f59e0b' }} />
         </div>
       </section>
+      <div style={{ paddingLeft: 24, paddingRight: 24, marginTop: 20 }}>
 
       {/* ── Today's Entry ── */}
       {!bookOpen ? (
@@ -318,17 +331,23 @@ export default function Journal({ onNavigate, onOpenParental }) {
               <label className="font-label text-xs font-bold text-primary block uppercase tracking-wide mb-3">
                 {t('journal.gratitude.title')}
               </label>
-              <div className="flex flex-wrap gap-3">
+              {/* Polish v2 .chip spec: flat pill, no rotation, no offset
+                   shadow (audit call-out — the v1 "handmade sticker" look
+                   was dropped). Rounded-full, padding 8/14, weight 700. */}
+              <div className="flex flex-wrap gap-2">
                 {GRATITUDE.map((g, i) => (
                   <button key={g}
-                    className={`px-5 py-2.5 rounded-xl font-label text-xs font-black uppercase transition-all active:scale-95 ${
-                      gratitude.includes(g) ? 'bg-primary text-white shadow-lg' : 'bg-white text-primary border-2'
-                    }`}
-                    style={!gratitude.includes(g) ? {
-                      border: '2px solid rgba(18,67,70,0.12)',
-                      boxShadow: '4px 4px 0px rgba(18,67,70,0.08)',
-                      transform: `rotate(${(g.length % 5) - 2}deg)`,
-                    } : undefined}
+                    className="font-label font-bold uppercase rounded-full transition-all active:scale-95"
+                    style={{
+                      padding: '8px 14px',
+                      fontSize: 12,
+                      letterSpacing: '0.04em',
+                      background: gratitude.includes(g) ? '#124346' : '#ffffff',
+                      color: gratitude.includes(g) ? '#fef3c7' : '#124346',
+                      border: gratitude.includes(g)
+                        ? '1.5px solid #124346'
+                        : '1.5px solid rgba(18,67,70,0.12)',
+                    }}
                     onClick={() => toggleItem(gratitude, setGratitude, g)}
                   >{gratitudeLabels[i]}</button>
                 ))}
@@ -340,18 +359,55 @@ export default function Journal({ onNavigate, onOpenParental }) {
               <label className="font-label text-xs font-bold text-primary block uppercase tracking-wide mb-3">
                 {t('journal.dayEmoji.title')}
               </label>
+              {/* Day emoji grid — selected tile gets a sparkle ✨ crown
+                   anchored top-right with an 1.8s sparkle pulse (Polish
+                   .emoji-crown spec; previously missing — backlog fix). */}
               <div className="grid grid-cols-3 gap-3 p-4 rounded-2xl"
                    style={{ background: 'rgba(18,67,70,0.05)', border: '1px solid rgba(18,67,70,0.1)' }}>
-                {DAY_EMOJIS.map((e, i) => (
-                  <button key={i}
-                    className={`aspect-square flex items-center justify-center text-3xl rounded-2xl shadow-sm transition-all active:scale-95 ${
-                      dayEmoji === i ? 'ring-4 ring-primary/30 scale-110' : ''
-                    }`}
-                    style={{ background: dayEmoji === i ? 'rgba(252,211,77,0.15)' : 'rgba(255,255,255,0.5)' }}
-                    onClick={() => { SFX.play('tap'); setDayEmoji(i); }}
-                  >{e}</button>
-                ))}
+                {DAY_EMOJIS.map((e, i) => {
+                  const selected = dayEmoji === i;
+                  return (
+                    <button key={i}
+                      className="relative aspect-square flex items-center justify-center text-3xl transition-all active:scale-95"
+                      style={{
+                        borderRadius: 16,
+                        background: selected
+                          ? 'linear-gradient(160deg, #fffdf5, #fef3c7)'
+                          : 'rgba(255,255,255,0.5)',
+                        border: selected
+                          ? '1.5px solid rgba(180,83,9,0.35)'
+                          : '1px solid transparent',
+                        boxShadow: selected
+                          ? '0 8px 18px -6px rgba(180,83,9,0.3)'
+                          : '0 1px 3px rgba(0,0,0,0.05)',
+                        transform: selected ? 'scale(1.08)' : 'scale(1)',
+                      }}
+                      onClick={() => { SFX.play('tap'); setDayEmoji(i); }}
+                    >
+                      <span>{e}</span>
+                      {selected && (
+                        <span aria-hidden="true"
+                              style={{
+                                position: 'absolute',
+                                top: -6,
+                                right: -6,
+                                fontSize: 18,
+                                animation: 'emojiSparkle 1.8s ease-in-out infinite',
+                                filter: 'drop-shadow(0 2px 4px rgba(180,83,9,0.35))',
+                              }}>
+                          ✨
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
+              <style>{`
+                @keyframes emojiSparkle {
+                  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+                  50% { transform: scale(1.2) rotate(15deg); opacity: 0.85; }
+                }
+              `}</style>
             </div>
 
             {/* Achievements */}
@@ -387,40 +443,96 @@ export default function Journal({ onNavigate, onOpenParental }) {
         </>
       )}
 
-      {/* ── Stimmungs-Kalender ── */}
-      <details className="mb-6 rounded-2xl"
-               style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-        <summary className="flex justify-between items-center p-5 cursor-pointer select-none list-none">
-          <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline">{t('journal.moodCalendar')}</h3>
-          <div className="flex items-center gap-2">
-            <span className="font-label text-xs font-bold text-primary uppercase">
-              {new Date().toLocaleDateString(locale, { month: 'long' })}
-            </span>
-            <span className="material-symbols-outlined text-sm text-outline">expand_more</span>
-          </div>
-        </summary>
-        <div className="px-5 pb-5">
-          <div className="grid grid-cols-7 gap-y-3 gap-x-2">
-            {['M','D','M','D','F','S','S'].map((d, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <span className="text-xs font-bold" style={{ color: 'rgba(123,116,134,0.4)' }}>{d}</span>
+      {/* ── Stimmungs-Kalender — 7-day strip per Polish .kalender-strip.
+             Replaces the old 28-day grid of tiny dots (backlog fix, Marc
+             endorsed). Each tile shows the last 7 days' mood emoji on a
+             per-mood tint wash. Full month stays behind a "mehr" details. ── */}
+      {(() => {
+        // Build last 7 days (today at right) from journalHistory + today's live mood.
+        const today = new Date();
+        const days = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(today);
+          d.setDate(today.getDate() - i);
+          const iso = d.toISOString().slice(0, 10);
+          const isToday = i === 0;
+          const entry = isToday
+            ? { mood: state.moodAM }
+            : (state.journalHistory || []).find(h => h.date === iso);
+          days.push({
+            iso,
+            label: d.toLocaleDateString(locale, { weekday: 'narrow' }),
+            mood: entry?.mood ?? null,
+            isToday,
+          });
+        }
+        return (
+          <section className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline">
+                {t('journal.moodCalendar')}
+              </h3>
+              <span className="font-label text-xs font-bold text-primary uppercase">
+                {lang === 'de' ? 'letzte 7 Tage' : 'last 7 days'}
+              </span>
+            </div>
+            <div className="grid grid-cols-7 gap-2">
+              {days.map((d, i) => {
+                const tint = d.mood !== null ? MOOD_COLORS[d.mood].tint : '#fffaf2';
+                const ink = d.mood !== null ? MOOD_COLORS[d.mood].ink : 'rgba(123,116,134,0.45)';
+                return (
+                  <div key={i}
+                       className="flex flex-col items-center justify-center rounded-xl transition-transform"
+                       style={{
+                         aspectRatio: '1/1',
+                         background: tint,
+                         border: d.isToday ? '2px solid #124346' : '1px solid rgba(0,0,0,0.04)',
+                         boxShadow: d.isToday ? '0 4px 12px -4px rgba(18,67,70,0.3)' : '0 1px 2px rgba(0,0,0,0.04)',
+                       }}>
+                    <span style={{ fontSize: 22, lineHeight: 1 }}>
+                      {d.mood !== null ? MOOD_EMOJIS[d.mood] : '·'}
+                    </span>
+                    <span className="font-label font-bold uppercase"
+                          style={{ fontSize: 9, color: ink, letterSpacing: '0.08em', marginTop: 3 }}>
+                      {d.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Month expansion hidden behind details (legacy 28-day view) */}
+            <details className="mt-4 rounded-2xl"
+                     style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.06)' }}>
+              <summary className="flex justify-between items-center px-4 py-3 cursor-pointer select-none list-none">
+                <span className="font-label font-bold text-xs uppercase tracking-widest text-outline">
+                  {lang === 'de' ? 'Ganzer Monat' : 'Full month'}
+                </span>
+                <span className="material-symbols-outlined text-sm text-outline">expand_more</span>
+              </summary>
+              <div className="px-4 pb-4">
+                <div className="grid grid-cols-7 gap-y-2 gap-x-1.5">
+                  {['M','D','M','D','F','S','S'].map((d, i) => (
+                    <span key={i} className="text-[10px] font-bold text-center" style={{ color: 'rgba(123,116,134,0.4)' }}>{d}</span>
+                  ))}
+                  {Array.from({ length: 28 }, (_, i) => {
+                    const dayNum = i + 1;
+                    const td = today.getDate();
+                    const isPast = dayNum < td;
+                    const isToday = dayNum === td;
+                    const colors = ['#34d399', '#fcd34d', '#fbbf24', '#5eead4', '#d1fae5'];
+                    const col = isPast ? colors[dayNum % colors.length] : '#f4ede5';
+                    return (
+                      <div key={i} className={`w-3 h-3 rounded-full mx-auto ${isToday ? 'ring-2 ring-primary/30' : ''}`}
+                           style={{ background: isToday && state.moodAM !== null ? '#b45309' : col }} />
+                    );
+                  })}
+                </div>
               </div>
-            ))}
-            {Array.from({ length: 28 }, (_, i) => {
-              const dayNum = i + 1;
-              const today = new Date().getDate();
-              const isPast = dayNum < today;
-              const isToday = dayNum === today;
-              const colors = ['#34d399', '#fcd34d', '#fbbf24', '#5eead4', '#d1fae5'];
-              const col = isPast ? colors[dayNum % colors.length] : '#f4ede5';
-              return (
-                <div key={i} className={`w-4 h-4 rounded-full mx-auto transition-transform hover:scale-125 ${isToday ? 'ring-4 ring-primary/20' : ''}`}
-                     style={{ background: isToday && state.moodAM !== null ? '#b45309' : col }} />
-              );
-            })}
-          </div>
-        </div>
-      </details>
+            </details>
+          </section>
+        );
+      })()}
 
       {/* ── Alte Abenteuer — past journal entries.
              Design-ref v2 (Ronki Buch Polish v2): "ALTE ABENTEUER" with a
@@ -522,6 +634,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
       <div className="flex justify-center items-center gap-2 py-6" style={{ color: 'rgba(123,116,134,0.5)' }}>
         <span className="material-symbols-outlined text-sm">lock</span>
         <span className="font-label text-xs font-bold uppercase tracking-widest">{t('journal.privacy')}</span>
+      </div>
       </div>
     </div>
   );

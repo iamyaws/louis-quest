@@ -92,20 +92,38 @@ export default function ForscherEcke({ onPlayGame }) {
       <span className="absolute top-3 right-16 text-base opacity-60 select-none" aria-hidden="true">✦</span>
       <span className="absolute bottom-3 left-5 text-xs opacity-40 select-none" aria-hidden="true">✦</span>
 
-      {/* Header — eyebrow + headline + count, microscope anchored right */}
-      <div className="flex items-start justify-between gap-4 mb-5">
+      {/* Header — eyebrow + headline + count, Doktor Funkel anchored right.
+           Marc replaced the microscope emoji with a character — Doktor
+           Funkel (forest-biome researcher from the Micropedia) gives the
+           section a face + story instead of an abstract glyph. The alt
+           portrait already sits on a warm cream bg that matches this
+           card, so no bg removal needed; a circular mask keeps the crop
+           tidy on different card widths. */}
+      <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex-1 min-w-0">
           <p className="font-bold text-[11px] font-label uppercase tracking-[0.22em] text-secondary mb-1.5">
             Forscher-Ecke
           </p>
           <h3 className="font-headline font-extrabold text-lg text-primary-container leading-tight">
-            Knobel-Abenteuer
+            Mit Dr. Funkel
           </h3>
           <p className="font-body text-on-surface-variant text-sm mt-1">
             {playedCount} von {MINT_SEQUENCE.length} entdeckt
           </p>
         </div>
-        <span className="text-2xl leading-none select-none shrink-0 mt-0.5" aria-hidden="true">🔬</span>
+        <div className="shrink-0 rounded-full overflow-hidden"
+             style={{
+               width: 56,
+               height: 56,
+               background: 'linear-gradient(160deg, #fffdf5, #fef3c7)',
+               border: '2px solid rgba(180,83,9,0.2)',
+               boxShadow: '0 4px 14px -4px rgba(180,83,9,0.35), inset 0 1px 0 rgba(255,255,255,0.7)',
+             }}>
+          <img src={`${import.meta.env.BASE_URL}art/characters/doktor-funkel.png`}
+               alt="Dr. Funkel"
+               className="w-full h-full object-cover"
+               style={{ objectPosition: 'center 30%', transform: 'scale(1.2)' }} />
+        </div>
       </div>
 
       {/* Grid — one column per implemented game in the sequence */}

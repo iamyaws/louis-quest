@@ -48,9 +48,8 @@ export interface MintGame {
 }
 
 // Sequential unlock: game N requires the badge from the implemented game
-// immediately before it in this array. Unimplemented games are skipped, so
-// Pilz-Waage (game 4) unlocks on Wurzel-Labyrinth's badge even though
-// Kristall-Sortierer (unimplemented) sits between them in spec order.
+// immediately before it in this array. Unimplemented games are skipped.
+// All 5 games are implemented as of Wave 2.7.
 export const MINT_GAMES: MintGame[] = [
   {
     // Position 1 — always unlocked from day one. Easiest (counting).
@@ -89,8 +88,7 @@ export const MINT_GAMES: MintGame[] = [
     implemented: true,
   },
   {
-    // Position 4 — unlocks on Wurzel-Labyrinth badge (Kristall-Sortierer is
-    // unimplemented so skipped in sequence). Logic / balance.
+    // Position 4 — unlocks on Wurzel-Labyrinth badge. Logic / balance.
     id: 'pilz-waage',
     name: { de: 'Pilz-Waage', en: 'Mushroom Balance' },
     emoji: '⚖️',
@@ -102,8 +100,8 @@ export const MINT_GAMES: MintGame[] = [
     implemented: true,
   },
   {
-    // Position 5 — Wave 2.7. Currently filtered out of ForscherEcke until
-    // implemented. When it ships, will unlock on Pilz-Waage badge.
+    // Position 5 — Wave 2.7. Color-sorting tap game. Unlocks on Pilz-Waage badge.
+    // Completion closes the Forscher-Ecke sequence → Hub graduates it.
     id: 'kristall-sortierer',
     name: { de: 'Kristall-Sortierer', en: 'Crystal Sorter' },
     emoji: '🔷',
@@ -112,7 +110,7 @@ export const MINT_GAMES: MintGame[] = [
     hostId: 'forest_5', // Mr. Shroom
     unlockCheck: (s) => (s.mintBadgesEarned || []).includes('badge_mint_waage'),
     introLine: 'Mein Hut ist voll Kristalle. Hilfst du mir beim Sortieren?',
-    implemented: false, // Wave 2.7
+    implemented: true,
   },
 ];
 
