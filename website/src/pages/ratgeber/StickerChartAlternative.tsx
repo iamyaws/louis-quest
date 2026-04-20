@@ -16,6 +16,7 @@ export default function RatgeberStickerChartAlternative() {
       category="Belohnung & Motivation"
       readMinutes={11}
       publishedAt="2026-04-19"
+      ogImage="/og-ratgeber-sticker-chart.jpg"
       heroImage="/art/bioms/Naschgarten_temptaion-garden.webp"
       heroAlt="Malerischer Naschgarten mit süßen Versuchungen, Metapher für extrinsische Belohnungen."
       related={[

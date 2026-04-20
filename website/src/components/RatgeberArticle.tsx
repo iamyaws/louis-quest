@@ -23,6 +23,8 @@ interface Props {
   publishedAt: string;
   heroImage?: string;
   heroAlt?: string;
+  /** Path to a 1200x630 OG image for social previews. Falls back to /og-ronki.jpg. */
+  ogImage?: string;
   related?: RelatedLink[];
   children: ReactNode;
 }
@@ -129,6 +131,7 @@ export function RatgeberArticle({
   publishedAt,
   heroImage,
   heroAlt,
+  ogImage,
   related,
   children,
 }: Props) {
@@ -144,6 +147,7 @@ export function RatgeberArticle({
         title={`${title} · Ratgeber`}
         description={description}
         canonicalPath={`/ratgeber/${slug}`}
+        ogImage={ogImage}
       />
 
       {/* ─────────── Hero ─────────── */}

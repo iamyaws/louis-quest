@@ -16,6 +16,7 @@ export default function RatgeberMorgenroutineGrundschulkind() {
       category="Morgenroutine"
       readMinutes={8}
       publishedAt="2026-04-19"
+      ogImage="/og-ratgeber-morgenroutine.jpg"
       heroImage="/art/bioms/Morgenwald_dawn-forest.webp"
       heroAlt="Malerischer Morgenwald im ersten Licht, ruhiger Tagesbeginn."
       related={[

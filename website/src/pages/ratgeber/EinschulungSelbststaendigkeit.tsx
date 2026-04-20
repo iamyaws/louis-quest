@@ -16,6 +16,7 @@ export default function RatgeberEinschulungSelbststaendigkeit() {
       category="Einschulung"
       readMinutes={8}
       publishedAt="2026-04-19"
+      ogImage="/og-ratgeber-einschulung.jpg"
       heroImage="/art/bioms/Sonnenglast_sun-highlands.webp"
       heroAlt="Malerische sonnige Hügellandschaft, Aufbruch in etwas Neues."
       related={[

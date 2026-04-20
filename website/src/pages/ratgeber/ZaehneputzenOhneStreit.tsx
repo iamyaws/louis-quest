@@ -14,6 +14,7 @@ export default function RatgeberZaehneputzenOhneStreit() {
       category="Hygiene & Zähne"
       readMinutes={7}
       publishedAt="2026-04-19"
+      ogImage="/og-ratgeber-zaehneputzen.jpg"
       heroImage="/art/routines/brushing-teeth.webp"
       heroAlt="Malerische Szene: Kind putzt Zähne im warm beleuchteten Bad."
       related={[

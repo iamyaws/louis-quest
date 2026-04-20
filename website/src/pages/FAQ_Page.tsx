@@ -143,6 +143,7 @@ export default function FAQ_Page() {
         title="Häufige Fragen zu Ronki"
         description="Antworten auf die häufigsten Fragen von Eltern zu Ronki: Geräte, Alter, Datenschutz, Preis und was das Alpha-Programm bedeutet."
         canonicalPath="/faq"
+        ogImage="/og-faq.jpg"
       />
       <FAQPageSchema items={ALL_ITEMS} />
 

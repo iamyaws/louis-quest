@@ -16,6 +16,7 @@ export default function RatgeberDarkPatternsKinderApps() {
       category="Digitale Mündigkeit"
       readMinutes={12}
       publishedAt="2026-04-19"
+      ogImage="/og-ratgeber-dark-patterns.jpg"
       heroImage="/art/bioms/Wolkengrat_mountain-ridge.webp"
       heroAlt="Malerischer Bergkamm zwischen Wolken, schwieriges Terrain, das Orientierung braucht."
       related={[

@@ -172,6 +172,7 @@ export default function FuerEltern() {
         title="Für Eltern: Ronki"
         description="Die Fragen, die sich Eltern stellen, bevor sie einer Kinder-App vertrauen. Ehrliche Antworten zu Bildschirmzeit, Daten, Kosten und Dark Patterns."
         canonicalPath="/fuer-eltern"
+        ogImage="/og-fuer-eltern.jpg"
       />
 
       {/* ── Hero ── */}

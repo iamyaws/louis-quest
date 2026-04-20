@@ -92,6 +92,7 @@ export default function Ratgeber() {
         title="Ratgeber: Ronki"
         description="Ehrliche Artikel für Eltern von 5- bis 9-Jährigen. Über Morgenroutinen, Abendroutinen, Motivation und was in Kinder-Apps wirklich passiert. Kein Ratgeber-Kitsch, keine Versprechen, nur das, was wir selbst rausgefunden haben."
         canonicalPath="/ratgeber"
+        ogImage="/og-ratgeber.jpg"
       />
 
       {/* ─────────── Hero ─────────── */}

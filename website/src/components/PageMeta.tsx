@@ -23,7 +23,13 @@ export function PageMeta({
   locale = 'de',
 }: Props) {
   useEffect(() => {
-    const resolvedImage = ogImage || 'https://www.ronki.de/og-ronki.jpg';
+    // Accept both absolute and root-relative ogImage paths. Social crawlers
+    // need absolute URLs, so we prefix relative paths with the canonical domain.
+    const resolvedImage = ogImage
+      ? ogImage.startsWith('http')
+        ? ogImage
+        : `https://www.ronki.de${ogImage}`
+      : 'https://www.ronki.de/og-ronki.jpg';
     const resolvedUrl = canonicalPath ? `https://www.ronki.de${canonicalPath}` : undefined;
 
     document.title = title;

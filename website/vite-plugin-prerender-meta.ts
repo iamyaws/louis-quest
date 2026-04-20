@@ -35,12 +35,14 @@ const ROUTES: RouteMeta[] = [
     title: 'Häufige Fragen zu Ronki',
     description:
       'Antworten auf die häufigsten Fragen von Eltern zu Ronki: Geräte, Alter, Datenschutz, Preis und was das Alpha-Programm bedeutet.',
+    ogImage: '/og-faq.jpg',
   },
   {
     path: '/fuer-eltern',
     title: 'Für Eltern: Ronki',
     description:
       'Sechs ehrliche Antworten auf die Fragen, die Eltern sich zu Ronki stellen: Bildschirmzeit, Datenschutz, Motivation, Preis und Alpha.',
+    ogImage: '/og-fuer-eltern.jpg',
   },
   {
     path: '/vorlagen',
@@ -53,48 +55,56 @@ const ROUTES: RouteMeta[] = [
     title: 'Ratgeber: Ronki',
     description:
       'Ehrliche Artikel für Eltern von 5- bis 9-Jährigen. Morgenroutinen, Abendroutinen, Motivation und was in Kinder-Apps wirklich passiert. Kein Ratgeber-Kitsch, nur das, was wir selbst rausgefunden haben.',
+    ogImage: '/og-ratgeber.jpg',
   },
   {
     path: '/ratgeber/morgen-troedeln',
     title: 'Warum dein Kind morgens trödelt · Ratgeber · Ronki',
     description:
       'Trödeln ist keine Boshaftigkeit und kein Erziehungsversagen. Was wirklich dahinter steckt und vier Hebel, die bei Grundschulkindern messbar wirken.',
+    ogImage: '/og-ratgeber-morgen-troedeln.jpg',
   },
   {
     path: '/ratgeber/sticker-chart-alternative',
     title: 'Warum Sticker-Charts oft nicht halten · Ratgeber · Ronki',
     description:
       'Sticker-Charts funktionieren kurz, dann brauchst du immer größere Belohnungen. Was die Forschung sagt und was bei Grundschulkindern wirklich trägt.',
+    ogImage: '/og-ratgeber-sticker-chart.jpg',
   },
   {
     path: '/ratgeber/dark-patterns-kinder-apps',
     title: 'Dark Patterns in Kinder-Apps · Ratgeber · Ronki',
     description:
       'Push-Benachrichtigungen, Streaks, Loot-Boxes, Endless-Scroll: wie Kinder-Apps designed sind, dich und dein Kind zurückzuholen. Und woran du eine gute App erkennst.',
+    ogImage: '/og-ratgeber-dark-patterns.jpg',
   },
   {
     path: '/ratgeber/morgenroutine-grundschulkind',
     title: 'Die Morgenroutine, die wirklich klappt · Ratgeber · Ronki',
     description:
       'Eine Morgenroutine, die ein Grundschulkind selbst ausführen kann. Reihenfolge, Zeitplan, typische Stolpersteine und warum deine Routine vielleicht am falschen Ende anfängt.',
+    ogImage: '/og-ratgeber-morgenroutine.jpg',
   },
   {
     path: '/ratgeber/abendroutine-grundschulkind',
     title: 'Die Abendroutine für Grundschulkinder · Ratgeber · Ronki',
     description:
       'Abendroutine für 6- bis 9-Jährige: Warum 45 Minuten reichen, welche Reihenfolge wirklich Schlaf bringt, und wie du aus dem Zähneputz-Drama rauskommst.',
+    ogImage: '/og-ratgeber-abendroutine.jpg',
   },
   {
     path: '/ratgeber/zaehneputzen-ohne-streit',
     title: 'Zähneputzen ohne Streit · Ratgeber · Ronki',
     description:
       'Kind verweigert Zähneputzen? Warum das meistens kein Erziehungsproblem ist, was Kinderzahnärzt:innen raten, und drei Hebel, die bei Grundschulkindern wirken.',
+    ogImage: '/og-ratgeber-zaehneputzen.jpg',
   },
   {
     path: '/ratgeber/einschulung-selbststaendigkeit',
     title: 'Vor der Einschulung: Selbstständigkeit ohne Druck · Ratgeber · Ronki',
     description:
       'Ein halbes Jahr vor der Einschulung: welche Fähigkeiten dein Kind wirklich braucht, was Schule voraussetzt, und wie du das entspannt aufbaust ohne Drill.',
+    ogImage: '/og-ratgeber-einschulung.jpg',
   },
   {
     path: '/impressum',
