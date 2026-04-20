@@ -37,7 +37,7 @@ function getDailyIndex(arr) {
 
 export default function Journal() {
   const { state, actions } = useTask();
-  const { t, locale } = useTranslation();
+  const { t, locale, lang } = useTranslation();
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -88,31 +88,36 @@ export default function Journal() {
 
   return (
     <div className="relative px-6 pb-32">
-      {/* Background texture */}
+      {/* Page bg — subtle navy texture stays (Buch is read against a calm,
+           slightly darker backdrop). Design reference v2 keeps the dark-teal
+           header card and renames the book to "Abenteuer-Buch". */}
       <img src={base + 'art/bg-navy-night.png'} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none opacity-20" />
 
-      {/* ── Header with hero illustration ── */}
+      {/* ── Hero header — dark teal card, renamed to "Abenteuer-Buch" ── */}
       <section className="mb-6 -mx-6 -mt-6">
         <div className="relative rounded-b-3xl overflow-hidden"
              style={{ background: 'linear-gradient(135deg, #0c3236, #124346)' }}>
           <div className="flex items-end px-6 pt-4 pb-5">
-            {/* Text */}
             <div className="flex-1 z-10 pb-2">
-              <h1 className="text-3xl font-bold font-headline text-white mb-1"
-                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-                {t('journal.title')}
+              <h1 className="text-3xl font-headline text-white mb-1"
+                  style={{
+                    fontFamily: 'Fredoka, sans-serif',
+                    fontWeight: 500,
+                    letterSpacing: '-0.015em',
+                    textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                  }}>
+                {lang === 'de' ? 'Abenteuer-Buch' : 'Adventure Book'}
               </h1>
-              <p className="text-white/60 font-body text-sm leading-relaxed">
-                {t('journal.subtitle')}
+              <p className="font-body text-sm leading-relaxed"
+                 style={{ color: 'rgba(255,255,255,0.65)' }}>
+                {lang === 'de' ? 'Dein Tagebuch voller Erinnerungen' : 'Your journal full of memories'}
               </p>
             </div>
-            {/* Hero campfire illustration */}
             <img src={base + 'art/hero-journal.webp'}
                  alt=""
                  className="w-32 h-auto -mb-5 -mr-2 drop-shadow-2xl"
                  style={{ filter: 'brightness(1.1)' }} />
           </div>
-          {/* Warm glow from campfire */}
           <div className="absolute bottom-0 right-8 w-24 h-16 rounded-full blur-2xl opacity-30 pointer-events-none"
                style={{ background: '#f59e0b' }} />
         </div>
@@ -223,7 +228,9 @@ export default function Journal() {
             </div>
           </section>
 
-          {/* ── Mood Selector ── */}
+          {/* ── Mood Selector — v2 design: white card with emoji inside a
+               soft peach circle, uppercase label below. Selected state
+               keeps the warm gold glow around the card. ── */}
           <section className="mb-6">
             <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline mb-4">{t('journal.mood.title')}</h3>
             <div className="grid grid-cols-3 gap-3">
@@ -233,7 +240,7 @@ export default function Journal() {
                 return (
                   <button key={idx}
                     aria-pressed={isSelected}
-                    className={`flex flex-col items-center gap-2 py-5 px-2 rounded-2xl transition-all duration-300 active:scale-95 ${
+                    className={`flex flex-col items-center gap-2.5 py-4 px-2 rounded-2xl transition-all duration-300 active:scale-95 ${
                       isSelected ? 'scale-[1.04]' : ''
                     }`}
                     style={isSelected ? {
@@ -248,8 +255,22 @@ export default function Journal() {
                     }}
                     onClick={() => { SFX.play('pop'); actions.setMood('moodAM', idx); }}
                   >
-                    <span className={`text-5xl ${!isSelected ? 'grayscale opacity-80' : ''}`} style={{ lineHeight: 1 }}>{emoji}</span>
-                    <span className="font-label text-sm font-extrabold uppercase tracking-wide text-center leading-tight">{moodLabels[idx]}</span>
+                    {/* Peach circle backdrop around the emoji (design v2) */}
+                    <div className="flex items-center justify-center rounded-full"
+                         style={{
+                           width: 56,
+                           height: 56,
+                           background: isSelected
+                             ? 'rgba(255,255,255,0.7)'
+                             : 'linear-gradient(140deg, #fef3c7 0%, #fde68a 100%)',
+                           boxShadow: isSelected ? 'inset 0 1px 2px rgba(180,83,9,0.12)' : 'inset 0 1px 2px rgba(180,83,9,0.08)',
+                         }}>
+                      <span className="text-3xl leading-none select-none">{emoji}</span>
+                    </div>
+                    <span className="font-label text-xs font-extrabold uppercase tracking-wider text-center leading-tight"
+                          style={{ color: isSelected ? '#3b2802' : '#124346' }}>
+                      {moodLabels[idx]}
+                    </span>
                   </button>
                 );
               })}
@@ -386,12 +407,20 @@ export default function Journal() {
         </div>
       </details>
 
-      {/* ── Past Entries (Alte Abenteuer) ── */}
+      {/* ── Alte Abenteuer — past journal entries.
+             Design-ref v2 (Ronki Buch Polish v2): "ALTE ABENTEUER" with a
+             small count pill. Each entry is a clean white card showing
+             mood + day emoji + formatted date + memory snippet + chevron. ── */}
       {history.length > 0 && (
         <section className="mb-8">
-          <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline mb-4 flex items-center gap-2">
+          <h3 className="font-label font-bold uppercase tracking-widest text-xs mb-4 flex items-center gap-2"
+              style={{ color: '#6b655b' }}>
             <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>history</span>
-            {`${t('journal.history.title')} (${history.length})`}
+            {lang === 'de' ? 'Alte Abenteuer' : 'Past adventures'}
+            <span className="ml-1 px-2 py-0.5 rounded-full font-label font-extrabold"
+                  style={{ fontSize: 10, background: 'rgba(18,67,70,0.08)', color: '#124346', letterSpacing: '0.06em' }}>
+              {history.length}
+            </span>
           </h3>
           <div className="flex flex-col gap-3">
             {history.map(entry => (
@@ -403,15 +432,18 @@ export default function Journal() {
                   border: viewingEntry === entry.date ? '1.5px solid rgba(18,67,70,0.12)' : '1px solid rgba(0,0,0,0.06)',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                 }}>
-                {/* Header row */}
-                <div className="flex items-center justify-between mb-1">
+                {/* Header row — mood + day emoji + date + chevron */}
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    {entry.mood !== null && <span className="text-lg">{MOOD_EMOJIS[entry.mood]}</span>}
-                    {entry.dayEmoji !== null && <span className="text-lg">{DAY_EMOJIS[entry.dayEmoji]}</span>}
-                    <span className="font-headline font-bold text-sm text-on-surface">{formatDate(entry.date)}</span>
+                    {entry.mood !== null && <span className="text-xl">{MOOD_EMOJIS[entry.mood]}</span>}
+                    {entry.dayEmoji !== null && <span className="text-xl">{DAY_EMOJIS[entry.dayEmoji]}</span>}
+                    <span className="font-headline font-semibold text-sm"
+                          style={{ color: '#124346', letterSpacing: '-0.005em' }}>
+                      {formatDate(entry.date)}
+                    </span>
                   </div>
-                  <span className="material-symbols-outlined text-sm text-outline">
-                    {viewingEntry === entry.date ? 'expand_less' : 'expand_more'}
+                  <span className="material-symbols-outlined text-sm" style={{ color: '#6b655b' }}>
+                    {viewingEntry === entry.date ? 'expand_less' : 'chevron_right'}
                   </span>
                 </div>
                 {/* Memory preview (collapsed) */}
