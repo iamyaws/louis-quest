@@ -26,11 +26,16 @@ function BodhiLeaf({ className = '' }) {
   );
 }
 
-export default function ParentalDashboard({ onClose, currentView }) {
+export default function ParentalDashboard({ onClose, currentView, preauthorized = false }) {
   const { state, actions } = useTask();
   const { t, lang, setLang } = useTranslation();
   const [pin, setPin] = useState('');
-  const [authed, setAuthed] = useState(false);
+  // `preauthorized` short-circuits the legacy internal PIN gate. We now
+  // surface a dedicated PinModal from App.jsx *before* the dashboard
+  // mounts (Marc's flow: enter PIN on a focused screen, then the
+  // dashboard opens cleanly). The internal gate is kept as a fallback
+  // for any call sites that still mount the dashboard directly.
+  const [authed, setAuthed] = useState(preauthorized);
   const [pinError, setPinError] = useState(false);
   const [tab, setTab] = useState('overview');
   const [showFeedback, setShowFeedback] = useState(false);
@@ -192,7 +197,7 @@ export default function ParentalDashboard({ onClose, currentView }) {
       </div>
 
       <main className="relative z-10 px-6 pb-12 max-w-lg mx-auto flex flex-col gap-5">
-        {tab === 'overview' && <OverviewTab state={state} lang={lang} />}
+        {tab === 'overview' && <OverviewTab state={state} lang={lang} t={t} />}
         {tab === 'family' && <FamilyTab state={state} actions={actions} lang={lang} />}
         {tab === 'questlines' && <QuestLineEditor />}
         {tab === 'settings' && <SettingsTab lang={lang} setLang={setLang} t={t} actions={actions} state={state} onOpenFeedback={() => setShowFeedback(true)} />}
@@ -214,7 +219,7 @@ export default function ParentalDashboard({ onClose, currentView }) {
 // ═══════════════════════════════════════════════════════
 // OVERVIEW TAB
 // ═══════════════════════════════════════════════════════
-function OverviewTab({ state, lang }) {
+function OverviewTab({ state, lang, t }) {
   const completedToday = (state.quests || []).filter(q => q.done && !q.sideQuest).length;
   const totalToday = (state.quests || []).filter(q => !q.sideQuest).length;
   const completionPct = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0;

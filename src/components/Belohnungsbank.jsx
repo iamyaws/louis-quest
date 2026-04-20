@@ -5,6 +5,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 import { Pearl, Hourglass } from './CurrencyIcons';
 import BelohnungRedeemModal from './BelohnungRedeemModal';
 import FunkelzeitParentConfirm from './FunkelzeitParentConfirm';
+import TopBar from './TopBar';
 import { useGameAccess } from '../hooks/useGameAccess';
 
 const ICON_MAP = {
@@ -74,98 +75,93 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
   };
 
   return (
-    <div className="px-6 pb-32">
+    <div className="pb-32" style={{ backgroundColor: '#fff8f2', minHeight: '100dvh' }}>
 
-      {/* ── Header with hero illustration ── */}
-      <section className="mb-6 -mx-6 -mt-6">
-        <div className="relative rounded-b-3xl overflow-hidden"
-             style={{ background: 'linear-gradient(135deg, #0c3236, #124346)' }}>
-          <div className="flex items-end px-6 pt-4 pb-5">
-            {/* Text */}
-            <div className="flex-1 z-10 pb-2">
-              <h1 className="text-3xl font-bold font-headline text-white mb-1"
-                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+      {/* TopBar sits ABOVE the hero card on the cream page background
+           (Polish .bb-hero spec: hero is a floating 26px-rounded gold
+           card inside outer margin, TopBar is *not* inside it). Audit
+           call-out fixed the old dark-teal bleed. */}
+      <TopBar onNavigate={onNavigate} view="shop" onOpenParental={onOpenParental} />
+
+      {/* ── Gilded hero card — cream→amber→gold radial gradient matching
+             Polish .bb-hero. Floats in outer 20px margin with 26px rounded
+             corners and a warm gold border. Replaces the prior dark-teal
+             bleed. ── */}
+      <section style={{ padding: '6px 20px 0' }}>
+        <div className="relative overflow-hidden"
+             style={{
+               background: `radial-gradient(circle at 15% 15%, rgba(252,211,77,0.35), transparent 55%), linear-gradient(135deg, #fef3c7 0%, #fde68a 55%, #fcd34d 100%)`,
+               border: '1px solid rgba(180,83,9,0.25)',
+               borderRadius: 26,
+               boxShadow: '0 16px 36px -14px rgba(180,83,9,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
+             }}>
+          <div className="flex items-end" style={{ padding: '20px 22px' }}>
+            <div className="flex-1 z-10 pb-1">
+              <p className="font-label font-extrabold uppercase"
+                 style={{ fontSize: 10, letterSpacing: '0.28em', color: '#b45309', marginBottom: 6 }}>
+                {t('shop.header.title') /* eyebrow doubles as section tag */}
+              </p>
+              <h1 className="font-headline"
+                  style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 500, fontSize: 26, letterSpacing: '-0.015em', color: '#124346', lineHeight: 1.1 }}>
                 {t('shop.header.title')}
               </h1>
-              <p className="text-white/60 font-body text-sm leading-relaxed">
+              <p className="font-body" style={{ fontSize: 13, color: 'rgba(18,67,70,0.65)', marginTop: 4, lineHeight: 1.35 }}>
                 {t('shop.header.subtitle')}
               </p>
             </div>
-            {/* Hero with coins illustration */}
             <img src={import.meta.env.BASE_URL + 'art/hero-shop.webp'}
                  alt=""
-                 className="w-32 h-auto -mb-5 -mr-2 drop-shadow-2xl"
-                 style={{ filter: 'brightness(1.1)' }} />
+                 className="w-24 h-auto -mb-3 -mr-1"
+                 style={{ filter: 'drop-shadow(0 6px 10px rgba(180,83,9,0.35))' }} />
           </div>
-          {/* Coin glow */}
-          <div className="absolute bottom-0 right-12 w-24 h-16 rounded-full blur-2xl opacity-35 pointer-events-none"
-               style={{ background: '#fcd34d' }} />
         </div>
       </section>
+      <div style={{ paddingLeft: 24, paddingRight: 24, marginTop: 20 }}>
 
-      {/* ── Dual Balance Cards — painterly parchment + sage palette.
-             Design refinement (Ronki Laden Polish.html): job-labels under
-             each currency so the two economies read clearly without a
-             separate legend. "HP für Dinge, Funkelzeit für Bildschirm." ── */}
+      {/* ── Dual Balance Cards — quiet cream + mint per Polish .hp-card /
+             .sp-card spec. Old gilded gold + painted sage were too loud
+             (audit call-out) and fought with the hero card for attention.
+             No texture overlays, no giant decorative watermarks, value
+             weight 500 (not bold). ── */}
       <div className="grid grid-cols-2 gap-4 mb-8">
-        {/* HP Balance — gilded parchment */}
+        {/* HP Balance — quiet cream */}
         <div className="p-5 rounded-2xl relative overflow-hidden"
              style={{
-               background: 'linear-gradient(140deg, #fef3c7 0%, #fcd34d 55%, #eab308 100%)',
-               border: '1.5px solid rgba(161, 98, 7, 0.25)',
-               boxShadow: '0 10px 24px -10px rgba(161,98,7,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
+               background: 'linear-gradient(160deg, #fffdf5 0%, #fef3c7 100%)',
+               border: '1px solid rgba(180,83,9,0.2)',
+               boxShadow: '0 6px 18px -10px rgba(180,83,9,0.22), inset 0 1px 0 rgba(255,255,255,0.7)',
              }}>
-          {/* Painted gold-dust texture overlay for depth */}
-          <div className="absolute inset-0 opacity-40 mix-blend-overlay pointer-events-none"
-               style={{
-                 backgroundImage: `url(${import.meta.env.BASE_URL}art/bg-gold-dust.webp)`,
-                 backgroundSize: 'cover',
-                 backgroundPosition: 'center',
-               }} />
-          <div className="relative flex items-center gap-2 mb-1">
-            <Pearl size={24} />
-            <p className="font-label font-bold uppercase tracking-widest text-[11px]" style={{ color: '#7a4a05' }}>{t('hub.boss.detail.heroPoints')}</p>
+          <div className="flex items-center gap-2 mb-2">
+            <Pearl size={22} />
+            <p className="font-label font-extrabold uppercase" style={{ fontSize: 10, letterSpacing: '0.2em', color: '#b45309' }}>{t('hub.boss.detail.heroPoints')}</p>
           </div>
-          <div className="relative flex items-baseline gap-1">
-            <span className="text-3xl font-headline font-bold" style={{ color: '#3b2802' }}>{hp}</span>
-            <span className="text-sm font-label font-bold" style={{ color: '#7a4a05' }}>HP</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-headline" style={{ fontWeight: 500, fontSize: 28, color: '#124346', letterSpacing: '-0.015em' }}>{hp}</span>
+            <span className="font-label font-bold" style={{ fontSize: 12, color: '#b45309' }}>HP</span>
           </div>
-          <p className="relative font-body mt-2 leading-snug" style={{ fontSize: 11, color: '#7a4a05', opacity: 0.85 }}>
+          <p className="font-body mt-2 leading-snug" style={{ fontSize: 11, color: 'rgba(180,83,9,0.8)' }}>
             Für Belohnungen aus dem Leben
           </p>
-          <div className="absolute -bottom-4 -right-4 opacity-15">
-            <Pearl size={64} />
-          </div>
         </div>
 
-        {/* Screen Minutes Balance — painted sage/teal */}
+        {/* Screen Minutes Balance — quiet mint */}
         <div className="p-5 rounded-2xl relative overflow-hidden"
              style={{
-               background: 'linear-gradient(140deg, #d1eae2 0%, #86d7b6 55%, #4ca88c 100%)',
-               border: '1.5px solid rgba(0, 81, 59, 0.25)',
-               boxShadow: '0 10px 24px -10px rgba(0,81,59,0.35), inset 0 1px 0 rgba(255,255,255,0.5)',
+               background: 'linear-gradient(160deg, #f0fdfa 0%, #ccfbf1 100%)',
+               border: '1px solid rgba(13,148,136,0.22)',
+               boxShadow: '0 6px 18px -10px rgba(13,148,136,0.22), inset 0 1px 0 rgba(255,255,255,0.7)',
              }}>
-          {/* Painted teal-brush texture overlay */}
-          <div className="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none"
-               style={{
-                 backgroundImage: `url(${import.meta.env.BASE_URL}art/bg-teal-soft.webp)`,
-                 backgroundSize: 'cover',
-                 backgroundPosition: 'center',
-               }} />
-          <div className="relative flex items-center gap-2 mb-1">
-            <Hourglass size={24} dark />
-            <p className="font-label font-bold uppercase tracking-widest text-[11px]" style={{ color: '#00513b' }}>{t('shop.screenMinutes')}</p>
+          <div className="flex items-center gap-2 mb-2">
+            <Hourglass size={22} dark />
+            <p className="font-label font-extrabold uppercase" style={{ fontSize: 10, letterSpacing: '0.2em', color: '#0d9488' }}>{t('shop.screenMinutes')}</p>
           </div>
-          <div className="relative flex items-baseline gap-1">
-            <span className="text-3xl font-headline font-bold" style={{ color: '#00291d' }}>{screenMin}</span>
-            <span className="text-sm font-label font-bold" style={{ color: '#00513b' }}>MIN</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-headline" style={{ fontWeight: 500, fontSize: 28, color: '#124346', letterSpacing: '-0.015em' }}>{screenMin}</span>
+            <span className="font-label font-bold" style={{ fontSize: 12, color: '#0d9488' }}>MIN</span>
           </div>
-          <p className="relative font-body mt-2 leading-snug" style={{ fontSize: 11, color: '#00513b', opacity: 0.85 }}>
+          <p className="font-body mt-2 leading-snug" style={{ fontSize: 11, color: 'rgba(13,148,136,0.85)' }}>
             Für Bildschirm-Zeit
           </p>
-          <div className="absolute -bottom-4 -right-4 opacity-15">
-            <Hourglass size={64} dark />
-          </div>
         </div>
       </div>
 
@@ -207,8 +203,15 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                       </div>
                       {canAfford ? (
                         <button
-                          className="font-label font-bold py-2 px-6 rounded-full text-sm transition-all active:scale-95"
-                          style={{ background: '#fcd34d', color: '#725b00' }}
+                          className="font-label font-extrabold uppercase rounded-full transition-all active:scale-95"
+                          style={{
+                            background: '#124346',
+                            color: '#fef3c7',
+                            padding: '9px 14px',
+                            fontSize: 11,
+                            letterSpacing: '0.12em',
+                            boxShadow: '0 4px 10px -3px rgba(18,67,70,0.35)',
+                          }}
                           onClick={() => setRedeemTarget({ ...reward, name: t('bel.' + reward.id) })}
                         >
                           {t('shop.redeem')}
@@ -272,31 +275,39 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
             {t('shop.digitalTime')}
           </h3>
 
-          {/* Mini-Spiele gate — gated by routine completion (useGameAccess).
-               Sits above the screen-reward list as the first piece of
-               screen-content Louis can reach. */}
+          {/* Mini-Spiele gate — Polish .mini-gate spec: teal family, not
+               violet. Dashed border when locked, solid teal when unlocked.
+               Icon tile 48px gradient teal. */}
           <button onClick={() => gamesUnlocked ? onNavigate?.('games') : null}
-            className={`w-full rounded-2xl p-5 mb-4 flex items-center gap-4 transition-all text-left ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
+            className={`w-full rounded-2xl p-4 mb-4 flex items-center gap-4 transition-all text-left ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
             style={{
               background: gamesUnlocked
-                ? 'linear-gradient(160deg, #ede9fe 0%, #c4b5fd 50%, #7c3aed 100%)'
-                : 'rgba(0,0,0,0.04)',
-              filter: gamesUnlocked ? 'none' : 'grayscale(0.5) brightness(0.85)',
-              opacity: gamesUnlocked ? 1 : 0.55,
+                ? 'linear-gradient(160deg, #f0fdfa 0%, rgba(94,234,212,0.35) 100%)'
+                : 'linear-gradient(160deg, #f0fdfa 0%, rgba(94,234,212,0.15) 100%)',
+              border: gamesUnlocked
+                ? '1px solid rgba(13,148,136,0.35)'
+                : '1.5px dashed rgba(13,148,136,0.35)',
+              opacity: gamesUnlocked ? 1 : 0.85,
             }}>
-            <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>🎮</span>
-            <div className="flex-1">
-              <h4 className="font-headline font-bold text-lg" style={{ color: gamesUnlocked ? '#2e1065' : '#6b7280' }}>{t('shop.miniGames')}</h4>
-              <p className="text-sm font-body mt-0.5" style={{ color: gamesUnlocked ? '#2e106599' : '#9ca3af' }}>
+            <div className="w-12 h-12 rounded-[14px] flex items-center justify-center shrink-0"
+                 style={{
+                   background: 'linear-gradient(160deg, #5eead4, #0d9488)',
+                   boxShadow: '0 4px 10px -3px rgba(13,148,136,0.35), inset 0 1px 0 rgba(255,255,255,0.5)',
+                 }}>
+              <span className="material-symbols-outlined text-xl text-white"
+                    style={{ fontVariationSettings: "'FILL' 1" }}>
+                {gamesUnlocked ? 'sports_esports' : 'lock'}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-headline font-bold text-base leading-tight" style={{ color: '#124346' }}>
+                {t('shop.miniGames')}
+              </h4>
+              <p className="font-body mt-0.5" style={{ fontSize: 12, color: 'rgba(13,148,136,0.85)' }}>
                 {gamesUnlocked ? t('shop.miniGames.subtitle') : 'Erst deine Aufgaben! 💪'}
               </p>
             </div>
-            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-                 style={{ background: '#ffffff', border: '2.5px solid rgba(46,16,101,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-              <span className="material-symbols-outlined text-xl" style={{ color: '#2e1065', fontVariationSettings: "'FILL' 1" }}>
-                {gamesUnlocked ? 'play_arrow' : 'lock'}
-              </span>
-            </div>
+            <span className="material-symbols-outlined shrink-0" style={{ color: '#0d9488', fontSize: 18 }}>chevron_right</span>
           </button>
 
           <div className="flex flex-col gap-4">
@@ -334,8 +345,15 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                       </div>
                       {canAfford && !blocked ? (
                         <button
-                          className="font-label font-bold py-2 px-6 rounded-full text-sm transition-all active:scale-95"
-                          style={{ background: '#00CEC9', color: 'white' }}
+                          className="font-label font-extrabold uppercase rounded-full transition-all active:scale-95"
+                          style={{
+                            background: '#0f766e',
+                            color: '#ccfbf1',
+                            padding: '9px 14px',
+                            fontSize: 11,
+                            letterSpacing: '0.12em',
+                            boxShadow: '0 4px 10px -3px rgba(13,148,136,0.35)',
+                          }}
                           onClick={() => handleScreenRewardTap(reward)}
                         >
                           {t('shop.redeem')}
@@ -390,16 +408,9 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         </div>
       </div>
 
-      {/* ── Parental access (boring on purpose) ── */}
-      <div className="flex flex-col items-center mt-10 mb-2 gap-1">
-        <button
-          onClick={onOpenParental}
-          className="w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-all"
-          style={{ background: 'rgba(156,163,175,0.1)', border: '1.5px solid rgba(156,163,175,0.2)' }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#9ca3af' }}>lock</span>
-        </button>
-        <span className="font-label text-xs text-[#9ca3af] tracking-wide" style={{ opacity: 0.5 }}>{t('shop.admin')}</span>
-      </div>
+      {/* Bottom parent-lock removed — the TopBar (top-right .parent-btn)
+           is the single entry point per Polish spec. Audit call-out #12:
+           duplicate bottom button was redundant. */}
 
       {/* ── HP Reward approval modal ── */}
       {redeemTarget && (
@@ -491,6 +502,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

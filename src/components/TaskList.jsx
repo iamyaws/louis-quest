@@ -9,6 +9,7 @@ import ToothbrushTimer from './ToothbrushTimer';
 import ToothBrushGuide from './ToothBrushGuide';
 import ClothingSheet from './ClothingSheet';
 import QuestLineCard from './QuestLineCard';
+import TopBar from './TopBar';
 import VoiceAudio from '../utils/voiceAudio';
 
 // Quest IDs that trigger the toothbrush timer
@@ -39,7 +40,7 @@ const ANCHOR_META_BASE = {
 // Vacation quests share the same hints as their school counterparts
 const HINT_ALIAS = { v1: 's1', v3: 's3', v4: 's4', v2: 's2', v5b: 's6b', v6: 's8', v7: 'sq_zimmer', v10: 's12', v11: 's13', v12: 's14', v13: 's15' };
 
-export default function TaskList({ onNavigate, onOpenQuestLine }) {
+export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct, byGroup } = computed;
   const { weather } = useWeather();
@@ -126,6 +127,15 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
 
       {/* Relative wrapper so all content floats above the sky backdrop */}
       <div className="relative" style={{ zIndex: 1 }}>
+
+      {/* ── Shared TopBar (back-pill to Lager). Rendered inside the view so
+             the cream pills sit over this view's sky backdrop instead of a
+             separate cream band (Hub pattern). -mx-6 cancels the parent's
+             px-6 so the pills hug the viewport edges exactly like the
+             Polish mockups. ── */}
+      <div className="-mx-6" style={{ marginBottom: 6 }}>
+        <TopBar onNavigate={onNavigate} view="quests" onOpenParental={onOpenParental} />
+      </div>
 
       {/* ── Personalised header + overall progress bar ──
              Moved up from the Bento card at the bottom so Louis gets an

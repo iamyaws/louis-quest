@@ -4,8 +4,22 @@ import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
+import TopBar from './TopBar';
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
+
+// Per-mood color palette (tint = soft bg wash, ink = text/border accent).
+// Design reference Ronki Buch Polish v2: "Magisch wird rosa, Müde cyan" —
+// each mood gets a warm personal tone so selection feels like a colour
+// bath, not a radio button. Indexed by MOOD_EMOJIS order.
+const MOOD_COLORS = [
+  { tint: '#dbeafe', ink: '#1e40af' }, // 0 Traurig — cool blue
+  { tint: '#ede9fe', ink: '#6d28d9' }, // 1 Besorgt — quiet violet
+  { tint: '#e5e7eb', ink: '#475569' }, // 2 Okay — neutral slate
+  { tint: '#fef3c7', ink: '#b45309' }, // 3 Gut — warm amber (default)
+  { tint: '#fce7f3', ink: '#be185d' }, // 4 Magisch — rosa
+  { tint: '#cffafe', ink: '#0e7490' }, // 5 Müde — cyan
+];
 const GRATITUDE = ["Familie", "Freunde", "Spielen", "Essen", "Natur", "Schule", "Ronki"];
 const DAY_EMOJIS = ["⭐", "🎈", "🍦", "🎨", "⚽", "🍕", "🎮", "🌈", "🐶"];
 const ACHIEVEMENTS = ["Quest erledigt", "Ronki gefüttert", "Draußen sein", "Lesen", "Geholfen"];
@@ -35,7 +49,7 @@ function getDailyIndex(arr) {
   return day % arr.length;
 }
 
-export default function Journal() {
+export default function Journal({ onNavigate, onOpenParental }) {
   const { state, actions } = useTask();
   const { t, locale, lang } = useTranslation();
 
@@ -93,11 +107,14 @@ export default function Journal() {
            header card and renames the book to "Abenteuer-Buch". */}
       <img src={base + 'art/bg-navy-night.png'} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none opacity-20" />
 
-      {/* ── Hero header — dark teal card, renamed to "Abenteuer-Buch" ── */}
+      {/* ── Hero header — dark teal card, renamed to "Abenteuer-Buch".
+             TopBar (back-pill + parent lock) sits INSIDE the card so the
+             cream pills float over the dark teal surface, Hub-pattern. ── */}
       <section className="mb-6 -mx-6 -mt-6">
         <div className="relative rounded-b-3xl overflow-hidden"
              style={{ background: 'linear-gradient(135deg, #0c3236, #124346)' }}>
-          <div className="flex items-end px-6 pt-4 pb-5">
+          <TopBar onNavigate={onNavigate} view="journal" onOpenParental={onOpenParental} />
+          <div className="flex items-end px-6 pt-2 pb-5">
             <div className="flex-1 z-10 pb-2">
               <h1 className="text-3xl font-headline text-white mb-1"
                   style={{
@@ -228,47 +245,45 @@ export default function Journal() {
             </div>
           </section>
 
-          {/* ── Mood Selector — v2 design: white card with emoji inside a
-               soft peach circle, uppercase label below. Selected state
-               keeps the warm gold glow around the card. ── */}
+          {/* ── Mood Selector — v2 "Stimmungen mit Charakter".
+               Each mood washes the tile in its own warm tone when selected:
+               Magisch rosa, Müde cyan, etc. See MOOD_COLORS. Non-selected
+               tiles stay white with a neutral emoji halo — selection reads
+               as a colour bath, not a radio toggle. ── */}
           <section className="mb-6">
             <h3 className="font-label font-bold uppercase tracking-widest text-xs text-outline mb-4">{t('journal.mood.title')}</h3>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               {[3, 4, 2, 0, 1, 5].map((idx) => {
                 const emoji = MOOD_EMOJIS[idx];
                 const isSelected = state.moodAM === idx;
+                const c = MOOD_COLORS[idx];
                 return (
                   <button key={idx}
                     aria-pressed={isSelected}
-                    className={`flex flex-col items-center gap-2.5 py-4 px-2 rounded-2xl transition-all duration-300 active:scale-95 ${
-                      isSelected ? 'scale-[1.04]' : ''
-                    }`}
-                    style={isSelected ? {
-                      background: 'linear-gradient(140deg, #fef3c7 0%, #fcd34d 100%)',
-                      border: '2.5px solid #eab308',
-                      boxShadow: '0 10px 24px -6px rgba(234,179,8,0.5), inset 0 1px 0 rgba(255,255,255,0.7)',
-                      color: '#3b2802',
-                    } : {
-                      background: '#ffffff',
-                      border: '2px solid rgba(18,67,70,0.08)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                    className="flex flex-col items-center gap-1.5 rounded-2xl transition-all duration-200 active:scale-[0.96]"
+                    style={{
+                      padding: '14px 8px 10px',
+                      background: isSelected ? c.tint : '#ffffff',
+                      border: `1.5px solid ${isSelected ? c.ink : 'rgba(18,67,70,0.08)'}`,
+                      boxShadow: isSelected ? `0 6px 14px -4px ${c.ink}40` : '0 2px 8px rgba(0,0,0,0.04)',
                     }}
                     onClick={() => { SFX.play('pop'); actions.setMood('moodAM', idx); }}
                   >
-                    {/* Peach circle backdrop around the emoji (design v2) */}
-                    <div className="flex items-center justify-center rounded-full"
+                    {/* Mood face — white halo when selected, quiet neutral otherwise */}
+                    <div className="flex items-center justify-center rounded-full transition-all"
                          style={{
-                           width: 56,
-                           height: 56,
-                           background: isSelected
-                             ? 'rgba(255,255,255,0.7)'
-                             : 'linear-gradient(140deg, #fef3c7 0%, #fde68a 100%)',
-                           boxShadow: isSelected ? 'inset 0 1px 2px rgba(180,83,9,0.12)' : 'inset 0 1px 2px rgba(180,83,9,0.08)',
+                           width: 44, height: 44,
+                           background: isSelected ? '#ffffff' : 'rgba(18,67,70,0.05)',
+                           boxShadow: isSelected ? 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.06)' : 'none',
                          }}>
-                      <span className="text-3xl leading-none select-none">{emoji}</span>
+                      <span className="leading-none select-none" style={{ fontSize: 26 }}>{emoji}</span>
                     </div>
-                    <span className="font-label text-xs font-extrabold uppercase tracking-wider text-center leading-tight"
-                          style={{ color: isSelected ? '#3b2802' : '#124346' }}>
+                    <span className="font-label font-extrabold uppercase text-center leading-none"
+                          style={{
+                            fontSize: 10,
+                            letterSpacing: '0.14em',
+                            color: isSelected ? c.ink : '#6b655b',
+                          }}>
                       {moodLabels[idx]}
                     </span>
                   </button>

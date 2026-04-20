@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth, LoginScreen } from './context/AuthContext';
 import { TaskProvider, useTask } from './context/TaskContext';
 import { useTranslation } from './i18n/LanguageContext';
-import TopBar from './components/TopBar';
+import PinModal from './components/PinModal';
 import NavBar from './components/NavBar';
 import TaskList from './components/TaskList';
 import Belohnungsbank from './components/Belohnungsbank';
@@ -50,7 +50,11 @@ function AppContent() {
   const [activeQuestLineId, setActiveQuestLineId] = useState(null);
   const [activeMintGame, setActiveMintGame] = useState(null); // MINT game id when view==='mint-game'
   const [showParental, setShowParental] = useState(false);
-  const longPressTimer = useRef(null);
+  // PIN gate — intercepts every parental-dashboard entry (lock tap, long
+  // press). Dashboard only opens after the correct 4-digit PIN.
+  const [pinGateOpen, setPinGateOpen] = useState(false);
+  const [pin, setPin] = useState('');
+  const openPinGate = () => { setPin(''); setPinGateOpen(true); };
   const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
 
   useSpecialQuests(); // side-effect only — silently completes special quests
@@ -117,40 +121,36 @@ function AppContent() {
     );
   }
 
-  const handleLongPressStart = () => {
-    longPressTimer.current = setTimeout(() => setShowParental(true), 1500);
-  };
-  const handleLongPressEnd = () => {
-    clearTimeout(longPressTimer.current);
-  };
+  // Long-press backdoor removed — the lock button on Buch + Laden gives a
+  // focused, intentional parental entry, and a 1.5s anywhere-hold was
+  // triggering on scroll holds. If parents need backdoor access on views
+  // without a lock (Aufgaben), we'll add the lock there instead.
 
   return (
     <>
-      {!['hub', 'care'].includes(view) && (
-        <div onTouchStart={handleLongPressStart} onTouchEnd={handleLongPressEnd}
-             onMouseDown={handleLongPressStart} onMouseUp={handleLongPressEnd} onMouseLeave={handleLongPressEnd}>
-          <TopBar onNavigate={setView} view={view} onOpenParental={() => setShowParental(true)} />
-        </div>
-      )}
-      <div className={`min-h-dvh max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
+      <div className="min-h-dvh max-w-lg mx-auto"
            style={{
-             // TopBar is now inline (not fixed), so it lives inside the same
-             // scroll container and provides its own safe-area-top padding.
-             // AlphaBanner still publishes --alpha-banner-h for its own
-             // offset. No extra 72px padding needed on non-hub views.
+             // Transparent wrapper — no cream bg. Each view hosts its own
+             // TopBar internally (Hub pattern: pill floats over the view's
+             // own sky/scene backdrop instead of sitting on a cream band).
+             // Hub + Care render their own headers; other views pull in the
+             // shared TopBar as the first child inside their own relative
+             // container so the pills always sit on whatever sky that view
+             // paints underneath.
              paddingTop: ['hub', 'care'].includes(view) ? 0 : 'var(--alpha-banner-h, 0px)',
              paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
            }}>
         {view === 'quests' && (
           <TaskList
             onNavigate={setView}
+            onOpenParental={() => openPinGate()}
             onOpenQuestLine={(id) => {
               setActiveQuestLineId(id);
               setView('questline');
             }}
           />
         )}
-        {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} onOpenParental={() => setShowParental(true)} />}
+        {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} onOpenParental={() => openPinGate()} />}
         {view === 'hub' && (
           <Hub
             onNavigate={setView}
@@ -161,7 +161,7 @@ function AppContent() {
           />
         )}
         {view === 'care' && <Sanctuary onNavigate={setView} />}
-        {view === 'journal' && <Journal />}
+        {view === 'journal' && <Journal onNavigate={setView} onOpenParental={() => openPinGate()} />}
         {view === 'kodex' && <HeldenKodex />}
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
         {view === 'memories' && <MemoryWall />}
@@ -183,41 +183,55 @@ function AppContent() {
             }}
           />
         )}
-        {view === 'mint-game' && activeMintGame && (
-          <>
-            {activeMintGame === 'zahlenjagd' && (
-              <ZahlenjagdGame onComplete={(reward) => {
-                if (reward?.hp > 0) actions.addHP(reward.hp);
-                setActiveMintGame(null);
-                setView('hub');
-              }} />
-            )}
-            {activeMintGame === 'muster-memory' && (
-              <MusterMemoryGame onComplete={(reward) => {
-                if (reward?.hp > 0) actions.addHP(reward.hp);
-                setActiveMintGame(null);
-                setView('hub');
-              }} />
-            )}
-            {activeMintGame === 'wurzel-labyrinth' && (
-              <WurzelLabyrinthGame onComplete={(reward) => {
-                if (reward?.hp > 0) actions.addHP(reward.hp);
-                setActiveMintGame(null);
-                setView('hub');
-              }} />
-            )}
-            {activeMintGame === 'pilz-waage' && (
-              <PilzWaageGame onComplete={(reward) => {
-                if (reward?.hp > 0) actions.addHP(reward.hp);
-                setActiveMintGame(null);
-                setView('hub');
-              }} />
-            )}
-          </>
-        )}
       </div>
       <NavBar active={view} onNavigate={setView} />
-      {showParental && <ParentalDashboard onClose={() => setShowParental(false)} currentView={view} />}
+      {/* ── MINT games — rendered OUTSIDE the max-w-lg wrapper so they
+             cover the full viewport (same pattern as MemoryGame/PotionGame
+             below). Previously nested inside the wrapper they got clipped
+             to the max-w-lg "banner" width. Marc flagged WurzelLabyrinth
+             opening "within the banner" — this moves all MINT games to the
+             top-level overlay layer. ── */}
+      {view === 'mint-game' && activeMintGame === 'zahlenjagd' && (
+        <ZahlenjagdGame onComplete={(reward) => {
+          if (reward?.hp > 0) actions.addHP(reward.hp);
+          setActiveMintGame(null);
+          setView('hub');
+        }} />
+      )}
+      {view === 'mint-game' && activeMintGame === 'muster-memory' && (
+        <MusterMemoryGame onComplete={(reward) => {
+          if (reward?.hp > 0) actions.addHP(reward.hp);
+          setActiveMintGame(null);
+          setView('hub');
+        }} />
+      )}
+      {view === 'mint-game' && activeMintGame === 'wurzel-labyrinth' && (
+        <WurzelLabyrinthGame onComplete={(reward) => {
+          if (reward?.hp > 0) actions.addHP(reward.hp);
+          setActiveMintGame(null);
+          setView('hub');
+        }} />
+      )}
+      {view === 'mint-game' && activeMintGame === 'pilz-waage' && (
+        <PilzWaageGame onComplete={(reward) => {
+          if (reward?.hp > 0) actions.addHP(reward.hp);
+          setActiveMintGame(null);
+          setView('hub');
+        }} />
+      )}
+      {pinGateOpen && (
+        <PinModal
+          pin={pin}
+          setPin={setPin}
+          onSuccess={() => {
+            setPinGateOpen(false);
+            setPin('');
+            setShowParental(true);
+          }}
+          onClose={() => { setPinGateOpen(false); setPin(''); }}
+        />
+      )}
+      {showParental && <ParentalDashboard onClose={() => setShowParental(false)} currentView={view} preauthorized />}
       {view === 'memory' && <MemoryGame onComplete={() => {
         actions.claimGameReward('memory');
         setView('games');

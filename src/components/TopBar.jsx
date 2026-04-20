@@ -20,14 +20,22 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
   const showHp = view !== 'journal';
 
   return (
-    <header className="relative w-full max-w-lg mx-auto px-6 pt-4 pb-3"
-            style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
+    <header className="relative w-full max-w-lg mx-auto"
+            style={{
+              // Tighter than the design default — Marc flagged that the
+              // previous 10/20/14 padding was eating too deep into the
+              // fold. Transparent (no bg on the header itself); the pills
+              // already have backdrop-blur cream bodies, so the bar reads
+              // as "floating elements over the sky" rather than a band.
+              padding: '6px 16px 8px',
+              paddingTop: 'calc(6px + env(safe-area-inset-top, 0px))',
+            }}>
       <div className="flex justify-between items-center gap-3">
-        {/* Left: back-pill to Lager (Hub). Inline, no fixed positioning. */}
+        {/* Left: back-pill to Lager. Design .back-pill spec exactly. */}
         <button onClick={() => onNavigate?.('hub')}
                 className="inline-flex items-center gap-1.5 active:scale-95 transition-all rounded-full shrink-0"
                 style={{
-                  background: 'rgba(255,248,242,0.85)',
+                  background: 'rgba(255,248,242,0.82)',
                   backdropFilter: 'blur(14px) saturate(160%)',
                   WebkitBackdropFilter: 'blur(14px) saturate(160%)',
                   padding: '8px 14px 8px 10px',
@@ -42,40 +50,47 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
           </b>
         </button>
 
-        {/* Right: parental-lock button (outlined square style) + HP pill.
-             Lock lives as its own button with a quieter outlined style so
-             it reads as a utility, not a primary CTA. Mirrors the design's
-             separate parent-btn.jsx treatment on Laden + Buch views. */}
+        {/* Right: view-specific slots (parent lock + HP).
+             HP pill matches design .hp spec: 7/14/7/9 padding, 22px pearl,
+             subtle cream→amber vertical gradient, primary-teal number with
+             gold-ink label below. Not the gold-heavy trophy pill I had. */}
         <div className="flex items-center gap-2.5 shrink-0">
           {showLock && (
             <button onClick={onOpenParental}
                     aria-label={lang === 'de' ? 'Eltern-Bereich' : 'Parent area'}
-                    className="flex items-center justify-center rounded-xl active:scale-95 transition-all"
+                    className="flex items-center justify-center active:scale-95 transition-all"
                     style={{
-                      width: 36, height: 36,
-                      background: 'rgba(255,248,242,0.7)',
-                      border: '1px solid rgba(18,67,70,0.14)',
-                      color: '#6b655b',
+                      // Matches design .parent-btn spec exactly (from uploaded
+                      // Ronki Laden Polish.html). Quieter utility button:
+                      // muted teal icon, cream pill, subtle shadow.
+                      width: 32, height: 32, borderRadius: 10,
+                      background: 'rgba(255,248,242,0.82)',
+                      backdropFilter: 'blur(14px) saturate(160%)',
+                      WebkitBackdropFilter: 'blur(14px) saturate(160%)',
+                      border: '1px solid rgba(18,67,70,0.12)',
+                      color: 'rgba(18,67,70,0.42)',
+                      boxShadow: '0 2px 8px -3px rgba(18,67,70,0.15)',
                     }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>lock</span>
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>lock</span>
             </button>
           )}
           {showHp && (
-            <div className="flex items-center gap-2.5 rounded-full"
+            <div className="flex items-center rounded-full"
                  style={{
-                   background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%)',
+                   background: 'linear-gradient(180deg, #fff8e1 0%, #fde68a 100%)',
                    border: '1px solid rgba(180,83,9,0.25)',
-                   padding: '6px 14px 6px 6px',
-                   boxShadow: '0 4px 12px -4px rgba(180,83,9,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
+                   padding: '7px 14px 7px 9px',
+                   gap: 8,
+                   boxShadow: '0 4px 12px -4px rgba(252,211,77,0.6), inset 0 1px 0 rgba(255,255,255,0.7)',
                  }}>
-              <Pearl size={28} />
+              <Pearl size={22} />
               <div className="flex flex-col leading-none">
-                <span className="font-headline font-extrabold"
-                      style={{ color: '#3b2802', fontSize: 16 }}>
+                <b className="font-label font-extrabold"
+                   style={{ color: '#124346', fontSize: 16, letterSpacing: '-0.01em', lineHeight: 1 }}>
                   {hp}
-                </span>
-                <span className="font-label font-bold uppercase mt-0.5"
-                      style={{ fontSize: 8, letterSpacing: '0.14em', color: '#7a4a05' }}>
+                </b>
+                <span className="font-label font-semibold uppercase"
+                      style={{ fontSize: 10, letterSpacing: '0.16em', color: '#725b00', marginTop: 3, lineHeight: 1 }}>
                   {lang === 'de' ? 'Heldenpunkte' : 'Hero points'}
                 </span>
               </div>
