@@ -251,22 +251,28 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
       <section style={{ padding: '6px 20px 0' }}>
         <div className="relative overflow-hidden"
              style={{
-               background: `radial-gradient(circle at 15% 15%, rgba(252,211,77,0.35), transparent 55%), linear-gradient(135deg, #fef3c7 0%, #fde68a 55%, #fcd34d 100%)`,
-               border: '1px solid rgba(180,83,9,0.25)',
+               // Deep forest-teal gradient matching the hero image's
+               // emerald background so the picture sits in its native
+               // color bed (Marc: "sits in the right color of green").
+               // Gold accents (eyebrow, sparks, image glow) survive for
+               // the "treasure" vibe; the dark card reads as an emerald
+               // coffer holding the gold inside.
+               background: `radial-gradient(circle at 15% 15%, rgba(94,234,212,0.28), transparent 55%), linear-gradient(135deg, #0f3236 0%, #164a48 50%, #0a2a2c 100%)`,
+               border: '1px solid rgba(94,234,212,0.2)',
                borderRadius: 26,
-               boxShadow: '0 16px 36px -14px rgba(180,83,9,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
+               boxShadow: '0 16px 36px -14px rgba(12,50,54,0.55), inset 0 1px 0 rgba(94,234,212,0.12)',
              }}>
           <div className="flex items-end" style={{ padding: '20px 22px' }}>
             <div className="flex-1 z-10 pb-1">
               <p className="font-label font-extrabold uppercase"
-                 style={{ fontSize: 10, letterSpacing: '0.28em', color: '#b45309', marginBottom: 6 }}>
+                 style={{ fontSize: 10, letterSpacing: '0.28em', color: '#fcd34d', marginBottom: 6 }}>
                 {t('shop.header.eyebrow')}
               </p>
               <h1 className="font-headline"
-                  style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 500, fontSize: 26, letterSpacing: '-0.015em', color: '#124346', lineHeight: 1.1 }}>
+                  style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 500, fontSize: 26, letterSpacing: '-0.015em', color: '#fff', lineHeight: 1.1, textShadow: '0 2px 8px rgba(0,0,0,0.35)' }}>
                 {t('shop.header.title')}
               </h1>
-              <p className="font-body" style={{ fontSize: 13, color: 'rgba(18,67,70,0.65)', marginTop: 4, lineHeight: 1.35 }}>
+              <p className="font-body" style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 4, lineHeight: 1.35 }}>
                 {t('shop.header.subtitle')}
               </p>
             </div>
@@ -274,11 +280,12 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
               <img src={import.meta.env.BASE_URL + 'art/hero-shop.webp'}
                    alt=""
                    className="w-full h-auto -mb-3 -mr-1"
-                   style={{ filter: 'drop-shadow(0 6px 10px rgba(180,83,9,0.35))' }} />
-              {/* Three sparks — absolute-positioned, independent twinkle delays */}
-              <span aria-hidden="true" className="bb-spark" style={{ position: 'absolute', top: 6, right: 8, fontSize: 14, color: '#b45309', textShadow: '0 0 6px rgba(252,211,77,0.7)', animation: 'bbTwinkle 2.4s ease-in-out infinite', animationDelay: '0s' }}>✦</span>
-              <span aria-hidden="true" className="bb-spark" style={{ position: 'absolute', top: 22, left: 4, fontSize: 10, color: '#b45309', textShadow: '0 0 6px rgba(252,211,77,0.7)', animation: 'bbTwinkle 2.4s ease-in-out infinite', animationDelay: '0.7s' }}>✦</span>
-              <span aria-hidden="true" className="bb-spark" style={{ position: 'absolute', bottom: 16, right: 2, fontSize: 12, color: '#b45309', textShadow: '0 0 6px rgba(252,211,77,0.7)', animation: 'bbTwinkle 2.4s ease-in-out infinite', animationDelay: '1.3s' }}>✦</span>
+                   style={{ filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.45))' }} />
+              {/* Three sparks — gold so they read as treasure glints
+                   against the deep emerald card. */}
+              <span aria-hidden="true" className="bb-spark" style={{ position: 'absolute', top: 6, right: 8, fontSize: 14, color: '#fcd34d', textShadow: '0 0 6px rgba(252,211,77,0.8)', animation: 'bbTwinkle 2.4s ease-in-out infinite', animationDelay: '0s' }}>✦</span>
+              <span aria-hidden="true" className="bb-spark" style={{ position: 'absolute', top: 22, left: 4, fontSize: 10, color: '#fcd34d', textShadow: '0 0 6px rgba(252,211,77,0.8)', animation: 'bbTwinkle 2.4s ease-in-out infinite', animationDelay: '0.7s' }}>✦</span>
+              <span aria-hidden="true" className="bb-spark" style={{ position: 'absolute', bottom: 16, right: 2, fontSize: 12, color: '#fcd34d', textShadow: '0 0 6px rgba(252,211,77,0.8)', animation: 'bbTwinkle 2.4s ease-in-out infinite', animationDelay: '1.3s' }}>✦</span>
             </div>
           </div>
         </div>

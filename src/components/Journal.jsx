@@ -6,6 +6,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
 import TopBar from './TopBar';
+import { biomeBackground } from '../utils/biomeBackgrounds';
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 
@@ -115,14 +116,15 @@ export default function Journal({ onNavigate, onOpenParental }) {
 
   return (
     <div className="relative pb-32" style={{ minHeight: '100dvh' }}>
-      {/* Viewport-level ambient sky (Hub pattern) — same cream-over-sky
-           backdrop as Hub/Aufgaben/Laden so the TopBar pills never sit
-           on a cream band. The dark-teal journal hero card sits as a
-           floating tile on top. */}
+      {/* Biome-tinted evening-dusk backdrop — Tagebuch = reflective
+           winding-down time of day. Cream wash dominates at the fold so
+           journal entries read clearly; the deep teal tint bleeds through
+           at the TopBar giving this tab its own calm, diary-at-dusk mood
+           (matches the floating dark-teal hero card thematically). */}
       <div className="fixed inset-0 pointer-events-none"
            style={{
              zIndex: 0,
-             background: `linear-gradient(rgba(255,248,242,0.35) 0%, rgba(255,248,242,0.55) 40%, rgba(255,248,242,0.88) 75%, #fff8f2 100%), url(${base}art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_bright_midday_sky._Wa_e8eca682-4eb9-4da2-8c93-a4cb25ba363d_1.webp) center top / cover no-repeat`,
+             background: biomeBackground('journal'),
              backgroundColor: '#fff8f2',
            }}
            aria-hidden="true" />
