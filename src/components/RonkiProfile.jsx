@@ -12,11 +12,16 @@ import { useGameAccess } from '../hooks/useGameAccess';
 import { biomeBackground } from '../utils/biomeBackgrounds';
 
 /**
- * Companion Profile — patterned on Finch's Piper page.
- * Header: portrait + name + stage pill
- * Tabs: About / Details / Traits
- * Memory card: last arc completed
- * Quick links: Ronkis Freunde + Discovery Log (both Phase 2)
+ * Companion Profile — Ronki Profile Polish v2.
+ * Living Scene hero (CSS gold-hour stage with hills, embers, breathing portrait)
+ * Rarity banner · Name block
+ * Pflege card (kickered, cream→amber)
+ * Mini-Spiele hero CTA (gold unlocked / dashed locked)
+ * Freunde circle-thumb card
+ * Tab bar (teal-filled active)
+ * About: plain italic bio + Material-icon fun facts + flat Chronik links
+ * Details: evolution (dev) + stats + weight/height
+ * Strengths: progress-bar rows with scores
  */
 
 const STAGE_NAMES_DE = ['Ei', 'Baby', 'Jungtier', 'Stolz', 'Legendär'];
@@ -37,16 +42,38 @@ const FACTS = {
 // Trait seeds — Phase 2 will earn these from arcs. For now, derive from milestones.
 // Labels kept to first-grade-readable German (per Marc: "wesenszüge und sanftmütig
 // are not really words that kids know"). "Stärken" replaces the "Wesenszüge" frame.
+// `score` is a progress-bar heuristic (0-100) based on live state so the strengths
+// tab feels responsive without waiting on Phase 2 arc grants.
 const TRAIT_POOL = [
-  { id: 'brave', label: { de: 'Mutig', en: 'Brave' }, icon: 'shield', color: '#f59e0b', when: (s) => (s.arcEngine?.completedArcIds?.length || 0) >= 1 },
-  { id: 'gentle', label: { de: 'Lieb', en: 'Kind' }, icon: 'favorite', color: '#f472b6', when: (s) => (s.catEvo || 0) >= 3 },
-  { id: 'curious', label: { de: 'Neugierig', en: 'Curious' }, icon: 'explore', color: '#0ea5e9', when: (s) => true },
-  { id: 'loyal', label: { de: 'Treu', en: 'Loyal' }, icon: 'handshake', color: '#34d399', when: (s) => (s.totalTaskDays || 0) >= 3 },
-  { id: 'dreamer', label: { de: 'Träumer', en: 'Dreamer' }, icon: 'auto_awesome', color: '#a855f7', when: (s) => (s.journalHistory?.length || 0) >= 3 },
-  { id: 'mapmaker', label: { de: 'Entdecker', en: 'Explorer' }, icon: 'map', color: '#fb923c', when: (s) => (s.arcEngine?.completedArcIds || []).includes('first-adventure') },
+  { id: 'brave',    label: { de: 'Mutig',      en: 'Brave' },    icon: 'shield',        color: '#f59e0b', when: (s) => (s.arcEngine?.completedArcIds?.length || 0) >= 1, score: (s) => clamp(40 + (s.arcEngine?.completedArcIds?.length || 0) * 15) },
+  { id: 'gentle',   label: { de: 'Lieb',       en: 'Kind' },     icon: 'favorite',      color: '#f472b6', when: (s) => (s.catEvo || 0) >= 3,                                score: (s) => clamp(30 + (s.catEvo || 0) * 10) },
+  { id: 'curious',  label: { de: 'Neugierig',  en: 'Curious' },  icon: 'explore',       color: '#0ea5e9', when: (s) => true,                                                score: (s) => clamp(55 + (s.micropediaDiscovered?.length || 0) * 6) },
+  { id: 'loyal',    label: { de: 'Treu',       en: 'Loyal' },    icon: 'handshake',     color: '#34d399', when: (s) => (s.totalTaskDays || 0) >= 3,                         score: (s) => clamp(35 + (s.totalTaskDays || 0) * 4) },
+  { id: 'dreamer',  label: { de: 'Träumer',    en: 'Dreamer' },  icon: 'auto_awesome',  color: '#a855f7', when: (s) => (s.journalHistory?.length || 0) >= 3,                score: (s) => clamp(35 + (s.journalHistory?.length || 0) * 8) },
+  { id: 'mapmaker', label: { de: 'Entdecker',  en: 'Explorer' }, icon: 'map',           color: '#fb923c', when: (s) => (s.arcEngine?.completedArcIds || []).includes('first-adventure'), score: (s) => (s.arcEngine?.completedArcIds || []).includes('first-adventure') ? 90 : 40 },
 ];
 
+function clamp(n) { return Math.max(20, Math.min(100, Math.round(n))); }
+
 const base = import.meta.env.BASE_URL;
+
+// Section kicker — Plus Jakarta 800/10 uppercase, .22em letter-spacing, teal.
+// Used above each major card per Polish v2 spec.
+function Kicker({ children }) {
+  return (
+    <p className="mb-2 ml-1" style={{
+      fontFamily: 'Plus Jakarta Sans, sans-serif',
+      fontWeight: 800,
+      fontSize: 10,
+      letterSpacing: '0.22em',
+      textTransform: 'uppercase',
+      color: '#124346',
+      margin: '0 0 8px 4px',
+    }}>
+      {children}
+    </p>
+  );
+}
 
 export default function RonkiProfile({ onNavigate }) {
   const { t, lang } = useTranslation();
@@ -111,6 +138,15 @@ export default function RonkiProfile({ onNavigate }) {
     return { recentFreunde: recent, totalFound: raw.length, totalCreatures: SEED_CREATURES.length };
   }, [state.micropediaDiscovered]);
 
+  // Rarity label under Ronki (stage · rarity). Stage name in dev mode,
+  // variant name in public mode — same identity rule as before.
+  const rarityLabel = dev
+    ? stageName
+    : (state.companionVariant
+      ? (getVariant(state.companionVariant).name[lang] || getVariant(state.companionVariant).name.de)
+      : stageName);
+  const rarityRare = lang === 'de' ? 'Rar' : 'Rare';
+
   return (
     <div className="relative min-h-dvh pb-32">
       {/* Biome-tinted forest-sage backdrop — Ronki = earthy biome where
@@ -126,281 +162,460 @@ export default function RonkiProfile({ onNavigate }) {
            aria-hidden="true" />
       <img src={base + 'art/bg-cream-brush.webp'} alt="" className="fixed inset-0 w-full h-full object-cover opacity-20 pointer-events-none -z-10" />
 
-      <main className="px-5 max-w-lg mx-auto"
-            style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))' }}>
+      {/* Polish v2 keyframes — gold-hour scene elements. Scoped via unique
+           class names so they don't collide with other CSS in the app. */}
+      <style>{`
+        @keyframes rp-breathe { 0%,100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.035) translateY(-3px); } }
+        @keyframes rp-aura-pulse { 0%,100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.12); opacity: 1; } }
+        @keyframes rp-ember-rise {
+          0% { transform: translateY(0); opacity: 0; }
+          15% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { transform: translateY(-220px); opacity: 0; }
+        }
+      `}</style>
 
-        {/* ═══ HEADER ═══ */}
-        <div className="flex flex-col items-center text-center mb-6">
-          {/* Dragon portrait with glow ring */}
-          <div className="relative mb-4">
-            <div className="absolute inset-0 rounded-full blur-2xl opacity-30"
-                 style={{ background: stageColor, transform: 'scale(1.3)' }} />
-            <div className="relative w-36 h-36 rounded-full overflow-hidden"
-                 style={{ border: `3px solid ${stageColor}`, boxShadow: `0 8px 32px ${stageColor}40` }}>
+      <main className="max-w-lg mx-auto"
+            style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))', paddingLeft: 0, paddingRight: 0 }}>
+
+        {/* ═══ LIVING SCENE — gold-hour stage (Polish v2 .rp-scene) ═══
+             Full-width 320px rounded card with radial sun, two silhouette
+             hills, ground band, 3 rising embers, Ronki portrait with breath
+             + aura, and a gold rarity banner pinned inside at the bottom.
+             All pure CSS — no new art assets. */}
+        <section className="relative mx-4 overflow-hidden"
+                 style={{
+                   height: 320,
+                   borderRadius: 24,
+                   boxShadow: '0 14px 30px -14px rgba(18,67,70,0.35)',
+                   background: 'radial-gradient(ellipse at 50% 0%, #fff3c8 0%, #fcd34d 28%, #f59e0b 58%, #9a3f1b 100%)',
+                 }}>
+          {/* Sun / golden orb glow (top-right-ish, behind portrait) */}
+          <div aria-hidden="true"
+               style={{
+                 position: 'absolute', top: 30, right: 40,
+                 width: 60, height: 60, borderRadius: '50%',
+                 background: 'radial-gradient(circle at 35% 30%, #fff3c8, #f59e0b 60%, #c2410c)',
+                 boxShadow: '0 0 60px rgba(245,158,11,0.6)',
+                 zIndex: 1,
+               }} />
+
+          {/* Back hill — darker, further away */}
+          <div aria-hidden="true"
+               style={{
+                 position: 'absolute', left: '-10%', right: '-10%', bottom: '26%',
+                 height: 80, opacity: 0.85,
+                 borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
+                 background: '#6d3a45',
+                 zIndex: 2,
+               }} />
+          {/* Front hill — closer, darker */}
+          <div aria-hidden="true"
+               style={{
+                 position: 'absolute', left: '-5%', right: '-5%', bottom: '20%',
+                 height: 100,
+                 borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
+                 background: '#4a2536',
+                 zIndex: 3,
+               }} />
+
+          {/* Ground band (tod-golden) */}
+          <div aria-hidden="true"
+               style={{
+                 position: 'absolute', left: 0, right: 0, bottom: 0,
+                 height: '22%',
+                 background: 'linear-gradient(180deg, #4a3a2f, #2a1f18)',
+                 boxShadow: 'inset 0 6px 16px rgba(0,0,0,0.25)',
+                 zIndex: 2,
+               }} />
+
+          {/* 3 ember particles — rising, staggered timing */}
+          {[
+            { left: '28%', delay: '0s',    duration: '4s'   },
+            { left: '52%', delay: '1.3s',  duration: '4.4s' },
+            { left: '72%', delay: '2.6s',  duration: '3.8s' },
+          ].map((e, i) => (
+            <div key={i} aria-hidden="true"
+                 style={{
+                   position: 'absolute', left: e.left, bottom: '18%',
+                   width: 4, height: 4, borderRadius: '50%',
+                   background: 'radial-gradient(circle, #fcd34d, #f59e0b)',
+                   boxShadow: '0 0 6px #fcd34d',
+                   animation: `rp-ember-rise ${e.duration} ease-in infinite`,
+                   animationDelay: e.delay,
+                   zIndex: 4,
+                 }} />
+          ))}
+
+          {/* Ronki portrait — composited at bottom: 14%, circular with
+               breathing scale. Blurred gold aura pulses behind. */}
+          <div style={{
+                 position: 'absolute', left: '50%', bottom: '14%',
+                 transform: 'translateX(-50%)',
+                 width: 140, height: 140,
+                 zIndex: 5,
+                 animation: 'rp-breathe 3s ease-in-out infinite',
+               }}>
+            <div aria-hidden="true"
+                 style={{
+                   position: 'absolute', inset: '-14%',
+                   borderRadius: '50%',
+                   background: 'radial-gradient(circle, rgba(252,211,77,0.55) 0%, transparent 65%)',
+                   filter: 'blur(12px)',
+                   animation: 'rp-aura-pulse 3s ease-in-out infinite',
+                 }} />
+            <div style={{
+                   position: 'relative',
+                   width: '100%', height: '100%',
+                   borderRadius: '50%',
+                   overflow: 'hidden',
+                   border: '3px solid rgba(255,248,242,0.85)',
+                   boxShadow: '0 10px 22px -8px rgba(60,20,5,0.55)',
+                 }}>
               <img src={`${base}art/companion/${artFile}.webp`} alt="Ronki"
                    className="w-full h-full object-cover" />
             </div>
-            {/* Identity badge — stage name in dev mode (evolution RPG),
-                 variant name in public mode (stable one-companion identity). */}
-            {dev ? (
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full font-label font-bold text-xs uppercase tracking-widest text-white"
-                   style={{ background: stageColor, boxShadow: `0 2px 8px ${stageColor}50` }}>
-                {stageName}
-              </div>
-            ) : state.companionVariant ? (
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full font-label font-bold text-xs uppercase tracking-widest text-white"
-                   style={{
-                     background: getVariant(state.companionVariant).borderColor,
-                     boxShadow: `0 2px 8px ${getVariant(state.companionVariant).glowColor}`,
-                   }}>
-                {getVariant(state.companionVariant).name[lang] || getVariant(state.companionVariant).name.de}
-              </div>
-            ) : null}
           </div>
 
-          {/* Name */}
-          <h1 className="font-headline text-3xl text-on-surface mt-2"
-              style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 500, letterSpacing: '-0.015em' }}>
+          {/* Rarity banner — gold-gradient pill pinned inside the scene */}
+          <div style={{
+                 position: 'absolute', left: '50%', bottom: '4%',
+                 transform: 'translateX(-50%)',
+                 display: 'inline-flex', alignItems: 'center', gap: 6,
+                 padding: '7px 16px', borderRadius: 999,
+                 background: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
+                 color: '#fff',
+                 fontFamily: 'Plus Jakarta Sans, sans-serif',
+                 fontWeight: 800, fontSize: 11, lineHeight: 1,
+                 letterSpacing: '0.16em',
+                 textTransform: 'uppercase',
+                 boxShadow: '0 6px 14px -4px rgba(245,158,11,0.55)',
+                 zIndex: 6,
+               }}>
+            <span className="material-symbols-outlined"
+                  style={{ fontSize: 14, fontVariationSettings: "'FILL' 1" }}>
+              local_fire_department
+            </span>
+            {rarityLabel.toUpperCase()} · {rarityRare.toUpperCase()}
+          </div>
+        </section>
+
+        {/* ═══ NAME BLOCK — Ronki + MYSTISCHER BEGLEITER ═══ */}
+        <div className="text-center" style={{ padding: '18px 16px 10px' }}>
+          <h1 style={{
+            margin: '0 0 4px',
+            fontFamily: 'Fredoka, sans-serif',
+            fontWeight: 500,
+            fontSize: 28,
+            lineHeight: 1,
+            letterSpacing: '-0.015em',
+            color: '#124346',
+          }}>
             Ronki
           </h1>
-          <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest mt-1">
+          <p style={{
+            margin: 0,
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            fontWeight: 800,
+            fontSize: 10,
+            lineHeight: 1,
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            color: '#6b655b',
+          }}>
             {lang === 'de' ? 'Mystischer Begleiter' : 'Mystical Companion'}
           </p>
         </div>
 
-        {/* ═══ PFLEGE — 3 care actions (Füttern · Streicheln · Spielen).
-             Absorbed from Sanctuary when the Pflege tab merged into Ronki's
-             page (April 2026). State lives on the same TaskContext fields
-             (catFed / catPetted / catPlayed) so the existing reducers work
-             unchanged. One tap per action per day; done state shows a check. */}
-        <section className="grid grid-cols-3 gap-3 mb-5">
-          {[
-            { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          label: t('care.feed'), reward: 5, color: '#f59e0b' },
-            { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        label: t('care.pet'),  reward: 3, color: '#ec4899' },
-            { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', label: t('care.play'), reward: 8, color: '#124346' },
-          ].map(a => (
-            <button key={a.key}
-              onClick={() => handleCare(a.onTap, a.state)}
-              disabled={a.state}
-              className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-              style={{ opacity: a.state ? 0.65 : 1 }}>
-              <div className="w-full aspect-square rounded-2xl flex items-center justify-center"
-                   style={{
-                     background: a.state
-                       ? 'rgba(52,211,153,0.12)'
-                       : 'linear-gradient(135deg, #ffffff 0%, #fef3c7 100%)',
-                     border: a.state ? '1.5px solid rgba(52,211,153,0.45)' : '1.5px solid rgba(255,255,255,0.9)',
-                     boxShadow: a.state
-                       ? '0 2px 8px rgba(5,150,105,0.1)'
-                       : '0 4px 14px -4px rgba(18,67,70,0.18), inset 0 1px 0 rgba(255,255,255,0.7)',
+        <div className="px-4">
+
+          {/* ═══ PFLEGE — kickered cream→amber card wrapping 3 care actions.
+               Absorbed from Sanctuary when the Pflege tab merged into Ronki's
+               page (April 2026). State lives on the same TaskContext fields
+               (catFed / catPetted / catPlayed) so the existing reducers work
+               unchanged. One tap per action per day; done state shows a check. */}
+          <Kicker>{lang === 'de' ? 'Pflege heute' : 'Care today'}</Kicker>
+          <section style={{
+                     padding: '14px 16px',
+                     borderRadius: 20,
+                     background: 'linear-gradient(160deg, #fffdf5, #fef3c7)',
+                     border: '1px solid rgba(245,158,11,0.2)',
+                     boxShadow: '0 6px 14px -8px rgba(245,158,11,0.2)',
+                     marginBottom: 14,
                    }}>
-                <span className="material-symbols-outlined"
-                      style={{
-                        fontSize: 36,
-                        color: a.state ? '#059669' : a.color,
-                        fontVariationSettings: "'FILL' 1",
-                      }}>
-                  {a.state ? 'check_circle' : a.icon}
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="font-headline font-bold text-sm text-on-surface leading-none">
-                  {a.label}
-                </span>
-                {a.state ? (
-                  <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: '#059669' }}>
-                    {t('care.done')}
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 font-label font-bold text-[11px]" style={{ color: '#725b00' }}>
-                    <Pearl size={10} />+{a.reward} HP
-                  </span>
-                )}
-              </div>
-            </button>
-          ))}
-        </section>
-
-        {/* ═══ SPIELE MIT RONKI — mini-games gate (moved from Laden Apr 2026).
-             Games are companion content, not a third economy, so they live
-             with Ronki now. Same unlock rule as before (useGameAccess: one
-             routine section done + inside play window). Polish v2 .mini-gate
-             styling: 48px teal icon tile, 34×34 lock/open square on the right,
-             teal family throughout. ═══ */}
-        <button
-          onClick={() => gamesUnlocked ? onNavigate?.('games') : null}
-          disabled={!gamesUnlocked}
-          className={`w-full grid items-center text-left mb-5 transition-all ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
-          style={{
-            gridTemplateColumns: '48px 1fr auto',
-            gap: 12,
-            padding: '12px 14px',
-            borderRadius: 18,
-            background: gamesUnlocked
-              ? 'linear-gradient(160deg, #f0fdfa 0%, #ccfbf1 100%)'
-              : 'linear-gradient(160deg, #f0fdfa 0%, rgba(94,234,212,0.25) 100%)',
-            border: gamesUnlocked
-              ? '1.5px solid rgba(13,148,136,0.35)'
-              : '1.5px dashed rgba(13,148,136,0.35)',
-            opacity: gamesUnlocked ? 1 : 0.88,
-          }}
-        >
-          {/* 48px teal icon tile — always shows games controller; lock sits on right */}
-          <div className="flex items-center justify-center shrink-0"
-               style={{
-                 width: 48,
-                 height: 48,
-                 borderRadius: 14,
-                 background: 'linear-gradient(160deg, #5eead4, #0d9488)',
-                 boxShadow: '0 4px 10px -3px rgba(13,148,136,0.4), inset 0 1px 0 rgba(255,255,255,0.35)',
-               }}>
-            <span className="material-symbols-outlined"
-                  style={{ fontSize: 24, color: '#fff', fontVariationSettings: "'FILL' 1, 'wght' 500" }}>
-              sports_esports
-            </span>
-          </div>
-
-          {/* Body: title + subtitle; teal text */}
-          <div className="min-w-0">
-            <p style={{ margin: '0 0 2px', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 14, lineHeight: 1.1, color: '#0f766e' }}>
-              {t('ronki.playWithRonki')}
-            </p>
-            <span style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 600, fontSize: 11, lineHeight: 1.3, color: '#0d9488', opacity: 0.9 }}>
-              {gamesUnlocked ? t('ronki.playWithRonki.subtitle') : t('ronki.playWithRonki.locked')}
-            </span>
-          </div>
-
-          {/* 34×34 rounded-square lock/open icon — muted teal locked, solid teal open */}
-          <div className="flex items-center justify-center shrink-0"
-               style={{
-                 width: 34,
-                 height: 34,
-                 borderRadius: 12,
-                 background: gamesUnlocked ? '#0d9488' : 'rgba(13,148,136,0.15)',
-                 color: gamesUnlocked ? '#ccfbf1' : '#0d9488',
-               }}>
-            <span className="material-symbols-outlined"
-                  style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>
-              {gamesUnlocked ? 'lock_open' : 'lock'}
-            </span>
-          </div>
-        </button>
-
-        {/* ═══ FREUNDE HERO CARD ═══ */}
-        <button
-          onClick={() => onNavigate?.('micropedia')}
-          className="w-full rounded-2xl p-4 mb-5 active:scale-[0.98] transition-transform text-left"
-          style={{
-            background: 'linear-gradient(135deg, #fff8f2 0%, #fef3c7 100%)',
-            border: '1.5px solid rgba(252,211,77,0.3)',
-            boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
-          }}
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <span className="material-symbols-outlined text-2xl"
-                  style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>
-              groups
-            </span>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-headline font-bold text-base text-on-surface">
-                {lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}
-              </h3>
-              <p className="font-label text-xs text-on-surface-variant">
-                {totalFound} / {totalCreatures} {lang === 'de' ? 'entdeckt' : 'found'}
-              </p>
-            </div>
-            <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
-          </div>
-          {recentFreunde.length > 0 && (
-            <div className="flex gap-2 mt-1">
-              {recentFreunde.slice(0, 4).map(f => (
-                <div key={f.id}
-                     className="w-12 h-12 rounded-xl overflow-hidden"
-                     style={{ border: '2px solid rgba(255,255,255,0.6)' }}>
-                  {f.art ? (
-                    <img src={base + f.art} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center"
-                         style={{ background: 'rgba(252,211,77,0.18)' }}>
-                      <span className="material-symbols-outlined text-base"
-                            style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>
-                        pets
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          label: t('care.feed'), reward: 5, color: '#f59e0b' },
+                { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        label: t('care.pet'),  reward: 3, color: '#ec4899' },
+                { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', label: t('care.play'), reward: 8, color: '#124346' },
+              ].map(a => (
+                <button key={a.key}
+                  onClick={() => handleCare(a.onTap, a.state)}
+                  disabled={a.state}
+                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
+                  style={{ opacity: a.state ? 0.7 : 1 }}>
+                  <div className="w-full aspect-square rounded-2xl flex items-center justify-center"
+                       style={{
+                         background: a.state
+                           ? 'rgba(52,211,153,0.12)'
+                           : 'linear-gradient(135deg, #ffffff 0%, #fef3c7 100%)',
+                         border: a.state ? '1.5px solid rgba(52,211,153,0.45)' : '1.5px solid rgba(255,255,255,0.9)',
+                         boxShadow: a.state
+                           ? '0 2px 8px rgba(5,150,105,0.1)'
+                           : '0 4px 14px -4px rgba(245,158,11,0.22), inset 0 1px 0 rgba(255,255,255,0.7)',
+                       }}>
+                    <span className="material-symbols-outlined"
+                          style={{
+                            fontSize: 34,
+                            color: a.state ? '#059669' : a.color,
+                            fontVariationSettings: "'FILL' 1",
+                          }}>
+                      {a.state ? 'check_circle' : a.icon}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span className="font-headline font-bold text-sm text-on-surface leading-none">
+                      {a.label}
+                    </span>
+                    {a.state ? (
+                      <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: '#059669' }}>
+                        {t('care.done')}
                       </span>
-                    </div>
-                  )}
-                </div>
+                    ) : (
+                      <span className="flex items-center gap-1 font-label font-bold text-[11px]" style={{ color: '#725b00' }}>
+                        <Pearl size={10} />+{a.reward} HP
+                      </span>
+                    )}
+                  </div>
+                </button>
               ))}
             </div>
-          )}
-        </button>
+          </section>
 
-        {/* ═══ HELDEN-KODEX BUTTON (public mode — small entry point to lighter Kodex page) ═══ */}
-        {!dev && (
+          {/* ═══ SPIELE MIT RONKI — hero CTA (Polish v2 .rp-hero-cta variant).
+               Most interactive card after the hero, so it sits directly under
+               Pflege and above Freunde. Unlocked = gold gradient with white
+               icon circle; locked = dashed amber stroke on cream. ═══ */}
           <button
-            onClick={() => onNavigate?.('kodex')}
-            className="w-full rounded-2xl p-5 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
+            onClick={() => gamesUnlocked ? onNavigate?.('games') : null}
+            disabled={!gamesUnlocked}
+            className={`w-full grid items-center text-left transition-all ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
             style={{
-              background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)',
-              boxShadow: '0 4px 16px rgba(252,211,77,0.3)',
+              gridTemplateColumns: '40px 1fr 32px',
+              gap: 14,
+              padding: '14px 16px',
+              borderRadius: 18,
+              marginBottom: 14,
+              background: gamesUnlocked
+                ? 'linear-gradient(160deg, #fcd34d, #f59e0b)'
+                : 'linear-gradient(160deg, #fffdf5, #fef3c7)',
+              border: gamesUnlocked
+                ? '1.5px solid transparent'
+                : '1.5px dashed rgba(245,158,11,0.5)',
+              boxShadow: gamesUnlocked
+                ? '0 8px 18px -6px rgba(245,158,11,0.45)'
+                : '0 4px 10px -6px rgba(245,158,11,0.18)',
+              opacity: gamesUnlocked ? 1 : 0.95,
             }}
           >
-            {/* Heart in a white circle — clear icon affordance, pops off the gold */}
-            <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-                 style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.15)', boxShadow: '0 2px 8px rgba(120,53,15,0.12)' }}>
-              <span className="material-symbols-outlined text-2xl"
-                    style={{ color: '#dc2626', fontVariationSettings: "'FILL' 1" }}>
-                favorite
+            {/* 40px white icon circle (unlocked) / amber tinted (locked) */}
+            <div className="flex items-center justify-center shrink-0"
+                 style={{
+                   width: 40, height: 40, borderRadius: '50%',
+                   background: gamesUnlocked ? '#ffffff' : 'rgba(245,158,11,0.12)',
+                   boxShadow: gamesUnlocked ? '0 2px 6px rgba(120,53,15,0.18)' : 'none',
+                 }}>
+              <span className="material-symbols-outlined"
+                    style={{
+                      fontSize: 20,
+                      color: '#b45309',
+                      fontVariationSettings: "'FILL' 1, 'wght' 600",
+                    }}>
+                {gamesUnlocked ? 'sports_esports' : 'lock'}
               </span>
             </div>
-            <div className="flex-1">
-              <p className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: '#78350f' }}>
-                {lang === 'de' ? 'Für Helden' : 'For heroes'}
-              </p>
-              <h4 className="font-headline font-bold text-lg leading-tight" style={{ color: '#78350f' }}>
-                {lang === 'de' ? 'Was einen Helden ausmacht' : 'What makes a hero'}
-              </h4>
+
+            {/* Body: kicker + title + subtitle */}
+            <div className="min-w-0">
+              <span style={{
+                display: 'block',
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontWeight: 800, fontSize: 10, lineHeight: 1,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: gamesUnlocked ? 'rgba(255,255,255,0.9)' : '#b45309',
+                marginBottom: 3,
+              }}>
+                {lang === 'de' ? 'Mini-Spiele' : 'Mini games'}
+              </span>
+              <b style={{
+                display: 'block',
+                fontFamily: 'Nunito, sans-serif',
+                fontWeight: 800, fontSize: 15, lineHeight: 1.1,
+                color: gamesUnlocked ? '#2a2005' : '#124346',
+              }}>
+                {t('ronki.playWithRonki')}
+              </b>
+              <span style={{
+                display: 'block',
+                fontFamily: 'Nunito, sans-serif',
+                fontWeight: 500, fontSize: 11, lineHeight: 1.3,
+                color: gamesUnlocked ? '#5c4508' : '#6b655b',
+                marginTop: 2,
+              }}>
+                {gamesUnlocked ? t('ronki.playWithRonki.subtitle') : t('ronki.playWithRonki.locked')}
+              </span>
             </div>
-            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-                 style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-              <span className="material-symbols-outlined text-xl"
-                    style={{ color: '#78350f', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+
+            {/* Chev / lock on right */}
+            <div className="flex items-center justify-center shrink-0"
+                 style={{
+                   width: 32, height: 32, borderRadius: '50%',
+                   background: gamesUnlocked ? 'rgba(255,255,255,0.9)' : 'transparent',
+                 }}>
+              <span className="material-symbols-outlined"
+                    style={{ fontSize: 18, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                {gamesUnlocked ? 'arrow_forward' : 'lock_open'}
+              </span>
             </div>
           </button>
-        )}
 
-        {/* ═══ TAB BAR ═══ */}
-        <div className="flex gap-1 p-1 rounded-full mb-6"
-             style={{ background: 'rgba(18,67,70,0.06)' }}>
-          {[
-            { id: 'about', label: lang === 'de' ? 'Über' : 'About', icon: 'info' },
-            { id: 'details', label: 'Details', icon: 'analytics' },
-            { id: 'traits', label: lang === 'de' ? 'Stärken' : 'Strengths', icon: 'psychology' },
-          ].map(tb => (
-            <button key={tb.id}
-              onClick={() => setTab(tb.id)}
-              className="flex-1 py-2.5 rounded-full font-label font-bold text-sm flex items-center justify-center gap-1.5 transition-all"
-              style={{
-                background: tab === tb.id ? '#ffffff' : 'transparent',
-                color: tab === tb.id ? '#124346' : '#707979',
-                boxShadow: tab === tb.id ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
-              }}>
-              <span className="material-symbols-outlined text-base"
-                    style={{ fontVariationSettings: tab === tb.id ? "'FILL' 1" : undefined }}>
-                {tb.icon}
+          {/* ═══ FREUNDE — kickered card, circular 48px thumbnails ═══ */}
+          <Kicker>{lang === 'de' ? 'Freunde' : 'Friends'}</Kicker>
+          <button
+            onClick={() => onNavigate?.('micropedia')}
+            className="w-full rounded-2xl p-4 active:scale-[0.98] transition-transform text-left"
+            style={{
+              background: 'linear-gradient(135deg, #fff8f2 0%, #fef3c7 100%)',
+              border: '1.5px solid rgba(252,211,77,0.3)',
+              boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
+              marginBottom: 14,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <span className="material-symbols-outlined text-2xl"
+                    style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>
+                groups
               </span>
-              {tb.label}
-            </button>
-          ))}
-        </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-headline font-bold text-base text-on-surface">
+                  {lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}
+                </h3>
+                <p className="font-label text-xs text-on-surface-variant">
+                  {totalFound} / {totalCreatures} {lang === 'de' ? 'entdeckt' : 'found'}
+                </p>
+              </div>
+              <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+            </div>
+            {recentFreunde.length > 0 && (
+              <div className="flex gap-2 mt-1">
+                {recentFreunde.slice(0, 4).map(f => (
+                  <div key={f.id}
+                       className="w-12 h-12 rounded-full overflow-hidden"
+                       style={{ border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    {f.art ? (
+                      <img src={base + f.art} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center"
+                           style={{ background: 'rgba(252,211,77,0.18)' }}>
+                        <span className="material-symbols-outlined text-base"
+                              style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>
+                          pets
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </button>
 
-        {/* ═══ ABOUT TAB ═══ */}
-        {tab === 'about' && (
-          <div className="flex flex-col gap-5">
-            {/* Bio card */}
-            <div className="rounded-2xl p-5"
-                 style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <p className="font-body text-sm text-on-surface leading-relaxed italic"
-                 style={{ color: '#4a4458' }}>
+          {/* ═══ HELDEN-KODEX BUTTON (public mode) — independent feature,
+               kept distinct from the v2 kickered cards. Remains loud gold
+               because it's the only CTA toward the lighter Kodex page. ═══ */}
+          {!dev && (
+            <button
+              onClick={() => onNavigate?.('kodex')}
+              className="w-full rounded-2xl p-5 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
+              style={{
+                background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)',
+                boxShadow: '0 4px 16px rgba(252,211,77,0.3)',
+              }}
+            >
+              <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                   style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.15)', boxShadow: '0 2px 8px rgba(120,53,15,0.12)' }}>
+                <span className="material-symbols-outlined text-2xl"
+                      style={{ color: '#dc2626', fontVariationSettings: "'FILL' 1" }}>
+                  favorite
+                </span>
+              </div>
+              <div className="flex-1">
+                <p className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: '#78350f' }}>
+                  {lang === 'de' ? 'Für Helden' : 'For heroes'}
+                </p>
+                <h4 className="font-headline font-bold text-lg leading-tight" style={{ color: '#78350f' }}>
+                  {lang === 'de' ? 'Was einen Helden ausmacht' : 'What makes a hero'}
+                </h4>
+              </div>
+              <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+                   style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+                <span className="material-symbols-outlined text-xl"
+                      style={{ color: '#78350f', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+              </div>
+            </button>
+          )}
+
+          {/* ═══ TAB BAR — v2 flipped: active = filled teal with cream text ═══ */}
+          <Kicker>{lang === 'de' ? 'Mein Drache' : 'My dragon'}</Kicker>
+          <div className="flex gap-1 mb-5"
+               style={{
+                 padding: 4,
+                 borderRadius: 14,
+                 background: 'rgba(18,67,70,0.06)',
+               }}>
+            {[
+              { id: 'about', label: lang === 'de' ? 'Über' : 'About', icon: 'info' },
+              { id: 'details', label: 'Details', icon: 'analytics' },
+              { id: 'traits', label: lang === 'de' ? 'Stärken' : 'Strengths', icon: 'psychology' },
+            ].map(tb => (
+              <button key={tb.id}
+                onClick={() => setTab(tb.id)}
+                className="flex-1 flex items-center justify-center gap-1.5 transition-all"
+                style={{
+                  padding: '10px 6px',
+                  borderRadius: 11,
+                  background: tab === tb.id ? '#124346' : 'transparent',
+                  color: tab === tb.id ? '#fef3c7' : '#6b655b',
+                  boxShadow: tab === tb.id ? '0 3px 8px -3px rgba(18,67,70,0.35)' : 'none',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                  fontWeight: 700,
+                  fontSize: 12,
+                  letterSpacing: '0.06em',
+                }}>
+                <span className="material-symbols-outlined text-base"
+                      style={{ fontVariationSettings: tab === tb.id ? "'FILL' 1" : undefined }}>
+                  {tb.icon}
+                </span>
+                {tb.label}
+              </button>
+            ))}
+          </div>
+
+          {/* ═══ ABOUT TAB ═══ */}
+          {tab === 'about' && (
+            <div className="flex flex-col gap-5">
+              {/* Bio — no card chrome (v2 .rp-about): plain italic teal */}
+              <p style={{
+                margin: 0,
+                padding: '4px 2px 0',
+                fontFamily: 'Nunito, sans-serif',
+                fontWeight: 500,
+                fontSize: 13,
+                lineHeight: 1.5,
+                color: '#124346',
+                fontStyle: 'italic',
+                textWrap: 'pretty',
+              }}>
                 {completedArcs.length > 0
                   ? (lang === 'de'
                     ? `Ronki schlüpfte am Tag, als ${heroName} sein erstes Abenteuer begann. Seitdem haben die beiden ${completedArcs.length} Abenteuer bestanden und ${daysTogether} Tage Seite an Seite verbracht. ${FACTS.motto.de}`
@@ -410,264 +625,270 @@ export default function RonkiProfile({ onNavigate }) {
                     : `Ronki just hatched and is waiting for their first adventure with ${heroName}. ${FACTS.motto.en}`)
                 }
               </p>
-            </div>
 
-            {/* Fun facts grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: lang === 'de' ? 'Spezies' : 'Species', value: FACTS.species[lang] || FACTS.species.de, emoji: '🐲' },
-                { label: lang === 'de' ? 'Größe' : 'Height', value: FACTS.heights[stage], emoji: '📏' },
-                { label: lang === 'de' ? 'Mag' : 'Likes', value: FACTS.likes[lang] || FACTS.likes.de, emoji: '❤️' },
-                { label: lang === 'de' ? 'Talent' : 'Talent', value: FACTS.talent[lang] || FACTS.talent.de, emoji: '⭐' },
-              ].map((fact, i) => (
-                <div key={i} className="rounded-xl px-4 py-3"
-                     style={{ background: 'rgba(18,67,70,0.03)', border: '1px solid rgba(18,67,70,0.06)' }}>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <span className="text-sm leading-none">{fact.emoji}</span>
-                    <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-wider">{fact.label}</span>
-                  </div>
-                  <p className="font-headline font-bold text-sm text-on-surface leading-tight">{fact.value}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Memory card — game-card style */}
-            <button className="w-full rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all"
-                 style={{ background: 'linear-gradient(160deg, #fef9c3 0%, #fde047 50%, #eab308 100%)' }}
-                 onClick={() => onNavigate?.('discovery')}>
-              <span className="text-4xl select-none shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>📖</span>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-headline font-bold text-lg" style={{ color: '#713f12' }}>
-                  {completedArcs.length > 0 ? (() => {
-                    const arc = findArc(completedArcs[completedArcs.length - 1]);
-                    return arc ? t(arc.titleKey) : (lang === 'de' ? 'Abenteuer' : 'Adventure');
-                  })() : (lang === 'de' ? 'Abenteuer-Chronik' : 'Discovery Log')}
-                </h3>
-                <p className="font-body text-sm mt-0.5" style={{ color: '#713f1299' }}>
-                  {completedArcs.length > 0
-                    ? `${completedArcs.length} ${lang === 'de' ? 'Abenteuer bestanden' : 'adventures survived'}`
-                    : (lang === 'de' ? 'Deine Geschichte beginnt bald!' : 'Your story begins soon!')}
-                </p>
-              </div>
-              <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-                   style={{ background: '#ffffff', border: '2.5px solid rgba(113,63,18,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                <span className="material-symbols-outlined text-xl" style={{ color: '#713f12', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
-              </div>
-            </button>
-
-            {/* Erinnerungen — trophy + badge gallery. Moved here from the Hub
-                 so the campfire surface stays minimal; Ronki's page is the
-                 natural home for "our story so far". */}
-            <button className="w-full rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all relative overflow-hidden"
-                 style={{
-                   background: 'linear-gradient(135deg, #0c1a2e 0%, #0e2840 100%)',
-                   border: '1.5px solid rgba(252,211,77,0.18)',
-                   boxShadow: '0 4px 16px rgba(12,24,48,0.22)',
-                 }}
-                 onClick={() => onNavigate?.('memories')}>
-              <img src={base + 'art/tex-sternenmeer.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none" />
-              <div className="relative z-10 w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                   style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.25)' }}>
-                <span className="material-symbols-outlined text-2xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-              </div>
-              <div className="relative z-10 flex-1 min-w-0">
-                <h3 className="font-headline font-bold text-lg text-white">
-                  {lang === 'de' ? 'Erinnerungen' : 'Memories'}
-                </h3>
-                <p className="font-body text-sm mt-0.5" style={{ color: 'rgba(252,211,77,0.7)' }}>
-                  {(() => {
-                    const parts = [];
-                    const bosses = state.bossTrophies?.length ? [...new Set(state.bossTrophies)].length : 0;
-                    const badges = state.unlockedBadges?.length || 0;
-                    if (bosses) parts.push(lang === 'de' ? `${bosses} Bosse` : `${bosses} boss${bosses !== 1 ? 'es' : ''}`);
-                    if (badges) parts.push(lang === 'de' ? `${badges} Abzeichen` : `${badges} badge${badges !== 1 ? 's' : ''}`);
-                    return parts.join(' · ') || (lang === 'de' ? 'Deine Geschichte beginnt hier' : 'Your story begins here');
-                  })()}
-                </p>
-              </div>
-              <div className="relative z-10 w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-                   style={{ background: 'rgba(252,211,77,0.15)', border: '2.5px solid rgba(252,211,77,0.3)' }}>
-                <span className="material-symbols-outlined text-xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
-              </div>
-            </button>
-          </div>
-        )}
-
-        {/* ═══ DETAILS TAB ═══ */}
-        {tab === 'details' && (
-          <div className="flex flex-col gap-5">
-            {/* Evolution progress (dev only — hides the "next stage" nudge for public) */}
-            {dev && (
-            <div className="rounded-2xl p-5"
-                 style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>upgrade</span>
-                  <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">
-                    {lang === 'de' ? 'Entwicklung' : 'Evolution'}
-                  </span>
-                </div>
-                <span className="font-label font-bold text-sm" style={{ color: stageColor }}>{stageName}</span>
-              </div>
-              {/* Progress bar */}
-              <div className="w-full h-3 rounded-full overflow-hidden mb-2" style={{ background: 'rgba(18,67,70,0.08)' }}>
-                <div className="h-full rounded-full transition-all duration-700"
-                     style={{ width: `${evoPct}%`, background: `linear-gradient(90deg, ${stageColor}, ${stageColor}cc)` }} />
-              </div>
-              <p className="font-label text-xs text-on-surface-variant">
-                {nextThreshold
-                  ? `${evo} / ${nextThreshold} ${lang === 'de' ? 'Pflege-Punkte' : 'care points'}`
-                  : (lang === 'de' ? 'Maximale Entwicklung erreicht!' : 'Max evolution reached!')}
-              </p>
-              {nextThreshold && (
-                <p className="font-label text-xs mt-1" style={{ color: stageColor }}>
-                  {lang === 'de'
-                    ? `Noch ${nextThreshold - evo} bis ${(lang === 'en' ? STAGE_NAMES_EN : STAGE_NAMES_DE)[stage + 1]}`
-                    : `${nextThreshold - evo} more to ${STAGE_NAMES_EN[stage + 1]}`}
-                </p>
-              )}
-            </div>
-            )}
-
-            {/* Stats grid */}
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: lang === 'de' ? 'Tage zusammen' : 'Days together', value: daysTogether, icon: 'calendar_month', color: '#124346' },
-                { label: 'HP', value: state.hp || 0, icon: 'diamond', color: '#f59e0b' },
-                { label: lang === 'de' ? 'Abenteuer' : 'Adventures', value: completedArcs.length, icon: 'auto_stories', color: '#6d28d9' },
-              ].map((stat, i) => (
-                <div key={i} className="rounded-xl p-4 text-center"
-                     style={{ background: `${stat.color}08`, border: `1.5px solid ${stat.color}18` }}>
-                  <span className="material-symbols-outlined text-xl block mb-1"
-                        style={{ color: stat.color, fontVariationSettings: "'FILL' 1" }}>{stat.icon}</span>
-                  <p className="font-headline font-bold text-2xl" style={{ color: stat.color }}>{stat.value}</p>
-                  <p className="font-label text-xs text-on-surface-variant mt-0.5 uppercase tracking-wider">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Today's care */}
-            <div className="rounded-2xl p-5"
-                 style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
-                <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">
-                  {lang === 'de' ? 'Pflege heute' : 'Care today'}
-                </span>
-              </div>
-              <div className="flex justify-around">
+              {/* Fun facts grid — Material Symbols, Plus Jakarta 800/9 labels */}
+              <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: lang === 'de' ? 'Füttern' : 'Feed', done: state.catFed, icon: 'cookie', color: '#f59e0b' },
-                  { label: lang === 'de' ? 'Streicheln' : 'Pet', done: state.catPetted, icon: 'favorite', color: '#f472b6' },
-                  { label: lang === 'de' ? 'Spielen' : 'Play', done: state.catPlayed, icon: 'sports_baseball', color: '#0ea5e9' },
-                ].map((c, i) => (
-                  <div key={i} className="flex flex-col items-center gap-2">
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center transition-all"
-                         style={{
-                           background: c.done ? `${c.color}15` : 'rgba(0,0,0,0.04)',
-                           border: c.done ? `2px solid ${c.color}40` : '2px solid rgba(0,0,0,0.08)',
-                         }}>
-                      <span className="material-symbols-outlined text-2xl"
-                            style={{ color: c.done ? c.color : '#c0c8c9', fontVariationSettings: "'FILL' 1" }}>
-                        {c.done ? 'check_circle' : c.icon}
+                  { label: lang === 'de' ? 'Spezies' : 'Species', value: FACTS.species[lang] || FACTS.species.de, icon: 'pets' },
+                  { label: lang === 'de' ? 'Größe' : 'Height',    value: FACTS.heights[stage],                    icon: 'straighten' },
+                  { label: lang === 'de' ? 'Mag' : 'Likes',       value: FACTS.likes[lang] || FACTS.likes.de,     icon: 'favorite' },
+                  { label: lang === 'de' ? 'Talent' : 'Talent',   value: FACTS.talent[lang] || FACTS.talent.de,   icon: 'star' },
+                ].map((fact, i) => (
+                  <div key={i} className="rounded-xl px-4 py-3"
+                       style={{ background: 'rgba(18,67,70,0.03)', border: '1px solid rgba(18,67,70,0.06)' }}>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="material-symbols-outlined"
+                            style={{ fontSize: 16, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                        {fact.icon}
+                      </span>
+                      <span style={{
+                        fontFamily: 'Plus Jakarta Sans, sans-serif',
+                        fontWeight: 800, fontSize: 9, lineHeight: 1,
+                        letterSpacing: '0.22em',
+                        textTransform: 'uppercase',
+                        color: '#124346',
+                      }}>
+                        {fact.label}
                       </span>
                     </div>
-                    <span className="font-label text-xs font-bold uppercase tracking-wider"
-                          style={{ color: c.done ? c.color : '#707979' }}>
-                      {c.label}
+                    <p className="font-headline font-bold text-sm text-on-surface leading-tight">{fact.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* CHRONIK section — kicker over both flat links */}
+              <div>
+                <Kicker>{lang === 'de' ? 'Chronik' : 'Chronicle'}</Kicker>
+
+                {/* Memory card — demoted to flat white chronik-link */}
+                <button className="w-full p-3 flex items-center gap-3 text-left active:scale-[0.98] transition-all"
+                     style={{
+                       borderRadius: 14,
+                       background: '#fff',
+                       border: '1px solid rgba(18,67,70,0.12)',
+                       marginBottom: 8,
+                     }}
+                     onClick={() => onNavigate?.('discovery')}>
+                  <span className="material-symbols-outlined"
+                        style={{ fontSize: 22, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                    auto_stories
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <b style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, lineHeight: 1.2, color: '#124346' }}>
+                      {completedArcs.length > 0 ? (() => {
+                        const arc = findArc(completedArcs[completedArcs.length - 1]);
+                        return arc ? t(arc.titleKey) : (lang === 'de' ? 'Abenteuer' : 'Adventure');
+                      })() : (lang === 'de' ? 'Abenteuer-Chronik' : 'Discovery Log')}
+                    </b>
+                    <span style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: 11, lineHeight: 1.3, color: '#6b655b' }}>
+                      {completedArcs.length > 0
+                        ? `${completedArcs.length} ${lang === 'de' ? 'Abenteuer bestanden' : 'adventures survived'}`
+                        : (lang === 'de' ? 'Deine Geschichte beginnt bald!' : 'Your story begins soon!')}
                     </span>
                   </div>
-                ))}
-              </div>
-            </div>
+                  <span className="material-symbols-outlined"
+                        style={{ fontSize: 18, color: '#6b655b' }}>
+                    chevron_right
+                  </span>
+                </button>
 
-            {/* Weight & height */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl p-4 text-center"
-                   style={{ background: 'rgba(18,67,70,0.03)', border: '1px solid rgba(18,67,70,0.06)' }}>
-                <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest block mb-1">
-                  {lang === 'de' ? 'Gewicht' : 'Weight'}
-                </span>
-                <span className="font-headline font-bold text-xl text-on-surface">{FACTS.weights[stage]}</span>
-              </div>
-              <div className="rounded-xl p-4 text-center"
-                   style={{ background: 'rgba(18,67,70,0.03)', border: '1px solid rgba(18,67,70,0.06)' }}>
-                <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest block mb-1">
-                  {lang === 'de' ? 'Größe' : 'Height'}
-                </span>
-                <span className="font-headline font-bold text-xl text-on-surface">{FACTS.heights[stage]}</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ═══ TRAITS TAB ═══ */}
-        {tab === 'traits' && (
-          <div className="flex flex-col gap-5">
-            {/* Earned traits */}
-            <div className="rounded-2xl p-5"
-                 style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
-                <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">
-                  {lang === 'de' ? 'Ronkis Wesen' : "Ronki's Traits"}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {earnedTraits.map(tr => (
-                  <div key={tr.id}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full"
-                    style={{ background: `${tr.color}12`, border: `1.5px solid ${tr.color}30` }}>
-                    <span className="material-symbols-outlined text-base"
-                          style={{ color: tr.color, fontVariationSettings: "'FILL' 1" }}>{tr.icon}</span>
-                    <span className="font-label font-bold text-sm" style={{ color: tr.color }}>
-                      {tr.label[lang] || tr.label.de}
+                {/* Erinnerungen — demoted to flat white chronik-link
+                     (bosses + badges summary preserved). */}
+                <button className="w-full p-3 flex items-center gap-3 text-left active:scale-[0.98] transition-all"
+                     style={{
+                       borderRadius: 14,
+                       background: '#fff',
+                       border: '1px solid rgba(18,67,70,0.12)',
+                     }}
+                     onClick={() => onNavigate?.('memories')}>
+                  <span className="material-symbols-outlined"
+                        style={{ fontSize: 22, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                    auto_awesome
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <b style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, lineHeight: 1.2, color: '#124346' }}>
+                      {lang === 'de' ? 'Erinnerungen' : 'Memories'}
+                    </b>
+                    <span style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: 11, lineHeight: 1.3, color: '#6b655b' }}>
+                      {(() => {
+                        const parts = [];
+                        const bosses = state.bossTrophies?.length ? [...new Set(state.bossTrophies)].length : 0;
+                        const badges = state.unlockedBadges?.length || 0;
+                        if (bosses) parts.push(lang === 'de' ? `${bosses} Bosse` : `${bosses} boss${bosses !== 1 ? 'es' : ''}`);
+                        if (badges) parts.push(lang === 'de' ? `${badges} Abzeichen` : `${badges} badge${badges !== 1 ? 's' : ''}`);
+                        return parts.join(' · ') || (lang === 'de' ? 'Deine Geschichte beginnt hier' : 'Your story begins here');
+                      })()}
                     </span>
                   </div>
-                ))}
+                  <span className="material-symbols-outlined"
+                        style={{ fontSize: 18, color: '#6b655b' }}>
+                    chevron_right
+                  </span>
+                </button>
               </div>
-              <p className="font-body text-xs text-on-surface-variant mt-4 italic leading-relaxed">
-                {lang === 'de'
-                  ? 'Ronki wird bei jedem Abenteuer stärker.'
-                  : 'Ronki grows stronger with every adventure.'}
-              </p>
             </div>
+          )}
 
-            {/* Locked traits preview */}
-            <div className="rounded-2xl p-5"
-                 style={{ background: 'rgba(18,67,70,0.03)', border: '1.5px dashed rgba(18,67,70,0.12)' }}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="material-symbols-outlined text-on-surface-variant">lock</span>
-                <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">
-                  {lang === 'de' ? 'Noch zu entdecken' : 'Yet to discover'}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {TRAIT_POOL.filter(tr => !tr.when(state)).map(tr => (
-                  <div key={tr.id}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full"
-                    style={{ background: 'rgba(0,0,0,0.03)', border: '1.5px solid rgba(0,0,0,0.06)' }}>
-                    <span className="material-symbols-outlined text-base text-on-surface-variant/40">help</span>
-                    <span className="font-label font-bold text-sm text-on-surface-variant/40">???</span>
+          {/* ═══ DETAILS TAB ═══ */}
+          {tab === 'details' && (
+            <div className="flex flex-col gap-5">
+              {/* Evolution progress (dev only) */}
+              {dev && (
+              <div className="rounded-2xl p-5"
+                   style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>upgrade</span>
+                    <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">
+                      {lang === 'de' ? 'Entwicklung' : 'Evolution'}
+                    </span>
                   </div>
-                ))}
-                {TRAIT_POOL.filter(tr => !tr.when(state)).length === 0 && (
-                  <p className="font-body text-sm text-on-surface-variant italic">
-                    {lang === 'de' ? 'Alle Stärken entdeckt!' : 'All strengths discovered!'}
+                  <span className="font-label font-bold text-sm" style={{ color: stageColor }}>{stageName}</span>
+                </div>
+                <div className="w-full h-3 rounded-full overflow-hidden mb-2" style={{ background: 'rgba(18,67,70,0.08)' }}>
+                  <div className="h-full rounded-full transition-all duration-700"
+                       style={{ width: `${evoPct}%`, background: `linear-gradient(90deg, ${stageColor}, ${stageColor}cc)` }} />
+                </div>
+                <p className="font-label text-xs text-on-surface-variant">
+                  {nextThreshold
+                    ? `${evo} / ${nextThreshold} ${lang === 'de' ? 'Pflege-Punkte' : 'care points'}`
+                    : (lang === 'de' ? 'Maximale Entwicklung erreicht!' : 'Max evolution reached!')}
+                </p>
+                {nextThreshold && (
+                  <p className="font-label text-xs mt-1" style={{ color: stageColor }}>
+                    {lang === 'de'
+                      ? `Noch ${nextThreshold - evo} bis ${(lang === 'en' ? STAGE_NAMES_EN : STAGE_NAMES_DE)[stage + 1]}`
+                      : `${nextThreshold - evo} more to ${STAGE_NAMES_EN[stage + 1]}`}
                   </p>
                 )}
               </div>
+              )}
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: lang === 'de' ? 'Tage zusammen' : 'Days together', value: daysTogether, icon: 'calendar_month', color: '#124346' },
+                  { label: 'HP', value: state.hp || 0, icon: 'diamond', color: '#f59e0b' },
+                  { label: lang === 'de' ? 'Abenteuer' : 'Adventures', value: completedArcs.length, icon: 'auto_stories', color: '#6d28d9' },
+                ].map((stat, i) => (
+                  <div key={i} className="rounded-xl p-4 text-center"
+                       style={{ background: `${stat.color}08`, border: `1.5px solid ${stat.color}18` }}>
+                    <span className="material-symbols-outlined text-xl block mb-1"
+                          style={{ color: stat.color, fontVariationSettings: "'FILL' 1" }}>{stat.icon}</span>
+                    <p className="font-headline font-bold text-2xl" style={{ color: stat.color }}>{stat.value}</p>
+                    <p className="font-label text-xs text-on-surface-variant mt-0.5 uppercase tracking-wider">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Weight & height */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl p-4 text-center"
+                     style={{ background: 'rgba(18,67,70,0.03)', border: '1px solid rgba(18,67,70,0.06)' }}>
+                  <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest block mb-1">
+                    {lang === 'de' ? 'Gewicht' : 'Weight'}
+                  </span>
+                  <span className="font-headline font-bold text-xl text-on-surface">{FACTS.weights[stage]}</span>
+                </div>
+                <div className="rounded-xl p-4 text-center"
+                     style={{ background: 'rgba(18,67,70,0.03)', border: '1px solid rgba(18,67,70,0.06)' }}>
+                  <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest block mb-1">
+                    {lang === 'de' ? 'Größe' : 'Height'}
+                  </span>
+                  <span className="font-headline font-bold text-xl text-on-surface">{FACTS.heights[stage]}</span>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ═══ MOTTO ═══ */}
-        <div className="flex justify-center mt-8 mb-4">
-          <p className="font-body text-sm text-on-surface-variant/50 italic text-center max-w-xs">
-            „{FACTS.motto[lang] || FACTS.motto.de}"
-          </p>
+          {/* ═══ TRAITS (STÄRKEN) TAB — progress-bar rows per v2 ═══ */}
+          {tab === 'traits' && (
+            <div className="flex flex-col gap-5">
+              {/* Earned strengths with progress bars + numeric scores */}
+              <div className="rounded-2xl p-5"
+                   style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
+                  <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">
+                    {lang === 'de' ? 'Ronkis Wesen' : "Ronki's Traits"}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2" style={{ padding: '4px 2px 0' }}>
+                  {earnedTraits.map(tr => {
+                    const score = tr.score(state);
+                    return (
+                      <div key={tr.id}
+                           className="grid items-center"
+                           style={{ gridTemplateColumns: '80px 1fr 32px', gap: 10 }}>
+                        <b style={{
+                          fontFamily: 'Plus Jakarta Sans, sans-serif',
+                          fontWeight: 700, fontSize: 12, lineHeight: 1,
+                          letterSpacing: '0.04em',
+                          textTransform: 'uppercase',
+                          color: '#124346',
+                        }}>
+                          {tr.label[lang] || tr.label.de}
+                        </b>
+                        <div style={{
+                          height: 8, borderRadius: 999,
+                          background: 'rgba(18,67,70,0.08)',
+                          overflow: 'hidden',
+                        }}>
+                          <div style={{
+                            width: `${score}%`, height: '100%',
+                            background: 'linear-gradient(90deg, #fcd34d, #f59e0b)',
+                            borderRadius: 999,
+                            transition: 'width .7s ease',
+                          }} />
+                        </div>
+                        <span style={{
+                          fontFamily: 'Plus Jakarta Sans, sans-serif',
+                          fontWeight: 800, fontSize: 12, lineHeight: 1,
+                          color: '#b45309',
+                          textAlign: 'right',
+                        }}>
+                          {score}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="font-body text-xs text-on-surface-variant mt-4 italic leading-relaxed">
+                  {lang === 'de'
+                    ? 'Ronki wird bei jedem Abenteuer stärker.'
+                    : 'Ronki grows stronger with every adventure.'}
+                </p>
+              </div>
+
+              {/* Locked preview — kept simple, dashed card */}
+              <div className="rounded-2xl p-5"
+                   style={{ background: 'rgba(18,67,70,0.03)', border: '1.5px dashed rgba(18,67,70,0.12)' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="material-symbols-outlined text-on-surface-variant">lock</span>
+                  <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">
+                    {lang === 'de' ? 'Noch zu entdecken' : 'Yet to discover'}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {TRAIT_POOL.filter(tr => !tr.when(state)).map(tr => (
+                    <div key={tr.id}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-full"
+                      style={{ background: 'rgba(0,0,0,0.03)', border: '1.5px solid rgba(0,0,0,0.06)' }}>
+                      <span className="material-symbols-outlined text-base text-on-surface-variant/40">help</span>
+                      <span className="font-label font-bold text-sm text-on-surface-variant/40">???</span>
+                    </div>
+                  ))}
+                  {TRAIT_POOL.filter(tr => !tr.when(state)).length === 0 && (
+                    <p className="font-body text-sm text-on-surface-variant italic">
+                      {lang === 'de' ? 'Alle Stärken entdeckt!' : 'All strengths discovered!'}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
-
       </main>
     </div>
   );
