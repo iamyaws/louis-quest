@@ -132,6 +132,22 @@ const CONCERNS: Concern[] = [
           verkaufen. Das Geschäftsmodell muss zum Versprechen passen, sonst
           zerreißt es früher oder später beides.
         </p>
+        <p>
+          Ronki kostet aktuell nichts und nimmt nichts. Wer trotzdem schon
+          jetzt unterstützen will, kann uns auf{' '}
+          <a
+            href="https://ko-fi.com/ronkiapp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-display font-semibold text-teal-dark underline decoration-teal/30 underline-offset-4 hover:decoration-teal hover:text-teal transition-colors"
+          >
+            Ko-fi
+          </a>{' '}
+          eine Kugel Eis für Louis spendieren. Freiwillig, ohne
+          Gegenleistung, einmalig. Für uns ist das aktuell die ehrlichste
+          Monetarisierung: wer's mag und kann, gibt was. Wer nicht, ist
+          genauso willkommen.
+        </p>
       </>
     ),
   },
