@@ -1038,5 +1038,21 @@
 
   "beat.close": "Close",
   "beat.didIt": "I did it!",
-  "beat.doneReading": "Done reading"
+  "beat.doneReading": "Done reading",
+
+  "hub.nextUp.label": "Next up",
+  "hub.bonus.headline": "Extra tasks",
+  "hub.bonus.allDone": "All done ✨",
+  "hub.mehrEntdecken": "Discover more",
+  "hub.streakDay": "Day {n}",
+  "anchor.short.morning": "Morning",
+  "anchor.short.evening": "Afternoon",
+  "anchor.short.bedtime": "Night",
+
+  "celebrate.forscher.title": "All puzzle adventures found!",
+  "celebrate.forscher.message": "You can always find them now in your games.",
+  "celebrate.forscher.button": "To the games",
+
+  "game.forscher.section": "Your puzzle adventures",
+  "game.forscher.replayHint": "Replay anytime"
 }

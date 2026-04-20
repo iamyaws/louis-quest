@@ -26,11 +26,19 @@ export function useArc() {
   // state.arcEngine (e.g. useSpecialQuests offering a Freund reunion arc).
   const lastPersistedRef = useRef<ArcEngineState | null>(null);
 
-  // Persist whenever arcState changes
+  // Persist whenever arcState changes.
+  // Depending on actions.patchState would re-fire every TaskContext render
+  // (the Provider's inline `actions` object gets a new reference every render,
+  // even though patchState itself is useCallback([])-stable). That creates a
+  // setState → re-render → effect → setState loop. Depending only on arcState
+  // is correct here because patchState's closure has no captured variables
+  // that change. See backlog_arc_offer_rework.md for the longer-term fix
+  // (memoize `actions` + `value` in TaskContext).
   useEffect(() => {
     lastPersistedRef.current = arcState;
     actions.patchState({ arcEngine: arcState });
-  }, [arcState, actions.patchState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [arcState]);
 
   // Hydrate once when state transitions from null (async load completes)
   const initializedRef = useRef(false);

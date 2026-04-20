@@ -316,14 +316,16 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
                                 {/* Weather hint persists after completion */}
                                 {isAnziehen && todayWeather && weatherInfo && (
                                   <button
-                                    className="flex items-center gap-1.5 mt-2 ml-14 px-2 py-1 rounded-lg transition-all text-left"
+                                    className="inline-flex items-center gap-1.5 mt-2 ml-14 px-2 py-0.5 rounded-md transition-all whitespace-nowrap"
                                     style={{ background: 'rgba(2,132,199,0.08)' }}
                                     onClick={() => setShowWeather(true)}
+                                    aria-label={t('task.weather.viewOutfit')}
                                   >
-                                    <span className="text-sm">{weatherInfo.emoji}</span>
-                                    <span className="text-xs font-bold" style={{ color: '#0284C7' }}>
-                                      {todayWeather.tempMin}°/{todayWeather.tempMax}° — {t('task.weather.viewOutfit')}
+                                    <span className="text-sm leading-none">{weatherInfo.emoji}</span>
+                                    <span className="text-xs font-bold leading-none" style={{ color: '#0284C7' }}>
+                                      {todayWeather.tempMin}°/{todayWeather.tempMax}°
                                     </span>
+                                    <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0284C7' }}>info</span>
                                   </button>
                                 )}
                               </div>
@@ -346,14 +348,16 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
                                   <p className="font-bold font-label text-on-surface">{t('quest.' + q.id)}</p>
                                   {isAnziehen && todayWeather && weatherInfo ? (
                                     <button
-                                      className="flex items-center gap-1.5 mt-1 px-2 py-1 rounded-lg transition-all text-left"
+                                      className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md transition-all whitespace-nowrap"
                                       style={{ background: 'rgba(2,132,199,0.08)' }}
                                       onClick={(e) => { e.stopPropagation(); setShowWeather(true); }}
+                                      aria-label={t('task.weather.outfitHint')}
                                     >
-                                      <span className="text-sm">{weatherInfo.emoji}</span>
-                                      <span className="text-xs font-bold" style={{ color: '#0284C7' }}>
-                                        {todayWeather.tempMin}°/{todayWeather.tempMax}° — {t('task.weather.outfitHint')}
+                                      <span className="text-sm leading-none">{weatherInfo.emoji}</span>
+                                      <span className="text-xs font-bold leading-none" style={{ color: '#0284C7' }}>
+                                        {todayWeather.tempMin}°/{todayWeather.tempMax}°
                                       </span>
+                                      <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#0284C7' }}>info</span>
                                     </button>
                                   ) : hint ? (
                                     <p className="text-xs font-body text-on-surface/60 mt-0.5">{hint}</p>

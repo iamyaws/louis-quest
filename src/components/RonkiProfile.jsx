@@ -313,6 +313,42 @@ export default function RonkiProfile({ onNavigate }) {
                 <span className="material-symbols-outlined text-xl" style={{ color: '#713f12', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
               </div>
             </button>
+
+            {/* Erinnerungen — trophy + badge gallery. Moved here from the Hub
+                 so the campfire surface stays minimal; Ronki's page is the
+                 natural home for "our story so far". */}
+            <button className="w-full rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all relative overflow-hidden"
+                 style={{
+                   background: 'linear-gradient(135deg, #0c1a2e 0%, #0e2840 100%)',
+                   border: '1.5px solid rgba(252,211,77,0.18)',
+                   boxShadow: '0 4px 16px rgba(12,24,48,0.22)',
+                 }}
+                 onClick={() => onNavigate?.('memories')}>
+              <img src={base + 'art/tex-sternenmeer.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none" />
+              <div className="relative z-10 w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                   style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.25)' }}>
+                <span className="material-symbols-outlined text-2xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+              </div>
+              <div className="relative z-10 flex-1 min-w-0">
+                <h3 className="font-headline font-bold text-lg text-white">
+                  {lang === 'de' ? 'Erinnerungen' : 'Memories'}
+                </h3>
+                <p className="font-body text-sm mt-0.5" style={{ color: 'rgba(252,211,77,0.7)' }}>
+                  {(() => {
+                    const parts = [];
+                    const bosses = state.bossTrophies?.length ? [...new Set(state.bossTrophies)].length : 0;
+                    const badges = state.unlockedBadges?.length || 0;
+                    if (bosses) parts.push(lang === 'de' ? `${bosses} Bosse` : `${bosses} boss${bosses !== 1 ? 'es' : ''}`);
+                    if (badges) parts.push(lang === 'de' ? `${badges} Abzeichen` : `${badges} badge${badges !== 1 ? 's' : ''}`);
+                    return parts.join(' · ') || (lang === 'de' ? 'Deine Geschichte beginnt hier' : 'Your story begins here');
+                  })()}
+                </p>
+              </div>
+              <div className="relative z-10 w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+                   style={{ background: 'rgba(252,211,77,0.15)', border: '2.5px solid rgba(252,211,77,0.3)' }}>
+                <span className="material-symbols-outlined text-xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+              </div>
+            </button>
           </div>
         )}
 

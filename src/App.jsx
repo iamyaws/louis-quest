@@ -13,7 +13,8 @@ import HeldenKodex from './components/HeldenKodex';
 import Onboarding from './components/Onboarding';
 import ParentalDashboard from './components/ParentalDashboard';
 import Celebration from './components/Celebration';
-import ArcOfferCard from './components/ArcOfferCard';
+// Arc offer system paused — see backlog_arc_offer_rework.md
+// import ArcOfferCard from './components/ArcOfferCard';
 import FreundCallbackCard from './components/FreundCallbackCard';
 import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
@@ -41,7 +42,6 @@ import { useQuietAttention } from './hooks/useQuietAttention';
 import EggOverlay from './components/EggOverlay';
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import AlphaBanner from './components/AlphaBanner';
-import CompanionVariantMigration from './components/CompanionVariantMigration';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -173,7 +173,15 @@ function AppContent() {
             onBack={() => { setActiveQuestLineId(null); setView('quests'); }}
           />
         )}
-        {view === 'games' && <MiniGames onPlay={(id) => setView(id)} />}
+        {view === 'games' && (
+          <MiniGames
+            onPlay={(id) => setView(id)}
+            onPlayMint={(id) => {
+              setActiveMintGame(id);
+              setView('mint-game');
+            }}
+          />
+        )}
         {view === 'mint-game' && activeMintGame && (
           <>
             {activeMintGame === 'zahlenjagd' && (
@@ -242,13 +250,11 @@ function AppContent() {
         !state.louisSeenParentIntro &&
         (state.totalTasksDone || 0) >= 3 &&
         view === 'hub' && <ParentIntroOverlay />}
-      {/* One-shot variant migration for pre-variant saves (Louis). Unmounts
-          itself by writing state.companionVariant; won't re-appear. */}
-      {state && state.onboardingDone && !state.companionVariant && (
-        <CompanionVariantMigration />
-      )}
+      {/* Variant-migration modal removed — Marc has already talked Louis through
+          the change in person, so the in-app "Ronki hat eine neue Form" beat is
+          redundant. The component file is kept for reference but no longer mounted. */}
       <Celebration />
-      <ArcOfferCard />
+      {/* <ArcOfferCard /> — paused, see backlog_arc_offer_rework.md */}
       <FreundCallbackCard />
       {screenTimer && (
         <ScreenTimer

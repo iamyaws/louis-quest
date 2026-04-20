@@ -10,6 +10,7 @@ import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
 import { SPECIAL_QUESTS } from '../data/specialQuests';
+import { MINT_SEQUENCE } from '../data/mintGames';
 import storage from '../utils/storage';
 import { useAuth } from './AuthContext';
 
@@ -206,7 +207,7 @@ interface TaskActions {
 }
 
 interface CelebrationEvent {
-  type: 'victory' | 'levelUp' | 'evolution' | 'chest';
+  type: 'victory' | 'levelUp' | 'evolution' | 'chest' | 'forscherGraduation';
   payload?: Record<string, any>;
 }
 
@@ -1155,14 +1156,30 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Forscher-Ecke: claim a MINT badge (idempotent) ──
+  // When this claim completes the final implemented badge, fire the
+  // graduation celebration. forscherFunkelUnlocked stays gated on ALL 5
+  // games (including Kristall-Sortierer) for the creature reveal; graduation
+  // fires at MINT_SEQUENCE completion (implemented-only, currently 4).
   const claimMintBadge = useCallback((badgeId: string, gameId: string) => {
     setState(prev => {
       if (!prev) return prev;
       const badges = prev.mintBadgesEarned || [];
       const played = prev.mintGamesPlayed || [];
-      const newBadges = badges.includes(badgeId) ? badges : [...badges, badgeId];
+      const alreadyEarned = badges.includes(badgeId);
+      const newBadges = alreadyEarned ? badges : [...badges, badgeId];
       const newPlayed = played.includes(gameId) ? played : [...played, gameId];
       const allComplete = newBadges.length >= 5;
+
+      // Graduation transition: only fire once, on the specific claim that
+      // crosses the boundary from "not graduated" to "graduated".
+      if (!alreadyEarned && MINT_SEQUENCE.length > 0) {
+        const wasGrad = MINT_SEQUENCE.every(g => badges.includes(g.badgeId));
+        const isGrad = MINT_SEQUENCE.every(g => newBadges.includes(g.badgeId));
+        if (!wasGrad && isGrad) {
+          queueCelebration({ type: 'forscherGraduation' });
+        }
+      }
+
       return {
         ...prev,
         mintBadgesEarned: newBadges,
@@ -1170,7 +1187,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         forscherFunkelUnlocked: allComplete,
       };
     });
-  }, []);
+  }, [queueCelebration]);
 
   // ── Forscher-Ecke: record first play of a MINT game (idempotent, no badge) ──
   const recordMintGamePlay = useCallback((gameId: string) => {

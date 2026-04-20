@@ -1,65 +1,52 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
-import { MINT_GAMES } from '../data/mintGames';
-import { FREUND_BY_ID } from '../data/freunde';
-import { SEED_BY_ID } from '../data/creatures';
+import { MINT_SEQUENCE } from '../data/mintGames';
 import FreundIntroModal from './FreundIntroModal';
 import SFX from '../utils/sfx';
 
 /**
- * ForscherEcke — discovery section for MINT games on the Hub.
+ * ForscherEcke — sequential MINT-game progression on the Hub.
  *
- * Behavior:
- *   - Only rendered when AT LEAST ONE game's unlockCheck passes.
- *   - Each slot shows one of four states: locked / unlocked-unplayed /
- *     played (badge earned) / bald (implemented=false even when unlocked).
+ * Unlock model (Apr 2026): game N unlocks when game N-1's badge is earned.
+ *   - Game 1 is always unlocked.
+ *   - Unimplemented games are filtered out of the sequence (see MINT_SEQUENCE
+ *     in data/mintGames.ts) and never block progression.
+ *   - When all implemented badges are earned, the Hub hides this whole
+ *     card (graduation) — handled in Hub.jsx via isForscherGraduated.
+ *
+ * Slot states:
+ *   - locked              → future game, waiting for previous badge
+ *   - unlocked-unplayed   → available, emits NEU badge
+ *   - played (badgeEarned) → completed, tap replays the game
  *
  * Taps:
- *   - locked             → flash hint "Erst wenn du {Host} kennenlernst."
+ *   - locked             → flash hint "Schließe zuerst {prev} ab"
  *   - unlocked-unplayed  → open FreundIntroModal → on accept call onPlayGame
  *   - played (badge)     → onPlayGame directly (no intro again)
- *   - bald (not built)   → toast "Bald kommt das Abenteuer!"
  *
  * Props:
  *   - onPlayGame: (gameId: string) => void
  */
 
-const getHostName = (hostId) => {
-  const freund = FREUND_BY_ID.get(hostId);
-  if (freund) return freund.name.de;
-  const creature = SEED_BY_ID.get(hostId);
-  if (creature) return creature.name.de;
-  return hostId;
-};
-
 export default function ForscherEcke({ onPlayGame }) {
   const { state, actions } = useTask();
   const [lockedHint, setLockedHint] = useState(null);   // game.id flash
-  const [baldToast, setBaldToast] = useState(null);     // game.id flash
   const [introFor, setIntroFor] = useState(null);       // game object
 
   if (!state) return null;
 
-  // Evaluate each game's unlock state once
-  const slots = MINT_GAMES.map(game => {
+  // Evaluate each game's unlock state once, using the implemented-only sequence.
+  const slots = MINT_SEQUENCE.map(game => {
     const unlocked = game.unlockCheck(state);
     const badgeEarned = (state.mintBadgesEarned || []).includes(game.badgeId);
     const played = (state.mintGamesPlayed || []).includes(game.id);
-    const shippable = game.implemented;
-    // Derived visual state
     let status;
     if (!unlocked) status = 'locked';
-    else if (!shippable) status = 'bald';
     else if (badgeEarned) status = 'played';
     else status = 'unlocked';
     return { game, status, played };
   });
 
-  // Gate: only render if ANY game is unlocked (shippable or bald)
-  const anyUnlocked = slots.some(s => s.status !== 'locked');
-  if (!anyUnlocked) return null;
-
-  const unlockedCount = slots.filter(s => s.status !== 'locked').length;
   const playedCount = slots.filter(s => s.status === 'played').length;
 
   const handleTap = (slot) => {
@@ -68,11 +55,6 @@ export default function ForscherEcke({ onPlayGame }) {
     if (status === 'locked') {
       setLockedHint(game.id);
       setTimeout(() => setLockedHint(null), 2400);
-      return;
-    }
-    if (status === 'bald') {
-      setBaldToast(game.id);
-      setTimeout(() => setBaldToast(null), 2400);
       return;
     }
     if (status === 'played') {
@@ -95,55 +77,54 @@ export default function ForscherEcke({ onPlayGame }) {
 
   return (
     <section
-      className="w-full p-5 rounded-2xl relative overflow-hidden"
+      className="w-full p-6 rounded-2xl relative overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
-        border: '1.5px solid rgba(5,150,105,0.22)',
-        boxShadow: '0 4px 16px rgba(5,150,105,0.08)',
+        // Match the HEUTE card: cream → soft amber gradient, white hairline,
+        // same elevated shadow + inset highlight. One visual system across
+        // the Hub's primary cards.
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.94) 0%, rgba(255,244,224,0.88) 80%)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.9)',
+        boxShadow: '0 12px 36px -8px rgba(18,67,70,0.18), inset 0 1px 0 rgba(255,255,255,0.6)',
       }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl" aria-hidden="true">🔬</span>
-          <div>
-            <p
-              className="font-headline font-bold text-lg leading-tight"
-              style={{ color: '#047857', fontFamily: 'Fredoka, sans-serif' }}
-            >
-              Forscher-Ecke
-            </p>
-            <p className="font-label text-xs" style={{ color: '#059669' }}>
-              {playedCount} / {MINT_GAMES.length} Knobel-Abenteuer entdeckt
-            </p>
-          </div>
+      {/* Decorative sparkles — same flourish as HEUTE */}
+      <span className="absolute top-3 right-16 text-base opacity-60 select-none" aria-hidden="true">✦</span>
+      <span className="absolute bottom-3 left-5 text-xs opacity-40 select-none" aria-hidden="true">✦</span>
+
+      {/* Header — eyebrow + headline + count, microscope anchored right */}
+      <div className="flex items-start justify-between gap-4 mb-5">
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-[11px] font-label uppercase tracking-[0.22em] text-secondary mb-1.5">
+            Forscher-Ecke
+          </p>
+          <h3 className="font-headline font-extrabold text-lg text-primary-container leading-tight">
+            Knobel-Abenteuer
+          </h3>
+          <p className="font-body text-on-surface-variant text-sm mt-1">
+            {playedCount} von {MINT_SEQUENCE.length} entdeckt
+          </p>
         </div>
-        <span
-          className="font-label font-bold text-xs px-2.5 py-1 rounded-full"
-          style={{ background: 'rgba(5,150,105,0.12)', color: '#047857' }}
-        >
-          NEU
-        </span>
+        <span className="text-2xl leading-none select-none shrink-0 mt-0.5" aria-hidden="true">🔬</span>
       </div>
 
-      {/* 5-slot grid */}
-      <div className="grid grid-cols-5 gap-2">
+      {/* Grid — one column per implemented game in the sequence */}
+      <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${slots.length}, minmax(0, 1fr))` }}>
         {slots.map((slot) => (
           <SlotCard
             key={slot.game.id}
             slot={slot}
             isLockedHint={lockedHint === slot.game.id}
-            isBaldToast={baldToast === slot.game.id}
             onTap={() => handleTap(slot)}
           />
         ))}
       </div>
 
-      {/* Flash hints pinned beneath grid */}
+      {/* Locked flash hint — names the game Louis must finish first */}
       {lockedHint && (() => {
-        const slot = slots.find(s => s.game.id === lockedHint);
-        if (!slot) return null;
-        const hostName = getHostName(slot.game.hostId);
+        const idx = slots.findIndex(s => s.game.id === lockedHint);
+        if (idx <= 0) return null; // position 0 is always unlocked; defensive
+        const prev = slots[idx - 1].game;
         return (
           <div
             className="mt-3 rounded-xl p-3 flex items-center gap-2"
@@ -151,21 +132,11 @@ export default function ForscherEcke({ onPlayGame }) {
           >
             <span className="material-symbols-outlined text-base" style={{ color: '#124346' }}>lock</span>
             <p className="font-body text-sm text-on-surface">
-              Erst wenn du {hostName} kennenlernst.
+              Schließe zuerst <b>{prev.name.de}</b> ab, dann geht's weiter.
             </p>
           </div>
         );
       })()}
-
-      {baldToast && (
-        <div
-          className="mt-3 rounded-xl p-3 flex items-center gap-2"
-          style={{ background: 'rgba(252,211,77,0.18)', border: '1px solid rgba(252,211,77,0.35)' }}
-        >
-          <span className="text-base" aria-hidden="true">⏳</span>
-          <p className="font-body text-sm text-on-surface">Bald kommt das Abenteuer!</p>
-        </div>
-      )}
 
       {/* Freund intro overlay */}
       {introFor && (
@@ -180,39 +151,45 @@ export default function ForscherEcke({ onPlayGame }) {
 }
 
 // ── Single slot card ──
-function SlotCard({ slot, isLockedHint, isBaldToast, onTap }) {
+// Three states after the sequential-unlock rework: locked / unlocked / played.
+// The old "bald" state is gone because unimplemented games are filtered out
+// of MINT_SEQUENCE entirely.
+function SlotCard({ slot, isLockedHint, onTap }) {
   const { game, status } = slot;
   const isLocked = status === 'locked';
-  const isBald = status === 'bald';
   const isPlayed = status === 'played';
   const isNew = status === 'unlocked';
 
-  const ring = isPlayed ? 'rgba(5,150,105,0.55)'
-             : isNew     ? 'rgba(252,211,77,0.6)'
-             : isBald    ? 'rgba(161,98,7,0.3)'
-             :             'rgba(18,67,70,0.18)';
-  const bg = isPlayed ? 'rgba(52,211,153,0.12)'
-           : isNew     ? 'rgba(252,211,77,0.14)'
-           : isBald    ? 'rgba(161,98,7,0.08)'
-           :             'rgba(18,67,70,0.05)';
+  // Palette matches the Hub's card aesthetic (cream + amber accents).
+  // Played → emerald (natural success color, matches the anchor-rail full state).
+  // Unlocked (next-up) → amber + soft white halo.
+  // Locked → muted cream, minimal edge.
+  const ring = isPlayed ? 'rgba(52,211,153,0.5)'
+             : isNew     ? 'rgba(252,211,77,0.55)'
+             :             'rgba(18,67,70,0.12)';
+  const bg = isPlayed ? 'rgba(52,211,153,0.1)'
+           : isNew     ? 'rgba(252,211,77,0.18)'
+           :             'rgba(255,248,242,0.6)';
 
   return (
     <button
       onClick={onTap}
       aria-label={isLocked ? 'Noch gesperrt' : game.name.de}
-      className="relative aspect-square rounded-xl flex flex-col items-center justify-center p-1.5 active:scale-95 transition-transform"
+      className="relative aspect-square rounded-2xl flex flex-col items-center justify-center p-1.5 active:scale-95 transition-transform"
       style={{
         background: bg,
         border: `1.5px solid ${ring}`,
         minHeight: 64,
         minWidth: 56,
-        animation: (isLockedHint || isBaldToast) ? 'slotShake 0.4s ease-in-out' : undefined,
+        // Soft lift on the next-up slot so it draws the eye without shouting.
+        boxShadow: isNew ? '0 4px 12px -4px rgba(252,211,77,0.45)' : 'none',
+        animation: isLockedHint ? 'slotShake 0.4s ease-in-out' : undefined,
       }}
     >
       {isLocked ? (
         <>
-          <span className="material-symbols-outlined" style={{ fontSize: 22, color: '#94a3b8' }}>lock</span>
-          <span className="font-label font-bold text-[10px] mt-0.5" style={{ color: '#94a3b8' }}>???</span>
+          <span className="material-symbols-outlined" style={{ fontSize: 22, color: 'rgba(18,67,70,0.4)' }}>lock</span>
+          <span className="font-label font-bold text-[10px] mt-0.5" style={{ color: 'rgba(18,67,70,0.4)' }}>???</span>
         </>
       ) : isPlayed ? (
         <>
@@ -231,13 +208,6 @@ function SlotCard({ slot, isLockedHint, isBaldToast, onTap }) {
           >
             Bestanden
           </span>
-        </>
-      ) : isBald ? (
-        <>
-          <span className="select-none leading-none opacity-55" style={{ fontSize: 26, fontFamily: 'Fredoka, sans-serif' }}>
-            {game.emoji}
-          </span>
-          <span className="font-label font-bold text-[9px] mt-1" style={{ color: '#b45309' }}>Bald...</span>
         </>
       ) : (
         <>

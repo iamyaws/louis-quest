@@ -1044,5 +1044,21 @@
 
   "beat.close": "Schließen",
   "beat.didIt": "Hab's geschafft!",
-  "beat.doneReading": "Fertig gelesen"
+  "beat.doneReading": "Fertig gelesen",
+
+  "hub.nextUp.label": "Als Nächstes",
+  "hub.bonus.headline": "Extra-Aufgaben",
+  "hub.bonus.allDone": "Alle erledigt ✨",
+  "hub.mehrEntdecken": "Mehr entdecken",
+  "hub.streakDay": "Tag {n}",
+  "anchor.short.morning": "Morgen",
+  "anchor.short.evening": "Abend",
+  "anchor.short.bedtime": "Nacht",
+
+  "celebrate.forscher.title": "Alle Knobel-Abenteuer entdeckt!",
+  "celebrate.forscher.message": "Du findest sie jetzt immer bei deinen Spielen.",
+  "celebrate.forscher.button": "Zu den Spielen",
+
+  "game.forscher.section": "Deine Knobel-Abenteuer",
+  "game.forscher.replayHint": "Jederzeit spielbar"
 }

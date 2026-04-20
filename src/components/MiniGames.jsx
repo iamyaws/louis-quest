@@ -8,6 +8,7 @@ import { getCatStage } from '../utils/helpers';
 import StaminaExhausted from './StaminaExhausted';
 import StaminaIndicator from './StaminaIndicator';
 import VoiceAudio from '../utils/voiceAudio';
+import { MINT_GAMES } from '../data/mintGames';
 
 // Module-level cooldown so stamina voice line doesn't repeat every Games mount
 let lastStaminaVoiceMs = 0;
@@ -67,7 +68,7 @@ const GAMES = [
   },
 ];
 
-export default function MiniGames({ onPlay }) {
+export default function MiniGames({ onPlay, onPlayMint }) {
   const { t } = useTranslation();
   const { state } = useTask();
   const access = useGameAccess();
@@ -77,6 +78,13 @@ export default function MiniGames({ onPlay }) {
   const voiceFiredRef = useRef(false);
 
   const catStage = getCatStage(state?.catEvo || 0);
+
+  // Earned MINT games — surface completed Knobel-Abenteuer as stables Louis
+  // can replay any time once they're out of the Hub's Forscher-Ecke. Filtering
+  // by badgeId (not gameId) mirrors the graduation check in TaskContext.
+  const mintEarned = MINT_GAMES.filter(g =>
+    (state?.mintBadgesEarned || []).includes(g.badgeId)
+  );
 
   // Fire stamina voice line at most once per mount AND throttled to 30min cross-mount
   useEffect(() => {
@@ -186,6 +194,56 @@ export default function MiniGames({ onPlay }) {
             Ronki wird langsam müde ...
           </p>
         </div>
+      )}
+
+      {/* ── Deine Knobel-Abenteuer — earned MINT games, replayable ── */}
+      {unlocked && mintEarned.length > 0 && (
+        <section className="mb-6">
+          <div className="flex items-baseline justify-between mb-3 px-1">
+            <h3 className="font-headline font-bold text-lg text-primary">
+              {t('game.forscher.section')}
+            </h3>
+            <p className="font-label text-xs uppercase tracking-widest text-on-surface-variant">
+              {t('game.forscher.replayHint')}
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            {mintEarned.map(game => (
+              <button
+                key={game.id}
+                className="w-full rounded-2xl p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(236,253,245,0.88) 100%)',
+                  border: '1.5px solid rgba(52,211,153,0.3)',
+                  boxShadow: '0 4px 14px -4px rgba(5,150,105,0.18), inset 0 1px 0 rgba(255,255,255,0.6)',
+                  cursor: stamina.exhausted ? 'not-allowed' : 'pointer',
+                  opacity: stamina.exhausted ? 0.5 : 1,
+                }}
+                onClick={() => {
+                  if (stamina.exhausted) { setShowExhausted(true); return; }
+                  onPlayMint?.(game.id);
+                }}
+              >
+                <span className="text-4xl select-none shrink-0 leading-none">{game.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-headline font-bold text-base text-primary-container">
+                    {game.name.de}
+                  </h4>
+                  <p className="font-body text-xs mt-0.5" style={{ color: '#047857' }}>
+                    <span className="material-symbols-outlined align-middle text-[13px]"
+                          style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                    {' '}{game.badgeLabel.de}
+                  </p>
+                </div>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                     style={{ background: 'rgba(52,211,153,0.16)', border: '1.5px solid rgba(52,211,153,0.35)' }}>
+                  <span className="material-symbols-outlined text-lg"
+                        style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Game cards — light, clean, emoji-forward */}

@@ -263,6 +263,57 @@ function VictoryCelebration({ onDismiss }) {
   );
 }
 
+// ── Forscher-Ecke Graduation — all implemented MINT games done ──
+// One-shot moment when Louis finishes the whole sequence. The games then move
+// to the MiniGames tab as stables (see MiniGames "Deine Knobel-Abenteuer").
+function ForscherGraduationCelebration({ onDismiss }) {
+  const { t } = useTranslation();
+  return (
+    <main className="min-h-dvh pt-24 pb-32 px-6 flex flex-col items-center justify-center relative overflow-hidden lotus-pattern">
+      <ConfettiCanvas />
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+        <div className="w-[460px] h-[460px] rounded-full blur-[120px]" style={{ background: '#34d399' }} />
+      </div>
+
+      <section className="relative z-10 w-full max-w-lg flex flex-col items-center text-center">
+        {/* Hero icon — microscope with soft emerald glow */}
+        <div className="relative w-64 h-64 mb-8">
+          <div className="absolute inset-0 rounded-full blur-3xl animate-pulse"
+               style={{ background: 'rgba(52,211,153,0.35)' }} />
+          <div className="relative z-10 w-full h-full flex items-center justify-center">
+            <span className="text-[9rem] drop-shadow-2xl">&#x1f52c;</span>
+          </div>
+          <div className="absolute -top-4 -right-4">
+            <span className="material-symbols-outlined text-4xl opacity-70"
+                  style={{ color: '#059669' }}>auto_awesome</span>
+          </div>
+          <div className="absolute bottom-4 -left-4">
+            <span className="material-symbols-outlined text-3xl opacity-50"
+                  style={{ color: '#059669' }}>stars</span>
+          </div>
+        </div>
+
+        <div className="space-y-4 mb-10">
+          <h2 className="font-headline font-bold text-5xl text-primary leading-tight">
+            {t('celebrate.forscher.title')}
+          </h2>
+          <p className="text-xl text-on-surface-variant font-body px-4">
+            {t('celebrate.forscher.message')}
+          </p>
+        </div>
+
+        <div className="w-full max-w-sm">
+          <CooldownButton delay={4} onClick={onDismiss} icon="sports_esports"
+            className="w-full py-5 px-8 bg-primary-container text-white font-headline font-bold text-xl rounded-full"
+            style={{ boxShadow: '0 8px 24px rgba(18,67,70,0.2)' }}>
+            {t('celebrate.forscher.button')}
+          </CooldownButton>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 // ── Chest / Streak Milestone ──
 function ChestCelebration({ milestone, reward, onDismiss }) {
   const { t } = useTranslation();
@@ -404,6 +455,7 @@ export default function Celebration() {
       {celebration.type === 'levelUp' && <LevelUpCelebration level={celebration.payload?.level} onDismiss={handleDismiss} />}
       {celebration.type === 'evolution' && <EvolutionCelebration {...(celebration.payload || {})} onDismiss={handleDismiss} />}
       {celebration.type === 'chest' && <ChestCelebration {...(celebration.payload || {})} onDismiss={handleDismiss} />}
+      {celebration.type === 'forscherGraduation' && <ForscherGraduationCelebration onDismiss={handleDismiss} />}
     </div>
   );
 }
