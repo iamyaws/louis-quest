@@ -57,6 +57,140 @@ function clamp(n) { return Math.max(20, Math.min(100, Math.round(n))); }
 
 const base = import.meta.env.BASE_URL;
 
+// ══════════════════════════════════════════════════════════════════════════
+// MOOD SPECTRUM — emotional-literacy scene + care variants
+// ══════════════════════════════════════════════════════════════════════════
+// Marc Apr 2026: "add the full spectrum of relevant emotions for teaching
+// purposes". The Ronki profile reads state.moodAM / moodPM (enum 0-5 from
+// Hub.jsx) and adapts scene + care card so the experience differs by mood.
+//
+// Teaching principle:
+//   · Baseline moods (Okay 2, Gut 3) — normal Pflege loop. Louis cares
+//     for Ronki. Day-to-day life.
+//   · Comfort moods (Traurig 0, Besorgt 1) — REVERSAL of care. Ronki
+//     looks after Louis. Quiet palette, Louis silhouette in scene, no XP.
+//   · Rest mood (Müde 5) — low-light nest palette, curl pose, gentle
+//     stillness. Still reversal but softer than comfort.
+//   · Celebration mood (Magisch 4) — starry sparkle palette, peer-mode
+//     joy. "Heute funkelt's zusammen!"
+//
+// Scene palette defines 6 colors (sky, hill-back, hill-front, ground-top,
+// ground-bot, orb) + the orb kind (sun / moon / firefly / sparkle).
+// Pflege card variant keyed on mood — title, copy, 3 action labels.
+
+const MOOD_PALETTES = {
+  0: { // Traurig — dusk-blue, low moon
+    mode: 'comfort',
+    scene: { sky: 'radial-gradient(ellipse at 50% 0%, #5e7a9f 0%, #2f3d5a 55%, #1a2030 100%)', hillBack: '#2b3a58', hillFront: '#1b2540', groundTop: '#1a2638', groundBot: '#0f1624', orb: 'radial-gradient(circle at 35% 30%, #e0e6f4, #bcc4d8 55%, #7a85a0)', orbGlow: 'rgba(200,210,235,0.4)', embers: false, firefly: true },
+    rarityGrad: 'linear-gradient(160deg, #8e9fc2, #5a6b8c)',
+    rarityShadow: '0 6px 14px -4px rgba(60,75,110,0.55)',
+    subtitle: { de: 'Heute da für dich', en: 'Here for you today' },
+  },
+  1: { // Besorgt — overcast mauve
+    mode: 'comfort',
+    scene: { sky: 'radial-gradient(ellipse at 50% 0%, #a694b5 0%, #6d5b7f 55%, #3e3450 100%)', hillBack: '#5f4f70', hillFront: '#40334d', groundTop: '#3b2f48', groundBot: '#241d30', orb: 'radial-gradient(circle at 35% 30%, #f3ebff, #cfbfe8 60%, #9783b8)', orbGlow: 'rgba(207,191,232,0.45)', embers: false, firefly: false },
+    rarityGrad: 'linear-gradient(160deg, #b8a5d0, #7f6a9c)',
+    rarityShadow: '0 6px 14px -4px rgba(95,79,112,0.55)',
+    subtitle: { de: 'Ich hör zu', en: 'I am listening' },
+  },
+  2: { // Okay — current golden-hour (baseline)
+    mode: 'baseline',
+    scene: { sky: 'radial-gradient(ellipse at 50% 0%, #fff3c8 0%, #fcd34d 28%, #f59e0b 58%, #9a3f1b 100%)', hillBack: '#6d3a45', hillFront: '#4a2536', groundTop: '#4a3a2f', groundBot: '#2a1f18', orb: 'radial-gradient(circle at 35% 30%, #fff3c8, #f59e0b 60%, #c2410c)', orbGlow: 'rgba(245,158,11,0.6)', embers: true, firefly: false },
+    rarityGrad: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
+    rarityShadow: '0 6px 14px -4px rgba(245,158,11,0.55)',
+    subtitle: { de: 'Mystischer Begleiter', en: 'Mystical Companion' },
+  },
+  3: { // Gut — bright midday (baseline+)
+    mode: 'baseline',
+    scene: { sky: 'radial-gradient(ellipse at 50% 0%, #fff 0%, #fef3c7 35%, #fcd34d 70%, #f59e0b 100%)', hillBack: '#72694e', hillFront: '#5e6740', groundTop: '#5a8f4a', groundBot: '#3f6b34', orb: 'radial-gradient(circle at 35% 30%, #fff, #fef3c7 60%, #fcd34d)', orbGlow: 'rgba(254,243,199,0.6)', embers: true, firefly: false },
+    rarityGrad: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
+    rarityShadow: '0 6px 14px -4px rgba(245,158,11,0.55)',
+    subtitle: { de: 'Mystischer Begleiter', en: 'Mystical Companion' },
+  },
+  4: { // Magisch — starry twilight with drifting sparkles
+    mode: 'celebration',
+    scene: { sky: 'radial-gradient(ellipse at 50% 0%, #fbcfe8 0%, #9d4edd 40%, #3c1f6b 75%, #1a0d36 100%)', hillBack: '#4c2a74', hillFront: '#331a5a', groundTop: '#2a1549', groundBot: '#150a2a', orb: 'radial-gradient(circle at 35% 30%, #fff, #f9a8d4 55%, #c026d3)', orbGlow: 'rgba(249,168,212,0.7)', embers: false, firefly: false, sparkles: true },
+    rarityGrad: 'linear-gradient(160deg, #f9a8d4, #c026d3)',
+    rarityShadow: '0 6px 14px -4px rgba(192,38,211,0.55)',
+    subtitle: { de: 'Heute funkelt\'s zusammen', en: 'Sparkle day together' },
+  },
+  5: { // Müde — low-light pillow nest
+    mode: 'rest',
+    scene: { sky: 'radial-gradient(ellipse at 50% 0%, #7e9ea8 0%, #465966 55%, #26333c 100%)', hillBack: '#3a4e5a', hillFront: '#263642', groundTop: '#2c3d49', groundBot: '#15202a', orb: 'radial-gradient(circle at 35% 30%, #e8f4f9, #9fc0d3 60%, #5d7d94)', orbGlow: 'rgba(159,192,211,0.45)', embers: false, firefly: false, zzz: true },
+    rarityGrad: 'linear-gradient(160deg, #9fc0d3, #5d7d94)',
+    rarityShadow: '0 6px 14px -4px rgba(70,89,102,0.55)',
+    subtitle: { de: 'Ruhen wir zusammen', en: 'Rest with me' },
+  },
+};
+
+// Pick the active mood: PM overrides AM if PM was logged. Default to
+// Okay (2) if nothing logged — the profile should still work for a
+// brand-new user who hasn't touched the mood chip yet.
+function activeMood(state) {
+  const pm = state?.moodPM;
+  const am = state?.moodAM;
+  if (typeof pm === 'number') return pm;
+  if (typeof am === 'number') return am;
+  return 2; // Okay — neutral baseline
+}
+
+// Care card variants — titles, body copy, 3 actions per mood mode.
+// Baseline keeps the existing Füttern/Streicheln/Spielen flow untouched.
+// Comfort / Rest / Celebration invert: Ronki does things FOR Louis.
+// Actions that don't award XP use reward=0 so the reducer no-ops.
+const CARE_VARIANTS = {
+  0: { // Traurig — comfort
+    kicker: { de: 'Drei kleine Rituale', en: 'Three small rituals' },
+    title:  { de: 'Ronki bleibt bei dir.', en: 'Ronki stays with you.' },
+    sub:    { de: 'Keine Aufgaben. Nur wir.', en: 'No tasks. Just us.' },
+    actions: [
+      { key: 'breathe', icon: 'air',          de: 'Atem',    en: 'Breath',   action: 'comfortBreath' },
+      { key: 'near',    icon: 'favorite',     de: 'Nah sein', en: 'Be close', action: 'comfortNear' },
+      { key: 'listen',  icon: 'headphones',   de: 'Hör zu',  en: 'Listen',   action: 'comfortListen' },
+    ],
+  },
+  1: { // Besorgt — gentle questions
+    kicker: { de: 'Sorgen kleiner machen', en: 'Make worries smaller' },
+    title:  { de: 'Was macht dir Sorgen?', en: 'What\'s worrying you?' },
+    sub:    { de: 'Eine Sache nach der anderen.', en: 'One thing at a time.' },
+    actions: [
+      { key: 'name',    icon: 'chat_bubble',   de: 'Benennen',   en: 'Name it',  action: 'comfortName' },
+      { key: 'breathe', icon: 'air',           de: 'Atem',       en: 'Breath',   action: 'comfortBreath' },
+      { key: 'one',     icon: 'flag',          de: 'Eine Sache', en: 'One thing', action: 'comfortOne' },
+    ],
+  },
+  2: { // Okay — baseline Pflege (unchanged)
+    kicker: { de: 'Pflege heute', en: 'Care today' },
+    title:  null, sub: null, // baseline uses the existing 3-action grid inline
+    actions: null, // sentinel: render baseline Füttern/Streicheln/Spielen
+  },
+  3: { // Gut — baseline Pflege (unchanged)
+    kicker: { de: 'Pflege heute', en: 'Care today' },
+    title:  null, sub: null,
+    actions: null,
+  },
+  4: { // Magisch — celebration
+    kicker: { de: 'Drei Funken für dich', en: 'Three sparks for you' },
+    title:  { de: 'Lass uns tanzen, Louis!', en: 'Let\'s dance, Louis!' },
+    sub:    { de: 'Heute ist ein großer Tag.', en: 'Today is a big day.' },
+    actions: [
+      { key: 'dance',  icon: 'music_note',     de: 'Tanzen',  en: 'Dance', action: 'celebDance' },
+      { key: 'wish',   icon: 'star',           de: 'Wünschen', en: 'Wish',  action: 'celebWish' },
+      { key: 'glow',   icon: 'auto_awesome',   de: 'Leuchten', en: 'Glow',  action: 'celebGlow' },
+    ],
+  },
+  5: { // Müde — rest
+    kicker: { de: 'Ganz sanft', en: 'Very gentle' },
+    title:  { de: 'Legen wir uns hin.', en: 'Let\'s lie down.' },
+    sub:    { de: 'Leise bleiben ist auch Mut.', en: 'Staying quiet is brave too.' },
+    actions: [
+      { key: 'cuddle',  icon: 'favorite',       de: 'Kuscheln',  en: 'Cuddle', action: 'restCuddle' },
+      { key: 'dream',   icon: 'nights_stay',    de: 'Träumen',   en: 'Dream',  action: 'restDream' },
+      { key: 'still',   icon: 'self_improvement', de: 'Stillsein', en: 'Be still', action: 'restStill' },
+    ],
+  },
+};
+
 // Section kicker — Plus Jakarta 800/10 uppercase, .22em letter-spacing, teal.
 // Used above each major card per Polish v2 spec.
 function Kicker({ children }) {
@@ -75,11 +209,33 @@ function Kicker({ children }) {
   );
 }
 
+// Ritual affirmation copy per action key. Serif-italic, first-grade
+// German. "For teaching purposes" — each affirmation names the emotion
+// and offers one small concrete gesture the kid can try on their own.
+const RITUAL_COPY = {
+  // Comfort (Traurig)
+  comfortBreath: { de: 'Atme mit mir. Ein… aus… ein… aus…', en: 'Breathe with me. In… out… in… out…' },
+  comfortNear:   { de: 'Ich bleib bei dir. So lang du magst.', en: 'I\'ll stay with you. As long as you want.' },
+  comfortListen: { de: 'Erzähl mir, was passiert ist. Ich hör zu.', en: 'Tell me what happened. I\'m listening.' },
+  // Comfort (Besorgt)
+  comfortName:   { de: 'Sag laut, was dich drückt. Dann wird\'s kleiner.', en: 'Say what\'s heavy out loud. It shrinks.' },
+  comfortOne:    { de: 'Such dir eine Sache. Nur eine. Der Rest wartet.', en: 'Pick one thing. Just one. The rest can wait.' },
+  // Celebration (Magisch)
+  celebDance:    { de: 'Wackel mit mir! Schultern hoch, runter, hoch.', en: 'Wiggle with me! Shoulders up, down, up.' },
+  celebWish:     { de: 'Denk einen Wunsch. Schick ihn rauf zum Stern.', en: 'Make a wish. Send it up to the star.' },
+  celebGlow:     { de: 'Wir funkeln beide. Kannst du\'s spüren?', en: 'We both sparkle. Can you feel it?' },
+  // Rest (Müde)
+  restCuddle:    { de: 'Leg den Kopf an. Ich bin warm.', en: 'Rest your head. I\'m warm.' },
+  restDream:     { de: 'Augen zu. Was siehst du?', en: 'Close your eyes. What do you see?' },
+  restStill:     { de: 'Ganz still. Nur atmen. Das reicht.', en: 'Very still. Just breathing. That\'s enough.' },
+};
+
 export default function RonkiProfile({ onNavigate }) {
   const { t, lang } = useTranslation();
   const { state, actions } = useTask();
   const { unlocked: gamesUnlocked } = useGameAccess();
   const [tab, setTab] = useState('about');
+  const [ritual, setRitual] = useState(null); // { copy, mode } when an overlay is up
   const dev = isDevMode();
 
   // Care action wrapper — plays pop, triggers haptic, runs the action.
@@ -90,6 +246,19 @@ export default function RonkiProfile({ onNavigate }) {
     SFX.play('pop');
     if (navigator.vibrate) navigator.vibrate(100);
     action();
+  };
+
+  // Ritual tap — for comfort / rest / celebration modes. No reducer
+  // action; shows a serif-italic affirmation overlay that auto-dismisses
+  // after 4.5s (tappable to close early). "For teaching purposes" —
+  // the copy names the emotion and offers one concrete gesture.
+  const handleRitual = (a, currentMode) => {
+    SFX.play(currentMode === 'celebration' ? 'celeb' : 'pop');
+    if (navigator.vibrate) navigator.vibrate(60);
+    const copy = RITUAL_COPY[a.action];
+    if (!copy) return;
+    setRitual({ copy: copy[lang] || copy.de, mode: currentMode });
+    setTimeout(() => setRitual(r => (r && r.copy === (copy[lang] || copy.de) ? null : r)), 4500);
   };
 
   if (!state) return null;
@@ -147,6 +316,16 @@ export default function RonkiProfile({ onNavigate }) {
       : stageName);
   const rarityRare = lang === 'de' ? 'Rar' : 'Rare';
 
+  // ── Mood-driven scene + care variant ──
+  // Drives: scene palette (sky/hills/ground/orb), particle kind,
+  // rarity banner color, subtitle copy, Pflege card variant, and
+  // whether the Louis silhouette appears in scene (comfort + rest).
+  const mood = activeMood(state);
+  const palette = MOOD_PALETTES[mood];
+  const careVariant = CARE_VARIANTS[mood];
+  const mode = palette.mode; // 'baseline' | 'comfort' | 'rest' | 'celebration'
+  const showLouis = mode === 'comfort' || mode === 'rest';
+
   return (
     <div className="relative min-h-dvh pb-32">
       {/* Biome-tinted forest-sage backdrop — Ronki = earthy biome where
@@ -173,31 +352,53 @@ export default function RonkiProfile({ onNavigate }) {
           80% { opacity: 1; }
           100% { transform: translateY(-220px); opacity: 0; }
         }
+        @keyframes rp-firefly {
+          0%,100% { transform: translate(0, 0); opacity: 0.45; }
+          25%     { transform: translate(-12px, -8px); opacity: 1; }
+          50%     { transform: translate(-4px, -18px); opacity: 0.75; }
+          75%     { transform: translate(10px, -10px); opacity: 1; }
+        }
+        @keyframes rp-sparkle {
+          0%,100% { transform: scale(0.6); opacity: 0.4; }
+          50%     { transform: scale(1.15); opacity: 1; }
+        }
+        @keyframes rp-zzz {
+          0%   { transform: translate(0, 0) scale(0.7); opacity: 0; }
+          30%  { transform: translate(-4px, -10px) scale(1); opacity: 0.9; }
+          80%  { transform: translate(-14px, -30px) scale(1.1); opacity: 0.6; }
+          100% { transform: translate(-22px, -44px) scale(0.8); opacity: 0; }
+        }
+        @keyframes rp-overlay-in {
+          from { opacity: 0; transform: scale(0.92); }
+          to   { opacity: 1; transform: scale(1); }
+        }
       `}</style>
 
       <main className="max-w-lg mx-auto"
             style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))', paddingLeft: 0, paddingRight: 0 }}>
 
-        {/* ═══ LIVING SCENE — gold-hour stage (Polish v2 .rp-scene) ═══
-             Full-width 320px rounded card with radial sun, two silhouette
-             hills, ground band, 3 rising embers, Ronki portrait with breath
-             + aura, and a gold rarity banner pinned inside at the bottom.
-             All pure CSS — no new art assets. */}
+        {/* ═══ LIVING SCENE — mood-driven stage (Polish v2 .rp-scene + spectrum) ═══
+             Full-width 320px rounded card. Sky / hills / ground / orb all
+             read from MOOD_PALETTES[mood]. On comfort + rest modes the
+             scene also holds a small Louis silhouette next to Ronki
+             (reversal of care — Ronki looks after Louis). */}
         <section className="relative mx-4 overflow-hidden"
                  style={{
                    height: 320,
                    borderRadius: 24,
                    boxShadow: '0 14px 30px -14px rgba(18,67,70,0.35)',
-                   background: 'radial-gradient(ellipse at 50% 0%, #fff3c8 0%, #fcd34d 28%, #f59e0b 58%, #9a3f1b 100%)',
+                   background: palette.scene.sky,
+                   transition: 'background 0.6s ease',
                  }}>
-          {/* Sun / golden orb glow (top-right-ish, behind portrait) */}
+          {/* Sun / moon / firefly / sparkle orb — kind driven by palette */}
           <div aria-hidden="true"
                style={{
                  position: 'absolute', top: 30, right: 40,
                  width: 60, height: 60, borderRadius: '50%',
-                 background: 'radial-gradient(circle at 35% 30%, #fff3c8, #f59e0b 60%, #c2410c)',
-                 boxShadow: '0 0 60px rgba(245,158,11,0.6)',
+                 background: palette.scene.orb,
+                 boxShadow: `0 0 60px ${palette.scene.orbGlow}`,
                  zIndex: 1,
+                 transition: 'background 0.6s ease',
                }} />
 
           {/* Back hill — darker, further away */}
@@ -206,8 +407,9 @@ export default function RonkiProfile({ onNavigate }) {
                  position: 'absolute', left: '-10%', right: '-10%', bottom: '26%',
                  height: 80, opacity: 0.85,
                  borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
-                 background: '#6d3a45',
+                 background: palette.scene.hillBack,
                  zIndex: 2,
+                 transition: 'background 0.6s ease',
                }} />
           {/* Front hill — closer, darker */}
           <div aria-hidden="true"
@@ -215,27 +417,30 @@ export default function RonkiProfile({ onNavigate }) {
                  position: 'absolute', left: '-5%', right: '-5%', bottom: '20%',
                  height: 100,
                  borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
-                 background: '#4a2536',
+                 background: palette.scene.hillFront,
                  zIndex: 3,
+                 transition: 'background 0.6s ease',
                }} />
 
-          {/* Ground band (tod-golden) */}
+          {/* Ground band — tinted per palette */}
           <div aria-hidden="true"
                style={{
                  position: 'absolute', left: 0, right: 0, bottom: 0,
                  height: '22%',
-                 background: 'linear-gradient(180deg, #4a3a2f, #2a1f18)',
+                 background: `linear-gradient(180deg, ${palette.scene.groundTop}, ${palette.scene.groundBot})`,
                  boxShadow: 'inset 0 6px 16px rgba(0,0,0,0.25)',
                  zIndex: 2,
+                 transition: 'background 0.6s ease',
                }} />
 
-          {/* 3 ember particles — rising, staggered timing */}
-          {[
+          {/* Particles — embers (baseline), firefly (Traurig), sparkles
+              (Magisch), zzz (Müde). One kind at a time; palette picks. */}
+          {palette.scene.embers && [
             { left: '28%', delay: '0s',    duration: '4s'   },
             { left: '52%', delay: '1.3s',  duration: '4.4s' },
             { left: '72%', delay: '2.6s',  duration: '3.8s' },
           ].map((e, i) => (
-            <div key={i} aria-hidden="true"
+            <div key={`em-${i}`} aria-hidden="true"
                  style={{
                    position: 'absolute', left: e.left, bottom: '18%',
                    width: 4, height: 4, borderRadius: '50%',
@@ -246,6 +451,75 @@ export default function RonkiProfile({ onNavigate }) {
                    zIndex: 4,
                  }} />
           ))}
+
+          {palette.scene.firefly && (
+            <div aria-hidden="true"
+                 style={{
+                   position: 'absolute', left: '62%', bottom: '36%',
+                   width: 6, height: 6, borderRadius: '50%',
+                   background: 'radial-gradient(circle, #fef3c7, #fcd34d)',
+                   boxShadow: '0 0 12px #fcd34d, 0 0 24px rgba(252,211,77,0.5)',
+                   animation: 'rp-firefly 3.6s ease-in-out infinite',
+                   zIndex: 4,
+                 }} />
+          )}
+
+          {palette.scene.sparkles && [
+            { left: '20%', top: '20%', delay: '0s' },
+            { left: '78%', top: '28%', delay: '0.9s' },
+            { left: '44%', top: '14%', delay: '1.8s' },
+          ].map((s, i) => (
+            <div key={`sp-${i}`} aria-hidden="true"
+                 style={{
+                   position: 'absolute', left: s.left, top: s.top,
+                   width: 10, height: 10, borderRadius: '50%',
+                   background: 'radial-gradient(circle, #fff, #f9a8d4)',
+                   boxShadow: '0 0 12px #f9a8d4',
+                   animation: 'rp-sparkle 2.8s ease-in-out infinite',
+                   animationDelay: s.delay,
+                   zIndex: 4,
+                 }} />
+          ))}
+
+          {palette.scene.zzz && (
+            <div aria-hidden="true"
+                 style={{
+                   position: 'absolute', top: '20%', right: '28%',
+                   fontFamily: 'Fredoka, sans-serif',
+                   fontWeight: 600, fontSize: 22,
+                   color: 'rgba(232,244,249,0.72)',
+                   animation: 'rp-zzz 3.4s ease-in-out infinite',
+                   zIndex: 4,
+                 }}>z</div>
+          )}
+
+          {/* Louis silhouette — appears for comfort + rest. Simple
+              head + body construction (reused from Polish v2 Variant C
+              .rp-louis). Sits to the left of Ronki so the two share the
+              ground band. Reversal-of-care: Louis is the one being
+              looked after today. */}
+          {showLouis && (
+            <div aria-hidden="true"
+                 style={{
+                   position: 'absolute', left: '10%', bottom: '18%',
+                   width: 52, height: 66,
+                   zIndex: 5,
+                 }}>
+              <div style={{
+                position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'linear-gradient(180deg, #f3d4b0, #d4a777)',
+                boxShadow: 'inset -3px -3px 0 rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.15)',
+              }} />
+              <div style={{
+                position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+                width: 44, height: 34,
+                background: 'linear-gradient(180deg, #4a6fb0, #2d4a82)',
+                borderRadius: '16px 16px 10px 10px',
+                boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.15)',
+              }} />
+            </div>
+          )}
 
           {/* Ronki portrait — composited at bottom: 14%, circular with
                breathing scale. Blurred gold aura pulses behind. */}
@@ -277,20 +551,21 @@ export default function RonkiProfile({ onNavigate }) {
             </div>
           </div>
 
-          {/* Rarity banner — gold-gradient pill pinned inside the scene */}
+          {/* Rarity banner — gradient pill, mood-tinted */}
           <div style={{
                  position: 'absolute', left: '50%', bottom: '4%',
                  transform: 'translateX(-50%)',
                  display: 'inline-flex', alignItems: 'center', gap: 6,
                  padding: '7px 16px', borderRadius: 999,
-                 background: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
+                 background: palette.rarityGrad,
                  color: '#fff',
                  fontFamily: 'Plus Jakarta Sans, sans-serif',
                  fontWeight: 800, fontSize: 11, lineHeight: 1,
                  letterSpacing: '0.16em',
                  textTransform: 'uppercase',
-                 boxShadow: '0 6px 14px -4px rgba(245,158,11,0.55)',
+                 boxShadow: palette.rarityShadow,
                  zIndex: 6,
+                 transition: 'background 0.6s ease, box-shadow 0.6s ease',
                }}>
             <span className="material-symbols-outlined"
                   style={{ fontSize: 14, fontVariationSettings: "'FILL' 1" }}>
@@ -322,73 +597,157 @@ export default function RonkiProfile({ onNavigate }) {
             letterSpacing: '0.22em',
             textTransform: 'uppercase',
             color: '#6b655b',
+            transition: 'color 0.4s ease',
           }}>
-            {lang === 'de' ? 'Mystischer Begleiter' : 'Mystical Companion'}
+            {palette.subtitle[lang] || palette.subtitle.de}
           </p>
         </div>
 
         <div className="px-4">
 
-          {/* ═══ PFLEGE — kickered cream→amber card wrapping 3 care actions.
-               Absorbed from Sanctuary when the Pflege tab merged into Ronki's
-               page (April 2026). State lives on the same TaskContext fields
-               (catFed / catPetted / catPlayed) so the existing reducers work
-               unchanged. One tap per action per day; done state shows a check. */}
-          <Kicker>{lang === 'de' ? 'Pflege heute' : 'Care today'}</Kicker>
+          {/* ═══ PFLEGE / SPECTRUM — mood-aware care card.
+               Baseline (Okay / Gut): Louis cares for Ronki — Füttern /
+               Streicheln / Spielen with XP. Comfort / Rest / Celebration:
+               REVERSAL — Ronki cares for Louis. No XP. Three mood-specific
+               mini-rituals (e.g., Atem / Nah sein / Hör zu). Tapping fires
+               a brief full-screen affirmation overlay (handleRitual). ═══ */}
+          <Kicker>{careVariant.kicker[lang] || careVariant.kicker.de}</Kicker>
           <section style={{
-                     padding: '14px 16px',
+                     padding: careVariant.actions ? '16px 16px 14px' : '14px 16px',
                      borderRadius: 20,
-                     background: 'linear-gradient(160deg, #fffdf5, #fef3c7)',
-                     border: '1px solid rgba(245,158,11,0.2)',
-                     boxShadow: '0 6px 14px -8px rgba(245,158,11,0.2)',
+                     background: mode === 'comfort'
+                       ? 'linear-gradient(160deg, #f1f3fa, #e0e6f4)'
+                       : mode === 'rest'
+                       ? 'linear-gradient(160deg, #eef4f8, #d8e3ec)'
+                       : mode === 'celebration'
+                       ? 'linear-gradient(160deg, #fdf4ff, #fbcfe8)'
+                       : 'linear-gradient(160deg, #fffdf5, #fef3c7)',
+                     border: mode === 'comfort'
+                       ? '1px solid rgba(90,107,140,0.22)'
+                       : mode === 'rest'
+                       ? '1px solid rgba(93,125,148,0.22)'
+                       : mode === 'celebration'
+                       ? '1px solid rgba(192,38,211,0.25)'
+                       : '1px solid rgba(245,158,11,0.2)',
+                     boxShadow: '0 6px 14px -8px rgba(18,67,70,0.18)',
                      marginBottom: 14,
+                     transition: 'background 0.5s ease, border-color 0.5s ease',
                    }}>
+            {/* Comfort / rest / celebration title + subcopy.
+                 Baseline has no header — goes straight to the 3-tile grid. */}
+            {careVariant.title && (
+              <div style={{ marginBottom: 12, textAlign: 'center' }}>
+                <p style={{
+                  margin: 0,
+                  fontFamily: 'Cormorant Garamond, Georgia, serif',
+                  fontStyle: 'italic',
+                  fontWeight: 600,
+                  fontSize: 19,
+                  lineHeight: 1.2,
+                  color: mode === 'comfort' ? '#2f3d5a'
+                        : mode === 'rest' ? '#26333c'
+                        : '#831843',
+                }}>
+                  {careVariant.title[lang] || careVariant.title.de}
+                </p>
+                {careVariant.sub && (
+                  <p style={{
+                    margin: '4px 0 0',
+                    fontFamily: 'Nunito, sans-serif',
+                    fontWeight: 500,
+                    fontSize: 12,
+                    lineHeight: 1.3,
+                    color: mode === 'comfort' ? 'rgba(47,61,90,0.72)'
+                          : mode === 'rest' ? 'rgba(38,51,60,0.72)'
+                          : 'rgba(131,24,67,0.72)',
+                  }}>
+                    {careVariant.sub[lang] || careVariant.sub.de}
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="grid grid-cols-3 gap-3">
-              {[
-                { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          label: t('care.feed'), reward: 5, color: '#f59e0b' },
-                { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        label: t('care.pet'),  reward: 3, color: '#ec4899' },
-                { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', label: t('care.play'), reward: 8, color: '#124346' },
-              ].map(a => (
-                <button key={a.key}
-                  onClick={() => handleCare(a.onTap, a.state)}
-                  disabled={a.state}
-                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-                  style={{ opacity: a.state ? 0.7 : 1 }}>
-                  <div className="w-full aspect-square rounded-2xl flex items-center justify-center"
-                       style={{
-                         background: a.state
-                           ? 'rgba(52,211,153,0.12)'
-                           : 'linear-gradient(135deg, #ffffff 0%, #fef3c7 100%)',
-                         border: a.state ? '1.5px solid rgba(52,211,153,0.45)' : '1.5px solid rgba(255,255,255,0.9)',
-                         boxShadow: a.state
-                           ? '0 2px 8px rgba(5,150,105,0.1)'
-                           : '0 4px 14px -4px rgba(245,158,11,0.22), inset 0 1px 0 rgba(255,255,255,0.7)',
-                       }}>
-                    <span className="material-symbols-outlined"
-                          style={{
-                            fontSize: 34,
-                            color: a.state ? '#059669' : a.color,
-                            fontVariationSettings: "'FILL' 1",
-                          }}>
-                      {a.state ? 'check_circle' : a.icon}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-center gap-0.5">
-                    <span className="font-headline font-bold text-sm text-on-surface leading-none">
-                      {a.label}
-                    </span>
-                    {a.state ? (
-                      <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: '#059669' }}>
-                        {t('care.done')}
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 font-label font-bold text-[11px]" style={{ color: '#725b00' }}>
-                        <Pearl size={10} />+{a.reward}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              ))}
+              {careVariant.actions
+                ? /* Reversal modes — comfort / rest / celebration.
+                      No XP, no persisted "done" state — each tap just
+                      plays a brief affirmation overlay. */
+                  careVariant.actions.map(a => {
+                    const color = mode === 'comfort' ? '#5a6b8c'
+                                : mode === 'rest' ? '#5d7d94'
+                                : '#c026d3';
+                    return (
+                      <button key={a.key}
+                        onClick={() => handleRitual(a, mode)}
+                        className="flex flex-col items-center gap-2 active:scale-95 transition-transform">
+                        <div className="w-full aspect-square rounded-2xl flex items-center justify-center"
+                             style={{
+                               background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.6) 100%)',
+                               border: `1.5px solid ${color}33`,
+                               boxShadow: `0 4px 14px -4px ${color}2a, inset 0 1px 0 rgba(255,255,255,0.8)`,
+                             }}>
+                          <span className="material-symbols-outlined"
+                                style={{
+                                  fontSize: 34,
+                                  color,
+                                  fontVariationSettings: "'FILL' 1",
+                                }}>
+                            {a.icon}
+                          </span>
+                        </div>
+                        <span className="font-headline font-bold text-sm text-on-surface leading-none">
+                          {a[lang] || a.de}
+                        </span>
+                      </button>
+                    );
+                  })
+                : /* Baseline Pflege — original 3-action grid, untouched. */
+                  [
+                    { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          label: t('care.feed'), reward: 5, color: '#f59e0b' },
+                    { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        label: t('care.pet'),  reward: 3, color: '#ec4899' },
+                    { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', label: t('care.play'), reward: 8, color: '#124346' },
+                  ].map(a => (
+                    <button key={a.key}
+                      onClick={() => handleCare(a.onTap, a.state)}
+                      disabled={a.state}
+                      className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
+                      style={{ opacity: a.state ? 0.7 : 1 }}>
+                      <div className="w-full aspect-square rounded-2xl flex items-center justify-center"
+                           style={{
+                             background: a.state
+                               ? 'rgba(52,211,153,0.12)'
+                               : 'linear-gradient(135deg, #ffffff 0%, #fef3c7 100%)',
+                             border: a.state ? '1.5px solid rgba(52,211,153,0.45)' : '1.5px solid rgba(255,255,255,0.9)',
+                             boxShadow: a.state
+                               ? '0 2px 8px rgba(5,150,105,0.1)'
+                               : '0 4px 14px -4px rgba(245,158,11,0.22), inset 0 1px 0 rgba(255,255,255,0.7)',
+                           }}>
+                        <span className="material-symbols-outlined"
+                              style={{
+                                fontSize: 34,
+                                color: a.state ? '#059669' : a.color,
+                                fontVariationSettings: "'FILL' 1",
+                              }}>
+                          {a.state ? 'check_circle' : a.icon}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center gap-0.5">
+                        <span className="font-headline font-bold text-sm text-on-surface leading-none">
+                          {a.label}
+                        </span>
+                        {a.state ? (
+                          <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: '#059669' }}>
+                            {t('care.done')}
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1 font-label font-bold text-[11px]" style={{ color: '#725b00' }}>
+                            <Pearl size={10} />+{a.reward}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))
+              }
             </div>
           </section>
 
@@ -890,6 +1249,33 @@ export default function RonkiProfile({ onNavigate }) {
 
         </div>
       </main>
+
+      {/* Ritual overlay — serif-italic affirmation splash, shown for
+           ~4.5s after tapping a comfort/rest/celebration action. Tap
+           anywhere to dismiss early. Color tint follows mood. */}
+      {ritual && (
+        <div
+          role="status"
+          onClick={() => setRitual(null)}
+          className="fixed inset-0 z-[500] flex items-center justify-center px-6"
+          style={{
+            background: ritual.mode === 'comfort' ? 'rgba(30,40,60,0.55)'
+                      : ritual.mode === 'rest'    ? 'rgba(22,30,38,0.6)'
+                      : 'rgba(50,15,60,0.55)',
+            backdropFilter: 'blur(8px)',
+            animation: 'rp-overlay-in 0.35s ease-out',
+          }}>
+          <p style={{
+            margin: 0, maxWidth: 320, textAlign: 'center',
+            fontFamily: 'Cormorant Garamond, Georgia, serif',
+            fontStyle: 'italic', fontWeight: 600, fontSize: 26, lineHeight: 1.25,
+            color: '#fff8f2',
+            textShadow: '0 2px 12px rgba(0,0,0,0.35)',
+          }}>
+            {ritual.copy}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
