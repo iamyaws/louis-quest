@@ -129,15 +129,16 @@ function AppContent() {
       {!['hub', 'care'].includes(view) && (
         <div onTouchStart={handleLongPressStart} onTouchEnd={handleLongPressEnd}
              onMouseDown={handleLongPressStart} onMouseUp={handleLongPressEnd} onMouseLeave={handleLongPressEnd}>
-          <TopBar onNavigate={setView} />
+          <TopBar onNavigate={setView} view={view} onOpenParental={() => setShowParental(true)} />
         </div>
       )}
       <div className={`min-h-dvh max-w-lg mx-auto ${['hub', 'care'].includes(view) ? '' : 'bg-surface'}`}
            style={{
-             // AlphaBanner publishes its own height to --alpha-banner-h (handles
-             // iOS safe-area-inset-top internally). TopBar sits below it via the
-             // same variable. Content pad = banner + 72px TopBar on non-hub views.
-             paddingTop: ['hub', 'care'].includes(view) ? 0 : 'calc(var(--alpha-banner-h, 0px) + 72px)',
+             // TopBar is now inline (not fixed), so it lives inside the same
+             // scroll container and provides its own safe-area-top padding.
+             // AlphaBanner still publishes --alpha-banner-h for its own
+             // offset. No extra 72px padding needed on non-hub views.
+             paddingTop: ['hub', 'care'].includes(view) ? 0 : 'var(--alpha-banner-h, 0px)',
              paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
            }}>
         {view === 'quests' && (

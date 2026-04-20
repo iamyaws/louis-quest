@@ -2,57 +2,85 @@ import React from 'react';
 import { useTask } from '../context/TaskContext';
 import { Pearl } from './CurrencyIcons';
 import { useTranslation } from '../i18n/LanguageContext';
-import { isDevMode } from '../utils/mode';
 
-// Global top bar — shown on all non-Hub/Care views. Styled to match the
-// Hub's hero pill so the app reads as one design system across tabs.
-export default function TopBar({ onNavigate }) {
-  const { state, computed } = useTask();
-  const { t } = useTranslation();
+// Global top bar — inline (not fixed) so it scrolls away with the content
+// as Louis reads the page. Design reference (Ronki Aufgaben/Laden/Buch
+// Polish v2): back-pill to Lager on the left, view-specific right slots.
+//   · Journal: parental-lock only (kids-eyes-only, no HP)
+//   · Shop:    parental-lock + HP pill (Belohnungsbank needs parent access)
+//   · Others:  HP pill only (Aufgaben, Ronki)
+// The HP pill is the tall "128 / HELDENPUNKTE" shape from the mockup, not
+// a compact chip — it reads as a proud score, not a balance line.
+// Hub renders its own hero pill; this component serves every other view.
+export default function TopBar({ onNavigate, view, onOpenParental }) {
+  const { state } = useTask();
+  const { lang } = useTranslation();
   const hp = state?.hp || 0;
-  const { level, xpProgress } = computed;
-  const xpPct = xpProgress.need > 0 ? Math.min(1, xpProgress.cur / xpProgress.need) : 0;
-  const heroName = state?.familyConfig?.childName || t('topbar.heroFallback');
-  const heroAvatar = state?.heroGender === 'girl' ? 'art/hero-default-girl.webp' : 'art/hero-default.webp';
-  const dev = isDevMode();
+  const showLock = view === 'journal' || view === 'shop';
+  const showHp = view !== 'journal';
 
   return (
-    <header className="fixed w-full z-50 bg-surface/80 backdrop-blur-xl"
-            style={{ top: 'var(--alpha-banner-h, 0px)' }}>
-      <div className="flex justify-between items-center px-6 py-3 w-full max-w-lg mx-auto">
-        {/* Left: Hero pill — mirrors Hub.jsx styling for design continuity.
-             Avatar + Louis + "Tag N" streak, wrapped in a white rounded
-             pill with the same shadow so the top-bar feels consistent
-             across tabs. */}
-        <button onClick={() => onNavigate?.('ronki')}
-                className="flex items-center gap-3 active:scale-95 transition-all rounded-full"
-                style={{ background: 'rgba(255,255,255,0.92)', padding: '6px 20px 6px 6px', boxShadow: '0 4px 14px rgba(0,0,0,0.16)' }}>
-          <div className="relative">
-            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center shrink-0"
-                 style={{ background: 'rgba(18,67,70,0.1)', border: '1px solid rgba(18,67,70,0.18)' }}>
-              <img src={import.meta.env.BASE_URL + heroAvatar} alt={heroName} className="w-full h-full object-cover" />
-            </div>
-            {/* Dev-only level badge */}
-            {dev && (
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shadow"
-                   style={{ background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', border: '2px solid white', color: '#1a1a1a', lineHeight: 1 }}>
-                {level}
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col leading-tight min-w-0">
-            <span className="text-sm font-headline font-bold text-primary whitespace-nowrap">{heroName}</span>
-            <span className="text-[10px] font-label font-semibold uppercase tracking-[0.16em] text-on-surface-variant mt-0.5 whitespace-nowrap">
-              {t('hub.streakDay', { n: state?.streak || 1 })}
-            </span>
-          </div>
+    <header className="relative w-full max-w-lg mx-auto px-6 pt-4 pb-3"
+            style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
+      <div className="flex justify-between items-center gap-3">
+        {/* Left: back-pill to Lager (Hub). Inline, no fixed positioning. */}
+        <button onClick={() => onNavigate?.('hub')}
+                className="inline-flex items-center gap-1.5 active:scale-95 transition-all rounded-full shrink-0"
+                style={{
+                  background: 'rgba(255,248,242,0.85)',
+                  backdropFilter: 'blur(14px) saturate(160%)',
+                  WebkitBackdropFilter: 'blur(14px) saturate(160%)',
+                  padding: '8px 14px 8px 10px',
+                  border: '1px solid rgba(18,67,70,0.12)',
+                  boxShadow: '0 4px 14px -4px rgba(18,67,70,0.22)',
+                  color: '#124346',
+                }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_back_ios_new</span>
+          <b className="font-label font-bold uppercase"
+             style={{ fontSize: 12, letterSpacing: '0.14em' }}>
+            {lang === 'de' ? 'Lager' : 'Camp'}
+          </b>
         </button>
 
-        {/* Right: HP pill — kept on non-Hub views (Hub hides HP by design). */}
-        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full"
-             style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
-          <Pearl size={20} />
-          <span className="text-primary font-bold text-sm font-label">{hp}</span>
+        {/* Right: parental-lock button (outlined square style) + HP pill.
+             Lock lives as its own button with a quieter outlined style so
+             it reads as a utility, not a primary CTA. Mirrors the design's
+             separate parent-btn.jsx treatment on Laden + Buch views. */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {showLock && (
+            <button onClick={onOpenParental}
+                    aria-label={lang === 'de' ? 'Eltern-Bereich' : 'Parent area'}
+                    className="flex items-center justify-center rounded-xl active:scale-95 transition-all"
+                    style={{
+                      width: 36, height: 36,
+                      background: 'rgba(255,248,242,0.7)',
+                      border: '1px solid rgba(18,67,70,0.14)',
+                      color: '#6b655b',
+                    }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>lock</span>
+            </button>
+          )}
+          {showHp && (
+            <div className="flex items-center gap-2.5 rounded-full"
+                 style={{
+                   background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%)',
+                   border: '1px solid rgba(180,83,9,0.25)',
+                   padding: '6px 14px 6px 6px',
+                   boxShadow: '0 4px 12px -4px rgba(180,83,9,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
+                 }}>
+              <Pearl size={28} />
+              <div className="flex flex-col leading-none">
+                <span className="font-headline font-extrabold"
+                      style={{ color: '#3b2802', fontSize: 16 }}>
+                  {hp}
+                </span>
+                <span className="font-label font-bold uppercase mt-0.5"
+                      style={{ fontSize: 8, letterSpacing: '0.14em', color: '#7a4a05' }}>
+                  {lang === 'de' ? 'Heldenpunkte' : 'Hero points'}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>
