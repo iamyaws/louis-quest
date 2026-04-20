@@ -372,7 +372,7 @@ function OverviewTab({ state, lang, t }) {
           <p className="font-label text-xs text-white/60 mt-1">{completedToday}/{totalToday} heute</p>
         </div>
         {/* HP */}
-        <StatCard label="Heldenpunkte" value={state.hp || 0} sub="Verfügbar" />
+        <StatCard label="Sterne" value={state.hp || 0} sub="Verfügbar" />
         {/* Wachstums-Orbs removed — backlog item, not live yet. See
              backlog_evolution_orbs.md. Re-add when the orb sub-goals ship. */}
       </div>
@@ -477,7 +477,7 @@ function OverviewTab({ state, lang, t }) {
             <p className="font-label font-bold text-sm text-primary">Eltern-Guide</p>
             <p className="font-body text-xs text-on-surface-variant mt-1 leading-relaxed">
               Ronki motiviert durch die tägliche Routine, Begleiter-Pflege
-              und kleine Abenteuer. Heldenpunkte können im Laden gegen echte
+              und kleine Abenteuer. Sterne können im Laden gegen echte
               Belohnungen eingetauscht werden, Funkelzeit gegen Bildschirm-Zeit.
             </p>
           </div>
@@ -1447,7 +1447,7 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
           <p className="font-label font-bold text-sm text-on-surface">Tag zurücksetzen</p>
         </div>
         <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
-          Setzt alle heutigen Aufgaben zurück, ohne HP oder Gesamtfortschritt zu löschen.
+          Setzt alle heutigen Aufgaben zurück, ohne Sterne oder Gesamtfortschritt zu löschen.
         </p>
         {!showResetConfirm ? (
           <button onClick={() => setShowResetConfirm(true)}

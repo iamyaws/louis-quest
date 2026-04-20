@@ -779,7 +779,7 @@ export default function PilzWaageGame({ onComplete }) {
               style={{ background: 'rgba(252,211,77,0.25)', color: '#92620a' }}
             >
               <span className="text-lg">💛</span>
-              <span className="font-label font-bold text-sm">+50 HP für Ronki</span>
+              <span className="font-label font-bold text-sm">+50 Sterne für Ronki</span>
             </div>
             <button
               onClick={() => onComplete?.({ hp: 50 })}

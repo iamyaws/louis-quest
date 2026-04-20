@@ -93,7 +93,7 @@ function MissionCard({ mission, active, completed, onStart, onAbandon }) {
           <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">{t('mission.reward.label')}</p>
           <p className="font-body font-bold text-on-surface">{t('mission.' + mission.id + '.reward')}</p>
           <p className="font-label text-xs text-on-surface-variant">
-            +{mission.reward.hp} HP &middot; +{mission.reward.evo} Evo
+            +{mission.reward.hp} &middot; +{mission.reward.evo} Evo
           </p>
         </div>
       </div>

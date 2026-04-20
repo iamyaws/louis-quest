@@ -426,7 +426,7 @@ export default function StarCatcherGame({ onComplete }) {
               </div>
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(252,211,77,0.15)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold" style={{ color: '#fcd34d' }}>+{reward.hp}</p>
-                <p className="font-label text-xs font-bold uppercase tracking-widest mt-1" style={{ color: 'rgba(252,211,77,0.6)' }}>HP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest mt-1" style={{ color: 'rgba(252,211,77,0.6)' }}>Sterne</p>
               </div>
             </div>
 

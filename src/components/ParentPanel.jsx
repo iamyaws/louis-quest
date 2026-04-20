@@ -33,7 +33,7 @@ export default function ParentPanel() {
         <input ref={nqRef} value={nq.name} onChange={e => setNq(n => ({ ...n, name: e.target.value }))} placeholder="Neue Aufgabe..." style={{ background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 14, padding: "10px 14px", fontSize: ".85rem", fontFamily: "'Nunito',sans-serif", outline: "none", fontWeight: 600, minHeight: 44 }} />
         <div style={{ display: "flex", gap: 6 }}>
           <select value={nq.anchor} onChange={e => setNq(n => ({ ...n, anchor: e.target.value }))} style={{ flex: 1, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 12, padding: "8px", fontSize: ".85rem", minHeight: 40 }}><option value="morning">{"\u{1F305}"} Morgens</option><option value="evening">{"\u{1F319}"} Abends</option></select>
-          <input type="number" value={nq.xp} onChange={e => setNq(n => ({ ...n, xp: +e.target.value }))} style={{ width: 55, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 12, padding: "8px", fontSize: ".85rem", textAlign: "center", minHeight: 40 }} placeholder="HP" />
+          <input type="number" value={nq.xp} onChange={e => setNq(n => ({ ...n, xp: +e.target.value }))} style={{ width: 55, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 12, padding: "8px", fontSize: ".85rem", textAlign: "center", minHeight: 40 }} placeholder="Sterne" />
           <input type="number" value={nq.minutes} onChange={e => setNq(n => ({ ...n, minutes: +e.target.value }))} style={{ width: 55, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 12, padding: "8px", fontSize: ".85rem", textAlign: "center", minHeight: 40 }} placeholder="Min" />
         </div>
         <button onClick={() => actions.addQuest(nq, () => setNq(n => ({ ...n, name: "" })))} style={{ background: `linear-gradient(135deg,${T.primary},${T.primaryLight})`, border: "none", borderRadius: 14, padding: "12px", color: "white", fontWeight: 800, cursor: "pointer", fontSize: ".85rem", fontFamily: "'Fredoka',sans-serif", minHeight: 44 }}>Erstellen</button>
@@ -42,7 +42,7 @@ export default function ParentPanel() {
       <div style={{ background: "rgba(180,120,40,0.04)", borderRadius: 16, padding: 12, marginTop: 10, border: "2.5px solid rgba(180,120,40,0.08)" }}>
         <div style={{ fontSize: ".85rem", fontWeight: 800, color: T.primary, textTransform: "uppercase", marginBottom: 8 }}>{"\u{1F4CA}"} \u00DCbersicht</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-          {[{ v: state.hist.length, l: "Aufgaben gesamt", c: T.success }, { v: (state.graduated || []).length, l: "Gemeistert \u{1F393}", c: T.accentDark }, { v: `Lvl ${level}`, l: `${state.xp} HP`, c: "#EC4899" }].map((s, i) => (
+          {[{ v: state.hist.length, l: "Aufgaben gesamt", c: T.success }, { v: (state.graduated || []).length, l: "Gemeistert \u{1F393}", c: T.accentDark }, { v: `Lvl ${level}`, l: `${state.xp} Sterne`, c: "#EC4899" }].map((s, i) => (
             <div key={i} style={{ background: "white", borderRadius: 12, padding: "10px", textAlign: "center", border: "2px solid rgba(180,120,40,0.06)" }}>
               <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.15rem", fontWeight: 700, color: s.c }}>{s.v}</div>
               <div style={{ fontSize: ".85rem", color: T.textSecondary, fontWeight: 600 }}>{s.l}</div>
@@ -89,7 +89,7 @@ export default function ParentPanel() {
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, whiteSpace: "nowrap" }}>HP Belohnung:</span>
+            <span style={{ fontSize: ".85rem", fontWeight: 700, color: T.textSecondary, whiteSpace: "nowrap" }}>Sterne Belohnung:</span>
             <input type="number" value={smHp} onChange={e => setSmHp(+e.target.value)} style={{ width: 70, background: "rgba(180,120,40,0.04)", border: "2.5px solid rgba(180,120,40,0.08)", borderRadius: 12, padding: "8px", fontSize: ".9rem", textAlign: "center", fontFamily: "'Fredoka',sans-serif", fontWeight: 600, minHeight: 44 }} />
           </div>
           <button onClick={() => { if (smName.trim()) { actions.addSpecialMission({ name: smName.trim(), emoji: smEmoji, hp: smHp }); setSmName(""); setSmEmoji("\uD83C\uDF81"); setSmHp(30); } }} style={{ background: `linear-gradient(135deg,${T.primary},${T.primaryLight})`, border: "none", borderRadius: 14, padding: "12px", color: "white", fontWeight: 800, cursor: "pointer", fontSize: ".85rem", fontFamily: "'Fredoka',sans-serif", minHeight: 44 }}>Erstellen</button>
@@ -102,7 +102,7 @@ export default function ParentPanel() {
                 <span style={{ fontSize: "1.2rem" }}>{m.emoji}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, fontSize: ".85rem", color: T.textPrimary, textDecoration: m.done ? "line-through" : "none" }}>{m.name}</div>
-                  <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{m.hp} HP</div>
+                  <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.primary }}>+{m.hp}</div>
                 </div>
                 <button onClick={() => actions.removeSpecialMission(m.id)} aria-label={`${m.name} entfernen`} style={{ background: `${T.danger}12`, border: `2px solid ${T.danger}30`, borderRadius: 10, padding: "4px 10px", color: T.danger, cursor: "pointer", fontSize: ".85rem", fontWeight: 800, minHeight: 36 }}>{"\u274C"}</button>
               </div>

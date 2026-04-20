@@ -150,7 +150,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
               }}
             >
               {isDigital ? <Hourglass size={13} /> : <Pearl size={13} />}
-              {reward.cost} {isDigital ? 'Min' : 'HP'}
+              {reward.cost} {isDigital ? 'Min' : ''}
             </span>
             {!canAfford && !disabled && (
               <span
@@ -163,7 +163,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                 }}
               >
                 Noch <b style={{ color: '#124346', fontWeight: 800 }}>{remaining}</b>{' '}
-                {isDigital ? 'Min' : 'HP'}
+                {isDigital ? 'Min' : 'Sterne'}
               </span>
             )}
           </div>
@@ -325,7 +325,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
           </div>
           <div className="flex items-baseline" style={{ gap: 4, marginTop: 2 }}>
             <span className="font-headline" style={{ fontWeight: 500, fontSize: 28, color: '#124346', letterSpacing: '-0.02em', lineHeight: 1 }}>{hp}</span>
-            <span className="font-label font-bold" style={{ fontSize: 11, color: '#6b655b', letterSpacing: '0.1em' }}>HP</span>
+            <span className="font-label font-bold" style={{ fontSize: 11, color: '#6b655b', letterSpacing: '0.1em' }}>STERNE</span>
           </div>
           <p className="font-body" style={{ fontSize: 10, lineHeight: 1.3, color: '#6b655b', opacity: 0.85, marginTop: 2, fontWeight: 600 }}>
             Für Belohnungen aus dem Leben

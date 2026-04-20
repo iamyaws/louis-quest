@@ -17,6 +17,7 @@ import VoiceBubble from './VoiceBubble';
 import BeatCompletionModal from './BeatCompletionModal';
 import ClothingSheet from './ClothingSheet';
 import CloudWaves from './CloudWaves';
+import CampfireScene from './CampfireScene';
 import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
 import ForscherEcke from './ForscherEcke';
@@ -97,6 +98,16 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const [showGefuehlsecke, setShowGefuehlsecke] = useState(false);
   const [zeigBlock, setZeigBlock] = useState(null);
 
+  // Expedition state — stubs for now. CampfireScene accepts 'idle' /
+  // 'away' / 'returning' and renders Ronki sitting by the fire / a paw
+  // trail / a glowing diary pickup respectively. The simplified state
+  // machine (surprise-based, not routine-gated per Marc's call-out)
+  // lands in a follow-up; for now Ronki is always home so Louis sees
+  // the baseline scene every time.
+  const expeditionState = 'idle';
+  const expeditionStatusText = null;
+  const expeditionStatusSub = null;
+
   const [forscherSeen, markForscherSeen] = useAttentionFlag('forscher-ecke-first-seen');
 
   // Trigger evening ritual when: evening + all bedtime quests done + hasn't happened today yet
@@ -171,7 +182,8 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const companionType = 'dragon';
   const stageName = t('companion.' + companionType + '.' + catStage) || t('companion.stage.egg');
   const stageNum = catStage + 1;
-  const sceneSrc = `art/campfire/lager-stage${catStage + 1}.png`;
+  // sceneSrc (lager-stageN.png) removed — CampfireScene handles the hub
+  // backdrop now with CSS. Freed ~8MB of Midjourney PNGs.
   const variantMeta = state.companionVariant ? getVariant(state.companionVariant) : null;
   const nameplateLabel = isDevMode()
     ? `${t('hub.companion.stage', { stage: stageNum })} · ${stageName}`
@@ -236,35 +248,28 @@ export default function Hub({ onNavigate, onPlayMint }) {
       )}
 
       {/* ═════════════════════════════════════════════════════════════════
-         B · SCROLL-OVER PAINTED SCENE
-         Full-bleed at top, fades into cream paper. Content (z-10) layers
-         on top. As the page scrolls, the scene scrolls with it.
+         B · CAMPFIRE SCENE — zero-asset CSS scene with day/golden/night
+         variants that shift automatically with the clock hour. Replaces
+         the old lager-stage1-4.png Midjourney sequence (-8MB of assets)
+         with a painterly CSS scene Louis loved in Claude Design's
+         Feature Previews. Includes side-view chibi Ronki sitting by
+         the fire, flame flicker, wing flap, and night stars.
+         `state='idle'` = Ronki home; 'away' / 'returning' hooks are
+         wired for the simplified Expedition feature landing next.
          ═════════════════════════════════════════════════════════════════ */}
-      <div className="absolute left-0 right-0 top-0 overflow-hidden pointer-events-none"
-           style={{ height: 440, zIndex: 1 }}
-           aria-hidden="true">
-        <img
-          src={base + sceneSrc}
-          alt=""
-          className="w-full h-full object-cover select-none companion-breathe"
-          style={{ objectPosition: 'center 42%' }}
-          draggable={false}
-          onError={(e) => {
-            if (!e.target.src.endsWith('lager-stage1.png')) {
-              e.target.src = base + 'art/campfire/lager-stage1.png';
-            }
-          }}
+      <div className="absolute left-0 right-0 top-0 overflow-hidden"
+           style={{ zIndex: 1 }}>
+        <CampfireScene
+          hour={_h}
+          state={expeditionState}
+          statusText={expeditionStatusText}
+          statusSub={expeditionStatusSub}
+          onDiaryTap={() => setOpenBeat('expedition-diary')}
+          height={340}
         />
         {/* Fade into cream paper so cards below land on a clean surface */}
-        <div className="absolute inset-x-0 bottom-0 h-32"
+        <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none"
              style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(255,248,242,0.55) 55%, #fff8f2 100%)' }} />
-        {/* Floating embers above the fire area */}
-        <div className="absolute inset-0 pointer-events-none">
-          <span className="ember" style={{ bottom: '32%', left: '52%', '--delay': '0s',   '--dur': '4.8s', '--drift': '14px' }} />
-          <span className="ember" style={{ bottom: '34%', left: '58%', '--delay': '1.2s', '--dur': '5.4s', '--drift': '-10px' }} />
-          <span className="ember" style={{ bottom: '28%', left: '64%', '--delay': '2.0s', '--dur': '4.2s', '--drift': '6px' }} />
-          <span className="ember" style={{ bottom: '36%', left: '48%', '--delay': '0.6s', '--dur': '5.0s', '--drift': '-14px' }} />
-        </div>
       </div>
 
       {/* ═════════════════════════════════════════════════════════════════
@@ -335,7 +340,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
             </b>
             <span className="font-label font-semibold uppercase"
                   style={{ fontSize: 10, letterSpacing: '0.16em', color: '#725b00', marginTop: 3, lineHeight: 1 }}>
-              {lang === 'de' ? 'Heldenpunkte' : 'Hero points'}
+              {lang === 'de' ? 'Sterne' : 'Stars'}
             </span>
           </div>
         </div>
@@ -594,7 +599,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
             </div>
             <span className="px-3 py-2 rounded-full font-label font-bold text-xs shrink-0"
                   style={{ background: '#124346', color: '#fff' }}>
-              +{nextQuest.xp} HP
+              +{nextQuest.xp}
             </span>
           </button>
         )}

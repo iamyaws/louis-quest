@@ -359,7 +359,7 @@ export default function CloudJumpGame({ onComplete }) {
               </div>
               <div className="p-5 rounded-2xl text-center" style={{ background: 'rgba(252,211,77,0.15)', minWidth: 100 }}>
                 <p className="font-headline text-3xl font-bold" style={{ color: '#735c00' }}>+{reward.hp}</p>
-                <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mt-1">HP</p>
+                <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mt-1">Sterne</p>
               </div>
             </div>
 

@@ -80,7 +80,7 @@ export default function PoemQuest({ onBack }) {
           <div className="flex items-center gap-2 px-4 py-2 rounded-full mt-4 mb-8"
                style={{ background: 'rgba(252,211,77,0.2)', border: '1px solid rgba(252,211,77,0.3)' }}>
             <span className="material-symbols-outlined text-sm" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>diamond</span>
-            <span className="font-label font-bold text-sm" style={{ color: '#fcd34d' }}>+100 HP</span>
+            <span className="font-label font-bold text-sm" style={{ color: '#fcd34d' }}>+100</span>
           </div>
 
           <CooldownButton delay={4} onClick={onBack} icon="arrow_forward"

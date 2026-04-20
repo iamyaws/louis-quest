@@ -383,7 +383,7 @@ export default function RonkiProfile({ onNavigate }) {
                       </span>
                     ) : (
                       <span className="flex items-center gap-1 font-label font-bold text-[11px]" style={{ color: '#725b00' }}>
-                        <Pearl size={10} />+{a.reward} HP
+                        <Pearl size={10} />+{a.reward}
                       </span>
                     )}
                   </div>
@@ -768,7 +768,7 @@ export default function RonkiProfile({ onNavigate }) {
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: lang === 'de' ? 'Tage zusammen' : 'Days together', value: daysTogether, icon: 'calendar_month', color: '#124346' },
-                  { label: 'HP', value: state.hp || 0, icon: 'diamond', color: '#f59e0b' },
+                  { label: lang === 'de' ? 'Sterne' : 'Stars', value: state.hp || 0, icon: 'diamond', color: '#f59e0b' },
                   { label: lang === 'de' ? 'Abenteuer' : 'Adventures', value: completedArcs.length, icon: 'auto_stories', color: '#6d28d9' },
                 ].map((stat, i) => (
                   <div key={i} className="rounded-xl p-4 text-center"

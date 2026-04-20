@@ -40,7 +40,7 @@ export default function ProfileCard({ state, level, mood, weather, wInfo, todayD
             <span style={{ fontSize: "1.4rem" }}>{"\u2B50"}</span>
             <div>
               <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "#D97706" }}>{(state.coins || 0).toLocaleString("de-DE")}</div>
-              <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textLight }}>HP</div>
+              <div style={{ fontSize: ".85rem", fontWeight: 700, color: T.textLight }}>Sterne</div>
             </div>
           </div>
           <div style={{ background: "#FEF3C720", borderRadius: 14, padding: "10px 10px", display: "flex", alignItems: "center", gap: 6 }}>

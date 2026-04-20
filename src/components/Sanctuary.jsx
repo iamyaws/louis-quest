@@ -239,7 +239,7 @@ export default function Sanctuary({ onNavigate }) {
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-sm" style={{ background: 'white' }}>
               {state.catFed
                 ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>{t('care.done')}</span>
-                : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>5 HP</span></React.Fragment>
+                : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>+5</span></React.Fragment>
               }
             </div>
           </button>
@@ -259,7 +259,7 @@ export default function Sanctuary({ onNavigate }) {
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-sm" style={{ background: 'white' }}>
               {state.catPetted
                 ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>{t('care.done')}</span>
-                : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>3 HP</span></React.Fragment>
+                : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>+3</span></React.Fragment>
               }
             </div>
           </button>
@@ -279,7 +279,7 @@ export default function Sanctuary({ onNavigate }) {
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-sm" style={{ background: 'white' }}>
               {state.catPlayed
                 ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>{t('care.done')}</span>
-                : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>8 HP</span></React.Fragment>
+                : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>+8</span></React.Fragment>
               }
             </div>
           </button>
@@ -542,7 +542,7 @@ function OrbsSection({ state, nextStage, progressPct, evo }) {
                               {t('orb.milestone.' + i)} — {ms.threshold} Orbs
                             </span>
                             <span className="font-label text-xs font-bold" style={{ color: '#fcd34d' }}>
-                              +{ms.reward} HP
+                              +{ms.reward}
                             </span>
                           </div>
                           <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.06)' }}>

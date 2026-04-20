@@ -131,7 +131,7 @@ export default function QuestLineView({ questLineId, onBack }) {
           <div className="flex items-center gap-2 px-4 py-2 rounded-full mt-4 mb-8"
                style={{ background: 'rgba(252,211,77,0.2)', border: '1px solid rgba(252,211,77,0.3)' }}>
             <span className="material-symbols-outlined text-sm" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>diamond</span>
-            <span className="font-label font-bold text-sm" style={{ color: '#fcd34d' }}>+100 HP</span>
+            <span className="font-label font-bold text-sm" style={{ color: '#fcd34d' }}>+100</span>
           </div>
 
           <CooldownButton delay={4} onClick={onBack} icon="arrow_forward"
@@ -366,7 +366,7 @@ export default function QuestLineView({ questLineId, onBack }) {
         {!readOnlyDone && (
           <div className="mt-8 flex flex-col gap-2">
             <p className="font-body text-sm text-center text-on-surface-variant italic">
-              {lang === 'de' ? 'Fertig machen bringt +100 HP!' : 'Finishing brings +100 HP!'}
+              {lang === 'de' ? 'Fertig machen bringt +100 Sterne!' : 'Finishing brings +100 Stars!'}
             </p>
             <p className="font-label text-xs text-center text-on-surface/50 flex items-center justify-center gap-1.5">
               <span>💛</span>

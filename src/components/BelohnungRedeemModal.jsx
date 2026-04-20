@@ -92,7 +92,7 @@ export default function BelohnungRedeemModal({ reward, onApprove, onDismiss }) {
         <div className="mb-8">
           <span className="font-label font-bold text-sm px-4 py-1.5 rounded-full"
                 style={{ background: 'rgba(252,211,77,0.18)', color: '#fcd34d', border: '1px solid rgba(252,211,77,0.3)' }}>
-            {reward.cost} HP
+            {reward.cost}
           </span>
         </div>
 

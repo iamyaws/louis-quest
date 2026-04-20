@@ -16,7 +16,15 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
   const { state } = useTask();
   const { lang } = useTranslation();
   const hp = state?.hp || 0;
-  const showLock = view === 'journal' || view === 'shop';
+  // Parental lock lives on Laden (shop) only — it reads as "this is
+  // our shared planning space" there (Funkelzeit approvals + reward
+  // coordination) without breaking the trust contract elsewhere. The
+  // Tagebuch is Louis's kids-eyes-only journal; a parent-gate pill on
+  // that view actively undermines the privacy promise (Marc: "it feels
+  // fishy"). Hub stays parent-free so Louis's home doesn't read as
+  // watched. If parents ever need faster access we can add a hidden
+  // gesture on the avatar pill later.
+  const showLock = view === 'shop';
   const showHp = view !== 'journal';
 
   return (
@@ -94,7 +102,7 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
                 </b>
                 <span className="font-label font-semibold uppercase"
                       style={{ fontSize: 10, letterSpacing: '0.16em', color: '#725b00', marginTop: 3, lineHeight: 1 }}>
-                  {lang === 'de' ? 'Heldenpunkte' : 'Hero points'}
+                  {lang === 'de' ? 'Sterne' : 'Stars'}
                 </span>
               </div>
             </div>

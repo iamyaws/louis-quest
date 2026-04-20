@@ -611,7 +611,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                               fontSize: 10,
                               letterSpacing: '0.1em',
                             }}>
-                        +{q.xp} HP · {t('task.bonus')}
+                        +{q.xp} · {t('task.bonus')}
                       </span>
                     </div>
                     {q.done ? (

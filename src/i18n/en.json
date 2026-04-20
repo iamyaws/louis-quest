@@ -250,10 +250,10 @@
   "profile.gear.back": "Back",
 
   "shop.title": "Reward Shop",
-  "shop.currency": "Hero Points",
+  "shop.currency": "Stars",
   "shop.buy": "Redeem",
   "shop.owned": "Already redeemed",
-  "shop.tooExpensive": "Not enough HP",
+  "shop.tooExpensive": "Not enough Stars",
   "shop.section.rewards": "Rewards",
   "shop.section.screen": "Sparkle Time",
 
@@ -278,7 +278,7 @@
   "celebrate.victory.button": "Continue!",
   "celebrate.chest.title": "Streak Chest!",
   "celebrate.chest.message": "A reward awaits you!",
-  "celebrate.chest.reward": "Hero Points earned!",
+  "celebrate.chest.reward": "Stars earned!",
   "celebrate.chest.button": "Collect!",
   "celebrate.evolution.label": "Level Up",
   "celebrate.evolution.title": "Evolution complete!",
@@ -450,7 +450,7 @@
   "tour.step.shop": "Trade points for rewards",
   "tour.step.journal": "Write your diary",
 
-  "chest.reward": "Your first Hero Point!",
+  "chest.reward": "Your first Star!",
 
   "item.h_sunglasses": "Sunglasses",
   "item.h_cape_red": "Red Cape",
@@ -535,7 +535,7 @@
   "hub.boss.detail.dailyBoss": "Daily Boss",
   "hub.boss.detail.defeated": "Defeated",
   "hub.boss.detail.loot": "Loot received",
-  "hub.boss.detail.heroPoints": "Hero Points",
+  "hub.boss.detail.heroPoints": "Stars",
   "hub.boss.detail.evoEssence": "grows!",
   "hub.boss.detail.trophies": "Trophy Collection",
   "hub.boss.detail.bossCount": "{done} / {total} bosses defeated",
@@ -578,7 +578,7 @@
   "celebrate.evolution.stage": "Stage {stage}",
   "celebrate.levelup.power": "Your power grows!",
   "celebrate.chest.daysInRow": "{days} days in a row! A reward awaits you!",
-  "celebrate.chest.earned": "+{reward} Hero Points earned!",
+  "celebrate.chest.earned": "+{reward} Stars earned!",
 
   "journal.todayEntry": "Today's Entry",
   "journal.dayEmoji": "Day Emoji",
@@ -622,7 +622,7 @@
   "shop.tooFew": "Too few",
   "shop.timerRunning": "Timer running",
   "shop.howItWorks": "How it works",
-  "shop.howItWorksBody": "Choose a reward and click Redeem. You earn Hero Points for completed quests, Sparkle Time is credited automatically!",
+  "shop.howItWorksBody": "Choose a reward and click Redeem. You earn Stars for completed quests, Sparkle Time is credited automatically!",
   "shop.admin": "Admin",
 
   "care.sanctuary": "Magical Sanctuary",
@@ -805,7 +805,7 @@
   "birthday.tipTitle": "Card tip",
   "birthday.tipBody": "Draw or write about your most beautiful moment together – when {name} laughed for the first time, or when you played together. That will be {possessive} favorite gift!",
   "birthday.tipFrom": "Recommended by Mom & Dad",
-  "birthday.badge.hp": "+500 Hero Points",
+  "birthday.badge.hp": "+500 Stars",
   "birthday.badge.superBrother": "Super Brother Badge",
   "birthday.badge.superSister": "Super Sister Badge",
   "birthday.badge.superSibling": "Super Sibling Badge",
@@ -840,6 +840,15 @@
   "auth.startFree": "Start for free",
   "auth.noAccount": "I don't have an account yet",
   "auth.hasAccount": "I already have an account",
+  "auth.signInWithGoogle": "Sign in with Google",
+  "auth.signInWithEmailLink": "Sign in with email link",
+  "auth.sendMagicLink": "Send link",
+  "auth.magicLinkSent.title": "Email on the way",
+  "auth.magicLinkSent.body": "Check your inbox — we've sent you a magic link.",
+  "auth.or": "or",
+  "auth.errors.google": "Google sign-in failed",
+  "auth.errors.magicLink": "Couldn't send the link",
+  "auth.backToOptions": "Back",
 
   "hub.checkin.title": "Daily Check-in",
 

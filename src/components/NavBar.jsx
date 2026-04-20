@@ -7,7 +7,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 // + any in-app links that still point at 'care' keep working.
 const TAB_KEYS = [
   { id: 'hub',     key: 'nav.hub',     icon: 'local_fire_department' },
-  { id: 'quests',  key: 'nav.quests',  icon: 'military_tech' },
+  { id: 'quests',  key: 'nav.quests',  icon: 'sunny' },
   { id: 'shop',    key: 'nav.shop',    icon: 'shopping_bag' },
   { id: 'journal', key: 'nav.journal', icon: 'auto_stories' },
   { id: 'ronki',   key: 'nav.ronki',   icon: 'pets' },

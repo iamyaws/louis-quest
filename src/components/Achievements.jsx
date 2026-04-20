@@ -45,7 +45,7 @@ export default function Achievements() {
       </div>
       <div style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 800, fontSize: ".85rem", color: "#64748B", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>Stats</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {[{ l: "Gesamt HP", v: state.xp, i: "\u26A1" }, { l: "Heldenpunkte", v: state.coins, i: "\u2B50" }, { l: "Aufgaben", v: state.hist.length, i: "\u2694\uFE0F" }, { l: "Level", v: level, i: "\u{1F4C8}" }].map((s, i) => (
+        {[{ l: "Gesamt Sterne", v: state.xp, i: "\u26A1" }, { l: "Sterne", v: state.coins, i: "\u2B50" }, { l: "Aufgaben", v: state.hist.length, i: "\u2694\uFE0F" }, { l: "Level", v: level, i: "\u{1F4C8}" }].map((s, i) => (
           <div key={i} className="game-card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 16, padding: "14px 18px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: "1.2rem" }}>{s.i}</span><span style={{ fontSize: ".85rem", fontWeight: 700 }}>{s.l}</span></div>
             <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.05rem", fontWeight: 700, color: T.primary }}>{s.v}</span>

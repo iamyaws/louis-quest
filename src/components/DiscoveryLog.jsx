@@ -110,7 +110,7 @@ export default function DiscoveryLog({ onNavigate }) {
                           <div className="flex items-center gap-1.5 mt-1">
                             <span className="material-symbols-outlined text-xs" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>diamond</span>
                             <span className="font-label font-bold text-xs" style={{ color: '#b45309' }}>
-                              +{arc.rewardOnComplete.xp} HP
+                              +{arc.rewardOnComplete.xp}
                             </span>
                           </div>
                         )}

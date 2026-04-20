@@ -127,7 +127,7 @@ export default function PotionGame({ onComplete }) {
           <div className="flex items-center gap-2 px-4 py-2 rounded-full mb-8"
                style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.3)' }}>
             <span className="material-symbols-outlined text-sm" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>diamond</span>
-            <span className="font-label font-bold text-sm" style={{ color: '#b45309' }}>+{reward.hp} HP</span>
+            <span className="font-label font-bold text-sm" style={{ color: '#b45309' }}>+{reward.hp}</span>
           </div>
 
           <CooldownButton delay={3} onClick={() => onComplete(reward)} icon="redeem"

@@ -1,0 +1,537 @@
+import React from 'react';
+
+/**
+ * CampfireScene — zero-asset painterly Hub scene.
+ *
+ * Replaces the earlier Midjourney lager-stageN.png sequence with a fully
+ * CSS-built scene (gradients + border-radius + box-shadows). Same
+ * construction Claude Design used in the Feature Previews file that Louis
+ * reacted to warmly. Wins:
+ *
+ *   · Zero asset weight — previous campfire PNGs were 2.4–2.9 MB each
+ *   · Infinitely scalable, sharp at any pixel density
+ *   · Time-of-day variants via CSS gradient swaps (dawn / day / golden /
+ *     night), no image pre-loading
+ *   · Animation-ready: flame flicker, breath pulse, wing flap, star twinkle
+ *   · Expedition-ready: `state` prop switches between 'idle' | 'away' |
+ *     'returning' without re-rendering the scene itself
+ *
+ * Painterly webp lager-stageN.png retained on the Ronki tab's Living
+ * Scene where the epic hero frame still reads best.
+ *
+ * Props:
+ *   · hour       (0-23)  — clock hour, auto-derived if omitted
+ *   · state      ('idle'|'away'|'returning') — expedition state
+ *   · statusText (string, optional) — status strip text (e.g. "Ronki ist
+ *     im Morgenwald."). If omitted, no strip shows.
+ *   · statusSub  (string, optional) — smaller secondary line
+ *   · onDiaryTap (fn, optional) — callback when Louis taps the glowing diary
+ *
+ * Caller provides height (default 320px).
+ */
+
+function pickTimeBand(hour) {
+  if (hour >= 5 && hour < 10) return 'dawn';
+  if (hour >= 10 && hour < 17) return 'day';
+  if (hour >= 17 && hour < 20) return 'golden';
+  return 'night';
+}
+
+// Palette per time-of-day: sky layers + ground tint. Stars only render on
+// night. Dawn is warmer than day (peachy top fade), golden is richer.
+const PALETTES = {
+  dawn: {
+    sky: `
+      radial-gradient(ellipse at 50% 18%, #fde68a 0%, transparent 32%),
+      linear-gradient(180deg, #fbcfb7 0%, #e7c8a4 38%, #a69a6a 66%, #5a5a3a 100%)
+    `,
+    ground: 'linear-gradient(180deg, #7a6644 0%, #3f3320 100%)',
+    tree: 'radial-gradient(ellipse at 40% 30%, #8da65a, #4a6628 70%)',
+    stars: false,
+    moon: false,
+  },
+  day: {
+    sky: `
+      radial-gradient(ellipse at 50% 12%, #fde68a 0%, transparent 32%),
+      linear-gradient(180deg, #e7d8b9 0%, #d4b894 38%, #8a8455 66%, #3f4a2e 100%)
+    `,
+    ground: 'linear-gradient(180deg, #6b5a3a 0%, #3a2f1a 100%)',
+    tree: 'radial-gradient(ellipse at 40% 30%, #7d9a4a, #4a6628 70%)',
+    stars: false,
+    moon: false,
+  },
+  golden: {
+    sky: `
+      radial-gradient(ellipse at 50% 20%, #fde68a 0%, transparent 30%),
+      linear-gradient(180deg, #f2b582 0%, #d98d55 40%, #7a5940 68%, #33281a 100%)
+    `,
+    ground: 'linear-gradient(180deg, #5a3c22 0%, #2a1c0f 100%)',
+    tree: 'radial-gradient(ellipse at 40% 30%, #6b7a4a, #3a4a1f 70%)',
+    stars: false,
+    moon: false,
+  },
+  night: {
+    sky: `
+      radial-gradient(ellipse at 22% 18%, rgba(226,232,255,0.35) 0%, transparent 28%),
+      radial-gradient(circle at 74% 16%, #f5f3e8 0%, #d5d7d0 40%, transparent 60%),
+      linear-gradient(180deg, #1a2344 0%, #2b3158 42%, #1a2338 70%, #0e1525 100%)
+    `,
+    ground: 'linear-gradient(180deg, #26303b 0%, #0f1520 100%)',
+    tree: 'radial-gradient(ellipse at 40% 30%, #2a3e3c, #15221f 70%)',
+    stars: true,
+    moon: true,
+  },
+};
+
+// Fixed star positions — seeded so twinkles feel organic, not random on
+// each render. Percentages relative to the scene box.
+const STAR_POS = [
+  { top: 12, left: 20, delay: 0.0 },
+  { top: 8,  left: 36, delay: 0.6 },
+  { top: 18, left: 54, delay: 1.2 },
+  { top: 6,  left: 68, delay: 0.3 },
+  { top: 14, left: 82, delay: 1.8 },
+  { top: 22, left: 90, delay: 0.9 },
+  { top: 26, left: 12, delay: 1.5 },
+];
+
+export default function CampfireScene({
+  hour,
+  state = 'idle',
+  statusText,
+  statusSub,
+  onDiaryTap,
+  height = 320,
+}) {
+  const h = hour ?? new Date().getHours();
+  const band = pickTimeBand(h);
+  const pal = PALETTES[band];
+  const isNight = band === 'night';
+
+  // Expedition visual state — controls Ronki visibility + status strip
+  const ronkiVisible = state === 'idle';
+  const showPawTrail = state === 'away';
+  const showDiary = state === 'returning';
+  const showStatus = state !== 'idle' && !!statusText;
+
+  return (
+    <div
+      className="cf-scene"
+      style={{
+        position: 'relative',
+        height,
+        overflow: 'hidden',
+        background: pal.sky,
+        isolation: 'isolate',
+      }}
+      aria-label="Lagerfeuer"
+    >
+      {/* Stars — only at night */}
+      {pal.stars && (
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} aria-hidden="true">
+          {STAR_POS.map((s, i) => (
+            <span
+              key={i}
+              style={{
+                position: 'absolute',
+                top: `${s.top}%`,
+                left: `${s.left}%`,
+                width: 2,
+                height: 2,
+                background: '#fefce8',
+                borderRadius: '50%',
+                boxShadow: '0 0 4px #fef3c7',
+                animation: `cfStar 3s ease-in-out infinite`,
+                animationDelay: `${s.delay}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Distant trees — 3 silhouettes at varied scale + opacity */}
+      <Tree left="8%"  scale={0.8}  opacity={0.75} tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      <Tree left="72%" scale={0.9}  opacity={1}    tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      <Tree right="6%" scale={0.7}  opacity={0.6}  tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+
+      {/* Ground band */}
+      <div style={{
+        position: 'absolute',
+        left: 0, right: 0, bottom: 0,
+        height: '28%',
+        background: pal.ground,
+        boxShadow: 'inset 0 6px 12px rgba(0,0,0,0.25)',
+      }} />
+
+      {/* Log — Louis's seat */}
+      <div style={{
+        position: 'absolute',
+        left: '18%',
+        bottom: '14%',
+        width: 110,
+        height: 18,
+        background: 'linear-gradient(180deg, #9b7447 0%, #5c3e1f 70%)',
+        borderRadius: 10,
+        boxShadow: '0 4px 6px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.1)',
+      }}>
+        <span style={{
+          position: 'absolute',
+          right: -5,
+          top: 2,
+          width: 14,
+          height: 14,
+          background: '#ead5a0',
+          border: '2px solid #8c6a3a',
+          borderRadius: '50%',
+        }} />
+      </div>
+
+      {/* Campfire — flame + logs + warm glow */}
+      <div style={{ position: 'absolute', left: '46%', bottom: '12%', width: 44, height: 50 }}>
+        <div style={{
+          position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+          width: 50, height: 10,
+          background: '#3a2212',
+          borderRadius: 4,
+          boxShadow: '0 -2px 4px rgba(252,165,73,0.4)',
+        }} />
+        <div style={{
+          position: 'absolute',
+          left: '50%', bottom: 8, transform: 'translateX(-50%)',
+          width: 28, height: 36,
+          background: 'radial-gradient(ellipse at 50% 80%, #fef3c7 0%, #fcd34d 20%, #f97316 55%, #dc2626 100%)',
+          borderRadius: '50% 50% 30% 30% / 60% 60% 40% 40%',
+          animation: 'cfFlameFlick 1.1s ease-in-out infinite alternate',
+          filter: 'drop-shadow(0 0 10px rgba(249,115,22,0.6))',
+        }} />
+        <div style={{
+          position: 'absolute',
+          left: -40, bottom: -20,
+          width: 130, height: 60,
+          background: 'radial-gradient(ellipse, rgba(252,165,73,0.4), transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+      </div>
+
+      {/* Side-view Ronki — sits by the fire when idle */}
+      {ronkiVisible && <SideRonki />}
+
+      {/* Away placeholder — pillow where Ronki sat */}
+      {!ronkiVisible && (
+        <div style={{
+          position: 'absolute',
+          left: '23%',
+          bottom: '17%',
+          width: 32,
+          height: 20,
+          background: 'linear-gradient(180deg, #e8dcc0, #b8a98a)',
+          borderRadius: '40% 40% 20% 20%',
+          boxShadow: '0 3px 6px rgba(0,0,0,0.25), inset 1px 1px 0 rgba(255,255,255,0.3)',
+          opacity: 0.85,
+        }} aria-hidden="true" />
+      )}
+
+      {/* Paw trail — 5 tiny prints leading out of frame, only when away */}
+      {showPawTrail && (
+        <div style={{
+          position: 'absolute',
+          bottom: '14%',
+          right: '8%',
+          width: 120,
+          height: 18,
+          display: 'flex',
+          gap: 12,
+          alignItems: 'flex-end',
+          opacity: 0.75,
+        }} aria-hidden="true">
+          {[0, 1, 2, 3, 4].map(i => (
+            <span key={i} style={{
+              width: 8,
+              height: 6,
+              background: isNight ? 'rgba(94,106,130,0.8)' : 'rgba(90,58,34,0.6)',
+              borderRadius: '50% 50% 40% 40%',
+              transform: `translateY(${i % 2 === 0 ? 0 : -2}px)`,
+            }} />
+          ))}
+        </div>
+      )}
+
+      {/* Diary glow — pulses when Ronki is back with an artifact */}
+      {showDiary && onDiaryTap && (
+        <button
+          onClick={onDiaryTap}
+          aria-label="Ronkis Mitbringsel öffnen"
+          style={{
+            position: 'absolute',
+            left: '26%',
+            bottom: '22%',
+            width: 28,
+            height: 22,
+            padding: 0,
+            background: 'linear-gradient(140deg, #fef3c7, #fcd34d)',
+            borderRadius: '3px 8px 3px 3px',
+            border: '1px solid rgba(180,83,9,0.4)',
+            boxShadow: '0 0 16px rgba(252,211,77,0.7), 0 4px 8px rgba(0,0,0,0.25)',
+            cursor: 'pointer',
+            animation: 'cfDiaryPulse 1.6s ease-in-out infinite',
+            zIndex: 6,
+          }}
+        />
+      )}
+
+      {/* Status strip — only during expedition states */}
+      {showStatus && (
+        <div style={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          right: 12,
+          padding: '10px 14px',
+          background: isNight ? 'rgba(20,28,50,0.8)' : 'rgba(255,248,242,0.92)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: isNight ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(18,67,70,0.1)',
+          borderRadius: 14,
+          boxShadow: '0 6px 16px -6px rgba(0,0,0,0.25)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+        }} role="status">
+          <span style={{
+            width: 28, height: 28,
+            borderRadius: '50%',
+            background: isNight ? 'rgba(148,163,184,0.25)' : 'rgba(94,139,108,0.2)',
+            display: 'grid', placeItems: 'center',
+            fontSize: 16,
+          }} aria-hidden="true">
+            {isNight ? '🌙' : '🌲'}
+          </span>
+          <div style={{ flex: 1, minWidth: 0, lineHeight: 1.2 }}>
+            <b style={{
+              fontFamily: 'Fredoka, sans-serif',
+              fontSize: 13,
+              fontWeight: 500,
+              color: isNight ? '#f8fafc' : '#124346',
+              display: 'block',
+            }}>{statusText}</b>
+            {statusSub && (
+              <span style={{
+                fontFamily: 'Nunito, sans-serif',
+                fontSize: 11,
+                color: isNight ? 'rgba(226,232,240,0.7)' : 'rgba(18,67,70,0.6)',
+              }}>{statusSub}</span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Scoped keyframes */}
+      <style>{`
+        @keyframes cfStar {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 1; }
+        }
+        @keyframes cfFlameFlick {
+          0%   { transform: translateX(-50%) scale(0.95, 1) rotate(-2deg); }
+          100% { transform: translateX(-50%) scale(1.05, 0.95) rotate(2deg); }
+        }
+        @keyframes cfRonkiBreathe {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.04); }
+        }
+        @keyframes cfWingFlap {
+          0%, 100% { transform: rotate(-15deg); }
+          50% { transform: rotate(-5deg); }
+        }
+        @keyframes cfDiaryPulse {
+          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(252,211,77,0.6)); }
+          50% { transform: scale(1.08); filter: drop-shadow(0 0 20px rgba(252,211,77,0.9)); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ── SideRonki — orange chibi dragon, sitting pose ─────────────────────
+// Lives inside the scene; extracted as a sub-component for readability.
+// Construction matches Claude Design's Feature Preview exactly.
+
+function SideRonki() {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        left: '22%',
+        bottom: '17%',
+        width: 78,
+        height: 72,
+        zIndex: 5,
+        animation: 'cfRonkiBreathe 3.4s ease-in-out infinite',
+        transformOrigin: '50% 90%',
+      }}
+    >
+      {/* Tail — swoops back and up, layered behind body */}
+      <div style={{
+        position: 'absolute',
+        left: '62%', top: '48%',
+        width: 26, height: 14,
+        background: 'linear-gradient(90deg, #f97316, #c2410c)',
+        borderRadius: '50% 80% 60% 70% / 60% 60% 50% 50%',
+        transform: 'rotate(-12deg)',
+        zIndex: 1,
+      }}>
+        <span style={{
+          position: 'absolute', right: -4, top: -4,
+          width: 10, height: 10,
+          background: 'linear-gradient(180deg, #fde68a, #f59e0b)',
+          borderRadius: '50%',
+          boxShadow: '0 0 6px rgba(252,165,73,0.5)',
+        }} />
+      </div>
+
+      {/* Wing — flaps subtly, layered behind body but above tail */}
+      <div style={{
+        position: 'absolute',
+        top: '24%', left: '-2%',
+        width: 22, height: 30,
+        background: 'linear-gradient(160deg, #f97e5a, #b23a1c)',
+        borderRadius: '50% 10% 50% 50% / 55% 20% 55% 55%',
+        transform: 'rotate(-15deg)',
+        transformOrigin: '100% 30%',
+        animation: 'cfWingFlap 2.2s ease-in-out infinite',
+        zIndex: 2,
+      }} />
+
+      {/* Body — pear-shape with inset volume shadow */}
+      <div style={{
+        position: 'absolute',
+        left: '10%', top: '20%',
+        width: 56, height: 54,
+        background: 'linear-gradient(175deg, #fed7aa 0%, #f97316 62%, #c2410c 100%)',
+        borderRadius: '58% 50% 40% 50% / 62% 56% 44% 48%',
+        boxShadow: 'inset -4px -6px 0 rgba(0,0,0,0.18), 0 4px 8px rgba(0,0,0,0.22)',
+        zIndex: 3,
+      }} />
+
+      {/* Belly — lighter cream panel */}
+      <div style={{
+        position: 'absolute',
+        left: '16%', top: '45%',
+        width: 26, height: 22,
+        background: '#fde0a8',
+        borderRadius: '50% 40% 50% 50%',
+        zIndex: 4,
+      }} />
+
+      {/* Horns */}
+      <div style={{
+        position: 'absolute',
+        top: '18%', left: '26%',
+        width: 8, height: 14,
+        background: 'linear-gradient(180deg, #fde68a, #f59e0b)',
+        borderRadius: '50% 50% 10% 10%',
+        transform: 'rotate(-8deg)',
+        zIndex: 4,
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: '18%', left: '38%',
+        width: 8, height: 12,
+        background: 'linear-gradient(180deg, #fde68a, #f59e0b)',
+        borderRadius: '50% 50% 10% 10%',
+        transform: 'rotate(6deg)',
+        zIndex: 4,
+      }} />
+
+      {/* Eye with catchlight */}
+      <div style={{
+        position: 'absolute',
+        top: '34%', left: '46%',
+        width: 6, height: 8,
+        background: '#1a0e08',
+        borderRadius: '50%',
+        zIndex: 5,
+      }}>
+        <span style={{
+          position: 'absolute',
+          top: 1, right: 0,
+          width: 2, height: 2,
+          background: '#fff',
+          borderRadius: '50%',
+        }} />
+      </div>
+
+      {/* Small mouth */}
+      <div style={{
+        position: 'absolute',
+        top: '50%', left: '52%',
+        width: 8, height: 3,
+        borderBottom: '1.5px solid #3a1f12',
+        borderRadius: '0 0 4px 4px',
+        zIndex: 5,
+      }} />
+
+      {/* Legs */}
+      <div style={legStyle('28%')} />
+      <div style={legStyle('52%')} />
+    </div>
+  );
+}
+
+function legStyle(left) {
+  return {
+    position: 'absolute',
+    left,
+    bottom: '2%',
+    width: 10,
+    height: 14,
+    background: 'linear-gradient(180deg, #f97316, #9a3412)',
+    borderRadius: '30% 30% 40% 40%',
+    boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.18)',
+    zIndex: 5,
+  };
+}
+
+// ── Tree ─────────────────────────────────────────────────────────────
+// Distant silhouette: brown trunk + rounded canopy. Scale + opacity are
+// props so we can dot three varied trees along the horizon for depth.
+
+function Tree({ left, right, scale = 1, opacity = 1, tree, trunk }) {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        bottom: '28%',
+        left, right,
+        width: 40,
+        height: 70,
+        transform: `scale(${scale})`,
+        opacity,
+      }}
+    >
+      {/* trunk */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
+        left: '46%',
+        width: '8%',
+        height: '40%',
+        background: trunk,
+        transform: 'translateX(-50%)',
+      }} />
+      {/* canopy */}
+      <div style={{
+        position: 'absolute',
+        left: '50%',
+        bottom: '30%',
+        transform: 'translateX(-50%)',
+        width: 36,
+        height: 50,
+        background: tree,
+        borderRadius: '50% 60% 55% 45% / 40% 50% 55% 45%',
+      }} />
+    </div>
+  );
+}

@@ -10,7 +10,7 @@ const STEPS = [
   {
     icon: 'task_alt',
     title: 'Tägliche Quests',
-    body: 'Erledige Morgen-, Abend- und Bonus-Aufgaben, um Heldenpunkte zu sammeln und Ronki wachsen zu lassen.',
+    body: 'Erledige Morgen-, Abend- und Bonus-Aufgaben, um Sterne zu sammeln und Ronki wachsen zu lassen.',
     tab: 'AUFGABEN',
   },
   {

@@ -118,7 +118,7 @@ export default function VictoryScreen({ onClose, onMemoryGame }) {
             ))}
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "center" }}>
-            <div style={{ background: `${T.primary}30`, borderRadius: 50, padding: "4px 12px", fontSize: ".85rem", fontWeight: 800, color: T.primaryLight }}>Lvl {level} {"\u26A1"} {state.xp} HP</div>
+            <div style={{ background: `${T.primary}30`, borderRadius: 50, padding: "4px 12px", fontSize: ".85rem", fontWeight: 800, color: T.primaryLight }}>Lvl {level} {"\u26A1"} {state.xp}</div>
             <div style={{ background: `${T.accent}30`, borderRadius: 50, padding: "4px 12px", fontSize: ".85rem", fontWeight: 800, color: T.accent }}>{"\u2B50"} {state.coins}</div>
           </div>
         </div>

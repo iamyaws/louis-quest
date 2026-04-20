@@ -271,7 +271,7 @@ export const BADGES: Badge[] = [
 ];
 
 // Onboarding gives NO HP during steps — only a single chest at the end
-export const OB_CHEST_REWARD = { hp: 1, text: "Dein erster Heldenpunkt!", icon: "\u{1F381}" };
+export const OB_CHEST_REWARD = { hp: 1, text: "Dein erster Stern!", icon: "\u{1F381}" };
 
 export const JOURNAL_QUESTIONS: JournalQuestion[] = [
   {

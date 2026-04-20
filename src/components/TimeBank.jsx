@@ -139,7 +139,7 @@ export default function TimeBank() {
             marginTop: 4,
             letterSpacing: ".02em",
           }}>
-            Heldenpunkte
+            Sterne
           </div>
         </div>
         <div className="game-card" style={{
@@ -286,7 +286,7 @@ export default function TimeBank() {
                       minHeight: 44,
                     }}
                   />
-                  <span style={{ fontSize: ".8rem", fontWeight: 600, color: T.textLight }}>HP</span>
+                  <span style={{ fontSize: ".8rem", fontWeight: 600, color: T.textLight }}>Sterne</span>
                 </div>
 
                 {/* Active toggle */}
@@ -439,10 +439,10 @@ export default function TimeBank() {
                     {isFreeDay && bel.weekendCost && bel.weekendCost < bel.cost ? (
                       <>
                         <span style={{ textDecoration: "line-through", opacity: 0.5, marginRight: 4 }}>{bel.cost}</span>
-                        <span style={{ color: "#DC2626", fontWeight: 800 }}>{bel.weekendCost} {bel.currency === "eggs" ? "Eier" : "HP"}</span>
+                        <span style={{ color: "#DC2626", fontWeight: 800 }}>{bel.weekendCost} {bel.currency === "eggs" ? "Eier" : "Sterne"}</span>
                       </>
                     ) : (
-                      <span>{effectiveCost} {bel.currency === "eggs" ? "Eier" : "HP"}</span>
+                      <span>{effectiveCost} {bel.currency === "eggs" ? "Eier" : "Sterne"}</span>
                     )}
                     {!available && " \u{1F512}"}
                   </div>

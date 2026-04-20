@@ -3,22 +3,30 @@ import React from "react";
 /**
  * RONKI CURRENCY ICONS
  *
- * Pearl (Chau)     -> Heldenpunkte / XP
- * Hourglass        -> Screentime Minutes
+ * Star (was Pearl)   -> Sterne (Heldenpunkte rename — Apr 2026)
+ * Bolt (was Hourglass) -> Funkelzeit (Screentime Minutes)
+ *
+ * NOTE: back-compat aliases `Pearl` and `Hourglass` are exported so call
+ * sites still compile while the rest of the codebase is migrated in-place.
  */
 
-// --- Pearl (Heldenpunkte) ---
+// --- Star (Sterne) ---
 
-export function Pearl({ size = 24, dark = false, className = "" }) {
+export function Star({ size = 24, dark = false, className = "" }) {
   const id = React.useId().replace(/:/g, "");
   const showGlow = size >= 24;
-  const showSecondary = size >= 28;
+  const showHighlight = size >= 20;
 
-  const glowOpacity = dark ? 0.15 : 0.2;
-  const highlightOpacity = dark ? 0.8 : 0.7;
+  const glowOpacity = dark ? 0.35 : 0.45;
+  const highlightOpacity = dark ? 0.65 : 0.75;
   const gradStops = dark
-    ? { inner: "#FDE68A", mid: "#EFB752", outer: "#D97706" }
-    : { inner: "#FDE68A", mid: "#F5C06A", outer: "#D97706" };
+    ? { inner: "#fef3c7", mid: "#efb752", outer: "#92400e" }
+    : { inner: "#fef3c7", mid: "#f5c06a", outer: "#b45309" };
+
+  // Classic 5-point star, centered at (12,12), outer radius ~8.5, inner ~3.6.
+  // Points start at top and rotate 72° around.
+  const starPath =
+    "M12 3.2 L13.95 9.35 L20.4 9.35 L15.22 13.15 L17.18 19.3 L12 15.5 L6.82 19.3 L8.78 13.15 L3.6 9.35 L10.05 9.35 Z";
 
   return (
     <svg
@@ -27,46 +35,53 @@ export function Pearl({ size = 24, dark = false, className = "" }) {
       viewBox="0 0 24 24"
       fill="none"
       className={className}
-      aria-label="Heldenpunkte"
+      aria-label="Sterne"
       role="img"
+      style={{
+        filter: showGlow
+          ? `drop-shadow(0 0 6px rgba(252,211,77,${glowOpacity}))`
+          : undefined,
+      }}
     >
       <defs>
-        <radialGradient id={`pg-${id}`} cx="0.4" cy="0.35" r="0.6">
+        <radialGradient id={`sg-${id}`} cx="0.38" cy="0.32" r="0.7">
           <stop offset="0%" stopColor={gradStops.inner} />
-          <stop offset="50%" stopColor={gradStops.mid} />
+          <stop offset="55%" stopColor={gradStops.mid} />
           <stop offset="100%" stopColor={gradStops.outer} />
         </radialGradient>
       </defs>
-      {showGlow && (
-        <circle cx="12" cy="12" r="8" fill="#FCD34D" opacity={glowOpacity} />
-      )}
-      <circle cx="12" cy="12" r="5.5" fill="#F5C06A" />
-      <circle cx="12" cy="12" r="5" fill={`url(#pg-${id})`} />
-      <ellipse
-        cx="10.2"
-        cy="10"
-        rx="1.8"
-        ry="1.2"
-        fill="#FFF8E8"
-        opacity={highlightOpacity}
-        transform="rotate(-20 10.2 10)"
-      />
-      {showSecondary && (
-        <circle cx="13.8" cy="14" r="0.6" fill="#FFF8E8" opacity={0.4} />
+      <path d={starPath} fill={`url(#sg-${id})`} stroke={gradStops.outer} strokeWidth="0.6" strokeLinejoin="round" />
+      {showHighlight && (
+        <path
+          d="M10.3 6.8 Q9.2 8.8 8.2 10.2"
+          stroke="rgba(255,255,255,0.75)"
+          strokeWidth="1.1"
+          strokeLinecap="round"
+          fill="none"
+          opacity={highlightOpacity}
+        />
       )}
     </svg>
   );
 }
 
-// --- Hourglass (Screentime Minutes) ---
+// Back-compat alias
+export const Pearl = Star;
 
-export function Hourglass({ size = 24, dark = false, className = "" }) {
-  const frameColor = dark ? "#AFA9EC" : "#6D28D9";
-  const frameOpacity = dark ? 0.9 : 0.8;
-  const sandOpacity = dark ? 0.7 : 0.6;
-  const sandTopOpacity = 0.3;
-  const dotColor = dark ? "#FCD34D" : "#D97706";
-  const strokeWidth = size <= 20 ? 1.2 : 1.3;
+// --- Bolt (Funkelzeit) ---
+
+export function Bolt({ size = 24, dark = false, className = "" }) {
+  const id = React.useId().replace(/:/g, "");
+  const showGlow = size >= 20;
+  const glowOpacity = dark ? 0.4 : 0.55;
+
+  const gradStops = dark
+    ? { inner: "#ccfbf1", mid: "#5eead4", outer: "#0f766e" }
+    : { inner: "#ccfbf1", mid: "#5eead4", outer: "#0d9488" };
+
+  // Lightning bolt: top-right tapered tip → zig at center → bottom-left tip.
+  const boltPath =
+    "M14.5 2.5 L7 12.2 L11 12.2 L9.5 21.5 L17 11.4 L13 11.4 Z";
 
   return (
     <svg
@@ -75,22 +90,39 @@ export function Hourglass({ size = 24, dark = false, className = "" }) {
       viewBox="0 0 24 24"
       fill="none"
       className={className}
-      aria-label="Screentime Minuten"
+      aria-label="Funkelzeit"
       role="img"
+      style={{
+        filter: showGlow
+          ? `drop-shadow(0 0 6px rgba(94,234,212,${glowOpacity}))`
+          : undefined,
+      }}
     >
-      <rect x="6.5" y="2" width="11" height="2.5" rx="1" fill={frameColor} opacity={frameOpacity} />
-      <rect x="6.5" y="19.5" width="11" height="2.5" rx="1" fill={frameColor} opacity={frameOpacity} />
+      <defs>
+        <radialGradient id={`bg-${id}`} cx="0.35" cy="0.3" r="0.8">
+          <stop offset="0%" stopColor={gradStops.inner} />
+          <stop offset="55%" stopColor={gradStops.mid} />
+          <stop offset="100%" stopColor={gradStops.outer} />
+        </radialGradient>
+      </defs>
       <path
-        d="M8 4.5 L8 8.5 Q8 10.5 10.5 11.5 L11.2 12 L10.5 12.5 Q8 13.5 8 15.5 L8 19.5"
-        fill="none" stroke={frameColor} strokeWidth={strokeWidth} strokeLinecap="round"
+        d={boltPath}
+        fill={`url(#bg-${id})`}
+        stroke={gradStops.outer}
+        strokeWidth="0.6"
+        strokeLinejoin="round"
       />
+      {/* White highlight on the leading (upper-right) stroke */}
       <path
-        d="M16 4.5 L16 8.5 Q16 10.5 13.5 11.5 L12.8 12 L13.5 12.5 Q16 13.5 16 15.5 L16 19.5"
-        fill="none" stroke={frameColor} strokeWidth={strokeWidth} strokeLinecap="round"
+        d="M13.3 4.3 L9.5 9.4"
+        stroke="rgba(255,255,255,0.85)"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        fill="none"
       />
-      <path d="M9.2 17.5 Q9.5 16 10.8 15 L12 14.2 L13.2 15 Q14.5 16 14.8 17.5 Z" fill="#FCD34D" opacity={sandOpacity} />
-      <path d="M9.2 6.5 Q9.5 8 10.8 9 L12 9.8 L13.2 9 Q14.5 8 14.8 6.5 Z" fill="#FCD34D" opacity={sandTopOpacity} />
-      <circle cx="12" cy="12" r="0.6" fill={dotColor} />
     </svg>
   );
 }
+
+// Back-compat alias
+export const Hourglass = Bolt;

@@ -244,7 +244,7 @@ export default function BossChest({ bossName, bossIcon, hpReward, unlockedItem, 
                 marginBottom: 8,
               }}
             >
-              +{hpReward} Heldenpunkte!
+              +{hpReward} Sterne!
             </div>
 
             {/* Unlocked item */}

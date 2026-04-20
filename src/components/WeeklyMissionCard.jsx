@@ -18,7 +18,7 @@ export default function WeeklyMissionCard({ weeklyMission, weeklyProgress }) {
       </div>
       <div style={{ fontSize: "1rem", color: T.textSecondary, marginBottom: 8 }}>{wm.story}</div>
       <div className="mission-progress-track"><div className="mission-progress-fill" style={{ width: `${Math.min(100, (wp / wm.target) * 100)}%`, background: wmDone ? `linear-gradient(90deg,${T.success},#6EE7B7)` : `linear-gradient(90deg,${T.primary},${T.primaryLight})` }} /></div>
-      {wmDone && <div style={{ fontSize: "1rem", color: T.success, fontWeight: 700, marginTop: 6, textAlign: "center" }}>{"\uD83C\uDF89"} +{wm.reward.amount} Heldenpunkte erhalten!</div>}
+      {wmDone && <div style={{ fontSize: "1rem", color: T.success, fontWeight: 700, marginTop: 6, textAlign: "center" }}>{"\uD83C\uDF89"} +{wm.reward.amount} Sterne erhalten!</div>}
     </div>
   );
 }
