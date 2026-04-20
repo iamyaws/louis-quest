@@ -123,7 +123,7 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-teal-dark/75 hover:text-teal-dark transition-colors block mb-4"
               >
-                <span aria-hidden>☕</span> Einen Kaffee ausgeben
+                <span aria-hidden>🍨</span> Louis eine Kugel Eis ausgeben
               </a>
               <Link
                 to="/en"
