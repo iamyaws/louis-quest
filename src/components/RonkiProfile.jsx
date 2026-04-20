@@ -7,6 +7,7 @@ import { Pearl } from './CurrencyIcons';
 import { SEED_BY_ID, SEED_CREATURES } from '../data/creatures';
 import { isDevMode } from '../utils/mode';
 import { getVariant } from '../data/companionVariants';
+import SFX from '../utils/sfx';
 
 /**
  * Companion Profile — patterned on Finch's Piper page.
@@ -47,9 +48,19 @@ const base = import.meta.env.BASE_URL;
 
 export default function RonkiProfile({ onNavigate }) {
   const { t, lang } = useTranslation();
-  const { state } = useTask();
+  const { state, actions } = useTask();
   const [tab, setTab] = useState('about');
   const dev = isDevMode();
+
+  // Care action wrapper — plays pop, triggers haptic, runs the action.
+  // Pulled up from Sanctuary so Louis can Füttern/Streicheln/Spielen
+  // without a separate Pflege tab (nav merged April 2026).
+  const handleCare = (action, alreadyDone) => {
+    if (alreadyDone) return;
+    SFX.play('pop');
+    if (navigator.vibrate) navigator.vibrate(100);
+    action();
+  };
 
   if (!state) return null;
 
@@ -144,6 +155,59 @@ export default function RonkiProfile({ onNavigate }) {
             {lang === 'de' ? 'Mystischer Begleiter' : 'Mystical Companion'}
           </p>
         </div>
+
+        {/* ═══ PFLEGE — 3 care actions (Füttern · Streicheln · Spielen).
+             Absorbed from Sanctuary when the Pflege tab merged into Ronki's
+             page (April 2026). State lives on the same TaskContext fields
+             (catFed / catPetted / catPlayed) so the existing reducers work
+             unchanged. One tap per action per day; done state shows a check. */}
+        <section className="grid grid-cols-3 gap-3 mb-5">
+          {[
+            { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          label: t('care.feed'), reward: 5, color: '#f59e0b' },
+            { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        label: t('care.pet'),  reward: 3, color: '#ec4899' },
+            { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', label: t('care.play'), reward: 8, color: '#124346' },
+          ].map(a => (
+            <button key={a.key}
+              onClick={() => handleCare(a.onTap, a.state)}
+              disabled={a.state}
+              className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
+              style={{ opacity: a.state ? 0.65 : 1 }}>
+              <div className="w-full aspect-square rounded-2xl flex items-center justify-center"
+                   style={{
+                     background: a.state
+                       ? 'rgba(52,211,153,0.12)'
+                       : 'linear-gradient(135deg, #ffffff 0%, #fef3c7 100%)',
+                     border: a.state ? '1.5px solid rgba(52,211,153,0.45)' : '1.5px solid rgba(255,255,255,0.9)',
+                     boxShadow: a.state
+                       ? '0 2px 8px rgba(5,150,105,0.1)'
+                       : '0 4px 14px -4px rgba(18,67,70,0.18), inset 0 1px 0 rgba(255,255,255,0.7)',
+                   }}>
+                <span className="material-symbols-outlined"
+                      style={{
+                        fontSize: 36,
+                        color: a.state ? '#059669' : a.color,
+                        fontVariationSettings: "'FILL' 1",
+                      }}>
+                  {a.state ? 'check_circle' : a.icon}
+                </span>
+              </div>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="font-headline font-bold text-sm text-on-surface leading-none">
+                  {a.label}
+                </span>
+                {a.state ? (
+                  <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: '#059669' }}>
+                    {t('care.done')}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 font-label font-bold text-[11px]" style={{ color: '#725b00' }}>
+                    <Pearl size={10} />+{a.reward} HP
+                  </span>
+                )}
+              </div>
+            </button>
+          ))}
+        </section>
 
         {/* ═══ FREUNDE HERO CARD ═══ */}
         <button

@@ -61,9 +61,12 @@ const BOSS_ART = {
 //   · Mood chip above HEUTE (collapsed, taps to expand picker inline)
 //   · HEUTE card + 3-block anchor rail (morning / evening / bedtime)
 //   · Als Nächstes CTA — navigates to Aufgaben
-//   · Bonus compact button with preview text (Extra-Aufgaben)
-//   · Wasser pill promoted from Daily Check-in
-//   · Memory Wall · Forscher-Ecke (if unlocked) · [dev: Boss / Achievement / Leitstern]
+//   · Wasser pill — baseline care, adjacent to Als Nächstes
+//   · Forscher-Ecke (sequential, hides after graduation)
+//   · Extra-Aufgaben compact button (truly optional, bottom of main stack)
+//   · Mood chip (top) + Wasser (primary) bookend daily care
+//   · [dev: Boss / Achievement / Leitstern]
+//   · Memory Wall moved to RonkiProfile (single source of truth for "our story")
 //   · No Mehr-entdecken wrapper — flat tail, AttentionGlow NEU badge stays visible
 //   · LoginBonus removed (retention-bait; see project_ronki_positioning.md)
 //   · Arc system paused — see backlog_arc_offer_rework.md
@@ -548,31 +551,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
           </button>
         )}
 
-        {/* ── Bonus compact button (C style, public) ── */}
-        {sideQuests.length > 0 && (
-          <button onClick={() => onNavigate?.('quests')}
-                  className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
-                  style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.08)' }}>
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 font-headline font-bold text-base"
-                 style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%)', color: '#725b00' }}>
-              {sideDone}/{sideQuests.length}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5" style={{ color: '#b45309' }}>
-                {t('task.bonus')}
-              </p>
-              <p className="font-headline font-semibold text-[15px] leading-tight text-on-surface">
-                {t('hub.bonus.headline')}
-              </p>
-              <p className="font-body text-[12px] leading-snug mt-0.5 text-on-surface-variant truncate">
-                {sidePreview || t('hub.bonus.allDone')}
-              </p>
-            </div>
-            <span className="material-symbols-outlined shrink-0" style={{ color: '#6b655b', fontSize: 20 }}>chevron_right</span>
-          </button>
-        )}
-
-        {/* ── Wasser pill (B style) — promoted from Daily Check-in ── */}
+        {/* ── Wasser pill — baseline care, sits adjacent to Als Nächstes.
+               Wasser is a daily-required tracker (not optional), so it lives
+               in the primary cluster instead of after the "optional things
+               to do". Mood chip (top) + Wasser bookend the day's care. ── */}
         <div className="w-full px-4 py-3 rounded-2xl flex items-center gap-2.5"
              style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.06)' }}>
           <span className="material-symbols-outlined shrink-0"
@@ -609,60 +591,59 @@ export default function Hub({ onNavigate, onPlayMint }) {
           </span>
         </div>
 
+        {/* ── Forscher-Ecke — sequential progression.
+               Optional activity. Hidden when Louis has graduated.
+               See data/mintGames.ts for the sequence model. ── */}
+        {!isForscherGraduated(state) && (
+          <AttentionGlow
+            active={!forscherSeen}
+            seenKey="forscher-ecke-first-seen"
+            accent="#059669"
+            intensity="medium"
+            badgeLabel="NEU"
+            voiceLineId="de_forscher_new_01"
+          >
+            <ForscherEcke
+              onPlayGame={(gameId) => {
+                markForscherSeen();
+                onPlayMint?.(gameId);
+              }}
+            />
+          </AttentionGlow>
+        )}
+
+        {/* ── Extra-Aufgaben — truly optional, sits at the bottom of the
+               main stack so Louis scrolls past his routine + baseline care
+               before the "extra" appears. ── */}
+        {sideQuests.length > 0 && (
+          <button onClick={() => onNavigate?.('quests')}
+                  className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
+                  style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.08)' }}>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 font-headline font-bold text-base"
+                 style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%)', color: '#725b00' }}>
+              {sideDone}/{sideQuests.length}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5" style={{ color: '#b45309' }}>
+                {t('task.bonus')}
+              </p>
+              <p className="font-headline font-semibold text-[15px] leading-tight text-on-surface">
+                {t('hub.bonus.headline')}
+              </p>
+              <p className="font-body text-[12px] leading-snug mt-0.5 text-on-surface-variant truncate">
+                {sidePreview || t('hub.bonus.allDone')}
+              </p>
+            </div>
+            <span className="material-symbols-outlined shrink-0" style={{ color: '#6b655b', fontSize: 20 }}>chevron_right</span>
+          </button>
+        )}
+
         {/* ═════════════════════════════════════════════════════════════════
-           E · SECONDARY SURFACES (flat, unwrapped)
-           "Mehr entdecken" collapse removed — in public mode the tail is just
-           Memory Wall + Forscher-Ecke (conditional), not worth a wrapper. In
-           dev mode, boss/achievement/leitstern sit inline too. Forscher-Ecke
-           keeps its AttentionGlow NEU badge visible instead of buried.
+           E · DEV-ONLY SURFACES (flat, unwrapped)
+           Memory Wall lives on RonkiProfile now (single source of truth for
+           "our story so far"), so the Hub tail stays minimal. Below this
+           only renders in dev mode.
            ═════════════════════════════════════════════════════════════════ */}
-
-        {/* ── Memory Wall ── */}
-        <button
-          className="w-full flex items-center gap-4 p-4 rounded-2xl active:scale-[0.98] transition-all text-left relative overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, #0c1a2e 0%, #0e2840 100%)',
-            border: '1.5px solid rgba(252,211,77,0.18)',
-            boxShadow: '0 4px 16px rgba(12,24,48,0.22)',
-          }}
-          onClick={() => onNavigate?.('memories')}
-        >
-          <img src={base + 'art/tex-sternenmeer.png'} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none" />
-          <div className="relative z-10 w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-               style={{ background: 'rgba(252,211,77,0.15)', border: '1px solid rgba(252,211,77,0.25)' }}>
-            <span className="material-symbols-outlined text-xl" style={{ color: '#fcd34d', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-          </div>
-          <div className="relative z-10 flex-1 min-w-0">
-            <p className="font-headline font-bold text-base text-white">Erinnerungen</p>
-            <p className="font-label text-xs" style={{ color: 'rgba(252,211,77,0.65)' }}>
-              {[...(state.bossTrophies?.length ? [`${[...new Set(state.bossTrophies)].length} Bosse`] : []), ...(state.unlockedBadges?.length ? [`${state.unlockedBadges.length} Abzeichen`] : [])].join(' · ') || 'Deine Geschichte beginnt hier'}
-            </p>
-          </div>
-          <span className="relative z-10 material-symbols-outlined" style={{ color: 'rgba(252,211,77,0.5)' }}>chevron_right</span>
-        </button>
-
-            {/* ── Forscher-Ecke — sequential progression.
-                   Hidden only when Louis has graduated (all implemented
-                   badges earned). Otherwise game 1 is always available and
-                   locked slots hint at the progression.
-                   See data/mintGames.ts for the sequence model. ── */}
-            {!isForscherGraduated(state) && (
-              <AttentionGlow
-                active={!forscherSeen}
-                seenKey="forscher-ecke-first-seen"
-                accent="#059669"
-                intensity="medium"
-                badgeLabel="NEU"
-                voiceLineId="de_forscher_new_01"
-              >
-                <ForscherEcke
-                  onPlayGame={(gameId) => {
-                    markForscherSeen();
-                    onPlayMint?.(gameId);
-                  }}
-                />
-              </AttentionGlow>
-            )}
 
             {/* ── Boss Card (dev only) + full-screen detail ── */}
             {isDevMode() && state.boss && (() => {

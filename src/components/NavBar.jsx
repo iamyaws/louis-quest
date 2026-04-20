@@ -1,10 +1,13 @@
 import React from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 
+// Pflege merged into Ronki's page (April 2026) — care actions
+// (Füttern/Streicheln/Spielen) now live at the top of RonkiProfile.
+// The 'care' view route stays in App.jsx so eggTriggers + dreamHighlights
+// + any in-app links that still point at 'care' keep working.
 const TAB_KEYS = [
   { id: 'hub',     key: 'nav.hub',     icon: 'local_fire_department' },
   { id: 'quests',  key: 'nav.quests',  icon: 'military_tech' },
-  { id: 'care',    key: 'nav.care',    icon: 'favorite' },
   { id: 'shop',    key: 'nav.shop',    icon: 'shopping_bag' },
   { id: 'journal', key: 'nav.journal', icon: 'auto_stories' },
   { id: 'ronki',   key: 'nav.ronki',   icon: 'pets' },
