@@ -137,8 +137,8 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
            style={{ color: '#b45309' }}>
           {lang === 'de' ? 'Heute' : 'Today'} · {weekday}
         </p>
-        <h1 className="font-headline font-bold text-2xl text-on-surface leading-tight"
-            style={{ letterSpacing: '-0.015em' }}>
+        <h1 className="font-headline text-2xl text-on-surface leading-[1.1]"
+            style={{ letterSpacing: '-0.015em', fontWeight: 500, textWrap: 'balance' }}>
           {allDone
             ? <>{lang === 'de' ? 'Alles geschafft, ' : 'All done, '}<em className="not-italic text-secondary">{heroName}</em>.</>
             : <>{lang === 'de' ? 'Deine Aufgaben, ' : 'Your tasks, '}<em className="not-italic text-secondary">{heroName}</em>.</>}
@@ -474,69 +474,96 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
           );
         })}
 
-        {/* ── Bonus Quests — 2-per-row grid ("als Einladung" per design).
-               Compact cards so the bonus feels like small invitations, not
-               a wall of checkboxes. Each card still taps to complete. ── */}
+        {/* ── Bonus-Quests — vertical stack, design-ref .side-card.
+               Parchment/amber container, full-width cards with icon tile,
+               title + "+HP · BONUS" label, tap-action on the right.
+               Done cards get a mint tint + line-through. ── */}
         {(() => {
           const sideQuests = (state.quests || []).filter(q => q.sideQuest);
           if (!sideQuests.length) return null;
           return (
-            <section className="rounded-2xl overflow-hidden"
+            <section className="rounded-2xl overflow-hidden p-4"
                      style={{
-                       background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-                       border: '1.5px solid rgba(115,92,0,0.18)',
-                       boxShadow: '0 2px 12px rgba(115,92,0,0.08)',
+                       background: 'linear-gradient(160deg, #fef3c7 0%, #fde68a 100%)',
+                       border: '1px solid rgba(180,83,9,0.18)',
+                       boxShadow: '0 8px 20px -8px rgba(180,83,9,0.2)',
                      }}>
-              <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-1.5 h-6 rounded-full" style={{ background: '#735c00' }} />
-                  <h2 className="font-headline text-lg text-on-surface">{t('task.bonus')}</h2>
+              <div className="flex items-center justify-between gap-3 mb-3.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-4 h-[2.5px] rounded-full" style={{ background: '#b45309' }} />
+                  <h2 className="font-headline text-base"
+                      style={{ color: '#124346', fontWeight: 500, letterSpacing: '-0.005em' }}>
+                    {t('task.bonus')}
+                  </h2>
                 </div>
-                <span className="font-label font-bold text-xs" style={{ color: '#735c00' }}>
+                <span className="font-label font-extrabold text-[11px] shrink-0"
+                      style={{
+                        color: '#b45309',
+                        background: 'rgba(255,255,255,0.6)',
+                        border: '1px solid rgba(180,83,9,0.2)',
+                        padding: '5px 9px',
+                        borderRadius: 8,
+                        letterSpacing: '0.08em',
+                      }}>
                   {sideQuests.filter(q => q.done).length}/{sideQuests.length}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2.5 px-4 pb-4">
+              <div className="flex flex-col gap-2">
                 {sideQuests.map(q => (
                   <button key={q.id}
                     onClick={() => !q.done && handleComplete(q.id)}
                     disabled={q.done}
-                    className={`flex flex-col items-start gap-2 p-3 rounded-xl transition-all text-left active:scale-[0.97] ${q.done ? 'opacity-70' : ''}`}
+                    className="w-full text-left transition-all active:scale-[0.98]"
                     style={{
-                      background: q.done
-                        ? 'rgba(52,211,153,0.1)'
-                        : 'rgba(255,255,255,0.85)',
-                      border: q.done
-                        ? '1.5px solid rgba(52,211,153,0.35)'
-                        : '1.5px solid rgba(115,92,0,0.2)',
-                      boxShadow: q.done
-                        ? 'none'
-                        : '0 2px 6px rgba(115,92,0,0.08)',
+                      display: 'grid',
+                      gridTemplateColumns: '36px 1fr 20px',
+                      gap: 10,
+                      alignItems: 'center',
+                      padding: '10px 12px',
+                      borderRadius: 14,
+                      background: q.done ? 'rgba(236,253,245,0.85)' : 'rgba(255,255,255,0.78)',
+                      border: q.done ? '1px solid rgba(52,211,153,0.25)' : '1px solid rgba(180,83,9,0.14)',
                       cursor: q.done ? 'default' : 'pointer',
                     }}
                     aria-label={q.done ? t('quest.' + q.id) : `${t('quest.' + q.id)} ${t('task.complete')}`}
                   >
-                    <div className="flex items-center justify-between w-full">
-                      <span className="text-2xl leading-none select-none">{q.icon}</span>
-                      {q.done ? (
-                        <span className="material-symbols-outlined text-lg"
-                              style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>
-                          check_circle
-                        </span>
-                      ) : (
-                        <span className="material-symbols-outlined text-base"
-                              style={{ color: 'rgba(115,92,0,0.45)' }}>
-                          add_circle
-                        </span>
-                      )}
+                    <div className="flex items-center justify-center rounded-[10px]"
+                         style={{
+                           width: 36, height: 36,
+                           background: q.done ? 'rgba(52,211,153,0.16)' : 'rgba(252,211,77,0.26)',
+                         }}>
+                      <span className="text-lg leading-none select-none">{q.icon}</span>
                     </div>
-                    <p className={`font-label font-bold text-sm leading-tight ${q.done ? 'text-on-surface/55 line-through' : 'text-on-surface'}`}>
-                      {t('quest.' + q.id)}
-                    </p>
-                    <span className="font-label font-bold text-[11px]"
-                          style={{ color: q.done ? '#059669' : '#735c00' }}>
-                      +{q.xp} HP · {t('task.bonus')}
-                    </span>
+                    <div className="min-w-0">
+                      <p className="font-body font-semibold text-sm leading-tight"
+                         style={{
+                           color: q.done ? '#065f46' : '#124346',
+                           textDecoration: q.done ? 'line-through' : 'none',
+                           textDecorationColor: q.done ? 'rgba(5,150,105,0.4)' : undefined,
+                           fontWeight: q.done ? 500 : 600,
+                         }}>
+                        {t('quest.' + q.id)}
+                      </p>
+                      <span className="font-label font-bold uppercase mt-0.5 inline-block"
+                            style={{
+                              color: q.done ? '#059669' : '#b45309',
+                              fontSize: 10,
+                              letterSpacing: '0.1em',
+                            }}>
+                        +{q.xp} HP · {t('task.bonus')}
+                      </span>
+                    </div>
+                    {q.done ? (
+                      <span className="material-symbols-outlined text-lg"
+                            style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                    ) : (
+                      <span className="material-symbols-outlined text-lg"
+                            style={{ color: 'rgba(180,83,9,0.7)' }}>
+                        add_circle
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -544,33 +571,9 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
           );
         })()}
 
-        {/* ── Bento Stats Grid ── */}
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          <div className="rounded-2xl p-6 text-white flex flex-col justify-between relative overflow-hidden"
-               style={{ background: 'linear-gradient(135deg, #124346, #2d5a5e)', minHeight: 160 }}>
-            <div className="relative z-10">
-              <p className="font-label text-sm uppercase tracking-wider opacity-80">{t('task.bento.dailyGoal')}</p>
-              <h4 className="font-headline text-2xl mt-1">{t('task.bento.ready', { pct: Math.round(pct * 100) })}</h4>
-            </div>
-            <div className="relative z-10 w-full h-2 rounded-full mt-4" style={{ background: 'rgba(255,255,255,0.2)' }}>
-              <div className="h-full rounded-full transition-all duration-500"
-                   style={{ width: `${pct * 100}%`, background: '#fcd34d' }} />
-            </div>
-            <span className="absolute -right-4 -bottom-4 material-symbols-outlined text-8xl text-white/10"
-                  style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-          </div>
-
-          <div className="rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden"
-               style={{ background: '#fcd34d', color: '#725b00', minHeight: 160 }}>
-            <div className="relative z-10">
-              <p className="font-label text-sm uppercase tracking-wider opacity-80">{t('task.bento.companion')}</p>
-              <h4 className="font-headline text-2xl mt-1">{t('task.bento.steps', { done })}</h4>
-              <p className="font-body text-xs mt-1 opacity-70">{t('task.bento.eggHelp')}</p>
-            </div>
-            <span className="material-symbols-outlined text-4xl relative z-10"
-                  style={{ fontVariationSettings: "'FILL' 1" }}>egg</span>
-          </div>
-        </div>
+        {/* Bento Stats Grid removed — overall progress is now at the top
+             of the page (one source of truth). Companion step-count was
+             cosmetic; catEvo progress lives on RonkiProfile. */}
       </div>
 
       {/* ── Explorer / Discovery Quests (collapsible, below routines) ── */}

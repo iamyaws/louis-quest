@@ -475,7 +475,8 @@ export default function Hub({ onNavigate, onPlayMint }) {
               <p className="font-bold text-[11px] font-label uppercase tracking-[0.22em] text-secondary mb-1.5">
                 {lang === 'de' ? 'HEUTE' : 'TODAY'}
               </p>
-              <h3 className="font-headline font-extrabold text-2xl text-primary-container leading-tight">
+              <h3 className="font-headline text-2xl text-primary-container leading-[1.1]"
+                  style={{ fontWeight: 500, letterSpacing: '-0.015em', textWrap: 'balance' }}>
                 {allDone ? t('hub.allDone.title') : t('hub.remaining', { count: remaining })}
               </h3>
               <p className="font-body text-on-surface-variant text-sm mt-1">

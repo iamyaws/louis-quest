@@ -147,8 +147,8 @@ export default function RonkiProfile({ onNavigate }) {
           </div>
 
           {/* Name */}
-          <h1 className="font-headline font-bold text-3xl text-on-surface mt-2"
-              style={{ fontFamily: 'Fredoka, sans-serif' }}>
+          <h1 className="font-headline text-3xl text-on-surface mt-2"
+              style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 500, letterSpacing: '-0.015em' }}>
             Ronki
           </h1>
           <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest mt-1">
