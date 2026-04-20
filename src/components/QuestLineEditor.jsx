@@ -200,25 +200,38 @@ function PresetGallery({ lang, onUse }) {
       <div className="grid grid-cols-2 gap-2.5">
         {QUEST_LINE_PRESETS.map(p => (
           <button key={p.id} onClick={() => setConfirmId(p.id)}
-            className="text-left rounded-2xl p-3 flex flex-col gap-1.5 transition-all active:scale-[0.97]"
+            className="text-left rounded-2xl overflow-hidden flex flex-col transition-all active:scale-[0.97]"
             style={{
               background: '#ffffff',
               border: '1.5px solid rgba(0,0,0,0.08)',
               boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
               borderRadius: '1.1rem',
             }}>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl shrink-0" aria-hidden="true">{p.emoji}</span>
-              <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-wider">
-                {p.beats.length} Schritte
-              </span>
+            {/* Hero image strip — only rendered for presets that ship
+                bespoke art (e.g. sibling birthday). Presets without art
+                fall through to the emoji-only header below. */}
+            {p.heroImage && (
+              <div className="relative w-full" style={{ aspectRatio: '5/3', background: '#faf3e8' }}>
+                <img src={`${import.meta.env.BASE_URL}${p.heroImage}`}
+                     alt=""
+                     className="absolute inset-0 w-full h-full object-cover"
+                     draggable={false} />
+              </div>
+            )}
+            <div className="p-3 flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl shrink-0" aria-hidden="true">{p.emoji}</span>
+                <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-wider">
+                  {p.beats.length} Schritte
+                </span>
+              </div>
+              <h4 className="font-headline font-bold text-sm text-on-surface leading-tight">
+                {p.title[lang] || p.title.de}
+              </h4>
+              <p className="font-body text-xs text-on-surface-variant leading-relaxed line-clamp-2">
+                {p.description[lang] || p.description.de}
+              </p>
             </div>
-            <h4 className="font-headline font-bold text-sm text-on-surface leading-tight">
-              {p.title[lang] || p.title.de}
-            </h4>
-            <p className="font-body text-xs text-on-surface-variant leading-relaxed line-clamp-2">
-              {p.description[lang] || p.description.de}
-            </p>
           </button>
         ))}
       </div>

@@ -243,7 +243,7 @@ function OverviewTab({ state, lang, t }) {
   const completedToday = (state.quests || []).filter(q => q.done && !q.sideQuest).length;
   const totalToday = (state.quests || []).filter(q => !q.sideQuest).length;
   const completionPct = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0;
-  const totalOrbs = state.orbs ? Object.values(state.orbs).reduce((a, b) => a + b, 0) : 0;
+  // totalOrbs removed with the Wachstums-Orbs card — restore if orb feature ships
 
   // ─── Build the curator summary: what will the child actually see today? ───
   // Pulled from D3 (Kartenstapel) — parents are curators, not spectators. The
@@ -373,8 +373,8 @@ function OverviewTab({ state, lang, t }) {
         </div>
         {/* HP */}
         <StatCard label="Heldenpunkte" value={state.hp || 0} sub="Verfügbar" />
-        {/* Orbs */}
-        <StatCard label="Wachstums-Orbs" value={totalOrbs} sub="Gesammelt" />
+        {/* Wachstums-Orbs removed — backlog item, not live yet. See
+             backlog_evolution_orbs.md. Re-add when the orb sub-goals ship. */}
       </div>
 
       {/* Mood — today + 7-day history */}
@@ -476,8 +476,9 @@ function OverviewTab({ state, lang, t }) {
           <div>
             <p className="font-label font-bold text-sm text-primary">Eltern-Guide</p>
             <p className="font-body text-xs text-on-surface-variant mt-1 leading-relaxed">
-              Ronki motiviert durch tägliche Aufgaben, Begleiter-Pflege und Boss-Kämpfe.
-              Heldenpunkte können im Laden gegen Belohnungen eingetauscht werden.
+              Ronki motiviert durch tägliche Rituale, Begleiter-Pflege und
+              kleine Abenteuer. Heldenpunkte können im Laden gegen echte
+              Belohnungen eingetauscht werden, Funkelzeit gegen Bildschirm-Zeit.
             </p>
           </div>
         </div>

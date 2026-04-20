@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTask } from '../context/TaskContext';
 import { MINT_SEQUENCE } from '../data/mintGames';
 import FreundIntroModal from './FreundIntroModal';
@@ -92,15 +93,14 @@ export default function ForscherEcke({ onPlayGame }) {
       <span className="absolute top-3 right-16 text-base opacity-60 select-none" aria-hidden="true">✦</span>
       <span className="absolute bottom-3 left-5 text-xs opacity-40 select-none" aria-hidden="true">✦</span>
 
-      {/* Header — eyebrow + headline + count, Doktor Funkel anchored right.
-           Marc replaced the microscope emoji with a character — Doktor
-           Funkel (forest-biome researcher from the Micropedia) gives the
-           section a face + story instead of an abstract glyph. The alt
-           portrait already sits on a warm cream bg that matches this
-           card, so no bg removal needed; a circular mask keeps the crop
-           tidy on different card widths. */}
-      <div className="flex items-start justify-between gap-3 mb-5">
-        <div className="flex-1 min-w-0">
+      {/* Header — eyebrow + headline + count, Dr. Funkel leaning in from
+           the right at proper size. The image has a warm cream bg; we use
+           mix-blend-mode:multiply so the image's lighter cream fades into
+           the card's cream background (visual bg-removal without a new
+           asset). object-contain keeps the whole character visible; the
+           frame is no longer a circle so he breathes. Marc: "get bigger". */}
+      <div className="flex items-start justify-between gap-2 mb-5 relative" style={{ minHeight: 104 }}>
+        <div className="flex-1 min-w-0 pt-1">
           <p className="font-bold text-[11px] font-label uppercase tracking-[0.22em] text-secondary mb-1.5">
             Forscher-Ecke
           </p>
@@ -111,18 +111,21 @@ export default function ForscherEcke({ onPlayGame }) {
             {playedCount} von {MINT_SEQUENCE.length} entdeckt
           </p>
         </div>
-        <div className="shrink-0 rounded-full overflow-hidden"
-             style={{
-               width: 56,
-               height: 56,
-               background: 'linear-gradient(160deg, #fffdf5, #fef3c7)',
-               border: '2px solid rgba(180,83,9,0.2)',
-               boxShadow: '0 4px 14px -4px rgba(180,83,9,0.35), inset 0 1px 0 rgba(255,255,255,0.7)',
-             }}>
+        {/* Dr. Funkel — 112px, leans slightly out of the card top-right.
+             mix-blend-mode:multiply drops the image's cream bg into the
+             card's cream; no hard edge visible. drop-shadow keeps him
+             readable; slight rotate for a "stepping in" feel. */}
+        <div className="shrink-0 relative"
+             style={{ width: 112, height: 112, marginTop: -18, marginRight: -8 }}>
           <img src={`${import.meta.env.BASE_URL}art/characters/doktor-funkel.png`}
                alt="Dr. Funkel"
-               className="w-full h-full object-cover"
-               style={{ objectPosition: 'center 30%', transform: 'scale(1.2)' }} />
+               className="w-full h-full object-contain select-none"
+               draggable={false}
+               style={{
+                 mixBlendMode: 'multiply',
+                 filter: 'drop-shadow(0 4px 10px rgba(180,83,9,0.3)) contrast(1.05)',
+                 transform: 'rotate(-3deg)',
+               }} />
         </div>
       </div>
 
@@ -156,13 +159,17 @@ export default function ForscherEcke({ onPlayGame }) {
         );
       })()}
 
-      {/* Freund intro overlay */}
-      {introFor && (
+      {/* Freund intro overlay — rendered through a portal to document.body
+           so it escapes the card's `backdrop-filter: blur(20px)` (which
+           creates a containing block and was trapping the modal inside
+           the widget instead of covering the viewport). */}
+      {introFor && createPortal(
         <FreundIntroModal
           gameId={introFor.id}
           onAccept={handleAcceptIntro}
           onDismiss={() => setIntroFor(null)}
-        />
+        />,
+        document.body
       )}
     </section>
   );

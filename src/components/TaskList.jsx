@@ -10,6 +10,7 @@ import ToothBrushGuide from './ToothBrushGuide';
 import ClothingSheet from './ClothingSheet';
 import QuestLineCard from './QuestLineCard';
 import TopBar from './TopBar';
+import DailyHabits from './DailyHabits';
 import VoiceAudio from '../utils/voiceAudio';
 import { biomeBackground } from '../utils/biomeBackgrounds';
 
@@ -171,6 +172,13 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
           </span>
         </div>
       </section>
+
+      {/* ── Daily habits — parent-configured checkpoints (Vitamin D, Zeit
+             mit Liam, etc). Configured in Eltern-Bereich → Familie →
+             Tägliche Gewohnheiten. Component auto-hides if none configured,
+             so this slot costs nothing when unused. Marc found these were
+             configured but never rendered — wired here Apr 2026. ── */}
+      <DailyHabits />
 
       {/* ── Parent-created quest-lines (top of list, show up to 3) ── */}
       {(() => {

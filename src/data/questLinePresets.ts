@@ -37,6 +37,9 @@ export interface QuestLinePreset {
   /** Optional suggested lead time in days — currently unused by the simple
    *  one-tap install path but reserved for date-picker variants. */
   suggestedDurationDays?: number;
+  /** Optional hero art shown on the preset card (relative to BASE_URL).
+   *  When present the gallery uses it instead of the plain emoji tile. */
+  heroImage?: string;
   beats: QuestLineBeat[];
 }
 
@@ -62,23 +65,78 @@ export const P_SCHWIMMEN: QuestLinePreset = {
   ],
 };
 
-// ── P2 — Fahrrad ohne Stützräder ──
-export const P_FAHRRAD: QuestLinePreset = {
-  id: 'p_fahrrad',
-  emoji: '🚲',
-  title: { de: 'Fahrrad ohne Stützräder', en: 'Bike without training wheels' },
+// ── P2 — Schuhe binden lernen ──
+// Replaced the older "Fahrrad ohne Stützräder" preset — Marc: a 7-year-old
+// typically already rides without training wheels. Schuhe binden is the
+// iconic 6-year-old milestone instead: real, concrete, universally relatable,
+// and stays meaningful through 1st grade when shoes come off constantly
+// (Sport, Hort, Schwimmen). Beats walk the loop from "Hasenohren" practice
+// to wearing the tied shoes to school on your own.
+export const P_SCHUHE: QuestLinePreset = {
+  id: 'p_schuhe',
+  emoji: '👟',
+  title: { de: 'Schuhe binden lernen', en: 'Learn to tie your shoes' },
   description: {
-    de: 'Erst Gleichgewicht finden, dann los. Kein Stress, dein Tempo.',
-    en: 'Find your balance first, then pedal. Your pace, no stress.',
+    de: 'Vom ersten Hasenohr bis zur festen Schleife — Schritt für Schritt.',
+    en: "From the first bunny ear to a tight bow — step by step.",
   },
   templateId: 'skill',
   beats: [
-    { id: 'b1', icon: '🌱', title: 'Auf Rasen üben',     description: 'Weicher Boden. Ohne Treten, nur mit den Füßen abstoßen.', xp: 10 },
-    { id: 'b2', icon: '⚖️', title: 'Gleichgewicht halten', description: 'Kurz die Füße hoch, rollen lassen. Zählen wie lange.', xp: 15 },
-    { id: 'b3', icon: '🚴', title: 'Erste Meter treten', description: 'Papa oder Mama hält am Sattel. Dann loslassen. Weiter treten!', xp: 20 },
-    { id: 'b4', icon: '↪️', title: 'Kurve fahren',       description: 'Leicht in die Kurve legen. Anschauen wo du hin willst.', xp: 20 },
-    { id: 'b5', icon: '🛑', title: 'Bremsen üben',       description: 'Sanft bremsen. Erst langsamer, dann stehen bleiben.', xp: 20 },
-    { id: 'b6', icon: '🏆', title: 'Du fährst Rad!',     description: 'Alleine losfahren. Alleine ankommen. Wir sehen dir zu.', xp: 40 },
+    { id: 'b1', icon: '🐰', title: 'Hasenohren formen',   description: 'Zwei Schlaufen formen. Wie zwei Hasenohren aus den Bändern.', xp: 10 },
+    { id: 'b2', icon: '🔀', title: 'Überkreuzen',         description: 'Ein Hasenohr über das andere legen. Dann durchziehen.', xp: 15 },
+    { id: 'b3', icon: '🪢', title: 'Stramm ziehen',       description: 'Beide Ohren ziehen bis die Schleife hält. Nicht zu fest!', xp: 15 },
+    { id: 'b4', icon: '👟', title: 'Einen Schuh alleine', description: 'Einen Schuh ganz alleine binden. Mama oder Papa schaut nur zu.', xp: 20 },
+    { id: 'b5', icon: '👟', title: 'Beide Schuhe',        description: 'Jetzt beide. Kein Doppelknoten — nur die Schleife.', xp: 25 },
+    { id: 'b6', icon: '🎒', title: 'Zur Schule!',         description: 'Zuhause anziehen, Schleife binden, losgehen. Alles alleine.', xp: 40 },
+  ],
+};
+
+// ── P6 — Gedicht lernen ──
+// Re-surfaces the old 7-day poem quest as a parent-installable preset.
+// Template 'learn' (homework-adjacent) since it's literal 1st-grade
+// curriculum: one short practice per day, ramping to the big recital.
+export const P_GEDICHT: QuestLinePreset = {
+  id: 'p_gedicht',
+  emoji: '🎤',
+  title: { de: 'Gedicht lernen', en: 'Learn a poem' },
+  description: {
+    de: 'Jeden Tag ein bisschen üben. Am Ende ist das ganze Gedicht dran.',
+    en: 'Practice a little every day. At the end you know the whole poem.',
+  },
+  templateId: 'learn',
+  suggestedDurationDays: 7,
+  beats: [
+    { id: 'b1', icon: '📖', title: 'Gedicht lesen',          description: 'Mit Mama oder Papa einmal durchlesen. Was meint es?', xp: 10 },
+    { id: 'b2', icon: '🗣️', title: 'Erste Strophe üben',     description: 'Die erste Strophe dreimal laut sprechen.', xp: 15 },
+    { id: 'b3', icon: '🌟', title: 'Zweite Strophe üben',    description: 'Jetzt die zweite Strophe. Auch dreimal laut.', xp: 15 },
+    { id: 'b4', icon: '💪', title: 'Alles zusammen',          description: 'Das ganze Gedicht in einem Rutsch. Kleine Fehler sind okay.', xp: 20 },
+    { id: 'b5', icon: '🐉', title: 'Ronki vortragen',         description: 'Ronki ist dein bestes Publikum. Er hört genau zu.', xp: 15 },
+    { id: 'b6', icon: '🎭', title: 'Generalprobe',            description: 'Ein letztes Mal durchgehen. Morgen ist der große Tag.', xp: 20 },
+    { id: 'b7', icon: '🎤', title: 'Der große Tag!',          description: 'Vor der Klasse aufsagen. Du schaffst das.', xp: 40 },
+  ],
+};
+
+// ── P7 — Geburtstag kleiner Bruder ──
+// For younger siblings — uses the bespoke painterly hero art we already
+// have in public/art/birthday/. Beats mirror Omas Geburtstag but tuned for
+// a little sibling (basteln + teilen + feiern, not a formal "Überraschung").
+export const P_GESCHWISTER: QuestLinePreset = {
+  id: 'p_geschwister_geburtstag',
+  emoji: '🎈',
+  title: { de: 'Geburtstag kleiner Bruder', en: 'Little brother\'s birthday' },
+  description: {
+    de: 'Etwas Liebes vorbereiten. Euer Tag zusammen — einfach schön.',
+    en: 'Get something lovely ready. Your shared day — simply special.',
+  },
+  templateId: 'event',
+  suggestedDurationDays: 5,
+  heroImage: 'art/birthday/birthday-prep-little-brother.webp',
+  beats: [
+    { id: 'b1', icon: '💡', title: 'Was mag er?',           description: 'Überlege: welches Spielzeug? Welche Farbe? Welche Geschichte liebt er?', xp: 10 },
+    { id: 'b2', icon: '🎨', title: 'Karte malen',           description: 'Eine Karte für den kleinen Bruder basteln. Herz drauf, Name drauf.', xp: 15 },
+    { id: 'b3', icon: '🎁', title: 'Geschenk aussuchen',    description: 'Ein kleines Geschenk aus deinen Sachen. Oder mit Mama/Papa basteln.', xp: 15 },
+    { id: 'b4', icon: '🎶', title: 'Lied üben',              description: '"Happy Birthday" üben. Laut singen macht ihn stolz.', xp: 10 },
+    { id: 'b5', icon: '🎂', title: 'Feiern & schenken',      description: 'Kuchen, Lied, Geschenk übergeben. Umarmen nicht vergessen.', xp: 40 },
   ],
 };
 
@@ -146,9 +204,11 @@ export const P_ZIMMER: QuestLinePreset = {
 
 export const QUEST_LINE_PRESETS: QuestLinePreset[] = [
   P_SCHWIMMEN,
-  P_FAHRRAD,
+  P_SCHUHE,           // replaced P_FAHRRAD — Apr 2026 (too easy by 7yo)
   P_REFERAT,
   P_OMA,
+  P_GESCHWISTER,      // sibling birthday with bespoke art
+  P_GEDICHT,          // 7-day poem learning (re-surfaces legacy PoemQuest)
   P_ZIMMER,
 ];
 
