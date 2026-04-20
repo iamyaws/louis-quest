@@ -48,6 +48,20 @@ const COMPANION_ART = {
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 
+// Per-mood color palette — matches Journal's MOOD_COLORS so "Gut" feels
+// warm-amber, "Magisch" rosa, "Traurig" cool-blue etc. Used for the
+// logged mood chip on Hub so it reads as a MOOD BATH (claimed) instead
+// of a faded placeholder at 8% opacity (Marc call-out). Tint = bg wash,
+// ink = text / border accent. Indexed by MOOD_EMOJIS order.
+const MOOD_COLORS = [
+  { tint: '#dbeafe', ink: '#1e40af' }, // 0 Traurig — cool blue
+  { tint: '#ede9fe', ink: '#6d28d9' }, // 1 Besorgt — quiet violet
+  { tint: '#e5e7eb', ink: '#475569' }, // 2 Okay — neutral slate
+  { tint: '#fef3c7', ink: '#b45309' }, // 3 Gut — warm amber
+  { tint: '#fce7f3', ink: '#be185d' }, // 4 Magisch — rosa
+  { tint: '#cffafe', ink: '#0e7490' }, // 5 Müde — cyan
+];
+
 const BOSS_ART = {
   schnarchling: { full: 'art/boss-schnarchling_the-snorer-fullpower.webp', defeated: 'art/boss-schnarchling_the-snorer-defeated.webp' },
   wusselwicht:  { full: 'art/boss-wusselwicht-the-chaos-imp-fullpower.webp', defeated: 'art/boss-wusselwicht-the-chaos-imp-defeated.webp' },
@@ -264,6 +278,21 @@ export default function Hub({ onNavigate, onPlayMint }) {
           state={expeditionState}
           statusText={expeditionStatusText}
           statusSub={expeditionStatusSub}
+          greetingText={(() => {
+            const hr = new Date().getHours();
+            const k = hr < 11 ? 'hub.greeting.morning' : hr < 17 ? 'hub.greeting.afternoon' : 'hub.greeting.evening';
+            const base = `${t(k)}, ${heroName}!`;
+            // Append a warm weather line in the morning so the weather
+            // info lives IN Ronki's bubble (Marc's reorder — we removed
+            // the separate weather chip). Tapping the bubble opens the
+            // ClothingSheet for a "what to wear today" view.
+            if (weather?.current && hr < 11) {
+              const wi = getWeatherInfo(weather.current.weatherCode);
+              return `${base} ${wi.emoji} Heute ${weather.current.temp}° — tippe für Kleidungs-Tipps.`;
+            }
+            return base;
+          })()}
+          onBubbleTap={weather?.current ? () => setShowClothing(true) : undefined}
           onDiaryTap={() => setOpenBeat('expedition-diary')}
           height={340}
         />
@@ -353,43 +382,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
       <main className="relative px-6 max-w-lg mx-auto flex flex-col gap-4"
             style={{ zIndex: 10, paddingTop: 184 }}>
 
-        {/* Greeting chip (+ weather) · Voice bubble · Companion nameplate */}
+        {/* Weather chip removed — it now lives entirely inside Ronki's
+             morning speech bubble on the scene (tap-to-open ClothingSheet
+             via onBubbleTap). Voice bubble + nameplate stay. */}
         <section className="flex flex-col items-center gap-2">
-          {(() => {
-            const hour = new Date().getHours();
-            const greetKey = hour < 11 ? 'hub.greeting.morning'
-              : hour < 17 ? 'hub.greeting.afternoon'
-              : 'hub.greeting.evening';
-            const hasWeather = !!weather?.current;
-            const wi = hasWeather ? getWeatherInfo(weather.current.weatherCode) : null;
-            return (
-              <button
-                onClick={() => hasWeather && setShowClothing(true)}
-                disabled={!hasWeather}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full active:scale-95 transition-all"
-                style={{
-                  background: 'rgba(255,248,242,0.92)',
-                  border: '1px solid rgba(18,67,70,0.14)',
-                  boxShadow: '0 4px 12px -2px rgba(18,67,70,0.2), inset 0 1px 0 rgba(255,255,255,0.9)',
-                  cursor: hasWeather ? 'pointer' : 'default',
-                }}
-                aria-label={hasWeather ? t('task.weather.outfitHint') : undefined}
-              >
-                <span className="font-body text-sm italic text-primary-container">
-                  {t(greetKey)}, {heroName}
-                </span>
-                {hasWeather && (
-                  <>
-                    <span className="text-on-surface-variant">·</span>
-                    <span aria-hidden="true" className="text-base leading-none">{wi.emoji}</span>
-                    <span className="font-headline font-bold text-sm text-primary-container">
-                      {weather.current.temp}°
-                    </span>
-                  </>
-                )}
-              </button>
-            );
-          })()}
           {voice.line && (
             <div className="w-full max-w-md px-2 mt-1">
               <VoiceBubble line={voice.line} onDismiss={voice.dismiss} variant="chip" />
@@ -460,55 +456,8 @@ export default function Hub({ onNavigate, onPlayMint }) {
           </div>
         )}
 
-        {/* ── Mood chip — collapsed by default, taps to expand picker inline.
-               Presence without demand: if the kid skips, mood just doesn't get
-               logged today. Sad/worried/tired → Gefühlsecke follow-up. ── */}
-        {state.moodAM === null ? (
-          <details className="group rounded-2xl overflow-hidden"
-                   style={{ background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(252,211,77,0.26)', boxShadow: '0 2px 10px rgba(217,119,6,0.05)' }}>
-            <summary className="flex items-center justify-between px-4 py-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden active:scale-[0.99] transition-all">
-              <div className="flex items-center gap-2.5">
-                <span className="text-lg" aria-hidden="true">🌤️</span>
-                <span className="font-body font-semibold text-sm text-on-surface">
-                  {t('hub.mood.title')}
-                </span>
-              </div>
-              <span className="material-symbols-outlined text-on-surface-variant text-base group-open:rotate-180 transition-transform">
-                expand_more
-              </span>
-            </summary>
-            <div className="px-4 pb-4 pt-1">
-              <div className="flex flex-wrap justify-center gap-2.5">
-                {[3, 4, 2, 0, 1, 5].map((idx) => (
-                  <button key={idx} onClick={() => {
-                      SFX.play("pop");
-                      actions.setMood("moodAM", idx);
-                      if (idx === 0 || idx === 1 || idx === 5) {
-                        setTimeout(() => setShowGefuehlsecke(true), 400);
-                      }
-                    }}
-                    className="w-[56px] h-[56px] text-2xl rounded-2xl transition-all active:scale-90 flex items-center justify-center"
-                    style={{ background: 'rgba(252,211,77,0.08)', border: '2px solid rgba(252,211,77,0.22)' }}>
-                    {MOOD_EMOJIS[idx]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </details>
-        ) : (
-          <div className="w-full px-4 py-3 rounded-2xl flex items-center gap-3"
-               style={{ background: 'rgba(252,211,77,0.08)', border: '1px solid rgba(252,211,77,0.22)' }}>
-            <span className="text-2xl" aria-hidden="true">{MOOD_EMOJIS[state.moodAM]}</span>
-            <div className="flex-1 min-w-0">
-              <p className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">
-                {t('hub.mood.label')}
-              </p>
-              <p className="font-headline font-bold text-sm text-primary truncate">
-                {MOOD_LABELS_I18N[state.moodAM]}
-              </p>
-            </div>
-          </div>
-        )}
+        {/* Mood chip moved DOWN next to Wasser (pair as body-care bookend,
+             per Marc) — see new mount point below the Als-Nächstes card. */}
 
         {/* ── HEUTE card (Aufgabentracker from A) + anchor rail ── */}
         <button onClick={() => onNavigate?.('quests')}
@@ -604,10 +553,103 @@ export default function Hub({ onNavigate, onPlayMint }) {
           </button>
         )}
 
-        {/* ── Wasser pill — baseline care, sits adjacent to Als Nächstes.
-               Wasser is a daily-required tracker (not optional), so it lives
-               in the primary cluster instead of after the "optional things
-               to do". Mood chip (top) + Wasser bookend the day's care. ── */}
+        {/* ── Mood chip — body-care pair with Wasser (Marc reordering).
+               Collapsed by default, taps to expand picker inline.
+               Sad/worried/tired → Gefühlsecke follow-up. ── */}
+        {state.moodAM === null ? (
+          <details className="group rounded-2xl overflow-hidden"
+                   style={{ background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(252,211,77,0.26)', boxShadow: '0 2px 10px rgba(217,119,6,0.05)' }}>
+            <summary className="flex items-center justify-between px-4 py-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden active:scale-[0.99] transition-all">
+              <div className="flex items-center gap-2.5">
+                <span className="text-lg" aria-hidden="true">🌤️</span>
+                <span className="font-body font-semibold text-sm text-on-surface">
+                  {t('hub.mood.title')}
+                </span>
+              </div>
+              <span className="material-symbols-outlined text-on-surface-variant text-base group-open:rotate-180 transition-transform">
+                expand_more
+              </span>
+            </summary>
+            <div className="px-4 pb-4 pt-1">
+              <div className="flex flex-wrap justify-center gap-2.5">
+                {[3, 4, 2, 0, 1, 5].map((idx) => (
+                  <button key={idx} onClick={() => {
+                      SFX.play("pop");
+                      actions.setMood("moodAM", idx);
+                      if (idx === 0 || idx === 1 || idx === 5) {
+                        setTimeout(() => setShowGefuehlsecke(true), 400);
+                      }
+                    }}
+                    className="w-[56px] h-[56px] text-2xl rounded-2xl transition-all active:scale-90 flex items-center justify-center"
+                    style={{ background: 'rgba(252,211,77,0.08)', border: '2px solid rgba(252,211,77,0.22)' }}>
+                    {MOOD_EMOJIS[idx]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </details>
+        ) : (() => {
+          // Per-mood color bath — "Gut" = amber, "Magisch" = rosa,
+          // "Traurig" = blue etc. Replaces the old 8%-opacity ghost chip
+          // so the logged mood feels CLAIMED, not placeholder (Marc
+          // call-out). Tint drives bg + halo; ink drives text + border.
+          const mc = MOOD_COLORS[state.moodAM] || MOOD_COLORS[3];
+          return (
+            <button
+              onClick={() => actions.setMood('moodAM', null)}
+              className="w-full px-4 py-3.5 rounded-2xl flex items-center gap-3.5 active:scale-[0.99] transition-all text-left"
+              style={{
+                background: `linear-gradient(160deg, ${mc.tint} 0%, ${mc.tint}dd 100%)`,
+                border: `1.5px solid ${mc.ink}33`,
+                boxShadow: `0 6px 18px -8px ${mc.ink}55, inset 0 1px 0 rgba(255,255,255,0.5)`,
+              }}
+              aria-label={`Stimmung: ${MOOD_LABELS_I18N[state.moodAM]}. Tippe zum Ändern.`}
+            >
+              {/* Emoji in a small white halo — echoes Journal's mood-tile
+                   face pattern so the chip looks like a claimed badge */}
+              <span
+                className="flex items-center justify-center shrink-0 rounded-full"
+                style={{
+                  width: 44,
+                  height: 44,
+                  background: '#ffffff',
+                  boxShadow: `0 0 0 3px ${mc.tint}, 0 2px 6px -2px ${mc.ink}40`,
+                  fontSize: 24,
+                  lineHeight: 1,
+                }}
+                aria-hidden="true"
+              >
+                {MOOD_EMOJIS[state.moodAM]}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="font-label font-extrabold uppercase"
+                  style={{ fontSize: 10, letterSpacing: '0.22em', color: mc.ink, opacity: 0.85 }}
+                >
+                  {t('hub.mood.label')}
+                </p>
+                <p
+                  className="font-headline font-bold truncate"
+                  style={{ fontSize: 18, color: mc.ink, letterSpacing: '-0.01em', fontWeight: 600 }}
+                >
+                  {MOOD_LABELS_I18N[state.moodAM]}
+                </p>
+              </div>
+              {/* Subtle change hint — parent-safe tiny edit icon */}
+              <span
+                className="material-symbols-outlined shrink-0"
+                style={{ fontSize: 18, color: `${mc.ink}70` }}
+                aria-hidden="true"
+              >
+                edit
+              </span>
+            </button>
+          );
+        })()}
+
+        {/* ── Wasser pill — baseline care, now paired with Mood above.
+               Daily-required tracker. Together Stimmung + Wasser form the
+               "body care" bookend on the Hub (Marc's reorder Apr 2026). ── */}
         <div className="w-full px-4 py-3 rounded-2xl flex items-center gap-2.5"
              style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.06)' }}>
           <span className="material-symbols-outlined shrink-0"

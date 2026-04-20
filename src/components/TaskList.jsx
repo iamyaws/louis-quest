@@ -145,15 +145,18 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
              reference: Ronki Aufgaben Polish.html ("ein Fortschritt, nicht
              fünf"). ── */}
       <section className="mb-5">
+        {/* Heute eyebrow: primary teal — matches the blue-sky biome on
+             this view (was gold #b45309 which clashed). Louis stays
+             gold-deep as a personal accent against the teal headline. */}
         <p className="font-label font-bold text-[11px] uppercase tracking-[0.22em] mb-2"
-           style={{ color: '#b45309' }}>
+           style={{ color: '#124346' }}>
           {lang === 'de' ? 'Heute' : 'Today'} · {weekday}
         </p>
-        <h1 className="font-headline text-2xl text-on-surface leading-[1.1]"
-            style={{ letterSpacing: '-0.015em', fontWeight: 500, textWrap: 'balance' }}>
+        <h1 className="font-headline text-2xl leading-[1.1]"
+            style={{ letterSpacing: '-0.015em', fontWeight: 500, textWrap: 'balance', color: '#124346' }}>
           {allDone
-            ? <>{lang === 'de' ? 'Alles geschafft, ' : 'All done, '}<em className="not-italic text-secondary">{heroName}</em>.</>
-            : <>{lang === 'de' ? 'Deine Aufgaben, ' : 'Your tasks, '}<em className="not-italic text-secondary">{heroName}</em>.</>}
+            ? <>{lang === 'de' ? 'Alles geschafft, ' : 'All done, '}<em className="not-italic" style={{ color: '#b45309' }}>{heroName}</em>.</>
+            : <>{lang === 'de' ? 'Deine Aufgaben, ' : 'Your tasks, '}<em className="not-italic" style={{ color: '#b45309' }}>{heroName}</em>.</>}
         </h1>
         <div className="flex items-center gap-3 mt-3">
           <div className="flex-1 h-2 rounded-full overflow-hidden"
@@ -173,12 +176,10 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
         </div>
       </section>
 
-      {/* ── Daily habits — parent-configured checkpoints (Vitamin D, Zeit
-             mit Liam, etc). Configured in Eltern-Bereich → Familie →
-             Tägliche Gewohnheiten. Component auto-hides if none configured,
-             so this slot costs nothing when unused. Marc found these were
-             configured but never rendered — wired here Apr 2026. ── */}
-      <DailyHabits />
+      {/* Daily habits moved BELOW routines (just above Bonus section).
+           Rationale: Morgen-/Abend-/Nachtroutine is the main ritual; small
+           checkpoints like Vitamin D or Zeit-mit-Liam belong as add-ons,
+           not as prelude. See new mount point further down. */}
 
       {/* ── Parent-created quest-lines (top of list, show up to 3) ── */}
       {(() => {
@@ -534,6 +535,12 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
             </details>
           );
         })}
+
+        {/* Daily habits — small checkpoints (Vitamin D, Zeit mit Liam)
+             sit here, after the main routines and just above Bonus.
+             Renamed user-facing title to "Nicht vergessen" (kid-friendly
+             German). Auto-hides if nothing configured. */}
+        <DailyHabits />
 
         {/* ── Bonus-Quests — vertical stack, design-ref .side-card.
                Parchment/amber container, full-width cards with icon tile,

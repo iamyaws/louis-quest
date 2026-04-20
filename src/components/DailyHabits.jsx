@@ -54,7 +54,7 @@ export default function DailyHabits() {
         <span className="shrink-0" style={{ width: 4, height: 18, borderRadius: 2, background: '#b45309' }} aria-hidden="true" />
         <h3 className="font-headline flex-1"
             style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 500, fontSize: 16, color: '#124346', letterSpacing: '-0.01em' }}>
-          {lang === 'de' ? 'Tägliche Gewohnheiten' : 'Daily habits'}
+          {lang === 'de' ? 'Nicht vergessen' : "Don't forget"}
         </h3>
         <span className="font-label font-extrabold uppercase"
               style={{

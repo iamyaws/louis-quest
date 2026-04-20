@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * CampfireScene — zero-asset painterly Hub scene.
@@ -100,6 +100,8 @@ export default function CampfireScene({
   state = 'idle',
   statusText,
   statusSub,
+  greetingText,
+  onBubbleTap,
   onDiaryTap,
   height = 320,
 }) {
@@ -113,6 +115,20 @@ export default function CampfireScene({
   const showPawTrail = state === 'away';
   const showDiary = state === 'returning';
   const showStatus = state !== 'idle' && !!statusText;
+
+  // Greeting speech bubble — appears once on mount when Louis opens the
+  // Hub, stays for 4s, then fades. Replaces the old persistent greeting
+  // chip that overlapped Ronki on the scene (Marc: "overcrowding").
+  // Matches the `.camp-speech home` bubble pattern from the Feature
+  // Previews file Louis reacted warmly to.
+  const [bubbleStage, setBubbleStage] = useState('hidden'); // hidden | visible | fading
+  useEffect(() => {
+    if (!greetingText || !ronkiVisible) return;
+    setBubbleStage('visible');
+    const fadeTimer = setTimeout(() => setBubbleStage('fading'), 4200);
+    const hideTimer = setTimeout(() => setBubbleStage('hidden'), 4800);
+    return () => { clearTimeout(fadeTimer); clearTimeout(hideTimer); };
+  }, [greetingText, ronkiVisible]);
 
   return (
     <div
@@ -215,6 +231,63 @@ export default function CampfireScene({
 
       {/* Side-view Ronki — sits by the fire when idle */}
       {ronkiVisible && <SideRonki />}
+
+      {/* Greeting speech bubble — shows above Ronki on mount, fades
+           after 4.2s. Tail points down-left toward Ronki. When
+           onBubbleTap is provided, renders as a button (weather + tap
+           opens ClothingSheet). Otherwise plain status div. */}
+      {ronkiVisible && greetingText && bubbleStage !== 'hidden' && (() => {
+        const Tag = onBubbleTap ? 'button' : 'div';
+        return (
+          <Tag
+            onClick={onBubbleTap}
+            aria-label={onBubbleTap ? greetingText : undefined}
+            style={{
+              position: 'absolute',
+              left: '16%',
+              bottom: '52%',
+              maxWidth: '62%',
+              padding: '9px 14px',
+              borderRadius: 14,
+              background: isNight ? 'rgba(255,255,255,0.96)' : '#ffffff',
+              border: '1px solid rgba(18,67,70,0.12)',
+              boxShadow: '0 8px 20px -6px rgba(18,67,70,0.25)',
+              fontFamily: 'Nunito, sans-serif',
+              fontSize: 13,
+              fontWeight: 500,
+              lineHeight: 1.3,
+              color: '#124346',
+              zIndex: 10,
+              cursor: onBubbleTap ? 'pointer' : 'default',
+              textAlign: 'left',
+              opacity: bubbleStage === 'fading' ? 0 : 1,
+              transform: bubbleStage === 'fading'
+                ? 'translateY(-4px) scale(0.95)'
+                : 'translateY(0) scale(1)',
+              animation: bubbleStage === 'visible' ? 'cfBubbleIn 0.3s cubic-bezier(.34,1.56,.64,1)' : undefined,
+              transition: 'opacity 0.5s ease, transform 0.5s ease',
+            }}
+            role={onBubbleTap ? 'button' : 'status'}
+          >
+            {greetingText}
+            {/* Tail pointing down toward Ronki */}
+            <span
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                bottom: -5,
+                left: 28,
+                width: 10,
+                height: 10,
+                background: isNight ? 'rgba(255,255,255,0.96)' : '#ffffff',
+                borderRight: '1px solid rgba(18,67,70,0.12)',
+                borderBottom: '1px solid rgba(18,67,70,0.12)',
+                transform: 'rotate(45deg)',
+              }}
+            />
+          </Tag>
+        );
+      })()}
 
       {/* Away placeholder — pillow where Ronki sat */}
       {!ronkiVisible && (
@@ -346,6 +419,10 @@ export default function CampfireScene({
         @keyframes cfDiaryPulse {
           0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(252,211,77,0.6)); }
           50% { transform: scale(1.08); filter: drop-shadow(0 0 20px rgba(252,211,77,0.9)); }
+        }
+        @keyframes cfBubbleIn {
+          from { opacity: 0; transform: translateY(-4px) scale(0.9); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
     </div>

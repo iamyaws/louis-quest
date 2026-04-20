@@ -241,36 +241,84 @@ export function LoginScreen() {
   }
 
   // ── Login / Signup form ──
+  // Design pass (Apr 2026): reworked to match the Polish v2 vocabulary
+  // used across the app — warm campfire-biome backdrop, Fredoka headline
+  // + Plus Jakarta kicker, cream-gradient card chrome with gold border,
+  // rounded-14 inputs (not pill), teal primary CTAs matching Laden /
+  // Heute. Ronki egg stays prominent as brand hero.
   return (
-    <div className="flex items-center justify-center min-h-dvh bg-background px-6 relative overflow-hidden">
-      {/* Cream brush texture */}
-      <img src={`${import.meta.env.BASE_URL}art/bg-cream-brush.png`} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" />
-      {/* Subtle gradient overlays */}
-      <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-full h-1/3 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
-
+    <div
+      className="flex items-start justify-center min-h-dvh px-5 relative overflow-hidden"
+      style={{
+        paddingTop: 'calc(32px + env(safe-area-inset-top, 0px))',
+        paddingBottom: 'calc(40px + env(safe-area-inset-bottom, 0px))',
+        // Warm campfire-biome base: amber ember at the top fading to cream
+        // at the fold where the card sits. Matches the hero amber mood
+        // used on Lager + Laden but softer so form text stays readable.
+        background: `
+          radial-gradient(ellipse 600px 400px at 50% 0%, rgba(252,211,77,0.35) 0%, transparent 55%),
+          radial-gradient(ellipse 500px 600px at 90% 100%, rgba(180,83,9,0.12) 0%, transparent 60%),
+          linear-gradient(180deg, #fff3de 0%, #fff8f2 45%, #fff8f2 100%)
+        `,
+      }}
+    >
       <div className="w-full max-w-md relative z-10">
-        {/* Ronki logo — word mark with boy + dragon egg */}
-        <div className="flex flex-col items-center mb-10">
-          <div className="relative mb-4">
-            <div className="absolute inset-0 rounded-full opacity-25" style={{ background: '#fcd34d', filter: 'blur(48px)' }} />
+        {/* ── Hero: Ronki egg logo + kicker + tagline ── */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="relative mb-5">
+            {/* Soft gold halo behind the egg — matches the Pearl / Star
+                currency icon glow used throughout the app */}
+            <div
+              className="absolute inset-0 rounded-full opacity-40 pointer-events-none"
+              style={{ background: '#fcd34d', filter: 'blur(56px)', transform: 'scale(1.15)' }}
+              aria-hidden="true"
+            />
             <img
               src={`${import.meta.env.BASE_URL}art/logo/ronki-logo-hero.webp`}
               alt="Ronki"
-              className="relative z-10 w-64 sm:w-72 h-auto drop-shadow-xl rounded-2xl"
+              className="relative z-10 w-56 sm:w-64 h-auto drop-shadow-xl rounded-2xl"
             />
           </div>
-          <p className="font-body text-on-surface-variant mt-2 text-base opacity-80 text-center">
+          <p
+            className="font-label font-extrabold uppercase mb-2"
+            style={{
+              fontFamily: 'Plus Jakarta Sans, sans-serif',
+              fontSize: 10,
+              letterSpacing: '0.28em',
+              color: '#b45309',
+            }}
+          >
+            Deine Reise beginnt
+          </p>
+          <p
+            className="font-body text-center"
+            style={{
+              fontFamily: 'Nunito, sans-serif',
+              fontSize: 14,
+              lineHeight: 1.4,
+              color: 'rgba(18,67,70,0.75)',
+            }}
+          >
             {mode === 'login' ? t('auth.heroJourney') : t('auth.createAccount')}
           </p>
         </div>
 
         {view === 'magic' ? (
           // ── Magic-link simplified form ──
-          <div className="bg-white rounded-xl p-8 mb-4" style={{ boxShadow: '0 8px 32px rgba(18,67,70,0.04)' }}>
-            <form onSubmit={handleMagicLink} className="space-y-6">
+          <div
+            className="rounded-3xl p-6 mb-4"
+            style={{
+              background: 'linear-gradient(160deg, #fffdf5 0%, #fef3c7 100%)',
+              border: '1px solid rgba(180,83,9,0.2)',
+              boxShadow: '0 8px 32px rgba(180,83,9,0.12), inset 0 1px 0 rgba(255,255,255,0.7)',
+            }}
+          >
+            <form onSubmit={handleMagicLink} className="space-y-5">
               <div className="space-y-2">
-                <label className="font-label text-xs font-semibold text-primary/70 px-1 block">
+                <label
+                  className="font-label font-extrabold uppercase block"
+                  style={{ fontSize: 10, letterSpacing: '0.22em', color: '#b45309' }}
+                >
                   {t('auth.parentEmail')}
                 </label>
                 <div className="relative group">
@@ -279,49 +327,95 @@ export function LoginScreen() {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
-                    className="w-full h-14 px-5 rounded-full bg-surface-container-low border border-outline-variant/30 font-body text-on-surface placeholder:text-outline-variant/60 focus:border-primary/30 focus:ring-4 focus:ring-primary/5 outline-none transition-all"
+                    autoFocus
+                    className="w-full px-4 font-body outline-none transition-all"
+                    style={{
+                      height: 52,
+                      borderRadius: 14,
+                      background: '#ffffff',
+                      border: '1.5px solid rgba(180,83,9,0.2)',
+                      color: '#124346',
+                      fontSize: 15,
+                      paddingRight: 44,
+                    }}
                     placeholder={t('auth.emailPlaceholder')}
                   />
-                  <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-outline-variant/60 group-focus-within:text-primary/60 text-xl transition-colors">mail</span>
+                  <span
+                    className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-xl transition-colors pointer-events-none"
+                    style={{ color: 'rgba(180,83,9,0.55)' }}
+                  >mail</span>
                 </div>
               </div>
 
               {error && (
-                <div className="p-3 rounded-xl bg-error-container flex items-center gap-2">
-                  <span className="material-symbols-outlined text-error text-lg">error</span>
-                  <p className="font-body text-sm text-on-error-container">{error}</p>
+                <div className="p-3 rounded-xl flex items-center gap-2" style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)' }}>
+                  <span className="material-symbols-outlined text-lg" style={{ color: '#b91c1c' }}>error</span>
+                  <p className="font-body text-sm" style={{ color: '#7f1d1d' }}>{error}</p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={magicBusy}
-                className="w-full py-5 bg-primary text-on-primary font-headline font-bold text-base rounded-2xl shadow-xl shadow-primary/10 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                className="w-full font-headline font-bold active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2.5"
+                style={{
+                  padding: '16px 20px',
+                  borderRadius: 14,
+                  background: '#124346',
+                  color: '#fef3c7',
+                  fontSize: 16,
+                  boxShadow: '0 6px 18px -6px rgba(18,67,70,0.4)',
+                }}
               >
                 <span>{magicBusy ? t('auth.loading') : t('auth.sendMagicLink')}</span>
-                {!magicBusy && <span className="material-symbols-outlined text-secondary-container text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>}
+                {!magicBusy && <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>}
               </button>
 
               <button
                 type="button"
                 onClick={() => { setView('options'); setError(null); }}
-                className="w-full py-3 text-primary font-label font-semibold flex items-center justify-center gap-1"
+                className="w-full py-2 font-label font-semibold flex items-center justify-center gap-1"
+                style={{ color: 'rgba(18,67,70,0.7)' }}
               >
-                <span className="material-symbols-outlined text-lg">arrow_back</span>
+                <span className="material-symbols-outlined text-base">arrow_back_ios_new</span>
                 {t('auth.backToOptions')}
               </button>
             </form>
           </div>
         ) : (
           <>
-            {/* ── Primary: Google ── */}
+            {/* ── Primary: Magic Link ──
+                 Reordered to primary (above Google) because Google's OAuth
+                 consent screen currently shows the raw Supabase subdomain
+                 `jdpxfvqaoxmnyvlxikce.supabase.co` — reads as phishing to a
+                 cautious parent. Magic Link skips the OAuth dance entirely
+                 (just an email with a tap-link), so it's the most trust-safe
+                 option until we set up a Supabase custom domain
+                 (`auth.ronki.de`, Supabase Pro $25/mo). See
+                 backlog_supabase_custom_domain.md. */}
+            <button
+              type="button"
+              onClick={() => { setView('magic'); setError(null); }}
+              className="w-full py-5 mb-3 rounded-2xl font-headline font-bold text-base flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl shadow-primary/10"
+              style={{
+                background: '#124346',
+                color: '#fef3c7',
+              }}
+            >
+              <span className="material-symbols-outlined text-xl text-secondary-container" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
+              <span>{t('auth.signInWithEmailLink')}</span>
+            </button>
+
+            {/* ── Secondary: Google ── */}
             {/* TODO(Marc): Enable Google provider in Supabase dashboard before this button does anything.
-                Auth → Providers → Google → enable + paste Client ID/Secret from Google Cloud Console. */}
+                Auth → Providers → Google → enable + paste Client ID/Secret from Google Cloud Console.
+                Then upgrade to Supabase Pro + set auth.ronki.de custom domain so the OAuth consent
+                screen stops showing the raw supabase.co subdomain to parents. */}
             <button
               type="button"
               onClick={handleGoogle}
               disabled={googleBusy}
-              className="w-full py-4 mb-3 rounded-2xl font-headline font-bold text-base flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
+              className="w-full py-4 rounded-2xl font-headline font-bold text-base flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
               style={{
                 background: '#ffffff',
                 color: '#1f2937',
@@ -333,98 +427,150 @@ export function LoginScreen() {
                 ? <span>{t('auth.loading')}</span>
                 : <><GoogleGIcon className="w-5 h-5" /><span>{t('auth.signInWithGoogle')}</span></>}
             </button>
-
-            {/* ── Secondary: Magic Link ── */}
-            <button
-              type="button"
-              onClick={() => { setView('magic'); setError(null); }}
-              className="w-full py-4 mb-5 rounded-2xl font-headline font-bold text-base flex items-center justify-center gap-3 active:scale-95 transition-all"
-              style={{
-                background: '#fef3c7',
-                color: '#124346',
-                border: '1.5px solid rgba(180,83,9,0.3)',
-              }}
+            {/* Trust microcopy — tells parents the supabase.co redirect is
+                expected BEFORE they see it. Reduces "this feels fishy" bounce
+                until the custom-domain migration lands. */}
+            <p
+              className="text-center mt-2 mb-5 font-body"
+              style={{ fontSize: 11, color: 'rgba(18,67,70,0.55)', lineHeight: 1.4 }}
             >
-              <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
-              <span>{t('auth.signInWithEmailLink')}</span>
-            </button>
+              {t('auth.googleHint')}
+            </p>
 
-            {/* ── Divider ── */}
+            {/* ── Divider ── Polish-v2 pill divider: thin hairlines with
+                cream pill label centered. Matches the "oder" breaks used
+                elsewhere in the app (Laden CTA area). */}
             <div className="flex items-center gap-3 mb-5" aria-hidden="true">
-              <div className="flex-1 h-px" style={{ background: 'rgba(18,67,70,0.12)' }} />
+              <div className="flex-1 h-px" style={{ background: 'rgba(180,83,9,0.18)' }} />
               <span
-                className="font-label text-xs uppercase tracking-wider px-2 rounded-full"
-                style={{ color: 'rgba(18,67,70,0.6)', background: '#fff8f2' }}
+                className="font-label font-extrabold uppercase px-2.5 py-0.5 rounded-full"
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.22em',
+                  color: '#b45309',
+                  background: 'rgba(254,243,199,0.7)',
+                  border: '1px solid rgba(180,83,9,0.15)',
+                }}
               >
                 {t('auth.or')}
               </span>
-              <div className="flex-1 h-px" style={{ background: 'rgba(18,67,70,0.12)' }} />
+              <div className="flex-1 h-px" style={{ background: 'rgba(180,83,9,0.18)' }} />
             </div>
 
-            {/* ── Fallback: email + password ── */}
-            <div className="bg-white rounded-xl p-8 mb-4" style={{ boxShadow: '0 8px 32px rgba(18,67,70,0.04)' }}>
-              <form onSubmit={handleSubmit} className="space-y-6">
+            {/* ── Fallback: email + password ── cream-gradient card with
+                gold hairline border, matching DailyHabits / Pflege cards */}
+            <div
+              className="rounded-3xl p-6 mb-4"
+              style={{
+                background: 'linear-gradient(160deg, #fffdf5 0%, #fef3c7 100%)',
+                border: '1px solid rgba(180,83,9,0.2)',
+                boxShadow: '0 8px 32px rgba(180,83,9,0.12), inset 0 1px 0 rgba(255,255,255,0.7)',
+              }}
+            >
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="font-label text-xs font-semibold text-primary/70 px-1 block">
+                  <label
+                    className="font-label font-extrabold uppercase block"
+                    style={{ fontSize: 10, letterSpacing: '0.22em', color: '#b45309' }}
+                  >
                     {t('auth.parentEmail')}
                   </label>
-                  <div className="relative group">
+                  <div className="relative">
                     <input
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
-                      className="w-full h-14 px-5 rounded-full bg-surface-container-low border border-outline-variant/30 font-body text-on-surface placeholder:text-outline-variant/60 focus:border-primary/30 focus:ring-4 focus:ring-primary/5 outline-none transition-all"
+                      className="w-full px-4 font-body outline-none transition-all"
+                      style={{
+                        height: 52,
+                        borderRadius: 14,
+                        background: '#ffffff',
+                        border: '1.5px solid rgba(180,83,9,0.2)',
+                        color: '#124346',
+                        fontSize: 15,
+                        paddingRight: 44,
+                      }}
                       placeholder={t('auth.emailPlaceholder')}
                     />
-                    <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-outline-variant/60 group-focus-within:text-primary/60 text-xl transition-colors">mail</span>
+                    <span
+                      className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-xl pointer-events-none"
+                      style={{ color: 'rgba(180,83,9,0.55)' }}
+                    >mail</span>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="font-label text-xs font-semibold text-primary/70 px-1 block">
+                  <label
+                    className="font-label font-extrabold uppercase block"
+                    style={{ fontSize: 10, letterSpacing: '0.22em', color: '#b45309' }}
+                  >
                     {t('auth.password')}
                   </label>
-                  <div className="relative group">
+                  <div className="relative">
                     <input
                       type="password"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       required
                       minLength={6}
-                      className="w-full h-14 px-5 rounded-full bg-surface-container-low border border-outline-variant/30 font-body text-on-surface placeholder:text-outline-variant/60 focus:border-primary/30 focus:ring-4 focus:ring-primary/5 outline-none transition-all"
+                      className="w-full px-4 font-body outline-none transition-all"
+                      style={{
+                        height: 52,
+                        borderRadius: 14,
+                        background: '#ffffff',
+                        border: '1.5px solid rgba(180,83,9,0.2)',
+                        color: '#124346',
+                        fontSize: 15,
+                        paddingRight: 44,
+                      }}
                       placeholder={t('auth.passwordPlaceholder')}
                     />
-                    <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-outline-variant/60 group-focus-within:text-primary/60 text-xl transition-colors">lock</span>
+                    <span
+                      className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-xl pointer-events-none"
+                      style={{ color: 'rgba(180,83,9,0.55)' }}
+                    >lock</span>
                   </div>
                 </div>
 
                 {error && (
-                  <div className="p-3 rounded-xl bg-error-container flex items-center gap-2">
-                    <span className="material-symbols-outlined text-error text-lg">error</span>
-                    <p className="font-body text-sm text-on-error-container">{error}</p>
+                  <div className="p-3 rounded-xl flex items-center gap-2" style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)' }}>
+                    <span className="material-symbols-outlined text-lg" style={{ color: '#b91c1c' }}>error</span>
+                    <p className="font-body text-sm" style={{ color: '#7f1d1d' }}>{error}</p>
                   </div>
                 )}
 
                 <button
                   type="submit"
                   disabled={busy}
-                  className="w-full py-5 bg-primary text-on-primary font-headline font-bold text-base rounded-2xl shadow-xl shadow-primary/10 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="w-full font-headline font-bold active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2.5"
+                  style={{
+                    padding: '16px 20px',
+                    borderRadius: 14,
+                    background: '#124346',
+                    color: '#fef3c7',
+                    fontSize: 16,
+                    boxShadow: '0 6px 18px -6px rgba(18,67,70,0.4)',
+                    marginTop: 8,
+                  }}
                 >
                   <span>{busy ? t('auth.loading') : mode === 'login' ? t('auth.login') : t('auth.startFree')}</span>
-                  {!busy && <span className="material-symbols-outlined text-secondary-container text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {!busy && <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
                     {mode === 'login' ? 'login' : 'bolt'}
                   </span>}
                 </button>
               </form>
             </div>
 
-            {/* Toggle as secondary button */}
+            {/* Toggle login / signup — underline link, quiet */}
             <button
               onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); }}
-              className="w-full py-4 text-primary font-headline font-semibold rounded-2xl hover:bg-surface-container-low transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 font-label font-bold transition-all flex items-center justify-center gap-1.5"
+              style={{ color: '#124346' }}
             >
-              <span>{mode === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}</span>
-              <span className="material-symbols-outlined text-primary/40 text-lg">{mode === 'login' ? 'person_add' : 'login'}</span>
+              <span style={{ textDecoration: 'underline', textUnderlineOffset: '3px', textDecorationColor: 'rgba(18,67,70,0.3)' }}>
+                {mode === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}
+              </span>
+              <span className="material-symbols-outlined text-base" style={{ color: 'rgba(18,67,70,0.5)' }}>{mode === 'login' ? 'person_add' : 'login'}</span>
             </button>
           </>
         )}

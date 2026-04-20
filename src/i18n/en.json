@@ -841,6 +841,7 @@
   "auth.noAccount": "I don't have an account yet",
   "auth.hasAccount": "I already have an account",
   "auth.signInWithGoogle": "Sign in with Google",
+  "auth.googleHint": "Google briefly redirects through our auth partner. That's normal.",
   "auth.signInWithEmailLink": "Sign in with email link",
   "auth.sendMagicLink": "Send link",
   "auth.magicLinkSent.title": "Email on the way",
