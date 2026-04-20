@@ -23,6 +23,10 @@ export interface QuestLineBeat {
   icon: string;
   /** XP reward for completing the beat. Higher for harder beats. */
   xp: number;
+  /** Optional bespoke art for this beat (relative to BASE_URL).
+   *  Used by QuestLineView to render a banner for "today's" beat.
+   *  E.g. P_GEDICHT beats map to `art/quests/poem-day-1.webp` etc. */
+  artFile?: string;
 }
 
 export interface QuestLinePreset {
@@ -95,6 +99,8 @@ export const P_SCHUHE: QuestLinePreset = {
 // Re-surfaces the old 7-day poem quest as a parent-installable preset.
 // Template 'learn' (homework-adjacent) since it's literal 1st-grade
 // curriculum: one short practice per day, ramping to the big recital.
+// Bespoke painterly art per beat — `art/quests/poem-day-N.webp` already
+// shipped in the repo (Marc: "we had a really cool poem arc with art").
 export const P_GEDICHT: QuestLinePreset = {
   id: 'p_gedicht',
   emoji: '🎤',
@@ -105,14 +111,15 @@ export const P_GEDICHT: QuestLinePreset = {
   },
   templateId: 'learn',
   suggestedDurationDays: 7,
+  heroImage: 'art/arc/poem/dragon-holding-poem.webp',
   beats: [
-    { id: 'b1', icon: '📖', title: 'Gedicht lesen',          description: 'Mit Mama oder Papa einmal durchlesen. Was meint es?', xp: 10 },
-    { id: 'b2', icon: '🗣️', title: 'Erste Strophe üben',     description: 'Die erste Strophe dreimal laut sprechen.', xp: 15 },
-    { id: 'b3', icon: '🌟', title: 'Zweite Strophe üben',    description: 'Jetzt die zweite Strophe. Auch dreimal laut.', xp: 15 },
-    { id: 'b4', icon: '💪', title: 'Alles zusammen',          description: 'Das ganze Gedicht in einem Rutsch. Kleine Fehler sind okay.', xp: 20 },
-    { id: 'b5', icon: '🐉', title: 'Ronki vortragen',         description: 'Ronki ist dein bestes Publikum. Er hört genau zu.', xp: 15 },
-    { id: 'b6', icon: '🎭', title: 'Generalprobe',            description: 'Ein letztes Mal durchgehen. Morgen ist der große Tag.', xp: 20 },
-    { id: 'b7', icon: '🎤', title: 'Der große Tag!',          description: 'Vor der Klasse aufsagen. Du schaffst das.', xp: 40 },
+    { id: 'b1', icon: '📖', title: 'Gedicht lesen',          description: 'Mit Mama oder Papa einmal durchlesen. Was meint es?',         xp: 10, artFile: 'art/quests/poem-day-1.webp' },
+    { id: 'b2', icon: '🗣️', title: 'Erste Strophe üben',     description: 'Die erste Strophe dreimal laut sprechen.',                    xp: 15, artFile: 'art/quests/poem-day-2.webp' },
+    { id: 'b3', icon: '🌟', title: 'Zweite Strophe üben',    description: 'Jetzt die zweite Strophe. Auch dreimal laut.',                xp: 15, artFile: 'art/quests/poem-day-3.webp' },
+    { id: 'b4', icon: '💪', title: 'Alles zusammen',          description: 'Das ganze Gedicht in einem Rutsch. Kleine Fehler sind okay.', xp: 20, artFile: 'art/quests/poem-day-4.webp' },
+    { id: 'b5', icon: '🐉', title: 'Ronki vortragen',         description: 'Ronki ist dein bestes Publikum. Er hört genau zu.',           xp: 15, artFile: 'art/quests/poem-day-5.webp' },
+    { id: 'b6', icon: '🎭', title: 'Generalprobe',            description: 'Ein letztes Mal durchgehen. Morgen ist der große Tag.',       xp: 20, artFile: 'art/quests/poem-day-6.webp' },
+    { id: 'b7', icon: '🎤', title: 'Der große Tag!',          description: 'Vor der Klasse aufsagen. Du schaffst das.',                   xp: 40, artFile: 'art/quests/poem-day-7.webp' },
   ],
 };
 
@@ -237,6 +244,11 @@ export function buildQuestLineFromPreset(
       icon: b.icon,
       title: b.title,
       description: b.description,
+      // Carry per-beat art through to the quest-line. QuestLineView
+      // uses this to render a banner image for today's beat (e.g.
+      // `poem-day-1.webp` for P_GEDICHT beat 1). Absent for beats
+      // without bespoke art; the renderer falls back to the emoji tile.
+      artFile: b.artFile,
       // Skill-template presets render beats as milestones; other templates
       // treat them as day-numbered beats. `isMilestone` lets the child-side
       // renderer pick the right label ("Meilenstein 2" vs "Tag 2").

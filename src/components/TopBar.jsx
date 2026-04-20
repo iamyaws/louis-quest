@@ -2,6 +2,7 @@ import React from 'react';
 import { useTask } from '../context/TaskContext';
 import { Pearl } from './CurrencyIcons';
 import { useTranslation } from '../i18n/LanguageContext';
+import PinnedRonki from './PinnedRonki';
 
 // Global top bar — inline (not fixed) so it scrolls away with the content
 // as Louis reads the page. Design reference (Ronki Aufgaben/Laden/Buch
@@ -60,6 +61,20 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
             {lang === 'de' ? 'Lager' : 'Camp'}
           </b>
         </button>
+
+        {/* Pinned Ronki — the companion follows Louis across tabs.
+             Registers with QuestEaterContext on mount so that ticking a
+             quest anywhere in the app makes THIS instance burp + show a
+             mood bubble. Tap routes to the Ronki tab for the full
+             Living Scene. Sized to match the Feature Previews spec
+             (46px). Hidden on Ronki tab itself (redundant). */}
+        {view !== 'care' && view !== 'ronki' && (
+          <PinnedRonki
+            size={46}
+            onTap={() => onNavigate?.('ronki')}
+            ariaLabel={lang === 'de' ? 'Zu Ronki' : 'Go to Ronki'}
+          />
+        )}
 
         {/* Right: view-specific slots (parent lock + HP).
              HP pill matches design .hp spec: 7/14/7/9 padding, 22px pearl,

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MiniRonki from './MiniRonki';
+import { useQuestEater } from './QuestEater';
 
 /**
  * PinnedRonki — circular gold-haloed pill housing a <MiniRonki>.
@@ -27,20 +28,44 @@ import MiniRonki from './MiniRonki';
 export default function PinnedRonki({
   size = 46,
   mood = 'happy',
-  bubble,
+  bubble: bubbleOverride,
   burpTrigger = 0,
   onTap,
   ariaLabel = 'Ronki',
 }) {
-  // Burp flame overlay — mounts briefly when burpTrigger changes.
-  const [burpKey, setBurpKey] = useState(0);
-  const lastTrigger = useRef(burpTrigger);
+  // Register with the QuestEater context so the "flying quest icon"
+  // animation knows where to aim. Also subscribe to its burp + bubble
+  // triggers so ticking a quest anywhere in the app makes Ronki react
+  // HERE without prop-drilling.
+  const eater = useQuestEater();
+  const pillRef = useRef(null);
   useEffect(() => {
-    if (burpTrigger !== lastTrigger.current) {
-      lastTrigger.current = burpTrigger;
+    if (!eater || !pillRef.current) return;
+    eater.registerRonkiEl(pillRef.current);
+    return () => eater.registerRonkiEl(null);
+  }, [eater]);
+
+  // Burp flame overlay — mounts briefly when burpTrigger (prop) OR
+  // eater.burpKey (context) changes. Either source can trigger Ronki.
+  const [burpKey, setBurpKey] = useState(0);
+  const lastPropTrigger = useRef(burpTrigger);
+  const lastCtxTrigger = useRef(eater?.burpKey ?? 0);
+  useEffect(() => {
+    if (burpTrigger !== lastPropTrigger.current) {
+      lastPropTrigger.current = burpTrigger;
       setBurpKey(k => k + 1);
     }
   }, [burpTrigger]);
+  useEffect(() => {
+    const ctxKey = eater?.burpKey ?? 0;
+    if (ctxKey !== lastCtxTrigger.current) {
+      lastCtxTrigger.current = ctxKey;
+      setBurpKey(k => k + 1);
+    }
+  }, [eater?.burpKey]);
+
+  // Prefer explicit bubble prop; fall back to context bubble.
+  const bubble = bubbleOverride ?? eater?.bubble;
 
   // Ronki's inner chibi is ~65% of the outer pill diameter (30/46 in the
   // Claude Design spec). Scale together so every size of the pill keeps
@@ -51,6 +76,7 @@ export default function PinnedRonki({
 
   return (
     <Tag
+      ref={pillRef}
       onClick={onTap}
       aria-label={onTap ? ariaLabel : undefined}
       className="pr-pin"

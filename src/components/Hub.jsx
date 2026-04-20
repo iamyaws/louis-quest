@@ -404,34 +404,13 @@ export default function Hub({ onNavigate, onPlayMint }) {
          as the page-structure break between "scene" and "cards".
          ═════════════════════════════════════════════════════════════════ */}
       <main className="relative px-6 max-w-lg mx-auto flex flex-col gap-4"
-            style={{ zIndex: 10, paddingTop: 340 }}>
+            style={{ zIndex: 10, paddingTop: 228 }}>
 
-        {/* ── Lagerfeuer section title (tight version).
-               Marc's first pass felt "excessive" — too much vertical space
-               between scene and title. This rebuild sits the kicker/title
-               RIGHT below the scene's cream fade (no floating gap) and
-               tightens typography: 22px title (was 26), tighter kicker
-               tracking (0.22em was 0.28em). Matches the Claude Design
-               Feature Preview reference Marc shared. ── */}
-        {(() => {
-          const hr = new Date().getHours();
-          const greet = hr < 11 ? 'Guten Morgen'
-            : hr < 17 ? 'Guten Tag'
-            : 'Guten Abend';
-          return (
-            <section className="text-center flex flex-col items-center"
-                     style={{ gap: 3, marginTop: -8, marginBottom: 4 }}>
-              <p className="font-label font-extrabold uppercase"
-                 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 10, letterSpacing: '0.22em', color: '#b45309' }}>
-                Lagerfeuer
-              </p>
-              <h1 className="font-headline"
-                  style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 500, fontSize: 22, letterSpacing: '-0.015em', color: '#124346', lineHeight: 1.15 }}>
-                {greet}.
-              </h1>
-            </section>
-          );
-        })()}
+        {/* Lagerfeuer kicker/headline removed entirely — Marc: "way too
+             much spacing for my taste". Scene itself carries the
+             time-of-day; no text header needed. paddingTop 184→228
+             gives "just a tiny bit more" so Ronki + flame read clearly,
+             cards then kiss the bottom of the scene. */}
 
         {/* Weather chip removed — lives in Ronki's morning bubble now. */}
         <section className="flex flex-col items-center gap-2">

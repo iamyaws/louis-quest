@@ -13,6 +13,7 @@ import TopBar from './TopBar';
 import DailyHabits from './DailyHabits';
 import VoiceAudio from '../utils/voiceAudio';
 import { biomeBackground } from '../utils/biomeBackgrounds';
+import { useQuestEater } from './QuestEater';
 
 // Quest IDs that trigger the toothbrush timer
 const TEETH_QUEST_IDS = new Set(['s3', 's12', 'v3', 'v10']);
@@ -50,6 +51,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
   const [teethTimerQuestId, setTeethTimerQuestId] = useState(null);
   const { t, lang } = useTranslation();
   const { quests: specialQuests, completed: sqCompleted, totalDone: sqDone, total: sqTotal } = useSpecialQuests();
+  const eater = useQuestEater();
 
   const ANCHOR_META_I18N = {
     morning: { ...ANCHOR_META_BASE.morning, label: t('task.morning.title'), sublabel: t('task.morning.subtitle') },
@@ -87,12 +89,27 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
     ? getClothingRecs(currentWeather.temp, currentWeather.feelsLike, currentWeather.weatherCode, currentWeather.windSpeed)
     : [];
 
-  const handleComplete = (id) => {
+  const handleComplete = (id, evt) => {
     // Teeth quests launch a brushing timer first
     if (TEETH_QUEST_IDS.has(id) && !state.quests?.find(q => q.id === id)?.done) {
       setTeethTimerQuestId(id);
       return;
     }
+    const quest = state.quests?.find(q => q.id === id);
+
+    // "Ronki eats the quest" animation — fly the quest's icon from the
+    // tapped card into the pinned Ronki in the TopBar, who burps a
+    // flame + briefly shows "+N ⭐". Core-loop audit #1 fix: the loop
+    // stops being silent. Gracefully no-ops if no TopBar (e.g. Hub).
+    if (eater && evt?.currentTarget && quest) {
+      const fromRect = evt.currentTarget.getBoundingClientRect();
+      eater.eatQuest({
+        fromRect,
+        emoji: quest.icon || '⭐',
+        hp: quest.xp || 0,
+      });
+    }
+
     actions.complete(id);
     // Ronki reacts with voice instead of generic pop
     const reactions = ['sfx_complete', 'sfx_wow', 'sfx_proud', 'sfx_excited', 'sfx_tap_happy'];
@@ -481,7 +498,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                                   padding: isNext ? '16px' : '12px 14px',
                                   borderRadius: 14,
                                 }}
-                                onClick={() => canTap && handleComplete(q.id)}
+                                onClick={(e) => canTap && handleComplete(q.id, e)}
                               >
                                 <div className="w-11 h-11 flex items-center justify-center shrink-0 transition-all"
                                      style={{ background: `${meta.col}18`, borderRadius: 14 }}>
@@ -579,7 +596,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
               <div className="flex flex-col gap-2">
                 {sideQuests.map(q => (
                   <button key={q.id}
-                    onClick={() => !q.done && handleComplete(q.id)}
+                    onClick={(e) => !q.done && handleComplete(q.id, e)}
                     disabled={q.done}
                     className="w-full text-left transition-all active:scale-[0.98]"
                     style={{

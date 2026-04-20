@@ -276,38 +276,67 @@ export default function QuestLineView({ questLineId, onBack }) {
               </div>
             )}
 
-            {/* Heute card */}
+            {/* Heute card — with optional painterly beat art above.
+                 P_GEDICHT's 7 beats each ship with `art/quests/poem-day-N.webp`
+                 (Marc: "we had a really cool poem arc with art"). Other
+                 beats without `artFile` fall back to the emoji-only
+                 layout. */}
             {todayDay && !readOnlyDone && (
               <div className="mb-5">
                 <p className="font-label font-bold text-xs uppercase tracking-widest mb-2" style={{ color: '#b45309' }}>
                   {lang === 'de' ? 'Heute' : 'Today'}
                 </p>
-                <div className="rounded-2xl p-5"
+                <div className="rounded-2xl overflow-hidden"
                      style={{ background: '#ffffff', border: '2px solid rgba(252,211,77,0.45)', boxShadow: '0 4px 16px rgba(252,211,77,0.15)' }}>
-                  <div className="flex items-start gap-3 mb-4">
-                    <span className="text-3xl shrink-0">{todayDay.icon || '✨'}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-label font-bold text-xs uppercase tracking-widest mb-0.5" style={{ color: '#b45309' }}>
-                        {lang === 'de' ? 'Tag' : 'Day'} {todayDay.dayNumber}
-                      </p>
-                      <h3 className="font-headline font-bold text-lg text-on-surface leading-tight">
-                        {todayDay.title}
-                      </h3>
-                      {todayDay.description && (
-                        <p className="font-body text-sm text-on-surface-variant mt-1 leading-snug">
-                          {todayDay.description}
-                        </p>
-                      )}
+                  {/* Painterly beat banner — only when artFile exists */}
+                  {todayDay.artFile && (
+                    <div className="relative w-full" style={{ aspectRatio: '16/9', background: '#faf3e8' }}>
+                      <img
+                        src={`${base}${todayDay.artFile}`}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover"
+                        draggable={false}
+                      />
+                      {/* Day-number pill pinned top-left on the art */}
+                      <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full flex items-center gap-1"
+                           style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)' }}>
+                        <span className="font-label font-extrabold uppercase"
+                              style={{ fontSize: 10, letterSpacing: '0.2em', color: '#b45309' }}>
+                          {lang === 'de' ? 'Tag' : 'Day'} {todayDay.dayNumber}
+                        </span>
+                      </div>
                     </div>
+                  )}
+                  <div className="p-5">
+                    <div className="flex items-start gap-3 mb-4">
+                      {!todayDay.artFile && (
+                        <span className="text-3xl shrink-0">{todayDay.icon || '✨'}</span>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        {!todayDay.artFile && (
+                          <p className="font-label font-bold text-xs uppercase tracking-widest mb-0.5" style={{ color: '#b45309' }}>
+                            {lang === 'de' ? 'Tag' : 'Day'} {todayDay.dayNumber}
+                          </p>
+                        )}
+                        <h3 className="font-headline font-bold text-lg text-on-surface leading-tight">
+                          {todayDay.title}
+                        </h3>
+                        {todayDay.description && (
+                          <p className="font-body text-sm text-on-surface-variant mt-1 leading-snug">
+                            {todayDay.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleCompleteDay(todayDay.id)}
+                      className="w-full py-3.5 rounded-full font-headline font-bold text-base active:scale-95 transition-all flex items-center justify-center gap-2"
+                      style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 4px 12px rgba(252,211,77,0.3)' }}
+                    >
+                      <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>task_alt</span>
+                      {lang === 'de' ? 'Gemacht' : 'Done'}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleCompleteDay(todayDay.id)}
-                    className="w-full py-3.5 rounded-full font-headline font-bold text-base active:scale-95 transition-all flex items-center justify-center gap-2"
-                    style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 4px 12px rgba(252,211,77,0.3)' }}
-                  >
-                    <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>task_alt</span>
-                    {lang === 'de' ? 'Gemacht' : 'Done'}
-                  </button>
                 </div>
               </div>
             )}

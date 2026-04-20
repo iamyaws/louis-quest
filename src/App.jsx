@@ -4,6 +4,7 @@ import { TaskProvider, useTask } from './context/TaskContext';
 import { useTranslation } from './i18n/LanguageContext';
 import PinModal from './components/PinModal';
 import NavBar from './components/NavBar';
+import { QuestEaterProvider } from './components/QuestEater';
 import TaskList from './components/TaskList';
 import Belohnungsbank from './components/Belohnungsbank';
 import Hub from './components/Hub';
@@ -336,7 +337,9 @@ function AuthGate() {
 
   return (
     <TaskProvider>
-      <AppContent />
+      <QuestEaterProvider>
+        <AppContent />
+      </QuestEaterProvider>
     </TaskProvider>
   );
 }
