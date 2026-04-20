@@ -315,10 +315,17 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
               {/* ── Task Items ── */}
               {(
                 <div className="px-6 pb-6 pt-2">
-                  {/* Section label */}
+                  {/* Section label — amber-brown accent matches the chapter's
+                       anchor colour instead of generic grey (design-ref: the
+                       "— SO STARTET DEIN TAG." orange-tinted subtitle). */}
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-1.5 h-4 rounded-full" style={{ background: meta.col }} />
-                    <h4 className="text-sm font-bold font-label uppercase tracking-wider text-on-surface/60">
+                    <div className="w-4 h-[2px] rounded-full shrink-0" style={{ background: meta.col }} />
+                    <h4 className="font-label font-extrabold uppercase"
+                        style={{
+                          fontSize: 11,
+                          letterSpacing: '0.22em',
+                          color: meta.col,
+                        }}>
                       {sublabel}
                     </h4>
                   </div>
@@ -376,16 +383,30 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
                           {/* Task card */}
                           <div className="flex-1 mb-3">
                             {fullyDone ? (
-                              /* ── Done task ── */
-                              <div className={`rounded-xl p-4 ${isAnziehen && todayWeather ? '' : 'opacity-60'}`}
-                                   style={{ background: 'rgba(249,243,235,0.5)' }}>
+                              /* ── Done task — mint-green tint makes "done" visually
+                                   distinct from pending/active (design-ref: .qcard.done-card).
+                                   XP pill drops the "HP" suffix so done reads
+                                   quieter than active's verbose "+10 HP". ── */
+                              <div className="rounded-xl p-4"
+                                   style={{
+                                     background: 'rgba(236,253,245,0.7)',
+                                     border: '1px solid rgba(52,211,153,0.2)',
+                                   }}>
                                 <div className="flex items-center gap-3">
                                   <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-                                       style={{ background: 'rgba(52,211,153,0.15)' }}>
+                                       style={{ background: 'rgba(52,211,153,0.22)' }}>
                                     <span className="text-lg">{q.icon}</span>
                                   </div>
                                   <div className="flex-1">
-                                    <p className="font-bold font-label line-through text-on-surface/50">{t('quest.' + q.id)}</p>
+                                    <p className="font-body font-medium"
+                                       style={{
+                                         color: '#065f46',
+                                         textDecoration: 'line-through',
+                                         textDecorationColor: 'rgba(5,150,105,0.4)',
+                                         textDecorationThickness: '1.5px',
+                                       }}>
+                                      {t('quest.' + q.id)}
+                                    </p>
                                   </div>
                                   <span className="font-label font-extrabold text-[11px] shrink-0 whitespace-nowrap"
                                         style={{
@@ -395,7 +416,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine }) {
                                           padding: '6px 9px',
                                           borderRadius: 8,
                                           letterSpacing: '0.04em',
-                                        }}>+{q.xp} HP</span>
+                                        }}>+{q.xp}</span>
                                 </div>
                                 {/* Weather hint persists after completion */}
                                 {isAnziehen && todayWeather && weatherInfo && (
