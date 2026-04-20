@@ -18,10 +18,10 @@ export default function PrintA4PosterAntiEngagement() {
             Ronki will <em>überflüssig werden</em>.
           </>
         ),
-        subline: 'Ein Drachen-Gefährte, gegen den Zeitgeist gebaut.',
+        subline: 'Ein Drache, ohne Fangmechanik.',
         body: (
           <>
-            Keine Streaks, die reißen. Keine Loot-Boxes. Keine Push-Benachrichtigungen. Keine „Dein Freund war gerade online"-Karten. Wenn dein Kind nach zwei Monaten den Drachen fast nicht mehr braucht, haben wir unseren Job gemacht. Als Gamer-Vater gesagt: <em>schlechtes Engagement-Metric, gutes Erziehungs-Metric</em>.
+            Keine Streaks, die reißen. Keine Loot-Boxes. Keine Push-Benachrichtigungen. Keine „Dein Freund ist online"-Karten. Wenn dein Kind nach zwei Monaten den Drachen fast nicht mehr braucht, haben wir unseren Job gemacht. Als Gamer-Vater gesagt: <em>schlechtes Engagement-Metric, gutes Erziehungs-Metric</em>.
           </>
         ),
         heroSrc: '/art/companion/dragon-majestic.webp',

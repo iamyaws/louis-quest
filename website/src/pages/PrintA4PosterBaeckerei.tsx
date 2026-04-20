@@ -19,11 +19,11 @@ export default function PrintA4PosterBaeckerei() {
         subline: 'Ronki zeigt deinem Kind, was morgens als Nächstes dran ist.',
         body: (
           <>
-            Socken, T-Shirt, Zähne, Frühstück, Ranzen, los. Für dich ist das Autopilot, für ein Sechsjähriges-Gehirn ein kognitiver Marathon. Ronki macht die Reihenfolge sichtbar, dein Kind übernimmt das Tempo. Keine App, kein Store, keine Werbung.
+            Socken, T-Shirt, Zähne, Frühstück, Ranzen, los. Für dich ist das Autopilot. Für ein Sechsjähriges sind es acht Entscheidungen vor acht Uhr. Ronki macht die Reihenfolge sichtbar. Dein Kind übernimmt das Tempo.
           </>
         ),
-        heroSrc: '/art/routines/getting-ready.webp',
-        heroAlt: 'Malerische Morgenszene: Kind zieht sich an, warmes Licht.',
+        heroSrc: '/art/flyer/morning-sleepy.png',
+        heroAlt: 'Malerische Morgenszene: Sechsjähriges Kind im Schlafanzug sitzt auf dem Boden und starrt eine Socke an.',
         phoneScreenshot: {
           src: '/art/app/morgen-quests.png',
           caption: 'Morgen-Quests, eine nach der anderen.',

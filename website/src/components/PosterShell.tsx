@@ -21,7 +21,7 @@ export interface PosterStep {
 export interface PosterConfig {
   /** Small uppercase caption above the wordmark */
   eyebrow: string;
-  /** Massive top headline — ReactNode so variants can add <em> / <span> for emphasis */
+  /** Massive top headline */
   headline: ReactNode;
   /** One-line subline under the headline */
   subline: ReactNode;
@@ -29,6 +29,10 @@ export interface PosterConfig {
   body: ReactNode;
   /** Short intro above the numbered step list */
   ctaHeading: string;
+  /** Optional bridge line between ctaHeading and steps (for posters that need
+   *  a practical fallback when the step list isn't action-oriented, e.g.
+   *  Kinderarzt shows academic sources but still wants an 'try the app' prompt). */
+  ctaBridge?: ReactNode;
   /** 3-4 numbered steps */
   steps: PosterStep[];
   /** Small grey footer line below the steps */
@@ -125,6 +129,9 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           <div className="bottom-row">
             <div className="cta-text">
               <p className="cta-heading">{config.ctaHeading}</p>
+              {config.ctaBridge && (
+                <p className="cta-bridge">{config.ctaBridge}</p>
+              )}
               <ol className="cta-steps">
                 {config.steps.map((step, i) => (
                   <li key={i}>{step.content}</li>
@@ -207,13 +214,16 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           --step-number: #50A082;
           --border: rgba(26,60,63,0.15);
         }
+        /* Step-number color was sage #50A082 — contrast on cream was ~3.1:1
+         * (sub-WCAG-AA for 8pt text). Tightened to teal #2D5A5E across all
+         * light themes (~5.3:1). Keeps brand, fixes legibility. */
         .poster-warm {
           --bg: #FDF8F0;
           --bg-accent-1: rgba(252,211,77,0.22);
           --bg-accent-2: rgba(80,160,130,0.14);
           --stripe: #FCD34D;
           --highlight: #2D5A5E;
-          --step-number: #50A082;
+          --step-number: #2D5A5E;
         }
         .poster-evening {
           --bg: #FDF8F0;
@@ -223,11 +233,15 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           --highlight: #2D5A5E;
           --step-number: #2D5A5E;
         }
+        /* Morning-stripe was orange #D97706 which tanzed out of the
+         * mustard/sage/teal brand palette. Pulled to mustard #FCD34D for
+         * consistency across the set. Highlights + step-number stay dark
+         * amber to preserve the warm-morning feel. */
         .poster-morning {
           --bg: #FDF8F0;
           --bg-accent-1: rgba(252,211,77,0.32);
           --bg-accent-2: rgba(217,119,6,0.10);
-          --stripe: #D97706;
+          --stripe: #FCD34D;
           --highlight: #B45309;
           --step-number: #B45309;
         }
@@ -237,7 +251,7 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           --bg-accent-2: rgba(45,90,94,0.08);
           --stripe: #50A082;
           --highlight: #2D5A5E;
-          --step-number: #50A082;
+          --step-number: #2D5A5E;
         }
         .poster-cool {
           --bg: #F4FAF7;
@@ -245,7 +259,7 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           --bg-accent-2: rgba(45,90,94,0.10);
           --stripe: #50A082;
           --highlight: #50A082;
-          --step-number: #50A082;
+          --step-number: #2D5A5E;
         }
         .poster-bold {
           --bg: #1A3C3F;
@@ -296,7 +310,9 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           font-weight: 800;
           font-size: 42pt;
-          line-height: 1.0;
+          /* 1.0 was too tight for 2-line display type (Anti-Engagement).
+           * 1.05 keeps it bold but lets tall letters breathe. */
+          line-height: 1.05;
           letter-spacing: -0.03em;
           color: var(--text-primary);
           margin: 0;
@@ -337,23 +353,26 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           box-shadow: 0 10mm 20mm -5mm rgba(26,60,63,0.25);
         }
 
-        /* Phone inset — bottom right of hero area */
+        /* Phone inset — bottom right of hero area
+         * Original 38x68mm + bottom: -4mm was cramped against the 92mm hero
+         * (only 3mm gap at A4 inner width). Shrunk to 32x58mm, anchored
+         * cleanly on the baseline (bottom: 0). */
         .phone-inset {
           position: absolute;
-          right: 0;
-          bottom: -4mm;
+          right: 4mm;
+          bottom: 0;
           margin: 0;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
         .phone-frame {
-          width: 38mm;
-          height: 68mm;
+          width: 32mm;
+          height: 58mm;
           background: #1A3C3F;
-          border-radius: 5mm;
-          padding: 1.5mm;
-          box-shadow: 0 6mm 15mm -4mm rgba(26,60,63,0.4);
+          border-radius: 4.5mm;
+          padding: 1.3mm;
+          box-shadow: 0 5mm 12mm -3mm rgba(26,60,63,0.4);
           position: relative;
         }
         .phone-notch {
@@ -382,7 +401,7 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           margin: 2mm 0 0;
           text-align: center;
           letter-spacing: 0.02em;
-          max-width: 38mm;
+          max-width: 34mm;
         }
 
         .body-text {
@@ -394,7 +413,9 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           margin: 0 0 6mm;
           text-align: center;
           text-wrap: pretty;
-          max-width: 155mm;
+          /* 155mm was ~77 chars/line, above the 50-75 optimum for body
+           * reading at arm's length. Pulled to 140mm (~70 chars/line). */
+          max-width: 140mm;
           margin-left: auto;
           margin-right: auto;
         }
@@ -417,11 +438,24 @@ export function PosterShell({ config }: { config: PosterConfig }) {
         .cta-text { min-width: 0; }
         .cta-heading {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-          font-weight: 700;
-          font-size: 11pt;
+          font-weight: 800;
+          font-size: 12pt;
           color: var(--text-primary);
           margin: 0 0 2mm;
-          letter-spacing: -0.005em;
+          letter-spacing: -0.01em;
+        }
+        .cta-bridge {
+          font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+          font-size: 9.5pt;
+          line-height: 1.4;
+          font-style: italic;
+          color: var(--text-secondary);
+          margin: 0 0 3mm;
+        }
+        .cta-bridge strong {
+          color: var(--text-primary);
+          font-weight: 700;
+          font-style: normal;
         }
         .cta-steps {
           counter-reset: step;

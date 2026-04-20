@@ -20,17 +20,18 @@ export default function PrintA4PosterKinderarzt() {
         subline: 'Was Kinder zwischen 5 und 9 brauchen, um ihren Alltag allein zu meistern.',
         body: (
           <>
-            Die Fähigkeit, drei bis vier Aufgaben hintereinander selbstständig zu erledigen, entwickelt sich erst zwischen sieben und zehn Jahren. Bis dahin hilft Sichtbarkeit: eine einfache, bildbasierte Reihenfolge, die das Kind selbst abarbeiten kann. <em>Fading Scaffolding</em>. Genau so ist Ronki gebaut.
+            Die Fähigkeit, mehrere Aufgaben in Folge selbstständig zu erledigen, reift erst im Grundschulalter voll aus. Bis dahin hilft Sichtbarkeit: Bilder, die zeigen, was als Nächstes kommt, und die das Kind selbst abhakt. Sichtbar machen, dann leiser werden. Genau so haben wir Ronki gebaut.
           </>
         ),
-        heroSrc: '/art/companion/dragon-baby.webp',
-        heroAlt: 'Kleiner freundlicher Drache, Begleiter für Grundschulkinder.',
+        heroSrc: '/art/flyer/family-kitchen.png',
+        heroAlt: 'Malerische Küchen-Szene: Elternteil liest am Tisch, kleines Kind sitzt daneben, ein warmer Drache dazwischen.',
         phoneScreenshot: {
           src: '/art/app/tagebuch.png',
           caption: 'Jeder Tag ein kleines Kapitel.',
         },
         qrPath: '/wissenschaft',
-        ctaHeading: 'Forschung, Quellen und Praxis:',
+        ctaHeading: 'Forschung dahinter:',
+        ctaBridge: <>Oder gleich ausprobieren: <strong>app.ronki.de</strong></>,
         steps: [
           { content: <><strong>Selbstbestimmung</strong> · Deci &amp; Ryan</> },
           { content: <><strong>Vorbereitete Umgebung</strong> · Montessori</> },

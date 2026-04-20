@@ -16,14 +16,14 @@ export default function PrintA4PosterHort() {
             <em>halber Marathon</em>.
           </>
         ),
-        subline: 'Ronki legt ihn für dein Kind sichtbar hin.',
+        subline: 'Ronki sortiert ihn. Dein Kind läuft ihn allein.',
         body: (
           <>
-            Hausaufgaben, Abendessen, Baden, Zähne, Schlafanzug, Vorlesen, Licht aus. Immer gleich, jeden Abend, oft auf einmal zu viel für ein Grundschulkind. Ronki zeigt die Reihenfolge, dein Kind hakt selbst ab. Kein App-Store, keine Werbung, keine Streaks.
+            Hausaufgaben, Abendessen, Baden, Zähne, Schlafanzug, Vorlesen, Licht aus. Jeden Abend dieselbe Kette, oft zu viel für ein Grundschulkind. Ronki macht die Reihenfolge sichtbar. Dein Kind hakt selbst ab. Kein App-Store. Keine Werbung. Keine Streaks.
           </>
         ),
-        heroSrc: '/art/bioms/Sternenmeer_sea-of-stars.webp',
-        heroAlt: 'Malerischer Sternenhimmel: ruhiger Übergang in den Abend.',
+        heroSrc: '/art/flyer/evening-bedtime.png',
+        heroAlt: 'Malerische Bettgehzeit-Szene: Kind liegt im Bett, Drache liest mit, Sternenhimmel am Fenster.',
         phoneScreenshot: {
           src: '/art/app/aufgaben-uebersicht.png',
           caption: 'So sieht ein Tag in der App aus.',
