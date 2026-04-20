@@ -16,6 +16,9 @@ const VorlageKleineGeschwister = lazy(() => import('./pages/VorlageKleineGeschwi
 const HomeEN = lazy(() => import('./pages/HomeEN'));
 const Installieren = lazy(() => import('./pages/Installieren'));
 const Ratgeber = lazy(() => import('./pages/Ratgeber'));
+// Private print-only utility pages; not in footer, not in sitemap, not in robots.
+const PrintA6Flyer = lazy(() => import('./pages/PrintA6Flyer'));
+const PrintA4Poster = lazy(() => import('./pages/PrintA4Poster'));
 const RatgeberMorgenTroedeln = lazy(() => import('./pages/ratgeber/MorgenTroedeln'));
 const RatgeberStickerChartAlternative = lazy(() => import('./pages/ratgeber/StickerChartAlternative'));
 const RatgeberDarkPatternsKinderApps = lazy(() => import('./pages/ratgeber/DarkPatternsKinderApps'));
@@ -61,6 +64,8 @@ export function AppRoutes() {
         <Route path="/vorlagen/abendroutine" element={<VorlageAbend />} />
         <Route path="/vorlagen/kleine-geschwister" element={<VorlageKleineGeschwister />} />
         <Route path="/installieren" element={<Installieren />} />
+        <Route path="/print/a6-flyer" element={<PrintA6Flyer />} />
+        <Route path="/print/a4-poster" element={<PrintA4Poster />} />
         <Route path="/ratgeber" element={<Ratgeber />} />
         <Route path="/ratgeber/morgen-troedeln" element={<RatgeberMorgenTroedeln />} />
         <Route path="/ratgeber/sticker-chart-alternative" element={<RatgeberStickerChartAlternative />} />
