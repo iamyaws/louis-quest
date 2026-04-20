@@ -134,7 +134,7 @@ function WaitlistForm({ copy }: { copy: ReturnType<typeof getLaunchCopy> }) {
           disabled={status.kind === 'submitting'}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
-          className="group relative m-1 inline-flex items-center gap-2 rounded-full bg-teal px-5 py-2.5 text-cream font-display font-semibold text-sm disabled:opacity-50 shadow-sm hover:shadow-md transition-shadow"
+          className="group relative m-1 inline-flex shrink-0 items-center gap-2 rounded-full bg-teal px-5 py-2.5 text-cream font-display font-semibold text-sm whitespace-nowrap [hyphens:none] disabled:opacity-50 shadow-sm hover:shadow-md transition-shadow"
         >
           {status.kind === 'submitting' ? '…' : copy.ctaLabel}
           <span className="transition-transform group-hover:translate-x-0.5">→</span>
