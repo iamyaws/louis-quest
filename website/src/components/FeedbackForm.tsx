@@ -28,6 +28,12 @@ const DEFAULT_PLACEHOLDER =
 export function FeedbackForm({ source, label, placeholder }: Props) {
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
+  /**
+   * Honeypot field — invisible to humans, usually filled by naive bots.
+   * If it ever has a value on submit, we fake a success state so the bot
+   * thinks it won and doesn't adapt, and we skip the Supabase insert.
+   */
+  const [website, setWebsite] = useState('');
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
 
   const trimmedMessage = message.trim();
@@ -39,6 +45,15 @@ export function FeedbackForm({ source, label, placeholder }: Props) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
+
+    // Honeypot: silently drop bot submissions with fake-success UI.
+    if (website) {
+      setStatus({ kind: 'success' });
+      setMessage('');
+      setEmail('');
+      setWebsite('');
+      return;
+    }
 
     // Simple email sanity check if provided.
     const trimmedEmail = email.trim();
@@ -87,6 +102,31 @@ export function FeedbackForm({ source, label, placeholder }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      {/* Honeypot — visually hidden, aria-hidden, not tab-reachable. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          top: 'auto',
+          width: '1px',
+          height: '1px',
+          overflow: 'hidden',
+        }}
+      >
+        <label>
+          Deine Website (bitte leer lassen)
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+          />
+        </label>
+      </div>
+
       <label className="flex flex-col gap-2">
         <span className="text-sm font-display font-semibold text-teal-dark">
           {label || DEFAULT_LABEL}
