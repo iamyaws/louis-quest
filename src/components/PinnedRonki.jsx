@@ -41,8 +41,11 @@ export default function PinnedRonki({
   const pillRef = useRef(null);
   useEffect(() => {
     if (!eater || !pillRef.current) return;
-    eater.registerRonkiEl(pillRef.current);
-    return () => eater.registerRonkiEl(null);
+    // Fallback slot — the CampfireScene's SideRonki takes priority
+    // when mounted (on Lager). Everywhere else, this TopBar Ronki is
+    // the target for the flying quest icon.
+    eater.registerRonkiEl(pillRef.current, 'fallback');
+    return () => eater.registerRonkiEl(null, 'fallback');
   }, [eater]);
 
   // Burp flame overlay — mounts briefly when burpTrigger (prop) OR

@@ -1063,11 +1063,19 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
   };
 
   // ── Zeig-Moment toggle + counter reset ──
-  const zmEnabled = state?.familyConfig?.zeigMomentEnabled !== false; // default on
+  // Default is OFF now (Marc Apr 2026: "rather annoying" out-of-the-box).
+  // Parents opt IN and pick which ONE grown-up vouches. Single-vouch
+  // keeps the moment simple — Louis shows ONE parent, not both.
+  const zmEnabled = state?.familyConfig?.zeigMomentEnabled === true;
+  const zmParent = state?.familyConfig?.zeigMomentParent === 'papa' ? 'papa' : 'mama';
   const zmCounts = state?.zeigMomentCounts || {};
   const setZmEnabled = (next) => {
     const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
     actions?.updateFamilyConfig?.({ ...config, zeigMomentEnabled: next });
+  };
+  const setZmParent = (next) => {
+    const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
+    actions?.updateFamilyConfig?.({ ...config, zeigMomentParent: next });
   };
   const resetZmCounts = () => {
     actions?.patchState?.({
@@ -1212,7 +1220,7 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
           <p className="font-label font-bold text-sm text-on-surface">Zeig-Moment</p>
         </div>
         <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
-          Nach jeder Routine erinnert Ronki Louis daran, Mama oder Papa zu zeigen, was er geschafft hat. Nach 14 Mal pro Block verblasst die Erinnerung.
+          Nach jeder Routine erinnert Ronki Louis daran, <strong>einer</strong> Bezugsperson zu zeigen, was er geschafft hat. Nach 14 Mal pro Block verblasst die Erinnerung. Standardmäßig aus — viele Familien finden's am Anfang zu viel.
         </p>
         <div className="flex items-center justify-between mb-4 p-4 rounded-2xl"
              style={{ background: 'rgba(252,211,77,0.06)', border: '1px solid rgba(161,98,7,0.15)' }}>
@@ -1235,6 +1243,50 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
                   style={{ transform: zmEnabled ? 'translateX(24px)' : 'translateX(0)' }} />
           </button>
         </div>
+
+        {/* Single-parent vouch picker — only shown when Zeig-Moment is ON.
+            Kept intentionally simple: radio between Mama and Papa. Only
+            one vouches per cheer moment, never both. */}
+        {zmEnabled && (
+          <div className="mb-4">
+            <p className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-wide mb-2">
+              Wem zeigt Louis?
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: 'mama', label: 'Mama', emoji: '👩' },
+                { id: 'papa', label: 'Papa', emoji: '👨' },
+              ].map((opt) => {
+                const active = zmParent === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setZmParent(opt.id)}
+                    className="flex items-center justify-center gap-2 py-3 rounded-xl font-label font-bold text-sm active:scale-[0.98] transition-all"
+                    style={{
+                      background: active ? 'rgba(252,211,77,0.18)' : 'rgba(255,255,255,0.6)',
+                      border: active ? '1.5px solid rgba(252,211,77,0.6)' : '1.5px solid rgba(0,0,0,0.08)',
+                      color: active ? '#92400e' : '#124346',
+                      boxShadow: active ? '0 2px 8px rgba(252,211,77,0.2)' : 'none',
+                    }}
+                    aria-pressed={active}
+                  >
+                    <span className="text-base" aria-hidden="true">{opt.emoji}</span>
+                    {opt.label}
+                    {active && (
+                      <span className="material-symbols-outlined text-sm"
+                            style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="font-label text-xs text-on-surface-variant mt-2 leading-relaxed">
+              Nur <strong>eine</strong> Bezugsperson bestätigt pro Cheer-Moment — nicht beide.
+            </p>
+          </div>
+        )}
+
         <button
           onClick={resetZmCounts}
           className="w-full py-3 rounded-xl font-label font-bold text-sm active:scale-[0.98] transition-all"

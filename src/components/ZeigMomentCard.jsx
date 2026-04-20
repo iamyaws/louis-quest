@@ -16,10 +16,10 @@ const THRESHOLD = 14; // how many times per block before the card fades away
  * parent what he finished ("Zeig Mama oder Papa"), so the parent-sighting
  * becomes part of the routine itself.
  *
- * Three actions:
- *   - "Hat Mama gesehen"   — records the sighting, increments count
- *   - "Hat Papa gesehen"   — same as Mama (we don't track which parent)
- *   - "Später"             — dismiss without marking; re-shows next block
+ * Two actions (simplified Apr 2026):
+ *   - "Hat {Mama|Papa} gesehen" — records sighting, increments count
+ *   - "Später"                   — dismiss for today's block without
+ *                                   counting; next block still shows
  *
  * On the 14th tap for a block, Ronki gives a small sendoff and the feature
  * goes quiet for that block forever (counts[block] === THRESHOLD).
@@ -33,6 +33,9 @@ export default function ZeigMomentCard({ block, onClose }) {
   const currentCount = counts[block] || 0;
   const nextCount = currentCount + 1;
   const isFinal = nextCount >= THRESHOLD;
+  // Marc: single-parent vouch is enough — not "did BOTH see". Parents
+  // pick which one (Mama/Papa) in Eltern-Bereich settings; default Mama.
+  const vouchParent = state?.familyConfig?.zeigMomentParent === 'papa' ? 'Papa' : 'Mama';
 
   const confirm = () => {
     SFX.play('celeb');
@@ -45,8 +48,18 @@ export default function ZeigMomentCard({ block, onClose }) {
     onClose?.();
   };
 
+  // Später = dismiss THIS block for today without counting toward the 14.
+  // Without persisting "shown today", Hub's useEffect immediately re-fires
+  // (the quest-done conditions still hold), so the card would pop back up
+  // and Später would feel broken. Mark the block as shown-today, but DO
+  // NOT bump the counter — next block still gets its prompt.
   const dismiss = () => {
     SFX.play('tap');
+    const today = new Date().toISOString().slice(0, 10);
+    const shown = state?.zeigMomentShownDates || {};
+    actions.patchState({
+      zeigMomentShownDates: { ...shown, [block]: today },
+    });
     onClose?.();
   };
 
@@ -73,10 +86,10 @@ export default function ZeigMomentCard({ block, onClose }) {
           {!isFinal ? (
             <>
               <p className="font-body text-base text-on-surface mb-1">
-                Zeig Mama oder Papa.
+                Zeig {vouchParent}.
               </p>
               <p className="font-body text-sm text-on-surface-variant mb-6">
-                Sie freuen sich mit dir!
+                Sie freut sich mit dir!
               </p>
             </>
           ) : (
@@ -90,7 +103,9 @@ export default function ZeigMomentCard({ block, onClose }) {
             </>
           )}
 
-          {/* Confirm buttons */}
+          {/* Single-parent vouch — Marc's reorder (Apr 2026): one grown-up
+               suffices for the cheer moment. Parent selection lives in
+               Eltern-Bereich Settings. */}
           <div className="w-full flex flex-col gap-2.5 mb-2">
             <button
               onClick={confirm}
@@ -100,17 +115,7 @@ export default function ZeigMomentCard({ block, onClose }) {
               <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
                 check_circle
               </span>
-              Hat Mama gesehen
-            </button>
-            <button
-              onClick={confirm}
-              className="w-full py-3.5 rounded-full font-label font-bold text-base flex items-center justify-center gap-2 active:scale-95 transition-all"
-              style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 6px 16px rgba(252,211,77,0.35)' }}
-            >
-              <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
-                check_circle
-              </span>
-              Hat Papa gesehen
+              Hat {vouchParent} gesehen
             </button>
             <button
               onClick={dismiss}

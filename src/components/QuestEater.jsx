@@ -35,52 +35,80 @@ export function useQuestEater() {
 }
 
 export function QuestEaterProvider({ children }) {
-  const ronkiRef = useRef(null);
+  // Two registration slots — 'preferred' wins when set. Lets the Hub
+  // CampfireScene register its side-view Ronki as the target whenever
+  // it's mounted (Louis is on Lager), falling back to the TopBar's
+  // PinnedRonki on every other tab. No props drilling needed.
+  const preferredRef = useRef(null);
+  const fallbackRef = useRef(null);
   const [flyer, setFlyer] = useState(null);
   const [burpKey, setBurpKey] = useState(0);
   const [bubble, setBubble] = useState(null);
+  // Separate trigger for the SideRonki fire-breath animation on Lager.
+  // Increments each time CampfireScene's Ronki is the one eating.
+  const [fireBreath, setFireBreath] = useState(0);
 
-  // PinnedRonki registers itself on mount so the flyer knows where to
-  // aim. We keep the raw DOM node (not the React ref object) so we can
-  // `getBoundingClientRect()` at eatQuest time — the position may have
-  // moved (scroll, resize) between registration and trigger.
-  const registerRonkiEl = useCallback((el) => {
-    ronkiRef.current = el;
+  const registerRonkiEl = useCallback((el, slot = 'fallback') => {
+    if (slot === 'preferred') preferredRef.current = el;
+    else fallbackRef.current = el;
   }, []);
 
+  const getActiveRonki = () => preferredRef.current || fallbackRef.current;
+  const getActiveSlot = () => (preferredRef.current ? 'preferred' : 'fallback');
+
   const eatQuest = useCallback(({ fromRect, emoji, hp = 0 }) => {
-    if (!fromRect || !ronkiRef.current) {
+    const target = getActiveRonki();
+    if (!fromRect || !target) {
       // No Ronki mounted or no source rect — skip silently. The normal
       // completion feedback (voice + SFX + haptic) still fires.
       return;
     }
-    const toRect = ronkiRef.current.getBoundingClientRect();
-    const id = Date.now() + Math.random();
 
-    // Spawn at source in 'start' phase. Next tick, flip to 'flying' so
-    // the CSS transition kicks in toward Ronki's rect.
-    setFlyer({ id, emoji, fromRect, toRect, phase: 'start' });
-    requestAnimationFrame(() => {
-      // Two rAFs → Chrome finishes layout of the start frame before we
-      // set the destination. One rAF is sometimes too fast on slow
-      // devices and the transition starts from the final position.
+    // If Ronki is off-screen (Marc's scroll issue — quest was below the
+    // fold, Ronki was above), smooth-scroll to bring him into view
+    // first, THEN fire the flyer. Gives the "dragon ate my quest"
+    // moment a chance to actually be seen.
+    const ronkiRect = target.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const isOffScreen = ronkiRect.bottom < 0 || ronkiRect.top > vh;
+
+    const start = () => {
+      // Re-measure after any scroll settles.
+      const toRect = target.getBoundingClientRect();
+      const id = Date.now() + Math.random();
+      setFlyer({ id, emoji, fromRect, toRect, phase: 'start' });
       requestAnimationFrame(() => {
-        setFlyer(prev => (prev && prev.id === id ? { ...prev, phase: 'flying' } : prev));
+        requestAnimationFrame(() => {
+          setFlyer(prev => (prev && prev.id === id ? { ...prev, phase: 'flying' } : prev));
+        });
       });
-    });
 
-    // After ~720ms the flyer has arrived. Cleanup + Ronki reactions.
-    setTimeout(() => {
-      setFlyer(prev => (prev && prev.id === id ? null : prev));
-      setBurpKey(k => k + 1);
-      const label = hp > 0 ? `+${hp} ⭐` : '👍';
-      setBubble(label);
-      setTimeout(() => setBubble(prev => (prev === label ? null : prev)), 2200);
-    }, 720);
+      setTimeout(() => {
+        setFlyer(prev => (prev && prev.id === id ? null : prev));
+        setBurpKey(k => k + 1);
+        // On Lager (preferred slot = CampfireScene SideRonki), trigger
+        // the fire-breath animation in addition to the burp bubble —
+        // Marc: "the dragon at the campfire needs to eat it and breath
+        // fire".
+        if (getActiveSlot() === 'preferred') {
+          setFireBreath(f => f + 1);
+        }
+        const label = hp > 0 ? `+${hp} ⭐` : '👍';
+        setBubble(label);
+        setTimeout(() => setBubble(prev => (prev === label ? null : prev)), 2200);
+      }, 720);
+    };
+
+    if (isOffScreen) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(start, 420);
+    } else {
+      start();
+    }
   }, []);
 
   return (
-    <QuestEaterContext.Provider value={{ registerRonkiEl, eatQuest, burpKey, bubble }}>
+    <QuestEaterContext.Provider value={{ registerRonkiEl, eatQuest, burpKey, bubble, fireBreath }}>
       {children}
       {flyer && <Flyer {...flyer} />}
     </QuestEaterContext.Provider>

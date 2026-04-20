@@ -136,11 +136,12 @@ export default function Hub({ onNavigate, onPlayMint }) {
     }
   }, [state?.quests, state?.eveningRitualCompletedAt]);
 
-  // Zeig-Moment: once per block per day when that block's main quests are all done
+  // Zeig-Moment: once per block per day when that block's main quests are all done.
+  // Opt-in — default off (Marc Apr 2026 "rather annoying" on first-run).
   useEffect(() => {
     if (!state) return;
     if (zeigBlock) return;
-    const enabled = state?.familyConfig?.zeigMomentEnabled !== false;
+    const enabled = state?.familyConfig?.zeigMomentEnabled === true;
     if (!enabled) return;
     const today = new Date().toISOString().slice(0, 10);
     const counts = state?.zeigMomentCounts || {};

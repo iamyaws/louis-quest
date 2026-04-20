@@ -75,10 +75,15 @@ export interface FamilyConfig {
   funkelzeitDailyCapMin?: number;
   /** Which tooth-brush UI mode to show by default. Default 'tasche'. */
   toothBrushDefaultMode?: ToothBrushMode;
-  /** When true (default), show a "zeig mama/papa"-confirmation after each routine
+  /** When true, show a "zeig mama/papa"-confirmation after each routine
    *  block (morning/evening/bedtime) for the first 14 completions per block.
-   *  Parents can switch off if not needed. */
+   *  Default is OFF (Marc Apr 2026: "rather annoying" on first-run).
+   *  Parents opt IN from the Eltern-Bereich Settings. */
   zeigMomentEnabled?: boolean;
+  /** Which ONE parent vouches for the cheer moment when zeigMomentEnabled
+   *  is true. Default 'mama'. Single-vouch keeps the moment simple:
+   *  kid shows ONE grown-up, not "did BOTH see". */
+  zeigMomentParent?: 'mama' | 'papa';
 }
 
 // ── Louis's family as the default template ──
@@ -119,5 +124,10 @@ export const DEFAULT_FAMILY_CONFIG: FamilyConfig = {
   funkelzeitMode: 'entspannt',
   funkelzeitDailyCapMin: 30,
   toothBrushDefaultMode: 'tasche',
-  zeigMomentEnabled: true,
+  // Off by default — Marc flagged the overlay as "rather annoying" for
+  // a first-run experience. Parents now opt IN from the Eltern-Bereich
+  // settings tab; if on, they also pick which ONE parent vouches for
+  // the cheer moment (not both).
+  zeigMomentEnabled: false,
+  zeigMomentParent: 'mama',
 };

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useQuestEater } from './QuestEater';
 
 /**
  * CampfireScene — zero-asset painterly Hub scene.
@@ -229,7 +230,10 @@ export default function CampfireScene({
         }} />
       </div>
 
-      {/* Side-view Ronki — sits by the fire when idle */}
+      {/* Side-view Ronki — sits by the fire when idle. Registers with
+           the QuestEater context as the 'preferred' flyer target so
+           that on Lager, the flying quest icon lands here (not the
+           TopBar Ronki, which isn't even rendered on Hub). */}
       {ronkiVisible && <SideRonki />}
 
       {/* Greeting speech bubble — shows above Ronki on mount, fades
@@ -424,6 +428,12 @@ export default function CampfireScene({
           from { opacity: 0; transform: translateY(-4px) scale(0.9); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
         }
+        @keyframes cfFireBreath {
+          0%   { opacity: 0; transform: scaleX(0.2) scaleY(0.6); }
+          25%  { opacity: 1; transform: scaleX(1) scaleY(1); }
+          80%  { opacity: 0.8; transform: scaleX(1.3) scaleY(0.9); }
+          100% { opacity: 0; transform: scaleX(1.6) scaleY(0.5); }
+        }
       `}</style>
     </div>
   );
@@ -434,8 +444,32 @@ export default function CampfireScene({
 // Construction matches Claude Design's Feature Preview exactly.
 
 function SideRonki() {
+  const eater = useQuestEater();
+  const ref = useRef(null);
+  const [fireKey, setFireKey] = useState(0);
+  const lastFire = useRef(eater?.fireBreath ?? 0);
+
+  // Register as the preferred flyer target (beats the TopBar Ronki
+  // when both are mounted; in practice only one is at a time).
+  useEffect(() => {
+    if (!eater || !ref.current) return;
+    eater.registerRonkiEl(ref.current, 'preferred');
+    return () => eater.registerRonkiEl(null, 'preferred');
+  }, [eater]);
+
+  // Trigger a one-shot fire-breath puff when QuestEater signals it
+  // (Marc: "the dragon at the campfire needs to eat it and breath fire").
+  useEffect(() => {
+    const ctxKey = eater?.fireBreath ?? 0;
+    if (ctxKey !== lastFire.current) {
+      lastFire.current = ctxKey;
+      setFireKey(k => k + 1);
+    }
+  }, [eater?.fireBreath]);
+
   return (
     <div
+      ref={ref}
       aria-hidden="true"
       style={{
         position: 'absolute',
@@ -448,6 +482,29 @@ function SideRonki() {
         transformOrigin: '50% 90%',
       }}
     >
+      {/* Fire-breath puff — emerges from Ronki's mouth, extends right
+           (toward the camera/fire), then fades. Keyed so each eat-event
+           remounts a fresh run. */}
+      {fireKey > 0 && (
+        <span
+          key={fireKey}
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: '42%',
+            left: '58%',
+            width: 36,
+            height: 20,
+            background: 'radial-gradient(ellipse at 15% 50%, #fef3c7 0%, #fcd34d 25%, #f97316 55%, #dc2626 100%)',
+            borderRadius: '0 50% 50% 0 / 0 60% 60% 0',
+            filter: 'drop-shadow(0 0 8px rgba(249,115,22,0.7))',
+            pointerEvents: 'none',
+            zIndex: 8,
+            transformOrigin: '0% 50%',
+            animation: 'cfFireBreath 1.1s ease-out forwards',
+          }}
+        />
+      )}
       {/* Tail — swoops back and up, layered behind body */}
       <div style={{
         position: 'absolute',
