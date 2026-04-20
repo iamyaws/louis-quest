@@ -111,18 +111,26 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
     <div className="relative px-6 pb-32">
 
       {/* ── Bluish sky wash at top ──
-             Ambient gradient so the Aufgaben page lives in the same painted
-             world as the Hub. 280px tall, fades into cream below. Design
-             reference: Ronki Aufgaben Polish.html (.sky at 0.75 opacity). ── */}
+             Extended to 560px at 0.72 opacity with objectPosition shifted
+             down so the blue-heavy middle reads into the fold. Marc's
+             feedback: the old 280px/0.55 strip made the TopBar sit on
+             what felt like a cream band — extending the sky up so the
+             pills float on atmosphere instead. Longer bottom fade (200px)
+             softly lands the sky into cream before the first chapter
+             card. Polish Aufgaben .sky spec: 0.75 opacity, full-height
+             ambient fade. ── */}
       <div className="absolute left-0 right-0 top-0 overflow-hidden pointer-events-none"
-           style={{ height: 280, zIndex: 0 }}
+           style={{ height: 560, zIndex: 0 }}
            aria-hidden="true">
         <img src={base + SKY_FILE} alt=""
              className="w-full h-full object-cover"
-             style={{ objectPosition: 'center 30%', opacity: 0.55 }}
+             style={{ objectPosition: 'center 55%', opacity: 0.72 }}
              draggable={false} />
-        <div className="absolute inset-x-0 bottom-0 h-24"
-             style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(255,248,242,0.55) 50%, #fff8f2 100%)' }} />
+        <div className="absolute inset-x-0 bottom-0"
+             style={{
+               height: 200,
+               background: 'linear-gradient(to bottom, transparent 0%, rgba(255,248,242,0.45) 45%, rgba(255,248,242,0.85) 80%, #fff8f2 100%)',
+             }} />
       </div>
 
       {/* Relative wrapper so all content floats above the sky backdrop */}
