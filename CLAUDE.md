@@ -154,19 +154,21 @@ All audited. If you modify, stay compliant:
 
 ## Install page
 
-`/installieren` covers iPhone/iPad (Safari required), Android Chrome (+ Samsung Internet + Firefox fallbacks), Amazon Fire Tablet (Chrome from Appstore or Silk fallback), Desktop. Plus "Die ersten 10 Minuten" briefing with parent + child columns. Content source: `docs/onboarding-drafts.md` section 1.
+`/installieren` covers iPhone/iPad (Safari required), Android Chrome (+ Samsung Internet + Firefox fallbacks), Amazon Fire Tablet (Chrome from Appstore or Silk fallback), Desktop. Plus "Die ersten 10 Minuten" briefing with parent + child columns. Content sourced from the Notion doc linked below; when you change install copy, update BOTH the Notion page AND `website/src/pages/Installieren.tsx` to keep them in sync.
 
-## Outreach assets (internal, not on site)
+## Outreach assets (Notion, not in the repo)
 
-`docs/onboarding-drafts.md` contains:
+All outreach drafts live in Notion: **[Ronki · Onboarding & Outreach-Entwürfe](https://www.notion.so/34811efd973181c186d7fe359905785b)** (child page of the `Ronki` parent page).
 
-1. Install instructions per device (public-ready; already on `/installieren`)
-2. "Die ersten 10 Minuten" briefing (also on `/installieren`)
+Contents:
+
+1. Install instructions per device (also the source-of-truth for `/installieren`)
+2. "Die ersten 10 Minuten" briefing (parent + child columns, same content as the install page's footer section)
 3. **Welcome email — two plaintext templates**: Vorlage 1 kurz/persönlich (~90 words), Vorlage 2 ausführlich/warm (~230 words). Each is code-fenced for clean Gmail paste. `[Vorname]` placeholder.
-4. **WhatsApp shares — three variants**: persönliche Einzel-Nachricht with `[Name]` + `[Kind]` + `[ANKER]` placeholders (Marc's current preference), ultra-kurz, Gruppenchat. Pretend-live framing (no "Frühzugang" label in the message).
-5. Next-steps checklist for Marc.
+4. **WhatsApp shares — three variants**: persönliche Einzel-Nachricht with `[Name]` + `[Kind]` + `[ANKER]` placeholders (Marc's preference), ultra-kurz, Gruppenchat. Pretend-live framing (no "Frühzugang" label in the message).
+5. Next-steps checklist.
 
-Welcome-email template ends with the Gamer-Vater P.S. Unsubscribe footer is mandatory (GDPR).
+Welcome-email template ends with the Gamer-Vater P.S. Unsubscribe footer is mandatory (GDPR). **Edit in Notion, never copy back into the repo** — the repo is code-only going forward.
 
 ## Active strategy (Apr 2026)
 
@@ -184,6 +186,6 @@ Welcome-email template ends with the Gamer-Vater P.S. Unsubscribe footer is mand
 2. Run `npm run build:web` from repo root to verify before push.
 3. Commit with conventional messages (`feat(ratgeber):`, `fix(feedback):`, `docs:`, etc.).
 4. Push to `main` — Vercel auto-deploys both projects.
-5. Update `docs/onboarding-drafts.md` if the change affects install flow or outreach copy.
+5. Update the Notion outreach page (linked above) if the change affects install flow or outreach copy. Do NOT create new `/docs` markdown files in the repo — outreach/brand docs live in Notion, not in git.
 6. Update the Notion task DB if it's a trackable item.
 7. For Supabase DDL changes: use `mcp__supabase__apply_migration`, check `get_advisors` for new warnings, update CLAUDE.md schema section.
