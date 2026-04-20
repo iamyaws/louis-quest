@@ -6,7 +6,7 @@
   "app.offline": "Offline — Daten werden lokal gespeichert",
 
   "nav.hub": "Lager",
-  "nav.quests": "Rituale",
+  "nav.quests": "Heute",
   "nav.care": "Pflege",
   "nav.shop": "Laden",
   "nav.journal": "Tagebuch",
@@ -104,7 +104,7 @@
   "hint.sq_geschirr": "Teller & Gläser einräumen",
   "hint.ft": "Volle Power auf dem Platz!",
 
-  "task.section.title": "Deine Rituale heute",
+  "task.section.title": "Deine Routine heute",
   "task.viewAll": "Alle ansehen",
   "task.status.complete": "Geschafft! Ronki ist stolz!",
   "task.status.complete.0": "Geschafft! Ronki ist stolz! 🐉",
@@ -116,7 +116,7 @@
   "task.status.complete.6": "Unglaublich stark heute! 💪",
   "task.status.complete.7": "Alles erledigt — Ronki jubelt! 🥳",
   "task.sideQuest": "Bonus-Quest",
-  "task.morning.title": "Morgen-Ritual",
+  "task.morning.title": "Morgenroutine",
   "task.morning.subtitle": "So startest du den Tag",
   "task.evening.title": "Für Morgen",
   "task.evening.vacTitle": "Für Morgen",

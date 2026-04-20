@@ -6,7 +6,7 @@
   "app.offline": "Offline — data saved locally",
 
   "nav.hub": "Camp",
-  "nav.quests": "Rituals",
+  "nav.quests": "Today",
   "nav.care": "Care",
   "nav.shop": "Shop",
   "nav.journal": "Journal",
@@ -104,7 +104,7 @@
   "hint.sq_geschirr": "Put plates and cups away",
   "hint.ft": "Full power on the field!",
 
-  "task.section.title": "Your Rituals Today",
+  "task.section.title": "Your Routine Today",
   "task.viewAll": "View all",
   "task.status.complete": "Done! Ronki is proud!",
   "task.status.complete.0": "Done! Ronki is so proud! 🐉",
@@ -116,7 +116,7 @@
   "task.status.complete.6": "Unbelievably strong today! 💪",
   "task.status.complete.7": "All done — Ronki cheers! 🥳",
   "task.sideQuest": "Bonus Quest",
-  "task.morning.title": "Morning Ritual",
+  "task.morning.title": "Morning Routine",
   "task.morning.subtitle": "How you start the day",
   "task.evening.title": "For Tomorrow",
   "task.evening.vacTitle": "For Tomorrow",

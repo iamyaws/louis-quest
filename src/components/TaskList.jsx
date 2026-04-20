@@ -113,11 +113,11 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
     <div className="relative px-6 pb-32">
 
       {/* ── Biome-tinted morning-sky backdrop.
-             Rituale gets the "morning ritual sky" biome: soft blue with
-             cloud depth. Cream wash dominates at the fold so chapter
+             Heute (Routine view) gets the "morning sky" biome: soft blue
+             with cloud depth. Cream wash dominates at the fold so chapter
              cards read cleanly, but the blue tint bleeds through at the
              TopBar zone giving this tab its own distinct mood — matches
-             the per-tab palette system (Lager amber, Rituale blue, Laden
+             the per-tab palette system (Lager amber, Heute blue, Laden
              gold, Tagebuch teal, Ronki sage). See utils/biomeBackgrounds.js. ── */}
       <div className="fixed inset-0 pointer-events-none"
            style={{
