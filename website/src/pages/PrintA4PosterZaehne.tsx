@@ -25,6 +25,10 @@ export default function PrintA4PosterZaehne() {
         ),
         heroSrc: '/art/routines/brushing-teeth.webp',
         heroAlt: 'Malerische Badezimmer-Szene: Kind putzt Zähne mit Drachen-Begleiter.',
+        phoneScreenshot: {
+          src: '/art/app/morgen-quests.png',
+          caption: 'Zähne putzen, eingebettet in die Routine.',
+        },
         ctaHeading: 'So läuft euer erster Abend:',
         steps: [
           { content: <><strong>app.ronki.de</strong> auf dem Familien-Tablet öffnen</> },

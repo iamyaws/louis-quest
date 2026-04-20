@@ -24,6 +24,10 @@ export default function PrintA4PosterHort() {
         ),
         heroSrc: '/art/bioms/Sternenmeer_sea-of-stars.webp',
         heroAlt: 'Malerischer Sternenhimmel: ruhiger Übergang in den Abend.',
+        phoneScreenshot: {
+          src: '/art/app/aufgaben-uebersicht.png',
+          caption: 'So sieht ein Tag in der App aus.',
+        },
         ctaHeading: 'So startet ihr heute Abend:',
         steps: [
           { content: <><strong>app.ronki.de</strong> auf dem Handy oder Tablet öffnen</> },

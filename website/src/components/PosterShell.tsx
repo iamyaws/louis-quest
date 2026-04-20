@@ -102,6 +102,13 @@ export function PosterShell({ config }: { config: PosterConfig }) {
                     src={config.phoneScreenshot.src}
                     alt=""
                     className="phone-screen"
+                    onError={(e) => {
+                      // Graceful fallback: if the screenshot file isn't in
+                      // the repo yet, hide the whole phone inset so the
+                      // poster still looks good with only the painterly hero.
+                      const inset = (e.currentTarget as HTMLElement).closest('.phone-inset');
+                      if (inset) (inset as HTMLElement).style.display = 'none';
+                    }}
                   />
                 </div>
                 {config.phoneScreenshot.caption && (

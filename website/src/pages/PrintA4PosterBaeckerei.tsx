@@ -24,6 +24,10 @@ export default function PrintA4PosterBaeckerei() {
         ),
         heroSrc: '/art/routines/getting-ready.webp',
         heroAlt: 'Malerische Morgenszene: Kind zieht sich an, warmes Licht.',
+        phoneScreenshot: {
+          src: '/art/app/morgen-quests.png',
+          caption: 'Morgen-Quests, eine nach der anderen.',
+        },
         ctaHeading: 'Heute Abend einrichten, morgen früh testen:',
         steps: [
           { content: <><strong>app.ronki.de</strong> öffnen (iPhone: Safari, Android: Chrome)</> },

@@ -26,6 +26,10 @@ export default function PrintA4PosterAntiEngagement() {
         ),
         heroSrc: '/art/companion/dragon-majestic.webp',
         heroAlt: 'Imposanter, freundlicher Drache: Gegenentwurf zu aggressiven Kinder-Apps.',
+        phoneScreenshot: {
+          src: '/art/app/aufgaben-uebersicht.png',
+          caption: 'Kein Streak, kein Loot. Nur was dran ist.',
+        },
         ctaHeading: 'So probiert ihr Ronki heute aus:',
         steps: [
           { content: <><strong>app.ronki.de</strong> im Browser öffnen</> },
