@@ -4,6 +4,7 @@ import { TaskProvider, useTask } from './context/TaskContext';
 import { useTranslation } from './i18n/LanguageContext';
 import PinModal from './components/PinModal';
 import NavBar from './components/NavBar';
+import TabUnlockCelebration from './components/TabUnlockCelebration';
 import { QuestEaterProvider } from './components/QuestEater';
 import TaskList from './components/TaskList';
 import Belohnungsbank from './components/Belohnungsbank';
@@ -229,6 +230,7 @@ function AppContent() {
         )}
       </div>
       <NavBar active={view} onNavigate={setView} />
+      <TabUnlockCelebration view={view} />
       {/* ── MINT games — rendered OUTSIDE the max-w-lg wrapper so they
              cover the full viewport (same pattern as MemoryGame/PotionGame
              below). Previously nested inside the wrapper they got clipped

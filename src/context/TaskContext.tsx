@@ -186,6 +186,11 @@ export interface TaskState {
   /** Has the "Ronki hat X gelernt" golden banner been shown for this skill?
    *  One shot per skill. */
   ronkiLearnBannerSeen?: Record<string, boolean>;
+  /** Tab IDs whose unlock toast has fired already. One shot per tab. */
+  tabUnlocksSeen?: Record<string, boolean>;
+  /** Tab IDs whose first-tap coachmark overlay has been dismissed.
+   *  One shot per tab. */
+  tabCoachmarksSeen?: Record<string, boolean>;
 }
 
 interface TaskComputed {
@@ -254,6 +259,10 @@ interface TaskActions {
   practiceSkill: (skillId: string) => void;
   /** Marks the "Ronki hat X gelernt" banner as seen (one shot per skill). */
   markLearnBannerSeen: (skillId: string) => void;
+  /** Marks a tab's unlock toast as already shown. */
+  markTabUnlockSeen: (tabId: string) => void;
+  /** Marks a tab's first-tap coachmark overlay as dismissed. */
+  markTabCoachmarkSeen: (tabId: string) => void;
 }
 
 interface CelebrationEvent {
@@ -503,6 +512,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           ronkiLearnedSkills: (raw as any).ronkiLearnedSkills || [],
           ronkiSkillPractice: (raw as any).ronkiSkillPractice || {},
           ronkiLearnBannerSeen: (raw as any).ronkiLearnBannerSeen || {},
+          tabUnlocksSeen: (raw as any).tabUnlocksSeen || {},
+          tabCoachmarksSeen: (raw as any).tabCoachmarksSeen || {},
           micropediaDiscovered: raw.micropediaDiscovered || [],
           freundArcsCompleted: raw.freundArcsCompleted || [],
           freundCallbacksPending: raw.freundCallbacksPending || [],
@@ -1427,6 +1438,26 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const markTabUnlockSeen = useCallback((tabId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const seen = { ...(prev.tabUnlocksSeen || {}) };
+      if (seen[tabId]) return prev;
+      seen[tabId] = true;
+      return { ...prev, tabUnlocksSeen: seen };
+    });
+  }, []);
+
+  const markTabCoachmarkSeen = useCallback((tabId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const seen = { ...(prev.tabCoachmarksSeen || {}) };
+      if (seen[tabId]) return prev;
+      seen[tabId] = true;
+      return { ...prev, tabCoachmarksSeen: seen };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -1450,7 +1481,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
