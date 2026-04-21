@@ -157,6 +157,12 @@ export default function RonkiProfile({ onNavigate }) {
   const { state, actions } = useTask();
   const { unlocked: gamesUnlocked } = useGameAccess();
   const [tab, setTab] = useState('about');
+  // Top segmented control — 4 destinations inside the Ronki world.
+  // Pflege is the landing (mood portrait + today's care); Freunde /
+  // Spiele / Erinnerungen are first-class siblings instead of drill-ins.
+  // Bottom app-nav stays the single "home" — switching segments doesn't
+  // replace the main tab bar (Marc: "kids get confused by two nav bars").
+  const [segment, setSegment] = useState('pflege');
   const [thankYou, setThankYou] = useState(null); // thank-you bubble after a reaction choice
   const dev = isDevMode();
 
@@ -391,6 +397,48 @@ export default function RonkiProfile({ onNavigate }) {
         </div>
 
         <div className="px-4">
+
+          {/* ═══ SEGMENTED CONTROL — four destinations inside the Ronki
+               world. Always visible under the portrait so Louis can
+               switch without scrolling. Pill-shaped with teal "selected"
+               fill (matches Polish v2 tab style used below the Box
+               segment inside Pflege). Bottom app-nav stays the single
+               way home (Marc call, 21 Apr 2026): kids shouldn't have
+               two bars competing for "this is where I am". ═══ */}
+          <div className="flex gap-1 mb-4"
+               style={{
+                 padding: 4,
+                 borderRadius: 14,
+                 background: 'rgba(18,67,70,0.06)',
+               }}>
+            {[
+              { id: 'pflege',       label: lang === 'de' ? 'Pflege'       : 'Care',     icon: 'favorite' },
+              { id: 'freunde',      label: lang === 'de' ? 'Freunde'      : 'Friends',  icon: 'groups' },
+              { id: 'spiele',       label: lang === 'de' ? 'Spiele'       : 'Games',    icon: 'sports_esports' },
+              { id: 'erinnerungen', label: lang === 'de' ? 'Erinnerungen' : 'Memories', icon: 'auto_stories' },
+            ].map(s => (
+              <button key={s.id}
+                onClick={() => setSegment(s.id)}
+                className="flex-1 flex items-center justify-center gap-1.5 transition-all"
+                style={{
+                  padding: '10px 4px',
+                  borderRadius: 11,
+                  background: segment === s.id ? '#124346' : 'transparent',
+                  color: segment === s.id ? '#fef3c7' : '#6b655b',
+                  boxShadow: segment === s.id ? '0 3px 8px -3px rgba(18,67,70,0.35)' : 'none',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                  fontWeight: 700, fontSize: 11, letterSpacing: '0.04em',
+                }}>
+                <span className="material-symbols-outlined"
+                      style={{ fontSize: 16, fontVariationSettings: segment === s.id ? "'FILL' 1" : undefined }}>
+                  {s.icon}
+                </span>
+                {s.label}
+              </button>
+            ))}
+          </div>
+
+          {segment === 'pflege' && (<>
 
           {/* ═══ PFLEGE — mood-aware care card.
                Normal days: Füttern / Streicheln / Spielen with XP rewards.
@@ -693,143 +741,10 @@ export default function RonkiProfile({ onNavigate }) {
             </section>
           )}
 
-          {/* ═══ SPIELE MIT RONKI — hero CTA (Polish v2 .rp-hero-cta variant).
-               Most interactive card after the hero, so it sits directly under
-               Pflege and above Freunde. Unlocked = gold gradient with white
-               icon circle; locked = dashed amber stroke on cream. ═══ */}
-          <button
-            onClick={() => gamesUnlocked ? onNavigate?.('games') : null}
-            disabled={!gamesUnlocked}
-            className={`w-full grid items-center text-left transition-all ${gamesUnlocked ? 'active:scale-[0.98]' : ''}`}
-            style={{
-              gridTemplateColumns: '40px 1fr 32px',
-              gap: 14,
-              padding: '14px 16px',
-              borderRadius: 18,
-              marginBottom: 14,
-              background: gamesUnlocked
-                ? 'linear-gradient(160deg, #fcd34d, #f59e0b)'
-                : 'linear-gradient(160deg, #fffdf5, #fef3c7)',
-              border: gamesUnlocked
-                ? '1.5px solid transparent'
-                : '1.5px dashed rgba(245,158,11,0.5)',
-              boxShadow: gamesUnlocked
-                ? '0 8px 18px -6px rgba(245,158,11,0.45)'
-                : '0 4px 10px -6px rgba(245,158,11,0.18)',
-              opacity: gamesUnlocked ? 1 : 0.95,
-            }}
-          >
-            {/* 40px white icon circle (unlocked) / amber tinted (locked) */}
-            <div className="flex items-center justify-center shrink-0"
-                 style={{
-                   width: 40, height: 40, borderRadius: '50%',
-                   background: gamesUnlocked ? '#ffffff' : 'rgba(245,158,11,0.12)',
-                   boxShadow: gamesUnlocked ? '0 2px 6px rgba(120,53,15,0.18)' : 'none',
-                 }}>
-              <span className="material-symbols-outlined"
-                    style={{
-                      fontSize: 20,
-                      color: '#b45309',
-                      fontVariationSettings: "'FILL' 1, 'wght' 600",
-                    }}>
-                {gamesUnlocked ? 'sports_esports' : 'lock'}
-              </span>
-            </div>
-
-            {/* Body: kicker + title + subtitle */}
-            <div className="min-w-0">
-              <span style={{
-                display: 'block',
-                fontFamily: 'Plus Jakarta Sans, sans-serif',
-                fontWeight: 800, fontSize: 10, lineHeight: 1,
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-                color: gamesUnlocked ? 'rgba(255,255,255,0.9)' : '#b45309',
-                marginBottom: 3,
-              }}>
-                {lang === 'de' ? 'Mini-Spiele' : 'Mini games'}
-              </span>
-              <b style={{
-                display: 'block',
-                fontFamily: 'Nunito, sans-serif',
-                fontWeight: 800, fontSize: 15, lineHeight: 1.1,
-                color: gamesUnlocked ? '#2a2005' : '#124346',
-              }}>
-                {t('ronki.playWithRonki')}
-              </b>
-              <span style={{
-                display: 'block',
-                fontFamily: 'Nunito, sans-serif',
-                fontWeight: 500, fontSize: 11, lineHeight: 1.3,
-                color: gamesUnlocked ? '#5c4508' : '#6b655b',
-                marginTop: 2,
-              }}>
-                {gamesUnlocked ? t('ronki.playWithRonki.subtitle') : t('ronki.playWithRonki.locked')}
-              </span>
-            </div>
-
-            {/* Chev / lock on right */}
-            <div className="flex items-center justify-center shrink-0"
-                 style={{
-                   width: 32, height: 32, borderRadius: '50%',
-                   background: gamesUnlocked ? 'rgba(255,255,255,0.9)' : 'transparent',
-                 }}>
-              <span className="material-symbols-outlined"
-                    style={{ fontSize: 18, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
-                {gamesUnlocked ? 'arrow_forward' : 'lock_open'}
-              </span>
-            </div>
-          </button>
-
-          {/* ═══ FREUNDE — kickered card, circular 48px thumbnails ═══ */}
-          <Kicker>{lang === 'de' ? 'Freunde' : 'Friends'}</Kicker>
-          <button
-            onClick={() => onNavigate?.('micropedia')}
-            className="w-full rounded-2xl p-4 active:scale-[0.98] transition-transform text-left"
-            style={{
-              background: 'linear-gradient(135deg, #fff8f2 0%, #fef3c7 100%)',
-              border: '1.5px solid rgba(252,211,77,0.3)',
-              boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
-              marginBottom: 14,
-            }}
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <span className="material-symbols-outlined text-2xl"
-                    style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>
-                groups
-              </span>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-headline font-bold text-base text-on-surface">
-                  {lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}
-                </h3>
-                <p className="font-label text-xs text-on-surface-variant">
-                  {totalFound} / {totalCreatures} {lang === 'de' ? 'entdeckt' : 'found'}
-                </p>
-              </div>
-              <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
-            </div>
-            {recentFreunde.length > 0 && (
-              <div className="flex gap-2 mt-1">
-                {recentFreunde.slice(0, 4).map(f => (
-                  <div key={f.id}
-                       className="w-12 h-12 rounded-full overflow-hidden"
-                       style={{ border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                    {f.art ? (
-                      <img src={base + f.art} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center"
-                           style={{ background: 'rgba(252,211,77,0.18)' }}>
-                        <span className="material-symbols-outlined text-base"
-                              style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>
-                          pets
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </button>
+          {/* Mini-Spiele CTA + Freunde card moved to their dedicated
+               segments below — no longer duplicated on the Pflege landing.
+               Helden-Kodex stays because it's a standalone hero, not one
+               of the 4 sub-nav destinations. */}
 
           {/* ═══ HELDEN-KODEX BUTTON (public mode) — independent feature,
                kept distinct from the v2 kickered cards. Remains loud gold
@@ -957,76 +872,9 @@ export default function RonkiProfile({ onNavigate }) {
                 ))}
               </div>
 
-              {/* CHRONIK section — kicker over both flat links */}
-              <div>
-                <Kicker>{lang === 'de' ? 'Chronik' : 'Chronicle'}</Kicker>
-
-                {/* Memory card — demoted to flat white chronik-link */}
-                <button className="w-full p-3 flex items-center gap-3 text-left active:scale-[0.98] transition-all"
-                     style={{
-                       borderRadius: 14,
-                       background: '#fff',
-                       border: '1px solid rgba(18,67,70,0.12)',
-                       marginBottom: 8,
-                     }}
-                     onClick={() => onNavigate?.('discovery')}>
-                  <span className="material-symbols-outlined"
-                        style={{ fontSize: 22, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
-                    auto_stories
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <b style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, lineHeight: 1.2, color: '#124346' }}>
-                      {completedArcs.length > 0 ? (() => {
-                        const arc = findArc(completedArcs[completedArcs.length - 1]);
-                        return arc ? t(arc.titleKey) : (lang === 'de' ? 'Abenteuer' : 'Adventure');
-                      })() : (lang === 'de' ? 'Abenteuer-Chronik' : 'Discovery Log')}
-                    </b>
-                    <span style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: 11, lineHeight: 1.3, color: '#6b655b' }}>
-                      {completedArcs.length > 0
-                        ? `${completedArcs.length} ${lang === 'de' ? 'Abenteuer bestanden' : 'adventures survived'}`
-                        : (lang === 'de' ? 'Deine Geschichte beginnt bald!' : 'Your story begins soon!')}
-                    </span>
-                  </div>
-                  <span className="material-symbols-outlined"
-                        style={{ fontSize: 18, color: '#6b655b' }}>
-                    chevron_right
-                  </span>
-                </button>
-
-                {/* Erinnerungen — demoted to flat white chronik-link
-                     (bosses + badges summary preserved). */}
-                <button className="w-full p-3 flex items-center gap-3 text-left active:scale-[0.98] transition-all"
-                     style={{
-                       borderRadius: 14,
-                       background: '#fff',
-                       border: '1px solid rgba(18,67,70,0.12)',
-                     }}
-                     onClick={() => onNavigate?.('memories')}>
-                  <span className="material-symbols-outlined"
-                        style={{ fontSize: 22, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
-                    auto_awesome
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <b style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, lineHeight: 1.2, color: '#124346' }}>
-                      {lang === 'de' ? 'Erinnerungen' : 'Memories'}
-                    </b>
-                    <span style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: 11, lineHeight: 1.3, color: '#6b655b' }}>
-                      {(() => {
-                        const parts = [];
-                        const bosses = state.bossTrophies?.length ? [...new Set(state.bossTrophies)].length : 0;
-                        const badges = state.unlockedBadges?.length || 0;
-                        if (bosses) parts.push(lang === 'de' ? `${bosses} Bosse` : `${bosses} boss${bosses !== 1 ? 'es' : ''}`);
-                        if (badges) parts.push(lang === 'de' ? `${badges} Abzeichen` : `${badges} badge${badges !== 1 ? 's' : ''}`);
-                        return parts.join(' · ') || (lang === 'de' ? 'Deine Geschichte beginnt hier' : 'Your story begins here');
-                      })()}
-                    </span>
-                  </div>
-                  <span className="material-symbols-outlined"
-                        style={{ fontSize: 18, color: '#6b655b' }}>
-                    chevron_right
-                  </span>
-                </button>
-              </div>
+              {/* Chronik + Erinnerungen drill-ins removed from Über tab
+                   — merged into the dedicated Erinnerungen segment in
+                   the top sub-nav (Apr 21 2026). */}
             </div>
           )}
 
@@ -1189,6 +1037,146 @@ export default function RonkiProfile({ onNavigate }) {
             </div>
           )}
 
+          </>)}
+
+          {/* ═══ FREUNDE SEGMENT ═══
+               Expanded version of the old Freunde drill-in card. Shows
+               recent discoveries in circle thumbs + a count + a "Alle
+               ansehen" CTA that jumps to the full Micropedia view. */}
+          {segment === 'freunde' && (
+            <section style={{ marginBottom: 14 }}>
+              <Kicker>{lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}</Kicker>
+              <div className="rounded-2xl p-5"
+                   style={{
+                     background: 'linear-gradient(160deg, #fff8f2 0%, #fef3c7 100%)',
+                     border: '1.5px solid rgba(252,211,77,0.3)',
+                     boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
+                   }}>
+                <div className="flex items-baseline justify-between mb-3">
+                  <b className="font-headline" style={{ fontSize: 22, color: '#124346' }}>
+                    {totalFound} <span style={{ fontWeight: 500, color: '#6b655b', fontSize: 16 }}>/ {totalCreatures}</span>
+                  </b>
+                  <span className="font-label font-bold uppercase tracking-widest"
+                        style={{ fontSize: 10, color: '#92400e' }}>
+                    {lang === 'de' ? 'entdeckt' : 'discovered'}
+                  </span>
+                </div>
+                {recentFreunde.length > 0 ? (
+                  <div className="grid grid-cols-4 gap-2 mb-4">
+                    {recentFreunde.slice(0, 8).map(f => (
+                      <div key={f.id}
+                           className="aspect-square rounded-2xl overflow-hidden"
+                           style={{ border: '2px solid #fff', boxShadow: '0 2px 6px rgba(120,53,15,0.12)' }}>
+                        {f.art ? (
+                          <img src={base + f.art} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center"
+                               style={{ background: 'rgba(252,211,77,0.18)' }}>
+                            <span className="material-symbols-outlined text-lg"
+                                  style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>pets</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="font-body text-sm italic mb-4" style={{ color: '#92400e' }}>
+                    {lang === 'de' ? 'Geh raus und find Ronkis erste Freunde!' : "Go out and find Ronki's first friends!"}
+                  </p>
+                )}
+                <button
+                  onClick={() => onNavigate?.('micropedia')}
+                  className="w-full py-3 rounded-full font-label font-bold text-sm active:scale-[0.98] transition-all"
+                  style={{
+                    background: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
+                    color: '#78350f',
+                    boxShadow: '0 4px 12px -4px rgba(245,158,11,0.5)',
+                  }}>
+                  {lang === 'de' ? 'Alle Freunde ansehen' : 'See all friends'}
+                </button>
+              </div>
+            </section>
+          )}
+
+          {/* ═══ SPIELE SEGMENT ═══
+               Thin pass for now — the Spiele destination links through
+               to the existing games hub. When locked (gamesUnlocked=false),
+               shows a quiet locked state that tells Louis what he needs
+               to do first (finish today's quests) rather than a dashed
+               tease. Future: embed a small games thumbnail grid. */}
+          {segment === 'spiele' && (
+            <section style={{ marginBottom: 14 }}>
+              <Kicker>{lang === 'de' ? 'Mini-Spiele' : 'Mini games'}</Kicker>
+              {gamesUnlocked ? (
+                <button
+                  onClick={() => onNavigate?.('games')}
+                  className="w-full rounded-2xl p-5 text-left active:scale-[0.98] transition-all"
+                  style={{
+                    background: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
+                    boxShadow: '0 8px 18px -6px rgba(245,158,11,0.45)',
+                  }}>
+                  <div className="flex items-center gap-4">
+                    <div style={{
+                      width: 48, height: 48, borderRadius: '50%',
+                      background: '#fff', display: 'grid', placeItems: 'center', flexShrink: 0,
+                      boxShadow: '0 2px 6px rgba(120,53,15,0.18)',
+                    }}>
+                      <span className="material-symbols-outlined"
+                            style={{ fontSize: 24, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                        sports_esports
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span style={{ display: 'block', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 800, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.9)', marginBottom: 3 }}>
+                        {lang === 'de' ? 'Bereit' : 'Ready'}
+                      </span>
+                      <b style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 800, fontSize: 16, lineHeight: 1.15, color: '#2a2005' }}>
+                        {t('ronki.playWithRonki')}
+                      </b>
+                      <span style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: 12, lineHeight: 1.3, color: '#5c4508', marginTop: 2 }}>
+                        {t('ronki.playWithRonki.subtitle')}
+                      </span>
+                    </div>
+                    <span className="material-symbols-outlined"
+                          style={{ fontSize: 24, color: '#78350f', fontVariationSettings: "'FILL' 1" }}>
+                      arrow_forward
+                    </span>
+                  </div>
+                </button>
+              ) : (
+                <div className="rounded-2xl p-5 text-center"
+                     style={{
+                       background: 'linear-gradient(160deg, #fffdf5, #fef3c7)',
+                       border: '1.5px dashed rgba(245,158,11,0.5)',
+                     }}>
+                  <span className="material-symbols-outlined block mb-2"
+                        style={{ fontSize: 36, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                    lock
+                  </span>
+                  <b className="font-headline block mb-1" style={{ fontSize: 16, color: '#124346' }}>
+                    {lang === 'de' ? 'Noch nicht bereit' : 'Not ready yet'}
+                  </b>
+                  <p className="font-body text-sm" style={{ color: '#92400e', lineHeight: 1.4 }}>
+                    {t('ronki.playWithRonki.locked')}
+                  </p>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ═══ ERINNERUNGEN SEGMENT ═══
+               Merged destination combining what were two drill-ins in
+               the Über tab (Abenteuer-Chronik = completed arcs; and
+               Erinnerungen = bosses + badges) PLUS the full journal
+               history (state.journalHistory), including the bonding-
+               agent memory entries written when Louis picks a gentle
+               reaction on a bad-Ronki day. Chronological scrollable list.
+               Interim surface — the full storybook treatment lives in
+               the Buch v2 backlog. */}
+          {segment === 'erinnerungen' && (
+            <ErinnerungenList state={state} lang={lang} t={t} />
+          )}
+
         </div>
       </main>
 
@@ -1223,5 +1211,152 @@ export default function RonkiProfile({ onNavigate }) {
         </div>
       )}
     </div>
+  );
+}
+
+// ── Erinnerungen segment — merged memories list ───────────────────────
+// Folds three previously-separate destinations into one chronological
+// scroll: journal memories (state.journalHistory), completed quest arcs
+// (state.arcEngine.completedArcIds → arc title + completion date), and
+// boss/badge milestones. The bonding-agent writes into journalHistory
+// when Louis picks a sad-day reaction, so those moments naturally flow
+// in too. Interim surface — Buch v2 will be the full storybook home.
+
+function ErinnerungenList({ state, lang, t }) {
+  const entries = React.useMemo(() => {
+    const out = [];
+    // Journal memories (bonding-agent reactions + daily journal saves)
+    (state?.journalHistory || []).forEach((j, i) => {
+      if (!j?.memory) return;
+      const isBondingAgent = (j.achievements || []).includes('ronki-bad-day');
+      out.push({
+        key: `j-${i}-${j.date}`,
+        date: j.date,
+        icon: isBondingAgent ? '🫂' : '📔',
+        title: isBondingAgent
+          ? (lang === 'de' ? 'Für Ronki da gewesen' : 'Being there for Ronki')
+          : (lang === 'de' ? 'Tagebuch' : 'Journal'),
+        body: j.memory,
+      });
+    });
+    // Completed arcs
+    (state?.arcEngine?.completedArcIds || []).forEach((arcId, i) => {
+      const arc = findArc(arcId);
+      if (!arc) return;
+      out.push({
+        key: `a-${arcId}-${i}`,
+        date: state?.arcEngine?.completedAt?.[arcId] || null,
+        icon: '📜',
+        title: t ? t(arc.titleKey) : arcId,
+        body: lang === 'de' ? 'Abenteuer bestanden' : 'Adventure survived',
+      });
+    });
+    // Boss trophies (dedupe by boss id)
+    [...new Set(state?.bossTrophies || [])].forEach((bossId, i) => {
+      out.push({
+        key: `b-${bossId}-${i}`,
+        date: null,
+        icon: '🏆',
+        title: lang === 'de' ? 'Boss besiegt' : 'Boss defeated',
+        body: bossId,
+      });
+    });
+    // Badges
+    (state?.unlockedBadges || []).forEach((badgeId, i) => {
+      out.push({
+        key: `badge-${badgeId}-${i}`,
+        date: null,
+        icon: '⭐',
+        title: lang === 'de' ? 'Abzeichen' : 'Badge',
+        body: badgeId,
+      });
+    });
+    // Sort newest first — entries without dates bubble to the end.
+    out.sort((a, b) => {
+      if (!a.date && !b.date) return 0;
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return b.date.localeCompare(a.date);
+    });
+    return out;
+  }, [state?.journalHistory, state?.arcEngine?.completedArcIds, state?.bossTrophies, state?.unlockedBadges, lang, t]);
+
+  const totalDays = state?.totalTaskDays || 0;
+
+  return (
+    <section style={{ marginBottom: 14 }}>
+      {/* Header — day count + memory count, matching the Polish v2
+           Chronik card pattern ("47 Tage · 5 neue Seiten seit letzter
+           Woche") but scaled down to a plain header for now. */}
+      <div className="flex items-baseline justify-between mb-3 px-1">
+        <b className="font-headline" style={{ fontSize: 22, color: '#124346' }}>
+          {totalDays > 0
+            ? `${totalDays} ${totalDays === 1 ? (lang === 'de' ? 'Tag' : 'day') : (lang === 'de' ? 'Tage' : 'days')}`
+            : (lang === 'de' ? 'Eure Geschichte' : 'Your story')}
+        </b>
+        <span className="font-label font-bold uppercase tracking-widest"
+              style={{ fontSize: 10, color: '#b45309' }}>
+          {entries.length} {entries.length === 1
+            ? (lang === 'de' ? 'Erinnerung' : 'memory')
+            : (lang === 'de' ? 'Erinnerungen' : 'memories')}
+        </span>
+      </div>
+
+      {entries.length === 0 ? (
+        <div className="rounded-2xl p-6 text-center"
+             style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.1)' }}>
+          <span className="material-symbols-outlined block mb-2"
+                style={{ fontSize: 32, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+            auto_stories
+          </span>
+          <b className="font-headline block mb-1" style={{ fontSize: 15, color: '#124346' }}>
+            {lang === 'de' ? 'Eure Geschichte beginnt bald' : 'Your story begins soon'}
+          </b>
+          <p className="font-body text-sm italic" style={{ color: '#6b655b' }}>
+            {lang === 'de'
+              ? 'Jedes Abenteuer, jeder kleine Moment landet hier.'
+              : 'Every adventure, every small moment lands here.'}
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {entries.slice(0, 30).map(e => (
+            <div key={e.key}
+                 className="flex items-start gap-3 p-3 rounded-2xl"
+                 style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.08)' }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                background: 'rgba(245,158,11,0.1)',
+                display: 'grid', placeItems: 'center', fontSize: 22,
+              }}>
+                {e.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline justify-between gap-2">
+                  <b className="font-headline" style={{ fontSize: 13, color: '#124346', lineHeight: 1.2 }}>
+                    {e.title}
+                  </b>
+                  {e.date && (
+                    <span className="font-label" style={{ fontSize: 10, color: '#6b655b', whiteSpace: 'nowrap' }}>
+                      {e.date}
+                    </span>
+                  )}
+                </div>
+                <p className="font-body" style={{ fontSize: 12, color: '#124346', lineHeight: 1.4, margin: '3px 0 0' }}>
+                  {e.body}
+                </p>
+              </div>
+            </div>
+          ))}
+          {entries.length > 30 && (
+            <p className="font-label text-xs text-center mt-2 italic" style={{ color: '#6b655b' }}>
+              {lang === 'de'
+                ? `${entries.length - 30} weitere werden im Buch gesammelt.`
+                : `${entries.length - 30} more collected in the Buch.`}
+            </p>
+          )}
+        </div>
+      )}
+    </section>
   );
 }
