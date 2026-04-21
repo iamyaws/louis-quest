@@ -1517,6 +1517,16 @@ export default function RonkiProfile({ onNavigate }) {
           30%  { opacity: 1; }
           100% { transform: translateY(-80%) scale(0.4); opacity: 0; }
         }
+        /* Abenteuer-Buch excited-state glow + sparkle animations */
+        @keyframes abCtaGlow {
+          0%,100% { box-shadow: 0 8px 22px -6px rgba(245,158,11,0.55); }
+          50%     { box-shadow: 0 10px 28px -4px rgba(245,158,11,0.85); }
+        }
+        @keyframes abCtaSparkle {
+          0%,100% { opacity: 0; transform: scale(0.4); }
+          30%     { opacity: 1; transform: scale(1); }
+          60%     { opacity: 0.85; transform: scale(1.1); }
+        }
       `}</style>
       {thankYou && (
         <div role="status" aria-live="polite"
@@ -1549,12 +1559,27 @@ export default function RonkiProfile({ onNavigate }) {
 // when Louis picks a sad-day reaction, so those moments naturally flow
 // in too. Interim surface — Buch v2 will be the full storybook home.
 
-// ── ChronikCta — "Eure Chronik · N Tage" card that opens the Buch ──
-// Replaces the dropped Erinnerungen segment (24 Apr 2026). Gold-amber
-// gradient matching the Feature Previews v2 reference, book icon on
-// the left, day count + freshness hint in the body, chevron on right.
+// ── ChronikCta — "Abenteuer-Buch" card that opens the Buch ──
+// Renamed from "Chronik" (not first-grade-friendly) → "Abenteuer-Buch"
+// per Marc 24 Apr 2026. Two visual states:
+//   · default  — subtle white pill matching the Helden-Kodex style so
+//                 it doesn't shout on every visit
+//   · excited  — gold-amber gradient + star sprinkle animation when a
+//                 new chapter just dropped (new journal entry today
+//                 or all daily routines completed). The "unread" tier.
+// Visual separation means Louis only sees the bright gold pull when
+// there's actually something fresh to open.
+
 function ChronikCta({ state, lang, onNavigate }) {
   const totalDays = state?.totalTaskDays || 0;
+  const today = new Date().toISOString().slice(0, 10);
+  // Excited state fires when EITHER today's journal has an entry
+  // (chapter just written) OR all main quests done today (new chapter
+  // at end-of-day). Kid sees the glow once per day of real progress.
+  const todaysJournal = (state?.journalHistory || []).find(j => j.date === today);
+  const mainQuests = (state?.quests || []).filter(q => !q.sideQuest);
+  const allRoutinesDone = mainQuests.length > 0 && mainQuests.every(q => q.done);
+  const isExcited = !!todaysJournal || allRoutinesDone;
   // Count journal entries written in the last 7 days as "new pages".
   const weekAgo = (() => {
     const d = new Date();
@@ -1563,40 +1588,106 @@ function ChronikCta({ state, lang, onNavigate }) {
   })();
   const newPages = (state?.journalHistory || []).filter(j => j.date && j.date >= weekAgo).length;
 
+  const title = lang === 'de' ? 'Abenteuer-Buch' : 'Adventure Book';
+  const subtitle = newPages > 0
+    ? (lang === 'de' ? `${newPages} neue Seite${newPages === 1 ? '' : 'n'} diese Woche` : `${newPages} new page${newPages === 1 ? '' : 's'} this week`)
+    : (lang === 'de' ? 'Eure Geschichte, Kapitel für Kapitel.' : 'Your story, chapter by chapter.');
+
+  if (!isExcited) {
+    // State A — subtle pill (matches Helden-Kodex row style)
+    return (
+      <button
+        onClick={() => onNavigate?.('buch')}
+        className="w-full mb-4 flex items-center gap-3 active:scale-[0.98] transition-all text-left relative overflow-hidden"
+        style={{
+          padding: '12px 14px 12px 18px',
+          borderRadius: 14,
+          background: '#ffffff',
+          border: '1px solid rgba(18,67,70,0.1)',
+          boxShadow: '0 2px 8px -4px rgba(18,67,70,0.15)',
+        }}>
+        <span aria-hidden="true" style={{
+          position: 'absolute', left: 0, top: 0, bottom: 0,
+          width: 4,
+          background: 'linear-gradient(180deg, #fcd34d, #b45309)',
+        }} />
+        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+             style={{ background: 'rgba(245,158,11,0.1)' }}>
+          <span className="material-symbols-outlined"
+                style={{ fontSize: 18, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+            menu_book
+          </span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="font-label font-bold uppercase block"
+                style={{ fontSize: 9, letterSpacing: '0.22em', color: 'rgba(18,67,70,0.5)', marginBottom: 1 }}>
+            {totalDays > 0 ? `${totalDays} ${totalDays === 1 ? (lang === 'de' ? 'Tag' : 'day') : (lang === 'de' ? 'Tage' : 'days')}` : (lang === 'de' ? 'Buch' : 'Book')}
+          </span>
+          <span className="font-body" style={{ fontSize: 13, fontWeight: 700, color: '#124346', lineHeight: 1.25 }}>
+            {title}
+          </span>
+        </div>
+        <span className="material-symbols-outlined shrink-0"
+              style={{ fontSize: 18, color: 'rgba(18,67,70,0.5)' }}>
+          chevron_right
+        </span>
+      </button>
+    );
+  }
+
+  // State B — excited (new chapter waiting). Gold gradient + sparkles.
   return (
     <button
       onClick={() => onNavigate?.('buch')}
-      className="w-full rounded-2xl p-5 mb-4 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
+      className="w-full rounded-2xl p-5 mb-4 flex items-center gap-4 active:scale-[0.98] transition-all text-left relative overflow-hidden"
       style={{
         background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 45%, #f59e0b 100%)',
-        boxShadow: '0 6px 16px -6px rgba(245,158,11,0.5)',
+        boxShadow: '0 8px 22px -6px rgba(245,158,11,0.65)',
+        animation: 'abCtaGlow 2.6s ease-in-out infinite',
       }}>
-      <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-           style={{ background: '#fff', border: '2px solid rgba(120,53,15,0.15)', boxShadow: '0 2px 8px rgba(120,53,15,0.12)' }}>
+      {/* Sparkle star overlay — 5 tiny stars drifting in at staggered
+          delays to catch the kid's eye. aria-hidden so SR doesn't
+          announce them. */}
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+        {[
+          { left: '12%',  top: '20%', delay: '0s',    size: 10 },
+          { left: '38%',  top: '68%', delay: '0.6s',  size: 8  },
+          { left: '62%',  top: '18%', delay: '1.1s',  size: 12 },
+          { left: '82%',  top: '55%', delay: '1.7s',  size: 9  },
+          { left: '25%',  top: '52%', delay: '2.2s',  size: 7  },
+        ].map((s, i) => (
+          <span key={i} style={{
+            position: 'absolute', left: s.left, top: s.top,
+            width: s.size, height: s.size,
+            background: 'radial-gradient(circle, #fff 0%, #fef3c7 60%, transparent 80%)',
+            borderRadius: '50%',
+            boxShadow: '0 0 8px rgba(255,255,255,0.9)',
+            animation: `abCtaSparkle 2.2s ease-in-out ${s.delay} infinite`,
+          }} />
+        ))}
+      </div>
+      <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 relative"
+           style={{ background: '#fff', border: '2px solid rgba(120,53,15,0.15)', boxShadow: '0 2px 8px rgba(120,53,15,0.12)', zIndex: 2 }}>
         <span className="material-symbols-outlined"
               style={{ fontSize: 24, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
-          menu_book
+          auto_stories
         </span>
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 relative" style={{ zIndex: 2 }}>
         <span className="font-label font-bold uppercase"
               style={{ fontSize: 10, letterSpacing: '0.22em', color: 'rgba(120,53,15,0.78)', display: 'block', marginBottom: 2 }}>
           {lang === 'de' ? 'Neues Kapitel' : 'New chapter'}
         </span>
         <b style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 800, fontSize: 15, lineHeight: 1.15, color: '#78350f' }}>
-          {lang === 'de' ? 'Eure Chronik' : 'Your chronicle'}
+          {title}
           {totalDays > 0 && ` · ${totalDays} ${totalDays === 1 ? (lang === 'de' ? 'Tag' : 'day') : (lang === 'de' ? 'Tage' : 'days')}`}
         </b>
-        <span style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: 12, lineHeight: 1.3, color: 'rgba(120,53,15,0.75)', marginTop: 2 }}>
-          {newPages > 0
-            ? (lang === 'de'
-              ? `${newPages} neue Seite${newPages === 1 ? '' : 'n'} seit letzter Woche`
-              : `${newPages} new page${newPages === 1 ? '' : 's'} this week`)
-            : (lang === 'de' ? 'Eure Geschichte als Kapitel-Buch.' : 'Your story as a chapter book.')}
+        <span style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: 12, lineHeight: 1.3, color: 'rgba(120,53,15,0.8)', marginTop: 2 }}>
+          {subtitle}
         </span>
       </div>
-      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-           style={{ background: '#fff', border: '2px solid rgba(120,53,15,0.15)' }}>
+      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 relative"
+           style={{ background: '#fff', border: '2px solid rgba(120,53,15,0.15)', zIndex: 2 }}>
         <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#b45309' }}>
           chevron_right
         </span>

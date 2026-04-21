@@ -327,6 +327,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
           onRonkiTap={() => setQuipRollKey(k => k + 1)}
           onDiaryTap={() => setOpenBeat('expedition-diary')}
           variant={state?.companionVariant || 'amber'}
+          stage={getCatStage(state?.catEvo || 0)}
           height={340}
         />
         {/* Fade into cream paper so cards below land on a clean surface */}

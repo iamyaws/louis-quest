@@ -101,6 +101,7 @@ const STAR_POS = [
 export default function CampfireScene({
   onRonkiTap,
   variant = 'amber',
+  stage = 2,
   hour,
   state = 'idle',
   statusText,
@@ -171,65 +172,72 @@ export default function CampfireScene({
         </div>
       )}
 
-      {/* Distant trees — 3 silhouettes at varied scale + opacity */}
-      <Tree left="8%"  scale={0.8}  opacity={0.75} tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
-      <Tree left="72%" scale={0.9}  opacity={1}    tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
-      <Tree right="6%" scale={0.7}  opacity={0.6}  tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      {/* Distant trees — 3 silhouettes at varied scale + opacity.
+          Scaled up ~50% on 24 Apr 2026 per Marc ("scene feels empty,
+          zoom in more on the campfire + Ronki") to pull the foreground
+          closer. Trees now read as bigger silhouettes framing the
+          central log + fire. */}
+      <Tree left="4%"  scale={1.25} opacity={0.78} tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      <Tree left="78%" scale={1.35} opacity={1}    tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      <Tree right="1%" scale={1.05} opacity={0.65} tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
 
-      {/* Ground band */}
+      {/* Ground band — taller (28% → 38%) so the horizon sits lower
+          on the card and the scene feels closer to the ground. */}
       <div style={{
         position: 'absolute',
         left: 0, right: 0, bottom: 0,
-        height: '28%',
+        height: '38%',
         background: pal.ground,
         boxShadow: 'inset 0 6px 12px rgba(0,0,0,0.25)',
       }} />
 
-      {/* Log — Louis's seat */}
+      {/* Log — Louis's seat. Bigger (110 × 18 → 155 × 24) to match
+          the zoomed-in foreground. */}
       <div style={{
         position: 'absolute',
-        left: '18%',
-        bottom: '14%',
-        width: 110,
-        height: 18,
+        left: '16%',
+        bottom: '12%',
+        width: 155,
+        height: 24,
         background: 'linear-gradient(180deg, #9b7447 0%, #5c3e1f 70%)',
-        borderRadius: 10,
+        borderRadius: 14,
         boxShadow: '0 4px 6px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.1)',
       }}>
         <span style={{
           position: 'absolute',
-          right: -5,
-          top: 2,
-          width: 14,
-          height: 14,
+          right: -6,
+          top: 3,
+          width: 18,
+          height: 18,
           background: '#ead5a0',
-          border: '2px solid #8c6a3a',
+          border: '2.5px solid #8c6a3a',
           borderRadius: '50%',
         }} />
       </div>
 
-      {/* Campfire — flame + logs + warm glow */}
-      <div style={{ position: 'absolute', left: '46%', bottom: '12%', width: 44, height: 50 }}>
+      {/* Campfire — flame + logs + warm glow. Scaled up ~1.4× to
+          match the zoomed scene. */}
+      <div style={{ position: 'absolute', left: '46%', bottom: '10%', width: 60, height: 70 }}>
         <div style={{
           position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-          width: 50, height: 10,
+          width: 70, height: 14,
           background: '#3a2212',
-          borderRadius: 4,
+          borderRadius: 5,
           boxShadow: '0 -2px 4px rgba(252,165,73,0.4)',
         }} />
         <div style={{
           position: 'absolute',
-          left: '50%', bottom: 8, transform: 'translateX(-50%)',
-          width: 28, height: 36,
+          left: '50%', bottom: 12, transform: 'translateX(-50%)',
+          width: 40, height: 52,
           background: 'radial-gradient(ellipse at 50% 80%, #fef3c7 0%, #fcd34d 20%, #f97316 55%, #dc2626 100%)',
           borderRadius: '50% 50% 30% 30% / 60% 60% 40% 40%',
           animation: 'cfFlameFlick 1.1s ease-in-out infinite alternate',
-          filter: 'drop-shadow(0 0 10px rgba(249,115,22,0.6))',
+          filter: 'drop-shadow(0 0 14px rgba(249,115,22,0.6))',
         }} />
         <div style={{
           position: 'absolute',
-          left: -40, bottom: -20,
-          width: 130, height: 60,
+          left: -55, bottom: -26,
+          width: 180, height: 80,
           background: 'radial-gradient(ellipse, rgba(252,165,73,0.4), transparent 70%)',
           pointerEvents: 'none',
         }} />
@@ -239,7 +247,7 @@ export default function CampfireScene({
            the QuestEater context as the 'preferred' flyer target so
            that on Lager, the flying quest icon lands here (not the
            TopBar Ronki, which isn't even rendered on Hub). */}
-      {ronkiVisible && <SideRonki onTap={onRonkiTap} variant={variant} />}
+      {ronkiVisible && <SideRonki onTap={onRonkiTap} variant={variant} stage={stage} />}
 
       {/* Greeting speech bubble — shows above Ronki on mount, stays
            ~7.5s, then fades. Tapping the bubble (or onBubbleTap) rolls
@@ -449,7 +457,7 @@ export default function CampfireScene({
 // Lives inside the scene; extracted as a sub-component for readability.
 // Construction matches Claude Design's Feature Preview exactly.
 
-function SideRonki({ onTap, variant = 'amber' }) {
+function SideRonki({ onTap, variant = 'amber', stage = 2 }) {
   const eater = useQuestEater();
   const ref = useRef(null);
   const [fireKey, setFireKey] = useState(0);
@@ -498,10 +506,10 @@ function SideRonki({ onTap, variant = 'amber' }) {
       onClick={handleTap}
       style={{
         position: 'absolute',
-        left: '22%',
-        bottom: '17%',
-        width: 82,
-        height: 82,
+        left: '20%',
+        bottom: '14%',
+        width: 130,
+        height: 130,
         zIndex: 5,
         animation: 'cfRonkiBreathe 3.4s ease-in-out infinite',
         transformOrigin: '50% 90%',
@@ -523,8 +531,8 @@ function SideRonki({ onTap, variant = 'amber' }) {
             position: 'absolute',
             top: '42%',
             left: '58%',
-            width: 36,
-            height: 20,
+            width: 54,
+            height: 30,
             background: 'radial-gradient(ellipse at 15% 50%, #fef3c7 0%, #fcd34d 25%, #f97316 55%, #dc2626 100%)',
             borderRadius: '0 50% 50% 0 / 0 60% 60% 0',
             filter: 'drop-shadow(0 0 8px rgba(249,115,22,0.7))',
@@ -538,8 +546,11 @@ function SideRonki({ onTap, variant = 'amber' }) {
 
       {/* Front-facing chibi, bare mode (no inner locket bg) so Ronki
           sits directly on the campfire scene. Variant palette matches
-          Louis's hatched colorway. */}
-      <MoodChibi size={82} mood="normal" bare variant={variant} />
+          Louis's hatched colorway. Stage threaded through so the
+          campfire Ronki matches the profile Ronki's evolution (Marc
+          24 Apr 2026 "stage of ronki at the lager and profile isn't
+          the same but should be"). */}
+      <MoodChibi size={130} mood="normal" bare variant={variant} stage={Math.min(3, stage)} />
     </Tag>
   );
 }

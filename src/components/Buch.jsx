@@ -184,7 +184,11 @@ function ChapterCard({ chapter, chapterNum, locale, lang }) {
           {chapter.title}
       </h2>
 
-      {/* Scene — gradient placeholder in lieu of Midjourney art */}
+      {/* Scene — gradient placeholder. Only rendered on milestone
+          chapters (completed arcs) where the gradient carries meaning.
+          Normal-day chapters skip it so they don't read as empty
+          colored rectangles (Marc 24 Apr 2026: "all look flawed"). */}
+      {isMilestone && (
       <div className="relative mb-4"
            style={{
              width: '100%', aspectRatio: '16 / 7',
@@ -219,6 +223,7 @@ function ChapterCard({ chapter, chapterNum, locale, lang }) {
           </div>
         )}
       </div>
+      )}
 
       {/* Log — dashed leader, Louis-voice entries + optional parent tag */}
       {chapter.logEntries.length > 0 && (
@@ -435,7 +440,18 @@ function buildChapters(state, t, lang) {
   });
 
   // Build the ordered list + synthesize titles, scene gradients, XP totals.
-  const list = Array.from(byDate.values()).sort((a, b) => b.date.localeCompare(a.date));
+  // Drop buckets with NO real content (no log entries, no milestone,
+  // no polaroid, no stickers) — otherwise we render hollow "Ein leiser
+  // Tag" chapters with empty scene blocks (Marc 24 Apr 2026: "the book
+  // so far doesn't really create real entries as they all look flawed").
+  const list = Array.from(byDate.values())
+    .filter(b =>
+      b.logEntries.length > 0 ||
+      b.milestones.length > 0 ||
+      !!b.polaroid ||
+      b.stickers.length > 0
+    )
+    .sort((a, b) => b.date.localeCompare(a.date));
   return list.map(bucket => {
     const isMilestone = bucket.milestones.length > 0;
     const title = synthesizeTitle(bucket, lang);
