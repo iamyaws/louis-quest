@@ -272,8 +272,20 @@ export default function MoodChibi({
 
 // Stage scale factor — how much to scale the whole chibi relative to
 // the default toddler build. Baby is smaller (0.78), final is taller
-// (1.1). Egg uses its own Egg component, not the chibi.
-const STAGE_SCALE = { 0: 1, 1: 0.78, 2: 1, 3: 1.1 };
+// (1.1). Egg uses its own Egg component, not the chibi. Stages 4
+// (Teen/Heranwachsend) + 5 (Legend) extend the scale ramp.
+const STAGE_SCALE = { 0: 1, 1: 0.78, 2: 1, 3: 1.1, 4: 1.22, 5: 1.38 };
+// Wing size per stage — dragons have wings from hatch (Marc Apr 2026).
+// 0 has no wings (egg). 1-5 scale up from barely-visible nubs to fully
+// extended majestic wings.
+const WING_SCALE = {
+  0: 0,     // egg — no wings
+  1: 0.35,  // baby — tiny nubs
+  2: 0.65,  // toddler — small
+  3: 1.0,   // stolz — current size (baseline)
+  4: 1.25,  // teen — bigger
+  5: 1.55,  // legend — fully extended
+};
 
 const MOOD_SKINS = {
   normal: {
@@ -400,8 +412,10 @@ function Mouth({ kind }) {
 
 function Chibi({ palette, stage = 2, face = false }) {
   // Stage-dependent tweaks. Baby (1) has bigger eyes and slightly shorter
-  // horns relative to body. Final (3) grows the horns + adds wings and
-  // a visible tail behind the torso. Toddler (2) is the current baseline.
+  // horns relative to body. Wings render from stage 1 onward (Marc Apr
+  // 2026 — "dragons have wings from hatch") at sizes controlled by
+  // WING_SCALE. Stages 3+ show a visible tail. Stages 4-5 add a legendary
+  // aura ring behind the whole chibi.
   //
   // `face` mode renders only the head — no legs, slit eyes on sad (per
   // Feature Previews .sad-ronki reference: eyes are 2-3px down-slanted
@@ -409,53 +423,81 @@ function Chibi({ palette, stage = 2, face = false }) {
   // feedback 23 Apr 2026.
   const isBaby = stage === 1;
   const isFinal = stage === 3;
+  const isTeen = stage === 4;
+  const isLegend = stage === 5;
+  const hasTail = stage >= 3;
+  const hasAura = stage >= 5;
+  const wingScale = WING_SCALE[stage] ?? 0;
   const isSadFace = face && palette.mouth === 'sad';
+  // Wing dimensions in percent — scale from base (stage 3 = 30% × 36%).
+  const wingW = 30 * wingScale;
+  const wingH = 36 * wingScale;
+  // Wings tilt further out on bigger stages
+  const wingRot = 22 + (stage - 3) * 4;
   return (
     <>
-      {/* Stage 3 — wings behind the torso (drawn first so they sit
-          beneath the body). Small triangular flaps that breathe with
-          the body. */}
-      {isFinal && (
+      {/* Legendary aura — faint halo behind stage-5 Ronki */}
+      {hasAura && (
+        <div style={{
+          position: 'absolute', left: '50%', top: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '140%', height: '140%',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${palette.cheek || '#fcd34d'}55 0%, transparent 60%)`,
+          filter: 'blur(6px)',
+          zIndex: 0,
+          pointerEvents: 'none',
+        }} />
+      )}
+
+      {/* Wings — scaled per stage (0 = hidden). Drawn first so they sit
+          beneath the torso. */}
+      {wingScale > 0 && (
         <>
           <div style={{
-            position: 'absolute', top: '26%', left: '-10%',
-            width: '30%', height: '36%',
+            position: 'absolute', top: `${28 - stage * 0.8}%`,
+            left: `${-wingW * 0.35}%`,
+            width: `${wingW}%`, height: `${wingH}%`,
             background: palette.body,
             borderRadius: '70% 20% 60% 30% / 60% 20% 70% 40%',
-            transform: 'rotate(-22deg)',
+            transform: `rotate(-${wingRot}deg)`,
             opacity: 0.95,
             zIndex: 1,
             boxShadow: 'inset -4px -4px 0 rgba(0,0,0,0.15)',
           }} />
           <div style={{
-            position: 'absolute', top: '26%', right: '-10%',
-            width: '30%', height: '36%',
+            position: 'absolute', top: `${28 - stage * 0.8}%`,
+            right: `${-wingW * 0.35}%`,
+            width: `${wingW}%`, height: `${wingH}%`,
             background: palette.body,
             borderRadius: '20% 70% 30% 60% / 20% 60% 40% 70%',
-            transform: 'rotate(22deg)',
+            transform: `rotate(${wingRot}deg)`,
             opacity: 0.95,
             zIndex: 1,
             boxShadow: 'inset 4px -4px 0 rgba(0,0,0,0.15)',
           }} />
-
-          {/* Tail — long slim arc from behind-right, tip glowing */}
-          <div style={{
-            position: 'absolute', right: '-4%', bottom: '8%',
-            width: '32%', height: '14%',
-            background: palette.body,
-            borderRadius: '50% 80% 60% 70% / 60% 60% 50% 50%',
-            transform: 'rotate(-16deg)',
-            zIndex: 1,
-            boxShadow: 'inset 2px -3px 0 rgba(0,0,0,0.18)',
-          }}>
-            <span style={{
-              position: 'absolute', right: -4, top: -4,
-              width: 10, height: 10, borderRadius: '50%',
-              background: palette.horn,
-              boxShadow: `0 0 8px ${palette.cheek}`,
-            }} />
-          </div>
         </>
+      )}
+
+      {/* Tail — shows from stage 3 onward. Slimmer on Teen/Legend and
+          tip glows brighter on Legend. */}
+      {hasTail && (
+        <div style={{
+          position: 'absolute', right: '-4%', bottom: '8%',
+          width: '32%', height: '14%',
+          background: palette.body,
+          borderRadius: '50% 80% 60% 70% / 60% 60% 50% 50%',
+          transform: 'rotate(-16deg)',
+          zIndex: 1,
+          boxShadow: 'inset 2px -3px 0 rgba(0,0,0,0.18)',
+        }}>
+          <span style={{
+            position: 'absolute', right: -4, top: -4,
+            width: 10, height: 10, borderRadius: '50%',
+            background: palette.horn,
+            boxShadow: `0 0 ${isLegend ? '14px' : '8px'} ${palette.cheek}`,
+          }} />
+        </div>
       )}
 
       {/* Torso — pear-shape with inset volume shadow */}

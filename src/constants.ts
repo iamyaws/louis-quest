@@ -193,7 +193,8 @@ export const CAT_STAGES: import('./types').CatStageInfo[] = [
   { name: "Baby", threshold: 3, emoji: "\u{1F423}", desc: "Frisch geschl\u00FCpft!" },
   { name: "Jungtier", threshold: 9, emoji: "\u{1F432}", desc: "W\u00E4chst und gedeiht!" },
   { name: "Stolz", threshold: 18, emoji: "\u{1F525}", desc: "Stark und mutig!" },
-  { name: "Legend\u00E4r", threshold: 30, emoji: "\u{1F451}", desc: "Eine Legende!" },
+  { name: "Heranwachsend", threshold: 30, emoji: "\u{1F409}", desc: "Fast erwachsen!" },
+  { name: "Legend\u00E4r", threshold: 45, emoji: "\u{1F451}", desc: "Eine Legende!" },
 ];
 
 export const COMPANION_STAGES: Record<string, { name: string; emoji: string; desc: string }[]> = {
