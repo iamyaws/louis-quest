@@ -71,12 +71,17 @@ describe('ArcEngine', () => {
   });
 
   describe('declineOffer', () => {
-    it('offered -> idle, arc not marked completed', () => {
+    it('offered -> cooldown with 24h cooldownEndsAt, arc not marked completed', () => {
       let s = offerNextArc(initialArcState());
+      const before = Date.now();
       s = declineOffer(s);
-      expect(s.phase).toBe('idle');
+      expect(s.phase).toBe('cooldown');
       expect(s.offeredArcId).toBeNull();
       expect(s.completedArcIds).not.toContain('first-adventure');
+      // Cooldown roughly 24h out (allow a 5-second render delta)
+      expect(s.cooldownEndsAt).not.toBeNull();
+      expect(s.cooldownEndsAt! - before).toBeGreaterThanOrEqual(24 * 60 * 60 * 1000 - 5000);
+      expect(s.cooldownEndsAt! - before).toBeLessThanOrEqual(24 * 60 * 60 * 1000 + 5000);
     });
   });
 

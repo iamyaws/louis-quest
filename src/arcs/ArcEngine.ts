@@ -59,12 +59,25 @@ export function acceptOffer(state: ArcEngineState): ArcEngineState {
 }
 
 /**
- * Transitions offered -> idle, clearing the offer. Arc is NOT marked
- * completed.
+ * Transitions offered -> cooldown, clearing the offer. Arc is NOT
+ * marked completed. Sets a 24h cooldown so the Hub auto-offer effect
+ * doesn't immediately re-open the same arc card — that was the
+ * "Vielleicht später doesn't work" bug (decline flipped state to idle,
+ * the next render auto-offered again, so the kid saw nothing change).
+ *
+ * 24h is short enough the kid sees another arc the next day, long
+ * enough to feel like a real "later." Parental Dashboard can extend
+ * this via a planned pause-arc toggle (see backlog_arc_offer_rework.md).
  */
+const DECLINE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 export function declineOffer(state: ArcEngineState): ArcEngineState {
   if (state.phase !== 'offered') return state;
-  return touch({ ...state, phase: 'idle', offeredArcId: null });
+  return touch({
+    ...state,
+    phase: 'cooldown',
+    offeredArcId: null,
+    cooldownEndsAt: Date.now() + DECLINE_COOLDOWN_MS,
+  });
 }
 
 /**
