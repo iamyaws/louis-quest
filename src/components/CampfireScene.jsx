@@ -172,14 +172,19 @@ export default function CampfireScene({
         </div>
       )}
 
-      {/* Distant trees — 3 silhouettes at varied scale + opacity.
-          Scaled up ~50% on 24 Apr 2026 per Marc ("scene feels empty,
-          zoom in more on the campfire + Ronki") to pull the foreground
-          closer. Trees now read as bigger silhouettes framing the
-          central log + fire. */}
-      <Tree left="4%"  scale={1.25} opacity={0.78} tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
-      <Tree left="78%" scale={1.35} opacity={1}    tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
-      <Tree right="1%" scale={1.05} opacity={0.65} tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      {/* Distant trees — silhouettes framing the campfire.
+          Scaled up ~50% on 24 Apr 2026 to pull the foreground closer.
+          Bottom raised on 25 Apr 2026 so the trunks sit on the ground
+          line (was 28% when the ground was 28% tall; ground is 38% now,
+          so trees rest at 38% too). Added 3 more trees for a denser
+          tree-line (Marc: "trees disappearing with ground overlap,
+          bring them back and add a few more"). */}
+      <Tree left="2%"   scale={1.25} opacity={0.78} tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      <Tree left="18%"  scale={0.9}  opacity={0.55} tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      <Tree left="78%"  scale={1.35} opacity={1}    tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      <Tree right="12%" scale={0.8}  opacity={0.5}  tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      <Tree right="0%"  scale={1.1}  opacity={0.7}  tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
+      <Tree left="36%"  scale={0.65} opacity={0.4}  tree={pal.tree} trunk={isNight ? '#1a1411' : '#5a3a22'} />
 
       {/* Ground band — taller (28% → 38%) so the horizon sits lower
           on the card and the scene feels closer to the ground. */}
@@ -216,8 +221,11 @@ export default function CampfireScene({
       </div>
 
       {/* Campfire — flame + logs + warm glow. Scaled up ~1.4× to
-          match the zoomed scene. */}
-      <div style={{ position: 'absolute', left: '46%', bottom: '10%', width: 60, height: 70 }}>
+          match the zoomed scene. Pushed right + deeper into the scene
+          (left 46% → 58%, bottom 10% → 22%) on 25 Apr 2026 so the
+          Veilchen-Ronki nameplate pill (centered below Ronki) no
+          longer overlaps the flame. */}
+      <div style={{ position: 'absolute', left: '58%', bottom: '22%', width: 60, height: 70 }}>
         <div style={{
           position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
           width: 70, height: 14,
@@ -565,7 +573,10 @@ function Tree({ left, right, scale = 1, opacity = 1, tree, trunk }) {
       aria-hidden="true"
       style={{
         position: 'absolute',
-        bottom: '28%',
+        // Trees rest on the ground-line (38% ground height per
+        // CampfireScene). Bumped from 28% on 25 Apr 2026 after ground
+        // got taller — trunks were getting buried.
+        bottom: '36%',
         left, right,
         width: 40,
         height: 70,
