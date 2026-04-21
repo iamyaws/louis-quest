@@ -1,6 +1,15 @@
-import { motion } from 'motion/react';
 import { ContainerScroll } from './primitives/ContainerScroll';
+import { PhoneMockup } from './PhoneMockup';
 
+/**
+ * AppPreview — "Eine App. Zwei Blickwinkel."
+ *
+ * Phase 2: abstract blobs replaced with the real PhoneMockup component
+ * (same scale-aware primitive that renders the print posters). Left
+ * column = kid's view (Aufgaben / morgen-anchor). Right column = the
+ * observational surface parents land on (mood-grid, the journal view
+ * that reflects how the week went, no control dashboard).
+ */
 export function AppPreview() {
   return (
     <ContainerScroll
@@ -19,74 +28,79 @@ export function AppPreview() {
         </>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] h-full">
-        <div className="relative p-8 sm:p-12 flex flex-col justify-between bg-gradient-to-br from-mustard-soft/40 via-cream to-sage-soft/30 border-r border-teal/10">
-          <div>
-            <p className="text-[0.65rem] uppercase tracking-[0.15em] text-teal/60 mb-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 h-full">
+        {/* Kid's view — real app UI. Morgen-Anchor shows how a routine
+            looks from the child's side. */}
+        <div className="relative p-6 sm:p-10 flex flex-col items-center justify-between bg-gradient-to-br from-mustard-soft/40 via-cream to-sage-soft/30 border-r border-teal/10 gap-6">
+          <div className="text-center">
+            <p className="text-[0.65rem] uppercase tracking-[0.15em] text-teal/60 mb-3 font-semibold">
               Eigenverantwortung statt Gehorsam
             </p>
             <h3 className="font-display font-bold text-2xl sm:text-3xl text-teal-dark leading-tight">
               Da bist du ja.
             </h3>
           </div>
-          <motion.div
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-            className="my-6 flex-1 flex items-center justify-center"
-          >
-            <div className="relative">
-              <div className="h-36 w-36 sm:h-44 sm:w-44 rounded-full bg-gradient-to-br from-teal via-teal-light to-sage shadow-xl flex items-center justify-center">
-                <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-gradient-to-br from-mustard to-mustard-soft shadow-inner" />
-              </div>
-              <div className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-sage shadow-md" />
-              <div className="absolute -bottom-1 left-4 h-5 w-5 rounded-full bg-mustard shadow-md" />
-            </div>
-          </motion.div>
-          <div className="space-y-3">
-            <div className="rounded-2xl bg-cream/80 backdrop-blur p-4 shadow-sm border border-teal/10">
-              <p className="text-sm font-medium text-teal-dark">Zähne putzen</p>
-              <p className="text-xs opacity-60">Ich halt den Becher.</p>
-            </div>
-            <div className="rounded-2xl bg-cream/80 backdrop-blur p-4 shadow-sm border border-teal/10">
-              <p className="text-sm font-medium text-teal-dark">Kommst du kurz zum Nest?</p>
-              <p className="text-xs opacity-60">Das Ei macht was.</p>
-            </div>
-          </div>
+          <PhoneFrame>
+            <PhoneMockup variant="morgen-anchor" scale={2} />
+          </PhoneFrame>
+          <p className="text-sm text-ink/65 text-center max-w-xs leading-relaxed">
+            Keine Push. Keine Streak. Louis sieht, was als Nächstes dran ist, und hakt selbst ab.
+          </p>
         </div>
 
-        <div className="relative p-8 sm:p-10 flex flex-col justify-between bg-gradient-to-br from-cream via-cream to-teal/5">
-          <div>
-            <p className="text-[0.65rem] uppercase tracking-[0.15em] text-teal/60 mb-3">
+        {/* Parent's view — the Buch / mood grid, the reflective surface.
+            NOT a control dashboard. Parents see the week as the child
+            wrote it, not as a compliance tracker. */}
+        <div className="relative p-6 sm:p-10 flex flex-col items-center justify-between bg-gradient-to-br from-cream via-cream to-teal/5 gap-6">
+          <div className="text-center">
+            <p className="text-[0.65rem] uppercase tracking-[0.15em] text-teal/60 mb-3 font-semibold">
               Einblick ohne Überwachung
             </p>
-            <h3 className="font-display font-bold text-lg sm:text-xl text-teal-dark leading-tight">
-              Louis hat seine Morgenroutine heute gemacht.
+            <h3 className="font-display font-bold text-2xl sm:text-3xl text-teal-dark leading-tight">
+              Louis hat seinen Tag eingetragen.
             </h3>
           </div>
-          <div className="my-6 flex-1 flex flex-col gap-3 justify-center">
-            <Row label="Morgens" status="fertig" color="sage" />
-            <Row label="Nachmittags" status="läuft" color="mustard" />
-            <Row label="Abends" status="offen" color="teal" faded />
-          </div>
-          <div className="rounded-xl bg-sage/15 border border-sage/30 p-3 text-[0.75rem] text-teal-dark">
-            <span className="font-medium">Keine Streaks.</span>{' '}
-            <span className="opacity-75">Kontinuität wächst in Ronkis Welt.</span>
-          </div>
+          <PhoneFrame>
+            <PhoneMockup variant="mood-grid" scale={2} />
+          </PhoneFrame>
+          <p className="text-sm text-ink/65 text-center max-w-xs leading-relaxed">
+            Das Abenteuer-Buch, wie Louis es gefüllt hat. Kein Dashboard. Keine Bewertungen.
+          </p>
         </div>
       </div>
     </ContainerScroll>
   );
 }
 
-function Row({ label, status, color, faded }: { label: string; status: string; color: 'sage' | 'mustard' | 'teal'; faded?: boolean }) {
-  const dot = color === 'sage' ? 'bg-sage' : color === 'mustard' ? 'bg-mustard' : 'bg-teal';
+/* ─── Shared phone-frame for both columns ──────────────────────────
+ * Uses same bezel styling as the print-poster phone-inset: dark teal
+ * body, rounded 3xl corners, small notch up top, screen inside.
+ * Sized for ~2x scale so the content is readable at arm's length. */
+function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`flex items-center justify-between px-4 py-3 rounded-xl bg-cream/70 backdrop-blur border border-teal/10 ${faded ? 'opacity-50' : ''}`}>
-      <div className="flex items-center gap-3">
-        <span className={`h-2 w-2 rounded-full ${dot}`} />
-        <span className="text-sm font-medium text-teal-dark">{label}</span>
+    <div
+      className="relative flex-shrink-0"
+      style={{
+        width: '200px',
+        height: '400px',
+        background: '#1A3C3F',
+        borderRadius: '28px',
+        padding: '8px',
+        boxShadow:
+          '0 24px 56px -16px rgba(26,60,63,0.45), 0 8px 24px -8px rgba(26,60,63,0.25)',
+      }}
+    >
+      <div
+        aria-hidden
+        className="absolute top-[14px] left-1/2 -translate-x-1/2 bg-teal-dark rounded-full"
+        style={{ width: '50px', height: '6px', zIndex: 2 }}
+      />
+      <div
+        className="w-full h-full overflow-hidden"
+        style={{ borderRadius: '22px' }}
+      >
+        {children}
       </div>
-      <span className="text-xs opacity-60">{status}</span>
     </div>
   );
 }
