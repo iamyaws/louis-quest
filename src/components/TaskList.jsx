@@ -102,9 +102,11 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
     // flame + briefly shows "+N ⭐". Core-loop audit #1 fix: the loop
     // stops being silent. Gracefully no-ops if no TopBar (e.g. Hub).
     if (eater && evt?.currentTarget && quest) {
-      const fromRect = evt.currentTarget.getBoundingClientRect();
+      const fromEl = evt.currentTarget;
+      const fromRect = fromEl.getBoundingClientRect();
       eater.eatQuest({
         fromRect,
+        fromEl,
         emoji: quest.icon || '⭐',
         hp: quest.xp || 0,
       });

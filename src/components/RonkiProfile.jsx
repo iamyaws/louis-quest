@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { getCatStage, getDragonArt } from '../utils/helpers';
@@ -105,7 +105,7 @@ const MOOD_PALETTES = {
     scene: { sky: 'radial-gradient(ellipse at 50% 0%, #fff 0%, #fef3c7 35%, #fcd34d 70%, #f59e0b 100%)', hillBack: '#72694e', hillFront: '#5e6740', groundTop: '#5a8f4a', groundBot: '#3f6b34', orb: 'radial-gradient(circle at 35% 30%, #fff, #fef3c7 60%, #fcd34d)', orbGlow: 'rgba(254,243,199,0.6)', embers: true, firefly: false },
     rarityGrad: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
     rarityShadow: '0 6px 14px -4px rgba(245,158,11,0.55)',
-    subtitle: { de: 'Mystischer Begleiter', en: 'Mystical Companion' },
+    subtitle: { de: 'Heute stark zusammen', en: 'Strong together today' },
   },
   4: { // Magisch — starry twilight with drifting sparkles
     mode: 'celebration',
@@ -125,13 +125,14 @@ const MOOD_PALETTES = {
 
 // Pick the active mood: PM overrides AM if PM was logged. Default to
 // Okay (2) if nothing logged — the profile should still work for a
-// brand-new user who hasn't touched the mood chip yet.
+// brand-new user who hasn't touched the mood chip yet. Clamps to 0-5
+// so a corrupt or stale persisted value can't crash the profile
+// (MOOD_PALETTES[7] would be undefined).
 function activeMood(state) {
   const pm = state?.moodPM;
   const am = state?.moodAM;
-  if (typeof pm === 'number') return pm;
-  if (typeof am === 'number') return am;
-  return 2; // Okay — neutral baseline
+  const raw = typeof pm === 'number' ? pm : typeof am === 'number' ? am : 2;
+  return (raw >= 0 && raw <= 5) ? raw : 2;
 }
 
 // Care card variants — titles, body copy, 3 actions per mood mode.
@@ -236,7 +237,29 @@ export default function RonkiProfile({ onNavigate }) {
   const { unlocked: gamesUnlocked } = useGameAccess();
   const [tab, setTab] = useState('about');
   const [ritual, setRitual] = useState(null); // { copy, mode } when an overlay is up
+  const ritualTimerRef = useRef(null);
+  const overlayRef = useRef(null);
   const dev = isDevMode();
+
+  // Clear any pending ritual timer on unmount so a navigate-away mid-
+  // overlay doesn't call setState on a torn-down component.
+  useEffect(() => () => {
+    if (ritualTimerRef.current) clearTimeout(ritualTimerRef.current);
+  }, []);
+
+  // Focus the overlay when it appears so Escape-to-dismiss works for
+  // keyboard users (and so screen readers announce the affirmation).
+  useEffect(() => {
+    if (ritual && overlayRef.current) overlayRef.current.focus();
+  }, [ritual]);
+
+  const closeRitual = () => {
+    if (ritualTimerRef.current) {
+      clearTimeout(ritualTimerRef.current);
+      ritualTimerRef.current = null;
+    }
+    setRitual(null);
+  };
 
   // Care action wrapper — plays pop, triggers haptic, runs the action.
   // Pulled up from Sanctuary so Louis can Füttern/Streicheln/Spielen
@@ -252,13 +275,25 @@ export default function RonkiProfile({ onNavigate }) {
   // action; shows a serif-italic affirmation overlay that auto-dismisses
   // after 4.5s (tappable to close early). "For teaching purposes" —
   // the copy names the emotion and offers one concrete gesture.
+  // SFX + haptic scale with the mood: celebration gets 'celeb', baseline
+  // 'pop', comfort/rest stay soft on 'tap' with no vibration (a sad or
+  // tired kid doesn't need jazz hands).
   const handleRitual = (a, currentMode) => {
-    SFX.play(currentMode === 'celebration' ? 'celeb' : 'pop');
-    if (navigator.vibrate) navigator.vibrate(60);
+    const sfxKey = currentMode === 'celebration' ? 'celeb'
+                : currentMode === 'comfort' || currentMode === 'rest' ? 'tap'
+                : 'pop';
+    SFX.play(sfxKey);
+    if (currentMode === 'celebration' && navigator.vibrate) navigator.vibrate(60);
     const copy = RITUAL_COPY[a.action];
     if (!copy) return;
+    // Cancel a previous pending auto-dismiss so re-tapping resets the
+    // 4.5s window instead of letting the first timer close the new one.
+    if (ritualTimerRef.current) clearTimeout(ritualTimerRef.current);
     setRitual({ copy: copy[lang] || copy.de, mode: currentMode });
-    setTimeout(() => setRitual(r => (r && r.copy === (copy[lang] || copy.de) ? null : r)), 4500);
+    ritualTimerRef.current = setTimeout(() => {
+      setRitual(null);
+      ritualTimerRef.current = null;
+    }, 4500);
   };
 
   if (!state) return null;
@@ -629,7 +664,11 @@ export default function RonkiProfile({ onNavigate }) {
                        : mode === 'celebration'
                        ? '1px solid rgba(192,38,211,0.25)'
                        : '1px solid rgba(245,158,11,0.2)',
-                     boxShadow: '0 6px 14px -8px rgba(18,67,70,0.18)',
+                     // Baseline keeps the original amber drop shadow to
+                     // match pre-spectrum visual; other modes use teal.
+                     boxShadow: mode === 'baseline'
+                       ? '0 6px 14px -8px rgba(245,158,11,0.2)'
+                       : '0 6px 14px -8px rgba(18,67,70,0.18)',
                      marginBottom: 14,
                      transition: 'background 0.5s ease, border-color 0.5s ease',
                    }}>
@@ -1252,12 +1291,20 @@ export default function RonkiProfile({ onNavigate }) {
 
       {/* Ritual overlay — serif-italic affirmation splash, shown for
            ~4.5s after tapping a comfort/rest/celebration action. Tap
-           anywhere to dismiss early. Color tint follows mood. */}
+           anywhere OR press Escape to dismiss early. role="dialog"
+           because this is a modal — it captures attention and blocks
+           interaction with the profile until dismissed; focus the
+           container so Escape works for keyboard users. */}
       {ritual && (
         <div
-          role="status"
-          onClick={() => setRitual(null)}
-          className="fixed inset-0 z-[500] flex items-center justify-center px-6"
+          ref={overlayRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rp-ritual-copy"
+          tabIndex={-1}
+          onClick={closeRitual}
+          onKeyDown={(e) => { if (e.key === 'Escape') closeRitual(); }}
+          className="fixed inset-0 z-[500] flex items-center justify-center px-6 outline-none"
           style={{
             background: ritual.mode === 'comfort' ? 'rgba(30,40,60,0.55)'
                       : ritual.mode === 'rest'    ? 'rgba(22,30,38,0.6)'
@@ -1265,7 +1312,7 @@ export default function RonkiProfile({ onNavigate }) {
             backdropFilter: 'blur(8px)',
             animation: 'rp-overlay-in 0.35s ease-out',
           }}>
-          <p style={{
+          <p id="rp-ritual-copy" style={{
             margin: 0, maxWidth: 320, textAlign: 'center',
             fontFamily: 'Cormorant Garamond, Georgia, serif',
             fontStyle: 'italic', fontWeight: 600, fontSize: 26, lineHeight: 1.25,
