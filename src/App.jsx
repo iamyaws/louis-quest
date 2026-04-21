@@ -32,6 +32,7 @@ import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
 import RonkiProfile from './components/RonkiProfile';
 import Buch from './components/Buch';
+import ChibiGallery from './components/ChibiGallery';
 import MemoryWall from './components/MemoryWall';
 import DiscoveryLog from './components/DiscoveryLog';
 import Micropedia from './components/Micropedia';
@@ -49,7 +50,16 @@ import AlphaBanner from './components/AlphaBanner';
 function AppContent() {
   const { t } = useTranslation();
   const { state, actions, loading, toastTrigger } = useTask();
-  const [view, setView] = useState('hub');
+  // Dev gallery shortcut — open the standalone ChibiGallery via
+  // ?gallery=1 in the URL. Not for Louis, just for design review.
+  const initialView = (() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('gallery') === '1') return 'gallery';
+    }
+    return 'hub';
+  })();
+  const [view, setView] = useState(initialView);
   const [activeQuestLineId, setActiveQuestLineId] = useState(null);
   const [activeMintGame, setActiveMintGame] = useState(null); // MINT game id when view==='mint-game'
   const [showParental, setShowParental] = useState(false);
@@ -169,6 +179,7 @@ function AppContent() {
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
         {view === 'memories' && <MemoryWall />}
         {view === 'buch' && <Buch onNavigate={setView} />}
+        {view === 'gallery' && <ChibiGallery onClose={() => setView('hub')} />}
         {view === 'discovery' && <DiscoveryLog onNavigate={setView} />}
         {view === 'micropedia' && <Micropedia onNavigate={setView} />}
         {view === 'poem' && <PoemQuest onBack={() => setView('quests')} />}

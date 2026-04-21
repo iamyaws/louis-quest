@@ -157,6 +157,20 @@ export default function RonkiProfile({ onNavigate }) {
   const { state, actions } = useTask();
   const { unlocked: gamesUnlocked } = useGameAccess();
   const [tab, setTab] = useState('about');
+  // Finch-style drawer (Marc 23 Apr 2026): the Mein Drache tab block
+  // is a collapsible card. Tapping the currently-selected tab toggles
+  // the drawer open/closed; tapping a different tab switches content
+  // AND opens the drawer. Default: closed, so the profile starts tidy
+  // and Louis reaches for info when he wants it.
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const onDrawerTab = (id) => {
+    if (id === tab) {
+      setDrawerOpen(v => !v);
+    } else {
+      setTab(id);
+      setDrawerOpen(true);
+    }
+  };
   // Top segmented control — 4 destinations inside the Ronki world.
   // Pflege is the landing (mood portrait + today's care); Freunde /
   // Spiele / Erinnerungen are first-class siblings instead of drill-ins.
@@ -526,50 +540,102 @@ export default function RonkiProfile({ onNavigate }) {
                the pflege sub-nav." Keeping the palette/copy tables
                below as MoodChibi + the header card both read them. */}
 
-          {/* ═══ MEIN DRACHE — identity tabs moved up from the bottom
-               23 Apr 2026 per Marc: "bring the mein Drache details up
-               right below the sub-nav." Über / Details / Stärken are
-               who Ronki IS — makes sense to see them first, then the
-               daily Pflege flow below. Only visible on Pflege segment
-               so Freunde / Spiele / Erinnerungen stay uncluttered. ═══ */}
-          <Kicker>{lang === 'de' ? 'Mein Drache' : 'My dragon'}</Kicker>
-          <div className="flex gap-1 mb-5"
-               style={{
-                 padding: 4,
-                 borderRadius: 14,
-                 background: 'rgba(18,67,70,0.06)',
-               }}>
-            {[
-              { id: 'about', label: lang === 'de' ? 'Über' : 'About', icon: 'info' },
-              { id: 'details', label: 'Details', icon: 'analytics' },
-              { id: 'traits', label: lang === 'de' ? 'Stärken' : 'Strengths', icon: 'psychology' },
-            ].map(tb => (
-              <button key={tb.id}
-                onClick={() => setTab(tb.id)}
-                className="flex-1 flex items-center justify-center gap-1.5 transition-all"
-                style={{
-                  padding: '10px 6px',
-                  borderRadius: 11,
-                  background: tab === tb.id ? '#124346' : 'transparent',
-                  color: tab === tb.id ? '#fef3c7' : '#6b655b',
-                  boxShadow: tab === tb.id ? '0 3px 8px -3px rgba(18,67,70,0.35)' : 'none',
-                  fontFamily: 'Plus Jakarta Sans, sans-serif',
-                  fontWeight: 700,
-                  fontSize: 12,
-                  letterSpacing: '0.06em',
-                }}>
-                <span className="material-symbols-outlined text-base"
-                      style={{ fontVariationSettings: tab === tb.id ? "'FILL' 1" : undefined }}>
-                  {tb.icon}
-                </span>
-                {tb.label}
-              </button>
-            ))}
-          </div>
+          {/* ═══ MEIN DRACHE DRAWER — Finch-style collapsible card.
+               One container holds the three tab buttons + the content
+               below; tapping the active tab closes the drawer, tapping
+               a different tab opens with content swap. Content area
+               uses grid-template-rows 0fr → 1fr for a smooth auto-height
+               expand that doesn't require JS-measured max-heights.
+               Tabs feel connected to the card because they live INSIDE
+               it — not a separate row above. Per Marc 23 Apr 2026
+               Finch/Piper benchmark. ═══ */}
+          <section className="mb-4 overflow-hidden"
+                   style={{
+                     borderRadius: 20,
+                     background: '#fff',
+                     border: '1px solid rgba(18,67,70,0.08)',
+                     boxShadow: '0 6px 14px -8px rgba(18,67,70,0.22)',
+                     transition: 'box-shadow 0.3s ease',
+                   }}>
+            {/* Subtle paper handle at the top — mimics the Finch tab
+                 nub, signals "this is a drawer you can pull." */}
+            <div aria-hidden="true" style={{
+              display: 'flex', justifyContent: 'center',
+              padding: '6px 0 0',
+            }}>
+              <span style={{
+                width: 34, height: 4, borderRadius: 3,
+                background: 'rgba(18,67,70,0.18)',
+              }} />
+            </div>
+
+            {/* Tab row — lives inside the same card as the content */}
+            <div className="flex gap-1"
+                 style={{
+                   padding: '8px 10px 0',
+                   background: '#fff',
+                 }}>
+              {[
+                { id: 'about', label: lang === 'de' ? 'Über' : 'About', icon: 'info' },
+                { id: 'details', label: 'Details', icon: 'analytics' },
+                { id: 'traits', label: lang === 'de' ? 'Stärken' : 'Strengths', icon: 'psychology' },
+              ].map(tb => {
+                const active = tab === tb.id;
+                const openAndActive = active && drawerOpen;
+                return (
+                  <button key={tb.id}
+                    onClick={() => onDrawerTab(tb.id)}
+                    aria-expanded={openAndActive}
+                    className="flex-1 flex items-center justify-center gap-1.5"
+                    style={{
+                      padding: '10px 6px',
+                      borderRadius: '11px 11px 0 0',
+                      background: openAndActive ? 'rgba(18,67,70,0.06)' : 'transparent',
+                      color: openAndActive ? '#124346' : (active ? '#124346' : '#6b655b'),
+                      borderBottom: openAndActive ? '2px solid #124346' : '2px solid transparent',
+                      fontFamily: 'Plus Jakarta Sans, sans-serif',
+                      fontWeight: openAndActive ? 800 : 700,
+                      fontSize: 12,
+                      letterSpacing: '0.06em',
+                      transition: 'all 0.2s ease',
+                    }}>
+                    <span className="material-symbols-outlined text-base"
+                          style={{ fontVariationSettings: openAndActive ? "'FILL' 1" : undefined }}>
+                      {tb.icon}
+                    </span>
+                    {tb.label}
+                    <span className="material-symbols-outlined"
+                          style={{
+                            fontSize: 14,
+                            marginLeft: 2,
+                            transform: openAndActive ? 'rotate(180deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.25s ease',
+                            opacity: active ? 0.8 : 0.3,
+                          }}>
+                      expand_more
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Content area — grid-template-rows trick for smooth
+                 height animation without measuring DOM. When closed,
+                 `0fr` collapses to zero; when open, `1fr` expands to
+                 natural content height. The inner `min-height: 0`
+                 prevents the child from fighting the collapse. */}
+            <div style={{
+              display: 'grid',
+              gridTemplateRows: drawerOpen ? '1fr' : '0fr',
+              transition: 'grid-template-rows 0.32s ease, padding 0.32s ease',
+              padding: drawerOpen ? '12px 18px 18px' : '0 18px',
+              background: '#fff',
+            }}>
+              <div style={{ overflow: 'hidden', minHeight: 0 }}>
 
           {/* About tab */}
           {tab === 'about' && (
-            <div className="flex flex-col gap-5 mb-4">
+            <div className="flex flex-col gap-5">
               <p style={{
                 margin: 0,
                 padding: '4px 2px 0',
@@ -771,6 +837,11 @@ export default function RonkiProfile({ onNavigate }) {
               </div>
             </div>
           )}
+
+              </div>
+            </div>
+          </section>
+          {/* ═══ END MEIN DRACHE DRAWER ═══ */}
 
           {isBadDay ? (
             <>
