@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { getCatStage, getDragonArt } from '../utils/helpers';
@@ -10,6 +10,7 @@ import { getVariant } from '../data/companionVariants';
 import SFX from '../utils/sfx';
 import { useGameAccess } from '../hooks/useGameAccess';
 import { biomeBackground } from '../utils/biomeBackgrounds';
+import MoodChibi from './MoodChibi';
 
 /**
  * Companion Profile — Ronki Profile Polish v2.
@@ -57,6 +58,48 @@ function clamp(n) { return Math.max(20, Math.min(100, Math.round(n))); }
 
 const base = import.meta.env.BASE_URL;
 
+// ── Bonding Agent ──
+// Sad-day reaction cards. Returned as a plain array so the component
+// stays simple. If Louis has taught Ronki a skill (e.g. Box-Atmung), a
+// 4th card appears letting Ronki offer it back — the Rollentausch
+// moment the Feature Previews spec calls "the deepest bonding move of
+// all engagement reports".
+function SAD_REACTIONS(lang, hasLearnedBox) {
+  const base = [
+    {
+      id: 'kuscheln',
+      emoji: '🫂',
+      iconBg: 'rgba(236,72,153,0.15)',
+      title: lang === 'de' ? 'Kuscheln' : 'Cuddle',
+      sub: lang === 'de' ? 'Leise neben ihm sitzen · nichts müssen' : 'Sit beside him · no pressure',
+    },
+    {
+      id: 'stille',
+      emoji: '🪷',
+      iconBg: 'rgba(167,139,250,0.18)',
+      title: lang === 'de' ? 'Still zusammen sitzen' : 'Sit in silence',
+      sub: lang === 'de' ? 'Einfach da sein · 3 Min Stille' : 'Just be there · 3 min silence',
+    },
+    {
+      id: 'tee',
+      emoji: '🍵',
+      iconBg: 'rgba(52,211,153,0.18)',
+      title: lang === 'de' ? 'Warmen Tee kochen' : 'Make warm tea',
+      sub: lang === 'de' ? 'Für Ronki und dich · kleine Geste' : 'For Ronki and you · small gesture',
+    },
+  ];
+  if (hasLearnedBox) {
+    base.push({
+      id: 'atmen',
+      emoji: '🌬️',
+      iconBg: 'rgba(14,165,233,0.18)',
+      title: lang === 'de' ? 'Atmen mit Ronki' : 'Breathe with Ronki',
+      sub: lang === 'de' ? 'Box-Atmung · die er von dir gelernt hat' : 'Box breathing · the skill he learned from you',
+    });
+  }
+  return base;
+}
+
 // Section kicker — Plus Jakarta 800/10 uppercase, .22em letter-spacing, teal.
 // Used above each major card per Polish v2 spec.
 function Kicker({ children }) {
@@ -80,7 +123,15 @@ export default function RonkiProfile({ onNavigate }) {
   const { state, actions } = useTask();
   const { unlocked: gamesUnlocked } = useGameAccess();
   const [tab, setTab] = useState('about');
+  const [thankYou, setThankYou] = useState(null); // thank-you bubble after a reaction choice
   const dev = isDevMode();
+
+  // Bonding Agent sync — run once per mount. Expires yesterday's bad
+  // mood and fires a new scheduled bad day if due. Idempotent per-day.
+  useEffect(() => {
+    actions.syncRonkiMood?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Care action wrapper — plays pop, triggers haptic, runs the action.
   // Pulled up from Sanctuary so Louis can Füttern/Streicheln/Spielen
@@ -90,6 +141,18 @@ export default function RonkiProfile({ onNavigate }) {
     SFX.play('pop');
     if (navigator.vibrate) navigator.vibrate(100);
     action();
+  };
+
+  // Gentle reaction on a bad-Ronki day. All choices are "right" — no
+  // XP, no winner. Writes a journal memory via TaskContext + shows a
+  // brief thank-you bubble, then reverts to normal mood.
+  const handleSadReaction = (reactionId) => {
+    SFX.play('pop');
+    if (navigator.vibrate) navigator.vibrate(40);
+    actions.pickRonkiSadReaction?.(reactionId);
+    const thanks = lang === 'de' ? 'Danke, Louis.' : 'Thank you, Louis.';
+    setThankYou(thanks);
+    setTimeout(() => setThankYou(t => (t === thanks ? null : t)), 2800);
   };
 
   if (!state) return null;
@@ -147,6 +210,18 @@ export default function RonkiProfile({ onNavigate }) {
       : stageName);
   const rarityRare = lang === 'de' ? 'Rar' : 'Rare';
 
+  // ── Bonding Agent ──
+  // Ronki's mood drives portrait + Pflege action set. On a bad day
+  // ('sad' / 'tired'), the mood-portrait takes on a tinted circle with
+  // rain or z particles; the Pflege card replaces Füttern/Streicheln/
+  // Spielen with three gentle reactions. Louis's mood (moodAM/moodPM)
+  // is untouched — this is Ronki's state, not Louis's.
+  const ronkiMood = state.ronkiMood || 'normal';
+  const isBadDay = ronkiMood === 'sad' || ronkiMood === 'tired';
+  const practiceCount = state.ronkiSkillPractice?.boxAtmung || 0;
+  const hasLearnedBox = (state.ronkiLearnedSkills || []).includes('boxAtmung');
+  const showLearnBanner = hasLearnedBox && !(state.ronkiLearnBannerSeen || {}).boxAtmung;
+
   return (
     <div className="relative min-h-dvh pb-32">
       {/* Biome-tinted forest-sage backdrop — Ronki = earthy biome where
@@ -178,119 +253,42 @@ export default function RonkiProfile({ onNavigate }) {
       <main className="max-w-lg mx-auto"
             style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top, 0px))', paddingLeft: 0, paddingRight: 0 }}>
 
-        {/* ═══ LIVING SCENE — gold-hour stage (Polish v2 .rp-scene) ═══
-             Full-width 320px rounded card with radial sun, two silhouette
-             hills, ground band, 3 rising embers, Ronki portrait with breath
-             + aura, and a gold rarity banner pinned inside at the bottom.
-             All pure CSS — no new art assets. */}
-        <section className="relative mx-4 overflow-hidden"
+        {/* ═══ MOOD PORTRAIT — forward-facing CSS chibi on a cream card.
+             Reuses the SideRonki chibi construction; mood-skinned via
+             MoodChibi (normal / sad+rain+tear / tired+zzz). Replaces the
+             old img portrait per Marc's Apr 2026 brief: same character
+             as the Lager view, just facing the child. ═══ */}
+        <section className="relative mx-4 overflow-hidden flex flex-col items-center justify-end"
                  style={{
                    height: 320,
                    borderRadius: 24,
+                   paddingTop: 16, paddingBottom: 16,
                    boxShadow: '0 14px 30px -14px rgba(18,67,70,0.35)',
-                   background: 'radial-gradient(ellipse at 50% 0%, #fff3c8 0%, #fcd34d 28%, #f59e0b 58%, #9a3f1b 100%)',
+                   background: ronkiMood === 'sad'
+                     ? 'linear-gradient(180deg, #dbe7f2 0%, #b5c7dc 100%)'
+                     : ronkiMood === 'tired'
+                     ? 'linear-gradient(180deg, #e6ecf2 0%, #c5ced8 100%)'
+                     : 'linear-gradient(180deg, #fffdf5 0%, #fef3c7 60%, #fcd34d 100%)',
+                   transition: 'background 0.6s ease',
                  }}>
-          {/* Sun / golden orb glow (top-right-ish, behind portrait) */}
-          <div aria-hidden="true"
-               style={{
-                 position: 'absolute', top: 30, right: 40,
-                 width: 60, height: 60, borderRadius: '50%',
-                 background: 'radial-gradient(circle at 35% 30%, #fff3c8, #f59e0b 60%, #c2410c)',
-                 boxShadow: '0 0 60px rgba(245,158,11,0.6)',
-                 zIndex: 1,
-               }} />
+          <MoodChibi size={220} mood={ronkiMood} />
 
-          {/* Back hill — darker, further away */}
-          <div aria-hidden="true"
-               style={{
-                 position: 'absolute', left: '-10%', right: '-10%', bottom: '26%',
-                 height: 80, opacity: 0.85,
-                 borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
-                 background: '#6d3a45',
-                 zIndex: 2,
-               }} />
-          {/* Front hill — closer, darker */}
-          <div aria-hidden="true"
-               style={{
-                 position: 'absolute', left: '-5%', right: '-5%', bottom: '20%',
-                 height: 100,
-                 borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
-                 background: '#4a2536',
-                 zIndex: 3,
-               }} />
-
-          {/* Ground band (tod-golden) */}
-          <div aria-hidden="true"
-               style={{
-                 position: 'absolute', left: 0, right: 0, bottom: 0,
-                 height: '22%',
-                 background: 'linear-gradient(180deg, #4a3a2f, #2a1f18)',
-                 boxShadow: 'inset 0 6px 16px rgba(0,0,0,0.25)',
-                 zIndex: 2,
-               }} />
-
-          {/* 3 ember particles — rising, staggered timing */}
-          {[
-            { left: '28%', delay: '0s',    duration: '4s'   },
-            { left: '52%', delay: '1.3s',  duration: '4.4s' },
-            { left: '72%', delay: '2.6s',  duration: '3.8s' },
-          ].map((e, i) => (
-            <div key={i} aria-hidden="true"
-                 style={{
-                   position: 'absolute', left: e.left, bottom: '18%',
-                   width: 4, height: 4, borderRadius: '50%',
-                   background: 'radial-gradient(circle, #fcd34d, #f59e0b)',
-                   boxShadow: '0 0 6px #fcd34d',
-                   animation: `rp-ember-rise ${e.duration} ease-in infinite`,
-                   animationDelay: e.delay,
-                   zIndex: 4,
-                 }} />
-          ))}
-
-          {/* Ronki portrait — composited at bottom: 14%, circular with
-               breathing scale. Blurred gold aura pulses behind. */}
+          {/* Rarity banner — gradient pill pinned at the bottom */}
           <div style={{
-                 position: 'absolute', left: '50%', bottom: '14%',
-                 transform: 'translateX(-50%)',
-                 width: 140, height: 140,
-                 zIndex: 5,
-                 animation: 'rp-breathe 3s ease-in-out infinite',
-               }}>
-            <div aria-hidden="true"
-                 style={{
-                   position: 'absolute', inset: '-14%',
-                   borderRadius: '50%',
-                   background: 'radial-gradient(circle, rgba(252,211,77,0.55) 0%, transparent 65%)',
-                   filter: 'blur(12px)',
-                   animation: 'rp-aura-pulse 3s ease-in-out infinite',
-                 }} />
-            <div style={{
-                   position: 'relative',
-                   width: '100%', height: '100%',
-                   borderRadius: '50%',
-                   overflow: 'hidden',
-                   border: '3px solid rgba(255,248,242,0.85)',
-                   boxShadow: '0 10px 22px -8px rgba(60,20,5,0.55)',
-                 }}>
-              <img src={`${base}art/companion/${artFile}.webp`} alt="Ronki"
-                   className="w-full h-full object-cover" />
-            </div>
-          </div>
-
-          {/* Rarity banner — gold-gradient pill pinned inside the scene */}
-          <div style={{
-                 position: 'absolute', left: '50%', bottom: '4%',
-                 transform: 'translateX(-50%)',
+                 marginTop: 14,
                  display: 'inline-flex', alignItems: 'center', gap: 6,
                  padding: '7px 16px', borderRadius: 999,
-                 background: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
+                 background: ronkiMood === 'sad'
+                   ? 'linear-gradient(160deg, #8ea5c0, #4f6a8a)'
+                   : ronkiMood === 'tired'
+                   ? 'linear-gradient(160deg, #9faab8, #5d6d7e)'
+                   : 'linear-gradient(160deg, #fcd34d, #f59e0b)',
                  color: '#fff',
                  fontFamily: 'Plus Jakarta Sans, sans-serif',
                  fontWeight: 800, fontSize: 11, lineHeight: 1,
                  letterSpacing: '0.16em',
                  textTransform: 'uppercase',
-                 boxShadow: '0 6px 14px -4px rgba(245,158,11,0.55)',
-                 zIndex: 6,
+                 boxShadow: '0 6px 14px -4px rgba(0,0,0,0.25)',
                }}>
             <span className="material-symbols-outlined"
                   style={{ fontSize: 14, fontVariationSettings: "'FILL' 1" }}>
@@ -323,74 +321,264 @@ export default function RonkiProfile({ onNavigate }) {
             textTransform: 'uppercase',
             color: '#6b655b',
           }}>
-            {lang === 'de' ? 'Mystischer Begleiter' : 'Mystical Companion'}
+            {ronkiMood === 'sad'
+              ? (lang === 'de' ? 'Braucht dich heute' : 'Needs you today')
+              : ronkiMood === 'tired'
+              ? (lang === 'de' ? 'Ruht sich aus' : 'Resting')
+              : (lang === 'de' ? 'Mystischer Begleiter' : 'Mystical Companion')}
           </p>
         </div>
 
         <div className="px-4">
 
-          {/* ═══ PFLEGE — kickered cream→amber card wrapping 3 care actions.
-               Absorbed from Sanctuary when the Pflege tab merged into Ronki's
-               page (April 2026). State lives on the same TaskContext fields
-               (catFed / catPetted / catPlayed) so the existing reducers work
-               unchanged. One tap per action per day; done state shows a check. */}
-          <Kicker>{lang === 'de' ? 'Pflege heute' : 'Care today'}</Kicker>
-          <section style={{
-                     padding: '14px 16px',
+          {/* ═══ PFLEGE — mood-aware care card.
+               Normal days: Füttern / Streicheln / Spielen with XP rewards.
+               Bad days (ronkiMood sad/tired): card morphs into the
+               Bonding Agent sad-hero + 3 gentle reactions (Kuscheln /
+               Stille / Tee). Louis picks one, memory lands in the Buch,
+               Ronki feels seen, bad mood ends. No XP on the reactions —
+               per spec "alle drei sind richtig, es gibt keinen Verlierer".
+               If Ronki has learned a skill (e.g. Box-Atmung via 5× in
+               Gefühlsecke), a 4th reaction "Atmen mit Ronki" appears —
+               the Rollentausch moment. ═══ */}
+          {isBadDay ? (
+            <>
+              {/* Sad hero card — kicker + name + "9 von 22 Tagen" rhythm copy.
+                   Inspired by the Feature Previews sad-hero layout. */}
+              <section style={{
+                     padding: '18px 18px 16px',
                      borderRadius: 20,
-                     background: 'linear-gradient(160deg, #fffdf5, #fef3c7)',
-                     border: '1px solid rgba(245,158,11,0.2)',
-                     boxShadow: '0 6px 14px -8px rgba(245,158,11,0.2)',
+                     background: ronkiMood === 'sad'
+                       ? 'linear-gradient(160deg, #dbe7f2 0%, #b5c7dc 100%)'
+                       : 'linear-gradient(160deg, #e6ecf2 0%, #c5ced8 100%)',
+                     border: '1px solid rgba(90,115,150,0.22)',
+                     boxShadow: '0 6px 14px -8px rgba(18,67,70,0.22)',
                      marginBottom: 14,
                    }}>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          label: t('care.feed'), reward: 5, color: '#f59e0b' },
-                { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        label: t('care.pet'),  reward: 3, color: '#ec4899' },
-                { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', label: t('care.play'), reward: 8, color: '#124346' },
-              ].map(a => (
-                <button key={a.key}
-                  onClick={() => handleCare(a.onTap, a.state)}
-                  disabled={a.state}
-                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-                  style={{ opacity: a.state ? 0.7 : 1 }}>
-                  <div className="w-full aspect-square rounded-2xl flex items-center justify-center"
-                       style={{
-                         background: a.state
-                           ? 'rgba(52,211,153,0.12)'
-                           : 'linear-gradient(135deg, #ffffff 0%, #fef3c7 100%)',
-                         border: a.state ? '1.5px solid rgba(52,211,153,0.45)' : '1.5px solid rgba(255,255,255,0.9)',
-                         boxShadow: a.state
-                           ? '0 2px 8px rgba(5,150,105,0.1)'
-                           : '0 4px 14px -4px rgba(245,158,11,0.22), inset 0 1px 0 rgba(255,255,255,0.7)',
+                <p className="font-label font-bold"
+                   style={{ fontSize: 10, lineHeight: 1, letterSpacing: '0.22em', textTransform: 'uppercase', color: ronkiMood === 'sad' ? '#2f3d5a' : '#26333c', margin: '0 0 8px 0' }}>
+                  {lang === 'de' ? 'Heute' : 'Today'}
+                </p>
+                <h2 className="font-headline font-bold"
+                    style={{ fontSize: 22, lineHeight: 1.15, color: ronkiMood === 'sad' ? '#1f2d47' : '#1a2530', margin: '0 0 6px 0' }}>
+                  {ronkiMood === 'sad'
+                    ? (lang === 'de' ? 'Ronki ist heute traurig.' : 'Ronki is sad today.')
+                    : (lang === 'de' ? 'Ronki ist heute müde.' : 'Ronki is tired today.')}
+                </h2>
+                <p className="font-body"
+                   style={{ fontSize: 13, lineHeight: 1.4, color: ronkiMood === 'sad' ? 'rgba(47,61,90,0.78)' : 'rgba(38,51,60,0.78)', margin: 0 }}>
+                  {lang === 'de'
+                    ? 'Manchmal passiert das einfach. Was soll Louis tun?'
+                    : 'It just happens sometimes. What should Louis do?'}
+                </p>
+              </section>
+
+              {/* 3 (or 4) gentle reactions — no XP. */}
+              <Kicker>{lang === 'de' ? 'Wähle eine sanfte Reaktion' : 'Pick a gentle response'}</Kicker>
+              <p className="font-body italic"
+                 style={{ fontSize: 13, color: '#5a6b8c', margin: '0 0 10px 4px' }}>
+                {lang === 'de' ? '„Was braucht Ronki gerade von dir?"' : '"What does Ronki need from you right now?"'}
+              </p>
+              <section style={{ marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {SAD_REACTIONS(lang, hasLearnedBox).map(r => (
+                  <button key={r.id}
+                    onClick={() => handleSadReaction(r.id)}
+                    className="w-full flex items-center gap-3 active:scale-[0.98] transition-transform text-left"
+                    style={{
+                      padding: '14px 16px',
+                      borderRadius: 18,
+                      background: 'linear-gradient(135deg, #ffffff, rgba(255,255,255,0.85))',
+                      border: '1.5px solid rgba(90,115,150,0.2)',
+                      boxShadow: '0 4px 12px -6px rgba(18,67,70,0.18)',
+                    }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 14,
+                      background: r.iconBg,
+                      display: 'grid', placeItems: 'center', flexShrink: 0,
+                    }}>
+                      <span style={{ fontSize: 22 }}>{r.emoji}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <b className="font-headline" style={{ fontSize: 15, lineHeight: 1.2, color: '#124346', display: 'block' }}>
+                        {r.title}
+                      </b>
+                      <span className="font-body" style={{ fontSize: 12, lineHeight: 1.3, color: 'rgba(18,67,70,0.65)' }}>
+                        {r.sub}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </section>
+            </>
+          ) : (
+            <>
+              <Kicker>{lang === 'de' ? 'Pflege heute' : 'Care today'}</Kicker>
+              <section style={{
+                         padding: '14px 16px',
+                         borderRadius: 20,
+                         background: 'linear-gradient(160deg, #fffdf5, #fef3c7)',
+                         border: '1px solid rgba(245,158,11,0.2)',
+                         boxShadow: '0 6px 14px -8px rgba(245,158,11,0.2)',
+                         marginBottom: 14,
                        }}>
-                    <span className="material-symbols-outlined"
-                          style={{
-                            fontSize: 34,
-                            color: a.state ? '#059669' : a.color,
-                            fontVariationSettings: "'FILL' 1",
-                          }}>
-                      {a.state ? 'check_circle' : a.icon}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          label: t('care.feed'), reward: 5, color: '#f59e0b' },
+                    { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        label: t('care.pet'),  reward: 3, color: '#ec4899' },
+                    { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', label: t('care.play'), reward: 8, color: '#124346' },
+                  ].map(a => (
+                    <button key={a.key}
+                      onClick={() => handleCare(a.onTap, a.state)}
+                      disabled={a.state}
+                      className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
+                      style={{ opacity: a.state ? 0.7 : 1 }}>
+                      <div className="w-full aspect-square rounded-2xl flex items-center justify-center"
+                           style={{
+                             background: a.state
+                               ? 'rgba(52,211,153,0.12)'
+                               : 'linear-gradient(135deg, #ffffff 0%, #fef3c7 100%)',
+                             border: a.state ? '1.5px solid rgba(52,211,153,0.45)' : '1.5px solid rgba(255,255,255,0.9)',
+                             boxShadow: a.state
+                               ? '0 2px 8px rgba(5,150,105,0.1)'
+                               : '0 4px 14px -4px rgba(245,158,11,0.22), inset 0 1px 0 rgba(255,255,255,0.7)',
+                           }}>
+                        <span className="material-symbols-outlined"
+                              style={{
+                                fontSize: 34,
+                                color: a.state ? '#059669' : a.color,
+                                fontVariationSettings: "'FILL' 1",
+                              }}>
+                          {a.state ? 'check_circle' : a.icon}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center gap-0.5">
+                        <span className="font-headline font-bold text-sm text-on-surface leading-none">
+                          {a.label}
+                        </span>
+                        {a.state ? (
+                          <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: '#059669' }}>
+                            {t('care.done')}
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1 font-label font-bold text-[11px]" style={{ color: '#725b00' }}>
+                            <Pearl size={10} />+{a.reward}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
+
+          {/* ═══ BOX-ATMUNG TEACHING BLOCK ═══
+               Persistent — visible on normal days AND bad days. Shows a
+               live "Dein Fortschritt X von 5" counter that Louis advances
+               by using the breathing exercise in Gefühlsecke. At 5:
+               Ronki "learns" it (see ronkiLearnedSkills). The teal square
+               diagram is a visual cue of the 4-step pattern (Einatmen /
+               Halten / Ausatmen / Ruhen, 4 seconds each). This is the
+               spec's "Louis bringt Ronki bei" moment. */}
+          {!hasLearnedBox && (
+            <>
+              <Kicker>{lang === 'de' ? 'Louis bringt Ronki bei' : 'Louis teaches Ronki'}</Kicker>
+              <section style={{
+                         padding: '16px 18px',
+                         borderRadius: 20,
+                         background: 'linear-gradient(160deg, #e0f2fe, #bae6fd)',
+                         border: '1px solid rgba(14,165,233,0.25)',
+                         boxShadow: '0 6px 14px -8px rgba(14,165,233,0.25)',
+                         marginBottom: 14,
+                       }}>
+                <div className="flex items-start gap-3 mb-3">
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 12,
+                    background: 'linear-gradient(135deg, #38bdf8, #0369a1)',
+                    display: 'grid', placeItems: 'center', flexShrink: 0,
+                    boxShadow: '0 3px 8px -3px rgba(14,165,233,0.5)',
+                  }}>
+                    <span className="material-symbols-outlined" style={{ color: '#fff', fontSize: 22, fontVariationSettings: "'FILL' 1" }}>air</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <b className="font-headline" style={{ fontSize: 16, lineHeight: 1.15, color: '#0c4a6e', display: 'block' }}>
+                      {lang === 'de' ? 'Box-Atmung' : 'Box breathing'}
+                    </b>
+                    <span className="font-body" style={{ fontSize: 12, lineHeight: 1.35, color: 'rgba(12,74,110,0.72)' }}>
+                      {lang === 'de'
+                        ? 'Übe sie 5× in der Gefühlsecke. Dann lernt Ronki sie von dir.'
+                        : 'Practice 5× in the Gefühlsecke. Then Ronki learns it from you.'}
                     </span>
                   </div>
-                  <div className="flex flex-col items-center gap-0.5">
-                    <span className="font-headline font-bold text-sm text-on-surface leading-none">
-                      {a.label}
-                    </span>
-                    {a.state ? (
-                      <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: '#059669' }}>
-                        {t('care.done')}
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 font-label font-bold text-[11px]" style={{ color: '#725b00' }}>
-                        <Pearl size={10} />+{a.reward}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </section>
+                </div>
+                {/* Progress row + 5 tick dots */}
+                <div className="flex items-center justify-between" style={{ marginTop: 10, marginBottom: 8 }}>
+                  <span className="font-label" style={{ fontSize: 11, color: 'rgba(12,74,110,0.7)', letterSpacing: '0.06em' }}>
+                    {lang === 'de' ? 'Dein Fortschritt' : 'Your progress'}
+                  </span>
+                  <b className="font-label" style={{ fontSize: 13, color: '#0c4a6e', fontWeight: 800 }}>
+                    {practiceCount} / 5
+                  </b>
+                </div>
+                <div className="flex gap-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} style={{
+                      flex: 1, height: 8, borderRadius: 999,
+                      background: i < practiceCount
+                        ? 'linear-gradient(90deg, #38bdf8, #0369a1)'
+                        : 'rgba(14,165,233,0.18)',
+                      transition: 'background 0.4s ease',
+                    }} />
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
+
+          {/* ═══ LEARN BANNER ═══
+               Fires the once Ronki crosses the learn threshold for a skill.
+               Golden, dismissable, marks ronkiLearnBannerSeen so it
+               doesn't re-show on next app open. Next bad-Ronki day Ronki
+               will offer the skill back to Louis (Rollentausch). */}
+          {showLearnBanner && (
+            <section style={{
+                     padding: '14px 16px',
+                     borderRadius: 18,
+                     marginBottom: 14,
+                     background: 'linear-gradient(160deg, #fef3c7, #fcd34d)',
+                     border: '1.5px solid rgba(245,158,11,0.45)',
+                     boxShadow: '0 6px 16px -6px rgba(245,158,11,0.45)',
+                     display: 'flex', alignItems: 'center', gap: 12,
+                   }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.85)',
+                display: 'grid', placeItems: 'center', flexShrink: 0,
+              }}>
+                <span style={{ fontSize: 22 }}>🌬️</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <b className="font-headline" style={{ fontSize: 14, color: '#78350f', display: 'block', lineHeight: 1.2 }}>
+                  {lang === 'de' ? 'Ronki hat Box-Atmung gelernt!' : 'Ronki learned box breathing!'}
+                </b>
+                <span className="font-body" style={{ fontSize: 11, color: 'rgba(120,53,15,0.75)', lineHeight: 1.3 }}>
+                  {lang === 'de' ? 'Nächstes Mal atmet er mit dir — ohne Worte.' : 'Next time he\'ll breathe with you — without words.'}
+                </span>
+              </div>
+              <button
+                aria-label={lang === 'de' ? 'Schließen' : 'Close'}
+                onClick={() => actions.markLearnBannerSeen?.('boxAtmung')}
+                className="active:scale-95 transition-transform"
+                style={{
+                  width: 28, height: 28, borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.7)', border: 'none',
+                  display: 'grid', placeItems: 'center', cursor: 'pointer',
+                  flexShrink: 0,
+                }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#78350f' }}>close</span>
+              </button>
+            </section>
+          )}
 
           {/* ═══ SPIELE MIT RONKI — hero CTA (Polish v2 .rp-hero-cta variant).
                Most interactive card after the hero, so it sits directly under
@@ -890,6 +1078,37 @@ export default function RonkiProfile({ onNavigate }) {
 
         </div>
       </main>
+
+      {/* Thank-you bubble — shown for ~2.8s after Louis picks a gentle
+           reaction on a bad-Ronki day. Simple centered pill; does not
+           block interaction. "Alle drei sind richtig" per spec. The
+           `<style>` block lives OUTSIDE role="status" so screen readers
+           don't announce the raw CSS with aria-live. */}
+      <style>{`
+        @keyframes rp-thx-in {
+          from { opacity: 0; transform: translateY(10px) scale(0.92); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
+      {thankYou && (
+        <div role="status" aria-live="polite"
+             className="fixed inset-x-0 flex justify-center pointer-events-none"
+             style={{ bottom: 120, zIndex: 400 }}>
+          <div style={{
+            padding: '10px 18px',
+            borderRadius: 999,
+            background: 'linear-gradient(160deg, #fef3c7, #fcd34d)',
+            border: '1.5px solid rgba(245,158,11,0.55)',
+            boxShadow: '0 8px 20px -6px rgba(245,158,11,0.55)',
+            fontFamily: 'Cormorant Garamond, Georgia, serif',
+            fontStyle: 'italic', fontWeight: 600,
+            fontSize: 16, color: '#78350f',
+            animation: 'rp-thx-in 0.3s ease-out',
+          }}>
+            {thankYou}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

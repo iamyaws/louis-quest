@@ -35,7 +35,12 @@ export default function ZeigMomentCard({ block, onClose }) {
   const isFinal = nextCount >= THRESHOLD;
   // Marc: single-parent vouch is enough — not "did BOTH see". Parents
   // pick which one (Mama/Papa) in Eltern-Bereich settings; default Mama.
-  const vouchParent = state?.familyConfig?.zeigMomentParent === 'papa' ? 'Papa' : 'Mama';
+  // German pronoun agreement matters here: Papa takes "Er", Mama takes
+  // "Sie" — a 6-year-old learning to read shouldn't hit "Zeig Papa. Sie
+  // freut sich mit dir!" and get tripped up on the mixed pronoun.
+  const isPapa = state?.familyConfig?.zeigMomentParent === 'papa';
+  const vouchParent = isPapa ? 'Papa' : 'Mama';
+  const vouchPronoun = isPapa ? 'Er' : 'Sie';
 
   const confirm = () => {
     SFX.play('celeb');
@@ -89,7 +94,7 @@ export default function ZeigMomentCard({ block, onClose }) {
                 Zeig {vouchParent}.
               </p>
               <p className="font-body text-sm text-on-surface-variant mb-6">
-                Sie freut sich mit dir!
+                {vouchPronoun} freut sich mit dir!
               </p>
             </>
           ) : (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import BaumPoseBeat from './BaumPoseBeat';
 import SFX from '../utils/sfx';
@@ -194,11 +194,13 @@ function SparkleDots() {
 
 // ── Mode 2b: Wütend — Box-Atmung (4-4-4-4, 2 cycles ≈ 32s) ──
 function WuetendFlow({ onClose }) {
+  const { actions } = useTask();
   const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
   const [phaseIdx, setPhaseIdx] = useState(0); // 0 Ein, 1 Halten, 2 Aus, 3 Halten
   const [secondsLeft, setSecondsLeft] = useState(4);
   const [cycle, setCycle] = useState(0);
+  const practicedRef = useRef(false); // guard so we only count one practice per flow
 
   const PHASES = [
     { label: 'Ein',    instruction: 'Atme ein',   color: '#34d399' },
@@ -214,7 +216,13 @@ function WuetendFlow({ onClose }) {
       const nextPhase = (phaseIdx + 1) % 4;
       const nextCycle = nextPhase === 0 ? cycle + 1 : cycle;
       if (nextPhase === 0 && cycle >= 1) {
-        // Completed 2 cycles
+        // Completed 2 cycles — count this as one Box-Atmung practice so
+        // Ronki can learn it. Guard with practicedRef so re-renders
+        // during the "done" state don't increment multiple times.
+        if (!practicedRef.current) {
+          practicedRef.current = true;
+          actions.practiceSkill?.('boxAtmung');
+        }
         setDone(true);
         return;
       }

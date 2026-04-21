@@ -154,6 +154,38 @@ export interface TaskState {
   /** One of COMPANION_VARIANTS.id — Louis's picked colorway at onboarding.
    *  Undefined for saves that pre-date the variant system (triggers migration). */
   companionVariant?: string;
+
+  // ── Bonding Agent (Apr 2026) ──
+  // Ronki has rare bad days (every 14-21 days, app-decided, never Louis).
+  // On those days Louis picks a gentle reaction — Kuscheln / Still zusammen
+  // sitzen / Warmen Tee kochen — reversing the normal care direction.
+  // Separately, Louis practices coping skills (Box-Atmung) in Gefühlsecke;
+  // at 5× Ronki "learns" the skill and offers it back on his next bad day.
+  // Matches the Feature Previews spec "Ronki hat schlechte Tage · und lernt
+  // von Louis" — the deepest bonding move of all engagement reports.
+
+  /** Ronki's current mood. 'normal' most days; 'sad' or 'tired' on rare
+   *  bad days. Drives the profile portrait skin + Pflege action set. */
+  ronkiMood?: 'normal' | 'sad' | 'tired';
+  /** ISO date (YYYY-MM-DD) when Ronki's current bad mood was set. A bad
+   *  mood lives 1 day; on a new date we revert to 'normal' and schedule
+   *  the next one. */
+  ronkiMoodSetDate?: string;
+  /** ISO date of the next scheduled bad-Ronki day. Sampled as today+14-21d
+   *  when a bad day starts so the rhythm is unpredictable but bounded. */
+  ronkiNextBadDayDate?: string;
+  /** Skills Louis has taught Ronki via ≥5 practice sessions in Gefühlsecke.
+   *  Today: 'boxAtmung' is the only skill. When Ronki is sad AND knows
+   *  a skill, a 4th action ("Atmen mit Ronki") appears. */
+  ronkiLearnedSkills?: string[];
+  /** Per-skill practice count from Gefühlsecke (incremented by the
+   *  Gefühlsecke hook each time Louis uses the skill). At threshold 5 the
+   *  skill moves to ronkiLearnedSkills + the "Ronki hat X gelernt" banner
+   *  fires once. */
+  ronkiSkillPractice?: Record<string, number>;
+  /** Has the "Ronki hat X gelernt" golden banner been shown for this skill?
+   *  One shot per skill. */
+  ronkiLearnBannerSeen?: Record<string, boolean>;
 }
 
 interface TaskComputed {
@@ -204,6 +236,24 @@ interface TaskActions {
   logFeeling: (feeling: 'gut' | 'wuetend' | 'traurig' | 'aengstlich' | 'muede', note?: string) => void;
   claimMintBadge: (badgeId: string, gameId: string) => void;
   recordMintGamePlay: (gameId: string) => void;
+
+  // ── Bonding Agent ──
+  /** Run on Ronki screen mount. (1) If a bad mood was set on a prior
+   *  date, revert to 'normal'. (2) If mood is 'normal' and today >= the
+   *  scheduled next bad-day, fire a bad mood (sad or tired) + roll the
+   *  next bad-day 14-21d out. Idempotent per-day. */
+  syncRonkiMood: () => void;
+  /** Louis picked a gentle reaction on a bad-Ronki day. Ends the bad
+   *  mood early (Ronki feels seen). Writes a memory into journalHistory
+   *  so the moment shows up in the Buch later. `reaction` is one of
+   *  'kuscheln' | 'stille' | 'tee' | 'atmen'. */
+  pickRonkiSadReaction: (reaction: string) => void;
+  /** Louis used a coping skill in Gefühlsecke. Increments the per-skill
+   *  practice counter. At threshold (5), promotes the skill to
+   *  ronkiLearnedSkills so Ronki can offer it back on his next bad day. */
+  practiceSkill: (skillId: string) => void;
+  /** Marks the "Ronki hat X gelernt" banner as seen (one shot per skill). */
+  markLearnBannerSeen: (skillId: string) => void;
 }
 
 interface CelebrationEvent {
@@ -229,6 +279,27 @@ function assignBoss(catEvo: number = 0): Boss {
   const pool = BOSSES.filter(b => allowedTiers.includes(b.tier));
   const b = pool[Math.floor(Math.random() * pool.length)];
   return { id: b.id, hp: b.hp, maxHp: b.hp };
+}
+
+// ── Bonding Agent scheduler ──
+// Samples a random offset in [14, 21] days and returns the resulting ISO
+// date string. Called whenever we need to plan the *next* bad-Ronki day,
+// which is after a bad day fires or during initial-state seeding. The
+// band keeps spacing between bad days unpredictable but always "rare
+// enough that it feels real" per the Feature Previews pitch.
+function scheduleNextBadRonkiDay(from: Date): string {
+  const days = 14 + Math.floor(Math.random() * 8); // 14..21 inclusive
+  const d = new Date(from);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+// Pick which kind of bad day Ronki is having today — sad or tired. 50/50
+// for now; could bias toward 'sad' if we find kids respond better to
+// that reaction set later. Keep this separate from the date scheduler
+// so the two decisions are independently testable.
+function pickBadRonkiMood(): 'sad' | 'tired' {
+  return Math.random() < 0.5 ? 'sad' : 'tired';
 }
 
 const TaskContext = createContext<TaskContextValue | null>(null);
@@ -290,6 +361,14 @@ export function createInitialState(): TaskState {
     eveningRitualCompletedAt: undefined,
     ronkiStamina: 5,
     ronkiStaminaUpdatedAt: new Date().toISOString(),
+    // Bonding Agent defaults — Ronki starts in a normal mood; the next
+    // rare bad day is scheduled 14-21d out so a first-week user doesn't
+    // see it immediately (the surprise should land after trust is built).
+    ronkiMood: 'normal',
+    ronkiNextBadDayDate: scheduleNextBadRonkiDay(new Date()),
+    ronkiLearnedSkills: [],
+    ronkiSkillPractice: {},
+    ronkiLearnBannerSeen: {},
     micropediaDiscovered: [],
     freundArcsCompleted: [],
     freundCallbacksPending: [],
@@ -403,6 +482,15 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           eveningRitualCompletedAt: raw.eveningRitualCompletedAt || undefined,
           ronkiStamina: raw.ronkiStamina ?? 5,
           ronkiStaminaUpdatedAt: raw.ronkiStaminaUpdatedAt || new Date().toISOString(),
+          // Bonding Agent migration — saves predating Apr 2026 don't have
+          // these fields. Default to normal mood + schedule a first bad
+          // day 14-21d out so returning users aren't ambushed on next open.
+          ronkiMood: (raw as any).ronkiMood || 'normal',
+          ronkiMoodSetDate: (raw as any).ronkiMoodSetDate,
+          ronkiNextBadDayDate: (raw as any).ronkiNextBadDayDate || scheduleNextBadRonkiDay(new Date()),
+          ronkiLearnedSkills: (raw as any).ronkiLearnedSkills || [],
+          ronkiSkillPractice: (raw as any).ronkiSkillPractice || {},
+          ronkiLearnBannerSeen: (raw as any).ronkiLearnBannerSeen || {},
           micropediaDiscovered: raw.micropediaDiscovered || [],
           freundArcsCompleted: raw.freundArcsCompleted || [],
           freundCallbacksPending: raw.freundCallbacksPending || [],
@@ -1218,6 +1306,115 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Bonding Agent: Ronki mood scheduler ──
+  // Called from RonkiProfile mount. Two responsibilities:
+  //   1. Expire yesterday's bad mood — if ronkiMoodSetDate !== today and
+  //      ronkiMood is 'sad'/'tired', revert to 'normal'. (Bad days are
+  //      one-day events; if Louis didn't open the app yesterday, the bad
+  //      day still expires — Ronki doesn't carry it forward.)
+  //   2. Fire a new bad mood — if ronkiMood is 'normal' and today >=
+  //      ronkiNextBadDayDate, pick sad/tired + schedule the next bad day
+  //      14-21d out. Idempotent per-day thanks to the mood/date guard.
+  const syncRonkiMood = useCallback(() => {
+    setState(prev => {
+      if (!prev) return prev;
+      const t = today();
+      let next = prev;
+
+      // Step 1 — expire
+      if (next.ronkiMood && next.ronkiMood !== 'normal' && next.ronkiMoodSetDate !== t) {
+        next = { ...next, ronkiMood: 'normal', ronkiMoodSetDate: undefined };
+      }
+
+      // Step 2 — fire a new bad day when scheduled
+      const due = next.ronkiNextBadDayDate && t >= next.ronkiNextBadDayDate;
+      if ((next.ronkiMood || 'normal') === 'normal' && due) {
+        next = {
+          ...next,
+          ronkiMood: pickBadRonkiMood(),
+          ronkiMoodSetDate: t,
+          ronkiNextBadDayDate: scheduleNextBadRonkiDay(new Date()),
+        };
+      }
+
+      return next === prev ? prev : next;
+    });
+  }, []);
+
+  // ── Bonding Agent: Louis picks a gentle reaction on a bad-Ronki day ──
+  // All reactions (Kuscheln / Stille / Tee / Atmen) are "right" — no
+  // points, no loser. Writes a journal memory so the moment shows up in
+  // the Buch, ends the bad mood early (Ronki feels seen), schedules the
+  // next bad day 14-21d out.
+  const pickRonkiSadReaction = useCallback((reaction: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const t = today();
+      const mood = prev.ronkiMood || 'normal';
+      const memoryText = (() => {
+        const mp = mood === 'tired' ? 'müde' : 'traurig';
+        switch (reaction) {
+          case 'kuscheln': return `Ronki war ${mp}. Ich habe ihn gekuschelt.`;
+          case 'stille':   return `Ronki war ${mp}. Wir haben still zusammen gesessen.`;
+          case 'tee':      return `Ronki war ${mp}. Ich habe warmen Tee gekocht.`;
+          case 'atmen':    return `Ronki war ${mp}. Wir haben zusammen geatmet.`;
+          default:         return `Ronki war ${mp}. Ich war für ihn da.`;
+        }
+      })();
+      const entry: JournalEntry = {
+        date: t,
+        memory: memoryText,
+        gratitude: [],
+        dayEmoji: null,
+        achievements: ['ronki-bad-day'],
+        mood: null,
+      };
+      const history = prev.journalHistory || [];
+      return {
+        ...prev,
+        ronkiMood: 'normal',
+        ronkiMoodSetDate: undefined,
+        ronkiNextBadDayDate: scheduleNextBadRonkiDay(new Date()),
+        journalHistory: [...history, entry],
+      };
+    });
+  }, []);
+
+  // ── Bonding Agent: Louis practices a coping skill in Gefühlsecke ──
+  // Increments per-skill counter. At threshold 5, promotes to
+  // ronkiLearnedSkills so Ronki can offer the skill back on his next
+  // bad day. The golden "Ronki hat X gelernt" banner is triggered by
+  // the UI reading (learnedSkills.includes(skill) && !learnBannerSeen[skill]).
+  const practiceSkill = useCallback((skillId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const practice = { ...(prev.ronkiSkillPractice || {}) };
+      const cur = practice[skillId] || 0;
+      const nextCount = cur + 1;
+      practice[skillId] = nextCount;
+      const learned = prev.ronkiLearnedSkills || [];
+      const wasAlreadyLearned = learned.includes(skillId);
+      const nextLearned = nextCount >= 5 && !wasAlreadyLearned
+        ? [...learned, skillId]
+        : learned;
+      return {
+        ...prev,
+        ronkiSkillPractice: practice,
+        ronkiLearnedSkills: nextLearned,
+      };
+    });
+  }, []);
+
+  const markLearnBannerSeen = useCallback((skillId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const seen = { ...(prev.ronkiLearnBannerSeen || {}) };
+      if (seen[skillId]) return prev;
+      seen[skillId] = true;
+      return { ...prev, ronkiLearnBannerSeen: seen };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -1241,7 +1438,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
