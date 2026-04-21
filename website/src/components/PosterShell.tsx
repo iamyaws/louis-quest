@@ -102,7 +102,12 @@ export function PosterShell({ config }: { config: PosterConfig }) {
       <section className={`poster-page poster-${config.theme}`}>
         <div className="poster-inner">
           <div className="wordmark" aria-label="Ronki">
-            <span className="wordmark-dot" aria-hidden />
+            <img
+              src="/art/branding/ronki-icon-heroic-128.webp"
+              alt=""
+              className="wordmark-icon"
+              aria-hidden
+            />
             <span className="wordmark-text">ronki</span>
           </div>
           <p className="eyebrow">{config.eyebrow}</p>
@@ -349,12 +354,11 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           gap: 2mm;
           z-index: 2;
         }
-        .wordmark-dot {
-          width: 2.4mm;
-          height: 2.4mm;
-          border-radius: 50%;
-          background: var(--stripe);
-          box-shadow: 0 0 0 0.4mm rgba(0,0,0,0.04);
+        .wordmark-icon {
+          width: 6mm;
+          height: 6mm;
+          display: block;
+          flex-shrink: 0;
         }
         .wordmark-text {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;

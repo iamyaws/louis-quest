@@ -32,7 +32,6 @@ const RatgeberZaehneputzenOhneStreit = lazy(() => import('./pages/ratgeber/Zaehn
 const RatgeberEinschulungSelbststaendigkeit = lazy(() => import('./pages/ratgeber/EinschulungSelbststaendigkeit'));
 const RatgeberMorgenroutineGrundschulkind = lazy(() => import('./pages/ratgeber/MorgenroutineGrundschulkind'));
 const RatgeberElternBereich = lazy(() => import('./pages/ratgeber/ElternBereich'));
-const CompareWordmark = lazy(() => import('./pages/CompareWordmark'));
 const Impressum = lazy(() => import('./pages/Impressum'));
 const Datenschutz = lazy(() => import('./pages/Datenschutz'));
 const AGB = lazy(() => import('./pages/AGB'));
@@ -87,7 +86,6 @@ export function AppRoutes() {
         <Route path="/ratgeber/einschulung-selbststaendigkeit" element={<RatgeberEinschulungSelbststaendigkeit />} />
         <Route path="/ratgeber/morgenroutine-grundschulkind" element={<RatgeberMorgenroutineGrundschulkind />} />
         <Route path="/ratgeber/eltern-bereich" element={<RatgeberElternBereich />} />
-        <Route path="/compare/wordmark" element={<CompareWordmark />} />
         <Route path="/en" element={<HomeEN />} />
         <Route path="/impressum" element={<Impressum />} />
         <Route path="/datenschutz" element={<Datenschutz />} />
