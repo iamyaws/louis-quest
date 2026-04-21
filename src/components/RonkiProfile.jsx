@@ -475,21 +475,21 @@ export default function RonkiProfile({ onNavigate }) {
             </div>
             <div className="min-w-0" style={{ position: 'relative', zIndex: 2, minWidth: 0 }}>
               <p className="font-label font-bold"
-                 style={{ fontSize: 10, lineHeight: 1, letterSpacing: '0.2em', textTransform: 'uppercase',
+                 style={{ fontSize: 11, lineHeight: 1, letterSpacing: '0.2em', textTransform: 'uppercase',
                           color: ronkiMood === 'sad' || ronkiMood === 'tired' ? 'rgba(30,42,54,0.65)' : MOOD_CARD_INK.normal,
-                          margin: '0 0 6px 0' }}>
+                          margin: '0 0 8px 0' }}>
                 {daysTogether > 0
                   ? `${lang === 'de' ? 'Heute' : 'Today'} · ${daysTogether} ${daysTogether === 1 ? (lang === 'de' ? 'Tag' : 'day') : (lang === 'de' ? 'Tage' : 'days')}`
                   : (lang === 'de' ? 'Heute' : 'Today')}
               </p>
               <h1 className="font-headline font-bold"
-                  style={{ fontSize: 18, lineHeight: 1.2, letterSpacing: '-0.01em',
+                  style={{ fontSize: 22, lineHeight: 1.2, letterSpacing: '-0.01em',
                            color: ronkiMood === 'sad' || ronkiMood === 'tired' ? '#1e2a36' : MOOD_CARD_HEAD.normal,
-                           margin: '0 0 6px 0', textWrap: 'balance' }}>
+                           margin: '0 0 8px 0', textWrap: 'balance' }}>
                 {MOOD_CARD_COPY[ronkiMood]?.title[lang] || MOOD_CARD_COPY.normal.title[lang] || MOOD_CARD_COPY.normal.title.de}
               </h1>
               <p className="font-body"
-                 style={{ fontSize: 13, lineHeight: 1.4,
+                 style={{ fontSize: 15, lineHeight: 1.4,
                           color: ronkiMood === 'sad' || ronkiMood === 'tired' ? 'rgba(30,42,54,0.85)' : MOOD_CARD_SUB.normal,
                           margin: 0, textWrap: 'pretty' }}>
                 {MOOD_CARD_COPY[ronkiMood]?.body[lang] || MOOD_CARD_COPY.normal.body[lang] || MOOD_CARD_COPY.normal.body.de}
