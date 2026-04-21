@@ -433,8 +433,13 @@ export default function RonkiProfile({ onNavigate }) {
               </div>
             )}
 
-            <div style={{ zIndex: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <MoodChibi size={180} mood={ronkiMood} bare face
+            <div style={{ zIndex: 2, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              {/* Full-body chibi (legs + horns + all parts) at 1.5× of
+                   the previous face-only size — Marc 23 Apr 2026:
+                   "just the face feels weird. let's bring back the
+                   legs and horns that you had before and make ronki
+                   like 1.5x bigger in that view." */}
+              <MoodChibi size={170} mood={ronkiMood} bare
                          variant={state.companionVariant}
                          stage={Math.min(3, stage)} />
             </div>
