@@ -47,6 +47,12 @@ export function QuestEaterProvider({ children }) {
   // Separate trigger for the SideRonki fire-breath animation on Lager.
   // Increments each time CampfireScene's Ronki is the one eating.
   const [fireBreath, setFireBreath] = useState(0);
+  // Paired with fireBreath — the variant shape the puff should render
+  // (flame / ember / sparkle / heart / rainbow). See FireBreathPuff.jsx
+  // + backlog_ronki_fire_breath_variations.md.
+  const [fireBreathFlavor, setFireBreathFlavor] = useState('flame');
+  // Same pairing for the TopBar PinnedRonki burp.
+  const [burpFlavor, setBurpFlavor] = useState('flame');
 
   const registerRonkiEl = useCallback((el, slot = 'fallback') => {
     if (slot === 'preferred') preferredRef.current = el;
@@ -56,7 +62,7 @@ export function QuestEaterProvider({ children }) {
   const getActiveRonki = () => preferredRef.current || fallbackRef.current;
   const getActiveSlot = () => (preferredRef.current ? 'preferred' : 'fallback');
 
-  const eatQuest = useCallback(({ fromRect, emoji, hp = 0 }) => {
+  const eatQuest = useCallback(({ fromRect, emoji, hp = 0, flavor = 'flame' }) => {
     const target = getActiveRonki();
     if (!fromRect || !target) {
       // No Ronki mounted or no source rect — skip silently. The normal
@@ -86,12 +92,14 @@ export function QuestEaterProvider({ children }) {
       setTimeout(() => {
         setFlyer(prev => (prev && prev.id === id ? null : prev));
         setBurpKey(k => k + 1);
+        setBurpFlavor(flavor);
         // On Lager (preferred slot = CampfireScene SideRonki), trigger
         // the fire-breath animation in addition to the burp bubble —
         // Marc: "the dragon at the campfire needs to eat it and breath
         // fire".
         if (getActiveSlot() === 'preferred') {
           setFireBreath(f => f + 1);
+          setFireBreathFlavor(flavor);
         }
         const label = hp > 0 ? `+${hp} ⭐` : '👍';
         setBubble(label);
@@ -108,7 +116,7 @@ export function QuestEaterProvider({ children }) {
   }, []);
 
   return (
-    <QuestEaterContext.Provider value={{ registerRonkiEl, eatQuest, burpKey, bubble, fireBreath }}>
+    <QuestEaterContext.Provider value={{ registerRonkiEl, eatQuest, burpKey, bubble, fireBreath, fireBreathFlavor, burpFlavor }}>
       {children}
       {flyer && <Flyer {...flyer} />}
     </QuestEaterContext.Provider>

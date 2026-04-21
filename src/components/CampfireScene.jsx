@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useQuestEater } from './QuestEater';
 import { getVariant } from '../data/companionVariants';
 import MoodChibi from './MoodChibi';
+import FireBreathPuff from './FireBreathPuff';
 
 /**
  * CampfireScene — zero-asset painterly Hub scene.
@@ -470,6 +471,7 @@ function SideRonki({ onTap, variant = 'amber', stage = 2, mood = 'normal' }) {
   const eater = useQuestEater();
   const ref = useRef(null);
   const [fireKey, setFireKey] = useState(0);
+  const [fireFlavor, setFireFlavor] = useState('flame');
   const lastFire = useRef(eater?.fireBreath ?? 0);
 
   // Register as the preferred flyer target (beats the TopBar Ronki
@@ -482,13 +484,15 @@ function SideRonki({ onTap, variant = 'amber', stage = 2, mood = 'normal' }) {
 
   // Trigger a one-shot fire-breath puff when QuestEater signals it
   // (Marc: "the dragon at the campfire needs to eat it and breath fire").
+  // Also captures the flavor so the puff variant matches the quest type.
   useEffect(() => {
     const ctxKey = eater?.fireBreath ?? 0;
     if (ctxKey !== lastFire.current) {
       lastFire.current = ctxKey;
+      setFireFlavor(eater?.fireBreathFlavor || 'flame');
       setFireKey(k => k + 1);
     }
-  }, [eater?.fireBreath]);
+  }, [eater?.fireBreath, eater?.fireBreathFlavor]);
 
   // When onTap is provided (from Hub — rotates Ronki's quip), render as
   // a <button> and add a small haptic + SFX for feedback. aria-label is
@@ -529,29 +533,9 @@ function SideRonki({ onTap, variant = 'amber', stage = 2, mood = 'normal' }) {
         cursor: onTap ? 'pointer' : 'default',
       }}
     >
-      {/* Fire-breath puff — extends right toward the campfire, keyed so
-          each eat-event remounts a fresh run. Lives above the chibi in
-          z-order so it visually bursts from his mouth. */}
-      {fireKey > 0 && (
-        <span
-          key={fireKey}
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            top: '42%',
-            left: '58%',
-            width: 54,
-            height: 30,
-            background: 'radial-gradient(ellipse at 15% 50%, #fef3c7 0%, #fcd34d 25%, #f97316 55%, #dc2626 100%)',
-            borderRadius: '0 50% 50% 0 / 0 60% 60% 0',
-            filter: 'drop-shadow(0 0 8px rgba(249,115,22,0.7))',
-            pointerEvents: 'none',
-            zIndex: 8,
-            transformOrigin: '0% 50%',
-            animation: 'cfFireBreath 1.1s ease-out forwards',
-          }}
-        />
-      )}
+      {/* Fire-breath puff — variant shape picked by flavor. See
+           FireBreathPuff.jsx + backlog_ronki_fire_breath_variations.md. */}
+      <FireBreathPuff fireKey={fireKey} flavor={fireFlavor} />
 
       {/* Front-facing chibi, bare mode (no inner locket bg) so Ronki
           sits directly on the campfire scene. Variant palette matches

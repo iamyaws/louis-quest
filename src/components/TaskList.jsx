@@ -14,6 +14,7 @@ import DailyHabits from './DailyHabits';
 import VoiceAudio from '../utils/voiceAudio';
 import { biomeBackground } from '../utils/biomeBackgrounds';
 import { useQuestEater } from './QuestEater';
+import { flavorForQuest } from './FireBreathPuff';
 
 // Quest IDs that trigger the toothbrush timer
 const TEETH_QUEST_IDS = new Set(['s3', 's12', 'v3', 'v10']);
@@ -107,6 +108,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
         fromRect,
         emoji: quest.icon || '⭐',
         hp: quest.xp || 0,
+        flavor: flavorForQuest(quest),
       });
     }
 

@@ -50,7 +50,10 @@ export default function PinnedRonki({
 
   // Burp flame overlay — mounts briefly when burpTrigger (prop) OR
   // eater.burpKey (context) changes. Either source can trigger Ronki.
+  // Flavor picks which shape/color the burp renders (flame, ember,
+  // sparkle, heart, rainbow) so the pin mirrors the Lager fire-breath.
   const [burpKey, setBurpKey] = useState(0);
+  const [burpFlavor, setBurpFlavor] = useState('flame');
   const lastPropTrigger = useRef(burpTrigger);
   const lastCtxTrigger = useRef(eater?.burpKey ?? 0);
   useEffect(() => {
@@ -63,9 +66,10 @@ export default function PinnedRonki({
     const ctxKey = eater?.burpKey ?? 0;
     if (ctxKey !== lastCtxTrigger.current) {
       lastCtxTrigger.current = ctxKey;
+      setBurpFlavor(eater?.burpFlavor || 'flame');
       setBurpKey(k => k + 1);
     }
-  }, [eater?.burpKey]);
+  }, [eater?.burpKey, eater?.burpFlavor]);
 
   // Prefer explicit bubble prop; fall back to context bubble.
   const bubble = bubbleOverride ?? eater?.bubble;
@@ -104,28 +108,47 @@ export default function PinnedRonki({
     >
       <MiniRonki size={innerSize} mood={mood} />
 
-      {/* Flame burp — radial gold→red ellipse that rises and fades. Keyed
-          on burpKey so each trigger remounts a fresh animation run. */}
-      {burpKey > 0 && (
-        <span
-          key={burpKey}
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            left: '50%',
-            top: '30%',
-            transform: 'translateX(-50%)',
-            width: size * 0.4,
-            height: size * 0.48,
-            background: 'radial-gradient(ellipse at 50% 70%, #fef3c7 0%, #f59e0b 45%, #dc2626 100%)',
-            borderRadius: '50% 50% 30% 30% / 65% 65% 35% 35%',
-            pointerEvents: 'none',
-            zIndex: 40,
-            filter: 'drop-shadow(0 0 8px rgba(245,158,11,0.7))',
-            animation: 'prBurp 0.9s ease-out forwards',
-          }}
-        />
-      )}
+      {/* Flavored burp — shape/color picked by flavor so the pin mirrors
+          the Lager fire-breath variant for the same event. Keyed so each
+          trigger mounts a fresh animation run. */}
+      {burpKey > 0 && (() => {
+        const f = burpFlavor || 'flame';
+        const common = {
+          position: 'absolute',
+          left: '50%',
+          top: '30%',
+          transform: 'translateX(-50%)',
+          width: size * 0.4,
+          height: size * 0.48,
+          pointerEvents: 'none',
+          zIndex: 40,
+          animation: 'prBurp 0.9s ease-out forwards',
+        };
+        const bg =
+          f === 'rainbow' ? 'conic-gradient(from 0deg at 50% 70%, #f97316, #fde047, #4ade80, #22d3ee, #818cf8, #ec4899, #f97316)' :
+          f === 'heart'   ? 'radial-gradient(ellipse at 50% 70%, #fbcfe8 0%, #ec4899 50%, #be185d 100%)' :
+          f === 'sparkle' ? 'radial-gradient(ellipse at 50% 70%, #fff 0%, #fde68a 45%, #fcd34d 100%)' :
+          f === 'ember'   ? 'radial-gradient(ellipse at 50% 70%, #fef3c7 0%, #fcd34d 35%, #f97316 75%, transparent 100%)' :
+                            'radial-gradient(ellipse at 50% 70%, #fef3c7 0%, #f59e0b 45%, #dc2626 100%)';
+        const glow =
+          f === 'rainbow' ? '0 0 10px rgba(236,72,153,0.6)' :
+          f === 'heart'   ? '0 0 10px rgba(236,72,153,0.7)' :
+          f === 'sparkle' ? '0 0 10px rgba(252,211,77,0.9)' :
+          f === 'ember'   ? '0 0 8px rgba(249,115,22,0.6)' :
+                            '0 0 8px rgba(245,158,11,0.7)';
+        return (
+          <span
+            key={burpKey}
+            aria-hidden="true"
+            style={{
+              ...common,
+              background: bg,
+              borderRadius: '50% 50% 30% 30% / 65% 65% 35% 35%',
+              filter: `drop-shadow(${glow})`,
+            }}
+          />
+        );
+      })()}
 
       {/* Speech bubble — positioned below the pin, small tail pointing up.
           Kept inside the pin so it follows the component; consumers don't
