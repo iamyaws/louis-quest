@@ -3,16 +3,21 @@ import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
 import { useTask } from '../context/TaskContext';
 import { getVariant } from '../data/companionVariants';
+import PinModal from './PinModal';
 
 /**
- * ToothbrushTimer — 2-3 minute countdown with animated dragon.
+ * ToothbrushTimer — 3-minute countdown with animated dragon.
  * Launches when Louis taps "Zähne putzen" quest.
  * Dragon progresses through brushing stages as the timer runs.
  *
  * Props:
- *  - duration: seconds (default 120 = 2min)
+ *  - duration: seconds (default 180 = 3min, dentist recommendation;
+ *    bumped from 2min per Marc 22 Apr 2026 — "should be three")
  *  - onFinish: called when timer completes
  *  - onSkip: called if parent skips (long-press)
+ *  - onParentOverride: called when a parent taps the PIN-gated
+ *    "Eltern: fertig" button to close the timer early (kid already
+ *    finished, no point waiting out the remaining seconds)
  */
 
 const STAGES = [
@@ -25,13 +30,20 @@ const STAGES = [
 
 const base = import.meta.env.BASE_URL;
 
-export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
+export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onParentOverride }) {
   const { state } = useTask();
   const variant = getVariant(state?.companionVariant);
 
   const [remaining, setRemaining] = useState(duration);
   const [finished, setFinished] = useState(false);
   const intervalRef = useRef(null);
+  // Parent-PIN override — when a parent can see the child already
+  // finished brushing but the timer still has 30-90s on the clock,
+  // tapping "Eltern: fertig" + PIN completes the task immediately.
+  // Marc 22 Apr 2026: "mark it done as parents vs. waiting two minutes
+  // even though it done." Same "1234" default PIN as the Eltern-Bereich.
+  const [pinOpen, setPinOpen] = useState(false);
+  const [pin, setPin] = useState('');
 
   const pct = duration > 0 ? 1 - (remaining / duration) : 1;
   const currentStage = STAGES.reduce((acc, s) => pct >= s.pct ? s : acc, STAGES[0]);
@@ -192,11 +204,42 @@ export default function ToothbrushTimer({ duration = 120, onFinish, onSkip }) {
             Fertig! 🦷✨
           </button>
         ) : (
-          <p className="font-label text-xs text-white/30 mt-4">
-            Weiterputzen — Ronki passt auf! ✨
-          </p>
+          <>
+            <p className="font-label text-xs text-white/30 mt-4">
+              Weiterputzen — Ronki passt auf! ✨
+            </p>
+            {/* Parent override — small, discrete. Not meant to catch a
+                 kid's eye (which is why it's tiny + low contrast + off to
+                 the bottom), but a parent knows to look. */}
+            <button
+              onClick={() => { setPin(''); setPinOpen(true); }}
+              className="mt-6 font-label uppercase tracking-widest active:opacity-70 transition-opacity"
+              style={{
+                fontSize: 10, letterSpacing: '0.22em',
+                color: 'rgba(255,255,255,0.35)',
+                background: 'transparent', border: 'none',
+                padding: '8px 14px', borderRadius: 999,
+              }}>
+              Eltern: fertig
+            </button>
+          </>
         )}
       </div>
+
+      {pinOpen && (
+        <PinModal
+          pin={pin}
+          setPin={setPin}
+          onSuccess={() => {
+            setPinOpen(false); setPin('');
+            clearInterval(intervalRef.current);
+            SFX.play('coin');
+            if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+            (onParentOverride || onFinish)?.();
+          }}
+          onClose={() => { setPinOpen(false); setPin(''); }}
+        />
+      )}
 
       {/* CSS for bubble animation */}
       <style>{`

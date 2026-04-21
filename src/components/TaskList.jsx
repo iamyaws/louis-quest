@@ -733,7 +733,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
           />
         ) : (
           <ToothbrushTimer
-            duration={120}
+            duration={180}
             onFinish={() => {
               actions.complete(teethTimerQuestId);
               SFX.play('coin');
