@@ -255,12 +255,22 @@ export function PosterShell({ config }: { config: PosterConfig }) {
         /* Step-number color was sage #50A082 — contrast on cream was ~3.1:1
          * (sub-WCAG-AA for 8pt text). Tightened to teal #2D5A5E across all
          * light themes (~5.3:1). Keeps brand, fixes legibility. */
+        /* All light themes share the brand Tertiary (Sage #50A082) as
+         * the --highlight per DESIGN.md: Sage IS the accent color. Earlier
+         * teal-2 #2D5A5E was too close to the base ink #1A3C3F and made
+         * em/strong text look "same color". Mustard #FCD34D stays reserved
+         * for "Quest Gold" (achievement moments), so it doesn't land on
+         * light-theme headlines.
+         *
+         * --step-number stays Teal-2 on light themes: at 8pt the stronger
+         * contrast of #2D5A5E on cream (7.1:1) keeps tiny step counters
+         * readable. Sage at 3.2:1 on cream fails WCAG AA for small text. */
         .poster-warm {
           --bg: #FDF8F0;
           --bg-accent-1: rgba(252,211,77,0.22);
           --bg-accent-2: rgba(80,160,130,0.14);
           --stripe: #FCD34D;
-          --highlight: #2D5A5E;
+          --highlight: #50A082;
           --step-number: #2D5A5E;
         }
         .poster-evening {
@@ -268,21 +278,15 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           --bg-accent-1: rgba(26,60,63,0.14);
           --bg-accent-2: rgba(252,211,77,0.20);
           --stripe: #1A3C3F;
-          --highlight: #2D5A5E;
+          --highlight: #50A082;
           --step-number: #2D5A5E;
         }
-        /* Morning-stripe was orange #D97706 which tanzed out of the
-         * mustard/sage/teal brand palette. Pulled to mustard #FCD34D for
-         * consistency across the set. Highlight was dark amber #B45309 —
-         * Marc found it visually heavy and off-brand. Pulled to teal
-         * #2D5A5E to match the rest of the set while keeping the mustard
-         * stripe for morning warmth. */
         .poster-morning {
           --bg: #FDF8F0;
           --bg-accent-1: rgba(252,211,77,0.32);
           --bg-accent-2: rgba(217,119,6,0.10);
           --stripe: #FCD34D;
-          --highlight: #2D5A5E;
+          --highlight: #50A082;
           --step-number: #2D5A5E;
         }
         .poster-quiet {
@@ -290,12 +294,8 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           --bg-accent-1: rgba(80,160,130,0.16);
           --bg-accent-2: rgba(45,90,94,0.08);
           --stripe: #50A082;
-          /* Highlight was teal-2 #2D5A5E — too close in value to the base
-           * headline ink #1A3C3F, making the accent word look weak.
-           * Pulled to sage #2F7A5A (deeper sage) for more separation
-           * while staying in the "quiet/natural" theme. */
-          --highlight: #2F7A5A;
-          --step-number: #2F7A5A;
+          --highlight: #50A082;
+          --step-number: #2D5A5E;
         }
         .poster-cool {
           --bg: #F4FAF7;
