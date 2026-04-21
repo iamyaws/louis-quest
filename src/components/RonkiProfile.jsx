@@ -359,10 +359,14 @@ export default function RonkiProfile({ onNavigate }) {
                className="relative overflow-hidden"
                style={{
                  display: 'grid',
-                 gridTemplateColumns: '2fr 1fr',
+                 // 60 / 40 split per Marc 23 Apr 2026.
+                 gridTemplateColumns: '3fr 2fr',
                  alignItems: 'center',
                  gap: 20,
                  padding: '20px',
+                 // Card needs enough vertical room for the 2.5×-bigger
+                 // chibi to breathe without clipping at the card edges.
+                 minHeight: 260,
                  borderRadius: 20,
                  background: ronkiMood === 'sad'
                    ? 'linear-gradient(160deg, #cfd8de 0%, #a4b3be 100%)'
@@ -447,15 +451,32 @@ export default function RonkiProfile({ onNavigate }) {
               </div>
             )}
 
-            <div style={{ zIndex: 2, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              {/* Full-body chibi (legs + horns + all parts) at 1.5× of
-                   the previous face-only size — Marc 23 Apr 2026:
-                   "just the face feels weird. let's bring back the
-                   legs and horns that you had before and make ronki
-                   like 1.5x bigger in that view." */}
-              <MoodChibi size={170} mood={ronkiMood} bare
-                         variant={state.companionVariant}
-                         stage={Math.min(3, stage)} />
+            {/* Chibi column — 60% of the card. Chibi renders at 2.5×
+                 the previous 170 px (→ 425 logical), visually scaled
+                 back with `transform: scale()` so it fits the narrower
+                 column on small phones while still reading huge. The
+                 grid + flex combo centers it both axes per Marc's ask
+                 23 Apr 2026. */}
+            <div style={{
+              zIndex: 2,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'relative',
+              minHeight: 220,
+            }}>
+              <div style={{
+                // MoodChibi is `size` wide; we wrap it in a scaler so
+                // tiny screens don't break the column. Default scale 1,
+                // but CSS clamps via `max-width: 100%` on the inner
+                // wrapper to prevent horizontal overflow of the card.
+                width: 425, maxWidth: '100%',
+                display: 'flex', justifyContent: 'center',
+              }}>
+                <MoodChibi size={425} mood={ronkiMood} bare
+                           variant={state.companionVariant}
+                           stage={Math.min(3, stage)} />
+              </div>
             </div>
             <div className="min-w-0" style={{ position: 'relative', zIndex: 2 }}>
               <p className="font-label font-bold"
