@@ -12,21 +12,24 @@ export default function PrintA4PosterHort() {
         eyebrow: 'Für Eltern, die nach 17 Uhr abholen',
         headline: (
           <>
-            Abends zuhause ist ein{' '}
+            Abends zuhause ist ein
+            <br />
             <em>halber Marathon</em>.
           </>
         ),
         subline: 'Ronki sortiert ihn. Dein Kind läuft ihn allein.',
         body: (
           <>
-            Hausaufgaben, Abendessen, Baden, Zähne, Schlafanzug, Vorlesen, Licht aus. Jeden Abend dieselbe Kette, oft zu viel für ein Grundschulkind. Ronki macht die Reihenfolge sichtbar. Dein Kind hakt selbst ab. Kein App-Store. Keine Werbung. Keine Streaks.
+            <p>Hausaufgaben, Abendessen, Baden, Zähne, Schlafanzug, Vorlesen, Licht aus. Jeden Abend dieselbe Kette, oft zu viel für ein Grundschulkind.</p>
+            <p>Ronki macht die Reihenfolge sichtbar. Dein Kind hakt selbst ab.</p>
+            <p>Kein App-Store. Keine Werbung. Keine Streaks.</p>
           </>
         ),
         heroSrc: '/art/flyer/evening-bedtime.png',
         heroAlt: 'Malerische Bettgehzeit-Szene: Kind liegt im Bett, Drache liest mit, Sternenhimmel am Fenster.',
-        phoneScreenshot: {
-          src: '/art/app/aufgaben-uebersicht.png',
-          caption: 'So sieht ein Tag in der App aus.',
+        phoneMockup: {
+          variant: 'nacht-anchor',
+          caption: 'Die Abend-Kette, sortiert.',
         },
         ctaHeading: 'So startet ihr heute Abend:',
         steps: [

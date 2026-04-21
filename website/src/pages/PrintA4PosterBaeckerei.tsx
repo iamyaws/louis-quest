@@ -10,22 +10,26 @@ export default function PrintA4PosterBaeckerei() {
     <PosterShell
       config={{
         theme: 'morning',
-        eyebrow: 'Für Eltern, die morgens Brötchen holen',
+        eyebrow: 'Für den Morgen-Stress vor 8 Uhr',
         headline: (
           <>
-            „Zähne putzen!" <em>14 Mal</em> oder <em>einmal</em>.
+            „Zähne putzen!"
+            <br />
+            <strong>14 Mal</strong> oder <strong>einmal</strong>.
           </>
         ),
         subline: 'Ronki zeigt deinem Kind, was morgens als Nächstes dran ist.',
         body: (
           <>
-            Socken, T-Shirt, Zähne, Frühstück, Ranzen, los. Für dich ist das Autopilot. Für ein Sechsjähriges sind es acht Entscheidungen vor acht Uhr. Ronki macht die Reihenfolge sichtbar. Dein Kind übernimmt das Tempo.
+            <p>Socken, T-Shirt, Zähne, Frühstück, Ranzen, los. Für dich ist das Autopilot.</p>
+            <p>Für ein Sechsjähriges sind es acht Entscheidungen vor acht Uhr.</p>
+            <p>Ronki macht die Reihenfolge sichtbar. Dein Kind übernimmt das Tempo.</p>
           </>
         ),
         heroSrc: '/art/flyer/morning-sleepy.png',
         heroAlt: 'Malerische Morgenszene: Sechsjähriges Kind im Schlafanzug sitzt auf dem Boden und starrt eine Socke an.',
-        phoneScreenshot: {
-          src: '/art/app/morgen-quests.png',
+        phoneMockup: {
+          variant: 'morgen-anchor',
           caption: 'Morgen-Quests, eine nach der anderen.',
         },
         ctaHeading: 'Heute Abend einrichten, morgen früh testen:',

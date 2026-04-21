@@ -13,20 +13,23 @@ export default function PrintA4PosterKinderarzt() {
         eyebrow: 'Für Eltern im Wartezimmer',
         headline: (
           <>
-            Routinen sind keine Disziplin.{' '}
+            Routinen sind keine Disziplin.
+            <br />
             <em>Sie sind Entwicklung.</em>
           </>
         ),
         subline: 'Was Kinder zwischen 5 und 9 brauchen, um ihren Alltag allein zu meistern.',
         body: (
           <>
-            Die Fähigkeit, mehrere Aufgaben in Folge selbstständig zu erledigen, reift erst im Grundschulalter voll aus. Bis dahin hilft Sichtbarkeit: Bilder, die zeigen, was als Nächstes kommt, und die das Kind selbst abhakt. Sichtbar machen, dann leiser werden. Genau so haben wir Ronki gebaut.
+            <p>Die Fähigkeit, mehrere Aufgaben in Folge selbstständig zu erledigen, reift erst im Grundschulalter voll aus.</p>
+            <p>Bis dahin hilft Sichtbarkeit: Bilder, die zeigen, was als Nächstes kommt, und die das Kind selbst abhakt.</p>
+            <p>Sichtbar machen, dann leiser werden. Genau so haben wir Ronki gebaut.</p>
           </>
         ),
         heroSrc: '/art/flyer/family-kitchen.png',
         heroAlt: 'Malerische Küchen-Szene: Elternteil liest am Tisch, kleines Kind sitzt daneben, ein warmer Drache dazwischen.',
-        phoneScreenshot: {
-          src: '/art/app/tagebuch.png',
+        phoneMockup: {
+          variant: 'mood-grid',
           caption: 'Jeder Tag ein kleines Kapitel.',
         },
         qrPath: '/wissenschaft',

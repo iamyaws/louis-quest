@@ -13,21 +13,24 @@ export default function PrintA4PosterZaehne() {
         eyebrow: 'Das tägliche Zähneputz-Drama',
         headline: (
           <>
-            Zähne putzen,{' '}
+            Zähne putzen,
+            <br />
             <em>ohne dreimal bitten</em>.
           </>
         ),
         subline: 'Morgens und abends. Zwei Minuten. Mit Drache statt Dauerbeschallung.',
         body: (
           <>
-            Zähneputzen ist in den meisten Familien eine tägliche Verhandlung. Ronki zeigt deinem Kind, wann Zähne dran sind, baut einen sichtbaren Timer ein und macht die Abfolge zur Gewohnheit statt zum Kampf. Kein Sticker-Zirkus. Kein Streak. Kein Druck.
+            <p>Zähneputzen ist in den meisten Familien eine tägliche Verhandlung.</p>
+            <p>Ronki zeigt deinem Kind, wann Zähne dran sind, baut einen sichtbaren Timer ein und macht die Abfolge zur Gewohnheit statt zum Kampf.</p>
+            <p>Kein Sticker-Zirkus. Kein Streak. Kein Druck.</p>
           </>
         ),
         heroSrc: '/art/flyer/bathroom-teeth.png',
         heroAlt: 'Malerische Familien-Badezimmer-Szene: Kind putzt Zähne, Drache am Waschbecken daneben.',
-        phoneScreenshot: {
-          src: '/art/app/morgen-quests.png',
-          caption: 'Zähne putzen, eingebettet in die Routine.',
+        phoneMockup: {
+          variant: 'zahne-quest',
+          caption: 'Zwei-Minuten-Timer, Ronki bleibt dabei.',
         },
         ctaHeading: 'So läuft euer erster Abend:',
         steps: [

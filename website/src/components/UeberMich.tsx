@@ -1,11 +1,13 @@
 import { motion } from 'motion/react';
 
 /* Washi-tape sticker SVGs — same visual language as Footer.tsx so the
- * quote card reads as part of the "grounded / handmade" visual family. */
-function QuoteTapeTopLeft() {
+ * quote card reads as part of the "grounded / handmade" visual family.
+ * Tapes positioned top-right + bottom-left to avoid overlapping the
+ * quote mark that sits at top-left. */
+function QuoteTapeTopRight() {
   return (
     <svg
-      className="absolute -top-3 left-6 sm:left-10 w-20 h-8 -rotate-[8deg]"
+      className="absolute -top-3 right-6 sm:right-10 w-20 h-8 rotate-[8deg]"
       viewBox="0 0 120 40"
       fill="none"
       aria-hidden
@@ -17,10 +19,10 @@ function QuoteTapeTopLeft() {
   );
 }
 
-function QuoteTapeBottomRight() {
+function QuoteTapeBottomLeft() {
   return (
     <svg
-      className="absolute -bottom-3 right-6 sm:right-10 w-20 h-8 rotate-[8deg]"
+      className="absolute -bottom-3 left-6 sm:left-10 w-20 h-8 -rotate-[8deg]"
       viewBox="0 0 120 40"
       fill="none"
       aria-hidden
@@ -165,10 +167,10 @@ export function UeberMich() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="relative -my-2 md:-my-3 max-w-2xl rounded-3xl bg-cream/80 backdrop-blur-sm border border-teal/10 py-10 px-8 sm:py-12 sm:px-12 shadow-sm"
+              className="relative my-2 md:my-3 max-w-2xl rounded-3xl bg-cream/80 backdrop-blur-sm border border-teal/10 py-10 px-8 sm:py-12 sm:px-12 shadow-sm"
             >
-              <QuoteTapeTopLeft />
-              <QuoteTapeBottomRight />
+              <QuoteTapeTopRight />
+              <QuoteTapeBottomLeft />
               <span
                 aria-hidden
                 className="absolute -top-2 left-6 font-display font-extrabold text-7xl leading-none text-teal-dark/15 select-none"

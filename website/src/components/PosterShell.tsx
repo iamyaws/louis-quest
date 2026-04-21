@@ -11,8 +11,16 @@
  */
 
 import { ReactNode, useEffect } from 'react';
+import { PhoneMockup } from './PhoneMockup';
 
 type PosterTheme = 'warm' | 'evening' | 'morning' | 'quiet' | 'cool' | 'bold';
+
+type PhoneMockupVariant =
+  | 'morgen-anchor'
+  | 'zahne-quest'
+  | 'nacht-anchor'
+  | 'mood-grid'
+  | 'clean-aufgaben';
 
 export interface PosterStep {
   content: ReactNode;
@@ -40,9 +48,16 @@ export interface PosterConfig {
   /** Painterly hero image path (e.g. /art/companion/dragon-baby.webp) */
   heroSrc: string;
   heroAlt?: string;
-  /** Optional phone-frame inset with app screenshot — overlays bottom-right */
+  /** Optional phone-frame inset with app screenshot — overlays bottom-right.
+   *  Prefer `phoneMockup` for crisp vector UI; this is kept as a raster fallback. */
   phoneScreenshot?: {
     src: string;
+    caption?: string;
+  };
+  /** Preferred: inline HTML/CSS mockup of an app screen. Print-crisp, no
+   *  resolution issues. When set, takes precedence over phoneScreenshot. */
+  phoneMockup?: {
+    variant: PhoneMockupVariant;
     caption?: string;
   };
   /** QR code destination path on ronki.de (default: /installieren) */
@@ -86,6 +101,10 @@ export function PosterShell({ config }: { config: PosterConfig }) {
       {/* ── Poster page ──────────────────────────────────────────── */}
       <section className={`poster-page poster-${config.theme}`}>
         <div className="poster-inner">
+          <div className="wordmark" aria-label="Ronki">
+            <span className="wordmark-dot" aria-hidden />
+            <span className="wordmark-text">ronki</span>
+          </div>
           <p className="eyebrow">{config.eyebrow}</p>
           <h1 className="headline">{config.headline}</h1>
           <p className="subline">{config.subline}</p>
@@ -98,7 +117,21 @@ export function PosterShell({ config }: { config: PosterConfig }) {
               width={600}
               height={600}
             />
-            {config.phoneScreenshot && (
+            {config.phoneMockup ? (
+              <figure className="phone-inset">
+                <div className="phone-frame">
+                  <div className="phone-notch" aria-hidden />
+                  <div className="phone-screen phone-screen-mockup">
+                    <PhoneMockup variant={config.phoneMockup.variant} />
+                  </div>
+                </div>
+                {config.phoneMockup.caption && (
+                  <figcaption className="phone-caption">
+                    {config.phoneMockup.caption}
+                  </figcaption>
+                )}
+              </figure>
+            ) : config.phoneScreenshot ? (
               <figure className="phone-inset">
                 <div className="phone-frame">
                   <div className="phone-notch" aria-hidden />
@@ -121,10 +154,10 @@ export function PosterShell({ config }: { config: PosterConfig }) {
                   </figcaption>
                 )}
               </figure>
-            )}
+            ) : null}
           </div>
 
-          <p className="body-text">{config.body}</p>
+          <div className="body-text">{config.body}</div>
 
           <div className="bottom-row">
             <div className="cta-text">
@@ -235,23 +268,29 @@ export function PosterShell({ config }: { config: PosterConfig }) {
         }
         /* Morning-stripe was orange #D97706 which tanzed out of the
          * mustard/sage/teal brand palette. Pulled to mustard #FCD34D for
-         * consistency across the set. Highlights + step-number stay dark
-         * amber to preserve the warm-morning feel. */
+         * consistency across the set. Highlight was dark amber #B45309 —
+         * Marc found it visually heavy and off-brand. Pulled to teal
+         * #2D5A5E to match the rest of the set while keeping the mustard
+         * stripe for morning warmth. */
         .poster-morning {
           --bg: #FDF8F0;
           --bg-accent-1: rgba(252,211,77,0.32);
           --bg-accent-2: rgba(217,119,6,0.10);
           --stripe: #FCD34D;
-          --highlight: #B45309;
-          --step-number: #B45309;
+          --highlight: #2D5A5E;
+          --step-number: #2D5A5E;
         }
         .poster-quiet {
           --bg: #FDF8F0;
           --bg-accent-1: rgba(80,160,130,0.16);
           --bg-accent-2: rgba(45,90,94,0.08);
           --stripe: #50A082;
-          --highlight: #2D5A5E;
-          --step-number: #2D5A5E;
+          /* Highlight was teal-2 #2D5A5E — too close in value to the base
+           * headline ink #1A3C3F, making the accent word look weak.
+           * Pulled to sage #2F7A5A (deeper sage) for more separation
+           * while staying in the "quiet/natural" theme. */
+          --highlight: #2F7A5A;
+          --step-number: #2F7A5A;
         }
         .poster-cool {
           --bg: #F4FAF7;
@@ -277,7 +316,8 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           background: var(--bg);
           background-image:
             radial-gradient(ellipse 70% 45% at 75% 18%, var(--bg-accent-1) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 40% at 15% 82%, var(--bg-accent-2) 0%, transparent 60%);
+            radial-gradient(ellipse 60% 40% at 15% 82%, var(--bg-accent-2) 0%, transparent 60%),
+            radial-gradient(ellipse 55% 35% at 85% 95%, var(--bg-accent-1) 0%, transparent 65%);
           color: var(--text-primary);
         }
         .poster-page::before {
@@ -294,6 +334,35 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           padding: 20mm 18mm 16mm;
           display: flex;
           flex-direction: column;
+          position: relative;
+        }
+
+        /* ── Wordmark (brand anchor, top-right) ───────────────────
+         * Simple text-based mark with a mustard dot accent. Reuses
+         * themed colors so it adapts to light/bold themes. */
+        .wordmark {
+          position: absolute;
+          top: 10mm;
+          right: 14mm;
+          display: inline-flex;
+          align-items: center;
+          gap: 2mm;
+          z-index: 2;
+        }
+        .wordmark-dot {
+          width: 2.4mm;
+          height: 2.4mm;
+          border-radius: 50%;
+          background: var(--stripe);
+          box-shadow: 0 0 0 0.4mm rgba(0,0,0,0.04);
+        }
+        .wordmark-text {
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+          font-weight: 800;
+          font-size: 13pt;
+          letter-spacing: -0.04em;
+          color: var(--text-primary);
+          line-height: 1;
         }
 
         .eyebrow {
@@ -317,12 +386,25 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           color: var(--text-primary);
           margin: 0;
           text-align: center;
-          text-wrap: balance;
+          /* Predictable wrapping via explicit <br /> in each poster.
+           * text-wrap: balance caused Figma capture artifacts (browser
+           * wrapped at one place, Figma measured differently). Forced
+           * breaks are uglier to maintain but render consistently. */
+          max-width: 174mm;
+          margin-left: auto;
+          margin-right: auto;
         }
         .headline em {
           font-style: italic;
           color: var(--highlight);
-          font-weight: 700;
+          font-weight: 800;
+        }
+        /* Non-italic accent — use when italic on short fragments
+         * (numbers, bare adverbs) feels typographically off. */
+        .headline strong {
+          font-style: normal;
+          color: var(--highlight);
+          font-weight: 800;
         }
         .subline {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -336,21 +418,29 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           text-wrap: balance;
         }
 
+        /* hero-wrap absorbs leftover vertical space (flex: 1). Hero image
+         * stays fixed at 68mm and centers within the expanded wrap, so the
+         * image reads as "breathing" rather than "cramped". Posters with
+         * short bodies still look balanced; posters with long bodies keep
+         * the 72mm minimum. */
         .hero-wrap {
-          flex: 1;
+          flex: 1 1 auto;
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
-          min-height: 0;
-          margin: 6mm 0;
+          margin: 4mm 0 6mm;
+          min-height: 72mm;
         }
+        /* Hero shrunk from 92 → 68mm. Original size was visually dominant
+         * and crowded the body-text "proof" section. Smaller hero gives
+         * the mid-section room to hold attention. */
         .hero {
-          width: 92mm;
-          height: 92mm;
+          width: 68mm;
+          height: 68mm;
           object-fit: cover;
-          border-radius: 10mm;
-          box-shadow: 0 10mm 20mm -5mm rgba(26,60,63,0.25);
+          border-radius: 8mm;
+          box-shadow: 0 8mm 16mm -4mm rgba(26,60,63,0.22);
         }
 
         /* Phone inset — bottom right of hero area
@@ -393,6 +483,10 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           border-radius: 3.5mm;
           display: block;
         }
+        .phone-screen-mockup {
+          /* div-based vector mockup wrapper — same size/radius, no object-fit */
+          overflow: hidden;
+        }
         .phone-caption {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           font-size: 7pt;
@@ -404,29 +498,75 @@ export function PosterShell({ config }: { config: PosterConfig }) {
           max-width: 34mm;
         }
 
+        /* Body wrapper — renders caller's children. Callers MUST wrap
+         * individual paragraphs in <p>…</p> so the shell can apply
+         * per-paragraph typography + inter-paragraph spacing.
+         *
+         * Typography hierarchy:
+         *   - First <p> → "lead" (larger, heavier, full opacity) — the
+         *     primary claim, the attention-holder in the mid-section
+         *   - Subsequent <p> → supporting (smaller, lighter) — the
+         *     proof-beats that reinforce the lead
+         *
+         * Mid-section pop: headline grabs → lead paragraph delivers the
+         * core claim in display type → supporting paragraphs carry the
+         * reasoning → CTA closes. */
         .body-text {
+          max-width: 150mm;
+          margin: 0 auto 8mm;
+          padding: 0 4mm;
+          display: flex;
+          flex-direction: column;
+          gap: 4mm;
+        }
+        .body-text p {
           font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-          font-size: 10.5pt;
-          line-height: 1.5;
-          color: var(--text-primary);
-          opacity: 0.85;
-          margin: 0 0 6mm;
+          margin: 0;
           text-align: center;
           text-wrap: pretty;
-          /* 155mm was ~77 chars/line, above the 50-75 optimum for body
-           * reading at arm's length. Pulled to 140mm (~70 chars/line). */
+          color: var(--text-primary);
+        }
+        /* Lead paragraph — the mid-section anchor */
+        .body-text p:first-child {
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+          font-size: 14pt;
+          font-weight: 600;
+          line-height: 1.3;
+          letter-spacing: -0.015em;
+          opacity: 0.95;
           max-width: 140mm;
           margin-left: auto;
           margin-right: auto;
         }
-        .poster-bold .body-text { opacity: 0.9; }
+        /* Supporting paragraphs — smaller, readable, slightly recessed */
+        .body-text p:not(:first-child) {
+          font-size: 10.5pt;
+          line-height: 1.5;
+          font-weight: 400;
+          opacity: 0.72;
+          max-width: 130mm;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .poster-bold .body-text p:first-child { opacity: 1; }
+        .poster-bold .body-text p:not(:first-child) { opacity: 0.82; }
         .body-text em {
           font-style: italic;
           color: var(--highlight);
-          font-weight: 600;
+          font-weight: 700;
           opacity: 1;
         }
+        .body-text strong {
+          color: var(--highlight);
+          font-weight: 700;
+          opacity: 1;
+          font-style: normal;
+        }
 
+        /* bottom-row sits naturally after body-text. Leftover vertical
+         * space is absorbed by hero-wrap (flex: 1 auto above), keeping
+         * the image area balanced rather than leaving awkward empty
+         * space at the very bottom or right above the CTA. */
         .bottom-row {
           display: grid;
           grid-template-columns: 1fr auto;

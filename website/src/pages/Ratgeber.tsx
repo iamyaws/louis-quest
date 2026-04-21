@@ -80,6 +80,15 @@ const ARTICLES: Article[] = [
     readMinutes: 8,
     image: '/art/bioms/Sonnenglast_sun-highlands.webp',
   },
+  {
+    slug: 'eltern-bereich',
+    title: 'Der Eltern-Bereich in Ronki: was drin ist und wie du hinkommst',
+    description:
+      'Ronki ist für dein Kind gebaut, nicht für dich. Der Eltern-Bereich ist die eine Ausnahme: ein PIN-geschützter Ort für Einstellungen, eigene Quest-Linien und einen ruhigen Blick auf die Woche.',
+    category: 'Ronki nutzen',
+    readMinutes: 5,
+    image: '/art/bioms/Sonnenglast_sun-highlands.webp',
+  },
 ];
 
 export default function Ratgeber() {

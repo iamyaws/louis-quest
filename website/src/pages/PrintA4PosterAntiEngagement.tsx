@@ -21,13 +21,14 @@ export default function PrintA4PosterAntiEngagement() {
         subline: 'Ein Drache, ohne Fangmechanik.',
         body: (
           <>
-            Keine Streaks, die reißen. Keine Loot-Boxes. Keine Push-Benachrichtigungen. Keine „Dein Freund ist online"-Karten. Wenn dein Kind nach zwei Monaten den Drachen fast nicht mehr braucht, haben wir unseren Job gemacht. Als Gamer-Vater gesagt: <em>schlechtes Engagement-Metric, gutes Erziehungs-Metric</em>.
+            <p>Keine Streaks, die reißen. Keine Loot-Boxes. Keine Push-Benachrichtigungen. Keine „Dein Freund ist online"-Karten.</p>
+            <p>Wenn dein Kind nach zwei Monaten den Drachen fast nicht mehr braucht, haben wir unseren Job gemacht.</p>
           </>
         ),
         heroSrc: '/art/companion/dragon-majestic.webp',
         heroAlt: 'Imposanter, freundlicher Drache: Gegenentwurf zu aggressiven Kinder-Apps.',
-        phoneScreenshot: {
-          src: '/art/app/aufgaben-uebersicht.png',
+        phoneMockup: {
+          variant: 'clean-aufgaben',
           caption: 'Kein Streak, kein Loot. Nur was dran ist.',
         },
         ctaHeading: 'So probiert ihr Ronki heute aus:',
