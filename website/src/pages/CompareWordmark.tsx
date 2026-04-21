@@ -29,7 +29,7 @@ export default function CompareWordmark() {
         <div className="space-y-16">
           <VariantRow
             label="Option A · Text only"
-            description="So wie aktuell in PosterShell: mustard Punkt + „ronki" in Plus Jakarta 800. Minimal, keine Bild-Abhängigkeit."
+            description={'So wie aktuell in PosterShell: mustard Punkt + „ronki" in Plus Jakarta 800. Minimal, keine Bild-Abhängigkeit.'}
           >
             <WordmarkTextOnly size="small" />
             <WordmarkTextOnly size="large" />
