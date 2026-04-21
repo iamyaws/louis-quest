@@ -13,7 +13,9 @@ export default function PrintA4PosterKinderarzt() {
         eyebrow: 'Für Eltern im Wartezimmer',
         headline: (
           <>
-            Routinen sind keine Disziplin.
+            Routinen sind
+            <br />
+            keine Disziplin.
             <br />
             <em>Sie sind Entwicklung.</em>
           </>

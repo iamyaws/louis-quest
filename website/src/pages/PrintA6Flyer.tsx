@@ -53,10 +53,12 @@ export default function PrintA6Flyer() {
           <p className="eyebrow">Für Grundschulkinder ab 5</p>
 
           <h1 className="headline">
-            Wenn morgens noch{' '}
+            Wenn morgens noch
+            <br />
             <span style={{ fontStyle: 'italic', color: '#50A082' }}>
               „Zähne putzen!"
-            </span>{' '}
+            </span>
+            <br />
             durchs Haus schallt.
           </h1>
 
