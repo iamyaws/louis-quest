@@ -104,6 +104,7 @@ export default function CampfireScene({
   variant = 'amber',
   stage = 2,
   mood = 'normal',
+  weather,              // 'clear' | 'cloud' | 'fog' | 'rain' | 'snow' | 'thunder' | undefined
   hour,
   state = 'idle',
   statusText,
@@ -113,6 +114,13 @@ export default function CampfireScene({
   onDiaryTap,
   height = 320,
 }) {
+  // Weather atmosphere is layered ONTOP of the time-of-day palette.
+  // Rule (backlog_weather_aware_ronki.md): mood > weather. If Ronki's mood
+  // drives rain/cold tints (e.g. sad → blue rain), weather's rain must not
+  // add on top — would double-up and confuse the emotional signal. So we
+  // suppress the weather layer when the mood already carries precipitation.
+  const moodOwnsAtmosphere = mood === 'sad' || mood === 'tired';
+  const effectiveWeather = moodOwnsAtmosphere ? undefined : weather;
   const h = hour ?? new Date().getHours();
   const band = pickTimeBand(h);
   const pal = PALETTES[band];
@@ -258,6 +266,26 @@ export default function CampfireScene({
            that on Lager, the flying quest icon lands here (not the
            TopBar Ronki, which isn't even rendered on Hub). */}
       {ronkiVisible && <SideRonki onTap={onRonkiTap} variant={variant} stage={stage} mood={mood} />}
+
+      {/* ── Weather atmosphere layer ──
+           Rides on top of the time-of-day palette + below Ronki so
+           the rain/snow falls in front of hills but behind the chibi.
+           Mood always wins: suppressed when Ronki is sad/tired
+           (moodOwnsAtmosphere above). Kept deliberately thin — 2-3 drops
+           at a time, single flash on thunder — per Marc "should drizzle
+           a little". */}
+      {effectiveWeather === 'rain' && <WeatherRain />}
+      {effectiveWeather === 'snow' && <WeatherSnow />}
+      {effectiveWeather === 'thunder' && <WeatherThunder />}
+      {(effectiveWeather === 'cloud' || effectiveWeather === 'fog') && (
+        <div aria-hidden="true" style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          background: effectiveWeather === 'fog'
+            ? 'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 60%, transparent 100%)'
+            : 'linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 40%, transparent 100%)',
+          zIndex: 3,
+        }} />
+      )}
 
       {/* Greeting speech bubble — shows above Ronki on mount, stays
            ~7.5s, then fades. Tapping the bubble (or onBubbleTap) rolls
@@ -466,6 +494,116 @@ export default function CampfireScene({
 // ── SideRonki — orange chibi dragon, sitting pose ─────────────────────
 // Lives inside the scene; extracted as a sub-component for readability.
 // Construction matches Claude Design's Feature Preview exactly.
+
+// ── Weather sub-components ────────────────────────────────────────────
+// Thin atmospheric layers. Use CSS animations for cheap GPU-accelerated
+// motion; no JS loop. Seeded positions so drops/flakes don't re-randomize
+// every render (would flicker).
+
+const RAIN_DROPS = [
+  { left: 12, delay: 0.0, dur: 1.7 },
+  { left: 28, delay: 0.6, dur: 1.9 },
+  { left: 46, delay: 1.2, dur: 1.6 },
+  { left: 62, delay: 0.3, dur: 2.0 },
+  { left: 78, delay: 0.9, dur: 1.8 },
+  { left: 90, delay: 1.4, dur: 1.7 },
+];
+
+function WeatherRain() {
+  return (
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4 }}>
+      {RAIN_DROPS.map((d, i) => (
+        <span key={i} style={{
+          position: 'absolute',
+          left: `${d.left}%`,
+          top: '-10%',
+          width: 1.5,
+          height: 14,
+          background: 'linear-gradient(to bottom, rgba(200,220,240,0), rgba(200,220,240,0.55))',
+          borderRadius: 1,
+          transform: 'skewX(-8deg)',
+          animation: `cfRainFall ${d.dur}s linear ${d.delay}s infinite`,
+          opacity: 0.6,
+        }} />
+      ))}
+      <style>{`
+        @keyframes cfRainFall {
+          0%   { transform: skewX(-8deg) translateY(0); opacity: 0; }
+          10%  { opacity: 0.6; }
+          100% { transform: skewX(-8deg) translateY(320px); opacity: 0.6; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+const SNOW_FLAKES = [
+  { left: 8,  delay: 0.0, dur: 7 },
+  { left: 22, delay: 1.4, dur: 8 },
+  { left: 38, delay: 3.0, dur: 6.5 },
+  { left: 54, delay: 0.6, dur: 7.5 },
+  { left: 70, delay: 2.1, dur: 8 },
+  { left: 86, delay: 4.0, dur: 7 },
+];
+
+function WeatherSnow() {
+  return (
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4 }}>
+      {SNOW_FLAKES.map((s, i) => (
+        <span key={i} style={{
+          position: 'absolute',
+          left: `${s.left}%`,
+          top: '-6%',
+          width: 5,
+          height: 5,
+          borderRadius: '50%',
+          background: '#fff',
+          opacity: 0.75,
+          filter: 'blur(0.5px)',
+          boxShadow: '0 0 3px rgba(255,255,255,0.6)',
+          animation: `cfSnowFall ${s.dur}s linear ${s.delay}s infinite`,
+        }} />
+      ))}
+      <style>{`
+        @keyframes cfSnowFall {
+          0%   { transform: translateY(0) translateX(0); }
+          50%  { transform: translateY(160px) translateX(6px); }
+          100% { transform: translateY(320px) translateX(-4px); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function WeatherThunder() {
+  return (
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4 }}>
+      {/* Dim cloud band across the top */}
+      <div style={{
+        position: 'absolute', inset: '0 0 auto 0', height: '22%',
+        background: 'linear-gradient(180deg, rgba(30,41,59,0.42) 0%, transparent 100%)',
+      }} />
+      {/* Occasional full-viewport flash — 1.5s flash every 18s */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'rgba(255,255,255,0.9)',
+        animation: 'cfLightning 18s steps(1) infinite',
+        opacity: 0,
+      }} />
+      {/* Rain under the cloud */}
+      <WeatherRain />
+      <style>{`
+        @keyframes cfLightning {
+          0%, 98%   { opacity: 0; }
+          98.5%     { opacity: 0.9; }
+          99%       { opacity: 0.2; }
+          99.5%     { opacity: 0.8; }
+          100%      { opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 function SideRonki({ onTap, variant = 'amber', stage = 2, mood = 'normal' }) {
   const eater = useQuestEater();

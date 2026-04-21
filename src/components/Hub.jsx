@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES, BOSS_TIERS, GEAR_ITEMS, CAT_STAGES, COMPANION_STAGES } from '../constants';
 import { useTask } from '../context/TaskContext';
 import { getLevel, getLvlProg, getCatStage } from '../utils/helpers';
-import useWeather, { getWeatherInfo } from '../hooks/useWeather';
+import useWeather, { getWeatherInfo, getWeatherCategory } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
 import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
@@ -385,6 +385,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
           variant={state?.companionVariant || 'amber'}
           stage={getCatStage(state?.catEvo || 0)}
           mood={state?.ronkiMood || 'normal'}
+          weather={weather?.current ? getWeatherCategory(weather.current.weatherCode) : undefined}
           height={340}
         />
         {/* Fade into cream paper so cards below land on a clean surface */}

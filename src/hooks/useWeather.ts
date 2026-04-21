@@ -110,6 +110,22 @@ export function getWeatherInfo(code: number): { emoji: string; label: string } {
   return { emoji: '☁️', label: 'Bewölkt' };
 }
 
+// Weather category — used by the Lager scene to pick an atmospheric layer
+// (raindrops, snow, thunder flash). Coarser than getWeatherInfo so the
+// CampfireScene only cares about broad buckets.
+export type WeatherCategory = 'clear' | 'cloud' | 'fog' | 'rain' | 'snow' | 'thunder';
+export function getWeatherCategory(code: number): WeatherCategory {
+  if (code === 0)   return 'clear';
+  if (code <= 3)    return 'cloud';
+  if (code <= 48)   return 'fog';
+  if (code <= 67)   return 'rain';
+  if (code <= 77)   return 'snow';
+  if (code <= 82)   return 'rain';
+  if (code <= 86)   return 'snow';
+  if (code <= 99)   return 'thunder';
+  return 'cloud';
+}
+
 // ── Clothing recommendations ──────────────────────────────────────────────────
 export interface ClothingItem {
   emoji: string;
