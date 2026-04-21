@@ -194,6 +194,89 @@ Welcome-email template ends with the Gamer-Vater P.S. Unsubscribe footer is mand
 
 **`child_age` / `challenge` → `text[]` migration: deferred.** Comma-joined strings work. Migrate when analytics require per-bucket filtering.
 
+## App (louis-quest / app.ronki.de) — conventions
+
+### Dev URL shortcuts (Apr 2026)
+
+Handled at App.jsx mount (single ref-guarded effect, waits for state hydrate):
+
+| Param | Effect |
+|-------|--------|
+| `?compendium=1` | Public Ronki-Sammelbuch (exempt from AuthGate — website can link) |
+| `?gallery=1` | Dev-only ChibiGallery (6 variants × 6 stages × 6 moods) |
+| `?cave=1` | Jump into KristallHoehleGame (Cave Mining) |
+| `?visitors=1` | Jump into CampfireVisitorsGame |
+| `?dreiDanke=1` | Drei-Danke gratitude tool |
+| `?ausmalbild=1` | RonkiAusmalbild reward page |
+| `?variant=amber\|teal\|rose\|violet\|forest\|sunset` | Seed companionVariant |
+| `?stage=0..5` | Seed catEvo to matching stage threshold (Ei→Legendär) |
+| `?ronkiMood=normal\|sad\|tired\|besorgt\|gut\|magisch` | Force ronkiMood for preview |
+| `?boxAtmung=learned\|learning\|N` | Seed Box-Atmung practice counter |
+| `?reveal=all` | NavBar: unlock every tab regardless of real state |
+| `?hint=heute\|ronki` | Ronki unlock-hint placement A/B |
+
+### Core state shape (in TaskContext)
+
+- **`crystalInventory: Record<family, number>`** — shared between Cave Mining (adds) and Campfire Visitors (spends). 5 families: ember/lagoon/meadow/blossom/star.
+- **`freundFriendship: Record<freundId, 0..5>`** — gift-counter per Freund. 5 = scene evolution unlocks.
+- **`todaysVisitor: { freundId, wish, date } | null`** — idempotent per day; picked by date-seed so refreshing same day = same visitor.
+- **`ronkiSkillPractice: Record<skillId, 0..5>`** — how many times Louis has practiced a self-regulation tool with Ronki.
+- **`ronkiLearnedSkills: string[]`** — skills where practice hit 5; Ronki can now offer them back.
+- **`ronkiLearnBannerSeen: Record<skillId, true>`** — one-shot "Ronki hat X gelernt" golden banner.
+- **`ronkiMood: 'normal'|'sad'|'tired'|'besorgt'|'gut'|'magisch'`** — companion mood, drives chibi face + particles + campfire scene tint.
+- **`tabUnlocksSeen / tabCoachmarksSeen`** — one-shot flags for NavBar grey-lock reveal toasts + coachmarks.
+- **`completedColoringPages`** — Ausmalbild saves land here; Buch will pick them up.
+
+### The skill-learning pattern (Louis teaches Ronki)
+
+Consistent mechanic across all emotional tools — kid practices → Ronki "learns" at 5 practices → next time Ronki is in that mood, the learned skill appears as an additional sanfte-Reaktion card on RonkiProfile.
+
+Reference impl: `useGefuehlsecke` flow → `actions.practiceSkill('boxAtmung')` → at 5, `ronkiLearnedSkills` pushes 'boxAtmung' + `ronkiLearnBannerSeen.boxAtmung` triggers the one-shot golden banner.
+
+Tool library plan in `memory/project_emotional_tool_library.md`:
+- `boxAtmung` (sad) — shipped
+- `dreiDanke` (gut) — shipped Apr 22
+- `kraftwort` (magisch), `gedankenWolken` (besorgt), `steinUndGummi` (tired) — spec'd, not built
+
+### Organic mood triggers (syncRonkiMood)
+
+Priority order in `syncRonkiMood` — once one fires, others short-circuit until next day:
+
+1. **magisch** → streak milestone (7/14/21/30/50/75/100/150/200/365 days)
+2. **gut** → all main quests done today
+3. **besorgt** → kid returned after 2+ days absent
+4. **sad / tired** → scheduled "bad day" (14-21d interval via `ronkiNextBadDayDate`)
+
+Called from Hub mount + RonkiProfile mount. Idempotent per day via `ronkiMoodSetDate === today`.
+
+### MINT games contract
+
+Each game mounts via `view === 'mint-game' && activeMintGame === 'id'` and receives `<Game onComplete={(reward) => void} />`. Reward shape: `{ hp: number }`. Handler calls `actions.addHP(reward.hp)` + navigates back to Hub. IDs are defined in `src/data/mintGames.ts` with `implemented: true` flag; `MINT_SEQUENCE` filters down to live entries.
+
+### Cave Mining + Campfire Visitors (compound loop)
+
+Cave Mining (KristallHoehleGame) = extract. Campfire Visitors (CampfireVisitorsGame) = spend. Shared state via `crystalInventory`. Visitors' `todaysVisitor` rotates by date-seed so same-day reopen = same Freund. Entry points currently URL-param only — want Louis playtest before Hub/Nav surfacing.
+
+### Fire-breath flavors
+
+`FireBreathPuff.jsx` renders 5 variants keyed by flavor:
+- `flame` (routine quests) · `ember` (side quests + habits) — wait, actually habits use `sparkle`
+- `sparkle` (MINT + daily habits) · `heart` (Freund arcs) · `rainbow` (streak milestones)
+
+Routing via `flavorForQuest(quest)` in FireBreathPuff.jsx. Both SideRonki (Lager) + PinnedRonki (TopBar) consume it from QuestEater context.
+
+### NavBar grey-lock pattern
+
+Tabs never hide — locked ones dim to 55% opacity with a padlock badge and show a tap-to-reveal hint sheet above the nav. Unlock criteria in `src/data/tabUnlocks.ts`. Unlock ceremony: toast at top + sparkle pulse on the tab icon until coachmark dismissed.
+
+### Public routes (no auth)
+
+`?compendium=1` is the only public route. It's intercepted BEFORE AuthGate in App.jsx so the URL is share-safe and can be iframe'd on ronki.de.
+
+### Backlog + second brain
+
+Marc's memory system at `C:\Users\öööö\.claude\projects\C--Users-------basic-memory\memory\`. Every meaningful decision, backlog item, and project context has a file there. MEMORY.md is the index. Update it whenever a backlog item ships or a new one lands.
+
 ## What to do when user asks for changes
 
 1. Follow the brand voice rules above. Pay special attention to em-dash and AI-slop sweeps after any writing task. Run `Grep pattern='—'` across touched files before declaring done.
