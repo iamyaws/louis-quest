@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuestEater } from './QuestEater';
 import { getVariant } from '../data/companionVariants';
+import MoodChibi from './MoodChibi';
 
 /**
  * CampfireScene — zero-asset painterly Hub scene.
@@ -453,11 +454,6 @@ function SideRonki({ onTap, variant = 'amber' }) {
   const ref = useRef(null);
   const [fireKey, setFireKey] = useState(0);
   const lastFire = useRef(eater?.fireBreath ?? 0);
-  // Pull the chibi palette for the selected colorway so the campfire
-  // Ronki matches whatever egg Louis hatched. Falls back to amber if
-  // unknown. Marc 24 Apr 2026: "this should not only change the chibi
-  // in the profile but also at the campfire."
-  const palette = getVariant(variant).chibi;
 
   // Register as the preferred flyer target (beats the TopBar Ronki
   // when both are mounted; in practice only one is at a time).
@@ -489,6 +485,11 @@ function SideRonki({ onTap, variant = 'amber' }) {
       }
     : undefined;
 
+  // Front-facing MoodChibi for the campfire (Marc 24 Apr 2026: "happy
+  // to have him look towards the user and not the campfire. maybe that's
+  // even more natural."). Drops the old custom side-profile construction
+  // in favor of the same chibi we use on the profile — consistent pose,
+  // variant palette, no more mixed-perspective issues.
   return (
     <Tag
       ref={ref}
@@ -499,12 +500,11 @@ function SideRonki({ onTap, variant = 'amber' }) {
         position: 'absolute',
         left: '22%',
         bottom: '17%',
-        width: 78,
-        height: 72,
+        width: 82,
+        height: 82,
         zIndex: 5,
         animation: 'cfRonkiBreathe 3.4s ease-in-out infinite',
         transformOrigin: '50% 90%',
-        // Button-specific resets so it looks identical to the <div> version
         background: 'transparent',
         border: 'none',
         padding: 0,
@@ -512,9 +512,9 @@ function SideRonki({ onTap, variant = 'amber' }) {
         cursor: onTap ? 'pointer' : 'default',
       }}
     >
-      {/* Fire-breath puff — emerges from Ronki's mouth, extends right
-           (toward the camera/fire), then fades. Keyed so each eat-event
-           remounts a fresh run. */}
+      {/* Fire-breath puff — extends right toward the campfire, keyed so
+          each eat-event remounts a fresh run. Lives above the chibi in
+          z-order so it visually bursts from his mouth. */}
       {fireKey > 0 && (
         <span
           key={fireKey}
@@ -535,138 +535,13 @@ function SideRonki({ onTap, variant = 'amber' }) {
           }}
         />
       )}
-      {/* Tail — swoops back and up, layered behind body. Uses the
-          variant body gradient so the tail matches the colorway. */}
-      <div style={{
-        position: 'absolute',
-        left: '62%', top: '48%',
-        width: 26, height: 14,
-        background: palette.body,
-        borderRadius: '50% 80% 60% 70% / 60% 60% 50% 50%',
-        transform: 'rotate(-12deg)',
-        zIndex: 1,
-      }}>
-        <span style={{
-          position: 'absolute', right: -4, top: -4,
-          width: 10, height: 10,
-          background: palette.horn,
-          borderRadius: '50%',
-          boxShadow: `0 0 6px ${palette.cheek}`,
-        }} />
-      </div>
 
-      {/* Wing — flaps subtly, layered behind body but above tail */}
-      <div style={{
-        position: 'absolute',
-        top: '24%', left: '-2%',
-        width: 22, height: 30,
-        background: palette.body,
-        borderRadius: '50% 10% 50% 50% / 55% 20% 55% 55%',
-        transform: 'rotate(-15deg)',
-        transformOrigin: '100% 30%',
-        animation: 'cfWingFlap 2.2s ease-in-out infinite',
-        opacity: 0.95,
-        zIndex: 2,
-      }} />
-
-      {/* Body — pear-shape with inset volume shadow */}
-      <div style={{
-        position: 'absolute',
-        left: '10%', top: '20%',
-        width: 56, height: 54,
-        background: palette.body,
-        borderRadius: '58% 50% 40% 50% / 62% 56% 44% 48%',
-        boxShadow: 'inset -4px -6px 0 rgba(0,0,0,0.18), 0 4px 8px rgba(0,0,0,0.22)',
-        zIndex: 3,
-      }} />
-
-      {/* Belly — side-facing crescent along the under-front edge of the
-          torso. No longer a centered oval (which read as front-facing
-          belly) per Marc 24 Apr 2026. Sits lower-left on the body. */}
-      <div style={{
-        position: 'absolute',
-        left: '14%', top: '52%',
-        width: 22, height: 14,
-        background: palette.belly,
-        borderRadius: '60% 30% 50% 50% / 80% 50% 50% 60%',
-        transform: 'rotate(-6deg)',
-        boxShadow: 'inset 0 -2px 3px rgba(0,0,0,0.08)',
-        zIndex: 4,
-      }} />
-
-      {/* Horn — single visible (near-side) horn. In side-view only one
-          should read prominently; a tiny nub hints at the back horn for
-          depth. Previously both horns rendered symmetrically which gave
-          the "mixed perspective" feel (Marc 24 Apr 2026). */}
-      <div style={{
-        position: 'absolute',
-        top: '14%', left: '38%',
-        width: 8, height: 15,
-        background: palette.horn,
-        borderRadius: '50% 50% 10% 10%',
-        transform: 'rotate(8deg)',
-        zIndex: 4,
-      }} />
-      {/* Back horn — tiny nub peeking out behind. Occluded most of its
-          length by the body; renders with lower opacity for depth. */}
-      <div style={{
-        position: 'absolute',
-        top: '16%', left: '32%',
-        width: 5, height: 8,
-        background: palette.horn,
-        borderRadius: '50% 50% 10% 10%',
-        transform: 'rotate(-4deg)',
-        opacity: 0.55,
-        zIndex: 2,
-      }} />
-
-      {/* Eye with catchlight */}
-      <div style={{
-        position: 'absolute',
-        top: '34%', left: '46%',
-        width: 6, height: 8,
-        background: palette.eyeInk,
-        borderRadius: '50%',
-        zIndex: 5,
-      }}>
-        <span style={{
-          position: 'absolute',
-          top: 1, right: 0,
-          width: 2, height: 2,
-          background: '#fff',
-          borderRadius: '50%',
-        }} />
-      </div>
-
-      {/* Small mouth */}
-      <div style={{
-        position: 'absolute',
-        top: '50%', left: '52%',
-        width: 8, height: 3,
-        borderBottom: '1.5px solid #3a1f12',
-        borderRadius: '0 0 4px 4px',
-        zIndex: 5,
-      }} />
-
-      {/* Legs — use variant leg gradient */}
-      <div style={legStyle('28%', palette.leg)} />
-      <div style={legStyle('52%', palette.leg)} />
+      {/* Front-facing chibi, bare mode (no inner locket bg) so Ronki
+          sits directly on the campfire scene. Variant palette matches
+          Louis's hatched colorway. */}
+      <MoodChibi size={82} mood="normal" bare variant={variant} />
     </Tag>
   );
-}
-
-function legStyle(left, gradient) {
-  return {
-    position: 'absolute',
-    left,
-    bottom: '2%',
-    width: 10,
-    height: 14,
-    background: gradient || 'linear-gradient(180deg, #f97316, #9a3412)',
-    borderRadius: '30% 30% 40% 40%',
-    boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.18)',
-    zIndex: 5,
-  };
 }
 
 // ── Tree ─────────────────────────────────────────────────────────────
