@@ -1130,7 +1130,12 @@ export default function RonkiProfile({ onNavigate }) {
                hides, and the golden learn banner fires. On the next
                bad-Ronki day, Ronki offers Box-Atmung back to Louis as
                a 4th reaction option. */}
-          {!hasLearnedBox && practiceCount > 0 && (
+          {/* Visible when Louis has already practiced at least once, OR
+               when Ronki is having a bad day — surfaces the tool during
+               the moment it's actually useful instead of hiding it until
+               Louis stumbles into Gefühlsecke. Marc Apr 2026: "when mood=sad
+               there should also be the box breathing thingy." */}
+          {!hasLearnedBox && (practiceCount > 0 || ronkiMood === 'sad' || ronkiMood === 'tired') && (
             <>
               <Kicker>{lang === 'de' ? 'Louis bringt Ronki bei' : 'Louis teaches Ronki'}</Kicker>
               <section style={{

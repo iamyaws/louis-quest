@@ -102,6 +102,7 @@ export default function CampfireScene({
   onRonkiTap,
   variant = 'amber',
   stage = 2,
+  mood = 'normal',
   hour,
   state = 'idle',
   statusText,
@@ -255,7 +256,7 @@ export default function CampfireScene({
            the QuestEater context as the 'preferred' flyer target so
            that on Lager, the flying quest icon lands here (not the
            TopBar Ronki, which isn't even rendered on Hub). */}
-      {ronkiVisible && <SideRonki onTap={onRonkiTap} variant={variant} stage={stage} />}
+      {ronkiVisible && <SideRonki onTap={onRonkiTap} variant={variant} stage={stage} mood={mood} />}
 
       {/* Greeting speech bubble — shows above Ronki on mount, stays
            ~7.5s, then fades. Tapping the bubble (or onBubbleTap) rolls
@@ -465,7 +466,7 @@ export default function CampfireScene({
 // Lives inside the scene; extracted as a sub-component for readability.
 // Construction matches Claude Design's Feature Preview exactly.
 
-function SideRonki({ onTap, variant = 'amber', stage = 2 }) {
+function SideRonki({ onTap, variant = 'amber', stage = 2, mood = 'normal' }) {
   const eater = useQuestEater();
   const ref = useRef(null);
   const [fireKey, setFireKey] = useState(0);
@@ -558,7 +559,7 @@ function SideRonki({ onTap, variant = 'amber', stage = 2 }) {
           campfire Ronki matches the profile Ronki's evolution (Marc
           24 Apr 2026 "stage of ronki at the lager and profile isn't
           the same but should be"). */}
-      <MoodChibi size={130} mood="normal" bare variant={variant} stage={Math.min(3, stage)} />
+      <MoodChibi size={130} mood={mood} bare variant={variant} stage={Math.min(3, stage)} />
     </Tag>
   );
 }

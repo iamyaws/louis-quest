@@ -360,6 +360,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
           onDiaryTap={() => setOpenBeat('expedition-diary')}
           variant={state?.companionVariant || 'amber'}
           stage={getCatStage(state?.catEvo || 0)}
+          mood={state?.ronkiMood || 'normal'}
           height={340}
         />
         {/* Fade into cream paper so cards below land on a clean surface */}
