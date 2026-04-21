@@ -45,7 +45,6 @@ export const SCHOOL_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   // Marc correction: Louis's actual job is to empty the lunchbox (take it out
   // of the schoolbag + throw leftovers away), not wash it. Parents do the wash.
   { id: "s_lunchbox", name: "Brotdose leeren", icon: "\u{1F371}", anchor: "evening", xp: 10, minutes: 3, order: 1 },
-  { id: "s_water", name: "Wasserflasche auff\u00FCllen", icon: "\u{1F4A7}", anchor: "evening", xp: 10, minutes: 1, order: 2 },
   { id: "s_packcheck", name: "Schultasche checken", icon: "\u{1F392}", anchor: "evening", xp: 10, minutes: 3, order: 3 },
   { id: "s_signature", name: "Unterschriften checken", icon: "\u270D\uFE0F", anchor: "evening", xp: 10, minutes: 2, order: 4 },
   // 2. Homework

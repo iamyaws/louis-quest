@@ -16,11 +16,17 @@ export function getLvlProg(xp: number): { cur: number; need: number } {
   return { cur: xp - c, need: n - c };
 }
 
+// School-prep evening quests only make sense on school nights.
+// On Sat/Sun there's no schoolbag to pack, so skip them to avoid noise.
+const WEEKEND_SKIP_IDS = new Set(['s_lunchbox', 's_packcheck', 's_signature', 's7']);
+
 export function buildDay(vac: boolean): Quest[] {
-  const b: Quest[] = (vac ? VACATION_QUESTS : SCHOOL_QUESTS).map(q => ({
-    ...q, done: false, streak: 0, completions: 0,
-  }));
   const d = new Date().getDay();
+  const isWeekend = d === 0 || d === 6;
+  const source = vac ? VACATION_QUESTS : SCHOOL_QUESTS;
+  const b: Quest[] = source
+    .filter(q => !(isWeekend && !vac && WEEKEND_SKIP_IDS.has(q.id)))
+    .map(q => ({ ...q, done: false, streak: 0, completions: 0 }));
   if ((d === 1 || d === 3) && !vac) b.push({ ...FOOTBALL, done: false, streak: 0, completions: 0 });
   // Pick 2 random side-quests for the day
   const shuffled = [...SIDE_QUESTS].sort(() => Math.random() - 0.5);
