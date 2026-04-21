@@ -1046,61 +1046,75 @@ export default function RonkiProfile({ onNavigate }) {
           </>)}
 
           {/* ═══ FREUNDE SEGMENT ═══
-               Expanded version of the old Freunde drill-in card. Shows
-               recent discoveries in circle thumbs + a count + a "Alle
-               ansehen" CTA that jumps to the full Micropedia view. */}
+               Louis's preferred style (22 Apr 2026): single tappable
+               card, cream→amber gradient, groups icon + "Ronkis
+               Freunde" + "X von Y getroffen" subtitle + chevron.
+               Horizontal strip of 6 circle avatars — discovered first,
+               dashed locked slots filling the rest. The card itself
+               navigates to the full Micropedia, so no separate CTA
+               button (fewer tap targets = less visual noise). */}
           {segment === 'freunde' && (
             <section style={{ marginBottom: 14 }}>
               <Kicker>{lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}</Kicker>
-              <div className="rounded-2xl p-5"
-                   style={{
-                     background: 'linear-gradient(160deg, #fff8f2 0%, #fef3c7 100%)',
-                     border: '1.5px solid rgba(252,211,77,0.3)',
-                     boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
-                   }}>
-                <div className="flex items-baseline justify-between mb-3">
-                  <b className="font-headline" style={{ fontSize: 22, color: '#124346' }}>
-                    {totalFound} <span style={{ fontWeight: 500, color: '#6b655b', fontSize: 16 }}>/ {totalCreatures}</span>
-                  </b>
-                  <span className="font-label font-bold uppercase tracking-widest"
-                        style={{ fontSize: 10, color: '#92400e' }}>
-                    {lang === 'de' ? 'entdeckt' : 'discovered'}
+              <button
+                onClick={() => onNavigate?.('micropedia')}
+                className="w-full rounded-2xl p-4 active:scale-[0.98] transition-transform text-left"
+                style={{
+                  background: 'linear-gradient(135deg, #fff8f2 0%, #fef3c7 100%)',
+                  border: '1.5px solid rgba(252,211,77,0.3)',
+                  boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
+                }}>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="material-symbols-outlined text-2xl"
+                        style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>
+                    groups
                   </span>
-                </div>
-                {recentFreunde.length > 0 ? (
-                  <div className="grid grid-cols-4 gap-2 mb-4">
-                    {recentFreunde.slice(0, 8).map(f => (
-                      <div key={f.id}
-                           className="aspect-square rounded-2xl overflow-hidden"
-                           style={{ border: '2px solid #fff', boxShadow: '0 2px 6px rgba(120,53,15,0.12)' }}>
-                        {f.art ? (
-                          <img src={base + f.art} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center"
-                               style={{ background: 'rgba(252,211,77,0.18)' }}>
-                            <span className="material-symbols-outlined text-lg"
-                                  style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>pets</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-headline font-bold text-base text-on-surface">
+                      {lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}
+                    </h3>
+                    <p className="font-label text-xs text-on-surface-variant">
+                      {totalFound} {lang === 'de' ? 'von' : 'of'} {totalCreatures} {lang === 'de' ? 'getroffen' : 'met'}
+                    </p>
                   </div>
-                ) : (
-                  <p className="font-body text-sm italic mb-4" style={{ color: '#92400e' }}>
-                    {lang === 'de' ? 'Geh raus und find Ronkis erste Freunde!' : "Go out and find Ronki's first friends!"}
-                  </p>
-                )}
-                <button
-                  onClick={() => onNavigate?.('micropedia')}
-                  className="w-full py-3 rounded-full font-label font-bold text-sm active:scale-[0.98] transition-all"
-                  style={{
-                    background: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
-                    color: '#78350f',
-                    boxShadow: '0 4px 12px -4px rgba(245,158,11,0.5)',
-                  }}>
-                  {lang === 'de' ? 'Alle Freunde ansehen' : 'See all friends'}
-                </button>
-              </div>
+                  <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                </div>
+                {/* Compact strip of 6 circle avatars — discovered first,
+                     dashed locked circles filling the rest. Scrolls
+                     horizontally if Louis has met more than 6 creatures. */}
+                <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                  {recentFreunde.slice(0, 6).map(f => (
+                    <div key={f.id}
+                         className="w-14 h-14 rounded-full overflow-hidden shrink-0"
+                         style={{ border: '2px solid #fff', boxShadow: '0 2px 6px rgba(120,53,15,0.15)' }}>
+                      {f.art ? (
+                        <img src={base + f.art} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center"
+                             style={{ background: 'rgba(252,211,77,0.18)' }}>
+                          <span className="material-symbols-outlined text-base"
+                                style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>pets</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {/* Locked slots — fill out to 6 with dashed circles
+                       so the row always reads "part of a bigger set". */}
+                  {Array.from({ length: Math.max(0, 6 - recentFreunde.length) }).map((_, i) => (
+                    <div key={`locked-${i}`}
+                         className="w-14 h-14 rounded-full shrink-0 flex items-center justify-center"
+                         style={{
+                           border: '2px dashed rgba(120,53,15,0.25)',
+                           background: 'rgba(255,255,255,0.35)',
+                         }}>
+                      <span className="material-symbols-outlined"
+                            style={{ fontSize: 18, color: 'rgba(120,53,15,0.4)', fontVariationSettings: "'FILL' 1" }}>
+                        lock
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </button>
             </section>
           )}
 
