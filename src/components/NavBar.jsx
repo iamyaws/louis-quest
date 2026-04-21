@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useTask } from '../context/TaskContext';
 import { isTabUnlocked, getTabUnlock } from '../data/tabUnlocks';
@@ -26,66 +26,99 @@ const TAB_KEYS = [
 ];
 
 function useRevealOverride() {
-  // Dev preview: ?reveal=all → everything unlocked;
-  //              ?reveal=0   → everything locked (simulate fresh user);
-  //              otherwise   → use real state to evaluate unlock criteria.
+  // Dev preview: ?reveal=all → everything unlocked regardless of state.
+  // Everything else falls through to real state, so natural unlocks (first
+  // task → Ronki, first mood + 3 tasks → Tagebuch, 50 Sterne → Laden) still
+  // fire as the kid plays — Marc's preview workflow needs that to verify
+  // the unlock ceremony actually plays.
+  //
+  // Note: the old ?reveal=0 "force everything locked" mode was dropped
+  // because it masked real state changes, making it impossible to preview
+  // an unlock firing. To preview the locked look now, start a fresh
+  // profile via onboarding (or clear IndexedDB).
   const [param] = useState(() => {
     if (typeof window === 'undefined') return null;
     return new URLSearchParams(window.location.search).get('reveal');
   });
-  if (param === 'all') return { forceUnlockAll: true, forceLockAll: false };
-  if (param === '0')   return { forceUnlockAll: false, forceLockAll: true };
-  return { forceUnlockAll: false, forceLockAll: false };
+  if (param === 'all') return { forceUnlockAll: true };
+  return { forceUnlockAll: false };
 }
 
 export default function NavBar({ active = 'quests', onNavigate }) {
   const { t } = useTranslation();
   const { state } = useTask();
-  const { forceUnlockAll, forceLockAll } = useRevealOverride();
-  const [lockedHintFor, setLockedHintFor] = useState(null); // tab.id or null
+  const { forceUnlockAll } = useRevealOverride();
+  // Locked hint state: null OR { tabId, anchorX } so the hint bubble can
+  // anchor its pointer at the tapped tab instead of dead-centering.
+  const [lockedHintFor, setLockedHintFor] = useState(null);
+  const btnRefsRef = useRef({}); // tabId → button element
 
   // Auto-dismiss the hint after 3.5s so a kid who taps something locked
-  // doesn't need to know they have to close the sheet manually.
+  // doesn't need to know they have to close the sheet manually. Also
+  // dismiss on any outside pointerdown WITHOUT intercepting the click —
+  // the previous full-viewport backdrop was eating the next tap, so the
+  // kid had to tap twice to switch tabs. Using `capture: false` means the
+  // tapped element still receives its own event.
   useEffect(() => {
     if (!lockedHintFor) return;
     const timer = setTimeout(() => setLockedHintFor(null), 3500);
-    return () => clearTimeout(timer);
+    const handleOutside = (e) => {
+      const sheet = document.getElementById('nav-lock-hint-sheet');
+      if (sheet && !sheet.contains(e.target)) setLockedHintFor(null);
+    };
+    document.addEventListener('pointerdown', handleOutside);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('pointerdown', handleOutside);
+    };
   }, [lockedHintFor]);
 
   const handleTap = (tab, locked) => {
     if (locked) {
-      setLockedHintFor(tab.id);
+      const el = btnRefsRef.current[tab.id];
+      const rect = el?.getBoundingClientRect();
+      const anchorX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+      setLockedHintFor({ tabId: tab.id, anchorX });
       return;
     }
     setLockedHintFor(null);
     onNavigate?.(tab.id);
   };
 
-  const hintUnlock = lockedHintFor ? getTabUnlock(lockedHintFor) : null;
+  const hintUnlock = lockedHintFor ? getTabUnlock(lockedHintFor.tabId) : null;
   const hintVars = hintUnlock?.hintVars ? hintUnlock.hintVars(state) : undefined;
+
+  // Anchor math: sheet is up to 360px wide, clamped 16px from each viewport
+  // edge, ideally centered on the tapped tab. Triangle points at the exact
+  // tab center (anchorX) — even if the sheet has to shift to stay onscreen,
+  // the triangle stays at the anchor.
+  let sheetLeft = 0;
+  let sheetWidth = 0;
+  let triangleLeft = 0;
+  if (lockedHintFor && typeof window !== 'undefined') {
+    const vw = window.innerWidth;
+    sheetWidth = Math.min(360, vw - 32);
+    const idealLeft = lockedHintFor.anchorX - sheetWidth / 2;
+    sheetLeft = Math.max(16, Math.min(idealLeft, vw - sheetWidth - 16));
+    triangleLeft = lockedHintFor.anchorX - sheetLeft;
+  }
 
   return (
     <>
       {/* Locked-tab hint sheet — floats just above the nav, points at the
            tapped tab with a gentle bounce. Auto-dismisses after 3.5s or
-           on any outside tap via the backdrop. */}
+           on any outside pointerdown. No backdrop — the previous version
+           intercepted the next tap which broke tab switching. */}
       {lockedHintFor && hintUnlock && (
-        <div
-          className="fixed inset-0 z-[55]"
-          onClick={() => setLockedHintFor(null)}
-          style={{ background: 'transparent' }}
-          aria-hidden="true"
-        >
           <div
-            className="fixed left-1/2 z-[56]"
+            id="nav-lock-hint-sheet"
+            className="fixed z-[56]"
             style={{
               bottom: 'calc(env(safe-area-inset-bottom, 22px) + 96px)',
-              transform: 'translateX(-50%)',
-              maxWidth: 'calc(100vw - 32px)',
-              width: 'min(360px, calc(100vw - 32px))',
+              left: sheetLeft,
+              width: sheetWidth,
               animation: 'navLockHintIn 0.22s ease-out',
             }}
-            onClick={(e) => e.stopPropagation()}
           >
             <div
               role="dialog"
@@ -114,13 +147,14 @@ export default function NavBar({ active = 'quests', onNavigate }) {
                 </p>
               </div>
             </div>
-            {/* Tiny pointer triangle toward the nav */}
+            {/* Triangle points at the tapped tab (anchorX), clamped so it
+                stays within the sheet's rounded corners. */}
             <div
               aria-hidden="true"
               style={{
                 position: 'absolute',
                 bottom: -6,
-                left: '50%',
+                left: Math.max(16, Math.min(triangleLeft, sheetWidth - 16)),
                 transform: 'translateX(-50%) rotate(45deg)',
                 width: 12,
                 height: 12,
@@ -130,7 +164,6 @@ export default function NavBar({ active = 'quests', onNavigate }) {
               }}
             />
           </div>
-        </div>
       )}
 
       <nav
@@ -156,11 +189,7 @@ export default function NavBar({ active = 'quests', onNavigate }) {
         >
           {TAB_KEYS.map(tab => {
             const isActive = tab.id === active;
-            const unlocked = forceUnlockAll
-              ? true
-              : forceLockAll
-                ? (tab.id === 'hub' || tab.id === 'quests')
-                : isTabUnlocked(tab.id, state);
+            const unlocked = forceUnlockAll || isTabUnlocked(tab.id, state);
             // Never lock the currently-active tab — it would strand the
             // user inside a tab they can't reopen by tapping it.
             const locked = !unlocked && !isActive;
@@ -168,6 +197,7 @@ export default function NavBar({ active = 'quests', onNavigate }) {
             return (
               <button
                 key={tab.id}
+                ref={(el) => { btnRefsRef.current[tab.id] = el; }}
                 aria-label={locked ? `${label} — ${t('nav.locked.aria')}` : label}
                 aria-disabled={locked ? 'true' : 'false'}
                 onClick={() => handleTap(tab, locked)}

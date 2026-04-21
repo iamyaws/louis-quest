@@ -207,6 +207,7 @@ interface TaskActions {
   complete: (id: string) => void;
   setMood: (period: string, val: number) => void;
   drinkWater: () => void;
+  completeHabit: (habitId: string) => void;
   feedCompanion: () => void;
   petCompanion: () => void;
   playCompanion: () => void;
@@ -392,6 +393,7 @@ export function createInitialState(): TaskState {
     bossKilledToday: false,
     arcBeatAdvancedToday: false,
     completedSpecialQuests: {},
+    dailyHabits: {},
     viewsVisited: [],
     pendingEgg: null,
     collectedEggs: [],
@@ -544,6 +546,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
               : DEFAULT_FAMILY_CONFIG.parentMessage,
           },
           completedSpecialQuests: raw.completedSpecialQuests || {},
+          dailyHabits: (raw as any).dailyHabits || {},
           viewsVisited: raw.viewsVisited || [],
           pendingEgg: raw.pendingEgg || null,
           collectedEggs: raw.collectedEggs || [],
@@ -897,6 +900,28 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   // ── Set mood ──
   const setMood = useCallback((period: string, val: number) => {
     setState(prev => prev ? { ...prev, [period]: val } : prev);
+  }, []);
+
+  // ── Daily habits (parent-defined: Vitamin D, Zeit mit Liam, etc.) ──
+  // Ticks a habit, bumps HP by its configured XP, tracks dailyHabits map.
+  // Idempotent per id per day. Orphan fix Apr 2026: DailyHabits.jsx called
+  // actions.completeHabit but TaskContext never exposed one, so taps silently
+  // no-op'd.
+  const completeHabit = useCallback((habitId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const doneMap = (prev as any).dailyHabits || {};
+      if (doneMap[habitId]) return prev;
+      const habits = prev.familyConfig?.dailyHabits || [];
+      const def = habits.find(h => h.id === habitId);
+      const reward = def?.xp || 5;
+      return {
+        ...prev,
+        dailyHabits: { ...doneMap, [habitId]: true },
+        hp: (prev.hp || 0) + reward,
+      } as TaskState;
+    });
+    setToastTrigger(t => t + 1);
   }, []);
 
   // ── Drink water (also tracks water missions) ──
@@ -1481,7 +1506,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
