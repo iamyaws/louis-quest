@@ -31,6 +31,7 @@ import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
 import RonkiProfile from './components/RonkiProfile';
+import Buch from './components/Buch';
 import MemoryWall from './components/MemoryWall';
 import DiscoveryLog from './components/DiscoveryLog';
 import Micropedia from './components/Micropedia';
@@ -167,6 +168,7 @@ function AppContent() {
         {view === 'kodex' && <HeldenKodex />}
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
         {view === 'memories' && <MemoryWall />}
+        {view === 'buch' && <Buch onNavigate={setView} />}
         {view === 'discovery' && <DiscoveryLog onNavigate={setView} />}
         {view === 'micropedia' && <Micropedia onNavigate={setView} />}
         {view === 'poem' && <PoemQuest onBack={() => setView('quests')} />}

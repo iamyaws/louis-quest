@@ -409,7 +409,8 @@ export default function RonkiProfile({ onNavigate }) {
                style={{
                  padding: 4,
                  borderRadius: 14,
-                 background: 'rgba(18,67,70,0.06)',
+                 background: 'rgba(18,67,70,0.18)',
+                 boxShadow: 'inset 0 1px 2px rgba(18,67,70,0.1)',
                }}>
             {[
               { id: 'pflege',       label: lang === 'de' ? 'Pflege'       : 'Care',     icon: 'favorite' },
@@ -527,62 +528,64 @@ export default function RonkiProfile({ onNavigate }) {
             </>
           ) : (
             <>
+              {/* Normal-day Pflege — same horizontal-card layout as the
+                   sanfte-Reaktion cards on bad days (Marc's ask 22 Apr 2026
+                   "bring Pflege heute in a look like the screenshoted
+                   version"). Circle-icon-left, title + sub + reward on
+                   the right. Checked style when the action is done today. */}
               <Kicker>{lang === 'de' ? 'Pflege heute' : 'Care today'}</Kicker>
-              <section style={{
-                         padding: '14px 16px',
-                         borderRadius: 20,
-                         background: 'linear-gradient(160deg, #fffdf5, #fef3c7)',
-                         border: '1px solid rgba(245,158,11,0.2)',
-                         boxShadow: '0 6px 14px -8px rgba(245,158,11,0.2)',
-                         marginBottom: 14,
-                       }}>
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          label: t('care.feed'), reward: 5, color: '#f59e0b' },
-                    { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        label: t('care.pet'),  reward: 3, color: '#ec4899' },
-                    { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', label: t('care.play'), reward: 8, color: '#124346' },
-                  ].map(a => (
-                    <button key={a.key}
-                      onClick={() => handleCare(a.onTap, a.state)}
-                      disabled={a.state}
-                      className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-                      style={{ opacity: a.state ? 0.7 : 1 }}>
-                      <div className="w-full aspect-square rounded-2xl flex items-center justify-center"
-                           style={{
-                             background: a.state
-                               ? 'rgba(52,211,153,0.12)'
-                               : 'linear-gradient(135deg, #ffffff 0%, #fef3c7 100%)',
-                             border: a.state ? '1.5px solid rgba(52,211,153,0.45)' : '1.5px solid rgba(255,255,255,0.9)',
-                             boxShadow: a.state
-                               ? '0 2px 8px rgba(5,150,105,0.1)'
-                               : '0 4px 14px -4px rgba(245,158,11,0.22), inset 0 1px 0 rgba(255,255,255,0.7)',
-                           }}>
-                        <span className="material-symbols-outlined"
-                              style={{
-                                fontSize: 34,
-                                color: a.state ? '#059669' : a.color,
-                                fontVariationSettings: "'FILL' 1",
-                              }}>
-                          {a.state ? 'check_circle' : a.icon}
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-center gap-0.5">
-                        <span className="font-headline font-bold text-sm text-on-surface leading-none">
-                          {a.label}
-                        </span>
-                        {a.state ? (
-                          <span className="font-label font-bold text-[10px] uppercase tracking-widest" style={{ color: '#059669' }}>
-                            {t('care.done')}
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-1 font-label font-bold text-[11px]" style={{ color: '#725b00' }}>
-                            <Pearl size={10} />+{a.reward}
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+              <section style={{ marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          title: t('care.feed'), sub: lang === 'de' ? 'Einen kleinen Snack für Ronki' : 'A small snack for Ronki',      reward: 5, iconBg: 'rgba(245,158,11,0.15)', iconColor: '#f59e0b' },
+                  { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        title: t('care.pet'),  sub: lang === 'de' ? 'Kurz den Kopf kraulen' : 'Ruffle his head gently',                  reward: 3, iconBg: 'rgba(236,72,153,0.15)', iconColor: '#ec4899' },
+                  { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', title: t('care.play'), sub: lang === 'de' ? 'Ball werfen, zusammen rennen' : 'Throw a ball, run together',      reward: 8, iconBg: 'rgba(18,67,70,0.12)',    iconColor: '#124346' },
+                ].map(a => (
+                  <button key={a.key}
+                    onClick={() => handleCare(a.onTap, a.state)}
+                    disabled={a.state}
+                    className="w-full flex items-center gap-3 active:scale-[0.98] transition-transform text-left"
+                    style={{
+                      padding: '14px 16px',
+                      borderRadius: 18,
+                      background: a.state
+                        ? 'linear-gradient(135deg, rgba(52,211,153,0.08), rgba(52,211,153,0.02))'
+                        : 'linear-gradient(135deg, #ffffff, rgba(255,255,255,0.85))',
+                      border: a.state
+                        ? '1.5px solid rgba(52,211,153,0.35)'
+                        : '1.5px solid rgba(245,158,11,0.2)',
+                      boxShadow: '0 4px 12px -6px rgba(245,158,11,0.18)',
+                      opacity: a.state ? 0.85 : 1,
+                    }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 14,
+                      background: a.state ? 'rgba(52,211,153,0.15)' : a.iconBg,
+                      display: 'grid', placeItems: 'center', flexShrink: 0,
+                    }}>
+                      <span className="material-symbols-outlined"
+                            style={{
+                              fontSize: 24,
+                              color: a.state ? '#059669' : a.iconColor,
+                              fontVariationSettings: "'FILL' 1",
+                            }}>
+                        {a.state ? 'check_circle' : a.icon}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <b className="font-headline" style={{ fontSize: 15, lineHeight: 1.2, color: '#124346', display: 'block' }}>
+                        {a.title}
+                      </b>
+                      <span className="font-body" style={{ fontSize: 12, lineHeight: 1.3, color: a.state ? '#059669' : 'rgba(18,67,70,0.65)' }}>
+                        {a.state ? t('care.done') : a.sub}
+                      </span>
+                    </div>
+                    {!a.state && (
+                      <span className="flex items-center gap-1 font-label font-bold shrink-0"
+                            style={{ fontSize: 12, color: '#b45309' }}>
+                        <Pearl size={12} />+{a.reward}
+                      </span>
+                    )}
+                  </button>
+                ))}
               </section>
             </>
           )}
@@ -597,58 +600,61 @@ export default function RonkiProfile({ onNavigate }) {
                hides, and the golden learn banner fires. On the next
                bad-Ronki day, Ronki offers Box-Atmung back to Louis as
                a 4th reaction option. */}
-          {!hasLearnedBox && (
+          {!hasLearnedBox && practiceCount > 0 && (
             <>
               <Kicker>{lang === 'de' ? 'Louis bringt Ronki bei' : 'Louis teaches Ronki'}</Kicker>
               <section style={{
                          padding: '16px 18px 18px',
                          borderRadius: 20,
-                         background: 'linear-gradient(160deg, #e0f2fe, #bae6fd)',
-                         border: '1px solid rgba(14,165,233,0.25)',
-                         boxShadow: '0 6px 14px -8px rgba(14,165,233,0.25)',
+                         background: 'linear-gradient(160deg, #ecfeff, #cffafe)',
+                         border: '1px solid rgba(8,145,178,0.15)',
+                         boxShadow: '0 6px 14px -8px rgba(14,165,233,0.18)',
                          marginBottom: 14,
                        }}>
                 <div className="flex items-start gap-3 mb-2">
                   <div style={{
                     width: 40, height: 40, borderRadius: 12,
-                    background: 'linear-gradient(135deg, #38bdf8, #0369a1)',
+                    background: 'linear-gradient(135deg, #67e8f9, #0891b2)',
                     display: 'grid', placeItems: 'center', flexShrink: 0,
-                    boxShadow: '0 3px 8px -3px rgba(14,165,233,0.5)',
+                    boxShadow: '0 3px 8px -3px rgba(8,145,178,0.4)',
                   }}>
                     <span className="material-symbols-outlined" style={{ color: '#fff', fontSize: 22, fontVariationSettings: "'FILL' 1" }}>air</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <b className="font-headline" style={{ fontSize: 16, lineHeight: 1.15, color: '#0c4a6e', display: 'block' }}>
+                    <b className="font-headline" style={{ fontSize: 17, lineHeight: 1.2, color: '#164e63', display: 'block' }}>
                       {lang === 'de' ? 'Box-Atmung' : 'Box breathing'}
                     </b>
-                    <span className="font-body" style={{ fontSize: 12, lineHeight: 1.35, color: 'rgba(12,74,110,0.72)' }}>
+                    <span className="font-body" style={{ fontSize: 12, lineHeight: 1.4, color: '#155e75' }}>
                       {lang === 'de'
-                        ? 'Übe sie 5× in der Gefühlsecke. Dann lernt Ronki sie von dir.'
-                        : 'Practice 5× in the Gefühlsecke. Then Ronki learns it from you.'}
+                        ? 'Benutze sie 5× in der Gefühlsecke. Dann lernt Ronki sie von dir.'
+                        : 'Use it 5× in the Gefühlsecke. Then Ronki learns it from you.'}
                     </span>
                   </div>
                 </div>
 
                 {/* Dashed square with traveling dot — 16s loop matching
-                     the 4-4-4-4 rhythm. Labels pinned outside each edge. */}
+                     the 4-4-4-4 rhythm. Labels sit further outside so
+                     RUHEN/HALTEN don't kiss the dashed edge (Marc feedback
+                     22 Apr 2026). "4s ·" prefix dropped — label alone is
+                     clearer for a first-grader, seconds are implicit. */}
                 <div style={{
                   position: 'relative',
                   width: 140, height: 140,
-                  margin: '28px auto 34px',
+                  margin: '30px auto 38px',
                   border: '2.5px dashed #0891b2',
                   borderRadius: 16,
                 }}>
-                  <span style={{ position: 'absolute', top: -22, left: '50%', transform: 'translateX(-50%)', font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
-                    4s · {lang === 'de' ? 'Einatmen' : 'Inhale'}
+                  <span style={{ position: 'absolute', top: -22, left: '50%', transform: 'translateX(-50%)', font: '800 10px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
+                    {lang === 'de' ? 'Einatmen' : 'Inhale'}
                   </span>
-                  <span style={{ position: 'absolute', top: '50%', right: -68, transform: 'translateY(-50%)', font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
-                    4s · {lang === 'de' ? 'Halten' : 'Hold'}
+                  <span style={{ position: 'absolute', top: '50%', right: -78, transform: 'translateY(-50%)', font: '800 10px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
+                    {lang === 'de' ? 'Halten' : 'Hold'}
                   </span>
-                  <span style={{ position: 'absolute', bottom: -22, left: '50%', transform: 'translateX(-50%)', font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
-                    4s · {lang === 'de' ? 'Ausatmen' : 'Exhale'}
+                  <span style={{ position: 'absolute', bottom: -22, left: '50%', transform: 'translateX(-50%)', font: '800 10px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
+                    {lang === 'de' ? 'Ausatmen' : 'Exhale'}
                   </span>
-                  <span style={{ position: 'absolute', top: '50%', left: -58, transform: 'translateY(-50%)', font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
-                    4s · {lang === 'de' ? 'Ruhen' : 'Rest'}
+                  <span style={{ position: 'absolute', top: '50%', left: -70, transform: 'translateY(-50%)', font: '800 10px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
+                    {lang === 'de' ? 'Ruhen' : 'Rest'}
                   </span>
                   <div aria-hidden="true" style={{
                     position: 'absolute',
@@ -662,10 +668,10 @@ export default function RonkiProfile({ onNavigate }) {
 
                 {/* Progress row + 5 tick bars */}
                 <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
-                  <span className="font-label" style={{ fontSize: 11, color: 'rgba(12,74,110,0.7)', letterSpacing: '0.06em' }}>
+                  <span className="font-label" style={{ fontSize: 11, color: '#155e75', letterSpacing: '0.06em' }}>
                     {lang === 'de' ? 'Dein Fortschritt' : 'Your progress'}
                   </span>
-                  <b className="font-label" style={{ fontSize: 13, color: '#0c4a6e', fontWeight: 800 }}>
+                  <b className="font-label" style={{ fontSize: 13, color: '#0e7490', fontWeight: 800 }}>
                     {practiceCount} {lang === 'de' ? 'von' : 'of'} 5
                   </b>
                 </div>
@@ -674,7 +680,7 @@ export default function RonkiProfile({ onNavigate }) {
                     <span key={i} style={{
                       flex: 1, height: 6, borderRadius: 999,
                       background: i < practiceCount
-                        ? 'linear-gradient(90deg, #38bdf8, #0369a1)'
+                        ? 'linear-gradient(90deg, #67e8f9, #0891b2)'
                         : 'rgba(14,165,233,0.18)',
                       transition: 'background 0.4s ease',
                     }} />
@@ -1174,7 +1180,7 @@ export default function RonkiProfile({ onNavigate }) {
                Interim surface — the full storybook treatment lives in
                the Buch v2 backlog. */}
           {segment === 'erinnerungen' && (
-            <ErinnerungenList state={state} lang={lang} t={t} />
+            <ErinnerungenList state={state} lang={lang} t={t} onNavigate={onNavigate} />
           )}
 
         </div>
@@ -1222,7 +1228,7 @@ export default function RonkiProfile({ onNavigate }) {
 // when Louis picks a sad-day reaction, so those moments naturally flow
 // in too. Interim surface — Buch v2 will be the full storybook home.
 
-function ErinnerungenList({ state, lang, t }) {
+function ErinnerungenList({ state, lang, t, onNavigate }) {
   const entries = React.useMemo(() => {
     const out = [];
     // Journal memories (bonding-agent reactions + daily journal saves)
@@ -1301,6 +1307,48 @@ function ErinnerungenList({ state, lang, t }) {
             : (lang === 'de' ? 'Erinnerungen' : 'memories')}
         </span>
       </div>
+
+      {/* Open-in-Buch CTA — the storybook view is the richer home;
+           this card pitches itself to the Buch's chapter layout with a
+           warm cream gradient + "auto_stories" icon. Always visible
+           (even when Erinnerungen is empty) so kids discover the Buch
+           from day one. */}
+      <button
+        onClick={() => onNavigate?.('buch')}
+        className="w-full flex items-center gap-3 active:scale-[0.98] transition-transform text-left mb-3"
+        style={{
+          padding: '14px 16px',
+          borderRadius: 18,
+          background: 'linear-gradient(160deg, #fff8f2 0%, #fef3c7 100%)',
+          border: '1.5px solid rgba(180,83,9,0.22)',
+          boxShadow: '0 6px 14px -6px rgba(180,83,9,0.25)',
+        }}>
+        <div style={{
+          width: 44, height: 44, borderRadius: 14,
+          background: 'linear-gradient(135deg, #fcd34d, #b45309)',
+          display: 'grid', placeItems: 'center', flexShrink: 0,
+          boxShadow: '0 3px 8px -3px rgba(180,83,9,0.4)',
+        }}>
+          <span className="material-symbols-outlined"
+                style={{ color: '#fff8f2', fontSize: 24, fontVariationSettings: "'FILL' 1" }}>
+            auto_stories
+          </span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <b className="font-headline" style={{ fontSize: 15, lineHeight: 1.2, color: '#124346', display: 'block' }}>
+            {lang === 'de' ? 'Euer Buch öffnen' : 'Open your Book'}
+          </b>
+          <span className="font-body" style={{ fontSize: 12, lineHeight: 1.3, color: 'rgba(18,67,70,0.7)' }}>
+            {lang === 'de'
+              ? 'Eure Geschichte als Kapitel-Buch.'
+              : 'Your story as a chapter book.'}
+          </span>
+        </div>
+        <span className="material-symbols-outlined"
+              style={{ fontSize: 22, color: '#b45309' }}>
+          chevron_right
+        </span>
+      </button>
 
       {entries.length === 0 ? (
         <div className="rounded-2xl p-6 text-center"
