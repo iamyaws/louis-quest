@@ -48,6 +48,45 @@ const COMPANION_ART = {
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 
+// Ronki's first-person quip pools — bubble text above the campfire Ronki.
+// Pool chosen by time-of-day; tapping Ronki rotates to another random line
+// from the same pool. Marc stripped the weather/°C suffix (Apr 21 2026)
+// because it crowded the bubble and duplicated the Heute-tab weather chip.
+const MORNING_QUIPS = [
+  'Ich bin heute voller Vorfreude.',
+  'Der Tag riecht gut — findest du nicht?',
+  'Was machen wir heute zuerst?',
+  'Ich hab die halbe Nacht geträumt.',
+  'Hast du gut geschlafen?',
+  'Ich rieche schon den Tag.',
+];
+const AFTERNOON_QUIPS = [
+  'Das Feuer wärmt so schön.',
+  'Ich hab auf dich gewartet.',
+  'Setz dich, erzähl was.',
+  'Das ist ein guter Tag.',
+  'Ich mag dich, wenn du wiederkommst.',
+  'Guck mal die Wolken.',
+];
+const EVENING_QUIPS = [
+  'Die Sterne kommen raus.',
+  'Heute war viel los, oder?',
+  'Ich mag diese leise Stunde.',
+  'Gleich schlafen wir gut.',
+  'Langsam wird\u2019s kuschelig.',
+  'Das Feuer summt noch ein bisschen.',
+];
+
+function pickQuip(hr, roll) {
+  const pool = hr < 11 ? MORNING_QUIPS : hr < 17 ? AFTERNOON_QUIPS : EVENING_QUIPS;
+  // Deterministic daily first quip (so Louis sees the same line when
+  // he reopens within the day), but tap-to-roll uses a counter to pick
+  // a different line each tap. Math.abs so negative indices don't fail.
+  const dayIdx = Math.floor(Date.now() / 86_400_000);
+  const idx = Math.abs((dayIdx + roll * 2654435761) % pool.length);
+  return pool[idx];
+}
+
 // Per-mood color palette — matches Journal's MOOD_COLORS so "Gut" feels
 // warm-amber, "Magisch" rosa, "Traurig" cool-blue etc. Used for the
 // logged mood chip on Hub so it reads as a MOOD BATH (claimed) instead
@@ -108,6 +147,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const [showBossDetail, setShowBossDetail] = useState(false);
   const [openBeat, setOpenBeat] = useState(null);
   const [showClothing, setShowClothing] = useState(false);
+  const [quipRollKey, setQuipRollKey] = useState(0);
   const [showEveningRitual, setShowEveningRitual] = useState(false);
   const [showGefuehlsecke, setShowGefuehlsecke] = useState(false);
   const [zeigBlock, setZeigBlock] = useState(null);
@@ -178,6 +218,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
     night:  'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_deep_night_sky._Rich__c902cc19-afa0-4c99-a434-6e206610ddf9_0.webp',
   };
   const _h = new Date().getHours();
+  // Current quip for the campfire bubble. Re-derived each render so
+  // tapping Ronki (which bumps quipRollKey) swaps to a different line
+  // from the same time-of-day pool.
+  const currentQuip = pickQuip(_h, quipRollKey);
   const skyFile = SKY_IMAGES[
     _h >= 6  && _h < 10 ? 'dawn' :
     _h >= 10 && _h < 17 ? 'midday' :
@@ -279,43 +323,8 @@ export default function Hub({ onNavigate, onPlayMint }) {
           state={expeditionState}
           statusText={expeditionStatusText}
           statusSub={expeditionStatusSub}
-          greetingText={(() => {
-            // Ronki's first-person mood quip — matches the Feature
-            // Previews pattern ("Ich bin heute voller Vorfreude."). The
-            // time-of-day "Guten Morgen" greeting is now in the
-            // Lagerfeuer section header below the scene, so the bubble
-            // is Ronki's VOICE instead (redundancy avoided).
-            const hr = new Date().getHours();
-            const dayIdx = Math.floor(Date.now() / 86_400_000);
-            const MORNING_QUIPS = [
-              'Ich bin heute voller Vorfreude.',
-              'Der Tag riecht gut — findest du nicht?',
-              'Was machen wir heute zuerst?',
-              'Ich hab die halbe Nacht geträumt.',
-            ];
-            const AFTERNOON_QUIPS = [
-              'Das Feuer wärmt so schön.',
-              'Ich hab auf dich gewartet.',
-              'Setz dich, erzähl was.',
-              'Das ist ein guter Tag.',
-            ];
-            const EVENING_QUIPS = [
-              'Die Sterne kommen raus.',
-              'Heute war viel los, oder?',
-              'Ich mag diese leise Stunde.',
-              'Gleich schlafen wir gut.',
-            ];
-            const pool = hr < 11 ? MORNING_QUIPS : hr < 17 ? AFTERNOON_QUIPS : EVENING_QUIPS;
-            const base = pool[dayIdx % pool.length];
-            // Morning: append a weather nudge so clothing tips are one
-            // tap away without a separate weather chip.
-            if (weather?.current && hr < 11) {
-              const wi = getWeatherInfo(weather.current.weatherCode);
-              return `${base} ${wi.emoji} Heute ${weather.current.temp}° — tippe für Tipps.`;
-            }
-            return base;
-          })()}
-          onBubbleTap={weather?.current ? () => setShowClothing(true) : undefined}
+          greetingText={currentQuip}
+          onRonkiTap={() => setQuipRollKey(k => k + 1)}
           onDiaryTap={() => setOpenBeat('expedition-diary')}
           height={340}
         />

@@ -97,6 +97,7 @@ const STAR_POS = [
 ];
 
 export default function CampfireScene({
+  onRonkiTap,
   hour,
   state = 'idle',
   statusText,
@@ -117,17 +118,18 @@ export default function CampfireScene({
   const showDiary = state === 'returning';
   const showStatus = state !== 'idle' && !!statusText;
 
-  // Greeting speech bubble — appears once on mount when Louis opens the
-  // Hub, stays for 4s, then fades. Replaces the old persistent greeting
-  // chip that overlapped Ronki on the scene (Marc: "overcrowding").
-  // Matches the `.camp-speech home` bubble pattern from the Feature
-  // Previews file Louis reacted warmly to.
+  // Greeting speech bubble — appears when Louis opens Hub OR when he
+  // taps Ronki to rotate to a new quip. Bumped from 4.2s → 7.5s so
+  // first-graders have time to read the whole line (Marc: "make the
+  // text stay a little longer"). The effect re-runs when greetingText
+  // changes — tapping Ronki feeds a new pool index back through the
+  // same prop so the bubble fades in on every tap.
   const [bubbleStage, setBubbleStage] = useState('hidden'); // hidden | visible | fading
   useEffect(() => {
     if (!greetingText || !ronkiVisible) return;
     setBubbleStage('visible');
-    const fadeTimer = setTimeout(() => setBubbleStage('fading'), 4200);
-    const hideTimer = setTimeout(() => setBubbleStage('hidden'), 4800);
+    const fadeTimer = setTimeout(() => setBubbleStage('fading'), 7500);
+    const hideTimer = setTimeout(() => setBubbleStage('hidden'), 8100);
     return () => { clearTimeout(fadeTimer); clearTimeout(hideTimer); };
   }, [greetingText, ronkiVisible]);
 
@@ -234,18 +236,19 @@ export default function CampfireScene({
            the QuestEater context as the 'preferred' flyer target so
            that on Lager, the flying quest icon lands here (not the
            TopBar Ronki, which isn't even rendered on Hub). */}
-      {ronkiVisible && <SideRonki />}
+      {ronkiVisible && <SideRonki onTap={onRonkiTap} />}
 
-      {/* Greeting speech bubble — shows above Ronki on mount, fades
-           after 4.2s. Tail points down-left toward Ronki. When
-           onBubbleTap is provided, renders as a button (weather + tap
-           opens ClothingSheet). Otherwise plain status div. */}
+      {/* Greeting speech bubble — shows above Ronki on mount, stays
+           ~7.5s, then fades. Tapping the bubble (or onBubbleTap) rolls
+           a new quip — same behaviour as tapping Ronki himself. Falls
+           back to a plain status div when neither tap handler is given. */}
       {ronkiVisible && greetingText && bubbleStage !== 'hidden' && (() => {
-        const Tag = onBubbleTap ? 'button' : 'div';
+        const bubbleTap = onBubbleTap || onRonkiTap;
+        const Tag = bubbleTap ? 'button' : 'div';
         return (
           <Tag
-            onClick={onBubbleTap}
-            aria-label={onBubbleTap ? greetingText : undefined}
+            onClick={bubbleTap}
+            aria-label={bubbleTap ? greetingText : undefined}
             style={{
               position: 'absolute',
               left: '16%',
@@ -262,7 +265,7 @@ export default function CampfireScene({
               lineHeight: 1.3,
               color: '#124346',
               zIndex: 10,
-              cursor: onBubbleTap ? 'pointer' : 'default',
+              cursor: bubbleTap ? 'pointer' : 'default',
               textAlign: 'left',
               opacity: bubbleStage === 'fading' ? 0 : 1,
               transform: bubbleStage === 'fading'
@@ -271,7 +274,7 @@ export default function CampfireScene({
               animation: bubbleStage === 'visible' ? 'cfBubbleIn 0.3s cubic-bezier(.34,1.56,.64,1)' : undefined,
               transition: 'opacity 0.5s ease, transform 0.5s ease',
             }}
-            role={onBubbleTap ? 'button' : 'status'}
+            role={bubbleTap ? 'button' : 'status'}
           >
             {greetingText}
             {/* Tail pointing down toward Ronki */}
@@ -443,7 +446,7 @@ export default function CampfireScene({
 // Lives inside the scene; extracted as a sub-component for readability.
 // Construction matches Claude Design's Feature Preview exactly.
 
-function SideRonki() {
+function SideRonki({ onTap }) {
   const eater = useQuestEater();
   const ref = useRef(null);
   const [fireKey, setFireKey] = useState(0);
@@ -467,10 +470,24 @@ function SideRonki() {
     }
   }, [eater?.fireBreath]);
 
+  // When onTap is provided (from Hub — rotates Ronki's quip), render as
+  // a <button> and add a small haptic + SFX for feedback. aria-label is
+  // non-empty then so screen readers can activate the control.
+  const Tag = onTap ? 'button' : 'div';
+  const handleTap = onTap
+    ? (e) => {
+        e.stopPropagation();
+        try { if (navigator.vibrate) navigator.vibrate(30); } catch (_) { /* noop */ }
+        onTap();
+      }
+    : undefined;
+
   return (
-    <div
+    <Tag
       ref={ref}
-      aria-hidden="true"
+      aria-label={onTap ? 'Ronki antippen' : undefined}
+      aria-hidden={onTap ? undefined : 'true'}
+      onClick={handleTap}
       style={{
         position: 'absolute',
         left: '22%',
@@ -480,6 +497,12 @@ function SideRonki() {
         zIndex: 5,
         animation: 'cfRonkiBreathe 3.4s ease-in-out infinite',
         transformOrigin: '50% 90%',
+        // Button-specific resets so it looks identical to the <div> version
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        margin: 0,
+        cursor: onTap ? 'pointer' : 'default',
       }}
     >
       {/* Fire-breath puff — emerges from Ronki's mouth, extends right
@@ -609,7 +632,7 @@ function SideRonki() {
       {/* Legs */}
       <div style={legStyle('28%')} />
       <div style={legStyle('52%')} />
-    </div>
+    </Tag>
   );
 }
 
