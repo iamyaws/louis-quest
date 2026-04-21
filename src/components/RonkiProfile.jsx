@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { getCatStage, getDragonArt } from '../utils/helpers';
@@ -92,6 +92,40 @@ const MOOD_CARD_COPY = {
   },
 };
 
+// Profile-card quips — Ronki occasionally says something first-person
+// on the mood card (tap the chibi to hear another line). Per Marc's
+// Begleiter Polish ask 24 Apr 2026: "text things he says randomly."
+// Pool per mood so a sad Ronki doesn't say chirpy lines.
+const PROFILE_QUIPS = {
+  normal: [
+    'Die Sonne mag mich.',
+    'Mein Lieblingsstein hat einen Namen.',
+    'Ich könnte ewig hier sitzen.',
+    'Riech mal — das ist Abenteuer.',
+    'Du siehst wach aus.',
+    'Erzähl mir was Neues.',
+  ],
+  sad: [
+    'Ich bin heute leise.',
+    'Bleib einfach kurz bei mir.',
+    'Mein Herz ist schwer.',
+    'Du musst nichts sagen.',
+  ],
+  tired: [
+    'Mhhh, ich blinzel nur kurz.',
+    'Meine Augen sind schwer.',
+    'Nach dem Schläfchen spielen wir.',
+    'Kuscheln ist auch Abenteuer.',
+  ],
+};
+
+function pickProfileQuip(mood, rollKey) {
+  const pool = PROFILE_QUIPS[mood] || PROFILE_QUIPS.normal;
+  const dayIdx = Math.floor(Date.now() / 86_400_000);
+  const idx = Math.abs((dayIdx + rollKey * 2654435761) % pool.length);
+  return pool[idx];
+}
+
 // ── Bonding Agent ──
 // Sad-day reaction cards. Returned as a plain array so the component
 // stays simple. If Louis has taught Ronki a skill (e.g. Box-Atmung), a
@@ -163,6 +197,13 @@ export default function RonkiProfile({ onNavigate }) {
   // AND opens the drawer. Default: closed, so the profile starts tidy
   // and Louis reaches for info when he wants it.
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // Profile-card quip (Marc 24 Apr Begleiter Polish ask). Starts hidden
+  // on mount; auto-appears after ~900 ms so the mood card has a moment
+  // to settle first. Tap the chibi to roll a new line + reset the
+  // auto-fade. Goes away after ~7 s.
+  const [quipRollKey, setQuipRollKey] = useState(0);
+  const [quipVisible, setQuipVisible] = useState(false);
+  const quipTimerRef = useRef(null);
   const onDrawerTab = (id) => {
     if (id === tab) {
       setDrawerOpen(v => !v);
@@ -246,6 +287,25 @@ export default function RonkiProfile({ onNavigate }) {
     const thanks = lang === 'de' ? 'Danke, Louis.' : 'Thank you, Louis.';
     setThankYou(thanks);
     setTimeout(() => setThankYou(t => (t === thanks ? null : t)), 2800);
+  };
+
+  // Profile quip — show a Ronki-says bubble on mount after a short
+  // delay, auto-fade at ~7s. Tapping the chibi rolls a new line +
+  // resets the timer. Timer cleaned up on unmount.
+  useEffect(() => {
+    const showAfter = setTimeout(() => setQuipVisible(true), 900);
+    const hideAfter = setTimeout(() => setQuipVisible(false), 7900);
+    return () => { clearTimeout(showAfter); clearTimeout(hideAfter); };
+    // Re-fires when the roll key changes so tapping resets the fade.
+  }, [quipRollKey]);
+  useEffect(() => () => {
+    if (quipTimerRef.current) clearTimeout(quipTimerRef.current);
+  }, []);
+  const handleChibiTap = () => {
+    SFX.play('tap');
+    if (navigator.vibrate) navigator.vibrate(30);
+    setQuipRollKey(k => k + 1);
+    setQuipVisible(true);
   };
 
   if (!state) return null;
@@ -389,6 +449,40 @@ export default function RonkiProfile({ onNavigate }) {
               background: 'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.2), transparent 50%)',
             }} />
 
+            {/* Ambient painterly bg blobs — Marc's Begleiter Polish ask:
+                 soft color blobs behind Ronki that feel like atmosphere,
+                 not pattern. Two large radial ellipses tinted by the
+                 variant palette (so each colorway has its own mood
+                 ambience). Low opacity + blur for a painterly feel.
+                 Suppressed on sad/tired so those moods stay quiet. */}
+            {ronkiMood === 'normal' && (() => {
+              const variantPalette = getVariant(state?.companionVariant || 'amber').chibi;
+              return (
+                <>
+                  <div aria-hidden="true" style={{
+                    position: 'absolute',
+                    top: '-15%', left: '-10%',
+                    width: 220, height: 220,
+                    background: `radial-gradient(circle, ${variantPalette.cheek} 0%, transparent 60%)`,
+                    filter: 'blur(12px)',
+                    opacity: 0.55,
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                  }} />
+                  <div aria-hidden="true" style={{
+                    position: 'absolute',
+                    bottom: '-20%', right: '-12%',
+                    width: 260, height: 200,
+                    background: `radial-gradient(ellipse, ${variantPalette.belly} 0%, transparent 65%)`,
+                    filter: 'blur(14px)',
+                    opacity: 0.4,
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                  }} />
+                </>
+              );
+            })()}
+
             {/* Card-scope particle layer — per-mood atmosphere that falls
                  across the WHOLE card (not just inside the chibi), matching
                  the Feature Previews .sad-hero pattern. Rain on sad days,
@@ -459,7 +553,9 @@ export default function RonkiProfile({ onNavigate }) {
             {/* Chibi column — 60% of the card (3fr side of the 3fr:2fr
                  grid). Chibi size 220 fills the column comfortably on
                  a 390 px phone without squeezing the 40% text column.
-                 Centered both axes per Marc 23 Apr 2026. */}
+                 Centered both axes per Marc 23 Apr 2026. Tap the chibi
+                 to hear another Ronki-says quip (Marc 24 Apr Begleiter
+                 Polish). */}
             <div style={{
               zIndex: 2,
               display: 'flex',
@@ -469,18 +565,76 @@ export default function RonkiProfile({ onNavigate }) {
               minWidth: 0,
               minHeight: 220,
             }}>
-              <MoodChibi size={220} mood={ronkiMood} bare
-                         variant={state.companionVariant}
-                         stage={Math.min(3, stage)} />
+              {/* Profile-card speech bubble — Ronki says. Positioned
+                   above the chibi, tail pointing down. Fades in on mount
+                   + on re-tap; fades out at ~7s. */}
+              <div aria-live="polite"
+                   style={{
+                     position: 'absolute',
+                     top: 2, left: '50%',
+                     transform: `translateX(-50%) translateY(${quipVisible ? 0 : 4}px) scale(${quipVisible ? 1 : 0.92})`,
+                     opacity: quipVisible ? 1 : 0,
+                     transition: 'opacity 0.4s ease, transform 0.4s ease',
+                     pointerEvents: 'none',
+                     zIndex: 3,
+                     maxWidth: 180,
+                     padding: '8px 12px',
+                     borderRadius: 14,
+                     background: '#ffffff',
+                     border: '1px solid rgba(18,67,70,0.12)',
+                     boxShadow: '0 8px 20px -6px rgba(18,67,70,0.2)',
+                     fontFamily: 'Nunito, sans-serif',
+                     fontSize: 12,
+                     fontWeight: 500,
+                     lineHeight: 1.3,
+                     color: '#124346',
+                     textAlign: 'center',
+                     textWrap: 'pretty',
+                   }}>
+                {pickProfileQuip(ronkiMood, quipRollKey)}
+                <span aria-hidden="true" style={{
+                  position: 'absolute',
+                  bottom: -5,
+                  left: '50%', transform: 'translateX(-50%) rotate(45deg)',
+                  width: 10, height: 10,
+                  background: '#fff',
+                  borderRight: '1px solid rgba(18,67,70,0.12)',
+                  borderBottom: '1px solid rgba(18,67,70,0.12)',
+                }} />
+              </div>
+              <button
+                onClick={handleChibiTap}
+                aria-label={lang === 'de' ? 'Ronki antippen' : 'Tap Ronki'}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  margin: 0,
+                  cursor: 'pointer',
+                }}>
+                <MoodChibi size={220} mood={ronkiMood} bare
+                           variant={state.companionVariant}
+                           stage={Math.min(3, stage)} />
+              </button>
             </div>
             <div className="min-w-0" style={{ position: 'relative', zIndex: 2, minWidth: 0 }}>
               <p className="font-label font-bold"
                  style={{ fontSize: 11, lineHeight: 1, letterSpacing: '0.2em', textTransform: 'uppercase',
                           color: ronkiMood === 'sad' || ronkiMood === 'tired' ? 'rgba(30,42,54,0.65)' : MOOD_CARD_INK.normal,
-                          margin: '0 0 8px 0' }}>
+                          margin: '0 0 4px 0' }}>
                 {daysTogether > 0
                   ? `${lang === 'de' ? 'Heute' : 'Today'} · ${daysTogether} ${daysTogether === 1 ? (lang === 'de' ? 'Tag' : 'day') : (lang === 'de' ? 'Tage' : 'days')}`
                   : (lang === 'de' ? 'Heute' : 'Today')}
+              </p>
+              {/* Stage label — quiet second line under the kicker.
+                  "Baby · Stufe 1" shape. Bundles with evolution work
+                  (backlog_ronki_chibi_expansion.md). Per Marc 24 Apr
+                  2026 Begleiter Polish list. */}
+              <p className="font-label"
+                 style={{ fontSize: 10, lineHeight: 1, letterSpacing: '0.1em',
+                          color: ronkiMood === 'sad' || ronkiMood === 'tired' ? 'rgba(30,42,54,0.5)' : 'rgba(18,67,70,0.5)',
+                          margin: '0 0 10px 0', fontWeight: 600 }}>
+                {stageName} · {lang === 'de' ? 'Stufe' : 'Stage'} {stage}
               </p>
               <h1 className="font-headline font-bold"
                   style={{ fontSize: 22, lineHeight: 1.2, letterSpacing: '-0.01em',
@@ -1135,38 +1289,48 @@ export default function RonkiProfile({ onNavigate }) {
                showing days together + new-pages hint. */}
           <ChronikCta state={state} lang={lang} onNavigate={onNavigate} />
 
-          {/* ═══ HELDEN-KODEX BUTTON (public mode) — independent feature,
-               kept distinct from the v2 kickered cards. Remains loud gold
-               because it's the only CTA toward the lighter Kodex page. ═══ */}
+          {/* ═══ HELDEN-KODEX — Band-Streak style flat pill (Marc 24
+               Apr 2026): was competing with the Eure Chronik gold CTA
+               above. Now a subtle white pill with a rose-red accent
+               stripe on the left, small heart icon, single-line copy.
+               Stops shouting; the Chronik CTA owns the gold tier. ═══ */}
           {!dev && (
             <button
               onClick={() => onNavigate?.('kodex')}
-              className="w-full rounded-2xl p-5 mb-5 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
+              className="w-full mb-4 flex items-center gap-3 active:scale-[0.98] transition-all text-left relative overflow-hidden"
               style={{
-                background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)',
-                boxShadow: '0 4px 16px rgba(252,211,77,0.3)',
-              }}
-            >
-              <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-                   style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.15)', boxShadow: '0 2px 8px rgba(120,53,15,0.12)' }}>
-                <span className="material-symbols-outlined text-2xl"
-                      style={{ color: '#dc2626', fontVariationSettings: "'FILL' 1" }}>
+                padding: '12px 14px 12px 18px',
+                borderRadius: 14,
+                background: '#ffffff',
+                border: '1px solid rgba(18,67,70,0.1)',
+                boxShadow: '0 2px 8px -4px rgba(18,67,70,0.15)',
+              }}>
+              {/* Rose-red left accent stripe — bookmark-ribbon cue */}
+              <span aria-hidden="true" style={{
+                position: 'absolute', left: 0, top: 0, bottom: 0,
+                width: 4,
+                background: 'linear-gradient(180deg, #f472b6, #dc2626)',
+              }} />
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                   style={{ background: 'rgba(220,38,38,0.08)' }}>
+                <span className="material-symbols-outlined"
+                      style={{ fontSize: 18, color: '#dc2626', fontVariationSettings: "'FILL' 1" }}>
                   favorite
                 </span>
               </div>
-              <div className="flex-1">
-                <p className="font-label font-bold text-xs uppercase tracking-widest" style={{ color: '#78350f' }}>
+              <div className="flex-1 min-w-0">
+                <span className="font-label font-bold uppercase block"
+                      style={{ fontSize: 9, letterSpacing: '0.22em', color: 'rgba(18,67,70,0.5)', marginBottom: 1 }}>
                   {lang === 'de' ? 'Für Helden' : 'For heroes'}
-                </p>
-                <h4 className="font-headline font-bold text-lg leading-tight" style={{ color: '#78350f' }}>
+                </span>
+                <span className="font-body" style={{ fontSize: 13, fontWeight: 700, color: '#124346', lineHeight: 1.25 }}>
                   {lang === 'de' ? 'Was einen Helden ausmacht' : 'What makes a hero'}
-                </h4>
+                </span>
               </div>
-              <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-                   style={{ background: '#ffffff', border: '2.5px solid rgba(120,53,15,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                <span className="material-symbols-outlined text-xl"
-                      style={{ color: '#78350f', fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
-              </div>
+              <span className="material-symbols-outlined shrink-0"
+                    style={{ fontSize: 18, color: 'rgba(18,67,70,0.5)' }}>
+                chevron_right
+              </span>
             </button>
           )}
 
