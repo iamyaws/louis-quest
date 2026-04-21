@@ -1110,5 +1110,8 @@
   "nav.coach.ronki": "Hier lebt dein Drache. Streichel ihn, füttere ihn, schau wie er wächst.",
   "nav.coach.journal": "Hier lebt eure Geschichte. Schreib auf, wie es dir heute ging.",
   "nav.coach.shop": "Hier tauschst du Sterne gegen Belohnungen. Funkelzeit, Überraschungen, alles dabei.",
-  "nav.coach.close": "Alles klar"
+  "nav.coach.close": "Alles klar",
+
+  "unlockHint.ronki.heute": "🔓 Erste Aufgabe — dann öffnet sich Ronki",
+  "unlockHint.ronki.voice": "Mach deine erste Aufgabe — dann wach ich auf!"
 }

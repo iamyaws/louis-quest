@@ -239,7 +239,21 @@ export default function Hub({ onNavigate, onPlayMint }) {
   // Current quip for the campfire bubble. Re-derived each render so
   // tapping Ronki (which bumps quipRollKey) swaps to a different line
   // from the same time-of-day pool.
-  const currentQuip = pickQuip(_h, quipRollKey);
+  //
+  // Unlock hint placement test (Apr 2026, see backlog_progressive_hub_disclosure.md):
+  //   ?hint=heute  → small footer pill inside the HEUTE card
+  //   ?hint=ronki  → override Ronki's campfire quip with a first-person
+  //                  unlock invitation ("Mach deine erste Aufgabe — dann wach
+  //                  ich auf"). Only applies while Ronki tab is locked.
+  //   default      → neither (ship current behavior until Marc picks a variant)
+  const hintPlacement = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('hint')
+    : null;
+  const ronkiLocked = (state.totalTasksDone || 0) < 1;
+  const showHeuteHint = hintPlacement === 'heute' && ronkiLocked;
+  const showRonkiVoiceHint = hintPlacement === 'ronki' && ronkiLocked;
+  const baseQuip = pickQuip(_h, quipRollKey);
+  const currentQuip = showRonkiVoiceHint ? t('unlockHint.ronki.voice') : baseQuip;
   const skyFile = SKY_IMAGES[
     _h >= 6  && _h < 10 ? 'dawn' :
     _h >= 10 && _h < 17 ? 'midday' :
@@ -583,6 +597,29 @@ export default function Hub({ onNavigate, onPlayMint }) {
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* Unlock hint — variant A (?hint=heute). Small gold footer pill
+               inside the HEUTE card. Only shows while Ronki tab is locked. */}
+          {showHeuteHint && (
+            <div
+              className="mt-4 -mx-1 px-3 py-2 rounded-xl flex items-center justify-center gap-1.5"
+              style={{
+                background: 'rgba(252,211,77,0.14)',
+                border: '1px solid rgba(180,83,9,0.22)',
+              }}
+            >
+              <span
+                className="font-label font-bold uppercase text-center"
+                style={{
+                  fontSize: 11,
+                  letterSpacing: '0.08em',
+                  color: '#b45309',
+                }}
+              >
+                {t('unlockHint.ronki.heute')}
+              </span>
             </div>
           )}
         </button>

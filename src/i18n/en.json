@@ -1106,5 +1106,8 @@
   "nav.coach.ronki": "Your dragon lives here. Pet them, feed them, watch them grow.",
   "nav.coach.journal": "Your story lives here. Write down how your day was.",
   "nav.coach.shop": "Trade stars for rewards — screen time, surprises, all there.",
-  "nav.coach.close": "Got it"
+  "nav.coach.close": "Got it",
+
+  "unlockHint.ronki.heute": "🔓 First task — then Ronki opens",
+  "unlockHint.ronki.voice": "Finish your first task — then I'll wake up!"
 }
