@@ -615,31 +615,48 @@ export default function RonkiProfile({ onNavigate }) {
                     : `Ronki just hatched and is waiting for their first adventure with ${heroName}. ${FACTS.motto.en}`)
                 }
               </p>
+              {/* Über fact-card grid — Polish v2 Variant A v1 styling
+                   (Marc 24 Apr 2026): bigger colored icon at the top-
+                   left, per-card tint on both icon + label, bold value
+                   below on its own line. Each card has a soft bg that
+                   echoes the icon color at low opacity. */}
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: lang === 'de' ? 'Spezies' : 'Species', value: FACTS.species[lang] || FACTS.species.de, icon: 'pets' },
-                  { label: lang === 'de' ? 'Größe' : 'Height',    value: FACTS.heights[stage],                    icon: 'straighten' },
-                  { label: lang === 'de' ? 'Mag' : 'Likes',       value: FACTS.likes[lang] || FACTS.likes.de,     icon: 'favorite' },
-                  { label: lang === 'de' ? 'Talent' : 'Talent',   value: FACTS.talent[lang] || FACTS.talent.de,   icon: 'star' },
+                  { label: lang === 'de' ? 'Spezies' : 'Species', value: FACTS.species[lang] || FACTS.species.de, icon: 'pets',       tint: '#b45309', bg: 'rgba(245,158,11,0.08)' },
+                  { label: lang === 'de' ? 'Größe'   : 'Height',  value: FACTS.heights[stage],                    icon: 'straighten', tint: '#0369a1', bg: 'rgba(14,165,233,0.08)' },
+                  { label: lang === 'de' ? 'Mag'     : 'Likes',   value: FACTS.likes[lang] || FACTS.likes.de,     icon: 'favorite',   tint: '#be185d', bg: 'rgba(236,72,153,0.08)' },
+                  { label: lang === 'de' ? 'Talent'  : 'Talent',  value: FACTS.talent[lang] || FACTS.talent.de,   icon: 'local_fire_department', tint: '#c2410c', bg: 'rgba(249,115,22,0.08)' },
                 ].map((fact, i) => (
-                  <div key={i} className="rounded-xl px-4 py-3"
-                       style={{ background: 'rgba(18,67,70,0.03)', border: '1px solid rgba(18,67,70,0.06)' }}>
-                    <div className="flex items-center gap-1.5 mb-2">
+                  <div key={i} className="rounded-2xl"
+                       style={{
+                         background: fact.bg,
+                         border: `1px solid ${fact.tint}24`,
+                         padding: '14px 14px 16px',
+                         display: 'flex', flexDirection: 'column', gap: 10,
+                       }}>
+                    <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined"
-                            style={{ fontSize: 16, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                            style={{ fontSize: 22, color: fact.tint, fontVariationSettings: "'FILL' 1" }}>
                         {fact.icon}
                       </span>
                       <span style={{
                         fontFamily: 'Plus Jakarta Sans, sans-serif',
-                        fontWeight: 800, fontSize: 9, lineHeight: 1,
+                        fontWeight: 800, fontSize: 10, lineHeight: 1,
                         letterSpacing: '0.22em',
                         textTransform: 'uppercase',
-                        color: '#124346',
+                        color: fact.tint,
                       }}>
                         {fact.label}
                       </span>
                     </div>
-                    <p className="font-headline font-bold text-sm text-on-surface leading-tight">{fact.value}</p>
+                    <p style={{
+                      margin: 0,
+                      fontFamily: 'Nunito, sans-serif',
+                      fontWeight: 800, fontSize: 14, lineHeight: 1.25,
+                      color: '#124346',
+                    }}>
+                      {fact.value}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -818,7 +835,9 @@ export default function RonkiProfile({ onNavigate }) {
               { id: 'pflege',       label: lang === 'de' ? 'Pflege'       : 'Care',     icon: 'favorite' },
               { id: 'freunde',      label: lang === 'de' ? 'Freunde'      : 'Friends',  icon: 'groups' },
               { id: 'spiele',       label: lang === 'de' ? 'Spiele'       : 'Games',    icon: 'sports_esports' },
-              { id: 'erinnerungen', label: lang === 'de' ? 'Erinnerungen' : 'Memories', icon: 'auto_stories' },
+              // Erinnerungen segment dropped 24 Apr 2026 (Marc) — memory
+              // access now lives as a single "Eure Chronik" CTA inside
+              // the Pflege flow that opens the Buch directly.
             ].map(s => (
               <button key={s.id}
                 onClick={() => setSegment(s.id)}
@@ -1109,6 +1128,13 @@ export default function RonkiProfile({ onNavigate }) {
                Helden-Kodex stays because it's a standalone hero, not one
                of the 4 sub-nav destinations. */}
 
+          {/* ═══ EURE CHRONIK — gold CTA linking to the Buch.
+               Replaces the dropped Erinnerungen segment (Marc 24 Apr 2026:
+               "create a card like this also from the Profile Polish v2
+               Variant A below the pflege actions"). Single tappable card
+               showing days together + new-pages hint. */}
+          <ChronikCta state={state} lang={lang} onNavigate={onNavigate} />
+
           {/* ═══ HELDEN-KODEX BUTTON (public mode) — independent feature,
                kept distinct from the v2 kickered cards. Remains loud gold
                because it's the only CTA toward the lighter Kodex page. ═══ */}
@@ -1358,6 +1384,62 @@ export default function RonkiProfile({ onNavigate }) {
 // boss/badge milestones. The bonding-agent writes into journalHistory
 // when Louis picks a sad-day reaction, so those moments naturally flow
 // in too. Interim surface — Buch v2 will be the full storybook home.
+
+// ── ChronikCta — "Eure Chronik · N Tage" card that opens the Buch ──
+// Replaces the dropped Erinnerungen segment (24 Apr 2026). Gold-amber
+// gradient matching the Feature Previews v2 reference, book icon on
+// the left, day count + freshness hint in the body, chevron on right.
+function ChronikCta({ state, lang, onNavigate }) {
+  const totalDays = state?.totalTaskDays || 0;
+  // Count journal entries written in the last 7 days as "new pages".
+  const weekAgo = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().slice(0, 10);
+  })();
+  const newPages = (state?.journalHistory || []).filter(j => j.date && j.date >= weekAgo).length;
+
+  return (
+    <button
+      onClick={() => onNavigate?.('buch')}
+      className="w-full rounded-2xl p-5 mb-4 flex items-center gap-4 active:scale-[0.98] transition-all text-left"
+      style={{
+        background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 45%, #f59e0b 100%)',
+        boxShadow: '0 6px 16px -6px rgba(245,158,11,0.5)',
+      }}>
+      <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+           style={{ background: '#fff', border: '2px solid rgba(120,53,15,0.15)', boxShadow: '0 2px 8px rgba(120,53,15,0.12)' }}>
+        <span className="material-symbols-outlined"
+              style={{ fontSize: 24, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+          menu_book
+        </span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <span className="font-label font-bold uppercase"
+              style={{ fontSize: 10, letterSpacing: '0.22em', color: 'rgba(120,53,15,0.78)', display: 'block', marginBottom: 2 }}>
+          {lang === 'de' ? 'Neues Kapitel' : 'New chapter'}
+        </span>
+        <b style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 800, fontSize: 15, lineHeight: 1.15, color: '#78350f' }}>
+          {lang === 'de' ? 'Eure Chronik' : 'Your chronicle'}
+          {totalDays > 0 && ` · ${totalDays} ${totalDays === 1 ? (lang === 'de' ? 'Tag' : 'day') : (lang === 'de' ? 'Tage' : 'days')}`}
+        </b>
+        <span style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: 12, lineHeight: 1.3, color: 'rgba(120,53,15,0.75)', marginTop: 2 }}>
+          {newPages > 0
+            ? (lang === 'de'
+              ? `${newPages} neue Seite${newPages === 1 ? '' : 'n'} seit letzter Woche`
+              : `${newPages} new page${newPages === 1 ? '' : 's'} this week`)
+            : (lang === 'de' ? 'Eure Geschichte als Kapitel-Buch.' : 'Your story as a chapter book.')}
+        </span>
+      </div>
+      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+           style={{ background: '#fff', border: '2px solid rgba(120,53,15,0.15)' }}>
+        <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#b45309' }}>
+          chevron_right
+        </span>
+      </div>
+    </button>
+  );
+}
 
 function ErinnerungenList({ state, lang, t, onNavigate }) {
   const entries = React.useMemo(() => {
