@@ -367,14 +367,19 @@ export default function RonkiProfile({ onNavigate }) {
                  // Card needs enough vertical room for the 2.5×-bigger
                  // chibi to breathe without clipping at the card edges.
                  minHeight: 260,
-                 borderRadius: 20,
+                 // Top corners round; bottom is flat so it seams
+                 // directly into the Mein Drache drawer below per
+                 // Marc's Finch reference (one attached card).
+                 borderRadius: '20px 20px 0 0',
                  background: ronkiMood === 'sad'
                    ? 'linear-gradient(160deg, #cfd8de 0%, #a4b3be 100%)'
                    : ronkiMood === 'tired'
                    ? 'linear-gradient(160deg, #d6dde4 0%, #9aa6b4 100%)'
                    : MOOD_CARD_BG.normal,
-                 boxShadow: '0 10px 24px -10px rgba(50,60,75,0.35)',
-                 marginBottom: 14,
+                 // Shadow only below — the drawer shares the same
+                 // footprint and carries the lower shadow.
+                 boxShadow: '0 -2px 0 rgba(0,0,0,0) inset',
+                 marginBottom: 0,
                  transition: 'background 0.5s ease',
                }}>
             {/* Card-level highlight (sad-hero ::before) — soft radial
@@ -451,34 +456,24 @@ export default function RonkiProfile({ onNavigate }) {
               </div>
             )}
 
-            {/* Chibi column — 60% of the card. Chibi renders at 2.5×
-                 the previous 170 px (→ 425 logical), visually scaled
-                 back with `transform: scale()` so it fits the narrower
-                 column on small phones while still reading huge. The
-                 grid + flex combo centers it both axes per Marc's ask
-                 23 Apr 2026. */}
+            {/* Chibi column — 60% of the card (3fr side of the 3fr:2fr
+                 grid). Chibi size 220 fills the column comfortably on
+                 a 390 px phone without squeezing the 40% text column.
+                 Centered both axes per Marc 23 Apr 2026. */}
             <div style={{
               zIndex: 2,
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
               position: 'relative',
+              minWidth: 0,
               minHeight: 220,
             }}>
-              <div style={{
-                // MoodChibi is `size` wide; we wrap it in a scaler so
-                // tiny screens don't break the column. Default scale 1,
-                // but CSS clamps via `max-width: 100%` on the inner
-                // wrapper to prevent horizontal overflow of the card.
-                width: 425, maxWidth: '100%',
-                display: 'flex', justifyContent: 'center',
-              }}>
-                <MoodChibi size={425} mood={ronkiMood} bare
-                           variant={state.companionVariant}
-                           stage={Math.min(3, stage)} />
-              </div>
+              <MoodChibi size={220} mood={ronkiMood} bare
+                         variant={state.companionVariant}
+                         stage={Math.min(3, stage)} />
             </div>
-            <div className="min-w-0" style={{ position: 'relative', zIndex: 2 }}>
+            <div className="min-w-0" style={{ position: 'relative', zIndex: 2, minWidth: 0 }}>
               <p className="font-label font-bold"
                  style={{ fontSize: 10, lineHeight: 1, letterSpacing: '0.2em', textTransform: 'uppercase',
                           color: ronkiMood === 'sad' || ronkiMood === 'tired' ? 'rgba(30,42,54,0.65)' : MOOD_CARD_INK.normal,
@@ -502,64 +497,14 @@ export default function RonkiProfile({ onNavigate }) {
             </div>
           </section>
 
-          {/* ═══ SEGMENTED CONTROL — four destinations inside the Ronki
-               world. Always visible under the portrait so Louis can
-               switch without scrolling. Pill-shaped with teal "selected"
-               fill (matches Polish v2 tab style used below the Box
-               segment inside Pflege). Bottom app-nav stays the single
-               way home (Marc call, 21 Apr 2026): kids shouldn't have
-               two bars competing for "this is where I am". ═══ */}
-          <div className="flex gap-1 mb-4"
-               style={{
-                 padding: 4,
-                 borderRadius: 14,
-                 background: 'rgba(18,67,70,0.18)',
-                 boxShadow: 'inset 0 1px 2px rgba(18,67,70,0.1)',
-               }}>
-            {[
-              { id: 'pflege',       label: lang === 'de' ? 'Pflege'       : 'Care',     icon: 'favorite' },
-              { id: 'freunde',      label: lang === 'de' ? 'Freunde'      : 'Friends',  icon: 'groups' },
-              { id: 'spiele',       label: lang === 'de' ? 'Spiele'       : 'Games',    icon: 'sports_esports' },
-              { id: 'erinnerungen', label: lang === 'de' ? 'Erinnerungen' : 'Memories', icon: 'auto_stories' },
-            ].map(s => (
-              <button key={s.id}
-                onClick={() => setSegment(s.id)}
-                className="flex-1 flex items-center justify-center gap-1.5 transition-all"
-                style={{
-                  padding: '10px 4px',
-                  borderRadius: 11,
-                  background: segment === s.id ? '#124346' : 'transparent',
-                  color: segment === s.id ? '#fef3c7' : '#6b655b',
-                  boxShadow: segment === s.id ? '0 3px 8px -3px rgba(18,67,70,0.35)' : 'none',
-                  fontFamily: 'Plus Jakarta Sans, sans-serif',
-                  fontWeight: 700, fontSize: 11, letterSpacing: '0.04em',
-                }}>
-                <span className="material-symbols-outlined"
-                      style={{ fontSize: 16, fontVariationSettings: segment === s.id ? "'FILL' 1" : undefined }}>
-                  {s.icon}
-                </span>
-                {s.label}
-              </button>
-            ))}
-          </div>
-
-          {segment === 'pflege' && (<>
-
-          {/* ═══ PFLEGE — mood-aware care card.
-               Normal days: Füttern / Streicheln / Spielen with XP rewards.
-               Bad days (ronkiMood sad/tired): card morphs into the
-               Bonding Agent sad-hero + 3 gentle reactions (Kuscheln /
-               Stille / Tee). Louis picks one, memory lands in the Buch,
-               Ronki feels seen, bad mood ends. No XP on the reactions —
-               per spec "alle drei sind richtig, es gibt keinen Verlierer".
-               If Ronki has learned a skill (e.g. Box-Atmung via 5× in
-               Gefühlsecke), a 4th reaction "Atmen mit Ronki" appears —
-               the Rollentausch moment. ═══ */}
-          {/* Old in-segment mood-description card removed 23 Apr 2026 —
-               replaced by the top-level MOOD HEADER CARD above the
-               sub-nav. Marc: "get rid of the second ronki card below
-               the pflege sub-nav." Keeping the palette/copy tables
-               below as MoodChibi + the header card both read them. */}
+          {/* Mein Drache drawer is now always visible regardless of
+               segment — per Marc 23 Apr 2026 Finch reference, the
+               identity tabs are attached to the Ronki profile card
+               at all times. Segment gating moves below, wrapping only
+               the Pflege-specific flow (actions, Box-Atmung, etc.).
+               The sub-nav (Pflege / Freunde / Spiele / Erinnerungen)
+               moved down to live AFTER this attached card unit, per
+               Marc 23 Apr 2026 "attach the two cards together". */}
 
           {/* ═══ MEIN DRACHE DRAWER — Finch-style collapsible card.
                One container holds the three tab buttons + the content
@@ -572,23 +517,16 @@ export default function RonkiProfile({ onNavigate }) {
                Finch/Piper benchmark. ═══ */}
           <section className="mb-4 overflow-hidden"
                    style={{
-                     borderRadius: 20,
+                     // Top flat — seams with the mood card above
+                     // (attached per Marc's Finch reference). Bottom
+                     // rounds so the unit reads as one card.
+                     borderRadius: '0 0 20px 20px',
                      background: '#fff',
                      border: '1px solid rgba(18,67,70,0.08)',
-                     boxShadow: '0 6px 14px -8px rgba(18,67,70,0.22)',
+                     borderTop: 'none',
+                     boxShadow: '0 10px 24px -10px rgba(50,60,75,0.35)',
                      transition: 'box-shadow 0.3s ease',
                    }}>
-            {/* Subtle paper handle at the top — mimics the Finch tab
-                 nub, signals "this is a drawer you can pull." */}
-            <div aria-hidden="true" style={{
-              display: 'flex', justifyContent: 'center',
-              padding: '6px 0 0',
-            }}>
-              <span style={{
-                width: 34, height: 4, borderRadius: 3,
-                background: 'rgba(18,67,70,0.18)',
-              }} />
-            </div>
 
             {/* Tab row — lives inside the same card as the content */}
             <div className="flex gap-1"
@@ -863,6 +801,52 @@ export default function RonkiProfile({ onNavigate }) {
             </div>
           </section>
           {/* ═══ END MEIN DRACHE DRAWER ═══ */}
+
+          {/* ═══ SEGMENTED CONTROL — four destinations inside the Ronki
+               world. Sits BELOW the merged profile+identity card (per
+               Marc's Finch reference). Pill-shaped with teal "selected"
+               fill. Bottom app-nav stays the single way home so kids
+               don't get two competing nav bars (Marc call 21 Apr 2026). ═══ */}
+          <div className="flex gap-1 mb-4 mt-4"
+               style={{
+                 padding: 4,
+                 borderRadius: 14,
+                 background: 'rgba(18,67,70,0.18)',
+                 boxShadow: 'inset 0 1px 2px rgba(18,67,70,0.1)',
+               }}>
+            {[
+              { id: 'pflege',       label: lang === 'de' ? 'Pflege'       : 'Care',     icon: 'favorite' },
+              { id: 'freunde',      label: lang === 'de' ? 'Freunde'      : 'Friends',  icon: 'groups' },
+              { id: 'spiele',       label: lang === 'de' ? 'Spiele'       : 'Games',    icon: 'sports_esports' },
+              { id: 'erinnerungen', label: lang === 'de' ? 'Erinnerungen' : 'Memories', icon: 'auto_stories' },
+            ].map(s => (
+              <button key={s.id}
+                onClick={() => setSegment(s.id)}
+                className="flex-1 flex items-center justify-center gap-1.5 transition-all"
+                style={{
+                  padding: '10px 4px',
+                  borderRadius: 11,
+                  background: segment === s.id ? '#124346' : 'transparent',
+                  color: segment === s.id ? '#fef3c7' : '#6b655b',
+                  boxShadow: segment === s.id ? '0 3px 8px -3px rgba(18,67,70,0.35)' : 'none',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                  fontWeight: 700, fontSize: 11, letterSpacing: '0.04em',
+                }}>
+                <span className="material-symbols-outlined"
+                      style={{ fontSize: 16, fontVariationSettings: segment === s.id ? "'FILL' 1" : undefined }}>
+                  {s.icon}
+                </span>
+                {s.label}
+              </button>
+            ))}
+          </div>
+
+          {segment === 'pflege' && (<>
+          {/* ═══ PFLEGE — mood-aware care card.
+               Normal days: Füttern / Streicheln / Spielen with XP rewards.
+               Bad days (ronkiMood sad/tired): card morphs into the
+               Bonding Agent sad-hero + 3 gentle reactions.
+               Box-Atmung teaching block + Helden-Kodex follow. ═══ */}
 
           {isBadDay ? (
             <>
