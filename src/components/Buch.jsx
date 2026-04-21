@@ -423,14 +423,11 @@ function buildChapters(state, t, lang) {
     bucket.metaBubbles.push('📜');
   });
 
-  // 3. Bosses + badges — attach to today (no dated log exists) with a
-  // synthetic milestone line. Deduped.
+  // 3. Badges — attach to today (no dated log exists) with a synthetic
+  // milestone. Boss trophies removed from the Buch chapter builder
+  // (Marc 23 Apr 2026: "let's remove boss besiegt under eure geschichte").
+  // Bosses belong on the trophy wall, not mixed into the memory chapters.
   const today = new Date().toISOString().slice(0, 10);
-  [...new Set(state?.bossTrophies || [])].forEach(bossId => {
-    const bucket = ensureBucket(today);
-    bucket.milestones.push({ kind: 'boss', label: bossId });
-    bucket.metaBubbles.push('🏆');
-  });
   (state?.unlockedBadges || []).forEach(badgeId => {
     const bucket = ensureBucket(today);
     bucket.milestones.push({ kind: 'badge', label: badgeId });
@@ -465,10 +462,9 @@ function synthesizeTitle(bucket, lang) {
   if (arcMs) {
     return de ? `Der Tag, an dem wir „${arcMs.label}" bestanden` : `The day we survived "${arcMs.label}"`;
   }
-  const bossMs = bucket.milestones.find(m => m.kind === 'boss');
-  if (bossMs) {
-    return de ? `${bossMs.label} besiegt — zusammen` : `${bossMs.label} defeated — together`;
-  }
+  // Boss-milestone titles removed with the boss-entries removal above
+  // (Marc 23 Apr 2026). If future trophies re-enter the Buch, add the
+  // kind === 'boss' branch back here.
   const bondingEntry = bucket.logEntries.find(e => e.tag);
   if (bondingEntry) {
     return de ? 'Der Tag, an dem Ronki mich brauchte' : 'The day Ronki needed me';

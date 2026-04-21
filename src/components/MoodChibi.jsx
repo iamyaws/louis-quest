@@ -46,6 +46,7 @@ export default function MoodChibi({
   bare = false,
   variant = 'amber',
   stage = 2,
+  face = false,
 }) {
   const moodSkin = MOOD_SKINS[mood] || MOOD_SKINS.normal;
   const variantPalette = getVariant(variant).chibi;
@@ -143,7 +144,7 @@ export default function MoodChibi({
           transformOrigin: '50% 90%',
           filter: chibiFilter,
         }}>
-          <Chibi palette={palette} stage={stage} />
+          <Chibi palette={palette} stage={stage} face={face} />
         </div>
       )}
 
@@ -293,12 +294,18 @@ function Mouth({ kind }) {
 
 // ── Chibi body ────────────────────────────────────────────────────────
 
-function Chibi({ palette, stage = 2 }) {
+function Chibi({ palette, stage = 2, face = false }) {
   // Stage-dependent tweaks. Baby (1) has bigger eyes and slightly shorter
   // horns relative to body. Final (3) grows the horns + adds wings and
   // a visible tail behind the torso. Toddler (2) is the current baseline.
+  //
+  // `face` mode renders only the head — no legs, slit eyes on sad (per
+  // Feature Previews .sad-ronki reference: eyes are 2-3px down-slanted
+  // lines, not round eyes with pupils). Matches Marc's "just the face"
+  // feedback 23 Apr 2026.
   const isBaby = stage === 1;
   const isFinal = stage === 3;
+  const isSadFace = face && palette.mouth === 'sad';
   return (
     <>
       {/* Stage 3 — wings behind the torso (drawn first so they sit
@@ -392,12 +399,18 @@ function Chibi({ palette, stage = 2 }) {
         zIndex: 4,
       }} />
 
-      {/* Eyes — facing forward. Tired mood collapses them to closed slits.
-          Baby gets oversized eyes (bigger head-to-feature ratio). */}
+      {/* Eyes — three modes. Tired: horizontal closed slits. Sad in
+          face mode: down-slanted lines (reference .sr-eye rotated
+          ±10deg). Otherwise: round white eye with pupil. */}
       {palette.closedEyes ? (
         <>
           <div style={{ position: 'absolute', top: '38%', left: '24%', width: '16%', height: '2.5px', background: palette.eyeInk, borderRadius: 2, zIndex: 5 }} />
           <div style={{ position: 'absolute', top: '38%', right: '24%', width: '16%', height: '2.5px', background: palette.eyeInk, borderRadius: 2, zIndex: 5 }} />
+        </>
+      ) : isSadFace ? (
+        <>
+          <div style={{ position: 'absolute', top: '36%', left: '26%', width: '14%', height: '3px', background: palette.eyeInk, borderRadius: 2, transform: 'rotate(-10deg)', zIndex: 5 }} />
+          <div style={{ position: 'absolute', top: '36%', right: '26%', width: '14%', height: '3px', background: palette.eyeInk, borderRadius: 2, transform: 'rotate(10deg)', zIndex: 5 }} />
         </>
       ) : (
         <>
@@ -441,23 +454,29 @@ function Chibi({ palette, stage = 2 }) {
         }} />
       )}
 
-      {/* Legs — two little feet under the torso */}
-      <div style={{
-        position: 'absolute', left: '25%', bottom: '-2%',
-        width: '15%', height: '18%',
-        background: palette.leg,
-        borderRadius: '34% 34% 45% 45%',
-        boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2)',
-        zIndex: 2,
-      }} />
-      <div style={{
-        position: 'absolute', right: '25%', bottom: '-2%',
-        width: '15%', height: '18%',
-        background: palette.leg,
-        borderRadius: '34% 34% 45% 45%',
-        boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2)',
-        zIndex: 2,
-      }} />
+      {/* Legs — two little feet under the torso. Hidden in face mode,
+          matching the Feature Previews .sad-ronki portrait (no legs
+          visible, the torso IS the head silhouette). */}
+      {!face && (
+        <>
+          <div style={{
+            position: 'absolute', left: '25%', bottom: '-2%',
+            width: '15%', height: '18%',
+            background: palette.leg,
+            borderRadius: '34% 34% 45% 45%',
+            boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2)',
+            zIndex: 2,
+          }} />
+          <div style={{
+            position: 'absolute', right: '25%', bottom: '-2%',
+            width: '15%', height: '18%',
+            background: palette.leg,
+            borderRadius: '34% 34% 45% 45%',
+            boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2)',
+            zIndex: 2,
+          }} />
+        </>
+      )}
     </>
   );
 }

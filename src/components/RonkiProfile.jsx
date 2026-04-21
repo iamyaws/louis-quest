@@ -434,7 +434,7 @@ export default function RonkiProfile({ onNavigate }) {
             )}
 
             <div style={{ zIndex: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <MoodChibi size={180} mood={ronkiMood} bare
+              <MoodChibi size={180} mood={ronkiMood} bare face
                          variant={state.companionVariant}
                          stage={Math.min(3, stage)} />
             </div>
@@ -1307,16 +1307,10 @@ function ErinnerungenList({ state, lang, t, onNavigate }) {
         body: lang === 'de' ? 'Abenteuer bestanden' : 'Adventure survived',
       });
     });
-    // Boss trophies (dedupe by boss id)
-    [...new Set(state?.bossTrophies || [])].forEach((bossId, i) => {
-      out.push({
-        key: `b-${bossId}-${i}`,
-        date: null,
-        icon: '🏆',
-        title: lang === 'de' ? 'Boss besiegt' : 'Boss defeated',
-        body: bossId,
-      });
-    });
+    // Boss trophies removed from the Erinnerungen list (Marc 23 Apr
+    // 2026: "let's remove boss besiegt under eure geschichte"). Bosses
+    // live in the Boss tab / trophy wall instead — they don't belong
+    // in the memory scroll alongside narrative journal entries.
     // Badges
     (state?.unlockedBadges || []).forEach((badgeId, i) => {
       out.push({
@@ -1335,7 +1329,7 @@ function ErinnerungenList({ state, lang, t, onNavigate }) {
       return b.date.localeCompare(a.date);
     });
     return out;
-  }, [state?.journalHistory, state?.arcEngine?.completedArcIds, state?.bossTrophies, state?.unlockedBadges, lang, t]);
+  }, [state?.journalHistory, state?.arcEngine?.completedArcIds, state?.unlockedBadges, lang, t]);
 
   const totalDays = state?.totalTaskDays || 0;
 
