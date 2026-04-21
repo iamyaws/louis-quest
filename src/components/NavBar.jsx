@@ -1,20 +1,41 @@
 import React from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
+import { useTask } from '../context/TaskContext';
 
 // Pflege merged into Ronki's page (April 2026) — care actions
 // (Füttern/Streicheln/Spielen) now live at the top of RonkiProfile.
 // The 'care' view route stays in App.jsx so eggTriggers + dreamHighlights
 // + any in-app links that still point at 'care' keep working.
+//
+// Progressive disclosure (Apr 2026, see backlog_progressive_hub_disclosure.md):
+// Tabs stage in by totalTasksDone so fresh kids only see Lager + Heute on
+// session 1. Ronki/Tagebuch/Laden appear as the core loop gets internalized.
+// Always-visible tab (the one the kid is currently ON) is never hidden
+// even if its threshold hasn't been met yet — avoids nav vanishing under
+// an active view.
 const TAB_KEYS = [
-  { id: 'hub',     key: 'nav.hub',     icon: 'local_fire_department' },
-  { id: 'quests',  key: 'nav.quests',  icon: 'sunny' },
-  { id: 'shop',    key: 'nav.shop',    icon: 'shopping_bag' },
-  { id: 'journal', key: 'nav.journal', icon: 'auto_stories' },
-  { id: 'ronki',   key: 'nav.ronki',   icon: 'pets' },
+  { id: 'hub',     key: 'nav.hub',     icon: 'local_fire_department', revealAt: 0 },
+  { id: 'quests',  key: 'nav.quests',  icon: 'sunny',                 revealAt: 0 },
+  { id: 'ronki',   key: 'nav.ronki',   icon: 'pets',                  revealAt: 1 },
+  { id: 'journal', key: 'nav.journal', icon: 'auto_stories',          revealAt: 3 },
+  { id: 'shop',    key: 'nav.shop',    icon: 'shopping_bag',          revealAt: 5 },
 ];
 
 export default function NavBar({ active = 'quests', onNavigate }) {
   const { t } = useTranslation();
+  const { state } = useTask();
+  const tasksReal = state?.totalTasksDone || 0;
+  const revealParam = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('reveal')
+    : null;
+  const tasksEffective = revealParam === 'all'
+    ? Infinity
+    : (revealParam != null && !Number.isNaN(Number(revealParam)))
+      ? Number(revealParam)
+      : tasksReal;
+  const visibleTabs = TAB_KEYS.filter(
+    tab => tasksEffective >= (tab.revealAt ?? 0) || tab.id === active
+  );
   return (
     <nav
       className="fixed bottom-0 left-0 w-full z-50"
@@ -37,7 +58,7 @@ export default function NavBar({ active = 'quests', onNavigate }) {
           paddingBottom: 'max(22px, env(safe-area-inset-bottom, 22px))',
         }}
       >
-        {TAB_KEYS.map(tab => {
+        {visibleTabs.map(tab => {
           const isActive = tab.id === active;
           const label = t(tab.key);
           return (
