@@ -35,6 +35,7 @@ import ScreenTimer from './components/ScreenTimer';
 import RonkiProfile from './components/RonkiProfile';
 import Buch from './components/Buch';
 import ChibiGallery from './components/ChibiGallery';
+import RonkiCompendium from './components/RonkiCompendium';
 import MemoryWall from './components/MemoryWall';
 import DiscoveryLog from './components/DiscoveryLog';
 import Micropedia from './components/Micropedia';
@@ -396,6 +397,15 @@ function AuthGate() {
         </div>
       </div>
     );
+  }
+
+  // Public routes — no auth required. ?compendium=1 renders the
+  // Ronki-Sammelbuch for website visitors and for showing Louis.
+  if (typeof window !== 'undefined') {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('compendium') === '1') {
+      return <RonkiCompendium />;
+    }
   }
 
   if (!user) {
