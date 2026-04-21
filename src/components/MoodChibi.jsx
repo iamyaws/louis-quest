@@ -23,44 +23,67 @@ import React from 'react';
  *   size  — outer square pixel size (default 180)
  *   mood  — 'normal' | 'sad' | 'tired'
  */
-export default function MoodChibi({ size = 180, mood = 'normal' }) {
+export default function MoodChibi({ size = 180, mood = 'normal', bare = false }) {
   const palette = MOOD_SKINS[mood] || MOOD_SKINS.normal;
 
-  return (
-    <div
-      aria-hidden="true"
-      style={{
+  // `bare` mode drops the outer circular background + inner particles
+  // so the chibi sits DIRECTLY on its parent (e.g. the mood header
+  // card), matching the Feature Previews .sad-hero layout where rain
+  // falls across the whole card and Ronki isn't inside a locket.
+  // Parent is expected to provide its own bg + particles in bare mode.
+  // Also swaps the breathe animation for a gentle tired-sway when sad
+  // or tired, per the reference `tired-sway` keyframe.
+  const outerStyle = bare
+    ? {
         position: 'relative',
-        width: size,
-        height: size,
+        width: size, height: size,
+      }
+    : {
+        position: 'relative',
+        width: size, height: size,
         borderRadius: '50%',
         overflow: 'hidden',
         background: palette.bgCircle,
         boxShadow: `inset 0 -12px 24px ${palette.bgInset}, 0 10px 22px -8px rgba(60,20,5,0.35)`,
         transition: 'background 0.6s ease',
-      }}
+      };
+
+  const swayAnim = (mood === 'sad' || mood === 'tired') ? 'mc-sway 4s ease-in-out infinite' : null;
+  const ronkiAnim = bare
+    ? (swayAnim || (mood === 'tired' ? 'mc-breathe-slow 5s ease-in-out infinite' : 'mc-breathe 3.4s ease-in-out infinite'))
+    : (mood === 'tired' ? 'mc-breathe-slow 5s ease-in-out infinite' : 'mc-breathe 3.4s ease-in-out infinite');
+
+  return (
+    <div
+      aria-hidden="true"
+      style={outerStyle}
     >
-      {/* Mood-specific particle layers — rain, z, ember */}
-      {palette.particles === 'rain' && <Rain />}
-      {palette.particles === 'zzz' && <ZZZ />}
-      {palette.particles === 'ember' && <EmberPuff />}
+      {/* Mood-specific particle layers — only in the locket version;
+          bare mode lets the parent render particles at card scope. */}
+      {!bare && palette.particles === 'rain' && <Rain />}
+      {!bare && palette.particles === 'zzz' && <ZZZ />}
+      {!bare && palette.particles === 'ember' && <EmberPuff />}
 
-      {/* Ground pad — a soft shadow ellipse where Ronki sits */}
-      <div style={{
-        position: 'absolute', left: '50%', bottom: '8%',
-        transform: 'translateX(-50%)',
-        width: '62%', height: '6%',
-        background: 'radial-gradient(ellipse, rgba(0,0,0,0.22), transparent 70%)',
-        filter: 'blur(2px)',
-      }} />
+      {/* Ground pad — soft shadow ellipse where Ronki sits. Skipped in
+          bare mode since the card has its own visual anchoring. */}
+      {!bare && (
+        <div style={{
+          position: 'absolute', left: '50%', bottom: '8%',
+          transform: 'translateX(-50%)',
+          width: '62%', height: '6%',
+          background: 'radial-gradient(ellipse, rgba(0,0,0,0.22), transparent 70%)',
+          filter: 'blur(2px)',
+        }} />
+      )}
 
-      {/* Ronki — absolutely centered, breathing */}
+      {/* Ronki — absolutely centered, breathing (or swaying on sad/
+          tired days when bare, matching the reference tired-sway). */}
       <div style={{
-        position: 'absolute', left: '50%', bottom: '14%',
+        position: 'absolute', left: '50%', bottom: bare ? '5%' : '14%',
         transform: 'translateX(-50%)',
         width: `${size * 0.56}px`,
         height: `${size * 0.6}px`,
-        animation: mood === 'tired' ? 'mc-breathe-slow 5s ease-in-out infinite' : 'mc-breathe 3.4s ease-in-out infinite',
+        animation: ronkiAnim,
         transformOrigin: '50% 90%',
       }}>
         <Chibi palette={palette} />
@@ -100,6 +123,16 @@ export default function MoodChibi({ size = 180, mood = 'normal' }) {
         @keyframes mc-blink {
           0%, 92%, 100% { transform: scaleY(1); }
           94%, 97%      { transform: scaleY(0.1); }
+        }
+        @keyframes mc-sway {
+          0%,100% { transform: translateX(-50%) rotate(-2deg); }
+          50%     { transform: translateX(-50%) rotate(2deg); }
+        }
+        @keyframes mc-card-rain {
+          0%   { transform: translateY(-10%); opacity: 0; }
+          15%  { opacity: 0.55; }
+          85%  { opacity: 0.55; }
+          100% { transform: translateY(140%); opacity: 0; }
         }
       `}</style>
     </div>
