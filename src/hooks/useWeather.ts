@@ -145,7 +145,11 @@ export function getClothingRecs(
   const isSnow = (weatherCode >= 71 && weatherCode <= 77) || (weatherCode >= 85 && weatherCode <= 86);
   const isWindy = windSpeed >= 25;
 
+  // Unterhemd as a baseline layer for cold + rain + wind — Marc feedback
+  // Apr 2026 ("wir sollten auch ein Unterhemd empfehlen"). Different icons
+  // per top-layer type so Jacke + Pulli + Unterhemd never share an emoji.
   if (effective < 0) {
+    items.push({ emoji: '👕', name: 'Unterhemd',      reason: 'Basis-Schicht' });
     items.push({ emoji: '🧥', name: 'Winterjacke',   reason: 'Es ist eiskalt!' });
     items.push({ emoji: '🧣', name: 'Schal',          reason: 'Hals warm halten' });
     items.push({ emoji: '🧤', name: 'Handschuhe',     reason: 'Finger schützen' });
@@ -153,12 +157,13 @@ export function getClothingRecs(
     items.push({ emoji: '👖', name: 'Dicke Hose',     reason: 'Beine warmhalten' });
     items.push({ emoji: '🥾', name: 'Winterstiefel',  reason: 'Füße warmhalten' });
   } else if (effective < 10) {
+    items.push({ emoji: '👕', name: 'Unterhemd',      reason: 'Basis-Schicht drunter' });
+    items.push({ emoji: '🧶', name: 'Langer Pulli',   reason: 'Extra Wärme' });
     items.push({ emoji: '🧥', name: 'Jacke',          reason: 'Es ist kalt' });
-    items.push({ emoji: '🧥', name: 'Langer Pulli',   reason: 'Extra Wärme' });
     items.push({ emoji: '👖', name: 'Lange Hose',     reason: 'Beine warmhalten' });
   } else if (effective < 18) {
+    items.push({ emoji: '🧶', name: 'Pulli/Hoodie',   reason: 'Kann kühl werden' });
     items.push({ emoji: '🧥', name: 'Leichte Jacke',  reason: 'Für morgens/abends' });
-    items.push({ emoji: '🧥', name: 'Pulli/Hoodie',   reason: 'Kann kühl werden' });
     items.push({ emoji: '👖', name: 'Lange Hose',     reason: 'Angenehm warm' });
   } else if (effective < 25) {
     items.push({ emoji: '👕', name: 'T-Shirt',        reason: 'Schönes Wetter!' });
@@ -171,8 +176,17 @@ export function getClothingRecs(
     items.push({ emoji: '🧢', name: 'Kappe/Hut',      reason: 'Sonnenschutz' });
   }
 
-  if (temp >= 20 && weatherCode <= 3) {
-    items.push({ emoji: '☀️', name: 'Sonnencreme',    reason: 'UV-Schutz!' });
+  // Sonnencreme — widened threshold. Clear/mostly-clear days and
+  // temp >= 15 (not 20) now trigger the recommendation. Heute relevant
+  // hint ("Heute besonders wichtig") appears when BOTH clear AND warm.
+  // UV reality: first-graders need cream even at 15°C on a clear day.
+  if (weatherCode <= 3 && temp >= 15) {
+    const urgent = temp >= 22;
+    items.push({
+      emoji: '🧴',
+      name: 'Sonnencreme',
+      reason: urgent ? '☀️ Heute besonders wichtig!' : 'UV-Schutz auch an kühlen Sonnentagen',
+    });
   }
   if (isRain) {
     items.push({ emoji: '🌧️', name: 'Regenjacke',    reason: 'Es regnet!' });

@@ -119,7 +119,11 @@ export default function CampfireVisitorsGame({ onClose }) {
     if (v && v.date === today) return v;
     return pickTodaysVisitor(state || {}, today);
   });
-  const [phase, setPhase] = useState('greeting'); // greeting | picking | gifted | done
+  // Simple two-state phase — the old 'picking' intermediate was a
+  // closure trap: setPhase('picking') + setTimeout(handlePickCrystal)
+  // ran the handler with the stale 'greeting' closure, so it early-
+  // returned. Removed. Marc saw: "drag and drop nothing happens."
+  const [phase, setPhase] = useState('greeting'); // greeting | gifted
   const [wrongHint, setWrongHint] = useState(false);
   const [evolutionMsg, setEvolutionMsg] = useState(null);
 
@@ -131,7 +135,7 @@ export default function CampfireVisitorsGame({ onClose }) {
   const hasNone = !visitor || !freund;
 
   const handlePickCrystal = (family) => {
-    if (!freund || !wishedFam || phase !== 'picking') return;
+    if (!freund || !wishedFam || phase !== 'greeting') return;
     const inv = state?.crystalInventory || {};
     const have = inv[family] || 0;
     if (have <= 0) return;
@@ -395,7 +399,7 @@ export default function CampfireVisitorsGame({ onClose }) {
               const c = FAMILIES[fam];
               return (
                 <button key={fam}
-                  onClick={() => { setPhase('picking'); setTimeout(() => handlePickCrystal(fam), 50); }}
+                  onClick={() => handlePickCrystal(fam)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '10px 14px',
