@@ -206,6 +206,11 @@ export default function Hub({ onNavigate, onPlayMint }) {
   // Ronki greets Louis once when Hub mounts.
   useEffect(() => {
     voice.say('hub_open', { arcPhase });
+    // Re-evaluate organic mood triggers on every Hub entry. This is how
+    // Ronki flips to 'gut' after Louis finished all his quests on the
+    // Heute tab and came back — without opening the Ronki profile. See
+    // syncRonkiMood in TaskContext for the trigger ladder.
+    actions.syncRonkiMood?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

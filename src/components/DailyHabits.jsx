@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
+import { useQuestEater } from './QuestEater';
 
 /**
  * DailyHabits — parent-defined daily checkpoints.
@@ -22,6 +23,7 @@ import SFX from '../utils/sfx';
 export default function DailyHabits() {
   const { state, actions } = useTask();
   const { lang } = useTranslation();
+  const eater = useQuestEater();
 
   const habits = state?.familyConfig?.dailyHabits || [];
   const doneMap = state?.dailyHabits || {};
@@ -31,10 +33,22 @@ export default function DailyHabits() {
   const activeHabits = habits.filter(h => h.name && h.name.trim().length > 0);
   if (activeHabits.length === 0) return null;
 
-  const handleTap = (habit) => {
+  const handleTap = (habit, evt) => {
     if (doneMap[habit.id]) return; // already done today
     SFX.play('pop');
     if (navigator.vibrate) navigator.vibrate(50);
+    // Habits get the sparkle flavor — star-drift fire-breath. Teaches
+    // the kid that habits (vs routine quests) are something different,
+    // and the ambient sparkle feels fitting for growing-over-time.
+    if (eater && evt?.currentTarget) {
+      const fromRect = evt.currentTarget.getBoundingClientRect();
+      eater.eatQuest({
+        fromRect,
+        emoji: habit.icon || '✨',
+        hp: habit.xp || 5,
+        flavor: 'sparkle',
+      });
+    }
     actions.completeHabit?.(habit.id);
   };
 
@@ -76,7 +90,7 @@ export default function DailyHabits() {
           return (
             <button
               key={habit.id}
-              onClick={() => handleTap(habit)}
+              onClick={(e) => handleTap(habit, e)}
               disabled={isDone}
               className="w-full flex items-center gap-3 transition-all active:scale-[0.98]"
               style={{

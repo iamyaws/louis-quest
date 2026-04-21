@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import MiniRonki from './MiniRonki';
+import MoodChibi from './MoodChibi';
 import { useQuestEater } from './QuestEater';
+import { useTask } from '../context/TaskContext';
 
 /**
  * PinnedRonki — circular gold-haloed pill housing a <MiniRonki>.
@@ -38,6 +39,15 @@ export default function PinnedRonki({
   // triggers so ticking a quest anywhere in the app makes Ronki react
   // HERE without prop-drilling.
   const eater = useQuestEater();
+  const { state, computed } = useTask();
+  // Ambient status — the pill becomes an at-a-glance companion chip:
+  //   ring fills with today's pct, face swaps to current ronkiMood,
+  //   variant threads through so the colorway matches Louis's save.
+  // See backlog_pinned_ronki_status_chip.md.
+  const pct = computed?.pct ?? 0;
+  const allDone = computed?.allDone ?? false;
+  const ambientMood = state?.ronkiMood || 'normal';
+  const variant = state?.companionVariant || 'amber';
   const pillRef = useRef(null);
   useEffect(() => {
     if (!eater || !pillRef.current) return;
@@ -106,7 +116,55 @@ export default function PinnedRonki({
       onMouseUp={onTap ? (e) => e.currentTarget.style.transform = '' : undefined}
       onMouseLeave={onTap ? (e) => e.currentTarget.style.transform = '' : undefined}
     >
-      <MiniRonki size={innerSize} mood={mood} />
+      {/* Progress ring — today's pct. Amber in-progress, emerald at all-done.
+           Sits above the pill's radial gradient so it reads at a glance
+           from any tab. Circumference calculated so stroke-dasharray
+           drives a smooth fill. */}
+      <svg
+        aria-hidden="true"
+        width={size + 8}
+        height={size + 8}
+        viewBox={`0 0 ${size + 8} ${size + 8}`}
+        style={{
+          position: 'absolute',
+          inset: -4,
+          pointerEvents: 'none',
+          transform: 'rotate(-90deg)',
+        }}
+      >
+        <circle
+          cx={(size + 8) / 2}
+          cy={(size + 8) / 2}
+          r={(size + 4) / 2}
+          fill="none"
+          stroke="rgba(18,67,70,0.14)"
+          strokeWidth="2.5"
+        />
+        <circle
+          cx={(size + 8) / 2}
+          cy={(size + 8) / 2}
+          r={(size + 4) / 2}
+          fill="none"
+          stroke={allDone ? '#34d399' : '#fcd34d'}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeDasharray={Math.PI * (size + 4)}
+          strokeDashoffset={Math.PI * (size + 4) * (1 - pct)}
+          style={{
+            transition: 'stroke-dashoffset 0.6s ease, stroke 0.3s ease',
+            filter: allDone
+              ? 'drop-shadow(0 0 6px rgba(52,211,153,0.7))'
+              : 'drop-shadow(0 0 4px rgba(252,211,77,0.55))',
+          }}
+        />
+      </svg>
+
+      {/* Chibi inside the pill — threads real ronkiMood + variant so the
+           face/particles match Ronki's state everywhere else (Lager,
+           Profile, Compendium). */}
+      <div style={{ width: innerSize, height: innerSize, position: 'relative', zIndex: 1 }}>
+        <MoodChibi size={innerSize} mood={ambientMood} variant={variant} stage={2} bare />
+      </div>
 
       {/* Flavored burp — shape/color picked by flavor so the pin mirrors
           the Lager fire-breath variant for the same event. Keyed so each

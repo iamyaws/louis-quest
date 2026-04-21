@@ -35,6 +35,8 @@ import PilzWaageGame from './components/PilzWaageGame';
 import KristallKetteGame from './components/KristallKetteGame';
 import KristallHoehleGame from './components/KristallHoehleGame';
 import CampfireVisitorsGame from './components/CampfireVisitorsGame';
+import DreiDankeTool from './components/DreiDankeTool';
+import RonkiAusmalbild from './components/RonkiAusmalbild';
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
@@ -73,6 +75,8 @@ function AppContent() {
       if (p.get('gallery') === '1') return 'gallery';
       if (p.get('cave') === '1') return 'hoehle';
       if (p.get('visitors') === '1') return 'visitors';
+      if (p.get('dreiDanke') === '1') return 'drei-danke';
+      if (p.get('ausmalbild') === '1') return 'ausmalbild';
     }
     return 'hub';
   })();
@@ -312,6 +316,12 @@ function AppContent() {
       )}
       {view === 'visitors' && (
         <CampfireVisitorsGame onClose={() => setView('hub')} />
+      )}
+      {view === 'drei-danke' && (
+        <DreiDankeTool onComplete={() => setView('ronki')} />
+      )}
+      {view === 'ausmalbild' && (
+        <RonkiAusmalbild onClose={() => setView('hub')} />
       )}
       {pinGateOpen && (
         <PinModal

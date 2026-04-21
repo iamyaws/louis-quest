@@ -1381,26 +1381,58 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Bonding Agent: Ronki mood scheduler ──
-  // Called from RonkiProfile mount. Two responsibilities:
-  //   1. Expire yesterday's bad mood — if ronkiMoodSetDate !== today and
-  //      ronkiMood is 'sad'/'tired', revert to 'normal'. (Bad days are
-  //      one-day events; if Louis didn't open the app yesterday, the bad
-  //      day still expires — Ronki doesn't carry it forward.)
-  //   2. Fire a new bad mood — if ronkiMood is 'normal' and today >=
-  //      ronkiNextBadDayDate, pick sad/tired + schedule the next bad day
-  //      14-21d out. Idempotent per-day thanks to the mood/date guard.
+  // Called from Hub + RonkiProfile mount, and after every quest complete.
+  // Responsibilities:
+  //   1. Expire yesterday's non-normal mood — ronkiMoodSetDate !== today
+  //      flips back to 'normal'. (Moods are one-day events.)
+  //   2. Organic triggers (Apr 2026 expansion) — idempotent per day:
+  //      · magisch  → streak milestone (7/14/21/30/50/75/100 days)
+  //      · gut      → all main quests done today
+  //      · besorgt  → kid just opened after 2+ days away
+  //   3. Scheduled bad day — keep existing sad/tired pick.
+  // Priority: magisch > gut > besorgt > scheduled-bad. Once one fires,
+  // others short-circuit until the next day.
   const syncRonkiMood = useCallback(() => {
     setState(prev => {
       if (!prev) return prev;
       const t = today();
       let next = prev;
 
-      // Step 1 — expire
+      // Step 1 — expire yesterday's non-normal mood
       if (next.ronkiMood && next.ronkiMood !== 'normal' && next.ronkiMoodSetDate !== t) {
         next = { ...next, ronkiMood: 'normal', ronkiMoodSetDate: undefined };
       }
 
-      // Step 2 — fire a new bad day when scheduled
+      // Don't overwrite an already-set mood from earlier today.
+      const alreadySetToday =
+        next.ronkiMoodSetDate === t && (next.ronkiMood || 'normal') !== 'normal';
+
+      if (!alreadySetToday) {
+        // Step 2a — magisch on streak milestones
+        const STREAK_MILESTONES = new Set([7, 14, 21, 30, 50, 75, 100, 150, 200, 365]);
+        if (STREAK_MILESTONES.has(next.streak || 0)) {
+          next = { ...next, ronkiMood: 'magisch', ronkiMoodSetDate: t };
+        }
+        // Step 2b — gut when all main quests done today
+        else {
+          const mainQuests = (next.quests || []).filter(q => !q.sideQuest);
+          const mainAllDone = mainQuests.length > 0 && mainQuests.every(q => q.done);
+          if (mainAllDone) {
+            next = { ...next, ronkiMood: 'gut', ronkiMoodSetDate: t };
+          }
+        }
+        // Step 2c — besorgt on long absence
+        if ((next.ronkiMood || 'normal') === 'normal' && next.lastDate) {
+          const last = new Date(next.lastDate + 'T00:00:00');
+          const now = new Date(t + 'T00:00:00');
+          const daysSince = Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+          if (daysSince >= 2) {
+            next = { ...next, ronkiMood: 'besorgt', ronkiMoodSetDate: t };
+          }
+        }
+      }
+
+      // Step 3 — scheduled bad day (existing). Only if nothing else fired.
       const due = next.ronkiNextBadDayDate && t >= next.ronkiNextBadDayDate;
       if ((next.ronkiMood || 'normal') === 'normal' && due) {
         next = {
