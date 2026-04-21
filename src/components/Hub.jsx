@@ -6,6 +6,7 @@ import useWeather, { getWeatherInfo, getWeatherCategory } from '../hooks/useWeat
 import SFX from '../utils/sfx';
 import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
+import AnimatedCount from './AnimatedCount';
 import { BADGES } from '../constants';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useVoice } from '../companion/useVoice';
@@ -445,7 +446,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
         {/* HP pill — Polish .hp spec. Tall "N / HELDENPUNKTE" shape,
              cream→amber vertical gradient, 22px pearl, primary-teal
              number + gold-ink label below. Proud score, not chip. */}
-        <div className="flex items-center rounded-full shrink-0"
+        <div data-sterne-pill className="flex items-center rounded-full shrink-0"
              style={{
                background: 'linear-gradient(180deg, #fff8e1 0%, #fde68a 100%)',
                border: '1px solid rgba(180,83,9,0.25)',
@@ -455,10 +456,11 @@ export default function Hub({ onNavigate, onPlayMint }) {
              }}>
           <Pearl size={22} />
           <div className="flex flex-col leading-none">
-            <b className="font-label font-extrabold"
-               style={{ color: '#124346', fontSize: 16, letterSpacing: '-0.01em', lineHeight: 1 }}>
-              {state.hp || 0}
-            </b>
+            <AnimatedCount
+              value={state.hp || 0}
+              className="font-label font-extrabold"
+              style={{ color: '#124346', fontSize: 16, letterSpacing: '-0.01em', lineHeight: 1 }}
+            />
             <span className="font-label font-semibold uppercase"
                   style={{ fontSize: 10, letterSpacing: '0.16em', color: '#725b00', marginTop: 3, lineHeight: 1 }}>
               {lang === 'de' ? 'Sterne' : 'Stars'}

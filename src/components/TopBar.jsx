@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTask } from '../context/TaskContext';
 import { Pearl } from './CurrencyIcons';
+import AnimatedCount from './AnimatedCount';
 import { useTranslation } from '../i18n/LanguageContext';
 import PinnedRonki from './PinnedRonki';
 
@@ -101,7 +102,7 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
             </button>
           )}
           {showHp && (
-            <div className="flex items-center rounded-full"
+            <div data-sterne-pill className="flex items-center rounded-full"
                  style={{
                    background: 'linear-gradient(180deg, #fff8e1 0%, #fde68a 100%)',
                    border: '1px solid rgba(180,83,9,0.25)',
@@ -111,10 +112,11 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
                  }}>
               <Pearl size={22} />
               <div className="flex flex-col leading-none">
-                <b className="font-label font-extrabold"
-                   style={{ color: '#124346', fontSize: 16, letterSpacing: '-0.01em', lineHeight: 1 }}>
-                  {hp}
-                </b>
+                <AnimatedCount
+                  value={hp}
+                  className="font-label font-extrabold"
+                  style={{ color: '#124346', fontSize: 16, letterSpacing: '-0.01em', lineHeight: 1 }}
+                />
                 <span className="font-label font-semibold uppercase"
                       style={{ fontSize: 10, letterSpacing: '0.16em', color: '#725b00', marginTop: 3, lineHeight: 1 }}>
                   {lang === 'de' ? 'Sterne' : 'Stars'}
