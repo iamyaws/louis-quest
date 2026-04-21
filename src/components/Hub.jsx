@@ -210,6 +210,24 @@ export default function Hub({ onNavigate, onPlayMint }) {
 
   if (!state) return null;
 
+  // ── Progressive disclosure — stage-reveal Hub sections by totalTasksDone.
+  //    See backlog_progressive_hub_disclosure.md. Fresh kids + parents
+  //    (Hector Apr 2026, Louis density feedback) land on a quiet screen
+  //    with just the quest list; Mood/Wasser/Als-Nächstes/Forscher/Extras
+  //    fade in as tasks get ticked off.
+  //    Dev override via URL: ?reveal=all (show everything) or
+  //    ?reveal=N (simulate at task count N).
+  const _tasksReal = state.totalTasksDone || 0;
+  const _revealParam = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('reveal')
+    : null;
+  const _tasksEffective = _revealParam === 'all'
+    ? Infinity
+    : (_revealParam != null && !Number.isNaN(Number(_revealParam)))
+      ? Number(_revealParam)
+      : _tasksReal;
+  const reveal = (n) => _tasksEffective >= n;
+
   // ── Time-of-day sky (page-level ambient, behind everything) ──
   const SKY_IMAGES = {
     dawn:   'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_an_early_morning_sky._S_882cfbe3-5eac-4403-87a0-5c66602cf76b_2.webp',
@@ -569,8 +587,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
           )}
         </button>
 
-        {/* ── Als Nächstes (B style) — navigates to Aufgaben ── */}
-        {!allDone && nextQuest && (
+        {/* ── Als Nächstes (B style) — navigates to Aufgaben.
+               Progressive disclosure: hidden until Louis has 3 tasks done
+               so first-session Hub stays focused on the HEUTE card. ── */}
+        {reveal(3) && !allDone && nextQuest && (
           <button onClick={() => onNavigate?.('quests')}
                   className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
                   style={{ background: '#fff', border: '1.5px solid #124346', boxShadow: '0 4px 14px -4px rgba(18,67,70,0.22)' }}>
@@ -595,8 +615,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
 
         {/* ── Mood chip — body-care pair with Wasser (Marc reordering).
                Collapsed by default, taps to expand picker inline.
-               Sad/worried/tired → Gefühlsecke follow-up. ── */}
-        {state.moodAM === null ? (
+               Sad/worried/tired → Gefühlsecke follow-up.
+               Progressive disclosure: unlocks after 1st task so a fresh
+               kid isn't handed feelings + quests on the same screen. ── */}
+        {reveal(1) && (state.moodAM === null ? (
           <details className="group rounded-2xl overflow-hidden"
                    style={{ background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(252,211,77,0.26)', boxShadow: '0 2px 10px rgba(217,119,6,0.05)' }}>
             <summary className="flex items-center justify-between px-4 py-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden active:scale-[0.99] transition-all">
@@ -685,13 +707,16 @@ export default function Hub({ onNavigate, onPlayMint }) {
               </span>
             </button>
           );
-        })()}
+        })())}
 
         {/* ── Wasser pill — baseline care, now paired with Mood above.
                Daily-required tracker. Together Stimmung + Wasser form the
-               "body care" bookend on the Hub (Marc's reorder Apr 2026). ── */}
-        <div className="w-full px-4 py-3 rounded-2xl flex items-center gap-2.5"
-             style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.06)' }}>
+               "body care" bookend on the Hub (Marc's reorder Apr 2026).
+               Progressive disclosure: joins at 3 tasks, same threshold as
+               Als Nächstes — baseline-care layer arrives together. ── */}
+        {reveal(3) && (
+          <div className="w-full px-4 py-3 rounded-2xl flex items-center gap-2.5"
+               style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.06)' }}>
           <span className="material-symbols-outlined shrink-0"
                 style={{ color: '#124346', fontSize: 20, fontVariationSettings: "'FILL' 1" }}>
             water_drop
@@ -724,12 +749,16 @@ export default function Hub({ onNavigate, onPlayMint }) {
                 style={{ color: '#6b655b', minWidth: 30 }}>
             {(state.dailyWaterCount || 0)}/6
           </span>
-        </div>
+          </div>
+        )}
 
         {/* ── Forscher-Ecke — sequential progression.
                Optional activity. Hidden when Louis has graduated.
-               See data/mintGames.ts for the sequence model. ── */}
-        {!isForscherGraduated(state) && (
+               See data/mintGames.ts for the sequence model.
+               Progressive disclosure: 10 tasks — matches the existing
+               Micropedia discovery threshold so the "new things to
+               explore" signal arrives in step. ── */}
+        {reveal(10) && !isForscherGraduated(state) && (
           <AttentionGlow
             active={!forscherSeen}
             seenKey="forscher-ecke-first-seen"
@@ -749,8 +778,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
 
         {/* ── Extra-Aufgaben — truly optional, sits at the bottom of the
                main stack so Louis scrolls past his routine + baseline care
-               before the "extra" appears. ── */}
-        {sideQuests.length > 0 && (
+               before the "extra" appears.
+               Progressive disclosure: 20 tasks — truly-optional side
+               content only shows once the core loop is internalized. ── */}
+        {reveal(20) && sideQuests.length > 0 && (
           <button onClick={() => onNavigate?.('quests')}
                   className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
                   style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.08)' }}>
