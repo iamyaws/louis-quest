@@ -58,6 +58,40 @@ function clamp(n) { return Math.max(20, Math.min(100, Math.round(n))); }
 
 const base = import.meta.env.BASE_URL;
 
+// ── Mood-description card copy + palette ──
+// Compact horizontal card shown under the portrait on every day. Day
+// count ("3 Tage · Heute") + bold mood title + short body. On bad days
+// the body nudges toward the three reaction cards below.
+
+const MOOD_CARD_BG = {
+  normal: 'linear-gradient(160deg, #fffdf5 0%, #fef3c7 100%)',
+  sad:    'linear-gradient(160deg, #eef4fa 0%, #d6e3f0 100%)',
+  tired:  'linear-gradient(160deg, #eef2f6 0%, #d1dae3 100%)',
+};
+const MOOD_CARD_BORDER = {
+  normal: 'rgba(245,158,11,0.2)',
+  sad:    'rgba(90,115,150,0.22)',
+  tired:  'rgba(93,125,148,0.22)',
+};
+const MOOD_CARD_INK = { normal: '#b45309', sad: '#2f3d5a', tired: '#26333c' };
+const MOOD_CARD_HEAD = { normal: '#124346', sad: '#1f2d47', tired: '#1a2530' };
+const MOOD_CARD_SUB = { normal: 'rgba(18,67,70,0.72)', sad: 'rgba(47,61,90,0.78)', tired: 'rgba(38,51,60,0.78)' };
+
+const MOOD_CARD_COPY = {
+  normal: {
+    title: { de: 'Ronki ist gut drauf.', en: 'Ronki is doing well.' },
+    body:  { de: 'Ein normaler Tag zusammen. Alles gut.', en: 'A normal day together. All good.' },
+  },
+  sad: {
+    title: { de: 'Ronki ist heute traurig.', en: 'Ronki is sad today.' },
+    body:  { de: 'Manchmal passiert das einfach. Was könnte Ronki helfen?', en: 'It just happens sometimes. What could help Ronki?' },
+  },
+  tired: {
+    title: { de: 'Ronki ist heute müde.', en: 'Ronki is tired today.' },
+    body:  { de: 'Leise Tage sind auch wichtig. Was tut ihm gut?', en: 'Quiet days matter too. What would feel good?' },
+  },
+};
+
 // ── Bonding Agent ──
 // Sad-day reaction cards. Returned as a plain array so the component
 // stays simple. If Louis has taught Ronki a skill (e.g. Box-Atmung), a
@@ -130,6 +164,33 @@ export default function RonkiProfile({ onNavigate }) {
   // mood and fires a new scheduled bad day if due. Idempotent per-day.
   useEffect(() => {
     actions.syncRonkiMood?.();
+    // Dev shortcut: allow ?ronkiMood=sad|tired|normal in the URL so
+    // parents (and Marc during testing) can force a mood without
+    // pasting into the console — Chrome blocks that on first paste.
+    // Also accepts ?boxAtmung=learned and ?boxAtmung=N to seed the
+    // practice counter for quick verification of the teaching flow.
+    const params = new URLSearchParams(window.location.search);
+    const mood = params.get('ronkiMood');
+    const boxParam = params.get('boxAtmung');
+    const patch = {};
+    if (mood === 'sad' || mood === 'tired' || mood === 'normal') {
+      patch.ronkiMood = mood;
+      patch.ronkiMoodSetDate = mood === 'normal' ? undefined : new Date().toISOString().slice(0, 10);
+    }
+    if (boxParam === 'learned') {
+      patch.ronkiSkillPractice = { boxAtmung: 5 };
+      patch.ronkiLearnedSkills = ['boxAtmung'];
+      patch.ronkiLearnBannerSeen = { boxAtmung: true };
+    } else if (boxParam === 'learning') {
+      patch.ronkiSkillPractice = { boxAtmung: 4 };
+      patch.ronkiLearnedSkills = [];
+      patch.ronkiLearnBannerSeen = {};
+    } else if (boxParam && /^\d+$/.test(boxParam)) {
+      const n = Math.min(5, Math.max(0, parseInt(boxParam, 10)));
+      patch.ronkiSkillPractice = { boxAtmung: n };
+      patch.ronkiLearnedSkills = n >= 5 ? ['boxAtmung'] : [];
+    }
+    if (Object.keys(patch).length > 0) actions.patchState?.(patch);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -341,44 +402,50 @@ export default function RonkiProfile({ onNavigate }) {
                If Ronki has learned a skill (e.g. Box-Atmung via 5× in
                Gefühlsecke), a 4th reaction "Atmen mit Ronki" appears —
                the Rollentausch moment. ═══ */}
+          {/* ═══ MOOD DESCRIPTION CARD ═══
+               Compact horizontal card: mini chibi on the left, "X Tage ·
+               HEUTE" kicker + bold title + body + optional CTA on the
+               right. Always visible, changes copy by mood. Matches the
+               Feature Previews sad-hero layout but scaled down so it
+               can sit directly under the portrait on every day, not
+               only bad days. */}
+          <section
+               style={{
+                 display: 'flex', alignItems: 'center', gap: 14,
+                 padding: '14px 14px 14px 10px',
+                 borderRadius: 20,
+                 background: MOOD_CARD_BG[ronkiMood] || MOOD_CARD_BG.normal,
+                 border: `1px solid ${MOOD_CARD_BORDER[ronkiMood] || MOOD_CARD_BORDER.normal}`,
+                 boxShadow: '0 6px 14px -8px rgba(18,67,70,0.18)',
+                 marginBottom: 14,
+                 transition: 'background 0.5s ease',
+               }}>
+            <div style={{ flexShrink: 0 }}>
+              <MoodChibi size={72} mood={ronkiMood} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-label font-bold"
+                 style={{ fontSize: 10, lineHeight: 1, letterSpacing: '0.22em', textTransform: 'uppercase',
+                          color: MOOD_CARD_INK[ronkiMood] || MOOD_CARD_INK.normal, margin: '0 0 4px 0' }}>
+                {daysTogether > 0
+                  ? `${daysTogether} ${daysTogether === 1 ? (lang === 'de' ? 'Tag' : 'day') : (lang === 'de' ? 'Tage' : 'days')} · ${lang === 'de' ? 'Heute' : 'Today'}`
+                  : (lang === 'de' ? 'Heute' : 'Today')}
+              </p>
+              <h2 className="font-headline font-bold"
+                  style={{ fontSize: 17, lineHeight: 1.2, color: MOOD_CARD_HEAD[ronkiMood] || MOOD_CARD_HEAD.normal, margin: '0 0 3px 0' }}>
+                {MOOD_CARD_COPY[ronkiMood]?.title[lang] || MOOD_CARD_COPY.normal.title[lang] || MOOD_CARD_COPY.normal.title.de}
+              </h2>
+              <p className="font-body"
+                 style={{ fontSize: 12, lineHeight: 1.35, color: MOOD_CARD_SUB[ronkiMood] || MOOD_CARD_SUB.normal, margin: 0 }}>
+                {MOOD_CARD_COPY[ronkiMood]?.body[lang] || MOOD_CARD_COPY.normal.body[lang] || MOOD_CARD_COPY.normal.body.de}
+              </p>
+            </div>
+          </section>
+
           {isBadDay ? (
             <>
-              {/* Sad hero card — kicker + name + "9 von 22 Tagen" rhythm copy.
-                   Inspired by the Feature Previews sad-hero layout. */}
-              <section style={{
-                     padding: '18px 18px 16px',
-                     borderRadius: 20,
-                     background: ronkiMood === 'sad'
-                       ? 'linear-gradient(160deg, #dbe7f2 0%, #b5c7dc 100%)'
-                       : 'linear-gradient(160deg, #e6ecf2 0%, #c5ced8 100%)',
-                     border: '1px solid rgba(90,115,150,0.22)',
-                     boxShadow: '0 6px 14px -8px rgba(18,67,70,0.22)',
-                     marginBottom: 14,
-                   }}>
-                <p className="font-label font-bold"
-                   style={{ fontSize: 10, lineHeight: 1, letterSpacing: '0.22em', textTransform: 'uppercase', color: ronkiMood === 'sad' ? '#2f3d5a' : '#26333c', margin: '0 0 8px 0' }}>
-                  {lang === 'de' ? 'Heute' : 'Today'}
-                </p>
-                <h2 className="font-headline font-bold"
-                    style={{ fontSize: 22, lineHeight: 1.15, color: ronkiMood === 'sad' ? '#1f2d47' : '#1a2530', margin: '0 0 6px 0' }}>
-                  {ronkiMood === 'sad'
-                    ? (lang === 'de' ? 'Ronki ist heute traurig.' : 'Ronki is sad today.')
-                    : (lang === 'de' ? 'Ronki ist heute müde.' : 'Ronki is tired today.')}
-                </h2>
-                <p className="font-body"
-                   style={{ fontSize: 13, lineHeight: 1.4, color: ronkiMood === 'sad' ? 'rgba(47,61,90,0.78)' : 'rgba(38,51,60,0.78)', margin: 0 }}>
-                  {lang === 'de'
-                    ? 'Manchmal passiert das einfach. Was soll Louis tun?'
-                    : 'It just happens sometimes. What should Louis do?'}
-                </p>
-              </section>
-
               {/* 3 (or 4) gentle reactions — no XP. */}
               <Kicker>{lang === 'de' ? 'Wähle eine sanfte Reaktion' : 'Pick a gentle response'}</Kicker>
-              <p className="font-body italic"
-                 style={{ fontSize: 13, color: '#5a6b8c', margin: '0 0 10px 4px' }}>
-                {lang === 'de' ? '„Was braucht Ronki gerade von dir?"' : '"What does Ronki need from you right now?"'}
-              </p>
               <section style={{ marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {SAD_REACTIONS(lang, hasLearnedBox).map(r => (
                   <button key={r.id}
@@ -473,25 +540,27 @@ export default function RonkiProfile({ onNavigate }) {
           )}
 
           {/* ═══ BOX-ATMUNG TEACHING BLOCK ═══
-               Persistent — visible on normal days AND bad days. Shows a
-               live "Dein Fortschritt X von 5" counter that Louis advances
-               by using the breathing exercise in Gefühlsecke. At 5:
-               Ronki "learns" it (see ronkiLearnedSkills). The teal square
-               diagram is a visual cue of the 4-step pattern (Einatmen /
-               Halten / Ausatmen / Ruhen, 4 seconds each). This is the
-               spec's "Louis bringt Ronki bei" moment. */}
+               Dashed cyan square with a traveling dot — the visual
+               breathing rhythm (4s Einatmen / Halten / Ausatmen / Ruhen).
+               Dot loops continuously so Louis can breathe along at any
+               time. The actual practice count advances when Louis uses
+               the exercise in Gefühlsecke (WuetendFlow). At 5 Ronki
+               "learns" the skill — ronkiLearnedSkills flips, this block
+               hides, and the golden learn banner fires. On the next
+               bad-Ronki day, Ronki offers Box-Atmung back to Louis as
+               a 4th reaction option. */}
           {!hasLearnedBox && (
             <>
               <Kicker>{lang === 'de' ? 'Louis bringt Ronki bei' : 'Louis teaches Ronki'}</Kicker>
               <section style={{
-                         padding: '16px 18px',
+                         padding: '16px 18px 18px',
                          borderRadius: 20,
                          background: 'linear-gradient(160deg, #e0f2fe, #bae6fd)',
                          border: '1px solid rgba(14,165,233,0.25)',
                          boxShadow: '0 6px 14px -8px rgba(14,165,233,0.25)',
                          marginBottom: 14,
                        }}>
-                <div className="flex items-start gap-3 mb-3">
+                <div className="flex items-start gap-3 mb-2">
                   <div style={{
                     width: 40, height: 40, borderRadius: 12,
                     background: 'linear-gradient(135deg, #38bdf8, #0369a1)',
@@ -511,19 +580,51 @@ export default function RonkiProfile({ onNavigate }) {
                     </span>
                   </div>
                 </div>
-                {/* Progress row + 5 tick dots */}
-                <div className="flex items-center justify-between" style={{ marginTop: 10, marginBottom: 8 }}>
+
+                {/* Dashed square with traveling dot — 16s loop matching
+                     the 4-4-4-4 rhythm. Labels pinned outside each edge. */}
+                <div style={{
+                  position: 'relative',
+                  width: 140, height: 140,
+                  margin: '28px auto 34px',
+                  border: '2.5px dashed #0891b2',
+                  borderRadius: 16,
+                }}>
+                  <span style={{ position: 'absolute', top: -22, left: '50%', transform: 'translateX(-50%)', font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
+                    4s · {lang === 'de' ? 'Einatmen' : 'Inhale'}
+                  </span>
+                  <span style={{ position: 'absolute', top: '50%', right: -68, transform: 'translateY(-50%)', font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
+                    4s · {lang === 'de' ? 'Halten' : 'Hold'}
+                  </span>
+                  <span style={{ position: 'absolute', bottom: -22, left: '50%', transform: 'translateX(-50%)', font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
+                    4s · {lang === 'de' ? 'Ausatmen' : 'Exhale'}
+                  </span>
+                  <span style={{ position: 'absolute', top: '50%', left: -58, transform: 'translateY(-50%)', font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#0e7490', whiteSpace: 'nowrap' }}>
+                    4s · {lang === 'de' ? 'Ruhen' : 'Rest'}
+                  </span>
+                  <div aria-hidden="true" style={{
+                    position: 'absolute',
+                    width: 18, height: 18, borderRadius: '50%',
+                    background: 'radial-gradient(circle at 35% 35%, #67e8f9, #0891b2)',
+                    boxShadow: '0 0 16px rgba(8,145,178,0.5)',
+                    top: -9, left: -9,
+                    animation: 'rp-box-travel 16s linear infinite',
+                  }} />
+                </div>
+
+                {/* Progress row + 5 tick bars */}
+                <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
                   <span className="font-label" style={{ fontSize: 11, color: 'rgba(12,74,110,0.7)', letterSpacing: '0.06em' }}>
                     {lang === 'de' ? 'Dein Fortschritt' : 'Your progress'}
                   </span>
                   <b className="font-label" style={{ fontSize: 13, color: '#0c4a6e', fontWeight: 800 }}>
-                    {practiceCount} / 5
+                    {practiceCount} {lang === 'de' ? 'von' : 'of'} 5
                   </b>
                 </div>
                 <div className="flex gap-2">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <span key={i} style={{
-                      flex: 1, height: 8, borderRadius: 999,
+                      flex: 1, height: 6, borderRadius: 999,
                       background: i < practiceCount
                         ? 'linear-gradient(90deg, #38bdf8, #0369a1)'
                         : 'rgba(14,165,233,0.18)',
@@ -532,6 +633,18 @@ export default function RonkiProfile({ onNavigate }) {
                   ))}
                 </div>
               </section>
+
+              {/* Keyframes for the traveling dot. Corners align exactly
+                   with the dashed square's edges; linear timing keeps
+                   each side at 4s. */}
+              <style>{`
+                @keyframes rp-box-travel {
+                  0%,100% { top: -9px;  left: -9px; }
+                  25%     { top: -9px;  left: calc(100% - 9px); }
+                  50%     { top: calc(100% - 9px); left: calc(100% - 9px); }
+                  75%     { top: calc(100% - 9px); left: -9px; }
+                }
+              `}</style>
             </>
           )}
 
