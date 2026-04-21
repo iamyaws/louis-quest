@@ -52,7 +52,7 @@ export function RoutinePrintSheet({
   return (
     <>
       <PageMeta
-        title={`${title} — Vorlage zum Ausdrucken`}
+        title={`${title} · Vorlage zum Ausdrucken`}
         description={description}
         canonicalPath={`/vorlagen/${slug}`}
       />
@@ -82,7 +82,7 @@ export function RoutinePrintSheet({
             Vorschau
           </p>
           <p className="text-sm text-ink/70 mb-6 leading-relaxed">
-            So wird deine Vorlage aussehen. Tipp auf „Drucken" oben rechts — dein Browser zeigt dir dann die Druckvorschau, wo du auch auf „Als PDF speichern" umschalten kannst.
+            So wird deine Vorlage aussehen. Tipp auf „Drucken" oben rechts. Dein Browser zeigt dir dann die Druckvorschau, wo du auch auf „Als PDF speichern" umschalten kannst.
           </p>
           <div
             className="bg-white rounded-2xl overflow-hidden border border-teal/10"

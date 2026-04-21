@@ -373,7 +373,7 @@ export default function HomeEN() {
               My measure of success: Ronki has done its job when your child doesn't need it anymore. As a gamer-dad, I know that's a terrible engagement metric. But it's a damn good parenting metric.
             </p>
             <p className="text-ink/60">
-              — Marc Förster, father of two, Munich area
+              Marc Förster, father of two, Munich area
             </p>
           </motion.div>
         </div>

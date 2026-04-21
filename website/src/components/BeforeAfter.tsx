@@ -59,9 +59,9 @@ export function BeforeAfter() {
             <div className="mt-8 pt-6 border-t border-teal/10">
               <div className="h-2.5 w-full bg-teal/10 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-sage/60 rounded-full"
+                  className="h-full bg-mustard rounded-full"
                   initial={{ width: 0 }}
-                  whileInView={{ width: '30%' }}
+                  whileInView={{ width: '92%' }}
                   viewport={{ once: true }}
                   transition={{ duration: 1, delay: 0.3 }}
                 />
@@ -97,9 +97,9 @@ export function BeforeAfter() {
             <div className="mt-8 pt-6 border-t border-cream/10">
               <div className="h-2.5 w-full bg-cream/10 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-mustard rounded-full"
+                  className="h-full bg-sage rounded-full"
                   initial={{ width: 0 }}
-                  whileInView={{ width: '100%' }}
+                  whileInView={{ width: '22%' }}
                   viewport={{ once: true }}
                   transition={{ duration: 1.2, delay: 0.5 }}
                 />

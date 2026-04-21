@@ -36,7 +36,7 @@ export default function AltRoutineCards() {
   return (
     <PainterlyShell>
       <PageMeta
-        title="Ein Tag mit Ronki — Routinen-Karten"
+        title="Ein Tag mit Ronki · Routinen-Karten"
         description="Drei kleine Routinen: Morgen, Nachmittag, Abend."
         noindex
       />
