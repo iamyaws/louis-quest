@@ -206,6 +206,14 @@ export interface TaskState {
   freundFriendship?: Record<string, number>;
   /** Which Freund is currently visiting the campfire today, if any. */
   todaysVisitor?: { freundId: string; wish: string; date: string } | null;
+  /** Completed coloring-page saves — each entry is one scene. Dedup by
+   *  sceneId so repeat saves overwrite instead of append. Buch v2 reads
+   *  these as polaroids. */
+  completedColoringPages?: Array<{
+    sceneId: string;
+    fills: Record<string, string>;
+    completedAt: string;
+  }>;
 }
 
 interface TaskComputed {
@@ -436,6 +444,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [celebTick, setCelebTick] = useState(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const cloudTimer = useRef<ReturnType<typeof setTimeout>>();
+  // Forward-reference to syncRonkiMood so earlier-declared callbacks
+  // (e.g. `complete`) can trigger it without hitting the TDZ. Assigned
+  // below once syncRonkiMood is declared.
+  const syncRonkiMoodRef = useRef<(() => void) | null>(null);
 
   const queueCelebration = useCallback((evt: CelebrationEvent) => {
     celebQueue.current.push(evt);
@@ -542,6 +554,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           crystalInventory: (raw as any).crystalInventory || {},
           freundFriendship: (raw as any).freundFriendship || {},
           todaysVisitor: (raw as any).todaysVisitor ?? null,
+          completedColoringPages: (raw as any).completedColoringPages || [],
           micropediaDiscovered: raw.micropediaDiscovered || [],
           freundArcsCompleted: raw.freundArcsCompleted || [],
           freundCallbacksPending: raw.freundCallbacksPending || [],
@@ -921,6 +934,13 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions };
     });
     setToastTrigger(t => t + 1);
+    // Re-evaluate organic mood triggers right after the completion
+    // lands — fixes the case where Louis is ALREADY on the Hub tab
+    // when he ticks the last main quest of the day: without this
+    // call, Hub's mount effect has already run (empty deps), so the
+    // 'gut' flip wouldn't fire until he navigated away and back.
+    // syncRonkiMood is idempotent per day so extra calls are safe.
+    queueMicrotask(() => syncRonkiMoodRef.current?.());
   }, []);
 
   // ── Set mood ──
@@ -948,6 +968,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       } as TaskState;
     });
     setToastTrigger(t => t + 1);
+    // Parallel to complete(): re-evaluate moods (habits don't flip
+    // gut on their own, but they may cross a hp threshold that a
+    // future trigger cares about; also cheap + idempotent).
+    queueMicrotask(() => syncRonkiMoodRef.current?.());
   }, []);
 
   // ── Drink water (also tracks water missions) ──
@@ -1408,9 +1432,24 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         next.ronkiMoodSetDate === t && (next.ronkiMood || 'normal') !== 'normal';
 
       if (!alreadySetToday) {
-        // Step 2a — magisch on streak milestones
+        // Step 2a — magisch on streak milestones.
+        //
+        // Code-review fix (22 Apr 2026): `state.streak` is not a field
+        // on TaskState (the `streak` prop in the schema belongs to a
+        // Quest, not the user). The prior milestone check read
+        // `next.streak` which was always undefined → dead code. Derive
+        // an effective day-streak from the max-consistent quest in
+        // `sm` (skill-map of per-quest consecutive-day counts). A kid
+        // keeping their routine for 7 days will have at least one
+        // quest at streak=7 in sm. Not perfect ("best quest streak"
+        // ≠ "session streak") but fires at the intended moments
+        // without a schema migration.
+        const smVals = Object.values(next.sm || {});
+        const effectiveStreak = smVals.length > 0
+          ? Math.max(...smVals.map(v => Number(v) || 0))
+          : 0;
         const STREAK_MILESTONES = new Set([7, 14, 21, 30, 50, 75, 100, 150, 200, 365]);
-        if (STREAK_MILESTONES.has(next.streak || 0)) {
+        if (STREAK_MILESTONES.has(effectiveStreak)) {
           next = { ...next, ronkiMood: 'magisch', ronkiMoodSetDate: t };
         }
         // Step 2b — gut when all main quests done today
@@ -1421,11 +1460,18 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
             next = { ...next, ronkiMood: 'gut', ronkiMoodSetDate: t };
           }
         }
-        // Step 2c — besorgt on long absence
+        // Step 2c — besorgt on long absence. QA fix (22 Apr 2026):
+        // old code used `Math.floor((now - last) / 86_400_000)` in
+        // epoch-ms, which silently miscounts across DST transitions
+        // (spring-forward: legitimate 2-day gap reads as 1). Switch
+        // to YYYY-MM-DD string parsing + UTC day-count so DST doesn't
+        // suppress the trigger.
         if ((next.ronkiMood || 'normal') === 'normal' && next.lastDate) {
-          const last = new Date(next.lastDate + 'T00:00:00');
-          const now = new Date(t + 'T00:00:00');
-          const daysSince = Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+          const dayNum = (iso: string) => {
+            const [y, m, d] = iso.split('-').map(Number);
+            return Date.UTC(y, (m || 1) - 1, d || 1) / 86_400_000;
+          };
+          const daysSince = dayNum(t) - dayNum(next.lastDate);
           if (daysSince >= 2) {
             next = { ...next, ronkiMood: 'besorgt', ronkiMoodSetDate: t };
           }
@@ -1446,6 +1492,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       return next === prev ? prev : next;
     });
   }, []);
+
+  // Expose syncRonkiMood to earlier-declared callbacks (complete,
+  // completeHabit, etc.) via a ref so organic mood triggers fire the
+  // instant relevant state changes, not only on tab mount.
+  syncRonkiMoodRef.current = syncRonkiMood;
 
   // ── Bonding Agent: Louis picks a gentle reaction on a bad-Ronki day ──
   // All reactions (Kuscheln / Stille / Tee / Atmen) are "right" — no

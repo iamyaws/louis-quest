@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
-import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 
 /**
@@ -37,83 +36,137 @@ const PALETTE = [
   { id: 'brown',   hex: '#92400e', label: 'Braun' },
 ];
 
+// Scenes built as proper Ronki chibi compositions — the same silhouette
+// the kid sees across the whole app (MoodChibi), now drawn as SVG paths
+// with black outlines + white fill so it reads as a real coloring page.
+// Marc Apr 2026: "this is abstract art at best — use the chibi Ronki."
+//
+// Each region id matches a MoodChibi body-part so kids intuitively
+// know what they're painting (belly, horn, wing, etc).
 const SCENES = [
   {
-    id: 'lagerfeuer',
-    title: 'Ronki am Lagerfeuer',
-    // Simple illustration: a Ronki silhouette next to a campfire,
-    // stars, moon, trees. Each region is a separate <path>.
-    regions: [
-      // Sky
-      { id: 'sky',    d: 'M 0 0 L 400 0 L 400 180 L 0 180 Z',           defaultFill: '#fff' },
-      // Moon
-      { id: 'moon',   d: 'M 320 50 A 30 30 0 1 1 319.9 50',              defaultFill: '#fff' },
-      // Ground
-      { id: 'ground', d: 'M 0 180 L 400 180 L 400 300 L 0 300 Z',       defaultFill: '#fff' },
-      // Left tree
-      { id: 'tree1',  d: 'M 40 220 L 20 150 L 60 150 Z M 36 220 L 44 220 L 44 240 L 36 240 Z', defaultFill: '#fff' },
-      // Right tree
-      { id: 'tree2',  d: 'M 360 225 L 340 155 L 380 155 Z M 356 225 L 364 225 L 364 245 L 356 245 Z', defaultFill: '#fff' },
-      // Firelog (left)
-      { id: 'log1',   d: 'M 170 240 L 230 240 L 240 255 L 160 255 Z',   defaultFill: '#fff' },
-      // Fire
-      { id: 'fire',   d: 'M 200 180 Q 180 210 195 240 Q 200 225 205 240 Q 220 210 200 180 Z', defaultFill: '#fff' },
-      // Ronki body
-      { id: 'body',   d: 'M 100 230 Q 80 200 110 185 Q 140 190 145 220 L 140 260 L 100 260 Z', defaultFill: '#fff' },
-      // Ronki belly
-      { id: 'belly',  d: 'M 115 220 Q 115 240 130 245 L 130 255 L 115 255 Z', defaultFill: '#fff' },
-      // Ronki left horn
-      { id: 'hornL',  d: 'M 110 185 L 105 170 L 115 180 Z',             defaultFill: '#fff' },
-      // Ronki right horn
-      { id: 'hornR',  d: 'M 135 185 L 140 170 L 130 180 Z',             defaultFill: '#fff' },
-      // Ronki left wing
-      { id: 'wingL',  d: 'M 90 205 Q 70 200 75 225 Q 95 220 95 210 Z',  defaultFill: '#fff' },
-      // Ronki right wing
-      { id: 'wingR',  d: 'M 145 205 Q 165 200 160 225 Q 145 220 145 210 Z', defaultFill: '#fff' },
+    id: 'portrait',
+    title: 'Ronki-Portrait',
+    // Big head-on toddler chibi. Centered, simple scene — just Ronki.
+    decor: [
+      // Ground shadow
+      { d: 'M 120 290 Q 200 300 280 290',                stroke: '#1a1a1a', strokeWidth: 2, dash: '4 4' },
     ],
-    stars: [
-      { cx: 60, cy: 40 }, { cx: 120, cy: 25 }, { cx: 260, cy: 40 },
-      { cx: 180, cy: 20 }, { cx: 220, cy: 60 },
+    regions: [
+      // Background (optional sky wash — so the kid gets a full picture)
+      { id: 'background', d: 'M 10 10 L 390 10 L 390 290 L 10 290 Z', defaultFill: '#fff' },
+      // Left wing (behind body)
+      { id: 'wingL', d: 'M 155 160 Q 110 150 105 195 Q 120 210 165 195 Q 170 175 155 160 Z' },
+      // Right wing (behind body)
+      { id: 'wingR', d: 'M 245 160 Q 290 150 295 195 Q 280 210 235 195 Q 230 175 245 160 Z' },
+      // Torso — classic pear shape
+      { id: 'body',  d: 'M 200 90 Q 135 105 135 190 Q 135 265 200 280 Q 265 265 265 190 Q 265 105 200 90 Z' },
+      // Belly panel
+      { id: 'belly', d: 'M 200 175 Q 165 175 165 225 Q 165 255 200 260 Q 235 255 235 225 Q 235 175 200 175 Z' },
+      // Left horn
+      { id: 'hornL', d: 'M 165 100 Q 150 60 170 50 Q 180 80 175 100 Z' },
+      // Right horn
+      { id: 'hornR', d: 'M 235 100 Q 250 60 230 50 Q 220 80 225 100 Z' },
+      // Left eye (white)
+      { id: 'eyeL',  d: 'M 170 150 Q 155 150 155 165 Q 155 180 170 180 Q 185 180 185 165 Q 185 150 170 150 Z' },
+      // Right eye (white)
+      { id: 'eyeR',  d: 'M 230 150 Q 215 150 215 165 Q 215 180 230 180 Q 245 180 245 165 Q 245 150 230 150 Z' },
+      // Left cheek blush
+      { id: 'cheekL', d: 'M 158 195 Q 148 195 148 205 Q 148 215 158 215 Q 168 215 168 205 Q 168 195 158 195 Z' },
+      // Right cheek blush
+      { id: 'cheekR', d: 'M 242 195 Q 232 195 232 205 Q 232 215 242 215 Q 252 215 252 205 Q 252 195 242 195 Z' },
+      // Left leg
+      { id: 'legL',  d: 'M 170 265 Q 160 265 160 285 Q 160 295 175 295 Q 185 295 185 285 Q 185 265 170 265 Z' },
+      // Right leg
+      { id: 'legR',  d: 'M 230 265 Q 220 265 220 285 Q 220 295 235 295 Q 245 295 245 285 Q 245 265 230 265 Z' },
+    ],
+    // Overlay details drawn on top but not colorable — pupils + mouth
+    // outline. These stay black so the face reads at a glance.
+    overlays: [
+      { type: 'circle', cx: 170, cy: 168, r: 4, fill: '#1a1a1a' },
+      { type: 'circle', cx: 230, cy: 168, r: 4, fill: '#1a1a1a' },
+      { type: 'path',   d: 'M 180 215 Q 200 230 220 215', fill: 'none', stroke: '#1a1a1a', strokeWidth: 3 },
     ],
   },
   {
     id: 'fliegender-ronki',
     title: 'Fliegender Ronki',
+    // Wings outstretched, in mid-air over mountains + cloud + sun.
+    decor: [],
     regions: [
-      { id: 'sky',    d: 'M 0 0 L 400 0 L 400 300 L 0 300 Z',           defaultFill: '#fff' },
-      // Sun
-      { id: 'sun',    d: 'M 340 60 A 32 32 0 1 1 339.9 60',              defaultFill: '#fff' },
-      // Cloud 1
-      { id: 'cloud1', d: 'M 40 80 Q 20 70 30 55 Q 40 45 60 55 Q 80 45 90 60 Q 95 75 80 80 Z', defaultFill: '#fff' },
-      // Cloud 2
-      { id: 'cloud2', d: 'M 250 120 Q 230 110 240 95 Q 250 85 270 95 Q 290 85 300 100 Q 305 115 290 120 Z', defaultFill: '#fff' },
-      // Mountains
-      { id: 'mountain1', d: 'M 0 300 L 80 180 L 160 300 Z',             defaultFill: '#fff' },
-      { id: 'mountain2', d: 'M 140 300 L 240 170 L 340 300 Z',          defaultFill: '#fff' },
-      // Ronki body (flying, wings outstretched)
-      { id: 'body',   d: 'M 180 165 Q 160 140 180 125 Q 210 125 220 150 Q 220 180 200 190 Z', defaultFill: '#fff' },
-      // Left wing (outstretched)
-      { id: 'wingL',  d: 'M 170 150 Q 120 130 110 160 Q 130 175 170 165 Z', defaultFill: '#fff' },
-      // Right wing (outstretched)
-      { id: 'wingR',  d: 'M 215 150 Q 265 130 275 160 Q 255 175 215 165 Z', defaultFill: '#fff' },
+      { id: 'sky',       d: 'M 0 0 L 400 0 L 400 210 L 0 210 Z' },
+      { id: 'sun',       d: 'M 340 50 Q 320 50 320 72 Q 320 94 340 94 Q 360 94 360 72 Q 360 50 340 50 Z' },
+      { id: 'cloud',     d: 'M 50 80 Q 25 80 25 100 Q 25 115 45 115 Q 55 130 75 125 Q 95 130 105 115 Q 125 115 125 100 Q 125 80 100 80 Q 95 65 75 70 Q 60 65 50 80 Z' },
+      { id: 'mountainL', d: 'M 0 300 L 70 200 L 140 300 Z' },
+      { id: 'mountainR', d: 'M 110 300 L 200 170 L 290 300 Z' },
+      { id: 'mountainF', d: 'M 240 300 L 330 220 L 400 300 Z' },
+      // Wings — dramatic outstretched
+      { id: 'wingL',     d: 'M 180 145 Q 100 115 85 165 Q 100 195 175 175 Q 190 165 180 145 Z' },
+      { id: 'wingR',     d: 'M 220 145 Q 300 115 315 165 Q 300 195 225 175 Q 210 165 220 145 Z' },
+      // Body (in flight — compact pose)
+      { id: 'body',      d: 'M 200 115 Q 165 120 170 175 Q 175 205 200 215 Q 225 205 230 175 Q 235 120 200 115 Z' },
       // Belly
-      { id: 'belly',  d: 'M 185 155 Q 185 180 200 185 L 200 188 L 190 188 Z', defaultFill: '#fff' },
-      // Left horn
-      { id: 'hornL',  d: 'M 185 130 L 180 115 L 190 125 Z',             defaultFill: '#fff' },
-      // Right horn
-      { id: 'hornR',  d: 'M 210 130 L 215 115 L 205 125 Z',             defaultFill: '#fff' },
-      // Trailing sparkle path
-      { id: 'trail',  d: 'M 100 220 Q 140 200 180 185 Q 160 210 100 220 Z', defaultFill: '#fff' },
+      { id: 'belly',     d: 'M 200 165 Q 180 165 180 195 Q 180 210 200 210 Q 220 210 220 195 Q 220 165 200 165 Z' },
+      // Horns
+      { id: 'hornL',     d: 'M 185 120 Q 175 95 190 88 Q 197 105 195 120 Z' },
+      { id: 'hornR',     d: 'M 215 120 Q 225 95 210 88 Q 203 105 205 120 Z' },
+      // Tail trailing back
+      { id: 'tail',      d: 'M 220 205 Q 255 220 275 240 Q 260 245 240 230 Q 225 220 220 205 Z' },
+      // Sparkle trail
+      { id: 'trail1',    d: 'M 130 230 Q 120 222 110 232 Q 118 240 130 230 Z' },
+      { id: 'trail2',    d: 'M 90 255 Q 82 250 75 258 Q 82 264 90 255 Z' },
     ],
-    stars: [
-      { cx: 50, cy: 25 }, { cx: 180, cy: 55 }, { cx: 330, cy: 130 },
+    overlays: [
+      // Eyes (flying determined look — closed-slits)
+      { type: 'path', d: 'M 178 148 L 192 148', stroke: '#1a1a1a', strokeWidth: 3 },
+      { type: 'path', d: 'M 208 148 L 222 148', stroke: '#1a1a1a', strokeWidth: 3 },
+      // Little smile
+      { type: 'path', d: 'M 192 170 Q 200 178 208 170', fill: 'none', stroke: '#1a1a1a', strokeWidth: 2.5 },
+    ],
+  },
+  {
+    id: 'campfire',
+    title: 'Ronki am Lagerfeuer',
+    // Ronki sits beside a painterly campfire with trees behind.
+    decor: [],
+    regions: [
+      { id: 'sky',     d: 'M 0 0 L 400 0 L 400 180 L 0 180 Z' },
+      { id: 'moon',    d: 'M 340 40 Q 320 40 320 62 Q 320 84 340 84 Q 360 84 360 62 Q 360 40 340 40 Z' },
+      { id: 'ground',  d: 'M 0 180 L 400 180 L 400 300 L 0 300 Z' },
+      // Trees — two simple triangle canopies with trunks
+      { id: 'tree1Can', d: 'M 50 200 L 20 130 L 80 130 Z' },
+      { id: 'tree1Tr',  d: 'M 45 200 L 55 200 L 55 220 L 45 220 Z' },
+      { id: 'tree2Can', d: 'M 360 205 L 330 140 L 390 140 Z' },
+      { id: 'tree2Tr',  d: 'M 355 205 L 365 205 L 365 225 L 355 225 Z' },
+      // Fire log
+      { id: 'log',      d: 'M 180 255 Q 200 247 230 255 Q 215 263 180 260 Z' },
+      // Fire
+      { id: 'fire',     d: 'M 205 220 Q 185 245 200 260 Q 205 250 210 260 Q 225 245 205 220 Z' },
+      // Ronki sitting on the left
+      { id: 'wingL',    d: 'M 80 210 Q 55 205 55 230 Q 70 240 95 225 Q 95 215 80 210 Z' },
+      { id: 'body',     d: 'M 115 155 Q 70 165 70 215 Q 70 265 115 275 Q 160 265 160 215 Q 160 165 115 155 Z' },
+      { id: 'belly',    d: 'M 115 215 Q 92 215 92 245 Q 92 260 115 262 Q 138 260 138 245 Q 138 215 115 215 Z' },
+      { id: 'hornL',    d: 'M 95 160 Q 85 130 100 123 Q 105 145 102 160 Z' },
+      { id: 'hornR',    d: 'M 135 160 Q 145 130 130 123 Q 125 145 128 160 Z' },
+      { id: 'legL',     d: 'M 95 265 Q 85 265 85 282 Q 85 292 98 292 Q 108 292 108 282 Q 108 265 95 265 Z' },
+      { id: 'legR',     d: 'M 135 265 Q 125 265 125 282 Q 125 292 138 292 Q 148 292 148 282 Q 148 265 135 265 Z' },
+    ],
+    overlays: [
+      // Face
+      { type: 'circle', cx: 100, cy: 195, r: 5, fill: '#1a1a1a' },
+      { type: 'circle', cx: 130, cy: 195, r: 5, fill: '#1a1a1a' },
+      { type: 'path',   d: 'M 105 225 Q 115 232 125 225', fill: 'none', stroke: '#1a1a1a', strokeWidth: 2.5 },
+      // Stars
+      { type: 'circle', cx: 80,  cy: 40, r: 2, fill: '#1a1a1a' },
+      { type: 'circle', cx: 160, cy: 60, r: 2, fill: '#1a1a1a' },
+      { type: 'circle', cx: 250, cy: 45, r: 2, fill: '#1a1a1a' },
+      { type: 'circle', cx: 290, cy: 70, r: 2, fill: '#1a1a1a' },
     ],
   },
 ];
 
 export default function RonkiAusmalbild({ onClose }) {
   const { state, actions } = useTask();
-  const { t } = useTranslation();
 
   const [sceneIdx, setSceneIdx] = useState(0);
   const [selectedColor, setSelectedColor] = useState(PALETTE[3].hex); // default green
@@ -136,13 +189,18 @@ export default function RonkiAusmalbild({ onClose }) {
   };
 
   const handleSave = () => {
+    if (saved) return; // idempotent — don't double-save same tap cycle
     SFX.play('coin');
     try { if (navigator.vibrate) navigator.vibrate([40, 30, 80]); } catch (_) {}
-    // Persist the completed page to state
+    // Persist the completed page to state. Dedup by sceneId so repeat
+    // saves update the existing entry instead of appending a 2nd, 3rd,
+    // 4th copy (code-reviewer + QA both caught: kid taps save multiple
+    // times, Buch v2 sees unbounded duplicates).
     const completed = state?.completedColoringPages || [];
+    const withoutPrior = completed.filter(p => p.sceneId !== scene.id);
     actions.patchState?.({
       completedColoringPages: [
-        ...completed,
+        ...withoutPrior,
         {
           sceneId: scene.id,
           fills: sceneFills,
@@ -210,26 +268,61 @@ export default function RonkiAusmalbild({ onClose }) {
         <svg
           viewBox="0 0 400 300"
           style={{ width: '100%', height: 'auto', maxHeight: '100%' }}
+          role="img"
+          aria-label={scene.title}
         >
-          {/* Regions — tap to fill with selectedColor */}
+          {/* Regions — tap to fill with selectedColor. Default fill is
+               white so kids see clear line-art to paint INTO. */}
           {scene.regions.map(r => (
             <path
               key={r.id}
               d={r.d}
-              fill={sceneFills[r.id] || r.defaultFill}
-              stroke="#1e2b2e"
+              fill={sceneFills[r.id] || r.defaultFill || '#fff'}
+              stroke="#1a1a1a"
               strokeWidth="2.5"
               strokeLinejoin="round"
+              strokeLinecap="round"
               onClick={() => handleRegionTap(r.id)}
-              style={{ cursor: 'pointer' }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleRegionTap(r.id);
+                }
+              }}
+              style={{ cursor: 'pointer', outline: 'none' }}
             />
           ))}
-          {/* Stars — decorative, not colorable */}
-          {scene.stars.map((s, i) => (
-            <g key={i}>
-              <circle cx={s.cx} cy={s.cy} r="2" fill="#1e2b2e" />
-            </g>
+          {/* Decorative lines (ground shadows, dashed details). */}
+          {(scene.decor || []).map((d, i) => (
+            <path
+              key={`decor-${i}`}
+              d={d.d}
+              fill="none"
+              stroke={d.stroke || '#1a1a1a'}
+              strokeWidth={d.strokeWidth || 2}
+              strokeDasharray={d.dash}
+              strokeLinecap="round"
+            />
           ))}
+          {/* Overlays — non-colorable detail (pupils, mouth, stars). */}
+          {(scene.overlays || []).map((o, i) => {
+            if (o.type === 'circle') {
+              return <circle key={`ov-${i}`} cx={o.cx} cy={o.cy} r={o.r} fill={o.fill} />;
+            }
+            return (
+              <path
+                key={`ov-${i}`}
+                d={o.d}
+                fill={o.fill || '#1a1a1a'}
+                stroke={o.stroke}
+                strokeWidth={o.strokeWidth}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            );
+          })}
         </svg>
       </div>
 

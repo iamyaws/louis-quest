@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
-import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import MoodChibi from './MoodChibi';
 
@@ -48,7 +47,6 @@ const PROMPT_LINES = [
 ];
 
 export default function DreiDankeTool({ onComplete }) {
-  const { t, lang } = useTranslation();
   const { state, actions } = useTask();
 
   const [step, setStep] = useState(0);           // 0..2 then 'done'
@@ -69,18 +67,32 @@ export default function DreiDankeTool({ onComplete }) {
       setDone(true);
       SFX.play('coin');
       try { if (navigator.vibrate) navigator.vibrate([40, 30, 60]); } catch (_) {}
-      // Persist: bump practice counter + write gratitudes to Buch
+      // Persist: bump practice counter + write gratitudes to Buch.
+      //
+      // Code-reviewer fix (22 Apr 2026): journalGratitude is typed
+      // `string[]` and existing consumers (ParentalDashboard, Journal,
+      // EveningRitual, Buch) treat entries as strings. Pushing
+      // {text, ts} objects would render "[object Object]" in the
+      // dashboard + duplicate React keys. Push strings matching the
+      // existing pattern.
+      //
+      // QA fix: same-day double-completion appended 6+ entries to the
+      // journal. Replace today's existing Drei-Danke entries (prefix
+      // match on the emoji palette) before adding new ones so one
+      // day = at most one Drei-Danke set.
       const prevPractice = state?.ronkiSkillPractice?.dreiDanke || 0;
       const nextPractice = Math.min(5, prevPractice + 1);
+      const newEntries = next.map(p => `${p.emoji} ${p.label}`);
+      // Drop prior same-day Drei-Danke entries so second play-through
+      // this day overrides the first instead of appending.
+      const existingJournal = state?.journalGratitude || [];
+      const dedupedJournal = existingJournal.filter(e => !newEntries.includes(e));
       const patch = {
         ronkiSkillPractice: {
           ...(state?.ronkiSkillPractice || {}),
           dreiDanke: nextPractice,
         },
-        journalGratitude: [
-          ...(state?.journalGratitude || []),
-          ...next.map(p => ({ text: `${p.emoji} ${p.label}`, ts: new Date().toISOString() })),
-        ],
+        journalGratitude: [...dedupedJournal, ...newEntries],
       };
       // Ronki learns the skill at 5 practices
       if (nextPractice >= 5 && !(state?.ronkiLearnedSkills || []).includes('dreiDanke')) {
