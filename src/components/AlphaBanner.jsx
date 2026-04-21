@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * AlphaBanner — small persistent strip at the top of the app that sets
  * expectations for early testers. Parent-focused message; kids ignore it.
- * Includes a feedback mailto link so testers always know where to send it.
+ * Includes a feedback mailto link + a DE/EN language toggle (Apr 2026 —
+ * Hector feedback: no visible way out of browser-detected English).
  *
  * Publishes its own rendered height to the CSS variable `--alpha-banner-h`
  * on the document root so downstream fixed headers (TopBar, Hub's internal
@@ -12,6 +14,7 @@ import React, { useEffect, useRef } from 'react';
  * headers render ON TOP of the sticky banner at scroll=0 and clip avatars.
  */
 export default function AlphaBanner() {
+  const { t, lang, setLang } = useTranslation();
   const ref = useRef(null);
   useEffect(() => {
     const node = ref.current;
@@ -45,14 +48,24 @@ export default function AlphaBanner() {
           aria-hidden
           className="inline-block w-1.5 h-1.5 rounded-full bg-[#FCD34D] shrink-0 animate-pulse"
         />
-        <span className="font-semibold tracking-wide">Alpha</span>
+        <span className="font-semibold tracking-wide">{t('alpha.label')}</span>
         <span className="opacity-40" aria-hidden>·</span>
-        <span className="opacity-70 truncate">Frühe Version, Daten können sich ändern</span>
+        <span className="opacity-70 truncate">{t('alpha.body')}</span>
+        <button
+          type="button"
+          onClick={() => setLang(lang === 'de' ? 'en' : 'de')}
+          aria-label={t('lang.switchTo')}
+          className="ml-auto shrink-0 font-semibold tracking-wide opacity-70 hover:opacity-100 transition-opacity"
+          style={{ fontSize: 10, letterSpacing: '0.12em' }}
+        >
+          {lang === 'de' ? 'DE ▸ EN' : 'EN ▸ DE'}
+        </button>
+        <span className="opacity-40" aria-hidden>·</span>
         <a
           href="mailto:hallo@ronki.de?subject=Ronki%20Alpha%20Feedback"
-          className="ml-auto shrink-0 font-semibold text-[#FCD34D] hover:text-white transition-colors underline decoration-[#FCD34D]/40 underline-offset-2"
+          className="shrink-0 font-semibold text-[#FCD34D] hover:text-white transition-colors underline decoration-[#FCD34D]/40 underline-offset-2"
         >
-          Rückmeldung
+          {t('alpha.feedback')}
         </a>
       </div>
     </div>

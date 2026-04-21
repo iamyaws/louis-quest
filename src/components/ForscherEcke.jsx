@@ -4,6 +4,7 @@ import { useTask } from '../context/TaskContext';
 import { MINT_SEQUENCE } from '../data/mintGames';
 import FreundIntroModal from './FreundIntroModal';
 import SFX from '../utils/sfx';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * ForscherEcke — sequential MINT-game progression on the Hub.
@@ -31,6 +32,7 @@ import SFX from '../utils/sfx';
 
 export default function ForscherEcke({ onPlayGame }) {
   const { state, actions } = useTask();
+  const { t, lang } = useTranslation();
   const [lockedHint, setLockedHint] = useState(null);   // game.id flash
   const [introFor, setIntroFor] = useState(null);       // game object
 
@@ -102,13 +104,13 @@ export default function ForscherEcke({ onPlayGame }) {
       <div className="flex items-start justify-between gap-2 mb-5 relative" style={{ minHeight: 104 }}>
         <div className="flex-1 min-w-0 pt-1">
           <p className="font-bold text-[11px] font-label uppercase tracking-[0.22em] text-secondary mb-1.5">
-            Forscher-Ecke
+            {t('forscher.eyebrow')}
           </p>
           <h3 className="font-headline font-extrabold text-lg text-primary-container leading-tight">
-            Mit Dr. Funkel
+            {t('forscher.title')}
           </h3>
           <p className="font-body text-on-surface-variant text-sm mt-1">
-            {playedCount} von {MINT_SEQUENCE.length} entdeckt
+            {t('forscher.count', { done: playedCount, total: MINT_SEQUENCE.length })}
           </p>
         </div>
         {/* Dr. Funkel — 112px, leans slightly out of the card top-right.
@@ -118,7 +120,7 @@ export default function ForscherEcke({ onPlayGame }) {
         <div className="shrink-0 relative"
              style={{ width: 112, height: 112, marginTop: -18, marginRight: -8 }}>
           <img src={`${import.meta.env.BASE_URL}art/characters/doktor-funkel.png`}
-               alt="Dr. Funkel"
+               alt={t('forscher.drFunkelAlt')}
                className="w-full h-full object-contain select-none"
                draggable={false}
                style={{
@@ -146,6 +148,10 @@ export default function ForscherEcke({ onPlayGame }) {
         const idx = slots.findIndex(s => s.game.id === lockedHint);
         if (idx <= 0) return null; // position 0 is always unlocked; defensive
         const prev = slots[idx - 1].game;
+        // Split the "Finish {game} first" sentence on the {game} token so
+        // we can bold the game name without losing localization.
+        const tmpl = t('forscher.lockedHint', { game: '\uFFFF' });
+        const [pre, post] = tmpl.split('\uFFFF');
         return (
           <div
             className="mt-3 rounded-xl p-3 flex items-center gap-2"
@@ -153,7 +159,7 @@ export default function ForscherEcke({ onPlayGame }) {
           >
             <span className="material-symbols-outlined text-base" style={{ color: '#124346' }}>lock</span>
             <p className="font-body text-sm text-on-surface">
-              Schließe zuerst <b>{prev.name.de}</b> ab, dann geht's weiter.
+              {pre}<b>{prev.name[lang] || prev.name.de}</b>{post}
             </p>
           </div>
         );
@@ -180,10 +186,12 @@ export default function ForscherEcke({ onPlayGame }) {
 // The old "bald" state is gone because unimplemented games are filtered out
 // of MINT_SEQUENCE entirely.
 function SlotCard({ slot, isLockedHint, onTap }) {
+  const { t, lang } = useTranslation();
   const { game, status } = slot;
   const isLocked = status === 'locked';
   const isPlayed = status === 'played';
   const isNew = status === 'unlocked';
+  const gameName = game.name[lang] || game.name.de;
 
   // Palette matches the Hub's card aesthetic (cream + amber accents).
   // Played → emerald (natural success color, matches the anchor-rail full state).
@@ -199,7 +207,7 @@ function SlotCard({ slot, isLockedHint, onTap }) {
   return (
     <button
       onClick={onTap}
-      aria-label={isLocked ? 'Noch gesperrt' : game.name.de}
+      aria-label={isLocked ? t('forscher.slotLocked') : gameName}
       className="relative aspect-square rounded-2xl flex flex-col items-center justify-center p-1.5 active:scale-95 transition-transform"
       style={{
         background: bg,
@@ -231,7 +239,7 @@ function SlotCard({ slot, isLockedHint, onTap }) {
             className="font-label font-bold text-[9px] mt-1 leading-tight text-center px-0.5"
             style={{ color: '#047857' }}
           >
-            Bestanden
+            {t('forscher.slotPassed')}
           </span>
         </>
       ) : (
@@ -243,13 +251,13 @@ function SlotCard({ slot, isLockedHint, onTap }) {
             className="absolute -top-1 -right-1 px-1 py-0.5 rounded-full font-label font-bold text-[8px]"
             style={{ background: '#fcd34d', color: '#725b00', border: '1.5px solid white' }}
           >
-            NEU
+            {t('forscher.slotNew')}
           </span>
           <span
             className="font-label font-bold text-[9px] mt-1 leading-tight text-center px-0.5"
             style={{ color: '#1c1b1e' }}
           >
-            {game.name.de}
+            {gameName}
           </span>
         </>
       )}

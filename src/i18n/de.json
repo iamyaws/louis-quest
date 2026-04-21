@@ -1078,5 +1078,23 @@
   "celebrate.forscher.button": "Zu den Spielen",
 
   "game.forscher.section": "Deine Knobel-Abenteuer",
-  "game.forscher.replayHint": "Jederzeit spielbar"
+  "game.forscher.replayHint": "Jederzeit spielbar",
+
+  "forscher.eyebrow": "Forscher-Ecke",
+  "forscher.title": "Mit Dr. Funkel",
+  "forscher.count": "{done} von {total} entdeckt",
+  "forscher.drFunkelAlt": "Dr. Funkel",
+  "forscher.lockedHint": "Schließe zuerst {game} ab, dann geht's weiter.",
+  "forscher.slotLocked": "Noch gesperrt",
+  "forscher.slotPassed": "Bestanden",
+  "forscher.slotNew": "NEU",
+
+  "lang.toggle": "Sprache",
+  "lang.de": "Deutsch",
+  "lang.en": "Englisch",
+  "lang.switchTo": "Auf Englisch wechseln",
+
+  "alpha.label": "Alpha",
+  "alpha.body": "Frühe Version, Daten können sich ändern",
+  "alpha.feedback": "Rückmeldung"
 }

@@ -1074,5 +1074,23 @@
   "celebrate.forscher.button": "To the games",
 
   "game.forscher.section": "Your puzzle adventures",
-  "game.forscher.replayHint": "Replay anytime"
+  "game.forscher.replayHint": "Replay anytime",
+
+  "forscher.eyebrow": "Explorer's Corner",
+  "forscher.title": "With Dr. Funkel",
+  "forscher.count": "{done} of {total} found",
+  "forscher.drFunkelAlt": "Dr. Funkel",
+  "forscher.lockedHint": "Finish {game} first, then we'll continue.",
+  "forscher.slotLocked": "Still locked",
+  "forscher.slotPassed": "Passed",
+  "forscher.slotNew": "NEW",
+
+  "lang.toggle": "Language",
+  "lang.de": "German",
+  "lang.en": "English",
+  "lang.switchTo": "Switch to German",
+
+  "alpha.label": "Alpha",
+  "alpha.body": "Early version, data may change",
+  "alpha.feedback": "Feedback"
 }

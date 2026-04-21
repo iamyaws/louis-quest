@@ -8,7 +8,7 @@ import { advanceBeat, initialArcState } from '../arcs/ArcEngine';
 import { findArc } from '../arcs/arcs';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
-import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES } from '../constants';
+import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES, SCHOOL_QUESTS, VACATION_QUESTS, SIDE_QUESTS, FOOTBALL } from '../constants';
 import { SPECIAL_QUESTS } from '../data/specialQuests';
 import { MINT_SEQUENCE } from '../data/mintGames';
 import storage from '../utils/storage';
@@ -431,8 +431,20 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         : await storage.load()
       ) as (GameState & TaskState) | null;
       if (raw && raw.quests) {
+        // Drop quests whose id no longer exists in the source lists.
+        // This catches stale persisted quests after a quest is removed
+        // from constants.ts (e.g. s_water retired Apr 2026) — without
+        // this filter, the UI renders `quest.<id>` literal because the
+        // i18n key is also gone.
+        const KNOWN_QUEST_IDS = new Set([
+          ...SCHOOL_QUESTS.map(q => q.id),
+          ...VACATION_QUESTS.map(q => q.id),
+          ...SIDE_QUESTS.map(q => q.id),
+          FOOTBALL.id,
+        ]);
+        const cleanedQuests = (raw.quests as Quest[]).filter(q => KNOWN_QUEST_IDS.has(q.id));
         let s: TaskState = {
-          quests: raw.quests,
+          quests: cleanedQuests,
           sm: raw.sm || {},
           lastDate: raw.lastDate || '',
           vacMode: raw.vacMode || false,
