@@ -28,7 +28,11 @@ import ZahlenjagdGame from './components/ZahlenjagdGame';
 import MusterMemoryGame from './components/MusterMemoryGame';
 import WurzelLabyrinthGame from './components/WurzelLabyrinthGame';
 import PilzWaageGame from './components/PilzWaageGame';
-import KristallSortiererGame from './components/KristallSortiererGame';
+// KristallSortiererGame deprecated Apr 2026 — replaced by Kristall-Kette
+// (drag-a-line tactile loop, backlog_mint_crystal_game_rework pitches).
+// Import kept commented for rollback reference.
+// import KristallSortiererGame from './components/KristallSortiererGame';
+import KristallKetteGame from './components/KristallKetteGame';
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
@@ -293,7 +297,7 @@ function AppContent() {
         }} />
       )}
       {view === 'mint-game' && activeMintGame === 'kristall-sortierer' && (
-        <KristallSortiererGame onComplete={(reward) => {
+        <KristallKetteGame onComplete={(reward) => {
           if (reward?.hp > 0) actions.addHP(reward.hp);
           setActiveMintGame(null);
           setView('hub');

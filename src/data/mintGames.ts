@@ -100,16 +100,19 @@ export const MINT_GAMES: MintGame[] = [
     implemented: true,
   },
   {
-    // Position 5 — Wave 2.7. Color-sorting tap game. Unlocks on Pilz-Waage badge.
+    // Position 5 — Apr 2026 rework. The original Kristall-Sortierer (pure
+    // color-sort) tested boring; replaced with Kristall-Kette (drag-a-line
+    // tactile chain game where Ronki eats your chain and burps a matching
+    // fire-breath flavor). Same id + badge so existing saves stay valid.
     // Completion closes the Forscher-Ecke sequence → Hub graduates it.
     id: 'kristall-sortierer',
-    name: { de: 'Kristall-Sortierer', en: 'Crystal Sorter' },
-    emoji: '🔷',
+    name: { de: 'Kristall-Kette', en: 'Crystal Chain' },
+    emoji: '💎',
     badgeId: 'badge_mint_kristall',
     badgeLabel: { de: 'Kristall-Kenner', en: 'Crystal Expert' },
     hostId: 'forest_5', // Mr. Shroom
     unlockCheck: (s) => (s.mintBadgesEarned || []).includes('badge_mint_waage'),
-    introLine: 'Mein Hut ist voll Kristalle. Hilfst du mir beim Sortieren?',
+    introLine: 'Ich hab funkelnde Kristalle gefunden! Zieh eine Linie durch gleiche Farben.',
     implemented: true,
   },
 ];
