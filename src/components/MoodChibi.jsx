@@ -1,30 +1,70 @@
 import React from 'react';
+import { getVariant } from '../data/companionVariants';
 
 /**
- * MoodChibi — forward-facing chibi Ronki with mood-driven skins.
+ * MoodChibi — forward-facing chibi Ronki, variant-colored + mood-skinned.
  *
  * Reuses the SideRonki chibi construction from CampfireScene (pear-shaped
  * body + belly + two horns + eyes + small mouth + legs) but re-posed to
  * face the child. Used on the Ronki profile as the mood-window portrait.
  *
- * The "skin" is the whole composite — background circle, face
- * expression, particle overlays (rain / z / ember) — not just a tint.
- * On sad days Ronki's face droops and a single tear runs down his cheek
- * with rain falling behind him. On tired days eyes close and z particles
- * drift up. Normal days: bright eyes, soft ember puff, cream→amber bg.
+ * Three dimensions of variation:
+ *   · Variant  — one of six colorways (amber / teal / rose / violet /
+ *                forest / sunset). Drives body/belly/horn/leg gradients
+ *                + eye ink + cheek tint. Set once at onboarding; Louis
+ *                picks one egg and lives with that colorway forever.
+ *   · Mood     — 'normal' / 'sad' / 'tired'. Drives the background
+ *                circle (in non-bare mode), particle overlay, face
+ *                expression (mouth + eyes), tear. Applies a saturation
+ *                filter to desaturate the variant palette on bad days.
+ *   · Stage    — 0..3 evolution. 0 = egg (no limbs/face), 1 = baby
+ *                (proportions skewed toward the head), 2 = toddler
+ *                (baseline — current chibi), 3 = final (wings + tail
+ *                visible). Data-driven proportional tweaks on the same
+ *                primitive shapes; same CSS construction for all.
  *
- * Per Marc (Apr 2026): "I want to use the character that we have build
- * for the lager view also in the profile view just from a different
- * perspective (facing the child looking at him) as in the example.
- * that character than will have different moods that will effect the
- * characters profile picture."
+ * Per Marc (Apr 2026 + 23 Apr 2026): "use the character that we built
+ * for the lager view also in the profile view from a different
+ * perspective ... different moods that will effect the profile picture"
+ * + "create all of the different ronki versions a kid could see" +
+ * "how would evolutions look like if we created a 4-stage-evolution
+ * scenario for Ronki (hatching egg → baby → toddler → final)?"
  *
  * Props:
- *   size  — outer square pixel size (default 180)
- *   mood  — 'normal' | 'sad' | 'tired'
+ *   size     — outer square pixel size (default 180)
+ *   mood     — 'normal' | 'sad' | 'tired' (default 'normal')
+ *   bare     — if true, skips the outer circular bg + internal particles
+ *              so the chibi sits directly on the parent (e.g. mood header
+ *              card with card-scope particles)
+ *   variant  — one of CompanionVariantId (default 'amber'). Falls back to
+ *              'amber' if unknown.
+ *   stage    — 0 egg | 1 baby | 2 toddler/default | 3 final (default 2)
  */
-export default function MoodChibi({ size = 180, mood = 'normal', bare = false }) {
-  const palette = MOOD_SKINS[mood] || MOOD_SKINS.normal;
+export default function MoodChibi({
+  size = 180,
+  mood = 'normal',
+  bare = false,
+  variant = 'amber',
+  stage = 2,
+}) {
+  const moodSkin = MOOD_SKINS[mood] || MOOD_SKINS.normal;
+  const variantPalette = getVariant(variant).chibi;
+  // Variant provides the colorway; mood provides mouth + particles +
+  // tear + closedEyes + the bg circle. Sad/tired desaturate the whole
+  // chibi via a CSS filter so we don't duplicate palettes per mood.
+  const palette = {
+    ...variantPalette,
+    mouth: moodSkin.mouth,
+    particles: moodSkin.particles,
+    tear: moodSkin.tear,
+    closedEyes: moodSkin.closedEyes,
+    bgCircle: moodSkin.bgCircle,
+    bgInset: moodSkin.bgInset,
+  };
+  const chibiFilter =
+    mood === 'sad'   ? 'saturate(0.6) brightness(0.92)' :
+    mood === 'tired' ? 'saturate(0.5) brightness(0.88)' :
+    'none';
 
   // `bare` mode drops the outer circular background + inner particles
   // so the chibi sits DIRECTLY on its parent (e.g. the mood header
@@ -76,18 +116,36 @@ export default function MoodChibi({ size = 180, mood = 'normal', bare = false })
         }} />
       )}
 
-      {/* Ronki — absolutely centered, breathing (or swaying on sad/
-          tired days when bare, matching the reference tired-sway). */}
-      <div style={{
-        position: 'absolute', left: '50%', bottom: bare ? '5%' : '14%',
-        transform: 'translateX(-50%)',
-        width: `${size * 0.56}px`,
-        height: `${size * 0.6}px`,
-        animation: ronkiAnim,
-        transformOrigin: '50% 90%',
-      }}>
-        <Chibi palette={palette} />
-      </div>
+      {/* Stage 0 — egg. No face/limbs; the egg itself is the whole
+          figure. Small wobble to feel alive + optional crack as the
+          hatching signal. */}
+      {stage === 0 ? (
+        <div style={{
+          position: 'absolute', left: '50%', bottom: bare ? '5%' : '12%',
+          transform: 'translateX(-50%)',
+          width: `${size * 0.6}px`,
+          height: `${size * 0.72}px`,
+          animation: 'mc-egg-wobble 3.8s ease-in-out infinite',
+          transformOrigin: '50% 90%',
+          filter: chibiFilter,
+        }}>
+          <Egg palette={palette} />
+        </div>
+      ) : (
+        <div style={{
+          position: 'absolute', left: '50%', bottom: bare ? '5%' : '14%',
+          transform: 'translateX(-50%)',
+          // Stage scales the whole chibi: baby is smaller, final is
+          // bigger. Scale factor on both dimensions.
+          width: `${size * 0.56 * STAGE_SCALE[stage]}px`,
+          height: `${size * 0.6 * STAGE_SCALE[stage]}px`,
+          animation: ronkiAnim,
+          transformOrigin: '50% 90%',
+          filter: chibiFilter,
+        }}>
+          <Chibi palette={palette} stage={stage} />
+        </div>
+      )}
 
       <style>{`
         @keyframes mc-breathe {
@@ -134,38 +192,44 @@ export default function MoodChibi({ size = 180, mood = 'normal', bare = false })
           85%  { opacity: 0.55; }
           100% { transform: translateY(140%); opacity: 0; }
         }
+        @keyframes mc-egg-wobble {
+          0%,100% { transform: translateX(-50%) rotate(-3deg); }
+          25%     { transform: translateX(-50%) rotate(2deg); }
+          50%     { transform: translateX(-50%) rotate(-2deg); }
+          75%     { transform: translateX(-50%) rotate(3deg); }
+        }
+        @keyframes mc-egg-glow {
+          0%,100% { opacity: 0.4; transform: scale(0.95); }
+          50%     { opacity: 0.8; transform: scale(1.05); }
+        }
       `}</style>
     </div>
   );
 }
 
 // ── Skins ─────────────────────────────────────────────────────────────
-// Each skin is a plain config object — bg, body/belly/horn gradients,
-// mouth kind ('happy' | 'sad' | 'neutral'), particle overlay kind,
-// optional extras (closedEyes, tear).
+// Mood-specific overlay only (mouth, particles, tear, closed eyes, and
+// the bg-circle palette used when not in bare mode). Body/belly/horn/
+// leg colors come from the variant so each colorway renders its own
+// Ronki. Sad/tired also apply a CSS saturate filter at the parent
+// component level rather than a pre-desaturated palette — keeps this
+// table thin.
+
+// Stage scale factor — how much to scale the whole chibi relative to
+// the default toddler build. Baby is smaller (0.78), final is taller
+// (1.1). Egg uses its own Egg component, not the chibi.
+const STAGE_SCALE = { 0: 1, 1: 0.78, 2: 1, 3: 1.1 };
 
 const MOOD_SKINS = {
   normal: {
     bgCircle: 'radial-gradient(ellipse at 50% 30%, #fff3c8 0%, #fcd34d 45%, #f59e0b 90%)',
     bgInset: 'rgba(180,80,10,0.18)',
-    body: 'linear-gradient(175deg, #fed7aa 0%, #f97316 62%, #c2410c 100%)',
-    belly: '#fde0a8',
-    horn: 'linear-gradient(180deg, #fde68a, #f59e0b)',
-    leg: 'linear-gradient(180deg, #f97316, #9a3412)',
-    eyeInk: '#1a0e08',
-    cheek: 'rgba(255,105,105,0.45)',
     mouth: 'happy',
     particles: 'ember',
   },
   sad: {
     bgCircle: 'radial-gradient(ellipse at 50% 30%, #c8d6e4 0%, #8fa6c2 45%, #5a7396 90%)',
     bgInset: 'rgba(30,45,75,0.32)',
-    body: 'linear-gradient(175deg, #f3d2a8 0%, #d97842 62%, #934220 100%)',
-    belly: '#e8c48a',
-    horn: 'linear-gradient(180deg, #e8d5a0, #b88429)',
-    leg: 'linear-gradient(180deg, #c76a42, #7a2e18)',
-    eyeInk: '#1a0e08',
-    cheek: 'rgba(220,100,100,0.28)',
     mouth: 'sad',
     particles: 'rain',
     tear: true,
@@ -173,12 +237,6 @@ const MOOD_SKINS = {
   tired: {
     bgCircle: 'radial-gradient(ellipse at 50% 30%, #e2e8f0 0%, #94a3b8 45%, #475569 90%)',
     bgInset: 'rgba(30,41,59,0.32)',
-    body: 'linear-gradient(175deg, #f5d4ad 0%, #e68548 62%, #9a4c24 100%)',
-    belly: '#ecc996',
-    horn: 'linear-gradient(180deg, #ecd7a5, #b88a38)',
-    leg: 'linear-gradient(180deg, #d1724a, #7e361c)',
-    eyeInk: '#1a0e08',
-    cheek: 'rgba(180,120,120,0.35)',
     mouth: 'neutral',
     particles: 'zzz',
     closedEyes: true,
@@ -235,9 +293,60 @@ function Mouth({ kind }) {
 
 // ── Chibi body ────────────────────────────────────────────────────────
 
-function Chibi({ palette }) {
+function Chibi({ palette, stage = 2 }) {
+  // Stage-dependent tweaks. Baby (1) has bigger eyes and slightly shorter
+  // horns relative to body. Final (3) grows the horns + adds wings and
+  // a visible tail behind the torso. Toddler (2) is the current baseline.
+  const isBaby = stage === 1;
+  const isFinal = stage === 3;
   return (
     <>
+      {/* Stage 3 — wings behind the torso (drawn first so they sit
+          beneath the body). Small triangular flaps that breathe with
+          the body. */}
+      {isFinal && (
+        <>
+          <div style={{
+            position: 'absolute', top: '26%', left: '-10%',
+            width: '30%', height: '36%',
+            background: palette.body,
+            borderRadius: '70% 20% 60% 30% / 60% 20% 70% 40%',
+            transform: 'rotate(-22deg)',
+            opacity: 0.95,
+            zIndex: 1,
+            boxShadow: 'inset -4px -4px 0 rgba(0,0,0,0.15)',
+          }} />
+          <div style={{
+            position: 'absolute', top: '26%', right: '-10%',
+            width: '30%', height: '36%',
+            background: palette.body,
+            borderRadius: '20% 70% 30% 60% / 20% 60% 40% 70%',
+            transform: 'rotate(22deg)',
+            opacity: 0.95,
+            zIndex: 1,
+            boxShadow: 'inset 4px -4px 0 rgba(0,0,0,0.15)',
+          }} />
+
+          {/* Tail — long slim arc from behind-right, tip glowing */}
+          <div style={{
+            position: 'absolute', right: '-4%', bottom: '8%',
+            width: '32%', height: '14%',
+            background: palette.body,
+            borderRadius: '50% 80% 60% 70% / 60% 60% 50% 50%',
+            transform: 'rotate(-16deg)',
+            zIndex: 1,
+            boxShadow: 'inset 2px -3px 0 rgba(0,0,0,0.18)',
+          }}>
+            <span style={{
+              position: 'absolute', right: -4, top: -4,
+              width: 10, height: 10, borderRadius: '50%',
+              background: palette.horn,
+              boxShadow: `0 0 8px ${palette.cheek}`,
+            }} />
+          </div>
+        </>
+      )}
+
       {/* Torso — pear-shape with inset volume shadow */}
       <div style={{
         position: 'absolute', left: '5%', top: '18%',
@@ -258,25 +367,33 @@ function Chibi({ palette }) {
         zIndex: 4,
       }} />
 
-      {/* Horns — symmetric, pointing up and slightly outward */}
+      {/* Horns — symmetric, pointing up. Baby has tiny nubs; final has
+          longer curved horns; toddler (default) is in between. */}
       <div style={{
-        position: 'absolute', top: '6%', left: '24%',
-        width: '12%', height: '18%',
+        position: 'absolute',
+        top: isBaby ? '8%' : (isFinal ? '2%' : '6%'),
+        left: '24%',
+        width: isBaby ? '9%' : '12%',
+        height: isBaby ? '12%' : (isFinal ? '22%' : '18%'),
         background: palette.horn,
         borderRadius: '50% 50% 10% 10%',
-        transform: 'rotate(-12deg)',
+        transform: `rotate(${isFinal ? '-16deg' : '-12deg'})`,
         zIndex: 4,
       }} />
       <div style={{
-        position: 'absolute', top: '6%', right: '24%',
-        width: '12%', height: '18%',
+        position: 'absolute',
+        top: isBaby ? '8%' : (isFinal ? '2%' : '6%'),
+        right: '24%',
+        width: isBaby ? '9%' : '12%',
+        height: isBaby ? '12%' : (isFinal ? '22%' : '18%'),
         background: palette.horn,
         borderRadius: '50% 50% 10% 10%',
-        transform: 'rotate(12deg)',
+        transform: `rotate(${isFinal ? '16deg' : '12deg'})`,
         zIndex: 4,
       }} />
 
-      {/* Eyes — facing forward. Tired mood collapses them to closed slits. */}
+      {/* Eyes — facing forward. Tired mood collapses them to closed slits.
+          Baby gets oversized eyes (bigger head-to-feature ratio). */}
       {palette.closedEyes ? (
         <>
           <div style={{ position: 'absolute', top: '38%', left: '24%', width: '16%', height: '2.5px', background: palette.eyeInk, borderRadius: 2, zIndex: 5 }} />
@@ -284,8 +401,8 @@ function Chibi({ palette }) {
         </>
       ) : (
         <>
-          <Eye side="left" eyeInk={palette.eyeInk} />
-          <Eye side="right" eyeInk={palette.eyeInk} />
+          <Eye side="left" eyeInk={palette.eyeInk} big={isBaby} />
+          <Eye side="right" eyeInk={palette.eyeInk} big={isBaby} />
         </>
       )}
 
@@ -345,15 +462,17 @@ function Chibi({ palette }) {
   );
 }
 
-function Eye({ side, eyeInk }) {
-  const posStyle = side === 'left' ? { left: '24%' } : { right: '24%' };
+function Eye({ side, eyeInk, big = false }) {
+  const posStyle = side === 'left'
+    ? { left: big ? '22%' : '24%' }
+    : { right: big ? '22%' : '24%' };
   return (
     <div style={{
       position: 'absolute',
-      top: '32%',
+      top: big ? '30%' : '32%',
       ...posStyle,
-      width: '14%',
-      height: '16%',
+      width: big ? '18%' : '14%',
+      height: big ? '21%' : '16%',
       borderRadius: '50%',
       background: '#fff',
       boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.18)',
@@ -376,6 +495,71 @@ function Eye({ side, eyeInk }) {
         }} />
       </div>
     </div>
+  );
+}
+
+// ── Egg — stage 0 ─────────────────────────────────────────────────────
+// Variant gradient in an egg silhouette. One diagonal crack line hints
+// at hatching; a soft pulsing glow suggests "something's alive in
+// there." No face, no limbs — those arrive at stage 1 (baby).
+
+function Egg({ palette }) {
+  return (
+    <>
+      {/* Glow behind the egg — rhythmic pulse */}
+      <div aria-hidden="true" style={{
+        position: 'absolute', inset: '-8%',
+        borderRadius: '50%',
+        background: `radial-gradient(circle, ${palette.cheek} 0%, transparent 65%)`,
+        filter: 'blur(10px)',
+        animation: 'mc-egg-glow 2.6s ease-in-out infinite',
+      }} />
+      {/* Egg body */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: palette.body,
+        borderRadius: '50% 50% 45% 45% / 62% 62% 38% 38%',
+        boxShadow: 'inset -8px -12px 0 rgba(0,0,0,0.18), inset 6px 6px 0 rgba(255,255,255,0.28), 0 8px 18px -6px rgba(0,0,0,0.3)',
+        zIndex: 2,
+      }}>
+        {/* Hatching crack — diagonal darker line across mid-body */}
+        <span style={{
+          position: 'absolute',
+          top: '42%', left: '22%',
+          width: '56%', height: '3px',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.55) 70%, transparent 100%)',
+          borderRadius: 3,
+          transform: 'rotate(-8deg)',
+          zIndex: 3,
+        }} />
+        {/* Secondary smaller crack, offset, gives the egg "texture" */}
+        <span style={{
+          position: 'absolute',
+          top: '58%', left: '35%',
+          width: '28%', height: '2px',
+          background: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.35), transparent)',
+          borderRadius: 2,
+          transform: 'rotate(6deg)',
+          zIndex: 3,
+        }} />
+        {/* Subtle spots for speckled-egg feel */}
+        <span style={{
+          position: 'absolute', top: '20%', left: '30%',
+          width: '6%', height: '6%', borderRadius: '50%',
+          background: 'rgba(0,0,0,0.18)', zIndex: 3,
+        }} />
+        <span style={{
+          position: 'absolute', top: '30%', right: '26%',
+          width: '4%', height: '4%', borderRadius: '50%',
+          background: 'rgba(0,0,0,0.22)', zIndex: 3,
+        }} />
+        <span style={{
+          position: 'absolute', bottom: '26%', right: '30%',
+          width: '5%', height: '5%', borderRadius: '50%',
+          background: 'rgba(0,0,0,0.15)', zIndex: 3,
+        }} />
+      </div>
+    </>
   );
 }
 

@@ -33,6 +33,27 @@ export interface CompanionVariant {
   /** Path (relative to BASE_URL) to the companion sprite. Placeholder shared
    *  across all variants right now. */
   spritePath: string;
+  /** CSS chibi palette — drives MoodChibi body/belly/horn/leg colors so
+   *  each variant renders as its own colorway in the CSS character. Mood
+   *  skins (sad/tired overlays) apply on top; variant is the base palette.
+   *  Added Apr 2026 when Marc asked for all egg colorways to render
+   *  consistently in the Ronki profile. */
+  chibi: ChibiPalette;
+}
+
+export interface ChibiPalette {
+  /** 175deg linear-gradient for the torso shape (light → mid → dark). */
+  body: string;
+  /** Belly panel — single color, a lighter cream-tinted shade of the mid. */
+  belly: string;
+  /** Horn gradient — typically gold-ish; can tint per variant. */
+  horn: string;
+  /** Leg gradient — darker version of body for grounded look. */
+  leg: string;
+  /** Eye ink — near-black; slight per-variant tint OK for warm/cool feel. */
+  eyeInk: string;
+  /** Cheek blush — rgba() for subtle color bath on the cheeks. */
+  cheek: string;
 }
 
 export const COMPANION_VARIANTS: CompanionVariant[] = [
@@ -44,6 +65,14 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     glowColor: 'rgba(245,158,11,0.35)',
     borderColor: '#f59e0b',
     spritePath: 'art/companion/dragon-young.webp',
+    chibi: {
+      body: 'linear-gradient(175deg, #fed7aa 0%, #f97316 62%, #c2410c 100%)',
+      belly: '#fde0a8',
+      horn: 'linear-gradient(180deg, #fde68a, #f59e0b)',
+      leg: 'linear-gradient(180deg, #f97316, #9a3412)',
+      eyeInk: '#1a0e08',
+      cheek: 'rgba(255,105,105,0.45)',
+    },
   },
   {
     id: 'teal',
@@ -53,6 +82,14 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     glowColor: 'rgba(20,184,166,0.35)',
     borderColor: '#14b8a6',
     spritePath: 'art/companion/dragon-young.webp',
+    chibi: {
+      body: 'linear-gradient(175deg, #99f6e4 0%, #14b8a6 62%, #0f766e 100%)',
+      belly: '#ccfbf1',
+      horn: 'linear-gradient(180deg, #5eead4, #14b8a6)',
+      leg: 'linear-gradient(180deg, #14b8a6, #134e4a)',
+      eyeInk: '#0a2025',
+      cheek: 'rgba(253,164,175,0.5)',
+    },
   },
   {
     id: 'rose',
@@ -62,6 +99,14 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     glowColor: 'rgba(244,114,182,0.35)',
     borderColor: '#fb7185',
     spritePath: 'art/companion/dragon-young.webp',
+    chibi: {
+      body: 'linear-gradient(175deg, #fecdd3 0%, #fb7185 62%, #be123c 100%)',
+      belly: '#ffe4e6',
+      horn: 'linear-gradient(180deg, #fda4af, #fb7185)',
+      leg: 'linear-gradient(180deg, #fb7185, #881337)',
+      eyeInk: '#1f0510',
+      cheek: 'rgba(244,114,182,0.55)',
+    },
   },
   {
     id: 'violet',
@@ -71,6 +116,14 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     glowColor: 'rgba(139,92,246,0.35)',
     borderColor: '#8b5cf6',
     spritePath: 'art/companion/dragon-young.webp',
+    chibi: {
+      body: 'linear-gradient(175deg, #ddd6fe 0%, #8b5cf6 62%, #5b21b6 100%)',
+      belly: '#ede9fe',
+      horn: 'linear-gradient(180deg, #c4b5fd, #8b5cf6)',
+      leg: 'linear-gradient(180deg, #8b5cf6, #4c1d95)',
+      eyeInk: '#140828',
+      cheek: 'rgba(236,72,153,0.42)',
+    },
   },
   {
     id: 'forest',
@@ -80,6 +133,14 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     glowColor: 'rgba(34,197,94,0.35)',
     borderColor: '#22c55e',
     spritePath: 'art/companion/dragon-young.webp',
+    chibi: {
+      body: 'linear-gradient(175deg, #86efac 0%, #22c55e 62%, #15803d 100%)',
+      belly: '#d1fae5',
+      horn: 'linear-gradient(180deg, #bbf7d0, #22c55e)',
+      leg: 'linear-gradient(180deg, #22c55e, #14532d)',
+      eyeInk: '#041a0a',
+      cheek: 'rgba(251,146,60,0.45)',
+    },
   },
   {
     id: 'sunset',
@@ -89,6 +150,14 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     glowColor: 'rgba(236,72,153,0.35)',
     borderColor: '#ec4899',
     spritePath: 'art/companion/dragon-young.webp',
+    chibi: {
+      body: 'linear-gradient(175deg, #fed7aa 0%, #f472b6 55%, #c026d3 100%)',
+      belly: '#fce7f3',
+      horn: 'linear-gradient(180deg, #fed7aa, #f472b6)',
+      leg: 'linear-gradient(180deg, #f472b6, #9d174d)',
+      eyeInk: '#2a0514',
+      cheek: 'rgba(249,168,212,0.55)',
+    },
   },
 ];
 

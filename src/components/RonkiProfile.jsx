@@ -196,6 +196,18 @@ export default function RonkiProfile({ onNavigate }) {
       patch.ronkiSkillPractice = { boxAtmung: n };
       patch.ronkiLearnedSkills = n >= 5 ? ['boxAtmung'] : [];
     }
+    // ?variant=amber|teal|rose|violet|forest|sunset — preview each
+    // colorway. ?stage=0..3 — preview evolution stage. Both apply to
+    // the profile mood chibi + the Begleiter icon; persist into state
+    // so Louis sees the chosen combo until reset.
+    const variantParam = params.get('variant');
+    if (/^(amber|teal|rose|violet|forest|sunset)$/.test(variantParam || '')) {
+      patch.companionVariant = variantParam;
+    }
+    const stageParam = params.get('stage');
+    if (stageParam && /^[0-3]$/.test(stageParam)) {
+      patch.catEvo = [0, 3, 9, 18][parseInt(stageParam, 10)];
+    }
     if (Object.keys(patch).length > 0) actions.patchState?.(patch);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -332,7 +344,10 @@ export default function RonkiProfile({ onNavigate }) {
           <section
                className="relative overflow-hidden"
                style={{
-                 display: 'flex', alignItems: 'center', gap: 16,
+                 display: 'grid',
+                 gridTemplateColumns: '2fr 1fr',
+                 alignItems: 'center',
+                 gap: 20,
                  padding: '20px',
                  borderRadius: 20,
                  background: ronkiMood === 'sad'
@@ -418,10 +433,12 @@ export default function RonkiProfile({ onNavigate }) {
               </div>
             )}
 
-            <div style={{ flexShrink: 0, zIndex: 2 }}>
-              <MoodChibi size={110} mood={ronkiMood} bare />
+            <div style={{ zIndex: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <MoodChibi size={180} mood={ronkiMood} bare
+                         variant={state.companionVariant}
+                         stage={Math.min(3, stage)} />
             </div>
-            <div className="flex-1 min-w-0" style={{ position: 'relative', zIndex: 2 }}>
+            <div className="min-w-0" style={{ position: 'relative', zIndex: 2 }}>
               <p className="font-label font-bold"
                  style={{ fontSize: 10, lineHeight: 1, letterSpacing: '0.2em', textTransform: 'uppercase',
                           color: ronkiMood === 'sad' || ronkiMood === 'tired' ? 'rgba(30,42,54,0.65)' : MOOD_CARD_INK.normal,
