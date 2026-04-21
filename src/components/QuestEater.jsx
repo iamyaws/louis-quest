@@ -56,7 +56,7 @@ export function QuestEaterProvider({ children }) {
   const getActiveRonki = () => preferredRef.current || fallbackRef.current;
   const getActiveSlot = () => (preferredRef.current ? 'preferred' : 'fallback');
 
-  const eatQuest = useCallback(({ fromRect, fromEl, emoji, hp = 0 }) => {
+  const eatQuest = useCallback(({ fromRect, emoji, hp = 0 }) => {
     const target = getActiveRonki();
     if (!fromRect || !target) {
       // No Ronki mounted or no source rect — skip silently. The normal
@@ -73,14 +73,10 @@ export function QuestEaterProvider({ children }) {
     const isOffScreen = ronkiRect.bottom < 0 || ronkiRect.top > vh;
 
     const start = () => {
-      // Re-measure BOTH ends after any scroll settles. The source
-      // element's viewport position also moved during scrollIntoView —
-      // using the pre-scroll fromRect would spawn the flyer at stale
-      // coordinates (sometimes off-screen).
+      // Re-measure after any scroll settles.
       const toRect = target.getBoundingClientRect();
-      const freshFromRect = fromEl?.getBoundingClientRect?.() || fromRect;
       const id = Date.now() + Math.random();
-      setFlyer({ id, emoji, fromRect: freshFromRect, toRect, phase: 'start' });
+      setFlyer({ id, emoji, fromRect, toRect, phase: 'start' });
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setFlyer(prev => (prev && prev.id === id ? { ...prev, phase: 'flying' } : prev));
