@@ -194,6 +194,15 @@ export default function NavBar({ active = 'quests', onNavigate }) {
             // user inside a tab they can't reopen by tapping it.
             const locked = !unlocked && !isActive;
             const label = t(tab.key);
+            // Sparkle pulse on tabs that have unlocked but whose coachmark
+            // hasn't been dismissed yet — draws the eye to the new surface
+            // until the kid actually opens it. Hub + Quests are never
+            // "new" so skip them. Dropped once coachmark is marked seen.
+            const hasCoachmark = tab.id === 'ronki' || tab.id === 'journal' || tab.id === 'shop';
+            const isFreshUnlock = hasCoachmark
+              && unlocked
+              && !isActive
+              && !(state?.tabCoachmarksSeen || {})[tab.id];
             return (
               <button
                 key={tab.id}
@@ -222,6 +231,10 @@ export default function NavBar({ active = 'quests', onNavigate }) {
                         minWidth: 52,
                         color: locked ? 'rgba(107,101,91,0.38)' : '#6b655b',
                         opacity: locked ? 0.55 : 1,
+                        borderRadius: isFreshUnlock ? 14 : undefined,
+                        animation: isFreshUnlock
+                          ? 'navTabUnlockPulse 1.8s ease-in-out infinite'
+                          : undefined,
                       }
                 }
               >
@@ -240,6 +253,31 @@ export default function NavBar({ active = 'quests', onNavigate }) {
                 >
                   {label}
                 </span>
+                {/* Sparkle accents on freshly-unlocked tabs — three tiny
+                     stars in gold that fade in/out on the unlock pulse.
+                     Hidden once the coachmark is dismissed. */}
+                {isFreshUnlock && (
+                  <>
+                    <span aria-hidden="true" style={{
+                      position: 'absolute', top: 2, right: 8, width: 4, height: 4,
+                      borderRadius: '50%', background: '#fcd34d',
+                      boxShadow: '0 0 6px 2px rgba(252,211,77,0.8)',
+                      animation: 'navTabUnlockSparkle 1.6s ease-in-out 0.2s infinite',
+                    }} />
+                    <span aria-hidden="true" style={{
+                      position: 'absolute', top: 18, left: 6, width: 3, height: 3,
+                      borderRadius: '50%', background: '#fde68a',
+                      boxShadow: '0 0 5px 1.5px rgba(253,230,138,0.7)',
+                      animation: 'navTabUnlockSparkle 1.8s ease-in-out 0.8s infinite',
+                    }} />
+                    <span aria-hidden="true" style={{
+                      position: 'absolute', bottom: 10, right: 4, width: 3, height: 3,
+                      borderRadius: '50%', background: '#f59e0b',
+                      boxShadow: '0 0 5px 1.5px rgba(245,158,11,0.7)',
+                      animation: 'navTabUnlockSparkle 2.1s ease-in-out 1.1s infinite',
+                    }} />
+                  </>
+                )}
                 {/* Padlock badge on locked tabs — tiny, bottom-right of the icon */}
                 {locked && (
                   <span
@@ -268,8 +306,17 @@ export default function NavBar({ active = 'quests', onNavigate }) {
 
       <style>{`
         @keyframes navLockHintIn {
-          from { opacity: 0; transform: translate(-50%, 6px); }
-          to   { opacity: 1; transform: translate(-50%, 0); }
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes navTabUnlockPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(252,211,77,0); }
+          50%      { box-shadow: 0 0 0 4px rgba(252,211,77,0.35), 0 0 16px 4px rgba(252,211,77,0.45); }
+        }
+        @keyframes navTabUnlockSparkle {
+          0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+          50%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
         }
       `}</style>
     </>

@@ -254,6 +254,30 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const showRonkiVoiceHint = hintPlacement === 'ronki' && ronkiLocked;
   const baseQuip = pickQuip(_h, quipRollKey);
   const currentQuip = showRonkiVoiceHint ? t('unlockHint.ronki.voice') : baseQuip;
+
+  // Tagebuch + Laden unlock hints (always-on on the relevant Hub cards
+  // when those tabs are locked; Marc Apr 2026: "showcase it on the
+  // Stimmungs-card"). Hint copy adapts to what's missing, so a kid who
+  // logged mood but hasn't finished 3 tasks sees a different nudge than
+  // a kid at 4 tasks who still hasn't logged mood.
+  const tasksDone = state.totalTasksDone || 0;
+  const moodLogged = state.moodAM != null || state.moodPM != null;
+  const journalTasksRemaining = Math.max(0, 3 - tasksDone);
+  const journalLocked = !(tasksDone >= 3 && moodLogged);
+  let journalUnlockHint = null;
+  if (journalLocked) {
+    if (!moodLogged && journalTasksRemaining > 0) {
+      journalUnlockHint = t('unlockHint.journal.needMood', { tasks: journalTasksRemaining });
+    } else if (!moodLogged) {
+      journalUnlockHint = t('unlockHint.journal.needMoodOnly');
+    } else if (journalTasksRemaining > 0) {
+      journalUnlockHint = t('unlockHint.journal.needTasks', { tasks: journalTasksRemaining });
+    }
+  }
+  const shopLocked = (state.hp || 0) < 50;
+  const shopUnlockHint = shopLocked
+    ? t('unlockHint.shop.progress', { current: state.hp || 0 })
+    : null;
   const skyFile = SKY_IMAGES[
     _h >= 6  && _h < 10 ? 'dawn' :
     _h >= 10 && _h < 17 ? 'midday' :
@@ -747,6 +771,27 @@ export default function Hub({ onNavigate, onPlayMint }) {
           );
         })())}
 
+        {/* Tagebuch unlock hint — quiet gold caption under the Stimmung
+             card. Copy adapts based on what the kid still needs (log mood
+             / finish more tasks / both). Only shows while Tagebuch is
+             locked AND the Stimmung card itself is revealed. */}
+        {reveal(1) && journalUnlockHint && (
+          <div
+            className="-mt-2 self-center px-3 py-1.5 rounded-full"
+            style={{
+              background: 'rgba(252,211,77,0.16)',
+              border: '1px solid rgba(180,83,9,0.22)',
+            }}
+          >
+            <span
+              className="font-label font-bold uppercase text-center"
+              style={{ fontSize: 10, letterSpacing: '0.08em', color: '#b45309' }}
+            >
+              {journalUnlockHint}
+            </span>
+          </div>
+        )}
+
         {/* ── Wasser pill — baseline care, now paired with Mood above.
                Daily-required tracker. Together Stimmung + Wasser form the
                "body care" bookend on the Hub (Marc's reorder Apr 2026).
@@ -787,6 +832,29 @@ export default function Hub({ onNavigate, onPlayMint }) {
                 style={{ color: '#6b655b', minWidth: 30 }}>
             {(state.dailyWaterCount || 0)}/6
           </span>
+          </div>
+        )}
+
+        {/* Laden unlock hint — shows current Sterne progress toward the
+             50-star shop unlock. Gated on reveal(1) (first task done) so
+             fresh-install screen 0 stays quiet, but from task 1 onwards
+             Louis sees his Sterne count ticking toward the shop opening.
+             Rides just above the Wasser pill (or in its slot when Wasser
+             is still gated). */}
+        {reveal(1) && shopUnlockHint && (
+          <div
+            className="-mt-2 self-center px-3 py-1.5 rounded-full"
+            style={{
+              background: 'rgba(252,211,77,0.16)',
+              border: '1px solid rgba(180,83,9,0.22)',
+            }}
+          >
+            <span
+              className="font-label font-bold uppercase text-center"
+              style={{ fontSize: 10, letterSpacing: '0.08em', color: '#b45309' }}
+            >
+              {shopUnlockHint}
+            </span>
           </div>
         )}
 

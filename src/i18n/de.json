@@ -1113,5 +1113,9 @@
   "nav.coach.close": "Alles klar",
 
   "unlockHint.ronki.heute": "🔓 Erste Aufgabe — dann öffnet sich Ronki",
-  "unlockHint.ronki.voice": "Mach deine erste Aufgabe — dann wach ich auf!"
+  "unlockHint.ronki.voice": "Mach deine erste Aufgabe — dann wach ich auf!",
+  "unlockHint.journal.needMood": "🔓 Stimmung + {tasks} Aufgaben — öffnet Tagebuch",
+  "unlockHint.journal.needMoodOnly": "🔓 Log deine Stimmung — öffnet Tagebuch",
+  "unlockHint.journal.needTasks": "🔓 Noch {tasks} Aufgaben — öffnet Tagebuch",
+  "unlockHint.shop.progress": "🔓 {current}/50 Sterne — öffnet Laden"
 }

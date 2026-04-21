@@ -1109,5 +1109,9 @@
   "nav.coach.close": "Got it",
 
   "unlockHint.ronki.heute": "🔓 First task — then Ronki opens",
-  "unlockHint.ronki.voice": "Finish your first task — then I'll wake up!"
+  "unlockHint.ronki.voice": "Finish your first task — then I'll wake up!",
+  "unlockHint.journal.needMood": "🔓 Mood + {tasks} tasks — opens Journal",
+  "unlockHint.journal.needMoodOnly": "🔓 Log your mood — opens Journal",
+  "unlockHint.journal.needTasks": "🔓 {tasks} more tasks — opens Journal",
+  "unlockHint.shop.progress": "🔓 {current}/50 stars — opens Shop"
 }
