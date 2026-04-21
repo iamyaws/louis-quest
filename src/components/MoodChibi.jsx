@@ -257,6 +257,28 @@ export default function MoodChibi({
           0%, 100% { opacity: 0; }
           40%, 60% { opacity: 0.7; }
         }
+        /* Legend + Teen crown effects */
+        @keyframes mc-horn-tip {
+          0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(0.9); }
+          50%      { opacity: 1;   transform: translateX(-50%) scale(1.2); }
+        }
+        @keyframes mc-legend-rays {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to   { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes mc-legend-pulse {
+          0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(0.94); }
+          50%      { opacity: 0.9;  transform: translate(-50%, -50%) scale(1.08); }
+        }
+        @keyframes mc-legend-crystal {
+          0%, 100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.9)) brightness(1); }
+          50%      { filter: drop-shadow(0 0 10px rgba(255,255,255,1)) brightness(1.4); }
+        }
+        /* Egg hatch-beam — soft column of golden light escaping the crack */
+        @keyframes mc-egg-beam {
+          0%, 100% { opacity: 0.35; transform: translateX(-50%) scaleY(0.85); }
+          50%      { opacity: 0.75; transform: translateX(-50%) scaleY(1.05); }
+        }
       `}</style>
     </div>
   );
@@ -436,45 +458,126 @@ function Chibi({ palette, stage = 2, face = false }) {
   const wingRot = 22 + (stage - 3) * 4;
   return (
     <>
-      {/* Legendary aura — faint halo behind stage-5 Ronki */}
-      {hasAura && (
+      {/* Teen aura — pre-Legend glow, less dramatic than Legend's rays
+          but more than the plain stage-3 chibi. */}
+      {isTeen && (
         <div style={{
           position: 'absolute', left: '50%', top: '50%',
           transform: 'translate(-50%, -50%)',
-          width: '140%', height: '140%',
+          width: '130%', height: '130%',
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${palette.cheek || '#fcd34d'}55 0%, transparent 60%)`,
-          filter: 'blur(6px)',
+          background: `radial-gradient(circle, ${palette.cheek || '#fcd34d'}40 0%, transparent 65%)`,
+          filter: 'blur(8px)',
           zIndex: 0,
           pointerEvents: 'none',
         }} />
       )}
 
+      {/* Legendary aura — pulsing starburst of light rays behind the
+          chibi, rotating slowly, with a bright radial halo underneath
+          for depth. All CSS — no new assets. */}
+      {hasAura && (
+        <>
+          {/* Rotating starburst rays — drawn as a repeating conic wedge */}
+          <div aria-hidden="true" style={{
+            position: 'absolute', left: '50%', top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '170%', height: '170%',
+            borderRadius: '50%',
+            background: `conic-gradient(from 0deg,
+              ${palette.cheek || '#fcd34d'}00 0deg,
+              ${palette.cheek || '#fcd34d'}55 8deg,
+              ${palette.cheek || '#fcd34d'}00 18deg,
+              ${palette.cheek || '#fcd34d'}00 44deg,
+              ${palette.cheek || '#fcd34d'}66 52deg,
+              ${palette.cheek || '#fcd34d'}00 62deg,
+              ${palette.cheek || '#fcd34d'}00 88deg,
+              ${palette.cheek || '#fcd34d'}55 96deg,
+              ${palette.cheek || '#fcd34d'}00 106deg,
+              ${palette.cheek || '#fcd34d'}00 132deg,
+              ${palette.cheek || '#fcd34d'}66 140deg,
+              ${palette.cheek || '#fcd34d'}00 150deg,
+              ${palette.cheek || '#fcd34d'}00 176deg,
+              ${palette.cheek || '#fcd34d'}55 184deg,
+              ${palette.cheek || '#fcd34d'}00 194deg,
+              ${palette.cheek || '#fcd34d'}00 220deg,
+              ${palette.cheek || '#fcd34d'}66 228deg,
+              ${palette.cheek || '#fcd34d'}00 238deg,
+              ${palette.cheek || '#fcd34d'}00 264deg,
+              ${palette.cheek || '#fcd34d'}55 272deg,
+              ${palette.cheek || '#fcd34d'}00 282deg,
+              ${palette.cheek || '#fcd34d'}00 308deg,
+              ${palette.cheek || '#fcd34d'}66 316deg,
+              ${palette.cheek || '#fcd34d'}00 326deg,
+              ${palette.cheek || '#fcd34d'}00 352deg,
+              ${palette.cheek || '#fcd34d'}55 360deg)`,
+            opacity: 0.5,
+            filter: 'blur(2px)',
+            animation: 'mc-legend-rays 14s linear infinite',
+            zIndex: 0,
+            pointerEvents: 'none',
+          }} />
+          {/* Inner radial halo — warm core glow */}
+          <div aria-hidden="true" style={{
+            position: 'absolute', left: '50%', top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '150%', height: '150%',
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${palette.cheek || '#fcd34d'}70 0%, ${palette.cheek || '#fcd34d'}22 40%, transparent 70%)`,
+            filter: 'blur(10px)',
+            animation: 'mc-legend-pulse 3s ease-in-out infinite',
+            zIndex: 0,
+            pointerEvents: 'none',
+          }} />
+          {/* Chest crystal — a small glowing gem on the torso centerline */}
+          <div aria-hidden="true" style={{
+            position: 'absolute',
+            left: '50%', top: '44%',
+            transform: 'translateX(-50%) rotate(45deg)',
+            width: '8%', height: '8%',
+            background: `linear-gradient(135deg, #fff, ${palette.cheek || '#fcd34d'})`,
+            boxShadow: `0 0 12px ${palette.cheek || '#fcd34d'}, 0 0 4px #fff`,
+            zIndex: 5,
+            animation: 'mc-legend-crystal 2.4s ease-in-out infinite',
+          }} />
+        </>
+      )}
+
       {/* Wings — scaled per stage (0 = hidden). Drawn first so they sit
-          beneath the torso. */}
+          beneath the torso. Teen/Legend get membrane veining (darker
+          radial) + gold glow halo on Legend, making big wings read as
+          dragon-grade instead of soft pillow-flaps. */}
       {wingScale > 0 && (
         <>
           <div style={{
             position: 'absolute', top: `${28 - stage * 0.8}%`,
             left: `${-wingW * 0.35}%`,
             width: `${wingW}%`, height: `${wingH}%`,
-            background: palette.body,
+            background: stage >= 4
+              ? `radial-gradient(ellipse at 90% 50%, ${palette.body} 0%, ${palette.body} 60%, rgba(0,0,0,0.22) 100%)`
+              : palette.body,
             borderRadius: '70% 20% 60% 30% / 60% 20% 70% 40%',
             transform: `rotate(-${wingRot}deg)`,
             opacity: 0.95,
             zIndex: 1,
-            boxShadow: 'inset -4px -4px 0 rgba(0,0,0,0.15)',
+            boxShadow: stage >= 5
+              ? `inset -4px -4px 0 rgba(0,0,0,0.18), 0 0 14px ${palette.cheek || '#fcd34d'}88`
+              : 'inset -4px -4px 0 rgba(0,0,0,0.15)',
           }} />
           <div style={{
             position: 'absolute', top: `${28 - stage * 0.8}%`,
             right: `${-wingW * 0.35}%`,
             width: `${wingW}%`, height: `${wingH}%`,
-            background: palette.body,
+            background: stage >= 4
+              ? `radial-gradient(ellipse at 10% 50%, ${palette.body} 0%, ${palette.body} 60%, rgba(0,0,0,0.22) 100%)`
+              : palette.body,
             borderRadius: '20% 70% 30% 60% / 20% 60% 40% 70%',
             transform: `rotate(${wingRot}deg)`,
             opacity: 0.95,
             zIndex: 1,
-            boxShadow: 'inset 4px -4px 0 rgba(0,0,0,0.15)',
+            boxShadow: stage >= 5
+              ? `inset 4px -4px 0 rgba(0,0,0,0.18), 0 0 14px ${palette.cheek || '#fcd34d'}88`
+              : 'inset 4px -4px 0 rgba(0,0,0,0.15)',
           }} />
         </>
       )}
@@ -520,30 +623,96 @@ function Chibi({ palette, stage = 2, face = false }) {
         zIndex: 4,
       }} />
 
-      {/* Horns — symmetric, pointing up. Baby has tiny nubs; final has
-          longer curved horns; toddler (default) is in between. */}
-      <div style={{
-        position: 'absolute',
-        top: isBaby ? '8%' : (isFinal ? '2%' : '6%'),
-        left: '24%',
-        width: isBaby ? '9%' : '12%',
-        height: isBaby ? '12%' : (isFinal ? '22%' : '18%'),
-        background: palette.horn,
-        borderRadius: '50% 50% 10% 10%',
-        transform: `rotate(${isFinal ? '-16deg' : '-12deg'})`,
-        zIndex: 4,
-      }} />
-      <div style={{
-        position: 'absolute',
-        top: isBaby ? '8%' : (isFinal ? '2%' : '6%'),
-        right: '24%',
-        width: isBaby ? '9%' : '12%',
-        height: isBaby ? '12%' : (isFinal ? '22%' : '18%'),
-        background: palette.horn,
-        borderRadius: '50% 50% 10% 10%',
-        transform: `rotate(${isFinal ? '16deg' : '12deg'})`,
-        zIndex: 4,
-      }} />
+      {/* Horns — symmetric, pointing up. Baby has tiny nubs; Final curves
+          a bit; Teen grows taller; Legend gets crown-style dual spikes
+          with a bright glowing tip. */}
+      {(() => {
+        // Horn metrics per stage
+        const hornTop = isBaby ? '8%' : isLegend ? '-2%' : isTeen ? '0%' : isFinal ? '2%' : '6%';
+        const hornW =
+          isLegend ? '14%' : isTeen ? '13%' : isBaby ? '9%' : '12%';
+        const hornH =
+          isLegend ? '28%' : isTeen ? '24%' : isBaby ? '12%' : isFinal ? '22%' : '18%';
+        const rotL = isLegend ? -20 : isTeen ? -18 : isFinal ? -16 : -12;
+        const rotR = -rotL;
+        // Legend horns get a richer gradient (crown jewel feel)
+        const hornBg = isLegend
+          ? `linear-gradient(180deg, ${palette.horn} 0%, ${palette.body} 100%)`
+          : palette.horn;
+        // Crown tip glow for Teen + Legend — small radial at the pointed end
+        const showTipGlow = isTeen || isLegend;
+        return (
+          <>
+            <div style={{
+              position: 'absolute',
+              top: hornTop, left: '24%',
+              width: hornW, height: hornH,
+              background: hornBg,
+              borderRadius: '50% 50% 10% 10%',
+              transform: `rotate(${rotL}deg)`,
+              boxShadow: isLegend ? `inset 0 2px 4px rgba(255,255,255,0.45), inset 0 -2px 2px rgba(0,0,0,0.25)` : undefined,
+              zIndex: 4,
+            }}>
+              {showTipGlow && (
+                <span aria-hidden="true" style={{
+                  position: 'absolute', top: '-6px', left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '14px', height: '14px',
+                  borderRadius: '50%',
+                  background: `radial-gradient(circle, ${palette.cheek || '#fcd34d'} 0%, transparent 65%)`,
+                  filter: 'blur(2px)',
+                  animation: 'mc-horn-tip 2.4s ease-in-out infinite',
+                }} />
+              )}
+            </div>
+            <div style={{
+              position: 'absolute',
+              top: hornTop, right: '24%',
+              width: hornW, height: hornH,
+              background: hornBg,
+              borderRadius: '50% 50% 10% 10%',
+              transform: `rotate(${rotR}deg)`,
+              boxShadow: isLegend ? `inset 0 2px 4px rgba(255,255,255,0.45), inset 0 -2px 2px rgba(0,0,0,0.25)` : undefined,
+              zIndex: 4,
+            }}>
+              {showTipGlow && (
+                <span aria-hidden="true" style={{
+                  position: 'absolute', top: '-6px', left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '14px', height: '14px',
+                  borderRadius: '50%',
+                  background: `radial-gradient(circle, ${palette.cheek || '#fcd34d'} 0%, transparent 65%)`,
+                  filter: 'blur(2px)',
+                  animation: 'mc-horn-tip 2.4s ease-in-out infinite 0.6s',
+                }} />
+              )}
+            </div>
+            {/* Legend only: a third central mini-horn, forming a crown */}
+            {isLegend && (
+              <div style={{
+                position: 'absolute',
+                top: '-4%', left: '50%',
+                transform: 'translateX(-50%)',
+                width: '9%', height: '22%',
+                background: hornBg,
+                borderRadius: '50% 50% 10% 10%',
+                boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.45), inset 0 -2px 2px rgba(0,0,0,0.25)',
+                zIndex: 4,
+              }}>
+                <span aria-hidden="true" style={{
+                  position: 'absolute', top: '-6px', left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '14px', height: '14px',
+                  borderRadius: '50%',
+                  background: `radial-gradient(circle, ${palette.cheek || '#fcd34d'} 0%, transparent 65%)`,
+                  filter: 'blur(2px)',
+                  animation: 'mc-horn-tip 2.4s ease-in-out infinite 1.2s',
+                }} />
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {/* Eyes — three modes. Tired: horizontal closed slits. Sad in
           face mode: down-slanted lines (reference .sr-eye rotated
@@ -678,6 +847,31 @@ function Egg({ palette }) {
         background: `radial-gradient(circle, ${palette.cheek} 0%, transparent 65%)`,
         filter: 'blur(10px)',
         animation: 'mc-egg-glow 2.6s ease-in-out infinite',
+      }} />
+      {/* Light beams escaping the top crack — two soft golden cones that
+          pulse with the glow. Reads as "something alive is about to
+          break through" instead of a static painted egg. */}
+      <span aria-hidden="true" style={{
+        position: 'absolute', top: '-24%', left: '50%',
+        width: '24%', height: '38%',
+        transform: 'translateX(-50%)',
+        background: `linear-gradient(to top, ${palette.cheek || '#fcd34d'}, transparent)`,
+        clipPath: 'polygon(20% 100%, 80% 100%, 100% 0%, 0% 0%)',
+        filter: 'blur(4px)',
+        animation: 'mc-egg-beam 2.6s ease-in-out infinite',
+        zIndex: 3,
+        pointerEvents: 'none',
+      }} />
+      <span aria-hidden="true" style={{
+        position: 'absolute', top: '-18%', left: '46%',
+        width: '10%', height: '30%',
+        transform: 'translateX(-50%) rotate(-12deg)',
+        background: `linear-gradient(to top, #fff, transparent)`,
+        filter: 'blur(3px)',
+        opacity: 0.6,
+        animation: 'mc-egg-beam 2.6s ease-in-out infinite 0.5s',
+        zIndex: 3,
+        pointerEvents: 'none',
       }} />
       {/* Egg body */}
       <div style={{
