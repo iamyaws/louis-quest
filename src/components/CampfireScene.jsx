@@ -278,13 +278,39 @@ export default function CampfireScene({
       {effectiveWeather === 'snow' && <WeatherSnow />}
       {effectiveWeather === 'thunder' && <WeatherThunder />}
       {(effectiveWeather === 'cloud' || effectiveWeather === 'fog') && (
-        <div aria-hidden="true" style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: effectiveWeather === 'fog'
-            ? 'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 60%, transparent 100%)'
-            : 'linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 40%, transparent 100%)',
-          zIndex: 3,
-        }} />
+        <>
+          <div aria-hidden="true" style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: effectiveWeather === 'fog'
+              ? 'linear-gradient(180deg, rgba(220,225,230,0.55) 0%, rgba(220,225,230,0.28) 50%, rgba(220,225,230,0.08) 100%)'
+              : 'linear-gradient(180deg, rgba(200,210,220,0.38) 0%, rgba(200,210,220,0.18) 50%, transparent 100%)',
+            zIndex: 3,
+          }} />
+          {/* Drifting cloud puffs across the top — more felt than seen,
+               but enough to communicate "overcast" at a glance. */}
+          {effectiveWeather === 'cloud' && (
+            <>
+              <div aria-hidden="true" style={{
+                position: 'absolute', top: '4%', left: '-20%',
+                width: '60%', height: '18%',
+                background: 'radial-gradient(ellipse at 50% 50%, rgba(240,240,248,0.75) 0%, rgba(240,240,248,0.25) 45%, transparent 75%)',
+                filter: 'blur(4px)',
+                animation: 'cfCloudDrift 30s linear infinite',
+                zIndex: 3,
+                pointerEvents: 'none',
+              }} />
+              <div aria-hidden="true" style={{
+                position: 'absolute', top: '10%', left: '-40%',
+                width: '50%', height: '14%',
+                background: 'radial-gradient(ellipse at 50% 50%, rgba(240,240,248,0.55) 0%, rgba(240,240,248,0.18) 45%, transparent 75%)',
+                filter: 'blur(5px)',
+                animation: 'cfCloudDrift 44s linear infinite',
+                zIndex: 3,
+                pointerEvents: 'none',
+              }} />
+            </>
+          )}
+        </>
       )}
 
       {/* Greeting speech bubble — shows above Ronki on mount, stays
@@ -486,6 +512,10 @@ export default function CampfireScene({
           80%  { opacity: 0.8; transform: scaleX(1.3) scaleY(0.9); }
           100% { opacity: 0; transform: scaleX(1.6) scaleY(0.5); }
         }
+        @keyframes cfCloudDrift {
+          from { transform: translateX(0); }
+          to   { transform: translateX(260%); }
+        }
       `}</style>
     </div>
   );
@@ -500,75 +530,113 @@ export default function CampfireScene({
 // motion; no JS loop. Seeded positions so drops/flakes don't re-randomize
 // every render (would flicker).
 
+// 14 drops — Marc feedback Apr 2026: original 6-drop was too subtle to
+// read at a glance. Doubled density, thicker lines, stronger opacity,
+// faster fall. Still painterly, not a monsoon.
 const RAIN_DROPS = [
-  { left: 12, delay: 0.0, dur: 1.7 },
-  { left: 28, delay: 0.6, dur: 1.9 },
-  { left: 46, delay: 1.2, dur: 1.6 },
-  { left: 62, delay: 0.3, dur: 2.0 },
-  { left: 78, delay: 0.9, dur: 1.8 },
-  { left: 90, delay: 1.4, dur: 1.7 },
+  { left: 8,  delay: 0.0, dur: 1.1 },
+  { left: 16, delay: 0.4, dur: 1.3 },
+  { left: 24, delay: 0.7, dur: 1.0 },
+  { left: 32, delay: 0.2, dur: 1.2 },
+  { left: 40, delay: 0.8, dur: 1.15 },
+  { left: 48, delay: 0.3, dur: 1.05 },
+  { left: 56, delay: 0.9, dur: 1.25 },
+  { left: 64, delay: 0.1, dur: 1.1 },
+  { left: 72, delay: 0.6, dur: 1.2 },
+  { left: 80, delay: 0.4, dur: 1.0 },
+  { left: 88, delay: 0.9, dur: 1.15 },
+  { left: 96, delay: 0.2, dur: 1.25 },
+  { left: 20, delay: 1.0, dur: 1.3 },
+  { left: 68, delay: 1.1, dur: 1.1 },
 ];
 
 function WeatherRain() {
   return (
-    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4 }}>
+    <div aria-hidden="true" style={{
+      position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4,
+      // Desaturate the scene behind slightly so rain reads against it
+      background: 'linear-gradient(180deg, rgba(30,41,59,0.08) 0%, rgba(30,41,59,0.14) 100%)',
+    }}>
       {RAIN_DROPS.map((d, i) => (
         <span key={i} style={{
           position: 'absolute',
           left: `${d.left}%`,
           top: '-10%',
-          width: 1.5,
-          height: 14,
-          background: 'linear-gradient(to bottom, rgba(200,220,240,0), rgba(200,220,240,0.55))',
-          borderRadius: 1,
-          transform: 'skewX(-8deg)',
+          width: 2.2,
+          height: 22,
+          background: 'linear-gradient(to bottom, rgba(200,220,240,0), rgba(220,235,250,0.95))',
+          borderRadius: 2,
+          transform: 'skewX(-12deg)',
           animation: `cfRainFall ${d.dur}s linear ${d.delay}s infinite`,
-          opacity: 0.6,
+          opacity: 0.9,
+          filter: 'blur(0.3px)',
         }} />
       ))}
       <style>{`
         @keyframes cfRainFall {
-          0%   { transform: skewX(-8deg) translateY(0); opacity: 0; }
-          10%  { opacity: 0.6; }
-          100% { transform: skewX(-8deg) translateY(320px); opacity: 0.6; }
+          0%   { transform: skewX(-12deg) translateY(0); opacity: 0; }
+          10%  { opacity: 0.9; }
+          100% { transform: skewX(-12deg) translateY(360px); opacity: 0.9; }
         }
       `}</style>
     </div>
   );
 }
 
+// 12 flakes — Marc feedback: original 6-flake was ambient-to-a-fault.
+// More flakes, bigger sizes, brighter glow, varied drift amplitude.
 const SNOW_FLAKES = [
-  { left: 8,  delay: 0.0, dur: 7 },
-  { left: 22, delay: 1.4, dur: 8 },
-  { left: 38, delay: 3.0, dur: 6.5 },
-  { left: 54, delay: 0.6, dur: 7.5 },
-  { left: 70, delay: 2.1, dur: 8 },
-  { left: 86, delay: 4.0, dur: 7 },
+  { left: 6,  delay: 0.0, dur: 6, size: 7 },
+  { left: 14, delay: 1.8, dur: 7, size: 5 },
+  { left: 22, delay: 0.5, dur: 6.5, size: 8 },
+  { left: 32, delay: 2.4, dur: 7.5, size: 6 },
+  { left: 40, delay: 0.9, dur: 6, size: 7 },
+  { left: 50, delay: 3.1, dur: 7, size: 9 },
+  { left: 58, delay: 1.3, dur: 6.5, size: 6 },
+  { left: 68, delay: 2.6, dur: 7.5, size: 8 },
+  { left: 76, delay: 0.2, dur: 6, size: 7 },
+  { left: 84, delay: 1.7, dur: 7, size: 5 },
+  { left: 92, delay: 3.0, dur: 6.5, size: 8 },
+  { left: 46, delay: 4.2, dur: 7.2, size: 6 },
 ];
 
 function WeatherSnow() {
   return (
-    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4 }}>
+    <div aria-hidden="true" style={{
+      position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4,
+      // Cool grey tint over the scene so flakes read as "winter day"
+      background: 'linear-gradient(180deg, rgba(180,200,220,0.14) 0%, rgba(180,200,220,0.06) 100%)',
+    }}>
       {SNOW_FLAKES.map((s, i) => (
         <span key={i} style={{
           position: 'absolute',
           left: `${s.left}%`,
           top: '-6%',
-          width: 5,
-          height: 5,
+          width: s.size,
+          height: s.size,
           borderRadius: '50%',
           background: '#fff',
-          opacity: 0.75,
-          filter: 'blur(0.5px)',
-          boxShadow: '0 0 3px rgba(255,255,255,0.6)',
-          animation: `cfSnowFall ${s.dur}s linear ${s.delay}s infinite`,
+          opacity: 0.95,
+          filter: 'blur(0.4px)',
+          boxShadow: '0 0 6px 1px rgba(255,255,255,0.8)',
+          animation: `cfSnowFall${i % 3} ${s.dur}s linear ${s.delay}s infinite`,
         }} />
       ))}
       <style>{`
-        @keyframes cfSnowFall {
+        @keyframes cfSnowFall0 {
           0%   { transform: translateY(0) translateX(0); }
-          50%  { transform: translateY(160px) translateX(6px); }
-          100% { transform: translateY(320px) translateX(-4px); }
+          50%  { transform: translateY(180px) translateX(10px); }
+          100% { transform: translateY(360px) translateX(-6px); }
+        }
+        @keyframes cfSnowFall1 {
+          0%   { transform: translateY(0) translateX(0); }
+          50%  { transform: translateY(180px) translateX(-8px); }
+          100% { transform: translateY(360px) translateX(8px); }
+        }
+        @keyframes cfSnowFall2 {
+          0%   { transform: translateY(0) translateX(0); }
+          50%  { transform: translateY(180px) translateX(12px); }
+          100% { transform: translateY(360px) translateX(0px); }
         }
       `}</style>
     </div>
@@ -578,26 +646,30 @@ function WeatherSnow() {
 function WeatherThunder() {
   return (
     <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4 }}>
-      {/* Dim cloud band across the top */}
+      {/* Heavier cloud band across the top — stormy, not hazy */}
       <div style={{
-        position: 'absolute', inset: '0 0 auto 0', height: '22%',
-        background: 'linear-gradient(180deg, rgba(30,41,59,0.42) 0%, transparent 100%)',
+        position: 'absolute', inset: '0 0 auto 0', height: '35%',
+        background: 'linear-gradient(180deg, rgba(20,30,45,0.75) 0%, rgba(20,30,45,0.35) 60%, transparent 100%)',
       }} />
-      {/* Occasional full-viewport flash — 1.5s flash every 18s */}
+      {/* Lightning flash — now every ~9s instead of 18s, with a triple
+           flicker for real storm feel. Stronger peak, faster cycle. */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'rgba(255,255,255,0.9)',
-        animation: 'cfLightning 18s steps(1) infinite',
+        background: 'radial-gradient(ellipse at 60% 20%, rgba(255,255,240,1) 0%, rgba(220,230,255,0.5) 40%, transparent 80%)',
+        animation: 'cfLightning 9s steps(1) infinite',
         opacity: 0,
       }} />
       {/* Rain under the cloud */}
       <WeatherRain />
       <style>{`
         @keyframes cfLightning {
-          0%, 98%   { opacity: 0; }
-          98.5%     { opacity: 0.9; }
-          99%       { opacity: 0.2; }
-          99.5%     { opacity: 0.8; }
+          0%, 92%   { opacity: 0; }
+          92.5%     { opacity: 1; }
+          93%       { opacity: 0.15; }
+          93.5%     { opacity: 0.85; }
+          94%       { opacity: 0.2; }
+          94.5%     { opacity: 0.6; }
+          95%       { opacity: 0; }
           100%      { opacity: 0; }
         }
       `}</style>
