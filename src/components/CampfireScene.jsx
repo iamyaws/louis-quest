@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuestEater } from './QuestEater';
+import { getVariant } from '../data/companionVariants';
 
 /**
  * CampfireScene — zero-asset painterly Hub scene.
@@ -98,6 +99,7 @@ const STAR_POS = [
 
 export default function CampfireScene({
   onRonkiTap,
+  variant = 'amber',
   hour,
   state = 'idle',
   statusText,
@@ -236,7 +238,7 @@ export default function CampfireScene({
            the QuestEater context as the 'preferred' flyer target so
            that on Lager, the flying quest icon lands here (not the
            TopBar Ronki, which isn't even rendered on Hub). */}
-      {ronkiVisible && <SideRonki onTap={onRonkiTap} />}
+      {ronkiVisible && <SideRonki onTap={onRonkiTap} variant={variant} />}
 
       {/* Greeting speech bubble — shows above Ronki on mount, stays
            ~7.5s, then fades. Tapping the bubble (or onBubbleTap) rolls
@@ -446,11 +448,16 @@ export default function CampfireScene({
 // Lives inside the scene; extracted as a sub-component for readability.
 // Construction matches Claude Design's Feature Preview exactly.
 
-function SideRonki({ onTap }) {
+function SideRonki({ onTap, variant = 'amber' }) {
   const eater = useQuestEater();
   const ref = useRef(null);
   const [fireKey, setFireKey] = useState(0);
   const lastFire = useRef(eater?.fireBreath ?? 0);
+  // Pull the chibi palette for the selected colorway so the campfire
+  // Ronki matches whatever egg Louis hatched. Falls back to amber if
+  // unknown. Marc 24 Apr 2026: "this should not only change the chibi
+  // in the profile but also at the campfire."
+  const palette = getVariant(variant).chibi;
 
   // Register as the preferred flyer target (beats the TopBar Ronki
   // when both are mounted; in practice only one is at a time).
@@ -528,12 +535,13 @@ function SideRonki({ onTap }) {
           }}
         />
       )}
-      {/* Tail — swoops back and up, layered behind body */}
+      {/* Tail — swoops back and up, layered behind body. Uses the
+          variant body gradient so the tail matches the colorway. */}
       <div style={{
         position: 'absolute',
         left: '62%', top: '48%',
         width: 26, height: 14,
-        background: 'linear-gradient(90deg, #f97316, #c2410c)',
+        background: palette.body,
         borderRadius: '50% 80% 60% 70% / 60% 60% 50% 50%',
         transform: 'rotate(-12deg)',
         zIndex: 1,
@@ -541,9 +549,9 @@ function SideRonki({ onTap }) {
         <span style={{
           position: 'absolute', right: -4, top: -4,
           width: 10, height: 10,
-          background: 'linear-gradient(180deg, #fde68a, #f59e0b)',
+          background: palette.horn,
           borderRadius: '50%',
-          boxShadow: '0 0 6px rgba(252,165,73,0.5)',
+          boxShadow: `0 0 6px ${palette.cheek}`,
         }} />
       </div>
 
@@ -552,11 +560,12 @@ function SideRonki({ onTap }) {
         position: 'absolute',
         top: '24%', left: '-2%',
         width: 22, height: 30,
-        background: 'linear-gradient(160deg, #f97e5a, #b23a1c)',
+        background: palette.body,
         borderRadius: '50% 10% 50% 50% / 55% 20% 55% 55%',
         transform: 'rotate(-15deg)',
         transformOrigin: '100% 30%',
         animation: 'cfWingFlap 2.2s ease-in-out infinite',
+        opacity: 0.95,
         zIndex: 2,
       }} />
 
@@ -565,18 +574,18 @@ function SideRonki({ onTap }) {
         position: 'absolute',
         left: '10%', top: '20%',
         width: 56, height: 54,
-        background: 'linear-gradient(175deg, #fed7aa 0%, #f97316 62%, #c2410c 100%)',
+        background: palette.body,
         borderRadius: '58% 50% 40% 50% / 62% 56% 44% 48%',
         boxShadow: 'inset -4px -6px 0 rgba(0,0,0,0.18), 0 4px 8px rgba(0,0,0,0.22)',
         zIndex: 3,
       }} />
 
-      {/* Belly — lighter cream panel */}
+      {/* Belly — lighter panel matching variant */}
       <div style={{
         position: 'absolute',
         left: '16%', top: '45%',
         width: 26, height: 22,
-        background: '#fde0a8',
+        background: palette.belly,
         borderRadius: '50% 40% 50% 50%',
         zIndex: 4,
       }} />
@@ -586,7 +595,7 @@ function SideRonki({ onTap }) {
         position: 'absolute',
         top: '18%', left: '26%',
         width: 8, height: 14,
-        background: 'linear-gradient(180deg, #fde68a, #f59e0b)',
+        background: palette.horn,
         borderRadius: '50% 50% 10% 10%',
         transform: 'rotate(-8deg)',
         zIndex: 4,
@@ -595,7 +604,7 @@ function SideRonki({ onTap }) {
         position: 'absolute',
         top: '18%', left: '38%',
         width: 8, height: 12,
-        background: 'linear-gradient(180deg, #fde68a, #f59e0b)',
+        background: palette.horn,
         borderRadius: '50% 50% 10% 10%',
         transform: 'rotate(6deg)',
         zIndex: 4,
@@ -606,7 +615,7 @@ function SideRonki({ onTap }) {
         position: 'absolute',
         top: '34%', left: '46%',
         width: 6, height: 8,
-        background: '#1a0e08',
+        background: palette.eyeInk,
         borderRadius: '50%',
         zIndex: 5,
       }}>
@@ -629,21 +638,21 @@ function SideRonki({ onTap }) {
         zIndex: 5,
       }} />
 
-      {/* Legs */}
-      <div style={legStyle('28%')} />
-      <div style={legStyle('52%')} />
+      {/* Legs — use variant leg gradient */}
+      <div style={legStyle('28%', palette.leg)} />
+      <div style={legStyle('52%', palette.leg)} />
     </Tag>
   );
 }
 
-function legStyle(left) {
+function legStyle(left, gradient) {
   return {
     position: 'absolute',
     left,
     bottom: '2%',
     width: 10,
     height: 14,
-    background: 'linear-gradient(180deg, #f97316, #9a3412)',
+    background: gradient || 'linear-gradient(180deg, #f97316, #9a3412)',
     borderRadius: '30% 30% 40% 40%',
     boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.18)',
     zIndex: 5,

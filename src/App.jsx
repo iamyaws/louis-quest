@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AuthProvider, useAuth, LoginScreen } from './context/AuthContext';
 import { TaskProvider, useTask } from './context/TaskContext';
 import { useTranslation } from './i18n/LanguageContext';
@@ -50,8 +50,12 @@ import AlphaBanner from './components/AlphaBanner';
 function AppContent() {
   const { t } = useTranslation();
   const { state, actions, loading, toastTrigger } = useTask();
-  // Dev gallery shortcut — open the standalone ChibiGallery via
-  // ?gallery=1 in the URL. Not for Louis, just for design review.
+  // Dev URL shortcuts — apply on mount so they propagate to every
+  // component (not just the Ronki tab where RonkiProfile reads them).
+  //   ?gallery=1            — jump to the standalone ChibiGallery
+  //   ?variant=teal|...     — seed companionVariant (affects campfire
+  //                            Ronki, profile, any future chibi)
+  //   ?stage=0..3           — seed catEvo to the matching stage threshold
   const initialView = (() => {
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search);
@@ -60,6 +64,29 @@ function AppContent() {
     return 'hub';
   })();
   const [view, setView] = useState(initialView);
+  const urlParamsAppliedRef = useRef(false);
+  useEffect(() => {
+    // Wait for the persisted state to load before patching — firing at
+    // bare App mount would either no-op (actions not wired) or get
+    // overwritten when TaskContext loads from storage. Guarded with a
+    // ref so the patch fires exactly once.
+    if (!state || urlParamsAppliedRef.current) return;
+    urlParamsAppliedRef.current = true;
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    const patch = {};
+    const v = p.get('variant');
+    if (/^(amber|teal|rose|violet|forest|sunset)$/.test(v || '')) {
+      patch.companionVariant = v;
+    }
+    const s = p.get('stage');
+    if (s && /^[0-3]$/.test(s)) {
+      patch.catEvo = [0, 3, 9, 18][parseInt(s, 10)];
+    }
+    if (Object.keys(patch).length > 0 && actions?.patchState) {
+      actions.patchState(patch);
+    }
+  }, [state, actions]);
   const [activeQuestLineId, setActiveQuestLineId] = useState(null);
   const [activeMintGame, setActiveMintGame] = useState(null); // MINT game id when view==='mint-game'
   const [showParental, setShowParental] = useState(false);
