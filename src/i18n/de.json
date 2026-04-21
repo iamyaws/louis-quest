@@ -1096,5 +1096,19 @@
 
   "alpha.label": "Alpha",
   "alpha.body": "Frühe Version, Daten können sich ändern",
-  "alpha.feedback": "Rückmeldung"
+  "alpha.feedback": "Rückmeldung",
+
+  "nav.locked.aria": "Noch gesperrt",
+  "nav.locked.sheetTitle": "Noch gesperrt",
+  "nav.locked.close": "Schließen",
+  "nav.lock.ronki": "Mach deine erste Aufgabe — dann kommt Ronki zu dir.",
+  "nav.lock.journal": "Log deine Stimmung und erledige 3 Aufgaben, dann hast du was zu erzählen.",
+  "nav.lock.shop": "Sammle 50 Sterne, dann kannst du sie hier eintauschen. Du hast {current} von 50.",
+  "nav.unlock.ronki": "🔓 Ronki wartet jetzt auf dich!",
+  "nav.unlock.journal": "🔓 Dein Tagebuch ist offen.",
+  "nav.unlock.shop": "🔓 Der Laden ist offen — 50 Sterne verdient!",
+  "nav.coach.ronki": "Hier lebt dein Drache. Streichel ihn, füttere ihn, schau wie er wächst.",
+  "nav.coach.journal": "Hier lebt eure Geschichte. Schreib auf, wie es dir heute ging.",
+  "nav.coach.shop": "Hier tauschst du Sterne gegen Belohnungen. Funkelzeit, Überraschungen, alles dabei.",
+  "nav.coach.close": "Alles klar"
 }

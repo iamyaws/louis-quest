@@ -1092,5 +1092,19 @@
 
   "alpha.label": "Alpha",
   "alpha.body": "Early version, data may change",
-  "alpha.feedback": "Feedback"
+  "alpha.feedback": "Feedback",
+
+  "nav.locked.aria": "Still locked",
+  "nav.locked.sheetTitle": "Still locked",
+  "nav.locked.close": "Close",
+  "nav.lock.ronki": "Finish your first task — Ronki will join you here.",
+  "nav.lock.journal": "Log your mood and finish 3 tasks — then you'll have something to write about.",
+  "nav.lock.shop": "Collect 50 stars, then trade them here. You have {current} of 50.",
+  "nav.unlock.ronki": "🔓 Ronki is waiting for you!",
+  "nav.unlock.journal": "🔓 Your journal is open.",
+  "nav.unlock.shop": "🔓 The shop is open — 50 stars earned!",
+  "nav.coach.ronki": "Your dragon lives here. Pet them, feed them, watch them grow.",
+  "nav.coach.journal": "Your story lives here. Write down how your day was.",
+  "nav.coach.shop": "Trade stars for rewards — screen time, surprises, all there.",
+  "nav.coach.close": "Got it"
 }
