@@ -33,6 +33,8 @@ import PilzWaageGame from './components/PilzWaageGame';
 // Import kept commented for rollback reference.
 // import KristallSortiererGame from './components/KristallSortiererGame';
 import KristallKetteGame from './components/KristallKetteGame';
+import KristallHoehleGame from './components/KristallHoehleGame';
+import CampfireVisitorsGame from './components/CampfireVisitorsGame';
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
@@ -69,6 +71,8 @@ function AppContent() {
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search);
       if (p.get('gallery') === '1') return 'gallery';
+      if (p.get('cave') === '1') return 'hoehle';
+      if (p.get('visitors') === '1') return 'visitors';
     }
     return 'hub';
   })();
@@ -302,6 +306,12 @@ function AppContent() {
           setActiveMintGame(null);
           setView('hub');
         }} />
+      )}
+      {view === 'hoehle' && (
+        <KristallHoehleGame onClose={() => setView('hub')} />
+      )}
+      {view === 'visitors' && (
+        <CampfireVisitorsGame onClose={() => setView('hub')} />
       )}
       {pinGateOpen && (
         <PinModal

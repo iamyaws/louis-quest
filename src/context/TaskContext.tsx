@@ -194,6 +194,18 @@ export interface TaskState {
   /** Tab IDs whose first-tap coachmark overlay has been dismissed.
    *  One shot per tab. */
   tabCoachmarksSeen?: Record<string, boolean>;
+  /** Crystal inventory — shared state between the Cave Mining game
+   *  (adds) and Campfire Visitors (spends). Keyed by color family:
+   *  'ember' | 'lagoon' | 'meadow' | 'blossom' | 'star'. 'star' is the
+   *  rare drop from deep-dig mining. Apr 2026 — see
+   *  backlog_mint_crystal_game_rework.md for the full loop design. */
+  crystalInventory?: Record<string, number>;
+  /** Friendship progress per Freund character. 0..5 gifts unlocks the
+   *  next "scene evolution" for that friend (cozier nest, bigger
+   *  mushroom, etc.). */
+  freundFriendship?: Record<string, number>;
+  /** Which Freund is currently visiting the campfire today, if any. */
+  todaysVisitor?: { freundId: string; wish: string; date: string } | null;
 }
 
 interface TaskComputed {
@@ -267,6 +279,14 @@ interface TaskActions {
   markTabUnlockSeen: (tabId: string) => void;
   /** Marks a tab's first-tap coachmark overlay as dismissed. */
   markTabCoachmarkSeen: (tabId: string) => void;
+  /** Cave Mining: add N crystals of a color family to the inventory. */
+  addCrystals: (family: string, n: number) => void;
+  /** Campfire Visitors: remove N crystals of a family (returns true on
+   *  success, false if not enough in the bank). */
+  spendCrystals: (family: string, n: number) => boolean;
+  /** Campfire Visitors: record a completed gift-exchange with a Freund,
+   *  bumping friendship (capped at 5 per friend). */
+  giftCrystalToFreund: (freundId: string) => void;
 }
 
 interface CelebrationEvent {
@@ -519,6 +539,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           ronkiLearnBannerSeen: (raw as any).ronkiLearnBannerSeen || {},
           tabUnlocksSeen: (raw as any).tabUnlocksSeen || {},
           tabCoachmarksSeen: (raw as any).tabCoachmarksSeen || {},
+          crystalInventory: (raw as any).crystalInventory || {},
+          freundFriendship: (raw as any).freundFriendship || {},
+          todaysVisitor: (raw as any).todaysVisitor ?? null,
           micropediaDiscovered: raw.micropediaDiscovered || [],
           freundArcsCompleted: raw.freundArcsCompleted || [],
           freundCallbacksPending: raw.freundCallbacksPending || [],
@@ -1476,6 +1499,40 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Crystal inventory (Cave Mining → Campfire Visitors compound loop) ──
+  const addCrystals = useCallback((family: string, n: number) => {
+    if (!family || !n) return;
+    setState(prev => {
+      if (!prev) return prev;
+      const inv = { ...(prev.crystalInventory || {}) };
+      inv[family] = (inv[family] || 0) + n;
+      return { ...prev, crystalInventory: inv };
+    });
+  }, []);
+
+  const spendCrystals = useCallback((family: string, n: number): boolean => {
+    let success = false;
+    setState(prev => {
+      if (!prev) return prev;
+      const current = (prev.crystalInventory || {})[family] || 0;
+      if (current < n) return prev; // not enough
+      success = true;
+      const inv = { ...(prev.crystalInventory || {}) };
+      inv[family] = current - n;
+      return { ...prev, crystalInventory: inv };
+    });
+    return success;
+  }, []);
+
+  const giftCrystalToFreund = useCallback((freundId: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const friendship = { ...(prev.freundFriendship || {}) };
+      friendship[freundId] = Math.min(5, (friendship[freundId] || 0) + 1);
+      return { ...prev, freundFriendship: friendship, todaysVisitor: null };
+    });
+  }, []);
+
   const markTabCoachmarkSeen = useCallback((tabId: string) => {
     setState(prev => {
       if (!prev) return prev;
@@ -1509,7 +1566,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
