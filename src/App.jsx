@@ -40,10 +40,12 @@ import PoemQuest from './components/PoemQuest';
 import QuestLineView from './components/QuestLineView';
 import StarfighterGame from './components/StarfighterGame';
 import { useSpecialQuests } from './hooks/useSpecialQuests';
-import { useEggSystem } from './hooks/useEggSystem';
+// Easter-egg system paused Apr 2026 — Marc: "don't feel it anymore".
+// Hook + component files kept so we can re-enable by restoring these imports.
+// import { useEggSystem } from './hooks/useEggSystem';
 import { useMicropediaDiscovery } from './hooks/useMicropediaDiscovery';
 import { useQuietAttention } from './hooks/useQuietAttention';
-import EggOverlay from './components/EggOverlay';
+// import EggOverlay from './components/EggOverlay'; // paused Apr 2026 (see useEggSystem note)
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import AlphaBanner from './components/AlphaBanner';
 
@@ -98,7 +100,7 @@ function AppContent() {
   const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
 
   useSpecialQuests(); // side-effect only — silently completes special quests
-  useEggSystem(); // silently spawns eggs when trigger conditions are met
+  // useEggSystem(); // paused Apr 2026 — spawner disabled, no more egg triggers
   useQuietAttention(view); // gentle voice brake when Louis zooms through screens
 
   const [discoveryToast, setDiscoveryToast] = useState(null);
@@ -302,12 +304,9 @@ function AppContent() {
         actions.claimGameReward('starfighter');
         setView('games');
       }} />}
-      {state?.pendingEgg && state.pendingEgg.view === view && (
-        <EggOverlay
-          egg={state.pendingEgg}
-          onCollect={() => actions.collectEgg()}
-        />
-      )}
+      {/* EggOverlay mount paused Apr 2026. Any lingering state.pendingEgg
+          stays in storage but doesn't render. Re-enable by restoring the
+          JSX block above with the useEggSystem() hook. */}
       <CompanionToast trigger={toastTrigger} />
       {state &&
         state.onboardingDone &&
