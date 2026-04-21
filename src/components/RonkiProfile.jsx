@@ -260,8 +260,10 @@ export default function RonkiProfile({ onNavigate }) {
       patch.companionVariant = variantParam;
     }
     const stageParam = params.get('stage');
-    if (stageParam && /^[0-3]$/.test(stageParam)) {
-      patch.catEvo = [0, 3, 9, 18][parseInt(stageParam, 10)];
+    if (stageParam && /^[0-5]$/.test(stageParam)) {
+      // Thresholds from constants.ts CAT_STAGES — 0 Ei, 1 Baby, 2 Jungtier,
+      // 3 Stolz, 4 Heranwachsend (Teen), 5 Legendär.
+      patch.catEvo = [0, 3, 9, 18, 30, 45][parseInt(stageParam, 10)];
     }
     if (Object.keys(patch).length > 0) actions.patchState?.(patch);
     // eslint-disable-next-line react-hooks/exhaustive-deps

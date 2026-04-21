@@ -84,8 +84,31 @@ function AppContent() {
       patch.companionVariant = v;
     }
     const s = p.get('stage');
-    if (s && /^[0-3]$/.test(s)) {
-      patch.catEvo = [0, 3, 9, 18][parseInt(s, 10)];
+    if (s && /^[0-5]$/.test(s)) {
+      // Thresholds match CAT_STAGES in constants.ts — 0 Ei, 1 Baby,
+      // 2 Jungtier, 3 Stolz, 4 Heranwachsend, 5 Legendär.
+      patch.catEvo = [0, 3, 9, 18, 30, 45][parseInt(s, 10)];
+    }
+    const mood = p.get('ronkiMood');
+    if (['sad', 'tired', 'normal', 'besorgt', 'gut', 'magisch'].includes(mood)) {
+      patch.ronkiMood = mood;
+      patch.ronkiMoodSetDate = mood === 'normal'
+        ? undefined
+        : new Date().toISOString().slice(0, 10);
+    }
+    const boxParam = p.get('boxAtmung');
+    if (boxParam === 'learned') {
+      patch.ronkiSkillPractice = { boxAtmung: 5 };
+      patch.ronkiLearnedSkills = ['boxAtmung'];
+      patch.ronkiLearnBannerSeen = { boxAtmung: true };
+    } else if (boxParam === 'learning') {
+      patch.ronkiSkillPractice = { boxAtmung: 4 };
+      patch.ronkiLearnedSkills = [];
+      patch.ronkiLearnBannerSeen = {};
+    } else if (boxParam && /^\d+$/.test(boxParam)) {
+      const n = Math.min(5, Math.max(0, parseInt(boxParam, 10)));
+      patch.ronkiSkillPractice = { boxAtmung: n };
+      patch.ronkiLearnedSkills = n >= 5 ? ['boxAtmung'] : [];
     }
     if (Object.keys(patch).length > 0 && actions?.patchState) {
       actions.patchState(patch);
@@ -112,6 +135,7 @@ function AppContent() {
     // Flush any queued feedback from previous offline sessions
     import('./utils/feedback').then(m => m.flushFeedbackQueue()).catch(() => {});
   }, []);
+
 
   // Scroll to top whenever the active view changes; also record first-time visits
   useEffect(() => {

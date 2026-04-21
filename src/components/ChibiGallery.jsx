@@ -15,16 +15,21 @@ import { COMPANION_VARIANTS } from '../data/companionVariants';
  */
 
 const STAGES = [
-  { id: 0, label: 'Ei', sub: 'Egg' },
-  { id: 1, label: 'Baby', sub: 'Baby' },
-  { id: 2, label: 'Jungtier', sub: 'Toddler' },
-  { id: 3, label: 'Stolz', sub: 'Final' },
+  { id: 0, label: 'Ei',             sub: 'Egg' },
+  { id: 1, label: 'Baby',           sub: 'Baby (wings from hatch)' },
+  { id: 2, label: 'Jungtier',       sub: 'Toddler' },
+  { id: 3, label: 'Stolz',          sub: 'Proud — tail appears' },
+  { id: 4, label: 'Heranwachsend',  sub: 'Teen — bigger wings' },
+  { id: 5, label: 'Legendär',       sub: 'Legend — aura halo' },
 ];
 
 const MOODS = [
-  { id: 'normal', label: 'Normal', ink: '#b45309' },
-  { id: 'sad',    label: 'Traurig', ink: '#2f3d5a' },
-  { id: 'tired',  label: 'Müde',    ink: '#26333c' },
+  { id: 'normal',  label: 'Normal',   ink: '#b45309' },
+  { id: 'sad',     label: 'Traurig',  ink: '#2f3d5a' },
+  { id: 'tired',   label: 'Müde',     ink: '#26333c' },
+  { id: 'besorgt', label: 'Besorgt',  ink: '#6d28d9' },
+  { id: 'gut',     label: 'Gut',      ink: '#a16207' },
+  { id: 'magisch', label: 'Magisch',  ink: '#be185d' },
 ];
 
 export default function ChibiGallery({ onClose }) {
@@ -46,8 +51,8 @@ export default function ChibiGallery({ onClose }) {
             All colorways × all stages
           </h1>
           <p style={{ margin: '6px 0 0', fontFamily: 'Nunito, sans-serif', fontSize: 13, color: 'rgba(255,242,217,0.6)' }}>
-            6 variants · 4 stages · live MoodChibi renders from the app.
-            Mood toggle below applies to every cell.
+            6 variants · 6 stages · 6 moods · live MoodChibi renders from
+            the app. Mood toggle below applies to every cell.
           </p>
         </div>
         {onClose && (
