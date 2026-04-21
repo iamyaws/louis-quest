@@ -580,34 +580,44 @@ function SideRonki({ onTap, variant = 'amber' }) {
         zIndex: 3,
       }} />
 
-      {/* Belly — lighter panel matching variant */}
+      {/* Belly — side-facing crescent along the under-front edge of the
+          torso. No longer a centered oval (which read as front-facing
+          belly) per Marc 24 Apr 2026. Sits lower-left on the body. */}
       <div style={{
         position: 'absolute',
-        left: '16%', top: '45%',
-        width: 26, height: 22,
+        left: '14%', top: '52%',
+        width: 22, height: 14,
         background: palette.belly,
-        borderRadius: '50% 40% 50% 50%',
+        borderRadius: '60% 30% 50% 50% / 80% 50% 50% 60%',
+        transform: 'rotate(-6deg)',
+        boxShadow: 'inset 0 -2px 3px rgba(0,0,0,0.08)',
         zIndex: 4,
       }} />
 
-      {/* Horns */}
+      {/* Horn — single visible (near-side) horn. In side-view only one
+          should read prominently; a tiny nub hints at the back horn for
+          depth. Previously both horns rendered symmetrically which gave
+          the "mixed perspective" feel (Marc 24 Apr 2026). */}
       <div style={{
         position: 'absolute',
-        top: '18%', left: '26%',
-        width: 8, height: 14,
+        top: '14%', left: '38%',
+        width: 8, height: 15,
         background: palette.horn,
         borderRadius: '50% 50% 10% 10%',
-        transform: 'rotate(-8deg)',
+        transform: 'rotate(8deg)',
         zIndex: 4,
       }} />
+      {/* Back horn — tiny nub peeking out behind. Occluded most of its
+          length by the body; renders with lower opacity for depth. */}
       <div style={{
         position: 'absolute',
-        top: '18%', left: '38%',
-        width: 8, height: 12,
+        top: '16%', left: '32%',
+        width: 5, height: 8,
         background: palette.horn,
         borderRadius: '50% 50% 10% 10%',
-        transform: 'rotate(6deg)',
-        zIndex: 4,
+        transform: 'rotate(-4deg)',
+        opacity: 0.55,
+        zIndex: 2,
       }} />
 
       {/* Eye with catchlight */}
