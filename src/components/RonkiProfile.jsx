@@ -234,7 +234,7 @@ export default function RonkiProfile({ onNavigate }) {
     const mood = params.get('ronkiMood');
     const boxParam = params.get('boxAtmung');
     const patch = {};
-    if (mood === 'sad' || mood === 'tired' || mood === 'normal') {
+    if (mood === 'sad' || mood === 'tired' || mood === 'normal' || mood === 'besorgt' || mood === 'gut' || mood === 'magisch') {
       patch.ronkiMood = mood;
       patch.ronkiMoodSetDate = mood === 'normal' ? undefined : new Date().toISOString().slice(0, 10);
     }

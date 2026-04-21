@@ -165,8 +165,11 @@ export interface TaskState {
   // von Louis" — the deepest bonding move of all engagement reports.
 
   /** Ronki's current mood. 'normal' most days; 'sad' or 'tired' on rare
-   *  bad days. Drives the profile portrait skin + Pflege action set. */
-  ronkiMood?: 'normal' | 'sad' | 'tired';
+   *  bad days. Apr 2026 expansion: 'besorgt' (worried), 'gut' (extra
+   *  good), 'magisch' (special — streaks, magical moments) so the chibi
+   *  can reflect the full 6-emotion taxonomy the Stimmung card supports.
+   *  Drives the profile portrait skin + Pflege action set. */
+  ronkiMood?: 'normal' | 'sad' | 'tired' | 'besorgt' | 'gut' | 'magisch';
   /** ISO date (YYYY-MM-DD) when Ronki's current bad mood was set. A bad
    *  mood lives 1 day; on a new date we revert to 'normal' and schedule
    *  the next one. */

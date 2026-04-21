@@ -63,8 +63,10 @@ export default function MoodChibi({
     bgInset: moodSkin.bgInset,
   };
   const chibiFilter =
-    mood === 'sad'   ? 'saturate(0.6) brightness(0.92)' :
-    mood === 'tired' ? 'saturate(0.5) brightness(0.88)' :
+    mood === 'sad'     ? 'saturate(0.6) brightness(0.92)' :
+    mood === 'tired'   ? 'saturate(0.5) brightness(0.88)' :
+    mood === 'besorgt' ? 'saturate(0.8) brightness(0.96)' :
+    mood === 'magisch' ? 'saturate(1.2) brightness(1.05)' :
     'none';
 
   // `bare` mode drops the outer circular background + inner particles
@@ -89,10 +91,18 @@ export default function MoodChibi({
         transition: 'background 0.6s ease',
       };
 
-  const swayAnim = (mood === 'sad' || mood === 'tired') ? 'mc-sway 4s ease-in-out infinite' : null;
-  const ronkiAnim = bare
-    ? (swayAnim || (mood === 'tired' ? 'mc-breathe-slow 5s ease-in-out infinite' : 'mc-breathe 3.4s ease-in-out infinite'))
-    : (mood === 'tired' ? 'mc-breathe-slow 5s ease-in-out infinite' : 'mc-breathe 3.4s ease-in-out infinite');
+  // Per-mood idle loop — each emotion gets its own signature motion so
+  // the kid reads the feeling from across the room without needing the
+  // label. CSS-only; one transform/opacity animation per mood (perf).
+  let ronkiAnim;
+  if (mood === 'sad')           ronkiAnim = 'mc-sway 4s ease-in-out infinite';
+  else if (mood === 'tired')    ronkiAnim = bare
+      ? 'mc-sway 5s ease-in-out infinite'
+      : 'mc-breathe-slow 5s ease-in-out infinite';
+  else if (mood === 'besorgt')  ronkiAnim = 'mc-fidget 3s ease-in-out infinite';
+  else if (mood === 'gut')      ronkiAnim = 'mc-bounce 2.6s ease-in-out infinite';
+  else if (mood === 'magisch')  ronkiAnim = 'mc-shimmer 3.2s ease-in-out infinite';
+  else                          ronkiAnim = 'mc-breathe 3.4s ease-in-out infinite';
 
   return (
     <div
@@ -104,6 +114,20 @@ export default function MoodChibi({
       {!bare && palette.particles === 'rain' && <Rain />}
       {!bare && palette.particles === 'zzz' && <ZZZ />}
       {!bare && palette.particles === 'ember' && <EmberPuff />}
+      {!bare && palette.particles === 'sparkle' && <SparkleDrift />}
+      {!bare && palette.particles === 'fidget' && <FidgetDots />}
+      {/* Magisch aura — gold-rose halo behind the chibi, pulsing slowly */}
+      {!bare && moodSkin.aura && (
+        <div style={{
+          position: 'absolute', left: '50%', top: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '88%', height: '88%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(249,168,212,0.45) 0%, rgba(249,168,212,0) 65%)',
+          animation: 'mc-aura 2.8s ease-in-out infinite',
+          pointerEvents: 'none',
+        }} />
+      )}
 
       {/* Ground pad — soft shadow ellipse where Ronki sits. Skipped in
           bare mode since the card has its own visual anchoring. */}
@@ -203,6 +227,36 @@ export default function MoodChibi({
           0%,100% { opacity: 0.4; transform: scale(0.95); }
           50%     { opacity: 0.8; transform: scale(1.05); }
         }
+        /* 6-mood expansion loops — one subtle motion per emotion */
+        @keyframes mc-fidget {
+          0%, 100% { transform: translateX(-50%) rotate(0deg); }
+          20%      { transform: translateX(-52%) rotate(-2deg); }
+          50%      { transform: translateX(-50%) rotate(0deg); }
+          80%      { transform: translateX(-48%) rotate(2deg); }
+        }
+        @keyframes mc-bounce {
+          0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+          30%      { transform: translateX(-50%) translateY(-6%) scale(1.03); }
+          50%      { transform: translateX(-50%) translateY(-4%) scale(1.02); }
+          70%      { transform: translateX(-50%) translateY(0) scale(1); }
+        }
+        @keyframes mc-shimmer {
+          0%, 100% { transform: translateX(-50%) scale(1); filter: brightness(1); }
+          50%      { transform: translateX(-50%) scale(1.04); filter: brightness(1.15) drop-shadow(0 0 10px rgba(249,168,212,0.6)); }
+        }
+        @keyframes mc-aura {
+          0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(0.92); }
+          50%      { opacity: 0.7;  transform: translate(-50%, -50%) scale(1.08); }
+        }
+        @keyframes mc-sparkle-drift {
+          0%   { opacity: 0; transform: translate(0, 0) scale(0.4); }
+          30%  { opacity: 1; }
+          100% { opacity: 0; transform: translate(-6px, -36px) scale(1); }
+        }
+        @keyframes mc-fidget-dot {
+          0%, 100% { opacity: 0; }
+          40%, 60% { opacity: 0.7; }
+        }
       `}</style>
     </div>
   );
@@ -242,6 +296,30 @@ const MOOD_SKINS = {
     particles: 'zzz',
     closedEyes: true,
   },
+  // ── 6-mood expansion (Apr 2026) ──
+  // Adds besorgt / gut / magisch so the Stimmung card's full 6-emotion
+  // taxonomy has chibi coverage. Normal + sad + tired stay as-is so
+  // existing states don't drift.
+  besorgt: {
+    bgCircle: 'radial-gradient(ellipse at 50% 30%, #e9dbff 0%, #c4b5fd 45%, #8b5cf6 90%)',
+    bgInset: 'rgba(55,30,110,0.28)',
+    mouth: 'worried',
+    particles: 'fidget',
+  },
+  gut: {
+    bgCircle: 'radial-gradient(ellipse at 50% 30%, #fef3c7 0%, #fcd34d 45%, #d97706 90%)',
+    bgInset: 'rgba(180,83,9,0.22)',
+    mouth: 'wide-happy',
+    particles: 'ember',
+    bounce: true,
+  },
+  magisch: {
+    bgCircle: 'radial-gradient(ellipse at 50% 30%, #fce7f3 0%, #f9a8d4 45%, #db2777 90%)',
+    bgInset: 'rgba(190,25,105,0.24)',
+    mouth: 'happy',
+    particles: 'sparkle',
+    aura: true,
+  },
 };
 
 // ── Mouth sub-component ───────────────────────────────────────────────
@@ -276,6 +354,32 @@ function Mouth({ kind }) {
           background: '#3a1f12',
           borderRadius: 2,
           marginTop: '40%',
+        }} />
+      </div>
+    );
+  }
+  if (kind === 'worried') {
+    // Slight open oval — concerned expression
+    return (
+      <div style={wrapper}>
+        <div style={{
+          width: '60%', height: '100%',
+          border: '2px solid #3a1f12',
+          borderRadius: '50%',
+          margin: '0 auto',
+          background: 'rgba(58,31,18,0.08)',
+        }} />
+      </div>
+    );
+  }
+  if (kind === 'wide-happy') {
+    // Wider smile — Gut mood
+    return (
+      <div style={{ ...wrapper, width: '26%', height: '8%' }}>
+        <div style={{
+          width: '100%', height: '100%',
+          borderBottom: '2.5px solid #3a1f12',
+          borderRadius: '0 0 12px 12px',
         }} />
       </div>
     );
@@ -636,6 +740,52 @@ function EmberPuff() {
           background: 'radial-gradient(circle, #fef3c7, #f59e0b)',
           boxShadow: '0 0 6px #fcd34d',
           animation: `mc-ember 3.2s ease-in ${p.delay} infinite`,
+          zIndex: 6,
+        }} />
+      ))}
+    </>
+  );
+}
+
+// Magisch — 3 small stars drifting up-and-leftward on rotating delays.
+// Delivers the "twinkly aura" without a heavy particle system.
+function SparkleDrift() {
+  const stars = [
+    { left: '30%', top: '40%', delay: '0s',   dur: '3s' },
+    { left: '62%', top: '34%', delay: '1.2s', dur: '3.4s' },
+    { left: '48%', top: '56%', delay: '2.3s', dur: '3.2s' },
+  ];
+  return (
+    <>
+      {stars.map((s, i) => (
+        <span key={i} aria-hidden="true" style={{
+          position: 'absolute', left: s.left, top: s.top,
+          fontFamily: 'Fredoka, sans-serif',
+          fontSize: 14, lineHeight: 1, color: '#fbcfe8',
+          filter: 'drop-shadow(0 0 5px rgba(251,207,232,0.9))',
+          animation: `mc-sparkle-drift ${s.dur} ease-out ${s.delay} infinite`,
+          zIndex: 6,
+        }}>✦</span>
+      ))}
+    </>
+  );
+}
+
+// Besorgt — three tiny worry dots hovering near Ronki's head, fading
+// in/out in sync. Implies fidget / "what if" without being loud.
+function FidgetDots() {
+  return (
+    <>
+      {[0, 1, 2].map(i => (
+        <span key={i} aria-hidden="true" style={{
+          position: 'absolute',
+          top: '24%',
+          left: `${52 + i * 6}%`,
+          width: 3, height: 3,
+          borderRadius: '50%',
+          background: 'rgba(139,92,246,0.7)',
+          boxShadow: '0 0 4px rgba(139,92,246,0.5)',
+          animation: `mc-fidget-dot 1.8s ease-in-out ${i * 0.25}s infinite`,
           zIndex: 6,
         }} />
       ))}
