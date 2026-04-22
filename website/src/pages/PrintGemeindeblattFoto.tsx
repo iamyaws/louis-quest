@@ -20,6 +20,7 @@ import { PhoneMockup } from '../components/PhoneMockup';
 
 export default function PrintGemeindeblattFoto() {
   const [exportMode, setExportMode] = useState(false);
+  const [showExitHint, setShowExitHint] = useState(false);
 
   useEffect(() => {
     // In export mode, body goes plain white so page screenshots don't
@@ -27,6 +28,27 @@ export default function PrintGemeindeblattFoto() {
     document.body.style.background = exportMode ? '#ffffff' : '#e4dfd6';
     return () => {
       document.body.style.background = '';
+    };
+  }, [exportMode]);
+
+  useEffect(() => {
+    if (!exportMode) return;
+
+    // Show the "ESC to exit" hint briefly when entering export mode,
+    // then auto-hide so it doesn't appear in screenshots.
+    setShowExitHint(true);
+    const hideTimer = setTimeout(() => setShowExitHint(false), 2500);
+
+    // Keyboard shortcut: ESC to exit export mode. No visible button
+    // at all, so full-page screenshots stay clean.
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setExportMode(false);
+    };
+    window.addEventListener('keydown', handleKey);
+
+    return () => {
+      clearTimeout(hideTimer);
+      window.removeEventListener('keydown', handleKey);
     };
   }, [exportMode]);
 
@@ -49,14 +71,10 @@ export default function PrintGemeindeblattFoto() {
         </div>
       )}
 
-      {exportMode && (
-        <button
-          onClick={() => setExportMode(false)}
-          style={exitExportBtnStyle}
-          className="no-print"
-        >
-          Export verlassen
-        </button>
+      {exportMode && showExitHint && (
+        <div style={exitHintStyle} aria-live="polite">
+          ESC zum Verlassen
+        </div>
       )}
 
       <div className="photo-canvas">
@@ -184,6 +202,14 @@ export default function PrintGemeindeblattFoto() {
           gap: 0 !important;
           min-height: 0 !important;
           align-items: flex-start !important;
+        }
+
+        /* Exit hint fade-out — invisible after 2.5s so full-page
+           screenshots taken later don't capture it. */
+        @keyframes gb-fade-out {
+          0%   { opacity: 0.92; }
+          70%  { opacity: 0.92; }
+          100% { opacity: 0; visibility: hidden; }
         }
 
         /* Ambient radial glows — warm TL (mustard), cool BR (sage) */
@@ -347,20 +373,24 @@ const exportBtnStyle: React.CSSProperties = {
   color: '#FDF8F0',
 };
 
-const exitExportBtnStyle: React.CSSProperties = {
+const exitHintStyle: React.CSSProperties = {
   position: 'fixed',
   top: 12,
   right: 12,
   zIndex: 100,
-  background: '#1A3C3F',
+  background: 'rgba(26,60,63,0.9)',
   color: '#FDF8F0',
-  border: 0,
   padding: '6px 14px',
   borderRadius: 999,
   fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
   fontWeight: 700,
   fontSize: 11,
-  cursor: 'pointer',
-  opacity: 0.4,
-  transition: 'opacity 0.2s',
+  pointerEvents: 'none',
+  letterSpacing: '0.05em',
+  animation: 'gb-fade-out 2.5s forwards',
 };
+
+/* Inline keyframe for the exit hint — fades from fully visible to
+   invisible over 2.5s so it never sticks into screenshots taken
+   after that window. Animation is defined in the page's <style>
+   block below (can't attach keyframes to a React.CSSProperties). */
