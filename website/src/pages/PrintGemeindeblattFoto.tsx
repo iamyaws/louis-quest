@@ -15,30 +15,49 @@
  * the height works out to 1440 × (210/297) ≈ 1018.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { PhoneMockup } from '../components/PhoneMockup';
 
 export default function PrintGemeindeblattFoto() {
+  const [exportMode, setExportMode] = useState(false);
+
   useEffect(() => {
-    document.body.style.background = '#e4dfd6';
+    // In export mode, body goes plain white so page screenshots don't
+    // pick up the warm cream background surrounding the canvas.
+    document.body.style.background = exportMode ? '#ffffff' : '#e4dfd6';
     return () => {
       document.body.style.background = '';
     };
-  }, []);
+  }, [exportMode]);
 
   return (
-    <div className="print-root">
-      <div className="no-print" style={instructionBarStyle}>
-        <strong style={{ fontWeight: 700 }}>
-          Gemeindeblatt-Foto &middot; 1440×1018 (A4 landscape)
-        </strong>
-        <span style={{ opacity: 0.7, marginLeft: 12 }}>
-          Screenshot bei 100% Browser-Zoom &middot; oder Cmd/Ctrl + P
-        </span>
-        <button onClick={() => window.print()} style={printBtnStyle}>
-          Drucken / Als PDF
+    <div className={`print-root ${exportMode ? 'export-mode' : ''}`}>
+      {!exportMode && (
+        <div className="no-print" style={instructionBarStyle}>
+          <strong style={{ fontWeight: 700 }}>
+            Gemeindeblatt-Foto &middot; 4320×3054 (A4 landscape @ 3×)
+          </strong>
+          <span style={{ opacity: 0.7, marginLeft: 10, fontSize: 11.5 }}>
+            Export-Modus versteckt diese Bar &middot; Screenshot via DevTools
+          </span>
+          <button onClick={() => setExportMode(true)} style={exportBtnStyle}>
+            Export-Modus
+          </button>
+          <button onClick={() => window.print()} style={printBtnStyle}>
+            Drucken / Als PDF
+          </button>
+        </div>
+      )}
+
+      {exportMode && (
+        <button
+          onClick={() => setExportMode(false)}
+          style={exitExportBtnStyle}
+          className="no-print"
+        >
+          Export verlassen
         </button>
-      </div>
+      )}
 
       <div className="photo-canvas">
         {/* Ambient glows — cream base reads warmer and more hand-made */}
@@ -133,15 +152,16 @@ export default function PrintGemeindeblattFoto() {
         .photo-canvas {
           position: relative;
           /* Layout dimensions are 1440×1018, design is authored at this
-             size. But we render at 2× via CSS zoom so screenshots are
-             2880×2036, which saves as a JPG above the Gemeindeblatt
-             1 MB minimum with plenty of margin. Design-time math stays
-             simple; render-time output stays print-ready. */
+             size. But we render at 3× via CSS zoom so screenshots are
+             4320×3054. Cream + gradient-heavy compositions compress very
+             aggressively as JPEG (flat areas + smooth gradients = low
+             entropy), so we need extra pixel headroom to still land above
+             the Gemeindeblatt 1 MB minimum after Q85-Q90 compression. */
           width: 1440px;
           /* 1440 × (210/297) ≈ 1018 — matches A4 landscape ratio so
              printing to A4 doesn't leave a white stripe at the bottom. */
           height: 1018px;
-          zoom: 2;
+          zoom: 3;
           background: #FDF8F0;
           overflow: hidden;
           box-shadow: 0 30px 60px rgba(0,0,0,0.18);
@@ -154,6 +174,16 @@ export default function PrintGemeindeblattFoto() {
            canvas scales naturally to A4 landscape. */
         @media print {
           .photo-canvas { zoom: 1; }
+        }
+        /* Export-mode: canvas is the only thing on the page, centered
+           in the white void. No cream body bg, no sticky bar — so
+           DevTools full-page screenshot or regular screenshot captures
+           just the canvas cleanly. */
+        .export-mode {
+          padding: 0 !important;
+          gap: 0 !important;
+          min-height: 0 !important;
+          align-items: flex-start !important;
         }
 
         /* Ambient radial glows — warm TL (mustard), cool BR (sage) */
@@ -178,17 +208,20 @@ export default function PrintGemeindeblattFoto() {
           filter: blur(10px);
         }
 
-        /* Paper-grain — SVG fractal noise, barely there */
+        /* Paper-grain — SVG fractal noise. Opacity bumped + higher alpha
+           in the noise filter so the JPEG encoder has more entropy to
+           chew on and can't compress the flatlay down to 120 KB.
+           Visually still reads as "paper texture". */
         .grain {
           position: absolute;
           inset: 0;
           pointer-events: none;
           mix-blend-mode: soft-light;
-          opacity: 0.55;
+          opacity: 0.85;
           z-index: 2;
           background-image:
-            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.24  0 0 0 0 0.25  0 0 0 0.45 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-          background-size: 260px 260px;
+            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.24  0 0 0 0 0.25  0 0 0 0.8 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+          background-size: 220px 220px;
         }
 
         /* Phone + Ronki stage */
@@ -294,7 +327,7 @@ const instructionBarStyle: React.CSSProperties = {
 };
 
 const printBtnStyle: React.CSSProperties = {
-  marginLeft: 'auto',
+  marginLeft: 8,
   background: '#FCD34D',
   color: '#1A3C3F',
   border: 0,
@@ -305,4 +338,29 @@ const printBtnStyle: React.CSSProperties = {
   fontSize: 12,
   cursor: 'pointer',
   flexShrink: 0,
+};
+
+const exportBtnStyle: React.CSSProperties = {
+  ...printBtnStyle,
+  marginLeft: 'auto',
+  background: '#50A082',
+  color: '#FDF8F0',
+};
+
+const exitExportBtnStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 12,
+  right: 12,
+  zIndex: 100,
+  background: '#1A3C3F',
+  color: '#FDF8F0',
+  border: 0,
+  padding: '6px 14px',
+  borderRadius: 999,
+  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+  fontWeight: 700,
+  fontSize: 11,
+  cursor: 'pointer',
+  opacity: 0.4,
+  transition: 'opacity 0.2s',
 };
