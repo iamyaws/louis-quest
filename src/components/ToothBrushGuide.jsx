@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
 import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
+import PinModal from './PinModal';
 
 /**
  * ToothBrushGuide — 3-minute guided tooth-brushing screen with two modes.
@@ -17,6 +18,15 @@ import VoiceAudio from '../utils/voiceAudio';
  * Mode is controlled by familyConfig.toothBrushDefaultMode (parent toggle).
  *
  * 6 zones x 30s = 3 min total.
+ *
+ * Parent-PIN override (added 22 Apr 2026): when a parent can see the
+ * child already finished brushing but the timer still has time on the
+ * clock, tapping "Eltern: fertig" + PIN completes the task immediately.
+ * Mirrors the pattern in ToothbrushTimer.jsx — same "1234" default PIN
+ * as the Eltern-Bereich. Morning brushing (s3/v3) uses ToothbrushTimer
+ * and already had this; evening brushing (s12/v10) uses THIS component
+ * and was missing the override — the inconsistency Louis + Marc hit
+ * during playtest.
  */
 
 const ZONES = [
@@ -28,7 +38,7 @@ const ZONES = [
   { id: 'tongue',        label: 'Zunge',                    motion: 'Sanft abbürsten',     seconds: 30, voiceId: 'de_brush_zone_6' },
 ];
 
-export default function ToothBrushGuide({ onFinish, onCancel }) {
+export default function ToothBrushGuide({ onFinish, onCancel, onParentOverride }) {
   const { state } = useTask();
   const mode = state?.familyConfig?.toothBrushDefaultMode || 'tasche';
 
@@ -36,6 +46,20 @@ export default function ToothBrushGuide({ onFinish, onCancel }) {
   const [zoneSecondsLeft, setZoneSecondsLeft] = useState(ZONES[0].seconds);
   // Flag flipped by visibilitychange — only matters in Tasche mode
   const [wasHidden, setWasHidden] = useState(false);
+  // Parent-PIN override — see component JSDoc. Same "1234" default PIN
+  // as the Eltern-Bereich; PinModal handles the actual validation.
+  const [pinOpen, setPinOpen] = useState(false);
+  const [pin, setPin] = useState('');
+
+  const handleParentOverrideTap = () => { setPin(''); setPinOpen(true); };
+  const handlePinSuccess = () => {
+    setPinOpen(false); setPin('');
+    SFX.play('coin');
+    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+    // Fall through to onFinish if no dedicated override handler — matches
+    // ToothbrushTimer.jsx:238. Both end in quest completion either way.
+    (onParentOverride || onFinish)?.();
+  };
 
   // ── Zone countdown + transition audio cue ──
   useEffect(() => {
@@ -77,23 +101,40 @@ export default function ToothBrushGuide({ onFinish, onCancel }) {
     return () => document.removeEventListener('visibilitychange', onVis);
   }, []);
 
-  if (mode === 'schau') {
-    return <SchauMode zoneIdx={zoneIdx} zoneSecondsLeft={zoneSecondsLeft} onCancel={onCancel} />;
-  }
   return (
-    <TascheMode
-      zoneIdx={zoneIdx}
-      zoneSecondsLeft={zoneSecondsLeft}
-      wasHidden={wasHidden}
-      onCancel={onCancel}
-    />
+    <>
+      {mode === 'schau' ? (
+        <SchauMode
+          zoneIdx={zoneIdx}
+          zoneSecondsLeft={zoneSecondsLeft}
+          onCancel={onCancel}
+          onParentOverrideTap={handleParentOverrideTap}
+        />
+      ) : (
+        <TascheMode
+          zoneIdx={zoneIdx}
+          zoneSecondsLeft={zoneSecondsLeft}
+          wasHidden={wasHidden}
+          onCancel={onCancel}
+          onParentOverrideTap={handleParentOverrideTap}
+        />
+      )}
+      {pinOpen && (
+        <PinModal
+          pin={pin}
+          setPin={setPin}
+          onSuccess={handlePinSuccess}
+          onClose={() => { setPinOpen(false); setPin(''); }}
+        />
+      )}
+    </>
   );
 }
 
 // ═══════════════════════════════════════════════════════════════════════
 // TASCHE MODE — phone down, dark calm, audio carries the guide
 // ═══════════════════════════════════════════════════════════════════════
-function TascheMode({ zoneIdx, zoneSecondsLeft, wasHidden, onCancel }) {
+function TascheMode({ zoneIdx, zoneSecondsLeft, wasHidden, onCancel, onParentOverrideTap }) {
   const base = import.meta.env.BASE_URL;
   const zone = ZONES[zoneIdx];
   // Total seconds remaining across all zones (for the mid-session nudge only)
@@ -155,9 +196,24 @@ function TascheMode({ zoneIdx, zoneSecondsLeft, wasHidden, onCancel }) {
         </div>
       )}
 
+      {/* Parent override — low-contrast, bottom-left. Kid-safe (tiny,
+           dim, no icon) while still discoverable for a parent who knows
+           what they're looking for. Same pattern as ToothbrushTimer. */}
+      {onParentOverrideTap && (
+        <button onClick={onParentOverrideTap}
+          className="absolute bottom-6 left-4 font-label uppercase active:opacity-70 transition-opacity min-h-[44px] px-4"
+          style={{
+            fontSize: 10, letterSpacing: '0.22em',
+            color: 'rgba(255,255,255,0.28)',
+            background: 'transparent', border: 'none',
+          }}>
+          Eltern: fertig
+        </button>
+      )}
+
       {/* Tiny cancel affordance — present but visually minimal */}
       <button onClick={onCancel}
-        className="absolute bottom-6 font-label text-xs active:opacity-70 py-3 px-6 min-h-[44px]"
+        className="absolute bottom-6 right-4 font-label text-xs active:opacity-70 py-3 px-6 min-h-[44px]"
         style={{ color: 'rgba(161,207,211,0.35)' }}>
         Abbrechen
       </button>
@@ -179,7 +235,7 @@ function TascheMode({ zoneIdx, zoneSecondsLeft, wasHidden, onCancel }) {
 // ═══════════════════════════════════════════════════════════════════════
 // SCHAU MODE — original visible 6-zone guide (illustrated backup)
 // ═══════════════════════════════════════════════════════════════════════
-function SchauMode({ zoneIdx, zoneSecondsLeft, onCancel }) {
+function SchauMode({ zoneIdx, zoneSecondsLeft, onCancel, onParentOverrideTap }) {
   const zone = ZONES[zoneIdx];
   return (
     <div className="fixed inset-0 z-[400] flex flex-col items-center justify-center px-6"
@@ -211,10 +267,23 @@ function SchauMode({ zoneIdx, zoneSecondsLeft, onCancel }) {
         {zoneIdx + 1} von {ZONES.length}
       </p>
 
-      <button onClick={onCancel}
-        className="font-label text-sm text-[#0c4a6e]/40 active:opacity-70 py-3 px-6 min-h-[44px]">
-        Abbrechen
-      </button>
+      <div className="flex items-center gap-6">
+        <button onClick={onCancel}
+          className="font-label text-sm text-[#0c4a6e]/40 active:opacity-70 py-3 px-6 min-h-[44px]">
+          Abbrechen
+        </button>
+        {onParentOverrideTap && (
+          <button onClick={onParentOverrideTap}
+            className="font-label uppercase active:opacity-70 transition-opacity min-h-[44px] px-4"
+            style={{
+              fontSize: 10, letterSpacing: '0.22em',
+              color: 'rgba(12,74,110,0.45)',
+              background: 'transparent', border: 'none',
+            }}>
+            Eltern: fertig
+          </button>
+        )}
+      </div>
     </div>
   );
 }

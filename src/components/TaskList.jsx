@@ -721,31 +721,36 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
       {/* ── Weather Outfit Modal ── */}
       {showWeather && <ClothingSheet onClose={() => setShowWeather(false)} />}
 
-      {/* ── Toothbrush Timer Overlay ── */}
-      {teethTimerQuestId && (
-        TEETH_GUIDE_IDS.has(teethTimerQuestId) ? (
+      {/* ── Toothbrush Timer Overlay ──
+           Morning brushing (s3/v3) → ToothbrushTimer (simple 3-min countdown)
+           Evening brushing (s12/v10) → ToothBrushGuide (6-zone guided, from TEETH_GUIDE_IDS)
+           Both receive onParentOverride so a parent can PIN-complete the
+           quest when the kid finished brushing faster than the clock (e.g.
+           Louis did 2 minutes of proper brushing but the timer wants 3).
+           Without this, evening brushing was stranded — the inconsistency
+           Marc hit during playtest. */}
+      {teethTimerQuestId && (() => {
+        const completeQuestFromParent = () => {
+          actions.complete(teethTimerQuestId);
+          SFX.play('coin');
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+          setTeethTimerQuestId(null);
+        };
+        return TEETH_GUIDE_IDS.has(teethTimerQuestId) ? (
           <ToothBrushGuide
-            onFinish={() => {
-              actions.complete(teethTimerQuestId);
-              SFX.play('coin');
-              if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-              setTeethTimerQuestId(null);
-            }}
+            onFinish={completeQuestFromParent}
             onCancel={() => setTeethTimerQuestId(null)}
+            onParentOverride={completeQuestFromParent}
           />
         ) : (
           <ToothbrushTimer
             duration={180}
-            onFinish={() => {
-              actions.complete(teethTimerQuestId);
-              SFX.play('coin');
-              if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-              setTeethTimerQuestId(null);
-            }}
+            onFinish={completeQuestFromParent}
             onSkip={() => setTeethTimerQuestId(null)}
+            onParentOverride={completeQuestFromParent}
           />
-        )
-      )}
+        );
+      })()}
     </div>
   );
 }
