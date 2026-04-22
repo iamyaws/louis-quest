@@ -133,7 +133,7 @@ export function FooterModern() {
             ronki
           </p>
           <p className="text-xs opacity-75">
-            © {year} Ronki · Ein unabhängiges Projekt · Keine Werbe-Partner, keine Tracker.
+            © {year} Ronki · Ein unabhängiges Projekt · Keine Werbe-Partner, keine Cookies.
           </p>
         </div>
       </div>

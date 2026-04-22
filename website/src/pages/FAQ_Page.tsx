@@ -100,7 +100,7 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: 'Wo werden Daten gespeichert?',
-        a: 'Ausschließlich in der EU. Wir nutzen Supabase in Frankfurt und Vercel Edge mit EU-Servern. Keine Drittanbieter-Tracker, keine Analytics, keine Werbe-Pixel.',
+        a: 'Ausschließlich in der EU. Wir nutzen Supabase in Frankfurt, Vercel Edge und Plausible Analytics (Estland). Keine Cookies, keine personenbezogenen Profile, keine Werbe-Pixel, nur eine aggregierte anonyme Reichweitenanalyse.',
       },
       {
         q: 'Kann ich meine Daten löschen?',

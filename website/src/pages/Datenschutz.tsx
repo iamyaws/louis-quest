@@ -8,7 +8,7 @@ export default function Datenschutz() {
     <PainterlyShell>
       <PageMeta
         title="Datenschutz: Ronki"
-        description="Wie wir mit deinen Daten umgehen. DSGVO-konform, EU-Hosting, kein Tracking."
+        description="Wie wir mit deinen Daten umgehen. DSGVO-konform, EU-Hosting, keine Cookies, keine personenbezogenen Profile."
         canonicalPath="/datenschutz"
       />
       <main className="relative px-6 py-20 sm:py-28">
@@ -27,9 +27,9 @@ export default function Datenschutz() {
             Datenschutz&shy;erklärung
           </h1>
           <p className="mt-5 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
-            Wir erheben so wenige Daten wie möglich. Nur, was wir wirklich brauchen, um Ronki an den Start zu bringen. Kein Tracking, keine Werbepartner, keine Weitergabe an Dritte außerhalb der EU.
+            Wir erheben so wenige Daten wie möglich. Nur, was wir wirklich brauchen, um Ronki an den Start zu bringen. Keine Werbung, keine Cookies, keine personenbezogenen Profile. Für eine anonyme Reichweitenanalyse nutzen wir Plausible Analytics aus der EU (siehe Abschnitt 7).
           </p>
-          <p className="mt-3 text-sm text-ink/60">Stand: 17. April 2026</p>
+          <p className="mt-3 text-sm text-ink/60">Stand: 22. April 2026</p>
 
           <div className="mt-14 flex flex-col gap-12 text-[0.98rem] leading-[1.75] text-ink/85">
 
@@ -109,20 +109,27 @@ export default function Datenschutz() {
               <p>
                 Technisch notwendige Mechanismen, etwa ein kurzfristiger Eintrag im Browser-Speicher, der beim Absenden des Warteliste-Formulars verhindert, dass du versehentlich doppelt klickst, gelten nach § 25 Abs. 2 TTDSG als unbedingt erforderlich und benötigen keine Einwilligung.
               </p>
+              <p>
+                Auch die von uns genutzte Reichweitenanalyse (Plausible Analytics) setzt bewusst keine Cookies und keinen Local Storage. Details siehe Abschnitt 7.
+              </p>
             </Section>
 
             <Section heading="6. Eingebundene Dienste, Analytics, Werbung">
               <p>
-                Diese Seite bindet <strong className="text-teal-dark">keine Dienste Dritter</strong> für Analytics, Werbung, Social-Media-Plugins oder Tracking ein. Wir nutzen:
+                Für die Reichweitenanalyse dieser Website nutzen wir ausschließlich <strong className="text-teal-dark">Plausible Analytics</strong> (Plausible Insights OÜ, Estland). Plausible ist eine privacy-first Alternative zu klassischen Tracking-Diensten: keine Cookies, keine IP-Adressen im Klartext, keine personenbezogenen Profile, keine geräteübergreifende Wiedererkennung. Details siehe Abschnitt 7.
+              </p>
+              <p>
+                Darüber hinaus binden wir <strong className="text-teal-dark">keine weiteren Dienste Dritter</strong> für Werbung, Social-Media-Plugins oder personenbezogenes Tracking ein:
               </p>
               <ul className="list-disc pl-6 space-y-1">
-                <li>kein Google Analytics, kein Plausible, kein Matomo</li>
+                <li>kein Google Analytics, kein Matomo, kein Hotjar</li>
                 <li>keine Meta/Facebook-Pixel, keine LinkedIn- oder TikTok-Tags</li>
                 <li>keine externen Schriftarten (Schriften sind lokal ausgeliefert)</li>
                 <li>keine Werbe-Netzwerke</li>
+                <li>keine nutzer- oder geräteübergreifenden Profile</li>
               </ul>
               <p>
-                Sollte sich das in Zukunft ändern, informieren wir dich an dieser Stelle transparent und holen, wo notwendig, deine Einwilligung ein.
+                Sollte sich an der Liste etwas ändern, informieren wir dich an dieser Stelle transparent und holen, wo notwendig, deine Einwilligung ein.
               </p>
             </Section>
 
@@ -235,7 +242,7 @@ export default function Datenschutz() {
               Kurz gesagt
             </p>
             <p className="text-base sm:text-lg text-ink/80 leading-relaxed max-w-2xl">
-              Wir speichern deine E-Mail-Adresse, ausschließlich um dir am Start-Tag zu schreiben. Keine Werbung, kein Tracking, kein Verkauf an Dritte. Wenn du's dir anders überlegst, eine Mail an <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a> reicht.
+              Wir speichern deine E-Mail-Adresse, ausschließlich um dir am Start-Tag zu schreiben. Keine Werbung, keine Cookies, kein Verkauf an Dritte. Für eine anonyme Reichweitenanalyse nutzen wir Plausible (EU-Hosting, keine Profile). Wenn du's dir anders überlegst, eine Mail an <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a> reicht.
             </p>
           </div>
         </article>

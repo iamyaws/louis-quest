@@ -5,7 +5,7 @@ import { EASE_OUT } from '../lib/motion';
 const ITEMS = [
   {
     q: 'Ist Ronki eine App?',
-    a: 'Ronki ist eine Web-App, die du direkt über den Browser auf deinem Startbildschirm installierst. Kein App Store, kein Download, keine Tracker.',
+    a: 'Ronki ist eine Web-App, die du direkt über den Browser auf deinem Startbildschirm installierst. Kein App Store, kein Download, keine Cookies.',
   },
   {
     q: 'Ab welchem Alter ist Ronki geeignet?',

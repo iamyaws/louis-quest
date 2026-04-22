@@ -37,7 +37,7 @@ export default function Home() {
           {
             question: 'Ist Ronki eine App?',
             answer:
-              'Ronki ist eine Web-App, die du direkt über den Browser auf deinem Startbildschirm installierst. Kein App Store, kein Download, keine Tracker.',
+              'Ronki ist eine Web-App, die du direkt über den Browser auf deinem Startbildschirm installierst. Kein App Store, kein Download, keine Cookies.',
           },
           {
             question: 'Ab welchem Alter ist Ronki geeignet?',

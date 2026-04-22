@@ -198,7 +198,7 @@ export function Footer() {
               ronki
             </p>
             <p className="text-xs text-teal-dark/70">
-              © {year} Ronki · Ein unabhängiges Projekt · Keine Werbepartner, keine Tracker.
+              © {year} Ronki · Ein unabhängiges Projekt · Keine Werbepartner, keine Cookies.
             </p>
           </div>
         </div>
