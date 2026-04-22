@@ -84,9 +84,46 @@ const VISITORS = [
   },
 ];
 
+// ── Visitor frequency ────────────────────────────────────────────────
+// Marc Apr 2026: "I would especially recommend for new users not to
+// overwhelm them and let them settle in for 4-5 days before this
+// feature gets into action and then this could be randomized."
+//
+// Two gates:
+//   1. Settle-in period — require `totalTasksDone >= 15` before any
+//      visitor appears (~3-5 days of a morning routine at 4-5 main
+//      quests a day). Fresh kids get quiet evenings.
+//   2. Randomized frequency — after settle-in, ~45% of days have a
+//      visitor. Date-seeded so same-day reopen = same answer. Silent
+//      days are a FEATURE, not a bug — matches "quiet aspiration"
+//      positioning. The in-game fallback copy ("Heute ist kein Freund
+//      da. Morgen kommt wieder jemand vorbei") already handles this.
+const VISITOR_SETTLE_IN_TASKS = 15;
+const VISITOR_FREQUENCY_PCT = 45; // 0..100
+
+function seedHash(today) {
+  // Deterministic hash per date so the randomized frequency is stable
+  // within a day (reopening the game doesn't flip visitor in/out).
+  const [y, m, d] = today.split('-').map(Number);
+  // Simple FNV-like mix; avoids the leading-zero parseInt problem that
+  // would bias toward certain day-of-month values.
+  return (y * 31 + m) * 31 + d;
+}
+
 // Pick today's visitor — idempotent by date. Rotates through unlocked
 // visitors using the date string as the seed so same day = same visitor.
-function pickTodaysVisitor(state, today) {
+export function pickTodaysVisitor(state, today) {
+  // Gate 1 — settle-in. Fresh kid hasn't done enough routine yet; keep
+  // the campfire quiet so the early app experience isn't "strangers show
+  // up and want things."
+  if ((state.totalTasksDone || 0) < VISITOR_SETTLE_IN_TASKS) return null;
+
+  // Gate 2 — randomized frequency. On a given day we either have a
+  // visitor or we don't, seeded by the date. No "the fox skipped
+  // today, Ronki is sad" — just absence as a neutral state.
+  const hash = seedHash(today);
+  if ((Math.abs(hash) % 100) >= VISITOR_FREQUENCY_PCT) return null;
+
   const friendships = state.freundFriendship || {};
   const unlocked = VISITORS.filter(v => {
     if (v.id === 'drachenmutter') return true;
@@ -97,9 +134,7 @@ function pickTodaysVisitor(state, today) {
     return false;
   });
   if (unlocked.length === 0) return null;
-  // Seed pick by date so same day = same visitor
-  const seed = today.split('-').join('');
-  const idx = parseInt(seed, 10) % unlocked.length;
+  const idx = Math.abs(hash) % unlocked.length;
   const chosen = unlocked[idx];
   return {
     freundId: chosen.id,

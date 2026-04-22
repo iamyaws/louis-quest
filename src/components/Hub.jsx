@@ -19,6 +19,7 @@ import BeatCompletionModal from './BeatCompletionModal';
 import ClothingSheet from './ClothingSheet';
 import CloudWaves from './CloudWaves';
 import CampfireScene from './CampfireScene';
+import { pickTodaysVisitor } from './CampfireVisitorsGame';
 import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
 import ForscherEcke from './ForscherEcke';
@@ -323,6 +324,21 @@ export default function Hub({ onNavigate, onPlayMint }) {
 
   // ── Next main quest for "Als Nächstes" ──
   const nextQuest = (state.quests || []).find(q => !q.done && !q.sideQuest);
+
+  // ── Today's visitor (for the Campfire Visitors card). Runs the same
+  //    settle-in + frequency gates as the game itself; null on silent
+  //    days is a FEATURE. Only shown once Louis has the habit ≥ 3 tasks
+  //    to match existing Hub card-reveal pacing.
+  const todayISO = new Date().toISOString().slice(0, 10);
+  const visitor = reveal(3) ? pickTodaysVisitor(state, todayISO) : null;
+  const visitorFreundMeta = visitor
+    ? { drachenmutter: '🐉', pilzhueter: '🍄', eulenhueterin: '🦉', wolfbruder: '🐺', sternenkind: '✨' }[visitor.freundId]
+    : null;
+
+  // ── Cave mining availability. Marc Apr 2026: gate behind the same
+  //    "settle in" signal as Visitors so fresh kids aren't flooded with
+  //    side-loops before the core routine sticks. Soft gate: 15+ tasks.
+  const caveAvailable = (state.totalTasksDone || 0) >= 15;
 
   // ── Side quests for Bonus button ──
   const sideQuests = (state.quests || []).filter(q => q.sideQuest);
@@ -864,6 +880,81 @@ export default function Hub({ onNavigate, onPlayMint }) {
               {shopUnlockHint}
             </span>
           </div>
+        )}
+
+        {/* ── Campfire Visitor card — only shows on days a Freund stops
+               by (settle-in + frequency gates inside pickTodaysVisitor).
+               Silent days intentionally show NOTHING; Marc Apr 2026:
+               absence is neutral, no "Ronki sad no fox today" chrome. ── */}
+        {visitor && (
+          <button
+            onClick={() => onNavigate?.('visitors')}
+            className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #fef3c7 0%, #fff8f2 100%)',
+              border: '1.5px solid rgba(252,211,77,0.55)',
+              boxShadow: '0 8px 20px -8px rgba(252,211,77,0.45)',
+            }}
+          >
+            <div
+              className="flex items-center justify-center shrink-0"
+              style={{
+                width: 48, height: 48, borderRadius: 16,
+                background: 'radial-gradient(circle at 50% 40%, rgba(252,211,77,0.35), rgba(255,248,242,0.8))',
+                fontSize: 28,
+              }}
+            >
+              {visitorFreundMeta}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5"
+                 style={{ color: '#b45309' }}>
+                {lang === 'de' ? 'Besuch am Lagerfeuer' : 'Visitor at the campfire'}
+              </p>
+              <p className="font-headline font-semibold text-[15px] leading-tight text-on-surface">
+                {lang === 'de' ? 'Jemand wartet auf dich' : 'Someone is waiting for you'}
+              </p>
+            </div>
+            <span className="material-symbols-outlined shrink-0" style={{ color: '#b45309', fontSize: 20 }}>chevron_right</span>
+          </button>
+        )}
+
+        {/* ── Kristall-Höhle card — gather-loop entry. Same settle-in
+               gate as Visitors so fresh kids aren't flooded with side
+               loops before the core routine sticks. ── */}
+        {caveAvailable && (
+          <button
+            onClick={() => onNavigate?.('hoehle')}
+            className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #1a0e22 0%, #2d1638 100%)',
+              color: '#fff8f2',
+              border: '1px solid rgba(252,211,77,0.22)',
+              boxShadow: '0 10px 22px -8px rgba(45,22,56,0.4)',
+            }}
+          >
+            <div
+              className="flex items-center justify-center shrink-0"
+              style={{
+                width: 48, height: 48, borderRadius: 16,
+                background: 'radial-gradient(circle at 40% 30%, #fcd34d 0%, #f59e0b 55%, #dc2626 100%)',
+                boxShadow: '0 0 14px rgba(249,115,22,0.55)',
+              }}
+              aria-hidden="true"
+            >
+              💎
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5"
+                 style={{ color: 'rgba(252,211,77,0.75)' }}>
+                {lang === 'de' ? 'Kristall-Höhle' : 'Crystal cave'}
+              </p>
+              <p className="font-headline font-semibold text-[15px] leading-tight">
+                {lang === 'de' ? 'Grab ein paar Kristalle aus' : 'Dig up some crystals'}
+              </p>
+            </div>
+            <span className="material-symbols-outlined shrink-0" style={{ color: 'rgba(252,211,77,0.7)', fontSize: 20 }}>chevron_right</span>
+          </button>
         )}
 
         {/* ── Forscher-Ecke — sequential progression.
