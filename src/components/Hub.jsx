@@ -4,6 +4,8 @@ import { useTask } from '../context/TaskContext';
 import { getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import useWeather, { getWeatherInfo, getWeatherCategory } from '../hooks/useWeather';
 import { useGameAccess } from '../hooks/useGameAccess';
+import HeroChibi from './HeroChibi';
+import HeroBuilder from './HeroBuilder';
 import SFX from '../utils/sfx';
 import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
@@ -143,6 +145,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const voice = useVoice();
   const base = import.meta.env.BASE_URL;
   const remaining = total - done;
+  // HeroBuilder modal — opens when the kid taps the top-bar avatar.
+  // Progressive-discovery pattern: no coachmark, no onboarding step —
+  // the kid finds it by tapping their own portrait.
+  const [heroBuilderOpen, setHeroBuilderOpen] = useState(false);
   const MOOD_LABELS_I18N = [t('mood.sad'), t('mood.worried'), t('mood.okay'), t('mood.good'), t('mood.magical'), t('mood.tired')];
 
   // Arc system paused — no auto-offer, no active banner. See
@@ -445,21 +451,37 @@ export default function Hub({ onNavigate, onPlayMint }) {
                 padding: '10px 20px 14px',
                 paddingTop: 'calc(10px + env(safe-area-inset-top, 0px))',
               }}>
-        <button onClick={() => onNavigate?.('ronki')}
-                className="inline-flex items-center active:scale-95 transition-all rounded-full shrink-0"
-                style={{
-                  background: 'rgba(255,248,242,0.82)',
-                  backdropFilter: 'blur(14px) saturate(160%)',
-                  WebkitBackdropFilter: 'blur(14px) saturate(160%)',
-                  padding: '5px 14px 5px 5px',
-                  gap: 10,
-                  border: '1px solid rgba(18,67,70,0.12)',
-                  boxShadow: '0 4px 14px -4px rgba(18,67,70,0.22)',
-                }}>
-          <div className="relative">
+        {/* Hero pill is now a split target:
+             - Tap avatar circle → open HeroBuilder (kid-initiated
+               customization, discovered by exploration per Marc)
+             - Tap the rest of the pill (name / TAG) → navigate to
+               Ronki tab (original behavior).
+             Separate onClick + stopPropagation on the inner avatar
+             button so the outer still captures its own tap area. */}
+        <div className="inline-flex items-center rounded-full shrink-0"
+             style={{
+               background: 'rgba(255,248,242,0.82)',
+               backdropFilter: 'blur(14px) saturate(160%)',
+               WebkitBackdropFilter: 'blur(14px) saturate(160%)',
+               padding: '5px 14px 5px 5px',
+               gap: 10,
+               border: '1px solid rgba(18,67,70,0.12)',
+               boxShadow: '0 4px 14px -4px rgba(18,67,70,0.22)',
+             }}>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setHeroBuilderOpen(true); }}
+            aria-label={lang === 'de' ? 'Held anpassen' : 'Customize hero'}
+            className="relative rounded-full active:scale-95 transition-all"
+            style={{ padding: 0, border: 'none', background: 'transparent' }}
+          >
             <div className="rounded-full overflow-hidden flex items-center justify-center shrink-0"
                  style={{ width: 38, height: 38, background: '#fef3c7', border: '2px solid #fff' }}>
-              <img src={base + heroAvatar} alt={heroName} className="w-full h-full object-cover" />
+              {state.heroFace ? (
+                <HeroChibi face={state.heroFace} size={38} />
+              ) : (
+                <img src={base + heroAvatar} alt={heroName} className="w-full h-full object-cover" />
+              )}
             </div>
             {isDevMode() && (
               <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shadow"
@@ -467,8 +489,14 @@ export default function Hub({ onNavigate, onPlayMint }) {
                 {level}
               </div>
             )}
-          </div>
-          <div className="flex flex-col leading-none min-w-0">
+          </button>
+          <button
+            type="button"
+            onClick={() => onNavigate?.('ronki')}
+            aria-label={lang === 'de' ? 'Zum Ronki-Profil' : 'Go to Ronki profile'}
+            className="flex flex-col leading-none min-w-0 active:scale-95 transition-transform"
+            style={{ padding: 0, border: 'none', background: 'transparent', textAlign: 'left' }}
+          >
             <span className="font-headline whitespace-nowrap"
                   style={{ fontSize: 15, fontWeight: 600, color: '#124346', lineHeight: 1 }}>
               {heroName}
@@ -484,8 +512,8 @@ export default function Hub({ onNavigate, onPlayMint }) {
                    RonkiProfile / Buch / DiscoveryLog already surface. */}
               {t('hub.streakDay', { n: Math.max(1, state.totalTaskDays || 0) })}
             </span>
-          </div>
-        </button>
+          </button>
+        </div>
 
         {/* HP pill — Polish .hp spec. Tall "N / HELDENPUNKTE" shape,
              cream→amber vertical gradient, 22px pearl, primary-teal
@@ -1394,6 +1422,10 @@ export default function Hub({ onNavigate, onPlayMint }) {
       )}
 
       {showClothing && <ClothingSheet onClose={() => setShowClothing(false)} />}
+
+      {/* Hero chibi builder — opens from the top-bar avatar tap.
+           Progressive discovery: no onboarding step, kid finds it. */}
+      <HeroBuilder open={heroBuilderOpen} onClose={() => setHeroBuilderOpen(false)} />
     </div>
   );
 }

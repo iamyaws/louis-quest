@@ -160,6 +160,18 @@ export interface TaskState {
    *  all preserved in code so activation is a flag flip, not a rebuild.
    *  See memory/backlog_rpg_mode.md. */
   rpgModeEnabled?: boolean;
+
+  // ── Hero chibi customization (added 22 Apr 2026) ──
+  /** Optional kid-customized avatar composition. Renders via HeroChibi
+   *  (pure CSS) when set; otherwise the default hero-default.webp /
+   *  hero-default-girl.webp image shows through. Discovered via tapping
+   *  the top-bar hero pill — deliberately NOT part of onboarding per
+   *  Marc's "kid explores by himself" directive. */
+  heroFace?: {
+    skin: string;       // one of SKIN_TONES ids (light / warm / tan / deep / pale)
+    hair: string;       // one of HAIR_STYLES ids (short-brown / long-black / ...)
+    expression: string; // one of EXPRESSIONS ids (happy / curious / cool / shy)
+  };
   /** Creatures discovered via useMicropediaDiscovery. One entry per unlock. */
   micropediaDiscovered?: Array<{ id: string; chapter: string; discoveredAt: string }>;
   /** Freund reunion arcs Louis has completed end-to-end (all 4 beats). */
@@ -487,6 +499,8 @@ export function createInitialState(): TaskState {
     analyticsEnabled: true,
     // RPG-Modus — off by default, parent-opt-in for older kids.
     rpgModeEnabled: false,
+    // Hero chibi — undefined until the kid discovers the builder.
+    heroFace: undefined,
     // Bonding Agent defaults — Ronki starts in a normal mood; the next
     // rare bad day is scheduled 14-21d out so a first-week user doesn't
     // see it immediately (the surprise should land after trust is built).
@@ -648,6 +662,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           analyticsEnabled: raw.analyticsEnabled ?? true,
           // RPG-Modus — off for all existing users; parent-opt-in later.
           rpgModeEnabled: raw.rpgModeEnabled ?? false,
+          // Hero chibi composition — preserved verbatim if saved, else
+          // undefined (falls back to stock hero-default image).
+          heroFace: raw.heroFace,
           // Bonding Agent migration — saves predating Apr 2026 don't have
           // these fields. Default to normal mood + schedule a first bad
           // day 14-21d out so returning users aren't ambushed on next open.
