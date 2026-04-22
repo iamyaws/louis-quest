@@ -306,7 +306,7 @@ export default function DrachenSammelkarten() {
               <p className="text-base sm:text-lg opacity-85 leading-relaxed max-w-xl mb-8">
                 In der App kannst du alle Drachen entdecken, lernen wie sie
                 leben, was sie mögen und wie du Freundschaft mit ihnen
-                schließt — ohne Tauschen nötig.
+                schließt, ganz ohne Tauschen.
               </p>
               <a
                 href="https://app.ronki.de/?compendium=1"

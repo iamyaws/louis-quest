@@ -15,6 +15,11 @@ export function FooterModern() {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
           className="font-display text-3xl sm:text-4xl leading-tight max-w-2xl opacity-85"
+          style={{
+            hyphens: 'manual',
+            WebkitHyphens: 'manual',
+            MozHyphens: 'manual',
+          }}
         >
           {copy.footerMicro}
         </motion.p>

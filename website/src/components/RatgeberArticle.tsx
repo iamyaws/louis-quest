@@ -234,7 +234,7 @@ export function RatgeberArticle({
               </h2>
               <p className="text-cream/70 leading-relaxed">
                 {getLaunchCopy(LAUNCH_STATE).ctaAction === 'install'
-                  ? 'Eine Routine führst du aus. Ein Ritual lebt ihr gemeinsam. Ronki läuft direkt im Browser — kein Store, kein Download, keine Werbung. Probier es aus und schreib uns an hallo@ronki.de, wenn was klemmt.'
+                  ? 'Eine Routine führst du aus. Ein Ritual lebt ihr gemeinsam. Ronki läuft direkt im Browser, ohne Store, ohne Download, ohne Werbung. Probier es aus und schreib uns an hallo@ronki.de, wenn was klemmt.'
                   : 'Eine Routine führst du aus. Ein Ritual lebt ihr gemeinsam. Wir öffnen Ronki in kleinen Gruppen. Kein Store, kein Download, keine Werbung. Trag dich ein und sag uns, wo\u2019s bei euch gerade klemmt.'}
               </p>
             </div>

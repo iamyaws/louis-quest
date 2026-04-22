@@ -51,7 +51,14 @@ export function Footer() {
             transition={{ duration: 0.7 }}
             className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-10"
           >
-            <p className="font-display font-semibold text-2xl sm:text-3xl leading-snug text-teal-dark flex-1">
+            <p
+              className="font-display font-semibold text-2xl sm:text-3xl leading-snug text-teal-dark flex-1"
+              style={{
+                hyphens: 'manual',
+                WebkitHyphens: 'manual',
+                MozHyphens: 'manual',
+              }}
+            >
               {copy.footerMicro}
             </p>
             <div className="w-full sm:w-auto sm:min-w-[320px] shrink-0">

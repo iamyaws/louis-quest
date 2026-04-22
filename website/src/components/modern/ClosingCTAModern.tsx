@@ -42,6 +42,11 @@ export function ClosingCTAModern() {
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
           className="text-lg opacity-70 max-w-xl"
+          style={{
+            hyphens: 'manual',
+            WebkitHyphens: 'manual',
+            MozHyphens: 'manual',
+          }}
         >
           {blurb}
         </motion.p>

@@ -39,7 +39,16 @@ export function WaitlistCTA({ launchState, appUrl }: Props) {
           <span className="relative z-10">{copy.ctaLabel}</span>
           <span className="relative z-10 transition-transform group-hover:translate-x-1">→</span>
         </motion.a>
-        <p className="text-sm opacity-70">{copy.ctaHelper}</p>
+        <p
+          className="text-sm opacity-70"
+          style={{
+            hyphens: 'manual',
+            WebkitHyphens: 'manual',
+            MozHyphens: 'manual',
+          }}
+        >
+          {copy.ctaHelper}
+        </p>
       </div>
     );
   }

@@ -57,6 +57,11 @@ export function ClosingCTA() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.25 }}
           className="mt-4 text-base opacity-70 max-w-md leading-relaxed"
+          style={{
+            hyphens: 'manual',
+            WebkitHyphens: 'manual',
+            MozHyphens: 'manual',
+          }}
         >
           {blurb}
         </motion.p>

@@ -295,9 +295,16 @@ export default function Installieren() {
                       <h2 className="font-display font-bold text-2xl sm:text-3xl leading-tight mb-4">
                         {isInstall ? 'Ronki öffnet direkt im Browser.' : 'Trag dich ein, wir melden uns.'}
                       </h2>
-                      <p className="text-cream/70 leading-relaxed text-sm sm:text-base">
+                      <p
+                        className="text-cream/70 leading-relaxed text-sm sm:text-base"
+                        style={{
+                          hyphens: 'manual',
+                          WebkitHyphens: 'manual',
+                          MozHyphens: 'manual',
+                        }}
+                      >
                         {isInstall
-                          ? 'Public-Alpha. Kein Store, kein Download, keine Anmeldung. Wenn etwas klemmt — Mail an hallo@ronki.de landet direkt bei Marc.'
+                          ? 'Public-Alpha. Kein Store, kein Download, keine Anmeldung. Wenn etwas klemmt, schreibt an hallo@ronki.de. Landet direkt bei Marc.'
                           : 'Wir öffnen Ronki in kleinen Gruppen. Meist innerhalb von 48 Stunden nach Eintrag. Kein Spam, kein Store, keine Werbung.'}
                       </p>
                     </>
