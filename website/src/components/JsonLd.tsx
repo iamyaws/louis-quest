@@ -74,3 +74,92 @@ export function FAQPageSchema({ items }: { items: FAQItem[] }) {
     />
   );
 }
+
+/* ── Article schema (for Ratgeber pages) ─────────────────── *
+ * Enables rich snippets in Google search (headline, author photo,
+ * date) and eligibility for featured snippets / top-stories-style
+ * placements. Applied via the RatgeberArticle wrapper so every
+ * Ratgeber page automatically gets it.
+ * ─────────────────────────────────────────────────────────── */
+
+type ArticleSchemaProps = {
+  /** Final page URL, e.g. https://www.ronki.de/ratgeber/morgen-troedeln */
+  url: string;
+  headline: string;
+  description: string;
+  /** Absolute URL to the article's og/hero image. */
+  image: string;
+  datePublished: string;
+  dateModified?: string;
+  author?: string;
+};
+
+export function ArticleSchema({
+  url,
+  headline,
+  description,
+  image,
+  datePublished,
+  dateModified,
+  author = 'Marc Förster',
+}: ArticleSchemaProps) {
+  return (
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': url,
+        },
+        headline,
+        description,
+        image: [image],
+        datePublished,
+        dateModified: dateModified ?? datePublished,
+        author: {
+          '@type': 'Person',
+          name: author,
+          url: 'https://www.ronki.de',
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Ronki',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://www.ronki.de/favicon-192.png',
+          },
+        },
+      }}
+    />
+  );
+}
+
+/* ── Breadcrumb schema ───────────────────────────────────── *
+ * Tells Google the path from Home → Ratgeber → Article. Surfaces
+ * as a breadcrumb trail in SERP, also a ranking signal. Applied
+ * via RatgeberArticle wrapper with hard-coded Home + Ratgeber
+ * ancestors (none of the article pages are deeper nested).
+ * ─────────────────────────────────────────────────────────── */
+
+export type BreadcrumbItem = {
+  name: string;
+  url: string;
+};
+
+export function BreadcrumbListSchema({ items }: { items: BreadcrumbItem[] }) {
+  return (
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: items.map((item, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: item.name,
+          item: item.url,
+        })),
+      }}
+    />
+  );
+}

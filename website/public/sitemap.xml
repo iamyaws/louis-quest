@@ -121,6 +121,24 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.ronki.de/ratgeber/eltern-bereich</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.ronki.de/mitmachen</loc>
+    <lastmod>2026-04-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.ronki.de/drachen-sammelkarten</loc>
+    <lastmod>2026-04-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.ronki.de/impressum</loc>
     <lastmod>2026-04-17</lastmod>
     <changefreq>yearly</changefreq>

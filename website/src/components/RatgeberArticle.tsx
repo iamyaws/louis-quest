@@ -7,6 +7,7 @@ import { Footer } from './Footer';
 import { WaitlistCTA } from './WaitlistCTA';
 import { RatgeberFiguresStyles } from './RatgeberFigures';
 import { FeedbackForm } from './FeedbackForm';
+import { ArticleSchema, BreadcrumbListSchema } from './JsonLd';
 import { LAUNCH_STATE, getLaunchCopy } from '../config/launch-state';
 import { EASE_OUT } from '../lib/motion';
 
@@ -142,6 +143,15 @@ export function RatgeberArticle({
     year: 'numeric',
   }).format(new Date(publishedAt));
 
+  const fullUrl = `https://www.ronki.de/ratgeber/${slug}`;
+  // Prefer the explicit ogImage, fall back to heroImage, then to the
+  // site default. ArticleSchema needs an absolute URL, so prepend the
+  // domain when a relative path is passed.
+  const schemaImagePath = ogImage || heroImage || '/og-ronki.jpg';
+  const schemaImage = schemaImagePath.startsWith('http')
+    ? schemaImagePath
+    : `https://www.ronki.de${schemaImagePath}`;
+
   return (
     <PainterlyShell>
       <PageMeta
@@ -149,6 +159,20 @@ export function RatgeberArticle({
         description={description}
         canonicalPath={`/ratgeber/${slug}`}
         ogImage={ogImage}
+      />
+      <ArticleSchema
+        url={fullUrl}
+        headline={title}
+        description={description}
+        image={schemaImage}
+        datePublished={publishedAt}
+      />
+      <BreadcrumbListSchema
+        items={[
+          { name: 'Start', url: 'https://www.ronki.de/' },
+          { name: 'Ratgeber', url: 'https://www.ronki.de/ratgeber' },
+          { name: title, url: fullUrl },
+        ]}
       />
 
       {/* ─────────── Hero ─────────── */}

@@ -11,6 +11,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Ronki" />
+    <!-- Preload above-the-fold fonts so they start loading in parallel
+         with the HTML, not waiting for CSS parse. Self-hosted WOFF2,
+         crossorigin required even for same-origin fonts per spec.
+         Preloading only the weights used in the hero region: 500 (body),
+         700 (headings), 800 (display-heavy hero). Lower-priority weights
+         load on-demand via @font-face in globals.css. -->
+    <link rel="preload" href="/fonts/plus-jakarta-sans-500.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/plus-jakarta-sans-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/plus-jakarta-sans-800.woff2" as="font" type="font/woff2" crossorigin />
     <title>Ronki — Der Drachen-Gefährte für Kinder-Routinen</title>
     <meta name="description" content="Ronki trägt die Routine mit. Ein Drachen-Gefährte, der Kinder durch den Alltag begleitet. Ohne Streaks, ohne Werbung, ohne Dark Patterns." />
     <meta property="og:title" content="Ronki — Der Drachen-Gefährte für Kinder-Routinen" />
