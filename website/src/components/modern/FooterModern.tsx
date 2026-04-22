@@ -24,18 +24,71 @@ export function FooterModern() {
           {copy.footerMicro}
         </motion.p>
 
+        {/* Four-column grid — same groupings as the main Footer for
+            consistency across the two design variants. */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Ronki (product) */}
           <div>
-            <p className="text-xs uppercase tracking-[0.15em] opacity-75 mb-4">Navigation</p>
-            <nav aria-label="Footer" className="flex flex-col gap-2 text-sm">
+            <p className="text-xs uppercase tracking-[0.15em] opacity-75 mb-4">Ronki</p>
+            <nav aria-label="Ronki" className="flex flex-col gap-2 text-sm">
               <Link to="/" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
                 Start
               </Link>
               <Link to="/wie-es-funktioniert" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
                 Wie es funktioniert
               </Link>
+              <Link to="/fuer-eltern" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
+                Für Eltern
+              </Link>
               <Link to="/wissenschaft" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
                 Wissenschaft
+              </Link>
+              <Link to="/faq" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
+                Häufige Fragen
+              </Link>
+            </nav>
+          </div>
+
+          {/* Mitmachen (community hub) */}
+          <div>
+            <p className="text-xs uppercase tracking-[0.15em] text-[#c48a3a] mb-4 font-medium">Mitmachen</p>
+            <nav aria-label="Mitmachen" className="flex flex-col gap-2 text-sm">
+              <Link
+                to="/mitmachen"
+                className="font-display font-semibold opacity-100 hover:text-[#c48a3a] transition-colors w-fit"
+              >
+                Gründungs-Familien
+              </Link>
+              <a
+                href="https://discord.gg/e8yns9A4X"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit inline-flex items-center gap-1.5"
+              >
+                Discord-Community
+                <span aria-hidden className="opacity-60 text-[10px] leading-none">↗</span>
+              </a>
+              <Link to="/installieren" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
+                Ronki installieren
+              </Link>
+              <a
+                href="mailto:hallo@ronki.de"
+                className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit"
+              >
+                hallo@ronki.de
+              </a>
+            </nav>
+          </div>
+
+          {/* Entdecken (content) */}
+          <div>
+            <p className="text-xs uppercase tracking-[0.15em] opacity-75 mb-4">Entdecken</p>
+            <nav aria-label="Entdecken" className="flex flex-col gap-2 text-sm">
+              <Link to="/ratgeber" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
+                Ratgeber
+              </Link>
+              <Link to="/vorlagen" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
+                Vorlagen
               </Link>
               <Link to="/drachen-sammelkarten" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
                 Drachen-Sammelkarten
@@ -51,34 +104,27 @@ export function FooterModern() {
               </a>
             </nav>
           </div>
+
+          {/* Rechtliches & Mehr */}
           <div>
-            <p className="text-xs uppercase tracking-[0.15em] opacity-75 mb-4">Rechtliches</p>
-            <nav aria-label="Rechtliches" className="flex flex-col gap-2 text-sm">
+            <p className="text-xs uppercase tracking-[0.15em] opacity-75 mb-4">Rechtliches &amp; Mehr</p>
+            <nav aria-label="Rechtliches und Mehr" className="flex flex-col gap-2 text-sm">
               <Link to="/impressum" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
                 Impressum
               </Link>
               <Link to="/datenschutz" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
                 Datenschutz
               </Link>
+              <Link to="/agb" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
+                AGB
+              </Link>
+              <Link
+                to="/"
+                className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit"
+              >
+                Klassisch (Aquarell) →
+              </Link>
             </nav>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.15em] opacity-75 mb-4">Kontakt</p>
-            <a
-              href="mailto:hallo@ronki.de"
-              className="text-sm opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors"
-            >
-              hallo@ronki.de
-            </a>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.15em] opacity-75 mb-4">Version</p>
-            <Link
-              to="/"
-              className="text-sm opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors"
-            >
-              Klassisch (Aquarell) →
-            </Link>
           </div>
         </div>
 

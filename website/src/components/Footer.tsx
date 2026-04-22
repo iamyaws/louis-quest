@@ -66,32 +66,82 @@ export function Footer() {
             </div>
           </motion.div>
 
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Four-column grid on desktop: Ronki (product), Mitmachen
+              (community hub — Gründungs-Familien, Discord, install),
+              Entdecken (browsing content), Rechtliches + Mehr. On
+              tablet collapses to 2 cols, on mobile to 1. */}
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {/* ── Ronki (product understanding) ────────── */}
             <div>
               <p className="text-xs uppercase tracking-[0.15em] text-teal/60 mb-4 font-medium">
-                Navigation
+                Ronki
               </p>
-              <nav aria-label="Footer" className="flex flex-col gap-2 text-sm">
+              <nav aria-label="Ronki" className="flex flex-col gap-2 text-sm">
                 <Link to="/" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Start
                 </Link>
                 <Link to="/wie-es-funktioniert" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Wie es funktioniert
                 </Link>
-                <Link to="/wissenschaft" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
-                  Wissenschaft
-                </Link>
                 <Link to="/fuer-eltern" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Für Eltern
+                </Link>
+                <Link to="/wissenschaft" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
+                  Wissenschaft
                 </Link>
                 <Link to="/faq" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Häufige Fragen
                 </Link>
+              </nav>
+            </div>
+
+            {/* ── Mitmachen (community hub) ─────────────── */}
+            <div>
+              <p className="text-xs uppercase tracking-[0.15em] text-sage mb-4 font-medium">
+                Mitmachen
+              </p>
+              <nav aria-label="Mitmachen" className="flex flex-col gap-2 text-sm">
+                <Link
+                  to="/mitmachen"
+                  className="text-teal-dark hover:text-sage transition-colors w-fit py-2.5 font-display font-semibold"
+                >
+                  Gründungs-Familien
+                </Link>
+                <a
+                  href="https://discord.gg/e8yns9A4X"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5 inline-flex items-center gap-1.5"
+                >
+                  Discord-Community
+                  <span aria-hidden className="text-sage/70 text-[10px] leading-none">↗</span>
+                </a>
+                <Link to="/installieren" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
+                  Ronki installieren
+                </Link>
+                <a
+                  href="mailto:hallo@ronki.de"
+                  className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5"
+                >
+                  hallo@ronki.de
+                </a>
+              </nav>
+            </div>
+
+            {/* ── Entdecken (content) ───────────────────── */}
+            <div>
+              <p className="text-xs uppercase tracking-[0.15em] text-teal/60 mb-4 font-medium">
+                Entdecken
+              </p>
+              <nav aria-label="Entdecken" className="flex flex-col gap-2 text-sm">
                 <Link to="/ratgeber" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Ratgeber
                 </Link>
-                <Link to="/installieren" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
-                  Ronki installieren
+                <Link to="/vorlagen" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
+                  Vorlagen zum Ausdrucken
+                </Link>
+                <Link to="/drachen-sammelkarten" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
+                  Drachen-Sammelkarten
                 </Link>
                 <a
                   href="https://app.ronki.de/?compendium=1"
@@ -102,19 +152,15 @@ export function Footer() {
                   Drachen-Compendium
                   <span aria-hidden className="text-teal/50 text-[10px] leading-none">↗</span>
                 </a>
-                <Link to="/vorlagen" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
-                  Vorlagen zum Ausdrucken
-                </Link>
-                <Link to="/drachen-sammelkarten" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
-                  Drachen-Sammelkarten
-                </Link>
               </nav>
             </div>
+
+            {/* ── Rechtliches + Mehr ────────────────────── */}
             <div>
               <p className="text-xs uppercase tracking-[0.15em] text-teal/60 mb-4 font-medium">
-                Rechtliches
+                Rechtliches &amp; Mehr
               </p>
-              <nav aria-label="Rechtliches" className="flex flex-col gap-2 text-sm">
+              <nav aria-label="Rechtliches und Mehr" className="flex flex-col gap-2 text-sm">
                 <Link to="/impressum" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Impressum
                 </Link>
@@ -124,32 +170,22 @@ export function Footer() {
                 <Link to="/agb" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   AGB
                 </Link>
+                <a
+                  href="https://ko-fi.com/ronkiapp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5 inline-flex items-center gap-1.5"
+                >
+                  <span aria-hidden>🍨</span> Louis ein Eis ausgeben
+                  <span aria-hidden className="text-teal/50 text-[10px] leading-none">↗</span>
+                </a>
+                <Link
+                  to="/en"
+                  className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5 inline-flex items-center gap-1.5"
+                >
+                  <span aria-hidden>🇬🇧</span> English version
+                </Link>
               </nav>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.15em] text-teal/60 mb-4 font-medium">
-                Kontakt
-              </p>
-              <a
-                href="mailto:hallo@ronki.de"
-                className="text-sm text-teal-dark/75 hover:text-teal-dark transition-colors block mb-4"
-              >
-                hallo@ronki.de
-              </a>
-              <a
-                href="https://ko-fi.com/ronkiapp"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-teal-dark/75 hover:text-teal-dark transition-colors block mb-4"
-              >
-                <span aria-hidden>🍨</span> Louis eine Kugel Eis ausgeben
-              </a>
-              <Link
-                to="/en"
-                className="inline-flex items-center gap-2 text-xs font-display font-semibold text-teal-dark/60 hover:text-teal-dark transition-colors"
-              >
-                <span aria-hidden>🇬🇧</span> English version
-              </Link>
             </div>
           </div>
 

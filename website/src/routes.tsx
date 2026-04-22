@@ -11,6 +11,7 @@ const FuerEltern = lazy(() => import('./pages/FuerEltern'));
 const FAQ_Page = lazy(() => import('./pages/FAQ_Page'));
 const Vorlagen = lazy(() => import('./pages/Vorlagen'));
 const DrachenSammelkarten = lazy(() => import('./pages/DrachenSammelkarten'));
+const MitMachen = lazy(() => import('./pages/MitMachen'));
 const VorlageMorgen = lazy(() => import('./pages/VorlageMorgen'));
 const VorlageAbend = lazy(() => import('./pages/VorlageAbend'));
 const VorlageKleineGeschwister = lazy(() => import('./pages/VorlageKleineGeschwister'));
@@ -74,6 +75,7 @@ export function AppRoutes() {
         <Route path="/faq" element={<FAQ_Page />} />
         <Route path="/vorlagen" element={<Vorlagen />} />
         <Route path="/drachen-sammelkarten" element={<DrachenSammelkarten />} />
+        <Route path="/mitmachen" element={<MitMachen />} />
         <Route path="/vorlagen/morgenroutine" element={<VorlageMorgen />} />
         <Route path="/vorlagen/abendroutine" element={<VorlageAbend />} />
         <Route path="/vorlagen/kleine-geschwister" element={<VorlageKleineGeschwister />} />
