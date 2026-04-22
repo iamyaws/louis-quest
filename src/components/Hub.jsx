@@ -475,7 +475,14 @@ export default function Hub({ onNavigate, onPlayMint }) {
             </span>
             <span className="font-label font-bold uppercase whitespace-nowrap"
                   style={{ fontSize: 10, letterSpacing: '0.16em', color: '#725b00', marginTop: 3, lineHeight: 1 }}>
-              {t('hub.streakDay', { n: state.streak || 1 })}
+              {/* Tag N pill: reads totalTaskDays — # days the kid has
+                   completed the main routine. Previously read the
+                   phantom `state.streak` field (removed in Apr 2026
+                   rebuild), which meant the fallback kicked in every
+                   time → "TAG 1" stuck forever, no matter how long
+                   the app had been used. Now matches the same counter
+                   RonkiProfile / Buch / DiscoveryLog already surface. */}
+              {t('hub.streakDay', { n: Math.max(1, state.totalTaskDays || 0) })}
             </span>
           </div>
         </button>

@@ -238,41 +238,33 @@ export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
           </div>
 
           <div className="flex flex-col gap-3">
-            {/* Kristall-Höhle — same visual treatment as the old Hub card
-                 (deep purple gradient + crystal glow) so the relocation
-                 is visually familiar for kids who saw it before. */}
+            {/* Kristall-Höhle — restyled Apr 2026 to match the classic
+                 Mini-Spiele tile aesthetic (light bg, emoji-forward,
+                 horizontal card). The old dark-purple pill stuck out
+                 visually next to the warm cream Mini-Spiele rail. */}
             {caveAvailable && (
               <button
                 onClick={() => onNavigate?.('hoehle')}
-                className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
+                className="w-full rounded-2xl p-5 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
                 style={{
-                  background: 'linear-gradient(135deg, #1a0e22 0%, #2d1638 100%)',
-                  color: '#fff8f2',
-                  border: '1px solid rgba(252,211,77,0.22)',
-                  boxShadow: '0 10px 22px -8px rgba(45,22,56,0.4)',
+                  background: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)',
+                  boxShadow: '0 4px 14px -4px rgba(180,83,9,0.25), inset 0 1px 0 rgba(255,255,255,0.5)',
                 }}
               >
-                <div
-                  className="flex items-center justify-center shrink-0"
-                  style={{
-                    width: 48, height: 48, borderRadius: 16,
-                    background: 'radial-gradient(circle at 40% 30%, #fcd34d 0%, #f59e0b 55%, #dc2626 100%)',
-                    boxShadow: '0 0 14px rgba(249,115,22,0.55)',
-                  }}
-                  aria-hidden="true"
-                >
+                <span className="text-5xl select-none shrink-0 leading-none"
+                      style={{ filter: 'drop-shadow(0 2px 8px rgba(120,53,15,0.25))' }}>
                   💎
-                </div>
+                </span>
                 <div className="flex-1 min-w-0">
-                  <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5"
-                     style={{ color: 'rgba(252,211,77,0.75)' }}>
+                  <h3 className="font-headline font-bold text-lg" style={{ color: '#78350f' }}>
                     {lang === 'de' ? 'Kristall-Höhle' : 'Crystal cave'}
-                  </p>
-                  <p className="font-headline font-semibold text-[15px] leading-tight">
+                  </h3>
+                  <p className="font-body text-sm mt-0.5" style={{ color: '#b45309' }}>
                     {lang === 'de' ? 'Grab ein paar Kristalle aus' : 'Dig up some crystals'}
                   </p>
                 </div>
-                <span className="material-symbols-outlined shrink-0" style={{ color: 'rgba(252,211,77,0.7)', fontSize: 20 }}>chevron_right</span>
+                <span className="material-symbols-outlined shrink-0"
+                      style={{ color: '#b45309', fontSize: 20 }}>chevron_right</span>
               </button>
             )}
 
@@ -316,38 +308,39 @@ export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
             {mintEarned.map(game => (
               <button
                 key={game.id}
-                className="w-full rounded-2xl p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+                className="w-full rounded-2xl p-5 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(236,253,245,0.88) 100%)',
-                  border: '1.5px solid rgba(52,211,153,0.3)',
-                  boxShadow: '0 4px 14px -4px rgba(5,150,105,0.18), inset 0 1px 0 rgba(255,255,255,0.6)',
+                  // Restyled Apr 2026 to match the Mini-Spiele classic-tile
+                  // shape (p-5, text-5xl emoji) so all three sections —
+                  // Abenteuer, Knobel, Mini-Spiele — share one visual
+                  // grammar. Kept the mint accent so earned-badge cards
+                  // still read as "the completed set."
+                  background: 'linear-gradient(160deg, #ecfdf5 0%, rgba(110,231,183,0.4) 50%, rgba(52,211,153,0.3) 100%)',
                   cursor: stamina.exhausted ? 'not-allowed' : 'pointer',
                   opacity: stamina.exhausted ? 0.5 : 1,
                 }}
                 onClick={() => {
                   if (stamina.exhausted) { setShowExhausted(true); return; }
-                  // Same game.start semantic as the main tile list;
-                  // MINT replays from the earned-games rail still count.
                   track('game.start', { gameId: game.id });
                   onPlayMint?.(game.id);
                 }}
               >
-                <span className="text-4xl select-none shrink-0 leading-none">{game.emoji}</span>
+                <span className="text-5xl select-none shrink-0 leading-none"
+                      style={{ filter: 'drop-shadow(0 2px 8px rgba(5,150,105,0.2))' }}>
+                  {game.emoji}
+                </span>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-headline font-bold text-base text-primary-container">
+                  <h3 className="font-headline font-bold text-lg" style={{ color: '#064e3b' }}>
                     {game.name.de}
-                  </h4>
-                  <p className="font-body text-xs mt-0.5" style={{ color: '#047857' }}>
-                    <span className="material-symbols-outlined align-middle text-[13px]"
+                  </h3>
+                  <p className="font-body text-sm mt-0.5" style={{ color: '#047857' }}>
+                    <span className="material-symbols-outlined align-middle text-[14px]"
                           style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                     {' '}{game.badgeLabel.de}
                   </p>
                 </div>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                     style={{ background: 'rgba(52,211,153,0.16)', border: '1.5px solid rgba(52,211,153,0.35)' }}>
-                  <span className="material-symbols-outlined text-lg"
-                        style={{ color: '#059669', fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                </div>
+                <span className="material-symbols-outlined shrink-0"
+                      style={{ color: '#059669', fontSize: 20 }}>chevron_right</span>
               </button>
             ))}
           </div>

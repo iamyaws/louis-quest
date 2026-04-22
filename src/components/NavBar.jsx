@@ -207,6 +207,7 @@ export default function NavBar({ active = 'quests', onNavigate }) {
               <button
                 key={tab.id}
                 ref={(el) => { btnRefsRef.current[tab.id] = el; }}
+                data-tab-id={tab.id}
                 aria-label={locked ? `${label} — ${t('nav.locked.aria')}` : label}
                 aria-disabled={locked ? 'true' : 'false'}
                 onClick={() => handleTap(tab, locked)}

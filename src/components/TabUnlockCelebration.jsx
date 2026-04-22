@@ -104,6 +104,32 @@ export default function TabUnlockCelebration({ view }) {
   const toastUnlock = toastFor ? TAB_UNLOCKS.find(u => u.tabId === toastFor) : null;
   const coachUnlock = coachFor ? TAB_UNLOCKS.find(u => u.tabId === coachFor) : null;
 
+  // Anchor the coachmark pointer at the target nav button. The card itself
+  // stays visually centered (fine for readability), but the arrow moves to
+  // point at whichever tab we're explaining. Without this, the pointer was
+  // stuck at the card's horizontal center — which on a 5-tab navbar lands
+  // roughly on the middle (Ronki) tab, so the Tagebuch unlock "Here's your
+  // Tagebuch!" arrow was pointing at Ronki. Embarrassing, fixed.
+  const [pointerLeftPx, setPointerLeftPx] = useState(null);
+  useEffect(() => {
+    if (!coachFor) { setPointerLeftPx(null); return; }
+    let rafId;
+    const measure = () => {
+      const tabEl = document.querySelector(`[data-tab-id="${coachFor}"]`);
+      if (!tabEl) return;
+      const rect = tabEl.getBoundingClientRect();
+      setPointerLeftPx(rect.left + rect.width / 2);
+    };
+    // Measure after the coach mount has painted. rAF is enough; NavBar
+    // is always mounted by the time a coachmark can fire.
+    rafId = requestAnimationFrame(measure);
+    window.addEventListener('resize', measure);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', measure);
+    };
+  }, [coachFor]);
+
   return (
     <>
       {/* Unlock toast — gold pill, top-center, floats over AlphaBanner so
@@ -181,22 +207,33 @@ export default function TabUnlockCelebration({ view }) {
                 {t('nav.coach.close')}
               </button>
             </div>
-            {/* Pointer triangle toward the tab bar */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                bottom: -7,
-                left: '50%',
-                transform: 'translateX(-50%) rotate(45deg)',
-                width: 14,
-                height: 14,
-                background: '#fff8e1',
-                borderRight: '1.5px solid rgba(252,211,77,0.5)',
-                borderBottom: '1.5px solid rgba(252,211,77,0.5)',
-              }}
-            />
           </div>
+          {/* Pointer triangle anchored at the target nav button — fixed
+               to the viewport so its left-coordinate is in the same
+               coordinate system as the tab button we measured. Falls
+               back to viewport-center if measurement hasn't resolved
+               yet (first paint). */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'fixed',
+              left: pointerLeftPx != null ? pointerLeftPx : '50%',
+              // Sit just above the NavBar. NavBar bottom padding + height ≈
+              // 80-90px on iOS; this lands the arrow over the active tab
+              // icon zone. Using a fixed offset works across all kid-
+              // plausible viewports (no magic numbers for tiny phones).
+              bottom: 'calc(env(safe-area-inset-bottom, 22px) + 90px)',
+              transform: pointerLeftPx != null
+                ? 'translateX(-50%) rotate(45deg)'
+                : 'translateX(-50%) rotate(45deg)',
+              width: 14,
+              height: 14,
+              background: '#fff8e1',
+              borderRight: '1.5px solid rgba(252,211,77,0.5)',
+              borderBottom: '1.5px solid rgba(252,211,77,0.5)',
+              pointerEvents: 'none',
+            }}
+          />
         </div>,
         document.body
       )}
