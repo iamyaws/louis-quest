@@ -23,10 +23,9 @@ import CampfireScene from './CampfireScene';
 import { pickTodaysVisitor } from './CampfireVisitorsGame';
 import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
-import ForscherEcke from './ForscherEcke';
-import AttentionGlow from './AttentionGlow';
-import { isForscherGraduated } from '../data/mintGames';
-import { useAttentionFlag } from '../hooks/useAttentionFlag';
+// ForscherEcke / AttentionGlow / isForscherGraduated / useAttentionFlag
+// imports removed with the Apr 2026 Hub simplification — Forscher-Ecke
+// now lives inside MiniGames (Spielzimmer).
 import ZeigMomentCard from './ZeigMomentCard';
 import { isDevMode } from '../utils/mode';
 import { getVariant } from '../data/companionVariants';
@@ -117,23 +116,24 @@ const BOSS_ART = {
 };
 
 // ══════════════════════════════════════════════════════════════════════════
-// HUB — Variant D layout (Marc's mix)
+// HUB — Simplified layout (Apr 2026 density pass)
 //   · Scroll-over painted scene (full-bleed) behind content
-//   · Slim hero pill, no HP pill on this view
-//   · Greeting chip with weather (taps to open ClothingSheet)
-//   · Mood chip above HEUTE (collapsed, taps to expand picker inline)
+//   · Slim hero pill + HP pill
 //   · HEUTE card + 3-block anchor rail (morning / evening / bedtime)
-//   · Als Nächstes CTA — navigates to Aufgaben
-//   · Wasser pill — baseline care, adjacent to Als Nächstes
-//   · Forscher-Ecke (sequential, hides after graduation)
-//   · Extra-Aufgaben compact button (truly optional, bottom of main stack)
-//   · Mood chip (top) + Wasser (primary) bookend daily care
+//     — single nav-to-quests CTA (Als Nächstes removed as duplicate)
+//   · Mood chip → Wasser pill — body-care bookend
+//   · Visitor card (conditional, silent days = no card)
+//   · Spielzimmer card (entry to MiniGames, which now hosts Cave +
+//     Forscher-Ecke tiles that used to live here)
 //   · [dev: Boss / Achievement / Leitstern]
 //   · Memory Wall moved to RonkiProfile (single source of truth for "our story")
-//   · No Mehr-entdecken wrapper — flat tail, AttentionGlow NEU badge stays visible
 //   · LoginBonus removed (retention-bait; see project_ronki_positioning.md)
 //   · Arc system paused — see backlog_arc_offer_rework.md
+//   · Apr 2026 density pass removed: Als Nächstes, Kristall-Höhle,
+//     Forscher-Ecke, Extra-Aufgaben cards. First-viewport element count
+//     dropped from 10-14 → 6 for the 6yo target readability bar.
 // ══════════════════════════════════════════════════════════════════════════
+// eslint-disable-next-line no-unused-vars
 export default function Hub({ onNavigate, onPlayMint }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct } = computed;
@@ -172,7 +172,9 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const expeditionStatusText = null;
   const expeditionStatusSub = null;
 
-  const [forscherSeen, markForscherSeen] = useAttentionFlag('forscher-ecke-first-seen');
+  // forscherSeen attention flag removed with the Hub simplification —
+  // the Forscher-Ecke card no longer mounts here, so the NEU badge is
+  // handled inside MiniGames instead.
 
   // Trigger evening ritual when: evening + all bedtime quests done + hasn't happened today yet
   useEffect(() => {
@@ -330,8 +332,8 @@ export default function Hub({ onNavigate, onPlayMint }) {
     return { anchor: a, pct: items.length ? gDone / items.length : 0, count: items.length };
   }).filter(Boolean);
 
-  // ── Next main quest for "Als Nächstes" ──
-  const nextQuest = (state.quests || []).find(q => !q.done && !q.sideQuest);
+  // Als Nächstes removed with the Apr 2026 Hub simplification — HEUTE
+  // card already covers the "go to quests" CTA; see comment below.
 
   // ── Today's visitor (for the Campfire Visitors card). Runs the same
   //    settle-in + frequency gates as the game itself; null on silent
@@ -343,10 +345,8 @@ export default function Hub({ onNavigate, onPlayMint }) {
     ? { drachenmutter: '🐉', pilzhueter: '🍄', eulenhueterin: '🦉', wolfbruder: '🐺', sternenkind: '✨' }[visitor.freundId]
     : null;
 
-  // ── Cave mining availability. Marc Apr 2026: gate behind the same
-  //    "settle in" signal as Visitors so fresh kids aren't flooded with
-  //    side-loops before the core routine sticks. Soft gate: 15+ tasks.
-  const caveAvailable = (state.totalTasksDone || 0) >= 15;
+  // Cave availability check moved into MiniGames (Spielzimmer) along
+  // with the entry tile itself. Hub no longer renders the Cave card.
 
   // ── Minispiele / Spielzimmer — consulted per parent's chosen mode.
   //    'frei' → always unlocked, card always visible after reveal(3).
@@ -358,10 +358,8 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const gameAccess = useGameAccess();
   const spielzimmerAvailable = reveal(3) && gameAccess.unlocked;
 
-  // ── Side quests for Bonus button ──
-  const sideQuests = (state.quests || []).filter(q => q.sideQuest);
-  const sideDone = sideQuests.filter(q => q.done).length;
-  const sidePreview = sideQuests.filter(q => !q.done).map(q => t('quest.' + q.id)).join(' · ');
+  // Side-quest preview computation removed — Extras card no longer on
+  // Hub. Side quests continue to render inside TaskList (Aufgaben tab).
 
   return (
     <div className="relative min-h-dvh pb-32" style={{ backgroundColor: '#fff8f2' }}>
@@ -691,31 +689,15 @@ export default function Hub({ onNavigate, onPlayMint }) {
           )}
         </button>
 
-        {/* ── Als Nächstes (B style) — navigates to Aufgaben.
-               Progressive disclosure: hidden until Louis has 3 tasks done
-               so first-session Hub stays focused on the HEUTE card. ── */}
-        {reveal(3) && !allDone && nextQuest && (
-          <button onClick={() => onNavigate?.('quests')}
-                  className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
-                  style={{ background: '#fff', border: '1.5px solid #124346', boxShadow: '0 4px 14px -4px rgba(18,67,70,0.22)' }}>
-            <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-                 style={{ background: 'rgba(18,67,70,0.08)', fontSize: 22 }}>
-              {nextQuest.icon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] text-primary mb-0.5">
-                {t('hub.nextUp.label')}
-              </p>
-              <p className="font-body font-semibold text-[15px] leading-tight text-on-surface">
-                {t('quest.' + nextQuest.id)}
-              </p>
-            </div>
-            <span className="px-3 py-2 rounded-full font-label font-bold text-xs shrink-0"
-                  style={{ background: '#124346', color: '#fff' }}>
-              +{nextQuest.xp}
-            </span>
-          </button>
-        )}
+        {/* ── Als Nächstes REMOVED (Apr 2026 Hub simplification).
+               Decision: HEUTE card already takes Louis to the Aufgaben tab
+               and shows "N Aufgaben bleiben" + the anchor rail. Duplicating
+               the "go to quests" CTA with a specific next-quest preview
+               created two targets for the same action. Playtest ("too much
+               on the Lager") + first-viewport density research (6yo target
+               4-6 elements max) drove the removal. The specific next quest
+               now only lives inside Aufgaben, where Louis is already
+               oriented to pick. ── */}
 
         {/* ── Mood chip — body-care pair with Wasser (Marc reordering).
                Collapsed by default, taps to expand picker inline.
@@ -943,43 +925,12 @@ export default function Hub({ onNavigate, onPlayMint }) {
           </button>
         )}
 
-        {/* ── Kristall-Höhle card — gather-loop entry. Same settle-in
-               gate as Visitors so fresh kids aren't flooded with side
-               loops before the core routine sticks. ── */}
-        {caveAvailable && (
-          <button
-            onClick={() => onNavigate?.('hoehle')}
-            className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
-            style={{
-              background: 'linear-gradient(135deg, #1a0e22 0%, #2d1638 100%)',
-              color: '#fff8f2',
-              border: '1px solid rgba(252,211,77,0.22)',
-              boxShadow: '0 10px 22px -8px rgba(45,22,56,0.4)',
-            }}
-          >
-            <div
-              className="flex items-center justify-center shrink-0"
-              style={{
-                width: 48, height: 48, borderRadius: 16,
-                background: 'radial-gradient(circle at 40% 30%, #fcd34d 0%, #f59e0b 55%, #dc2626 100%)',
-                boxShadow: '0 0 14px rgba(249,115,22,0.55)',
-              }}
-              aria-hidden="true"
-            >
-              💎
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5"
-                 style={{ color: 'rgba(252,211,77,0.75)' }}>
-                {lang === 'de' ? 'Kristall-Höhle' : 'Crystal cave'}
-              </p>
-              <p className="font-headline font-semibold text-[15px] leading-tight">
-                {lang === 'de' ? 'Grab ein paar Kristalle aus' : 'Dig up some crystals'}
-              </p>
-            </div>
-            <span className="material-symbols-outlined shrink-0" style={{ color: 'rgba(252,211,77,0.7)', fontSize: 20 }}>chevron_right</span>
-          </button>
-        )}
+        {/* ── Kristall-Höhle RELOCATED (Apr 2026 Hub simplification).
+               Moved into the Spielzimmer (MiniGames.jsx) so the Hub's
+               first viewport stays under the 4-6 element ceiling for
+               6yos. Cave route (setView('hoehle')) is unchanged — only
+               the entry tile moved. Same settle-in gate (15+ tasks)
+               is enforced inside MiniGames via useTask(). ── */}
 
         {/* ── Spielzimmer — Ronki's game room, access-aware.
                Visibility driven by useGameAccess → canAccessMinigames:
@@ -1025,57 +976,20 @@ export default function Hub({ onNavigate, onPlayMint }) {
           </button>
         )}
 
-        {/* ── Forscher-Ecke — sequential progression.
-               Optional activity. Hidden when Louis has graduated.
-               See data/mintGames.ts for the sequence model.
-               Progressive disclosure: 10 tasks — matches the existing
-               Micropedia discovery threshold so the "new things to
-               explore" signal arrives in step. ── */}
-        {reveal(10) && !isForscherGraduated(state) && (
-          <AttentionGlow
-            active={!forscherSeen}
-            seenKey="forscher-ecke-first-seen"
-            accent="#059669"
-            intensity="medium"
-            badgeLabel="NEU"
-            voiceLineId="de_forscher_new_01"
-          >
-            <ForscherEcke
-              onPlayGame={(gameId) => {
-                markForscherSeen();
-                onPlayMint?.(gameId);
-              }}
-            />
-          </AttentionGlow>
-        )}
+        {/* ── Forscher-Ecke RELOCATED (Apr 2026 Hub simplification).
+               Moved into the Spielzimmer (MiniGames.jsx). The MINT
+               progression grid is still a core activity but the big
+               Dr. Funkel card was crowding first-viewport on the Hub.
+               reveal(10) gate still applies inside MiniGames so the
+               sequence doesn't surface for fresh kids. AttentionGlow
+               NEU treatment preserved in the relocated mount. ── */}
 
-        {/* ── Extra-Aufgaben — truly optional, sits at the bottom of the
-               main stack so Louis scrolls past his routine + baseline care
-               before the "extra" appears.
-               Progressive disclosure: 20 tasks — truly-optional side
-               content only shows once the core loop is internalized. ── */}
-        {reveal(20) && sideQuests.length > 0 && (
-          <button onClick={() => onNavigate?.('quests')}
-                  className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
-                  style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.08)' }}>
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 font-headline font-bold text-base"
-                 style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%)', color: '#725b00' }}>
-              {sideDone}/{sideQuests.length}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5" style={{ color: '#b45309' }}>
-                {t('task.bonus')}
-              </p>
-              <p className="font-headline font-semibold text-[15px] leading-tight text-on-surface">
-                {t('hub.bonus.headline')}
-              </p>
-              <p className="font-body text-[12px] leading-snug mt-0.5 text-on-surface-variant truncate">
-                {sidePreview || t('hub.bonus.allDone')}
-              </p>
-            </div>
-            <span className="material-symbols-outlined shrink-0" style={{ color: '#6b655b', fontSize: 20 }}>chevron_right</span>
-          </button>
-        )}
+        {/* ── Extra-Aufgaben REMOVED from Hub (Apr 2026 simplification).
+               The bonus/side-quest count + preview already lives inside
+               the Aufgaben tab (TaskList), which Louis reaches via the
+               HEUTE card. Surfacing it here was adding a fourth
+               nav-to-quests CTA. Side quests are unchanged in
+               TaskContext — only the Hub entry tile is gone. ── */}
 
         {/* ═════════════════════════════════════════════════════════════════
            E · DEV-ONLY SURFACES (flat, unwrapped)

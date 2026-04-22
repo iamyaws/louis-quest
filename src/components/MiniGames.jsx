@@ -8,8 +8,14 @@ import { getCatStage } from '../utils/helpers';
 import StaminaExhausted from './StaminaExhausted';
 import StaminaIndicator from './StaminaIndicator';
 import VoiceAudio from '../utils/voiceAudio';
-import { MINT_GAMES } from '../data/mintGames';
+import { MINT_GAMES, isForscherGraduated } from '../data/mintGames';
 import { useAnalytics } from '../hooks/useAnalytics';
+// Adventure-mode modules relocated from the Hub (Apr 2026 Hub simplification).
+// Cave = tile nav; Forscher-Ecke = inline MINT progression with its own
+// NEU badge. See MEMORY.md → backlog_progressive_hub_disclosure.md.
+import ForscherEcke from './ForscherEcke';
+import AttentionGlow from './AttentionGlow';
+import { useAttentionFlag } from '../hooks/useAttentionFlag';
 
 // Module-level cooldown so stamina voice line doesn't repeat every Games mount
 let lastStaminaVoiceMs = 0;
@@ -69,8 +75,8 @@ const GAMES = [
   },
 ];
 
-export default function MiniGames({ onPlay, onPlayMint }) {
-  const { t } = useTranslation();
+export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
+  const { t, lang } = useTranslation();
   const { state } = useTask();
   const { track } = useAnalytics();
   const access = useGameAccess();
@@ -78,8 +84,18 @@ export default function MiniGames({ onPlay, onPlayMint }) {
   const stamina = useRonkiStamina();
   const [showExhausted, setShowExhausted] = useState(false);
   const voiceFiredRef = useRef(false);
+  // Shared NEU-badge flag with the old Hub mount — same key so Louis
+  // doesn't see a second "NEU" glow after graduating from the Hub card.
+  const [forscherSeen, markForscherSeen] = useAttentionFlag('forscher-ecke-first-seen');
 
   const catStage = getCatStage(state?.catEvo || 0);
+  const tasksDone = state?.totalTasksDone || 0;
+
+  // ── Adventure-mode gates (relocated from Hub Apr 2026) ──
+  //  Cave: 15+ tasks. Matches the Hub's old "settle-in" gate.
+  //  Forscher-Ecke: 10+ tasks AND not yet graduated. Matches the Hub gate.
+  const caveAvailable = tasksDone >= 15;
+  const forscherAvailable = tasksDone >= 10 && !isForscherGraduated(state);
 
   // Earned MINT games — surface completed Knobel-Abenteuer as stables Louis
   // can replay any time once they're out of the Hub's Forscher-Ecke. Filtering
@@ -204,6 +220,87 @@ export default function MiniGames({ onPlay, onPlayMint }) {
         </div>
       )}
 
+      {/* ══════════════════════════════════════════════════════════════
+           ABENTEUER (relocated from Hub Apr 2026)
+           Cave tile + Forscher-Ecke live here now instead of cluttering
+           the Hub first-viewport. Adventure-mode activities sit above
+           the "Klassische Mini-Spiele" list so a kid who wants the
+           progression path finds it first. Only renders when unlocked
+           (game-access gate passed) AND at least one adventure is
+           gate-open, so this whole section hides for fresh kids.
+           ══════════════════════════════════════════════════════════════ */}
+      {unlocked && (caveAvailable || forscherAvailable) && (
+        <section className="mb-6">
+          <div className="flex items-baseline justify-between mb-3 px-1">
+            <h3 className="font-headline font-bold text-lg text-primary">
+              {t('game.adventures.section')}
+            </h3>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {/* Kristall-Höhle — same visual treatment as the old Hub card
+                 (deep purple gradient + crystal glow) so the relocation
+                 is visually familiar for kids who saw it before. */}
+            {caveAvailable && (
+              <button
+                onClick={() => onNavigate?.('hoehle')}
+                className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, #1a0e22 0%, #2d1638 100%)',
+                  color: '#fff8f2',
+                  border: '1px solid rgba(252,211,77,0.22)',
+                  boxShadow: '0 10px 22px -8px rgba(45,22,56,0.4)',
+                }}
+              >
+                <div
+                  className="flex items-center justify-center shrink-0"
+                  style={{
+                    width: 48, height: 48, borderRadius: 16,
+                    background: 'radial-gradient(circle at 40% 30%, #fcd34d 0%, #f59e0b 55%, #dc2626 100%)',
+                    boxShadow: '0 0 14px rgba(249,115,22,0.55)',
+                  }}
+                  aria-hidden="true"
+                >
+                  💎
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5"
+                     style={{ color: 'rgba(252,211,77,0.75)' }}>
+                    {lang === 'de' ? 'Kristall-Höhle' : 'Crystal cave'}
+                  </p>
+                  <p className="font-headline font-semibold text-[15px] leading-tight">
+                    {lang === 'de' ? 'Grab ein paar Kristalle aus' : 'Dig up some crystals'}
+                  </p>
+                </div>
+                <span className="material-symbols-outlined shrink-0" style={{ color: 'rgba(252,211,77,0.7)', fontSize: 20 }}>chevron_right</span>
+              </button>
+            )}
+
+            {/* Forscher-Ecke — inline MINT progression with Dr. Funkel.
+                 AttentionGlow wraps the whole card for the NEU badge
+                 until Louis opens it once. Same voice line ID as the
+                 old Hub mount so any sound cues line up. */}
+            {forscherAvailable && (
+              <AttentionGlow
+                active={!forscherSeen}
+                seenKey="forscher-ecke-first-seen"
+                accent="#059669"
+                intensity="medium"
+                badgeLabel="NEU"
+                voiceLineId="de_forscher_new_01"
+              >
+                <ForscherEcke
+                  onPlayGame={(gameId) => {
+                    markForscherSeen();
+                    onPlayMint?.(gameId);
+                  }}
+                />
+              </AttentionGlow>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* ── Deine Knobel-Abenteuer — earned MINT games, replayable ── */}
       {unlocked && mintEarned.length > 0 && (
         <section className="mb-6">
@@ -255,6 +352,18 @@ export default function MiniGames({ onPlay, onPlayMint }) {
             ))}
           </div>
         </section>
+      )}
+
+      {/* ── Klassische Mini-Spiele — always-available quickplays.
+           Shown under a section header when the Abenteuer section
+           above is also rendering, so the two layers read as distinct.
+           Gates: unlocked (access hook) + game.ready flag per tile. ── */}
+      {unlocked && (caveAvailable || forscherAvailable) && (
+        <div className="flex items-baseline justify-between mb-3 px-1 mt-2">
+          <h3 className="font-headline font-bold text-lg text-primary">
+            {t('game.classic.section')}
+          </h3>
+        </div>
       )}
 
       {/* Game cards — light, clean, emoji-forward */}

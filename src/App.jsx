@@ -396,6 +396,7 @@ function AppContent() {
         {view === 'games' && (
           <MiniGames
             onPlay={(id) => setView(id)}
+            onNavigate={setView}
             onPlayMint={(id) => {
               setActiveMintGame(id);
               setView('mint-game');
