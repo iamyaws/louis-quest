@@ -1087,6 +1087,15 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     actions?.patchState?.({ analyticsEnabled: next });
   };
 
+  // ── RPG-Modus (dormant feature for older-cohort expansion) — default
+  //    off. When enabled, surfaces the boss mechanic with HP rewards
+  //    and combat UI for a different, more RPG-flavored experience
+  //    under the same Ronki umbrella. Parent-opt-in, off by default. ──
+  const rpgModeEnabled = state?.rpgModeEnabled === true;
+  const toggleRpgMode = (next) => {
+    actions?.patchState?.({ rpgModeEnabled: next });
+  };
+
   // ── Default-PIN warning banner — surfaces until parent customizes ──
   const showDefaultPinBanner = state?.parentPinIsDefault !== false;
 
@@ -1535,6 +1544,50 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* RPG-Modus — parent-opt-in for older kids. When off (default),
+           Ronki runs the calm routine+care loop. When on, surfaces the
+           dormant boss mechanic with HP rewards for a more challenge-
+           flavored experience. Positioned as "for older kids" so parents
+           read the tradeoff before flipping. */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(168,85,247,0.12)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#7e22ce', fontVariationSettings: "'FILL' 1" }}>swords</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">RPG-Modus</p>
+          <span className="ml-auto font-label text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                style={{ background: 'rgba(168,85,247,0.12)', color: '#7e22ce' }}>
+            Ältere Kinder
+          </span>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Aktiviert Bosse und Herausforderungen. Für ältere Kinder, die mehr Abenteuer wollen. Standard-Modus ist Routine + Pflege.
+        </p>
+        <div className="flex items-center justify-between p-4 rounded-2xl"
+             style={{ background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.15)' }}>
+          <div>
+            <p className="font-label font-bold text-sm text-on-surface">{rpgModeEnabled ? 'An' : 'Aus'}</p>
+            <p className="font-label text-xs text-on-surface-variant mt-0.5">
+              {rpgModeEnabled ? 'Bosse sichtbar, Belohnungen aktiv.' : 'Ruhiger Alltags-Modus.'}
+            </p>
+          </div>
+          <button
+            onClick={() => toggleRpgMode(!rpgModeEnabled)}
+            className="relative w-14 h-8 rounded-full transition-all active:scale-95"
+            style={{
+              background: rpgModeEnabled ? '#7e22ce' : 'rgba(0,0,0,0.12)',
+              boxShadow: rpgModeEnabled ? '0 2px 8px rgba(126,34,206,0.35)' : 'none',
+            }}
+            aria-label={rpgModeEnabled ? 'RPG-Modus deaktivieren' : 'RPG-Modus aktivieren'}
+          >
+            <span className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
+                  style={{ transform: rpgModeEnabled ? 'translateX(24px)' : 'translateX(0)' }} />
+          </button>
         </div>
       </div>
 

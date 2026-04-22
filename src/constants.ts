@@ -135,12 +135,16 @@ export const MILESTONE_REWARDS: Record<number, { itemId: string; label: string; 
 export const CHEST_MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100] as const;
 export const MAX_MONTHLY_FREEZES = 2;
 
+// Weekly mission HP rewards halved in the Apr 2026 economy rebalance
+// (was 120-250 → now 40-80). Evolution rewards untouched — they're
+// not part of the earn economy. The story gear on finish is the real
+// emotional payoff; HP was inflating the kid's weekly ceiling.
 export const WEEKLY_MISSIONS: WeeklyMission[] = [
   {
     id: "em1", title: "Der Wächter des Waldes",
     story: "Meistere 14 Morgenroutinen, um die magische Rüstung des Waldwächters zu erhalten.",
     goal: "allMorning", target: 14,
-    reward: { hp: 200, evo: 5 },
+    reward: { hp: 80, evo: 5 },
     icon: "🌲", tag: "Wald-Quest", tagColor: "emerald",
     rewardLabel: "Waldwächter-Rüstung", rewardIcon: "shield",
   },
@@ -148,7 +152,7 @@ export const WEEKLY_MISSIONS: WeeklyMission[] = [
     id: "em2", title: "Sonnenglast-Expedition",
     story: "Trinke 30 Mal Wasser, um deine Energie zu bündeln und die Sonnenflügel zu entfalten.",
     goal: "water", target: 30,
-    reward: { hp: 150, evo: 4 },
+    reward: { hp: 60, evo: 4 },
     icon: "☀️", tag: "Tages-Expedition", tagColor: "amber",
     rewardLabel: "Sonnenflügel", rewardIcon: "flutter_dash",
   },
@@ -156,7 +160,7 @@ export const WEEKLY_MISSIONS: WeeklyMission[] = [
     id: "em3", title: "Die Nachtwache",
     story: "Schließe 7 Abendroutinen komplett ab, um die Dunkelheit zu erleuchten.",
     goal: "allEvening", target: 7,
-    reward: { hp: 120, evo: 3 },
+    reward: { hp: 50, evo: 3 },
     icon: "🌙", tag: "Nacht-Quest", tagColor: "violet",
     rewardLabel: "Sternenlaterne", rewardIcon: "light",
   },
@@ -164,7 +168,7 @@ export const WEEKLY_MISSIONS: WeeklyMission[] = [
     id: "em4", title: "Bücherwurm-Saga",
     story: "Lies 10 Tage lang, um das verborgene Buch der Weisheit zu finden.",
     goal: "read", target: 10,
-    reward: { hp: 180, evo: 4 },
+    reward: { hp: 70, evo: 4 },
     icon: "📖", tag: "Wissens-Quest", tagColor: "sky",
     rewardLabel: "Buch der Weisheit", rewardIcon: "menu_book",
   },
@@ -172,7 +176,7 @@ export const WEEKLY_MISSIONS: WeeklyMission[] = [
     id: "em5", title: "Fußball-Legende",
     story: "Gehe 6 Mal zum Training und werde zur Fußball-Legende des Reichs!",
     goal: "football", target: 6,
-    reward: { hp: 160, evo: 3 },
+    reward: { hp: 60, evo: 3 },
     icon: "⚽", tag: "Sport-Quest", tagColor: "green",
     rewardLabel: "Goldene Stollenschuhe", rewardIcon: "sports_soccer",
   },
@@ -180,7 +184,7 @@ export const WEEKLY_MISSIONS: WeeklyMission[] = [
     id: "em6", title: "Sternenjäger",
     story: "Schließe 5 Tage ALLE Aufgaben ab, um einen verlorenen Stern einzufangen.",
     goal: "allDone", target: 5,
-    reward: { hp: 250, evo: 6 },
+    reward: { hp: 100, evo: 6 },
     icon: "⭐", tag: "Meister-Quest", tagColor: "yellow",
     rewardLabel: "Sternensplitter", rewardIcon: "star",
   },
@@ -411,12 +415,22 @@ export const DEFAULT_BELOHNUNGEN: Belohnung[] = [
   // Fun rewards (HP — meaningful save-up loops for a ~200 HP/day earner)
   // Tiered for a 1st grader: Tier 0 (~half a day, instant win), Tier 1 (1 day),
   // Tier 2 (~2-3 days), Tier 3 (~1 week aspirational)
+  // HP prices compressed in the Apr 2026 economy rebalance — big
+  // numbers read as "never" to a 6yo. New ladder maps to the revised
+  // earn ceiling (~80 HP/day) so each tier corresponds to a concrete
+  // number of days saving, not an abstract digit count.
+  //  50 HP = 1 good day         (Ausmalbild — instant-win)
+  //  80 HP = 1 day              (Süßigkeit)
+  // 120 HP = 2 days             (Storytime)
+  // 200 HP = 2-3 days           (Begleiter-Boost)
+  // 300 HP = 3-4 days           (Lieblingsessen)
+  // 500 HP = ~1 week            (Besonderer Ausflug — top tier)
   { id: "bel_coloring", name: "Ronki-Ausmalbild", emoji: "\u{1F3A8}", cost: 50, active: true, currency: "hp" },
-  { id: "bel_candy", name: "Süßigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 100, active: true, currency: "hp" },
-  { id: "bel_storytime", name: "Extra Gute-Nacht-Geschichte", emoji: "\u{1F4DA}", cost: 175, active: true, currency: "hp" },
-  { id: "bel_evoboost", name: "Begleiter-Boost (+5 EP)", emoji: "\u{1F4AA}", cost: 250, active: true, currency: "hp" },
-  { id: "bel_vote", name: "Lieblingsessen wählen", emoji: "\u{1F355}", cost: 350, active: true, currency: "hp" },
-  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 1000, active: true, currency: "hp" },
+  { id: "bel_candy", name: "Süßigkeit / 2. Nachtisch", emoji: "\u{1F36C}", cost: 80, active: true, currency: "hp" },
+  { id: "bel_storytime", name: "Extra Gute-Nacht-Geschichte", emoji: "\u{1F4DA}", cost: 120, active: true, currency: "hp" },
+  { id: "bel_evoboost", name: "Begleiter-Boost (+5 EP)", emoji: "\u{1F4AA}", cost: 200, active: true, currency: "hp" },
+  { id: "bel_vote", name: "Lieblingsessen wählen", emoji: "\u{1F355}", cost: 300, active: true, currency: "hp" },
+  { id: "bel_trip", name: "Besonderer Ausflug", emoji: "\u{1F3A2}", cost: 500, active: true, currency: "hp" },
 ];
 
 // ═══ Bavaria School Vacations ═══

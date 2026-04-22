@@ -151,6 +151,15 @@ export interface TaskState {
    *  first-run disclosure on Track A). Opt-out via Parental Dashboard.
    *  Events drop silently when false. */
   analyticsEnabled?: boolean;
+
+  // ── RPG mode (added 22 Apr 2026 — dormant feature) ──
+  /** When true, surfaces the boss mechanic + HP rewards for combat for
+   *  an older-cohort experience under the same Ronki umbrella. Default
+   *  false for the 5-8yo default audience (whose core loop is routine
+   *  + care, not combat). The boss data, BossChest, and voicelines are
+   *  all preserved in code so activation is a flag flip, not a rebuild.
+   *  See memory/backlog_rpg_mode.md. */
+  rpgModeEnabled?: boolean;
   /** Creatures discovered via useMicropediaDiscovery. One entry per unlock. */
   micropediaDiscovered?: Array<{ id: string; chapter: string; discoveredAt: string }>;
   /** Freund reunion arcs Louis has completed end-to-end (all 4 beats). */
@@ -476,6 +485,8 @@ export function createInitialState(): TaskState {
     // discloses this to parents + exposes the toggle in the Dashboard.
     analyticsDeviceId: undefined,
     analyticsEnabled: true,
+    // RPG-Modus — off by default, parent-opt-in for older kids.
+    rpgModeEnabled: false,
     // Bonding Agent defaults — Ronki starts in a normal mood; the next
     // rare bad day is scheduled 14-21d out so a first-week user doesn't
     // see it immediately (the surprise should land after trust is built).
@@ -635,6 +646,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // default. Device_id stays undefined until analytics.ts lazy-init.
           analyticsDeviceId: raw.analyticsDeviceId,
           analyticsEnabled: raw.analyticsEnabled ?? true,
+          // RPG-Modus — off for all existing users; parent-opt-in later.
+          rpgModeEnabled: raw.rpgModeEnabled ?? false,
           // Bonding Agent migration — saves predating Apr 2026 don't have
           // these fields. Default to normal mood + schedule a first bad
           // day 14-21d out so returning users aren't ambushed on next open.
@@ -934,12 +947,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         boss.hp = Math.max(0, boss.hp - dmg);
         bossDmgToday += dmg;
         if (boss.hp <= 0) {
+          // Boss HP reward zeroed in the Apr 2026 economy rebalance per
+          // Marc — the boss mechanic stays alive for a potential future
+          // older-cohort "RPG-Modus" but mints zero HP for today's kid
+          // audience (whose core loop is routine + care, not combat).
+          // bd lookup + trophy + killed-today flag preserved so the
+          // existing Buch / celebration surfaces continue to read boss
+          // history correctly when the feature is re-activated via
+          // state.rpgModeEnabled.
           const bd = BOSSES.find(b => b.id === boss!.id);
-          // Defense bonus: extra HP on defeat (1 per 5 defense)
-          const defenseBonus = Math.floor(gearDefense / 5);
-          if (bd) hp += bd.reward.hp + defenseBonus;
-          screenMin += 3; // bonus screen minutes on boss defeat
-          if (!bossTrophies.includes(boss.id)) bossTrophies.push(boss.id);
+          if (bd && !bossTrophies.includes(boss.id)) bossTrophies.push(boss.id);
           bossKilledToday = true;
         }
       }
@@ -1057,7 +1074,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (doneMap[habitId]) return prev;
       const habits = prev.familyConfig?.dailyHabits || [];
       const def = habits.find(h => h.id === habitId);
-      const reward = def?.xp || 5;
+      const baseReward = def?.xp || 5;
+      // Diminishing returns (economy rebalance Apr 2026) — 1st habit full
+      // reward, 2nd habit 60%, 3rd+ habits 0 HP. Prevents "dummy habits"
+      // becoming a mint: a parent configuring 10 habits shouldn't let
+      // Louis farm 50 HP/day just by tapping a row of checkboxes. The
+      // habit is still marked done + Ronki still reacts — kid gets the
+      // confirmation loop without the inflation.
+      const n = Object.keys(doneMap).length;
+      const multiplier = n === 0 ? 1 : n === 1 ? 0.6 : 0;
+      const reward = Math.floor(baseReward * multiplier);
       return {
         ...prev,
         dailyHabits: { ...doneMap, [habitId]: true },
@@ -1097,7 +1123,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       return {
         ...prev,
         dailyWaterCount: (prev.dailyWaterCount || 0) + 1,
-        hp: (prev.hp || 0) + 2 + bonusHp,
+        // Water sip: +1 HP (was +2). Kept small-positive so the bar
+        // fill still mints a tangible point but 6 sips = +6/day, not +12.
+        hp: (prev.hp || 0) + 1 + bonusHp,
         catEvo: (prev.catEvo || 0) + bonusEvo,
         activeMissions,
         completedMissions,
@@ -1116,12 +1144,17 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Cat-care HP grants compressed from +5/+3/+8 (=+16/day) to +1 each
+  // (=+3/day) in the Apr 2026 economy rebalance. Care actions are bonds,
+  // not economy taps — their job is evolution progress (catEvo ticks)
+  // and the 3-sec animation reaction, not minting HP. The +1 keeps a
+  // tiny signal so the kid still feels the tap "counts."
   const feedCompanion = useCallback(() => {
     setState(prev => {
       if (!prev || prev.catFed) return prev;
       const newEvo = (prev.catEvo || 0) + 1;
       evolveCheck(prev.catEvo || 0, newEvo);
-      return { ...prev, catFed: true, hp: (prev.hp || 0) + 5, catEvo: newEvo };
+      return { ...prev, catFed: true, hp: (prev.hp || 0) + 1, catEvo: newEvo };
     });
   }, [evolveCheck]);
 
@@ -1130,7 +1163,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (!prev || prev.catPetted) return prev;
       const newEvo = (prev.catEvo || 0) + 1;
       evolveCheck(prev.catEvo || 0, newEvo);
-      return { ...prev, catPetted: true, hp: (prev.hp || 0) + 3, catEvo: newEvo };
+      return { ...prev, catPetted: true, hp: (prev.hp || 0) + 1, catEvo: newEvo };
     });
   }, [evolveCheck]);
 
@@ -1139,15 +1172,19 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (!prev || prev.catPlayed) return prev;
       const newEvo = (prev.catEvo || 0) + 1;
       evolveCheck(prev.catEvo || 0, newEvo);
-      return { ...prev, catPlayed: true, hp: (prev.hp || 0) + 8, catEvo: newEvo };
+      return { ...prev, catPlayed: true, hp: (prev.hp || 0) + 1, catEvo: newEvo };
     });
   }, [evolveCheck]);
 
   // ── Login bonus ──
+  // Apr 2026 economy rebalance: HP grant zeroed per Marc ("shouldn't
+  // exist anymore"). The action + state flag stay so legacy call sites
+  // don't throw, but claiming mints zero HP — the login-bonus mechanic
+  // is dormant pending any future re-introduction.
   const collectLoginBonus = useCallback(() => {
     setState(prev => {
       if (!prev || prev.loginBonusClaimed) return prev;
-      return { ...prev, loginBonusClaimed: true, hp: (prev.hp || 0) + 5 };
+      return { ...prev, loginBonusClaimed: true };
     });
   }, []);
 
