@@ -8,3 +8,7 @@ website/dist/
 # Raw photographer source files for founder photos — keep local, deploy webp only
 website/public/art/founders/_DSC*.JPEG
 website/public/art/founders/_DSC*.jpg
+
+# Voice casting samples live outside the repo (~/Ronki Voice Samples/).
+# Safety net in case someone re-runs a generation script with the old path.
+voice-samples/

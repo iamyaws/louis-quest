@@ -21,7 +21,11 @@ if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
 MODEL_ID = 'eleven_multilingual_v2'
-OUTPUT_DIR = r'C:\Users\öööö\louis-quest\voice-samples\ronki'
+# Casting samples live OUTSIDE the repo (~/Ronki Voice Samples/) — Marc browses
+# + listens directly, they're never committed. Only production audio (under
+# voice IDs Marc has locked in) lands in public/audio/ronki/ via a different
+# generation script.
+OUTPUT_DIR = r'C:\Users\öööö\Ronki Voice Samples\ronki'
 ENV_PATH = r'C:\Users\öööö\louis-quest\.env'
 
 # Moderate settings — let each voice's natural character come through without
