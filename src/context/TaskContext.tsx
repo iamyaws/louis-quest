@@ -214,6 +214,9 @@ export interface TaskState {
     fills: Record<string, string>;
     completedAt: string;
   }>;
+  /** Today's Kraftwort (from KraftwortTool). Hub reads this to surface
+   *  the chosen word as an ambient chip. Refreshes daily via date match. */
+  todaysKraftwort?: { word: string; label: string; emoji: string; date: string } | null;
 }
 
 interface TaskComputed {
@@ -555,6 +558,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           freundFriendship: (raw as any).freundFriendship || {},
           todaysVisitor: (raw as any).todaysVisitor ?? null,
           completedColoringPages: (raw as any).completedColoringPages || [],
+          todaysKraftwort: (raw as any).todaysKraftwort ?? null,
           micropediaDiscovered: raw.micropediaDiscovered || [],
           freundArcsCompleted: raw.freundArcsCompleted || [],
           freundCallbacksPending: raw.freundCallbacksPending || [],

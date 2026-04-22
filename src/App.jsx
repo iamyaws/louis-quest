@@ -36,6 +36,7 @@ import KristallKetteGame from './components/KristallKetteGame';
 import KristallHoehleGame from './components/KristallHoehleGame';
 import CampfireVisitorsGame from './components/CampfireVisitorsGame';
 import DreiDankeTool from './components/DreiDankeTool';
+import KraftwortTool from './components/KraftwortTool';
 import RonkiAusmalbild from './components/RonkiAusmalbild';
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
@@ -76,6 +77,7 @@ function AppContent() {
       if (p.get('cave') === '1') return 'hoehle';
       if (p.get('visitors') === '1') return 'visitors';
       if (p.get('dreiDanke') === '1') return 'drei-danke';
+      if (p.get('kraftwort') === '1') return 'kraftwort';
       if (p.get('ausmalbild') === '1') return 'ausmalbild';
     }
     return 'hub';
@@ -319,6 +321,9 @@ function AppContent() {
       )}
       {view === 'drei-danke' && (
         <DreiDankeTool onComplete={() => setView('ronki')} />
+      )}
+      {view === 'kraftwort' && (
+        <KraftwortTool onComplete={() => setView('ronki')} />
       )}
       {view === 'ausmalbild' && (
         <RonkiAusmalbild onClose={() => setView('hub')} />
