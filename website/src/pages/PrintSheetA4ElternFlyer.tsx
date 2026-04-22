@@ -42,6 +42,10 @@ const APP_QR_URL_DARK =
   '&size=500x500&format=png&margin=8&color=1a3c3f&bgcolor=fdf8f0';
 
 function CutMarks() {
+  // Tick marks were 4mm long × 0.35mm thick — too faint, Marc nearly
+  // missed them when cutting the first print. Bumped to 5mm × 0.7mm
+  // with the center crosshair at 6mm × 0.5mm. Still subtle enough not
+  // to dominate the design, but visible against a printed background.
   return (
     <svg
       className="cut-marks"
@@ -49,12 +53,12 @@ function CutMarks() {
       preserveAspectRatio="none"
       aria-hidden
     >
-      <line x1="105" y1="0" x2="105" y2="4" />
-      <line x1="105" y1="293" x2="105" y2="297" />
-      <line x1="0" y1="148.5" x2="4" y2="148.5" />
-      <line x1="206" y1="148.5" x2="210" y2="148.5" />
-      <line x1="102" y1="148.5" x2="108" y2="148.5" opacity="0.35" />
-      <line x1="105" y1="145.5" x2="105" y2="151.5" opacity="0.35" />
+      <line x1="105" y1="0" x2="105" y2="5" />
+      <line x1="105" y1="292" x2="105" y2="297" />
+      <line x1="0" y1="148.5" x2="5" y2="148.5" />
+      <line x1="205" y1="148.5" x2="210" y2="148.5" />
+      <line x1="102" y1="148.5" x2="108" y2="148.5" className="ch" />
+      <line x1="105" y1="145.5" x2="105" y2="151.5" className="ch" />
     </svg>
   );
 }
@@ -367,8 +371,13 @@ const sheetCss = `
   }
   .cut-marks line {
     stroke: #1A3C3F;
-    stroke-width: 0.35;
+    stroke-width: 0.7;
     vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+  }
+  .cut-marks line.ch {
+    stroke-width: 0.5;
+    opacity: 0.45;
   }
 
   .sheet-label {

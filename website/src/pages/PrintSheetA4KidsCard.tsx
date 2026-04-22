@@ -39,9 +39,11 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 function CutMarks() {
-  // 4 tick marks at the paper edges, aligned to the cut cross.
-  // Plus a faint center crosshair so scissors have a visible guide.
-  // SVG viewBox maps 1 user unit = 1mm on A4 (210×297mm).
+  // Tick marks at the paper edges, aligned to the cut cross, plus a
+  // faint center crosshair so scissors have a visible guide. SVG
+  // viewBox maps 1 user unit = 1mm on A4 (210×297mm). Upgraded from
+  // 4mm × 0.35mm to 5mm × 0.7mm because Marc nearly missed them when
+  // cutting the first physical print.
   return (
     <svg
       className="cut-marks"
@@ -50,14 +52,14 @@ function CutMarks() {
       aria-hidden
     >
       {/* Vertical cut (x=105): ticks at top + bottom edges */}
-      <line x1="105" y1="0" x2="105" y2="4" />
-      <line x1="105" y1="293" x2="105" y2="297" />
+      <line x1="105" y1="0" x2="105" y2="5" />
+      <line x1="105" y1="292" x2="105" y2="297" />
       {/* Horizontal cut (y=148.5): ticks at left + right edges */}
-      <line x1="0" y1="148.5" x2="4" y2="148.5" />
-      <line x1="206" y1="148.5" x2="210" y2="148.5" />
-      {/* Subtle center crosshair */}
-      <line x1="102" y1="148.5" x2="108" y2="148.5" opacity="0.35" />
-      <line x1="105" y1="145.5" x2="105" y2="151.5" opacity="0.35" />
+      <line x1="0" y1="148.5" x2="5" y2="148.5" />
+      <line x1="205" y1="148.5" x2="210" y2="148.5" />
+      {/* Center crosshair — marked .ch for lighter stroke via CSS */}
+      <line x1="102" y1="148.5" x2="108" y2="148.5" className="ch" />
+      <line x1="105" y1="145.5" x2="105" y2="151.5" className="ch" />
     </svg>
   );
 }
@@ -188,8 +190,13 @@ const a4SheetCss = `
   }
   .cut-marks line {
     stroke: #1A3C3F;
-    stroke-width: 0.35;
+    stroke-width: 0.7;
     vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+  }
+  .cut-marks line.ch {
+    stroke-width: 0.5;
+    opacity: 0.45;
   }
 
   /* Floating label — only visible in web preview, hidden in print */
