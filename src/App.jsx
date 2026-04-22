@@ -37,6 +37,8 @@ import KristallHoehleGame from './components/KristallHoehleGame';
 import CampfireVisitorsGame from './components/CampfireVisitorsGame';
 import DreiDankeTool from './components/DreiDankeTool';
 import KraftwortTool from './components/KraftwortTool';
+import LoewenPoseTool from './components/LoewenPoseTool';
+import SteinUndGummiTool from './components/SteinUndGummiTool';
 import RonkiAusmalbild from './components/RonkiAusmalbild';
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
@@ -78,6 +80,8 @@ function AppContent() {
       if (p.get('visitors') === '1') return 'visitors';
       if (p.get('dreiDanke') === '1') return 'drei-danke';
       if (p.get('kraftwort') === '1') return 'kraftwort';
+      if (p.get('loewe') === '1') return 'loewe';
+      if (p.get('steinGummi') === '1') return 'stein-gummi';
       if (p.get('ausmalbild') === '1') return 'ausmalbild';
     }
     return 'hub';
@@ -324,6 +328,12 @@ function AppContent() {
       )}
       {view === 'kraftwort' && (
         <KraftwortTool onComplete={() => setView('ronki')} />
+      )}
+      {view === 'loewe' && (
+        <LoewenPoseTool onComplete={() => setView('ronki')} />
+      )}
+      {view === 'stein-gummi' && (
+        <SteinUndGummiTool onComplete={() => setView('ronki')} />
       )}
       {view === 'ausmalbild' && (
         <RonkiAusmalbild onClose={() => setView('hub')} />
