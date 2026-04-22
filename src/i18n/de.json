@@ -4,6 +4,12 @@
   "app.error.reload": "Neu laden",
   "app.error.back": "Zurück",
   "app.offline": "Offline — Daten werden lokal gespeichert",
+  "sw.update.title": "Neue Version verfügbar",
+  "sw.update.button": "Neu laden",
+
+  "tool.error.title": "Huch, etwas ist durcheinander.",
+  "tool.error.body": "Ronki ist kurz verwirrt. Wir gehen zurück zum Lagerfeuer.",
+  "tool.error.back": "Zurück zur Basis",
 
   "nav.hub": "Lager",
   "nav.quests": "Heute",

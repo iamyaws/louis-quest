@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth, LoginScreen } from './context/AuthContext';
 import { TaskProvider, useTask } from './context/TaskContext';
 import { useTranslation } from './i18n/LanguageContext';
@@ -24,35 +24,45 @@ import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
 import CloudJumpGame from './components/CloudJumpGame';
 import StarCatcherGame from './components/StarCatcherGame';
-import ZahlenjagdGame from './components/ZahlenjagdGame';
-import MusterMemoryGame from './components/MusterMemoryGame';
-import WurzelLabyrinthGame from './components/WurzelLabyrinthGame';
-import PilzWaageGame from './components/PilzWaageGame';
+import ToolErrorBoundary from './components/ToolErrorBoundary';
+// ── Lazy-loaded tools + games ──────────────────────────────────────────
+// These surfaces are mounted conditionally (URL param shortcuts, post-
+// routine tool launches, MINT-game selection) and account for the
+// majority of our JS bundle weight despite most users never opening
+// them in a given session. Code-split via React.lazy + dynamic import
+// so the initial chunk ships only the core Hub/Aufgaben/Care/Journal
+// flow — each tool/game arrives on demand when Louis actually opens it.
+//
 // KristallSortiererGame deprecated Apr 2026 — replaced by Kristall-Kette
 // (drag-a-line tactile loop, backlog_mint_crystal_game_rework pitches).
 // Import kept commented for rollback reference.
-// import KristallSortiererGame from './components/KristallSortiererGame';
-import KristallKetteGame from './components/KristallKetteGame';
-import KristallHoehleGame from './components/KristallHoehleGame';
-import CampfireVisitorsGame from './components/CampfireVisitorsGame';
-import DreiDankeTool from './components/DreiDankeTool';
-import KraftwortTool from './components/KraftwortTool';
-import LoewenPoseTool from './components/LoewenPoseTool';
-import SteinUndGummiTool from './components/SteinUndGummiTool';
-import RonkiAusmalbild from './components/RonkiAusmalbild';
+// const KristallSortiererGame = lazy(() => import('./components/KristallSortiererGame'));
+const ZahlenjagdGame = lazy(() => import('./components/ZahlenjagdGame'));
+const MusterMemoryGame = lazy(() => import('./components/MusterMemoryGame'));
+const WurzelLabyrinthGame = lazy(() => import('./components/WurzelLabyrinthGame'));
+const PilzWaageGame = lazy(() => import('./components/PilzWaageGame'));
+const KristallKetteGame = lazy(() => import('./components/KristallKetteGame'));
+const KristallHoehleGame = lazy(() => import('./components/KristallHoehleGame'));
+const CampfireVisitorsGame = lazy(() => import('./components/CampfireVisitorsGame'));
+const DreiDankeTool = lazy(() => import('./components/DreiDankeTool'));
+const KraftwortTool = lazy(() => import('./components/KraftwortTool'));
+const LoewenPoseTool = lazy(() => import('./components/LoewenPoseTool'));
+const SteinUndGummiTool = lazy(() => import('./components/SteinUndGummiTool'));
+const RonkiAusmalbild = lazy(() => import('./components/RonkiAusmalbild'));
+const RonkiCompendium = lazy(() => import('./components/RonkiCompendium'));
+const StarfighterGame = lazy(() => import('./components/StarfighterGame'));
+// ── End lazy tools/games ───────────────────────────────────────────────
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
 import ScreenTimer from './components/ScreenTimer';
 import RonkiProfile from './components/RonkiProfile';
 import Buch from './components/Buch';
 import ChibiGallery from './components/ChibiGallery';
-import RonkiCompendium from './components/RonkiCompendium';
 import MemoryWall from './components/MemoryWall';
 import DiscoveryLog from './components/DiscoveryLog';
 import Micropedia from './components/Micropedia';
 import PoemQuest from './components/PoemQuest';
 import QuestLineView from './components/QuestLineView';
-import StarfighterGame from './components/StarfighterGame';
 import { useSpecialQuests } from './hooks/useSpecialQuests';
 // Easter-egg system paused Apr 2026 — Marc: "don't feel it anymore".
 // Hook + component files kept so we can re-enable by restoring these imports.
@@ -64,6 +74,18 @@ import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import AlphaBanner from './components/AlphaBanner';
 import SWUpdateBanner from './components/SWUpdateBanner';
 
+// Tiny Suspense fallback for lazy-loaded tools/games. Intentionally
+// minimal — the chunks are small and a full "loading screen" treatment
+// would flash on fast networks. Shows a breath-sized pause message so a
+// 6yo knows something's arriving rather than assuming the tap broke.
+function ToolLoadingFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-dvh bg-surface">
+      <p className="font-label text-sm text-on-surface-variant">Einen Moment…</p>
+    </div>
+  );
+}
+
 function AppContent() {
   const { t } = useTranslation();
   const { state, actions, loading, toastTrigger } = useTask();
@@ -73,7 +95,14 @@ function AppContent() {
   //   ?variant=teal|...     — seed companionVariant (affects campfire
   //                            Ronki, profile, any future chibi)
   //   ?stage=0..3           — seed catEvo to the matching stage threshold
+  //
+  // All of these param shortcuts are QA/dev affordances — gated behind
+  // import.meta.env.DEV so production bundles don't accept them. The
+  // actual in-app entries to each tool (Gefühlsecke → Box-Atmung etc.)
+  // remain untouched; only the ?loewe=1 / ?cave=1 / ?dreiDanke=1 style
+  // URL shortcuts are dev-only.
   const initialView = (() => {
+    if (!import.meta.env.DEV) return 'hub';
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search);
       if (p.get('gallery') === '1') return 'gallery';
@@ -97,6 +126,11 @@ function AppContent() {
     if (!state || urlParamsAppliedRef.current) return;
     urlParamsAppliedRef.current = true;
     if (typeof window === 'undefined') return;
+    // All state-seed params (?variant, ?stage, ?ronkiMood, ?boxAtmung)
+    // exist purely for QA previews across devices. Gating them behind
+    // import.meta.env.DEV means production builds ignore the query even
+    // if someone bookmarks an old preview URL.
+    if (!import.meta.env.DEV) return;
     const p = new URLSearchParams(window.location.search);
     const patch = {};
     const v = p.get('variant');
@@ -284,60 +318,108 @@ function AppContent() {
              opening "within the banner" — this moves all MINT games to the
              top-level overlay layer. ── */}
       {view === 'mint-game' && activeMintGame === 'zahlenjagd' && (
-        <ZahlenjagdGame onComplete={(reward) => {
-          if (reward?.hp > 0) actions.addHP(reward.hp);
-          setActiveMintGame(null);
-          setView('hub');
-        }} />
+        <ToolErrorBoundary toolName="ZahlenjagdGame" onBack={() => { setActiveMintGame(null); setView('hub'); }}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <ZahlenjagdGame onComplete={(reward) => {
+              if (reward?.hp > 0) actions.addHP(reward.hp);
+              setActiveMintGame(null);
+              setView('hub');
+            }} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'mint-game' && activeMintGame === 'muster-memory' && (
-        <MusterMemoryGame onComplete={(reward) => {
-          if (reward?.hp > 0) actions.addHP(reward.hp);
-          setActiveMintGame(null);
-          setView('hub');
-        }} />
+        <ToolErrorBoundary toolName="MusterMemoryGame" onBack={() => { setActiveMintGame(null); setView('hub'); }}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <MusterMemoryGame onComplete={(reward) => {
+              if (reward?.hp > 0) actions.addHP(reward.hp);
+              setActiveMintGame(null);
+              setView('hub');
+            }} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'mint-game' && activeMintGame === 'wurzel-labyrinth' && (
-        <WurzelLabyrinthGame onComplete={(reward) => {
-          if (reward?.hp > 0) actions.addHP(reward.hp);
-          setActiveMintGame(null);
-          setView('hub');
-        }} />
+        <ToolErrorBoundary toolName="WurzelLabyrinthGame" onBack={() => { setActiveMintGame(null); setView('hub'); }}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <WurzelLabyrinthGame onComplete={(reward) => {
+              if (reward?.hp > 0) actions.addHP(reward.hp);
+              setActiveMintGame(null);
+              setView('hub');
+            }} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'mint-game' && activeMintGame === 'pilz-waage' && (
-        <PilzWaageGame onComplete={(reward) => {
-          if (reward?.hp > 0) actions.addHP(reward.hp);
-          setActiveMintGame(null);
-          setView('hub');
-        }} />
+        <ToolErrorBoundary toolName="PilzWaageGame" onBack={() => { setActiveMintGame(null); setView('hub'); }}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <PilzWaageGame onComplete={(reward) => {
+              if (reward?.hp > 0) actions.addHP(reward.hp);
+              setActiveMintGame(null);
+              setView('hub');
+            }} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'mint-game' && activeMintGame === 'kristall-sortierer' && (
-        <KristallKetteGame onComplete={(reward) => {
-          if (reward?.hp > 0) actions.addHP(reward.hp);
-          setActiveMintGame(null);
-          setView('hub');
-        }} />
+        <ToolErrorBoundary toolName="KristallKetteGame" onBack={() => { setActiveMintGame(null); setView('hub'); }}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <KristallKetteGame onComplete={(reward) => {
+              if (reward?.hp > 0) actions.addHP(reward.hp);
+              setActiveMintGame(null);
+              setView('hub');
+            }} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'hoehle' && (
-        <KristallHoehleGame onClose={() => setView('hub')} />
+        <ToolErrorBoundary toolName="KristallHoehleGame" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <KristallHoehleGame onClose={() => setView('hub')} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'visitors' && (
-        <CampfireVisitorsGame onClose={() => setView('hub')} />
+        <ToolErrorBoundary toolName="CampfireVisitorsGame" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <CampfireVisitorsGame onClose={() => setView('hub')} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'drei-danke' && (
-        <DreiDankeTool onComplete={() => setView('ronki')} />
+        <ToolErrorBoundary toolName="DreiDankeTool" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <DreiDankeTool onComplete={() => setView('ronki')} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'kraftwort' && (
-        <KraftwortTool onComplete={() => setView('ronki')} />
+        <ToolErrorBoundary toolName="KraftwortTool" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <KraftwortTool onComplete={() => setView('ronki')} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'loewe' && (
-        <LoewenPoseTool onComplete={() => setView('ronki')} />
+        <ToolErrorBoundary toolName="LoewenPoseTool" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <LoewenPoseTool onComplete={() => setView('ronki')} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'stein-gummi' && (
-        <SteinUndGummiTool onComplete={() => setView('ronki')} />
+        <ToolErrorBoundary toolName="SteinUndGummiTool" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <SteinUndGummiTool onComplete={() => setView('ronki')} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {view === 'ausmalbild' && (
-        <RonkiAusmalbild onClose={() => setView('hub')} />
+        <ToolErrorBoundary toolName="RonkiAusmalbild" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <RonkiAusmalbild onClose={() => setView('hub')} />
+          </Suspense>
+        </ToolErrorBoundary>
       )}
       {pinGateOpen && (
         <PinModal
@@ -368,11 +450,17 @@ function AppContent() {
         actions.claimGameReward('starfall');
         setView('games');
       }} />}
-      {view === 'starfighter' && <StarfighterGame onComplete={(reward) => {
-        if (reward?.hp > 0) actions.addHP(reward.hp);
-        actions.claimGameReward('starfighter');
-        setView('games');
-      }} />}
+      {view === 'starfighter' && (
+        <ToolErrorBoundary toolName="StarfighterGame" onBack={() => setView('games')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <StarfighterGame onComplete={(reward) => {
+              if (reward?.hp > 0) actions.addHP(reward.hp);
+              actions.claimGameReward('starfighter');
+              setView('games');
+            }} />
+          </Suspense>
+        </ToolErrorBoundary>
+      )}
       {/* EggOverlay mount paused Apr 2026. Any lingering state.pendingEgg
           stays in storage but doesn't render. Re-enable by restoring the
           JSX block above with the useEggSystem() hook. */}
@@ -443,10 +531,27 @@ function AuthGate() {
   // Ronki-Sammelbuch for website visitors and for showing Louis.
   // ?onboardingPreview=1 renders the onboarding flow for QA across
   // viewports/browsers without needing an auth session.
+  //
+  // Both remain reachable in production — they're intentional public
+  // routes (Sammelbuch is linked from the marketing site; onboarding
+  // preview is how we smoke-test cross-device). Everything else that
+  // reads URL params is gated behind import.meta.env.DEV further down.
   if (typeof window !== 'undefined') {
     const p = new URLSearchParams(window.location.search);
     if (p.get('compendium') === '1') {
-      return <RonkiCompendium />;
+      // RonkiCompendium is lazy — wrap in Suspense so the chunk can load,
+      // and ToolErrorBoundary so a chunk-load failure surfaces the warm
+      // fallback rather than blanking the public URL.
+      return (
+        <ToolErrorBoundary
+          toolName="RonkiCompendium"
+          onBack={() => { window.location.search = ''; }}
+        >
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <RonkiCompendium />
+          </Suspense>
+        </ToolErrorBoundary>
+      );
     }
     if (p.get('onboardingPreview') === '1') {
       const startStep = parseInt(p.get('step') || '0', 10) || 0;

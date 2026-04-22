@@ -4,6 +4,12 @@
   "app.error.reload": "Reload",
   "app.error.back": "Back",
   "app.offline": "Offline — data saved locally",
+  "sw.update.title": "New version available",
+  "sw.update.button": "Reload",
+
+  "tool.error.title": "Oops, something got tangled.",
+  "tool.error.body": "Ronki is a bit confused. Let's head back to camp.",
+  "tool.error.back": "Back to camp",
 
   "nav.hub": "Camp",
   "nav.quests": "Today",
