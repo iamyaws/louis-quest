@@ -84,12 +84,17 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
 
   // ══════════════════════════════════════════
   // Step 0: Welcome to Thang Long (lore intro)
+  // Trimmed per "Option 1: the lore is the product — trim it, don't cut it."
+  // Scroll pattern: `min-h-full` on main + `my-auto` on content = centers
+  // when content fits, scroll-from-top when content overflows (fixes iPhone
+  // SE bug where CTA was below the fold and parent's overflow-y-auto never
+  // fired because flex-1 locked main to viewport height).
   // ══════════════════════════════════════════
   if (step === 0) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-y-auto font-body">
+      <div className="fixed inset-0 overflow-y-auto font-body">
         {/* Background */}
-        <div className="fixed inset-0 z-0">
+        <div className="fixed inset-0 z-0 pointer-events-none">
           <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
@@ -99,39 +104,39 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
           <LangPicker />
         </div>
 
-        <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center min-h-0 py-8">
+        <main className="relative z-10 min-h-full flex flex-col px-8 text-center py-8"
+              style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
           <ProgressBar />
 
-          {/* Lantern illustration */}
-          <div className="mb-8 relative">
-            <div className="absolute inset-0 blur-3xl rounded-full scale-150" style={{ background: 'rgba(252,211,77,0.2)' }} />
-            <img src={base + 'art/onboarding/lantern.webp'} alt="Laterne"
-                 className="relative z-10 w-56 h-auto mx-auto rounded-2xl"
-                 style={{ filter: 'drop-shadow(0 20px 40px rgba(252,211,77,0.3))' }} />
-          </div>
+          {/* my-auto = auto vertical margins: centers inside main when content
+              fits, collapses to 0 and stacks from top when content overflows. */}
+          <div className="my-auto flex flex-col items-center">
+            {/* Lantern illustration — trimmed from w-56 to w-40 for iPhone SE */}
+            <div className="mb-6 relative">
+              <div className="absolute inset-0 blur-3xl rounded-full scale-150" style={{ background: 'rgba(252,211,77,0.2)' }} />
+              <img src={base + 'art/onboarding/lantern.webp'} alt="Laterne"
+                   className="relative z-10 w-40 h-auto mx-auto rounded-2xl"
+                   style={{ filter: 'drop-shadow(0 20px 40px rgba(252,211,77,0.3))' }} />
+            </div>
 
-          {/* Text */}
-          <div className="max-w-md space-y-5">
-            <h1 className="font-display text-4xl font-bold text-white tracking-tight leading-tight"
-                style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
-              {t('onboarding.welcome.title')}
-            </h1>
-            <p className="text-white/75 text-lg leading-relaxed px-4">
-              {t('onboarding.welcome.body')}
-            </p>
-          </div>
+            {/* Text */}
+            <div className="max-w-md space-y-4">
+              <h1 className="font-display text-4xl font-bold text-white tracking-tight leading-tight"
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
+                {t('onboarding.welcome.title')}
+              </h1>
+              <p className="text-white/80 text-lg leading-relaxed px-4">
+                {t('onboarding.welcome.body')}
+              </p>
+            </div>
 
-          {/* CTA */}
-          <div className="mt-12 w-full max-w-xs">
-            <PrimaryButton onClick={() => setStep(1)}>
-              {t('onboarding.continue')}
-              <span className="material-symbols-outlined">arrow_forward</span>
-            </PrimaryButton>
-          </div>
-
-          {/* Decorative */}
-          <div className="absolute bottom-16 opacity-10 pointer-events-none">
-            <span className="material-symbols-outlined text-white" style={{ fontSize: '120px' }}>eco</span>
+            {/* CTA — closer to the body so it's reachable without scroll on SE */}
+            <div className="mt-8 w-full max-w-xs">
+              <PrimaryButton onClick={() => setStep(1)}>
+                {t('onboarding.continue')}
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </PrimaryButton>
+            </div>
           </div>
         </main>
       </div>
@@ -140,51 +145,56 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
 
   // ══════════════════════════════════════════
   // Step 1: Helden-Aufgaben (quest intro)
+  // Same min-h-full + my-auto pattern as step 0; this one was the worst
+  // offender on iPhone SE (CTA 99px below fold, unscrollable).
   // ══════════════════════════════════════════
   if (step === 1) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-y-auto font-body">
+      <div className="fixed inset-0 overflow-y-auto font-body">
         {/* Background — same teal as welcome for cohesion */}
-        <div className="fixed inset-0 z-0">
+        <div className="fixed inset-0 z-0 pointer-events-none">
           <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
-        <main className="relative z-20 flex-1 flex flex-col items-center justify-between px-8 py-12">
+        <main className="relative z-10 min-h-full flex flex-col px-8"
+              style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
           <ProgressBar />
 
-          {/* Title */}
-          <header className="space-y-4 text-center">
-            <h1 className="text-4xl font-bold text-white leading-tight"
-                style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
-              {t('onboarding.quest.title')}
-            </h1>
-            <p className="text-white/75 max-w-sm mx-auto text-lg leading-relaxed">
-              {t('onboarding.quest.subtitle')}
-            </p>
-          </header>
+          <div className="my-auto flex flex-col items-center gap-6">
+            {/* Title */}
+            <header className="space-y-3 text-center">
+              <h1 className="text-4xl font-bold text-white leading-tight"
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
+                {t('onboarding.quest.title')}
+              </h1>
+              <p className="text-white/75 max-w-sm mx-auto text-lg leading-relaxed">
+                {t('onboarding.quest.subtitle')}
+              </p>
+            </header>
 
-          {/* Quest path illustration */}
-          <div className="w-full max-w-sm my-6 relative">
-            <div className="absolute inset-0 blur-3xl rounded-full opacity-20"
-                 style={{ background: 'rgba(252,211,77,0.4)' }} />
-            <img src={base + 'art/onboarding/path-fog.webp'} alt="Der Pfad"
-                 className="relative z-10 w-full h-auto rounded-2xl"
-                 style={{ filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.25))' }} />
-          </div>
-
-          {/* CTA */}
-          <footer className="w-full max-w-xs space-y-5">
-            <PrimaryButton onClick={() => setStep(2)}>
-              {t('onboarding.continue')}
-              <span className="material-symbols-outlined">arrow_forward</span>
-            </PrimaryButton>
-            <div className="flex items-center justify-center gap-2 text-white/40 font-label text-sm">
-              <span className="material-symbols-outlined text-base">verified_user</span>
-              {t('onboarding.secure')}
+            {/* Quest path illustration — height-capped so it doesn't eat
+                the viewport on short screens (was 413px tall at max-w-xs). */}
+            <div className="w-full max-w-[200px] relative">
+              <div className="absolute inset-0 blur-3xl rounded-full opacity-20"
+                   style={{ background: 'rgba(252,211,77,0.4)' }} />
+              <img src={base + 'art/onboarding/path-fog.webp'} alt="Der Pfad"
+                   className="relative z-10 w-full h-auto rounded-2xl"
+                   style={{ maxHeight: '180px', objectFit: 'contain', filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.25))' }} />
             </div>
-          </footer>
-        </main>
 
+            {/* CTA */}
+            <footer className="w-full max-w-xs space-y-3">
+              <PrimaryButton onClick={() => setStep(2)}>
+                {t('onboarding.continue')}
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </PrimaryButton>
+              <div className="flex items-center justify-center gap-2 text-white/40 font-label text-sm">
+                <span className="material-symbols-outlined text-base">verified_user</span>
+                {t('onboarding.secure')}
+              </div>
+            </footer>
+          </div>
+        </main>
       </div>
     );
   }
@@ -234,15 +244,28 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                 type="text"
                 value={heroName}
                 onChange={(e) => setHeroName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && heroName.trim().length >= 1) {
+                    // Parent setup flow: hitting return on the soft keyboard
+                    // advances the step so they don't have to hunt for the
+                    // Weiter button that might be hidden behind the keyboard
+                    // on older iOS versions.
+                    e.preventDefault();
+                    e.currentTarget.blur();
+                    setStep(3);
+                  }
+                }}
                 placeholder={t('onboarding.hero.namePlaceholder')}
                 maxLength={20}
+                autoCapitalize="words"
+                autoComplete="off"
+                enterKeyHint="next"
                 className="w-full px-6 py-4 rounded-2xl text-xl font-headline font-bold text-on-surface placeholder:text-on-surface/30 outline-none transition-all"
                 style={{
                   background: 'rgba(255,255,255,0.95)',
                   border: heroName.trim() ? '2.5px solid #fcd34d' : '2px solid rgba(255,255,255,0.3)',
                   boxShadow: heroName.trim() ? '0 0 20px rgba(252,211,77,0.2)' : '0 2px 8px rgba(0,0,0,0.08)',
                 }}
-                autoFocus
               />
             </div>
 
@@ -411,49 +434,48 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
 
   // ══════════════════════════════════════════
   // Step 5: Wachse zusammen (was step 4)
+  // Same scroll-safe pattern as steps 0 and 1.
   // ══════════════════════════════════════════
   if (step === 5) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-y-auto font-body">
+      <div className="fixed inset-0 overflow-y-auto font-body">
         {/* Background */}
-        <div className="fixed inset-0 z-0">
+        <div className="fixed inset-0 z-0 pointer-events-none">
           <img src={base + 'art/bg-cream-brush.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
-        <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center min-h-0 py-8">
+        <main className="relative z-10 min-h-full flex flex-col px-8 text-center"
+              style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
           <ProgressBar />
 
-          {/* World waking up illustration */}
-          <div className="relative mb-8">
-            <div className="absolute inset-0 blur-3xl rounded-full scale-125 opacity-20"
-                 style={{ background: 'rgba(252,211,77,0.4)' }} />
-            <img src={base + 'art/onboarding/world-dawn.webp'} alt="Die Welt erwacht"
-                 className="relative z-10 w-72 h-auto mx-auto rounded-2xl"
-                 style={{ filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.12))' }} />
-          </div>
+          <div className="my-auto flex flex-col items-center">
+            {/* World waking up illustration — trimmed from w-72 to w-56 */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 blur-3xl rounded-full scale-125 opacity-20"
+                   style={{ background: 'rgba(252,211,77,0.4)' }} />
+              <img src={base + 'art/onboarding/world-dawn.webp'} alt="Die Welt erwacht"
+                   className="relative z-10 w-56 h-auto mx-auto rounded-2xl"
+                   style={{ filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.12))' }} />
+            </div>
 
-          {/* Text */}
-          <div className="max-w-md space-y-5">
-            <h1 className="text-5xl font-bold text-primary tracking-tight leading-tight"
-                style={{ fontFamily: 'Fredoka, sans-serif' }}>
-              {t('onboarding.growth.title')}
-            </h1>
-            <p className="text-on-surface-variant text-lg leading-relaxed px-4">
-              {t('onboarding.growth.subtitle')}
-            </p>
-          </div>
+            {/* Text — text-4xl for consistency with steps 0/1 + iPhone SE fit */}
+            <div className="max-w-md space-y-4">
+              <h1 className="text-4xl font-bold text-primary tracking-tight leading-tight"
+                  style={{ fontFamily: 'Fredoka, sans-serif' }}>
+                {t('onboarding.growth.title')}
+              </h1>
+              <p className="text-on-surface-variant text-lg leading-relaxed px-4">
+                {t('onboarding.growth.subtitle')}
+              </p>
+            </div>
 
-          {/* CTA */}
-          <div className="mt-12 w-full max-w-xs">
-            <PrimaryButton onClick={() => setStep(6)}>
-              {t('onboarding.continue')}
-              <span className="material-symbols-outlined">arrow_forward</span>
-            </PrimaryButton>
-          </div>
-
-          {/* Decorative */}
-          <div className="absolute bottom-16 opacity-10 pointer-events-none">
-            <span className="material-symbols-outlined text-primary" style={{ fontSize: '120px' }}>eco</span>
+            {/* CTA */}
+            <div className="mt-8 w-full max-w-xs">
+              <PrimaryButton onClick={() => setStep(6)}>
+                {t('onboarding.continue')}
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </PrimaryButton>
+            </div>
           </div>
         </main>
       </div>
@@ -595,12 +617,12 @@ function HatchStep({ variant, heroName, t, ProgressBar, onDone }) {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
-      <div className="fixed inset-0 z-0">
+    <div className="fixed inset-0 overflow-y-auto font-body">
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
       </div>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center">
+      <main className="relative z-10 min-h-full flex flex-col items-center justify-center px-8 py-6 text-center">
         <ProgressBar />
 
         {/* Title — swaps when the reveal hits */}

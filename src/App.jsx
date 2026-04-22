@@ -440,10 +440,16 @@ function AuthGate() {
 
   // Public routes — no auth required. ?compendium=1 renders the
   // Ronki-Sammelbuch for website visitors and for showing Louis.
+  // ?onboardingPreview=1 renders the onboarding flow for QA across
+  // viewports/browsers without needing an auth session.
   if (typeof window !== 'undefined') {
     const p = new URLSearchParams(window.location.search);
     if (p.get('compendium') === '1') {
       return <RonkiCompendium />;
+    }
+    if (p.get('onboardingPreview') === '1') {
+      const startStep = parseInt(p.get('step') || '0', 10) || 0;
+      return <Onboarding startStep={startStep} onComplete={() => {}} />;
     }
   }
 
