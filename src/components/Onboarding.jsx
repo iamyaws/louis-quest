@@ -87,7 +87,7 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
   // ══════════════════════════════════════════
   if (step === 0) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
+      <div className="fixed inset-0 flex flex-col overflow-y-auto font-body">
         {/* Background */}
         <div className="fixed inset-0 z-0">
           <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
@@ -99,7 +99,7 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
           <LangPicker />
         </div>
 
-        <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center">
+        <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center min-h-0 py-8">
           <ProgressBar />
 
           {/* Lantern illustration */}
@@ -143,7 +143,7 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
   // ══════════════════════════════════════════
   if (step === 1) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
+      <div className="fixed inset-0 flex flex-col overflow-y-auto font-body">
         {/* Background — same teal as welcome for cohesion */}
         <div className="fixed inset-0 z-0">
           <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
@@ -195,7 +195,7 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
   if (step === 2) {
     const canProceed = heroName.trim().length >= 1;
     return (
-      <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
+      <div className="fixed inset-0 flex flex-col overflow-y-auto font-body">
         <div className="fixed inset-0 z-0">
           <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
         </div>
@@ -315,7 +315,7 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
   // ══════════════════════════════════════════
   if (step === 3) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
+      <div className="fixed inset-0 flex flex-col overflow-y-auto font-body">
         <div className="absolute inset-0 z-0">
           <img src={base + 'art/bg-teal-soft.webp'} alt="" className="w-full h-full object-cover" />
         </div>
@@ -414,13 +414,13 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
   // ══════════════════════════════════════════
   if (step === 5) {
     return (
-      <div className="fixed inset-0 flex flex-col overflow-hidden font-body">
+      <div className="fixed inset-0 flex flex-col overflow-y-auto font-body">
         {/* Background */}
         <div className="fixed inset-0 z-0">
           <img src={base + 'art/bg-cream-brush.webp'} alt="" className="w-full h-full object-cover" />
         </div>
 
-        <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center">
+        <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 text-center min-h-0 py-8">
           <ProgressBar />
 
           {/* World waking up illustration */}
@@ -464,7 +464,7 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
   // Step 6: Quick guide + launch (was step 5)
   // ══════════════════════════════════════════
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden font-body bg-background">
+    <div className="fixed inset-0 flex flex-col overflow-y-auto font-body bg-background">
       <img src={base + 'art/bg-parchment.webp'} alt="" className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-30" style={{ zIndex: 0 }} />
 
       <div className="relative z-10 flex-1 overflow-y-auto pb-40 px-8"
