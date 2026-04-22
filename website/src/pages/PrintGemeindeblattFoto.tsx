@@ -8,11 +8,11 @@
  * grain, matching the website's UeberMich aesthetic so the photo reads as
  * part of the same world Marc is building, not stock art.
  *
- * Canvas target: 1440×960 (3:2 landscape). At 300 dpi that's roughly
- * 122×81 mm, at 240 dpi roughly 152×101 mm — both fine for Gemeindeblatt
- * column placements. Marc exports by screenshotting the canvas element at
- * 100% browser zoom, or using Cmd/Ctrl+P + Save as PDF then extracting
- * the page as a high-res image.
+ * Canvas target: 1440×1018 (≈1.414:1, A4-landscape aspect). Crucial:
+ * this matches A4 landscape (297:210 mm) exactly so when Marc prints
+ * to PDF, the canvas fills the page without a white margin stripe at
+ * the bottom — which it does if the aspect mismatches. At 1440 wide,
+ * the height works out to 1440 × (210/297) ≈ 1018.
  */
 
 import { useEffect } from 'react';
@@ -30,7 +30,7 @@ export default function PrintGemeindeblattFoto() {
     <div className="print-root">
       <div className="no-print" style={instructionBarStyle}>
         <strong style={{ fontWeight: 700 }}>
-          Gemeindeblatt-Foto &middot; 1440×960 (3:2)
+          Gemeindeblatt-Foto &middot; 1440×1018 (A4 landscape)
         </strong>
         <span style={{ opacity: 0.7, marginLeft: 12 }}>
           Screenshot bei 100% Browser-Zoom &middot; oder Cmd/Ctrl + P
@@ -133,7 +133,9 @@ export default function PrintGemeindeblattFoto() {
         .photo-canvas {
           position: relative;
           width: 1440px;
-          height: 960px;
+          /* 1440 × (210/297) ≈ 1018 — matches A4 landscape ratio so
+             printing to A4 doesn't leave a white stripe at the bottom. */
+          height: 1018px;
           background: #FDF8F0;
           overflow: hidden;
           box-shadow: 0 30px 60px rgba(0,0,0,0.18);
@@ -233,7 +235,11 @@ export default function PrintGemeindeblattFoto() {
         }
 
         @media print {
-          @page { size: landscape; margin: 0; }
+          /* A4 landscape (297×210 mm ≈ 1.414:1) + canvas aspect of
+             1440×1018 (also ≈ 1.414:1) means the browser's default
+             "fit to page" print behavior scales the canvas uniformly
+             to fill the page. No letterbox, no white strip. */
+          @page { size: A4 landscape; margin: 0; }
           html, body {
             margin: 0 !important;
             padding: 0 !important;
