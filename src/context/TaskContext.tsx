@@ -95,10 +95,23 @@ export interface TaskState {
   earnedTraits: string[];
   /** ISO date (YYYY-MM-DD) when evening ritual was last completed. Resets daily. */
   eveningRitualCompletedAt?: string;
-  /** Current Ronki stamina for minigames (0-5). Recharges +1 per 40min real-time. */
+  /** Current Ronki stamina for minigames (0..minigameStaminaMax). Recharges
+   *  +1 every RECHARGE_MINUTES. Only consumed when minigameAccessMode !== 'frei'. */
   ronkiStamina?: number;
   /** ISO timestamp of the last stamina update (used for lazy recharge). */
   ronkiStaminaUpdatedAt?: string;
+  /** How minigames are gated for Louis. Added Apr 2026 after playtest showed
+   *  the old "routine-only" gate backfired (Louis hit an invisible wall on
+   *  weekends). Default: 'frei' (no gate, parents manage externally).
+   *   · 'frei'        — always available, stamina disabled (unlimited play)
+   *   · 'routine'     — unlocks after today's routine block is complete,
+   *                     stamina still applies
+   *   · 'zeitfenster' — only available in minigameTimeWindow, stamina applies */
+  minigameAccessMode?: 'frei' | 'routine' | 'zeitfenster';
+  /** Parent-configured max stamina cap. Default 10 (current 5 becomes "streng"). */
+  minigameStaminaMax?: number;
+  /** Time window (24h clock) when 'zeitfenster' mode is active. Default 16:00–18:00. */
+  minigameTimeWindow?: { startHour: number; endHour: number };
   /** Creatures discovered via useMicropediaDiscovery. One entry per unlock. */
   micropediaDiscovered?: Array<{ id: string; chapter: string; discoveredAt: string }>;
   /** Freund reunion arcs Louis has completed end-to-end (all 4 beats). */
@@ -403,8 +416,11 @@ export function createInitialState(): TaskState {
     birthdayEpic: { done: [], completed: false },
     earnedTraits: [],
     eveningRitualCompletedAt: undefined,
-    ronkiStamina: 5,
+    ronkiStamina: 10,
     ronkiStaminaUpdatedAt: new Date().toISOString(),
+    minigameAccessMode: 'frei',
+    minigameStaminaMax: 10,
+    minigameTimeWindow: { startHour: 16, endHour: 18 },
     // Bonding Agent defaults — Ronki starts in a normal mood; the next
     // rare bad day is scheduled 14-21d out so a first-week user doesn't
     // see it immediately (the surprise should land after trust is built).
@@ -541,8 +557,14 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           birthdayEpic: raw.birthdayEpic || { done: [], completed: false },
           earnedTraits: raw.earnedTraits || [],
           eveningRitualCompletedAt: raw.eveningRitualCompletedAt || undefined,
-          ronkiStamina: raw.ronkiStamina ?? 5,
+          ronkiStamina: raw.ronkiStamina ?? 10,
           ronkiStaminaUpdatedAt: raw.ronkiStaminaUpdatedAt || new Date().toISOString(),
+          // Minigame gating — default 'frei' (no gate) per playtest feedback
+          // 22 Apr 2026: the old routine-gate backfired on weekends (Louis
+          // hit an invisible wall). Parents who want the gate opt IN.
+          minigameAccessMode: raw.minigameAccessMode || 'frei',
+          minigameStaminaMax: raw.minigameStaminaMax ?? 10,
+          minigameTimeWindow: raw.minigameTimeWindow || { startHour: 16, endHour: 18 },
           // Bonding Agent migration — saves predating Apr 2026 don't have
           // these fields. Default to normal mood + schedule a first bad
           // day 14-21d out so returning users aren't ambushed on next open.
@@ -785,7 +807,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       journalSaved: false,
       bossDmgToday: 0,
       gamesPlayedToday: [],
-      ronkiStamina: 5,
+      // Day transition: refill stamina to the parent-configured max.
+      ronkiStamina: prev.minigameStaminaMax ?? 10,
       ronkiStaminaUpdatedAt: new Date().toISOString(),
       dreamHighlights,
       bossKilledToday: false,
@@ -1214,7 +1237,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (!prev) return prev;
       return {
         ...prev,
-        ronkiStamina: 5,
+        ronkiStamina: prev.minigameStaminaMax ?? 10,
         ronkiStaminaUpdatedAt: new Date().toISOString(),
       };
     });

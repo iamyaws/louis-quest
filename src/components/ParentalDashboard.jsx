@@ -1062,6 +1062,40 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     setVoiceMutedState(next);
   };
 
+  // ── Minigame access mode (22 Apr 2026 playtest rework) ──
+  // Default flipped to 'frei' from routine-gated. Reasoning in
+  // backlog: routine-gate backfired on weekends (Louis hit an invisible
+  // wall). Parents who want the gate opt IN here.
+  const minigameMode = state?.minigameAccessMode || 'frei';
+  const minigameStaminaMax = state?.minigameStaminaMax ?? 10;
+  const minigameTimeWindow = state?.minigameTimeWindow || { startHour: 16, endHour: 18 };
+  const setMinigameMode = (next) => {
+    actions?.patchState?.({ minigameAccessMode: next });
+  };
+  const setMinigameStaminaMax = (next) => {
+    // Clamp stamina to the new max so a parent lowering 15→5 doesn't leave
+    // Louis sitting on 12 impossible points.
+    const currentStamina = Math.min(state?.ronkiStamina ?? next, next);
+    actions?.patchState?.({
+      minigameStaminaMax: next,
+      ronkiStamina: currentStamina,
+    });
+  };
+  const setMinigameTimeWindow = (next) => {
+    actions?.patchState?.({ minigameTimeWindow: next });
+  };
+
+  const MINIGAME_MODES = [
+    { id: 'frei', label: 'Frei', desc: 'Immer offen. Ihr entscheidet außerhalb der App, wann gespielt wird.' },
+    { id: 'routine', label: 'Mit Routine verbunden', desc: 'Spielzimmer öffnet, wenn die heutige Routine fertig ist.' },
+    { id: 'zeitfenster', label: 'Zeitfenster', desc: `Offen von ${String(minigameTimeWindow.startHour).padStart(2, '0')}:00 bis ${String(minigameTimeWindow.endHour).padStart(2, '0')}:00 Uhr.` },
+  ];
+  const STAMINA_OPTIONS = [
+    { value: 5, label: 'Streng', desc: '5 Runden/Tag' },
+    { value: 10, label: 'Normal', desc: '10 Runden/Tag' },
+    { value: 15, label: 'Locker', desc: '15 Runden/Tag' },
+  ];
+
   // ── Zeig-Moment toggle + counter reset ──
   // Default is OFF now (Marc Apr 2026: "rather annoying" out-of-the-box).
   // Parents opt IN and pick which ONE grown-up vouches. Single-vouch
@@ -1294,6 +1328,117 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
         >
           Zähler zurücksetzen (Lernphase neu starten)
         </button>
+      </div>
+
+      {/* Minispiele — access mode + stamina cap + optional time window */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(245,158,11,0.14)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>sports_esports</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">Minispiele</p>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Wann darf dein Kind Ronkis Spielzimmer öffnen?
+        </p>
+        <div className="flex flex-col gap-2.5 mb-4">
+          {MINIGAME_MODES.map(m => {
+            const active = minigameMode === m.id;
+            return (
+              <button
+                key={m.id}
+                onClick={() => setMinigameMode(m.id)}
+                className="w-full flex items-start gap-3 p-4 rounded-2xl text-left active:scale-[0.98] transition-all"
+                style={{
+                  background: active ? 'rgba(245,158,11,0.08)' : 'rgba(255,255,255,0.6)',
+                  border: active ? '1.5px solid rgba(180,83,9,0.4)' : '1.5px solid rgba(0,0,0,0.08)',
+                }}
+              >
+                <div className="w-5 h-5 rounded-full mt-0.5 shrink-0 flex items-center justify-center"
+                     style={{
+                       background: active ? '#b45309' : 'transparent',
+                       border: active ? 'none' : '2px solid rgba(0,0,0,0.2)',
+                     }}>
+                  {active && <span className="material-symbols-outlined text-white" style={{ fontSize: 14 }}>check</span>}
+                </div>
+                <div className="flex-1">
+                  <p className="font-label font-bold text-sm text-on-surface">{m.label}</p>
+                  <p className="font-body text-xs text-on-surface-variant mt-0.5 leading-relaxed">{m.desc}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Time-window picker — only visible in zeitfenster mode */}
+        {minigameMode === 'zeitfenster' && (
+          <div className="mb-4 p-4 rounded-2xl" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(180,83,9,0.18)' }}>
+            <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3">
+              Zeitfenster
+            </p>
+            <div className="flex items-center gap-3">
+              <label className="flex-1">
+                <span className="font-label text-xs text-on-surface-variant block mb-1">Von</span>
+                <select
+                  value={minigameTimeWindow.startHour}
+                  onChange={(e) => setMinigameTimeWindow({ ...minigameTimeWindow, startHour: parseInt(e.target.value, 10) })}
+                  className="w-full py-2 px-3 rounded-xl font-label text-sm bg-white"
+                  style={{ border: '1.5px solid rgba(0,0,0,0.1)' }}
+                >
+                  {Array.from({ length: 24 }, (_, h) => (
+                    <option key={h} value={h}>{String(h).padStart(2, '0')}:00</option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex-1">
+                <span className="font-label text-xs text-on-surface-variant block mb-1">Bis</span>
+                <select
+                  value={minigameTimeWindow.endHour}
+                  onChange={(e) => setMinigameTimeWindow({ ...minigameTimeWindow, endHour: parseInt(e.target.value, 10) })}
+                  className="w-full py-2 px-3 rounded-xl font-label text-sm bg-white"
+                  style={{ border: '1.5px solid rgba(0,0,0,0.1)' }}
+                >
+                  {Array.from({ length: 24 }, (_, h) => (
+                    <option key={h} value={h} disabled={h <= minigameTimeWindow.startHour}>{String(h).padStart(2, '0')}:00</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </div>
+        )}
+
+        {/* Stamina cap — hidden in 'frei' because stamina is disabled there */}
+        {minigameMode !== 'frei' && (
+          <div>
+            <p className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3">
+              Ausdauer pro Tag
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {STAMINA_OPTIONS.map(opt => {
+                const active = minigameStaminaMax === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => setMinigameStaminaMax(opt.value)}
+                    className="p-3 rounded-xl text-center active:scale-[0.97] transition-all"
+                    style={{
+                      background: active ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.6)',
+                      border: active ? '1.5px solid rgba(180,83,9,0.4)' : '1.5px solid rgba(0,0,0,0.08)',
+                    }}
+                  >
+                    <p className="font-label font-bold text-sm" style={{ color: active ? '#b45309' : '#124346' }}>{opt.label}</p>
+                    <p className="font-label text-xs text-on-surface-variant mt-1">{opt.desc}</p>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="font-body text-xs text-on-surface-variant mt-3 leading-relaxed">
+              Ausdauer füllt sich automatisch wieder auf (alle 20 Minuten +1).
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Voice-Lines (Ronki spricht) */}

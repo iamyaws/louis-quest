@@ -1,68 +1,55 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { canAccessMinigames } from '../lib/minigameAccess';
 
 /**
  * useGameAccess — determines whether minigames are currently unlocked.
  *
- * Two layers of gating (both must pass):
+ * Reworked 22 Apr 2026. Now delegates to `canAccessMinigames()` which
+ * reads `state.minigameAccessMode` (parent-configurable). Three modes:
+ *   - 'frei'        — always unlocked (default, recommended per playtest)
+ *   - 'routine'     — unlocked after at least one routine section is done
+ *   - 'zeitfenster' — unlocked within state.minigameTimeWindow (configurable)
  *
- * 1. **Time window** (hard rule, productizes Funkelzeit-discipline):
- *    Games are open only between PLAY_WINDOW_START_HOUR and
- *    PLAY_WINDOW_END_HOUR. Outside that window Ronki is "zu früh" or
- *    "müde" and games are locked regardless of routine progress. This is
- *    the D5-Tag&Nacht design cue: the app has nothing exciting to offer
- *    outside play hours, so kids naturally wind down without a fight.
+ * The old hardcoded 13:00-19:30 window + "at least one section done"
+ * combo is gone. It backfired on weekends — Louis hit an invisible wall
+ * when the routine-skip logic and the time window disagreed.
  *
- * 2. **Routine progress** (soft rule, rewards doing the day):
- *    Even inside the window, at least one routine section must be fully
- *    complete before play unlocks.
+ * Dev mode still bypasses everything.
  *
- * Dev mode bypasses the time window entirely — Marc needs to be able to
- * walk through games at any time for iteration/screenshots.
- *
- * Reason codes (for kid-friendly copy):
+ * Reason codes (for i18n-ready copy):
  *   - 'loading'         — state not ready yet
- *   - 'timeBefore'      — too early (before PLAY_WINDOW_START_HOUR)
- *   - 'timeAfter'       — too late (after PLAY_WINDOW_END_HOUR)
- *   - 'noSection'       — inside window but no routine section done yet
- *   - 'sectionDone'     — unlocked via a section (one of them)
- *   - 'morningDone'     — unlocked via morning specifically
- *   - 'eveningDone'     — unlocked via evening specifically
- *   - 'allDone'         — everything done for the day
+ *   - 'unlocked'        — generic "you can play"
+ *   - 'routineNotDone'  — routine mode, haven't done today yet
+ *   - 'timeBefore'      — time mode, before window starts
+ *   - 'timeAfter'       — time mode, after window ends
+ *   - 'morningDone' / 'eveningDone' / 'allDone' / 'sectionDone' —
+ *     retained for downstream copy variations (they're finer-grained
+ *     flavors of "unlocked" that some components key messaging on)
  */
-
-// Default play window. Tuned to overlap after-school + pre-evening-routine
-// on a school day. One clear rule a first-grader can internalize:
-// "Spiele 13–19:30 Uhr."
-const PLAY_WINDOW_START_HOUR = 13;
-const PLAY_WINDOW_START_MINUTE = 0;
-const PLAY_WINDOW_END_HOUR = 19;
-const PLAY_WINDOW_END_MINUTE = 30;
 
 export interface GameAccessState {
   unlocked: boolean;
-  reason: string; // i18n-ready explanation
+  reason: string;
   morningDone: boolean;
   eveningDone: boolean;
   allDone: boolean;
-  /** How many routine sections are fully complete */
   sectionsComplete: number;
-  /** Whether we're currently inside the play-time window */
+  /** Whether we're currently inside the play-time window. True for
+   *  'frei' and 'routine' modes (they don't gate on time). */
   withinTimeWindow: boolean;
-  /** Configured window start hour (24h) — useful for copy like "öffnet um 13 Uhr" */
+  /** Time-window bounds, present for copy like "öffnet um 16 Uhr"
+   *  even if the active mode isn't 'zeitfenster'. Shows current config. */
   windowStartHour: number;
-  /** Configured window start minute (0-59) */
   windowStartMinute: number;
-  /** Configured window end hour (24h) — useful for copy */
   windowEndHour: number;
-  /** Configured window end minute (0-59) — supports non-hour boundaries like 19:30 */
   windowEndMinute: number;
+  /** The active gating mode (for components that want to branch on it). */
+  mode: 'frei' | 'routine' | 'zeitfenster';
 }
 
 function readDevMode(): boolean {
   try {
-    // Mirrors src/utils/mode.ts logic without introducing a circular import.
-    // Dev mode bypasses the time window so Marc can test at any hour.
     const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('ronki_app_mode') : null;
     if (stored === 'dev') return true;
     if (typeof window !== 'undefined') {
@@ -78,10 +65,9 @@ function readDevMode(): boolean {
 export function useGameAccess(): GameAccessState {
   const { state, computed } = useTask();
 
-  // Re-evaluate on the minute so a locked state flips open/closed exactly
-  // at the boundary (e.g. 19:30) without needing another state change to
-  // trigger a re-render. Tracked as minutes-since-midnight since the window
-  // supports non-hour boundaries.
+  // Re-evaluate on the minute so a time-gated unlock flips exactly at
+  // the boundary without requiring another state change to trigger a
+  // re-render.
   const [minutesOfDay, setMinutesOfDay] = useState(() => {
     const n = new Date();
     return n.getHours() * 60 + n.getMinutes();
@@ -96,22 +82,32 @@ export function useGameAccess(): GameAccessState {
   }, []);
 
   return useMemo(() => {
+    const mode = state?.minigameAccessMode || 'frei';
+    const timeWindow = state?.minigameTimeWindow || { startHour: 16, endHour: 18 };
     const base = {
-      morningDone: false,
-      eveningDone: false,
-      allDone: false,
-      sectionsComplete: 0,
-      withinTimeWindow: false,
-      windowStartHour: PLAY_WINDOW_START_HOUR,
-      windowStartMinute: PLAY_WINDOW_START_MINUTE,
-      windowEndHour: PLAY_WINDOW_END_HOUR,
-      windowEndMinute: PLAY_WINDOW_END_MINUTE,
+      mode,
+      windowStartHour: timeWindow.startHour,
+      windowStartMinute: 0,
+      windowEndHour: timeWindow.endHour,
+      windowEndMinute: 0,
     } as const;
 
     if (!state?.quests) {
-      return { ...base, unlocked: false, reason: 'loading' };
+      return {
+        ...base,
+        unlocked: false,
+        reason: 'loading',
+        morningDone: false,
+        eveningDone: false,
+        allDone: false,
+        sectionsComplete: 0,
+        withinTimeWindow: false,
+      };
     }
 
+    // Routine-section computation kept intact — consumers still ask
+    // "morning done?" / "evening done?" for copy flavor even when the
+    // gating mode doesn't care.
     const quests = state.quests.filter(q => !q.sideQuest);
     const morning = quests.filter(q => q.anchor === 'morning');
     const evening = quests.filter(q => q.anchor === 'evening');
@@ -130,47 +126,56 @@ export function useGameAccess(): GameAccessState {
     if (bedtimeDone) sectionsComplete++;
     if (hobbyDone) sectionsComplete++;
 
-    // Time window — minute-precise so we can land on boundaries like 19:30.
-    // Dev mode bypasses so iteration isn't blocked by clock.
+    const routineDoneToday = sectionsComplete >= 1;
     const devBypass = readDevMode();
-    const startMins = PLAY_WINDOW_START_HOUR * 60 + PLAY_WINDOW_START_MINUTE;
-    const endMins = PLAY_WINDOW_END_HOUR * 60 + PLAY_WINDOW_END_MINUTE;
-    const withinTimeWindow = devBypass
-      || (minutesOfDay >= startMins && minutesOfDay < endMins);
 
-    const sectionOk = sectionsComplete >= 1;
-    const unlocked = withinTimeWindow && sectionOk;
-
-    // Pick the most specific reason code. Time gate takes priority over
-    // routine gate because "do your morning routine" is unhelpful copy at
-    // 21:00 when the real blocker is it being bedtime.
-    let reason: string;
-    if (!withinTimeWindow) {
-      reason = minutesOfDay < startMins ? 'timeBefore' : 'timeAfter';
-    } else if (!sectionOk) {
-      reason = 'noSection';
-    } else if (allDone) {
-      reason = 'allDone';
-    } else if (morningDone && !eveningDone) {
-      reason = 'morningDone';
-    } else if (eveningDone && !morningDone) {
-      reason = 'eveningDone';
-    } else {
-      reason = 'sectionDone';
+    // Dev bypass: everything is unlocked. Keeps screenshot / iteration
+    // workflows fast.
+    if (devBypass) {
+      return {
+        ...base,
+        unlocked: true,
+        reason: allDone ? 'allDone' : sectionsComplete > 0 ? 'sectionDone' : 'unlocked',
+        morningDone,
+        eveningDone,
+        allDone,
+        sectionsComplete,
+        withinTimeWindow: true,
+      };
     }
 
+    const decision = canAccessMinigames(state, { routineDoneToday });
+
+    // Map decision → the richer reason code consumers expect.
+    let reason: string;
+    if (!decision.allowed) {
+      if (decision.reason === 'routine_not_done') reason = 'routineNotDone';
+      else if (decision.reason === 'outside_time_window') {
+        const hourOfDay = Math.floor(minutesOfDay / 60);
+        reason = hourOfDay < timeWindow.startHour ? 'timeBefore' : 'timeAfter';
+      } else reason = 'loading';
+    } else if (allDone) reason = 'allDone';
+    else if (morningDone && !eveningDone) reason = 'morningDone';
+    else if (eveningDone && !morningDone) reason = 'eveningDone';
+    else if (sectionsComplete > 0) reason = 'sectionDone';
+    else reason = 'unlocked';
+
+    // withinTimeWindow: for 'zeitfenster' mode, this mirrors the decision.
+    // For 'frei'/'routine' modes, there's no time gate, so we report true
+    // (so UI copy that checks "are we in play hours?" doesn't misfire).
+    const withinTimeWindow = mode === 'zeitfenster'
+      ? (decision.allowed || decision.reason !== 'outside_time_window' ? decision.allowed : false)
+      : true;
+
     return {
-      unlocked,
+      ...base,
+      unlocked: decision.allowed,
       reason,
       morningDone,
       eveningDone,
       allDone,
       sectionsComplete,
       withinTimeWindow,
-      windowStartHour: PLAY_WINDOW_START_HOUR,
-      windowStartMinute: PLAY_WINDOW_START_MINUTE,
-      windowEndHour: PLAY_WINDOW_END_HOUR,
-      windowEndMinute: PLAY_WINDOW_END_MINUTE,
     };
-  }, [state?.quests, computed.allDone, minutesOfDay]);
+  }, [state, computed.allDone, minutesOfDay]);
 }

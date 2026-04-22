@@ -3,6 +3,7 @@ import { WEEKLY_MISSIONS, MOOD_EMOJIS, BOSSES, BOSS_TIERS, GEAR_ITEMS, CAT_STAGE
 import { useTask } from '../context/TaskContext';
 import { getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import useWeather, { getWeatherInfo, getWeatherCategory } from '../hooks/useWeather';
+import { useGameAccess } from '../hooks/useGameAccess';
 import SFX from '../utils/sfx';
 import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
@@ -339,6 +340,16 @@ export default function Hub({ onNavigate, onPlayMint }) {
   //    "settle in" signal as Visitors so fresh kids aren't flooded with
   //    side-loops before the core routine sticks. Soft gate: 15+ tasks.
   const caveAvailable = (state.totalTasksDone || 0) >= 15;
+
+  // ── Minispiele / Spielzimmer — consulted per parent's chosen mode.
+  //    'frei' → always unlocked, card always visible after reveal(3).
+  //    'routine' → card shows after at least one routine section done.
+  //    'zeitfenster' → card shows only during the parent-set window.
+  //    See useGameAccess.ts for the full logic. Placed next to the
+  //    Cave card in the Hub hero stack so games are discoverable where
+  //    Louis already looks, not buried in Ronki's profile.
+  const gameAccess = useGameAccess();
+  const spielzimmerAvailable = reveal(3) && gameAccess.unlocked;
 
   // ── Side quests for Bonus button ──
   const sideQuests = (state.quests || []).filter(q => q.sideQuest);
@@ -954,6 +965,50 @@ export default function Hub({ onNavigate, onPlayMint }) {
               </p>
             </div>
             <span className="material-symbols-outlined shrink-0" style={{ color: 'rgba(252,211,77,0.7)', fontSize: 20 }}>chevron_right</span>
+          </button>
+        )}
+
+        {/* ── Spielzimmer — Ronki's game room, access-aware.
+               Visibility driven by useGameAccess → canAccessMinigames:
+                 'frei'        → always visible from reveal(3)
+                 'routine'     → visible when today's routine is done
+                 'zeitfenster' → visible inside the parent-set window
+               Surfaces games on the Hub instead of burying them in the
+               Ronki-tab teaser (22 Apr 2026 playtest: Louis couldn't
+               find them). Warm amber gradient to sit visually next to
+               the Cave without competing. ── */}
+        {spielzimmerAvailable && (
+          <button
+            onClick={() => onNavigate?.('games')}
+            className="w-full p-4 rounded-2xl flex items-center gap-3 text-left active:scale-[0.98] transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+              border: '1.5px solid rgba(217,119,6,0.45)',
+              boxShadow: '0 10px 22px -10px rgba(217,119,6,0.45)',
+            }}
+          >
+            <div
+              className="flex items-center justify-center shrink-0"
+              style={{
+                width: 48, height: 48, borderRadius: 16,
+                background: 'radial-gradient(circle at 40% 30%, #fcd34d 0%, #f59e0b 70%, #b45309 100%)',
+                boxShadow: '0 0 14px rgba(245,158,11,0.55)',
+                fontSize: 26,
+              }}
+              aria-hidden="true"
+            >
+              🎮
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5"
+                 style={{ color: '#b45309' }}>
+                {lang === 'de' ? 'Spielzimmer' : 'Play room'}
+              </p>
+              <p className="font-headline font-semibold text-[15px] leading-tight" style={{ color: '#78350f' }}>
+                {lang === 'de' ? 'Spiel mit Ronki' : 'Play with Ronki'}
+              </p>
+            </div>
+            <span className="material-symbols-outlined shrink-0" style={{ color: '#b45309', fontSize: 20 }}>chevron_right</span>
           </button>
         )}
 
