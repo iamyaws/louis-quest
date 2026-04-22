@@ -93,13 +93,23 @@ export function HeroVariantF() {
             <WaitlistCTA launchState={LAUNCH_STATE} />
           </motion.div>
 
-          {/* Secondary hook — Ritual framing (option C) */}
+          {/* Secondary hook — Ritual framing (option C).
+           * Explicit line break between the two statements keeps the
+           * rhythm Marc wants. hyphens: manual stops German auto-
+           * hyphenation from splitting "Unterschied" mid-word on
+           * narrow viewports. */}
           <motion.p
             {...fade(0.7)}
             className="mt-6 text-base sm:text-lg font-display font-semibold text-mustard/90 italic leading-snug"
+            style={{
+              hyphens: 'manual',
+              WebkitHyphens: 'manual',
+              MozHyphens: 'manual',
+            }}
           >
-            Routinen optimiert man. Rituale lebt man. Ronki ist für den
-            Unterschied gebaut.
+            Routinen optimiert man. Rituale lebt man.
+            <br />
+            Ronki ist für den Unterschied gebaut.
           </motion.p>
 
           {/* Trust indicators */}
