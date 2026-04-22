@@ -112,6 +112,45 @@ export interface TaskState {
   minigameStaminaMax?: number;
   /** Time window (24h clock) when 'zeitfenster' mode is active. Default 16:00–18:00. */
   minigameTimeWindow?: { startHour: number; endHour: number };
+
+  // ── Parent account + onboarding track (added 22 Apr 2026) ──
+  /** Parent PIN set during the new parent-onboarding Track A. Null means
+   *  the default "1234" is still active (parentPinIsDefault === true). */
+  parentPin?: string | null;
+  /** True when the parent hasn't customized the PIN yet. Drives the
+   *  yellow "PIN ist noch 1234 — jetzt ändern" warning banner in the
+   *  Parental Dashboard. Flips false on first real PIN set. */
+  parentPinIsDefault?: boolean;
+  /** Marks Track A (ParentOnboarding) as complete. Runs BEFORE the kid's
+   *  7-step Onboarding.jsx so the parent sets up the account before
+   *  handing the phone to the kid. */
+  parentOnboardingDone?: boolean;
+  /** True when the post-engagement PWA install prompt has been shown +
+   *  acted on (install / skip). Controlled by usePWAPromptGate hook. */
+  pwaPromptShown?: boolean;
+  /** ISO date string of the last time the kid logged in. Used by the
+   *  PWA prompt's "day-2 retry" logic — if dismissed on day 1, re-offer
+   *  on day 2 when the parent is likely to be back at the phone. */
+  lastLoginDate?: string;
+
+  // ── Haptics (added 22 Apr 2026 per research plan) ──
+  /** Master haptic enable flag. Default true. When false, all haptic calls
+   *  no-op regardless of mode. */
+  hapticsEnabled?: boolean;
+  /** Haptic intensity mode.
+   *   · 'gentle' (default) — halved pulse durations, widened pauses. Right
+   *     for age 6 per startle-reflex research.
+   *   · 'normal' — full patterns as defined in src/lib/haptics.ts. */
+  hapticsMode?: 'gentle' | 'normal';
+
+  // ── Analytics (added 22 Apr 2026) ──
+  /** Anonymous device identifier (UUID v4). Generated once on first launch,
+   *  persisted in localStorage. Never tied to Supabase auth user.id. */
+  analyticsDeviceId?: string;
+  /** Parent consent for anonymous usage telemetry. Default true (with
+   *  first-run disclosure on Track A). Opt-out via Parental Dashboard.
+   *  Events drop silently when false. */
+  analyticsEnabled?: boolean;
   /** Creatures discovered via useMicropediaDiscovery. One entry per unlock. */
   micropediaDiscovered?: Array<{ id: string; chapter: string; discoveredAt: string }>;
   /** Freund reunion arcs Louis has completed end-to-end (all 4 beats). */
@@ -421,6 +460,22 @@ export function createInitialState(): TaskState {
     minigameAccessMode: 'frei',
     minigameStaminaMax: 10,
     minigameTimeWindow: { startHour: 16, endHour: 18 },
+    // Parent account + onboarding defaults — Track A will set parentPin
+    // and flip parentPinIsDefault to false on first PIN customization.
+    parentPin: null,
+    parentPinIsDefault: true,
+    parentOnboardingDone: false,
+    pwaPromptShown: false,
+    lastLoginDate: undefined,
+    // Haptics — defaults per research plan (gentle for age 6).
+    hapticsEnabled: true,
+    hapticsMode: 'gentle',
+    // Analytics — device_id generated lazily by src/lib/analytics.ts.
+    // Default ON per EU DSA guidelines (data-minimisation posture
+    // qualifies as service-improvement legitimate-interest). Track A
+    // discloses this to parents + exposes the toggle in the Dashboard.
+    analyticsDeviceId: undefined,
+    analyticsEnabled: true,
     // Bonding Agent defaults — Ronki starts in a normal mood; the next
     // rare bad day is scheduled 14-21d out so a first-week user doesn't
     // see it immediately (the surprise should land after trust is built).
@@ -565,6 +620,21 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           minigameAccessMode: raw.minigameAccessMode || 'frei',
           minigameStaminaMax: raw.minigameStaminaMax ?? 10,
           minigameTimeWindow: raw.minigameTimeWindow || { startHour: 16, endHour: 18 },
+          // Parent account + onboarding — existing users pre-rework get
+          // parentOnboardingDone=true so we don't force them through
+          // Track A retroactively. New users go through it.
+          parentPin: raw.parentPin ?? null,
+          parentPinIsDefault: raw.parentPinIsDefault ?? true,
+          parentOnboardingDone: raw.parentOnboardingDone ?? !!raw.onboardingDone,
+          pwaPromptShown: raw.pwaPromptShown ?? false,
+          lastLoginDate: raw.lastLoginDate,
+          // Haptics — default gentle for age-6 safety.
+          hapticsEnabled: raw.hapticsEnabled ?? true,
+          hapticsMode: raw.hapticsMode ?? 'gentle',
+          // Analytics — existing users default ON, matching fresh-install
+          // default. Device_id stays undefined until analytics.ts lazy-init.
+          analyticsDeviceId: raw.analyticsDeviceId,
+          analyticsEnabled: raw.analyticsEnabled ?? true,
           // Bonding Agent migration — saves predating Apr 2026 don't have
           // these fields. Default to normal mood + schedule a first bad
           // day 14-21d out so returning users aren't ambushed on next open.
