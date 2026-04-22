@@ -19,14 +19,19 @@ type Props = {
   appUrl?: string;
 };
 
-export function WaitlistCTA({ launchState, appUrl = '/app' }: Props) {
+export function WaitlistCTA({ launchState, appUrl }: Props) {
   const copy = getLaunchCopy(launchState);
+  // Route by the copy's declared action rather than the state name —
+  // that way any future 'install'-action state (live, public-alpha,
+  // etc.) gets the direct-link button automatically, and waitlist-
+  // action states (waitlist, beta) get the email form.
+  const resolvedAppUrl = appUrl ?? copy.appUrl ?? '/app';
 
-  if (launchState === 'live') {
+  if (copy.ctaAction === 'install') {
     return (
       <div className="flex flex-col items-start gap-2">
         <motion.a
-          href={appUrl}
+          href={resolvedAppUrl}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className="group relative inline-flex items-center gap-3 rounded-full bg-teal px-8 py-4 text-cream font-display font-semibold text-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"

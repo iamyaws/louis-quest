@@ -47,7 +47,7 @@ export default function Home() {
           {
             question: 'Was kostet Ronki?',
             answer:
-              'Ronki ist gerade in der Entwicklung. Trag dich auf die Warteliste ein, wir melden uns einmal, wenn es losgeht. Kein Spam, versprochen.',
+              'Ronki ist kostenlos. Die Public-Alpha läuft direkt im Browser — keine Anmeldung, kein App Store, kein Download. Probiert es aus und schreibt uns an hallo@ronki.de wenn etwas klemmt.',
           },
           {
             question: 'Wie schützt ihr die Daten meines Kindes?',

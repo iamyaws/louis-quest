@@ -7,7 +7,7 @@ import { Footer } from './Footer';
 import { WaitlistCTA } from './WaitlistCTA';
 import { RatgeberFiguresStyles } from './RatgeberFigures';
 import { FeedbackForm } from './FeedbackForm';
-import { LAUNCH_STATE } from '../config/launch-state';
+import { LAUNCH_STATE, getLaunchCopy } from '../config/launch-state';
 import { EASE_OUT } from '../lib/motion';
 
 export interface RelatedLink {
@@ -233,7 +233,9 @@ export function RatgeberArticle({
                 Ronki macht aus der Routine ein tägliches Ritual.
               </h2>
               <p className="text-cream/70 leading-relaxed">
-                Eine Routine führst du aus. Ein Ritual lebt ihr gemeinsam. Wir öffnen Ronki in kleinen Gruppen. Kein Store, kein Download, keine Werbung. Trag dich ein und sag uns, wo's bei euch gerade klemmt.
+                {getLaunchCopy(LAUNCH_STATE).ctaAction === 'install'
+                  ? 'Eine Routine führst du aus. Ein Ritual lebt ihr gemeinsam. Ronki läuft direkt im Browser — kein Store, kein Download, keine Werbung. Probier es aus und schreib uns an hallo@ronki.de, wenn was klemmt.'
+                  : 'Eine Routine führst du aus. Ein Ritual lebt ihr gemeinsam. Wir öffnen Ronki in kleinen Gruppen. Kein Store, kein Download, keine Werbung. Trag dich ein und sag uns, wo\u2019s bei euch gerade klemmt.'}
               </p>
             </div>
             <div className="text-cream">

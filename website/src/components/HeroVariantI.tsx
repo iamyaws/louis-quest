@@ -44,7 +44,7 @@ export function HeroVariantI() {
           aria-hidden
         />
         <p className="text-xs uppercase tracking-[0.22em] text-teal font-medium">
-          Bald verf&uuml;gbar &middot; 2026
+          Public Alpha &middot; jetzt spielbar
         </p>
       </motion.div>
 

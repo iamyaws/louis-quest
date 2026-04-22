@@ -4,7 +4,7 @@ import { PageMeta } from '../components/PageMeta';
 import { PainterlyShell } from '../components/PainterlyShell';
 import { Footer } from '../components/Footer';
 import { WaitlistCTA } from '../components/WaitlistCTA';
-import { LAUNCH_STATE } from '../config/launch-state';
+import { LAUNCH_STATE, getLaunchCopy } from '../config/launch-state';
 import { EASE_OUT } from '../lib/motion';
 
 /* ------------------------------------------------------------------ */
@@ -284,15 +284,25 @@ export default function Installieren() {
           >
             <div className="grid sm:grid-cols-[1.1fr_1fr] gap-10 items-center">
               <div>
-                <p className="text-[0.7rem] uppercase tracking-[0.2em] text-mustard/80 font-semibold mb-4">
-                  Noch keinen Frühzugang?
-                </p>
-                <h2 className="font-display font-bold text-2xl sm:text-3xl leading-tight mb-4">
-                  Trag dich ein, wir melden uns.
-                </h2>
-                <p className="text-cream/70 leading-relaxed text-sm sm:text-base">
-                  Wir öffnen Ronki in kleinen Gruppen. Meist innerhalb von 48 Stunden nach Eintrag. Kein Spam, kein Store, keine Werbung.
-                </p>
+                {(() => {
+                  const copy = getLaunchCopy(LAUNCH_STATE);
+                  const isInstall = copy.ctaAction === 'install';
+                  return (
+                    <>
+                      <p className="text-[0.7rem] uppercase tracking-[0.2em] text-mustard/80 font-semibold mb-4">
+                        {isInstall ? 'Direkt loslegen' : 'Noch keinen Frühzugang?'}
+                      </p>
+                      <h2 className="font-display font-bold text-2xl sm:text-3xl leading-tight mb-4">
+                        {isInstall ? 'Ronki öffnet direkt im Browser.' : 'Trag dich ein, wir melden uns.'}
+                      </h2>
+                      <p className="text-cream/70 leading-relaxed text-sm sm:text-base">
+                        {isInstall
+                          ? 'Public-Alpha. Kein Store, kein Download, keine Anmeldung. Wenn etwas klemmt — Mail an hallo@ronki.de landet direkt bei Marc.'
+                          : 'Wir öffnen Ronki in kleinen Gruppen. Meist innerhalb von 48 Stunden nach Eintrag. Kein Spam, kein Store, keine Werbung.'}
+                      </p>
+                    </>
+                  );
+                })()}
               </div>
               <div className="text-cream">
                 <WaitlistCTA launchState={LAUNCH_STATE} />

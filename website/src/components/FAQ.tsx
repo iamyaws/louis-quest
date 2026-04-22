@@ -13,7 +13,7 @@ const ITEMS = [
   },
   {
     q: 'Was kostet Ronki?',
-    a: 'Ronki ist gerade in der Entwicklung. Trag dich auf die Warteliste ein, wir melden uns einmal, wenn es losgeht. Kein Spam, versprochen.',
+    a: 'Ronki ist kostenlos. Die Public-Alpha läuft direkt im Browser — keine Anmeldung, kein App Store, kein Download. Probiert es aus und schreibt uns an hallo@ronki.de, wenn etwas klemmt.',
   },
   {
     q: 'Wie schützt ihr die Daten meines Kindes?',

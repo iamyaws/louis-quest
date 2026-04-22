@@ -1,11 +1,12 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { WaitlistCTA } from './WaitlistCTA';
-import { LAUNCH_STATE } from '../config/launch-state';
+import { LAUNCH_STATE, getLaunchCopy } from '../config/launch-state';
 import { EASE_OUT } from '../lib/motion';
 
 /** Variant F — Dark hero with character art + story-driven B+E copy. */
 export function HeroVariantF() {
   const reduced = useReducedMotion();
+  const copy = getLaunchCopy(LAUNCH_STATE);
 
   const fade = (delay: number) =>
     reduced
@@ -57,7 +58,7 @@ export function HeroVariantF() {
             className="text-sm uppercase tracking-[0.18em] text-cream/70 mb-8 font-semibold"
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-mustard align-middle mr-3 animate-pulse" />
-            Beta offen · Frühzugang
+            {copy.heroEyebrow}
           </motion.p>
 
           {/* Headline — B copy */}

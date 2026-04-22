@@ -149,7 +149,7 @@ export function HeroVariantH() {
             className="inline-block h-1.5 w-1.5 rounded-full align-middle mr-3 animate-pulse"
             style={{ backgroundColor: '#FCD34D' }}
           />
-          Bald verf&uuml;gbar &middot; 2026
+          Public Alpha &middot; jetzt spielbar
         </motion.p>
 
         {/* H1 */}

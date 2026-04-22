@@ -29,7 +29,7 @@ export function HeroVariantB() {
           className="text-xs uppercase tracking-[0.2em] text-teal mb-10 font-medium"
         >
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-mustard align-middle mr-3 animate-pulse" />
-          Bald verfügbar &middot; 2026
+          Public Alpha &middot; jetzt spielbar
         </motion.p>
 
         {/* Headline */}

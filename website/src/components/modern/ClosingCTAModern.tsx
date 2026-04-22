@@ -1,8 +1,17 @@
 import { motion } from 'motion/react';
 import { WaitlistCTAModern } from './WaitlistCTAModern';
-import { LAUNCH_STATE } from '../../config/launch-state';
+import { LAUNCH_STATE, getLaunchCopy } from '../../config/launch-state';
 
 export function ClosingCTAModern() {
+  const copy = getLaunchCopy(LAUNCH_STATE);
+  const isInstall = copy.ctaAction === 'install';
+  const eyebrow = isInstall ? 'Jetzt spielbar' : 'Bald verfügbar';
+  const headline: [string, string] = isInstall
+    ? ['Ein Klick.', 'Ein Start.']
+    : ['Eine E-Mail.', 'Ein Tag.'];
+  const blurb = isInstall
+    ? 'Öffne die App direkt im Browser. Kein App Store, kein Download, kostenlos. Public-Alpha, also noch nicht perfekt — aber schon da.'
+    : 'Trag dich ein. Wir melden uns genau einmal: am Start-Tag. Danach hörst du nichts mehr von uns. Keine Werbung, kein Nachfassen.';
   return (
     <section
       className="relative px-6 py-32 border-t border-white/10"
@@ -15,7 +24,7 @@ export function ClosingCTAModern() {
           viewport={{ once: true }}
           className="text-xs uppercase tracking-[0.2em] text-[#c48a3a] font-medium"
         >
-          Bald verfügbar
+          {eyebrow}
         </motion.p>
         <motion.h2
           id="closing-cta-heading-modern"
@@ -25,7 +34,7 @@ export function ClosingCTAModern() {
           transition={{ duration: 0.8 }}
           className="font-display text-5xl sm:text-7xl lg:text-8xl leading-[0.98] tracking-tight"
         >
-          Eine E-Mail. <em className="italic opacity-70">Ein Tag.</em>
+          {headline[0]} <em className="italic opacity-70">{headline[1]}</em>
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -34,7 +43,7 @@ export function ClosingCTAModern() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="text-lg opacity-70 max-w-xl"
         >
-          Trag dich ein. Wir melden uns genau einmal: am Start-Tag. Danach hörst du nichts mehr von uns. Keine Werbung, kein Nachfassen.
+          {blurb}
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 16 }}

@@ -1,9 +1,17 @@
 import { motion } from 'motion/react';
 import { WaitlistCTA } from './WaitlistCTA';
-import { LAUNCH_STATE } from '../config/launch-state';
+import { LAUNCH_STATE, getLaunchCopy } from '../config/launch-state';
 import { EASE_OUT } from '../lib/motion';
 
 export function ClosingCTA() {
+  const copy = getLaunchCopy(LAUNCH_STATE);
+  // Direct-install states use a punchy one-liner that matches the
+  // action ("try it right now"); waitlist-flavoured states keep the
+  // "we'll ping you at start-day" promise.
+  const blurb =
+    copy.ctaAction === 'install'
+      ? 'Läuft direkt im Browser. Kein Store, kein Download, kostenlos.'
+      : 'Trag dich ein. Wir melden uns genau einmal, am Start-Tag.';
   return (
     <section
       className="relative px-6 py-24 sm:py-28 border-t border-teal/10"
@@ -50,7 +58,7 @@ export function ClosingCTA() {
           transition={{ duration: 0.6, delay: 0.25 }}
           className="mt-4 text-base opacity-70 max-w-md leading-relaxed"
         >
-          Trag dich ein. Wir melden uns genau einmal, am Start-Tag.
+          {blurb}
         </motion.p>
 
         <motion.div

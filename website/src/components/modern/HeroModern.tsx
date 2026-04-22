@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { WaitlistCTAModern } from './WaitlistCTAModern';
-import { LAUNCH_STATE } from '../../config/launch-state';
+import { LAUNCH_STATE, getLaunchCopy } from '../../config/launch-state';
 import { EASE_OUT } from '../../lib/motion';
 
 const WORDS = ['Ronki', 'trägt', 'die', 'Routine', 'mit.'];
@@ -9,6 +9,7 @@ const WORDS = ['Ronki', 'trägt', 'die', 'Routine', 'mit.'];
 export function HeroModern() {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  const copy = getLaunchCopy(LAUNCH_STATE);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], [0, 160]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
@@ -27,7 +28,7 @@ export function HeroModern() {
           className="text-[0.7rem] sm:text-xs uppercase tracking-[0.2em] text-[#c48a3a] mb-8 font-medium"
         >
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#c48a3a] align-middle mr-3 animate-pulse" />
-          Bald verfügbar · 2026
+          {copy.heroEyebrow}
         </motion.p>
 
         <h1 className="font-display leading-[0.95] tracking-tight text-[15vw] sm:text-[12vw] lg:text-[9rem] xl:text-[10rem]">

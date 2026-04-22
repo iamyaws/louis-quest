@@ -72,7 +72,7 @@ export function HeroVariantG() {
               aria-hidden
               className="h-1.5 w-1.5 rounded-full bg-mustard animate-pulse shrink-0"
             />
-            Bald verf&uuml;gbar &middot; 2026
+            Public Alpha &middot; jetzt spielbar
           </span>
         </motion.div>
 

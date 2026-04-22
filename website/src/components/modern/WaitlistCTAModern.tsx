@@ -16,14 +16,15 @@ type Props = {
   appUrl?: string;
 };
 
-export function WaitlistCTAModern({ launchState, appUrl = '/app' }: Props) {
+export function WaitlistCTAModern({ launchState, appUrl }: Props) {
   const copy = getLaunchCopy(launchState);
+  const resolvedAppUrl = appUrl ?? copy.appUrl ?? '/app';
 
-  if (launchState === 'live') {
+  if (copy.ctaAction === 'install') {
     return (
       <div className="flex flex-col items-start gap-2">
         <motion.a
-          href={appUrl}
+          href={resolvedAppUrl}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className="group relative inline-flex items-center gap-3 rounded-full bg-[#f5ecd4] px-8 py-4 text-[#12100c] font-display text-lg overflow-hidden"

@@ -34,7 +34,7 @@ export function HeroV2() {
           className="text-[0.7rem] sm:text-xs uppercase tracking-[0.2em] text-teal mb-8 font-medium"
         >
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-mustard align-middle mr-3 animate-pulse" />
-          Bald verfügbar · 2026
+          Public Alpha · jetzt spielbar
         </motion.p>
 
         <motion.h1
