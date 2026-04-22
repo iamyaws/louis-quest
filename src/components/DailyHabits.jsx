@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import { useQuestEater } from './QuestEater';
@@ -22,6 +23,7 @@ import { useQuestEater } from './QuestEater';
  */
 export default function DailyHabits() {
   const { state, actions } = useTask();
+  const haptic = useHaptic();
   const { lang } = useTranslation();
   const eater = useQuestEater();
 
@@ -36,7 +38,7 @@ export default function DailyHabits() {
   const handleTap = (habit, evt) => {
     if (doneMap[habit.id]) return; // already done today
     SFX.play('pop');
-    if (navigator.vibrate) navigator.vibrate(50);
+    haptic('confirm');
     // Habits get the sparkle flavor — star-drift fire-breath. Teaches
     // the kid that habits (vs routine quests) are something different,
     // and the ambient sparkle feels fitting for growing-over-time.

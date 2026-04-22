@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
+import { useHaptic } from '../hooks/useHaptic';
 import CooldownButton from './CooldownButton';
 
 /**
@@ -44,6 +45,7 @@ const base = import.meta.env.BASE_URL;
 
 export default function PotionGame({ onComplete }) {
   const { t, lang } = useTranslation();
+  const haptic = useHaptic();
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState([]);
   const [score, setScore] = useState(0);
@@ -57,7 +59,7 @@ export default function PotionGame({ onComplete }) {
   const handlePickColor = useCallback((colorId) => {
     if (animating || selected.length >= 2) return;
     SFX.play('pop');
-    if (navigator.vibrate) navigator.vibrate(40);
+    haptic('select');
 
     const next = [...selected, colorId];
     setSelected(next);
@@ -72,7 +74,7 @@ export default function PotionGame({ onComplete }) {
         if (correct) {
           setScore(s => s + 1);
           SFX.play('coin');
-          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+          haptic('success');
         } else {
           SFX.play('tick');
         }
@@ -90,7 +92,7 @@ export default function PotionGame({ onComplete }) {
         }, 1500);
       }, 600);
     }
-  }, [selected, round, animating, totalRounds]);
+  }, [selected, round, animating, totalRounds, haptic]);
 
   // Reward based on score
   const reward = { xp: 0, hp: Math.max(2, score * 2) };

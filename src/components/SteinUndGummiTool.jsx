@@ -57,13 +57,14 @@ export default function SteinUndGummiTool({ onComplete }) {
     }
     if (phase === 'tense') {
       SFX.play('pop');
-      try { if (navigator.vibrate) navigator.vibrate(30); } catch (_) {}
+      // No haptics — emotional-regulation tool. A buzz during muscle-tense
+      // competes with the body-awareness the exercise is cultivating.
       const t = setTimeout(() => setPhase('release'), STEP_DURATION_TENSE);
       return () => clearTimeout(t);
     }
     if (phase === 'release') {
       SFX.play('pop');
-      try { if (navigator.vibrate) navigator.vibrate([20, 40, 20]); } catch (_) {}
+      // No haptics on release either — the whole tool stays silent.
       const t = setTimeout(() => {
         // Pause briefly, then advance to next body part or finish
         setTimeout(() => {
@@ -80,7 +81,7 @@ export default function SteinUndGummiTool({ onComplete }) {
     if (phase === 'done' && !persisted) {
       setPersisted(true);
       SFX.play('coin');
-      try { if (navigator.vibrate) navigator.vibrate([40, 30, 120]); } catch (_) {}
+      // No haptics on completion either — emotional-regulation tool.
       // Persist practice + learn at 5
       const prevPractice = state?.ronkiSkillPractice?.steinUndGummi || 0;
       const nextPractice = Math.min(5, prevPractice + 1);

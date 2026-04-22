@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { getFreundSpritePath } from '../data/freunde';
 
 /**
@@ -86,6 +87,7 @@ function sum(arr) {
 
 export default function PilzWaageGame({ onComplete }) {
   const { actions } = useTask();
+  const haptic = useHaptic();
   const badgeClaimedRef = useRef(false);
 
   const [levelIdx, setLevelIdx] = useState(0);
@@ -150,7 +152,7 @@ export default function PilzWaageGame({ onComplete }) {
     // debounce a tick so the final placement animation reads
     const t = setTimeout(() => {
       SFX.play('celeb');
-      if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+      haptic('celebration');
       claimBadgeOnce();
       if (levelIdx >= LEVELS.length - 1) {
         setPhase('gameDone');
@@ -159,16 +161,16 @@ export default function PilzWaageGame({ onComplete }) {
       }
     }, 420);
     return () => clearTimeout(t);
-  }, [balanced, phase, levelIdx, claimBadgeOnce]);
+  }, [balanced, phase, levelIdx, claimBadgeOnce, haptic]);
 
   const tapTrayMushroom = useCallback(
     (id) => {
       if (phase !== 'playing') return;
       SFX.play('pop');
-      if (navigator.vibrate) navigator.vibrate(12);
+      haptic('tap');
       setSelectedId((cur) => (cur === id ? null : id));
     },
-    [phase]
+    [phase, haptic]
   );
 
   const tapPan = useCallback(
@@ -184,9 +186,9 @@ export default function PilzWaageGame({ onComplete }) {
       setSelectedId(null);
       setWobble((w) => w + 1);
       SFX.play('pop');
-      if (navigator.vibrate) navigator.vibrate(18);
+      haptic('select');
     },
-    [phase, selectedId]
+    [phase, selectedId, haptic]
   );
 
   const tapPlacedMushroom = useCallback(
@@ -198,9 +200,9 @@ export default function PilzWaageGame({ onComplete }) {
       setSelectedId(null);
       setWobble((w) => w + 1);
       SFX.play('pop');
-      if (navigator.vibrate) navigator.vibrate(12);
+      haptic('tap');
     },
-    [phase]
+    [phase, haptic]
   );
 
   const resetLevel = useCallback(() => {

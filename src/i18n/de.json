@@ -393,6 +393,30 @@
   "onboarding.launch.button": "Los geht's!",
   "onboarding.continue": "Weiter",
 
+  "parentOnboarding.welcome.title": "Hallo! Du richtest Ronki für dein Kind ein.",
+  "parentOnboarding.welcome.body": "Schön, dass du da bist. In zwei Minuten ist alles bereit — danach kann dein Kind starten.",
+  "parentOnboarding.welcome.cta": "Los geht's",
+  "parentOnboarding.what.title": "Was ist Ronki?",
+  "parentOnboarding.what.card1": "Tägliche Routine: Ein warmer Begleiter für Zähneputzen, Anziehen und Schulvorbereitung. Keine Punktejagd, kein Druck.",
+  "parentOnboarding.what.card2": "Gefühle: Dein Kind lernt, Emotionen zu benennen und einfache Werkzeuge wie Box-Atmung zu nutzen — mit Ronki als Freund.",
+  "parentOnboarding.what.card3": "Eltern-Bereich: Du steuerst Bildschirmzeit, Belohnungen und Routinen. Alles hinter einem PIN, damit dein Kind nichts verstellen kann.",
+  "parentOnboarding.what.cta": "Weiter",
+  "parentOnboarding.pin.title": "PIN setzen",
+  "parentOnboarding.pin.body": "Setze deinen Eltern-PIN. Er schützt Bildschirmzeit, Belohnungen und Routine-Anpassungen.",
+  "parentOnboarding.pin.primary": "PIN jetzt setzen (empfohlen)",
+  "parentOnboarding.pin.secondary": "Später — 1234 bleibt aktiv",
+  "parentOnboarding.pin.confirm": "Zur Bestätigung noch einmal eingeben",
+  "parentOnboarding.pin.mismatch": "Die beiden PINs passen nicht zusammen. Versuche es noch einmal.",
+  "parentOnboarding.preview.title": "So findest du den Eltern-Bereich",
+  "parentOnboarding.preview.body": "Tippe auf das Schloss-Symbol oben rechts in Aufgaben, Laden oder Buch.",
+  "parentOnboarding.preview.cta": "Verstanden",
+  "parentOnboarding.done.title": "Gib Ronki deinem Kind!",
+  "parentOnboarding.done.body": "Du kannst jederzeit zurück in den Eltern-Bereich — über das Schloss-Symbol.",
+  "parentOnboarding.done.cta": "Handy an mein Kind",
+
+  "pwa.prompt.title": "Toll gemacht!",
+  "pwa.prompt.body": "Ronki ist jetzt dein Begleiter. Leg ihn auf den Homescreen, damit ihr euch morgen schneller wiederseht.",
+
   "login.title": "Anmelden",
   "login.email": "E-Mail",
   "login.password": "Passwort",
@@ -1119,5 +1143,10 @@
   "unlockHint.journal.needMood": "🔓 Stimmung + {tasks} Aufgaben — öffnet Tagebuch",
   "unlockHint.journal.needMoodOnly": "🔓 Log deine Stimmung — öffnet Tagebuch",
   "unlockHint.journal.needTasks": "🔓 Noch {tasks} Aufgaben — öffnet Tagebuch",
-  "unlockHint.shop.progress": "🔓 {current}/50 Sterne — öffnet Laden"
+  "unlockHint.shop.progress": "🔓 {current}/50 Sterne — öffnet Laden",
+
+  "analytics.disclosure.title": "Anonyme Nutzungsstatistiken",
+  "analytics.disclosure.body": "Ronki sendet ein paar anonyme Ereignisse (z.B. 'Quest fertig'), damit wir die App verbessern können. Keine Namen, keine Texte, kein Standort. Du kannst das jederzeit im Eltern-Bereich ausschalten.",
+  "analytics.disclosure.accept": "Einverstanden",
+  "analytics.disclosure.decline": "Jetzt ausschalten"
 }

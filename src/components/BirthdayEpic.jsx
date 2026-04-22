@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import { DEFAULT_FAMILY_CONFIG, pronouns } from '../types/familyConfig';
 
 export default function BirthdayEpic({ onBack }) {
   const { state, actions } = useTask();
+  const haptic = useHaptic();
   const { t } = useTranslation();
   const base = import.meta.env.BASE_URL;
 
@@ -45,7 +47,7 @@ export default function BirthdayEpic({ onBack }) {
 
     actions.updateBirthdayEpic?.({ done: newDone, completed: nowAllDone });
     SFX.play('pop');
-    if (navigator.vibrate) navigator.vibrate(80);
+    haptic('success');
 
     if (nowAllDone) {
       actions.addHP?.(500);

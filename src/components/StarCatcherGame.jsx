@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
+import { useHaptic } from '../hooks/useHaptic';
 import CooldownButton from './CooldownButton';
 
 // ── Star types ──
@@ -43,6 +44,7 @@ function pickStarType() {
 
 export default function StarCatcherGame({ onComplete }) {
   const { t, locale } = useTranslation();
+  const haptic = useHaptic();
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const animRef = useRef(null);
@@ -148,11 +150,11 @@ export default function StarCatcherGame({ onComplete }) {
     const finalScore = g?.score || 0;
     setScore(finalScore);
     SFX.play('celeb');
-    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    haptic('success');
     const { list, rank } = saveHighscore(finalScore, locale);
     setHighscores(list);
     setCurrentRank(rank);
-  }, []);
+  }, [locale, haptic]);
 
   // Draw
   const draw = useCallback(() => {
@@ -279,9 +281,9 @@ export default function StarCatcherGame({ onComplete }) {
       }]);
 
       SFX.play(caught.type === 'shooting' ? 'match' : caught.type === 'golden' ? 'coin' : 'pop');
-      if (navigator.vibrate) navigator.vibrate(40);
+      haptic('select');
     }
-  }, [phase, startGame]);
+  }, [phase, startGame, haptic]);
 
   // Clean up catch effects after animation
   useEffect(() => {

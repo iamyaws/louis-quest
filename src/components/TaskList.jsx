@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ANCHORS } from '../constants';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import useWeather, { getWeatherInfo, getClothingRecs } from '../hooks/useWeather';
 import SFX from '../utils/sfx';
@@ -15,6 +16,7 @@ import VoiceAudio from '../utils/voiceAudio';
 import { biomeBackground } from '../utils/biomeBackgrounds';
 import { useQuestEater } from './QuestEater';
 import { flavorForQuest } from './FireBreathPuff';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 // Quest IDs that trigger the toothbrush timer
 const TEETH_QUEST_IDS = new Set(['s3', 's12', 'v3', 'v10']);
@@ -46,6 +48,8 @@ const HINT_ALIAS = { v1: 's1', v3: 's3', v4: 's4', v2: 's2', v5b: 's6b', v6: 's8
 
 export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }) {
   const { state, computed, actions } = useTask();
+  const haptic = useHaptic();
+  const { track } = useAnalytics();
   const { done, total, allDone, pct, byGroup } = computed;
   const { weather } = useWeather();
   const [showWeather, setShowWeather] = useState(false);
@@ -113,11 +117,33 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
     }
 
     actions.complete(id);
+    // ── Analytics: fire quest.complete with questId + anchor. Guard
+    //    against repeatable quests (target > 1) so we only count the
+    //    final tap that drives the quest to "fully done". If the quest
+    //    was already done this handler wouldn't run (canTap gates it
+    //    upstream), so quest.complete = 1 event per quest per day.
+    const anchor = quest?.anchor || 'unknown';
+    track('quest.complete', { questId: id, anchor });
+
+    // routine.complete — fires once per day when this tap takes the
+    //    last outstanding main quest to done. We compute the flip
+    //    synchronously against the just-mutated state rather than
+    //    waiting for the next render (state here is stale). Filter is
+    //    mainQuests only — side-quests don't gate routine completion.
+    if (quest && !quest.sideQuest) {
+      const mainQuests = (state.quests || []).filter(q => !q.sideQuest);
+      const remaining = mainQuests.filter(q => !q.done && q.id !== id).length;
+      const priorAllDone = mainQuests.every(q => q.done);
+      if (!priorAllDone && remaining === 0) {
+        track('routine.complete');
+      }
+    }
+
     // Ronki reacts with voice instead of generic pop
     const reactions = ['sfx_complete', 'sfx_wow', 'sfx_proud', 'sfx_excited', 'sfx_tap_happy'];
     VoiceAudio.play(reactions[Math.floor(Math.random() * reactions.length)]);
     SFX.play('pop');
-    if (navigator.vibrate) navigator.vibrate(80);
+    haptic('success');
   };
 
   // Hero name + today's weekday for the personalised header.
@@ -733,7 +759,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
         const completeQuestFromParent = () => {
           actions.complete(teethTimerQuestId);
           SFX.play('coin');
-          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+          haptic('success');
           setTeethTimerQuestId(null);
         };
         return TEETH_GUIDE_IDS.has(teethTimerQuestId) ? (

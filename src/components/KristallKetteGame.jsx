@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import SFX from '../utils/sfx';
 import FireBreathPuff from './FireBreathPuff';
 import MoodChibi from './MoodChibi';
@@ -68,6 +69,7 @@ function buildBoard() {
 export default function KristallKetteGame({ onComplete }) {
   const { t, lang } = useTranslation();
   const { state, actions } = useTask();
+  const haptic = useHaptic();
 
   const [round, setRound] = useState(1); // 1..3
   const [board, setBoard] = useState(() => buildBoard());
@@ -125,7 +127,7 @@ export default function KristallKetteGame({ onComplete }) {
     // Must match family of first crystal in chain
     if (hit.family !== chain[0].family) return;
     setChain(prev => [...prev, hit]);
-    try { if (navigator.vibrate) navigator.vibrate(15); } catch (_) {}
+    haptic('tap');
     SFX.play('pop');
   };
 
@@ -143,7 +145,7 @@ export default function KristallKetteGame({ onComplete }) {
       setFireKey(k => k + 1);
       setTotalHp(v => v + hp);
       SFX.play('coin');
-      try { if (navigator.vibrate) navigator.vibrate([40, 30, 60]); } catch (_) {}
+      haptic('celebration');
       // Remove the dissolved crystals from the board
       setBoard(prev => prev.filter(c => !chain.some(ch => ch.id === c.id)));
     }

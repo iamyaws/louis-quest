@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
 import PinModal from './PinModal';
@@ -40,6 +41,7 @@ const ZONES = [
 
 export default function ToothBrushGuide({ onFinish, onCancel, onParentOverride }) {
   const { state } = useTask();
+  const haptic = useHaptic();
   const mode = state?.familyConfig?.toothBrushDefaultMode || 'tasche';
 
   const [zoneIdx, setZoneIdx] = useState(0);
@@ -55,7 +57,7 @@ export default function ToothBrushGuide({ onFinish, onCancel, onParentOverride }
   const handlePinSuccess = () => {
     setPinOpen(false); setPin('');
     SFX.play('coin');
-    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+    haptic('success');
     // Fall through to onFinish if no dedicated override handler — matches
     // ToothbrushTimer.jsx:238. Both end in quest completion either way.
     (onParentOverride || onFinish)?.();

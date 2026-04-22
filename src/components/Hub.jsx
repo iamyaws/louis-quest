@@ -30,6 +30,12 @@ import { useAttentionFlag } from '../hooks/useAttentionFlag';
 import ZeigMomentCard from './ZeigMomentCard';
 import { isDevMode } from '../utils/mode';
 import { getVariant } from '../data/companionVariants';
+import { useAnalytics } from '../hooks/useAnalytics';
+
+// Stable mood enum for analytics (index matches MOOD_EMOJIS / MOOD_LABELS).
+// Never localized — analytics is language-agnostic and we never want a
+// DE/EN split in the telemetry table.
+const MOOD_ENUM = ['sad', 'worried', 'okay', 'good', 'magical', 'tired'];
 
 // ── Egg art per onboarding type (stage 0) ──
 const EGG_ART = {
@@ -132,6 +138,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct } = computed;
   const { t, lang } = useTranslation();
+  const { track } = useAnalytics();
   const { weather } = useWeather();
   const voice = useVoice();
   const base = import.meta.env.BASE_URL;
@@ -735,6 +742,12 @@ export default function Hub({ onNavigate, onPlayMint }) {
                   <button key={idx} onClick={() => {
                       SFX.play("pop");
                       actions.setMood("moodAM", idx);
+                      // Analytics: mood.pick. The `mood` prop is a stable
+                      // enum ID, not a localized label (never the user-
+                      // facing string). slot is 'AM' on Hub since Hub
+                      // only writes moodAM. Truncation to the hour is
+                      // handled in the analytics module.
+                      track('mood.pick', { mood: MOOD_ENUM[idx] || 'unknown', slot: 'AM' });
                       if (idx === 0 || idx === 1 || idx === 5) {
                         setTimeout(() => setShowGefuehlsecke(true), 400);
                       }

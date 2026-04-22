@@ -7,6 +7,7 @@ import { useRonkiStamina } from '../hooks/useRonkiStamina';
 import FeedbackModal from './FeedbackModal';
 import QuestLineEditor from './QuestLineEditor';
 import VoiceAudio from '../utils/voiceAudio';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 const PIN_CODE = '1234';
 const MOOD_EMOJIS = ['😢', '😕', '😐', '🙂', '😊', '🤩'];
@@ -30,6 +31,7 @@ function BodhiLeaf({ className = '' }) {
 export default function ParentalDashboard({ onClose, currentView, preauthorized = false }) {
   const { state, actions } = useTask();
   const { t, lang, setLang } = useTranslation();
+  const { track } = useAnalytics();
   const [pin, setPin] = useState('');
   // `preauthorized` short-circuits the legacy internal PIN gate. We now
   // surface a dedicated PinModal from App.jsx *before* the dashboard
@@ -54,6 +56,14 @@ export default function ParentalDashboard({ onClose, currentView, preauthorized 
       active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
   }, [tab]);
+
+  // Analytics: parent.dashboard.open — fire exactly once per mount. A
+  // separate pass will wire toggle UI (analyticsEnabled, mood-history,
+  // etc.) elsewhere in this component; we deliberately don't add any
+  // UI here beyond this one useEffect.
+  useEffect(() => {
+    track('parent.dashboard.open');
+  }, [track]);
 
   if (!state) return null;
 

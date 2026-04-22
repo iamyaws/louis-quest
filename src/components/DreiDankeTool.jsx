@@ -57,7 +57,9 @@ export default function DreiDankeTool({ onComplete }) {
 
   const handlePick = (item) => {
     SFX.play('pop');
-    try { if (navigator.vibrate) navigator.vibrate(30); } catch (_) {}
+    // No haptics — emotional-regulation tool. Research: user is regulating,
+    // not transacting. Confirmer buzz competes with the breath/attention
+    // the tool is trying to build. Visual + audio only.
     const next = [...picked, item];
     setPicked(next);
     if (step < 2) {
@@ -66,7 +68,7 @@ export default function DreiDankeTool({ onComplete }) {
       // Finish session
       setDone(true);
       SFX.play('coin');
-      try { if (navigator.vibrate) navigator.vibrate([40, 30, 60]); } catch (_) {}
+      // No haptics — emotional-regulation tool stays silent on completion.
       // Persist: bump practice counter + write gratitudes to Buch.
       //
       // Code-reviewer fix (22 Apr 2026): journalGratitude is typed

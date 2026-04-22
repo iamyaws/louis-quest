@@ -7,6 +7,11 @@ import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
 import TopBar from './TopBar';
 import { biomeBackground } from '../utils/biomeBackgrounds';
+import { useAnalytics } from '../hooks/useAnalytics';
+
+// Stable mood enum for analytics. Index matches MOOD_EMOJIS order.
+// Never localized — consistent with Hub.jsx.
+const MOOD_ENUM = ['sad', 'worried', 'okay', 'good', 'magical', 'tired'];
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
 
@@ -44,6 +49,7 @@ function getDailyIndex(arr) {
 export default function Journal({ onNavigate, onOpenParental }) {
   const { state, actions } = useTask();
   const { t, locale, lang } = useTranslation();
+  const { track } = useAnalytics();
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -79,6 +85,11 @@ export default function Journal({ onNavigate, onOpenParental }) {
 
   const handleSave = () => {
     actions.saveJournal({ memory, gratitude, dayEmoji, achievements });
+    // Analytics: journal.write — COUNT ONLY. No content, no mood, no
+    // gratitude tags, no achievements. Spec is explicit: never send
+    // user-generated strings. The existence of the event is the data
+    // product (sessions that end with a journal entry).
+    track('journal.write');
     // Actual book close SFX (not Ronki's voice) + delayed Ronki encouragement
     SFX.play('pop');
     const encouragements = ['de_journal_done_01', 'de_journal_done_02', 'de_journal_done_03'];
@@ -334,7 +345,15 @@ export default function Journal({ onNavigate, onOpenParental }) {
                       border: `1.5px solid ${isSelected ? c.ink : 'rgba(18,67,70,0.08)'}`,
                       boxShadow: isSelected ? `0 6px 14px -4px ${c.ink}40` : '0 2px 8px rgba(0,0,0,0.04)',
                     }}
-                    onClick={() => { SFX.play('pop'); actions.setMood('moodAM', idx); }}
+                    onClick={() => {
+                      SFX.play('pop');
+                      actions.setMood('moodAM', idx);
+                      // Analytics: mood.pick. Journal mood picker writes
+                      // moodAM too (same field Hub uses), so slot is AM
+                      // regardless of actual time-of-day. Product team
+                      // derives AM/PM from ts truncation if needed.
+                      track('mood.pick', { mood: MOOD_ENUM[idx] || 'unknown', slot: 'AM' });
+                    }}
                   >
                     {/* Mood face — white halo when selected, quiet neutral otherwise */}
                     <div className="flex items-center justify-center rounded-full transition-all"

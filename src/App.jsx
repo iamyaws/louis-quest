@@ -14,6 +14,10 @@ import Sanctuary from './components/Sanctuary';
 import Journal from './components/Journal';
 import HeldenKodex from './components/HeldenKodex';
 import Onboarding from './components/Onboarding';
+import ParentOnboarding from './components/ParentOnboarding';
+import PWAInstallSheet from './components/PWAInstallSheet';
+import { usePWAInstall } from './hooks/usePWAInstall';
+import { usePWAPromptGate } from './hooks/usePWAPromptGate';
 import ParentalDashboard from './components/ParentalDashboard';
 import Celebration from './components/Celebration';
 // Arc offer system paused — see backlog_arc_offer_rework.md
@@ -73,6 +77,7 @@ import { useQuietAttention } from './hooks/useQuietAttention';
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import AlphaBanner from './components/AlphaBanner';
 import SWUpdateBanner from './components/SWUpdateBanner';
+import { useAnalytics } from './hooks/useAnalytics';
 
 // Tiny Suspense fallback for lazy-loaded tools/games. Intentionally
 // minimal — the chunks are small and a full "loading screen" treatment
@@ -86,9 +91,21 @@ function ToolLoadingFallback() {
   );
 }
 
+// View → tool-id map for analytics. These names match the spec enum
+// (box_atmung / drei_danke / kraftwort / loewe / stein_gummi / ausmalbild).
+// Views not in this map don't fire tool.open (Hub / Aufgaben / etc.).
+const TOOL_VIEW_IDS = {
+  'drei-danke': 'drei_danke',
+  kraftwort: 'kraftwort',
+  loewe: 'loewe',
+  'stein-gummi': 'stein_gummi',
+  ausmalbild: 'ausmalbild',
+};
+
 function AppContent() {
   const { t } = useTranslation();
   const { state, actions, loading, toastTrigger } = useTask();
+  const { track } = useAnalytics();
   // Dev URL shortcuts — apply on mount so they propagate to every
   // component (not just the Ronki tab where RonkiProfile reads them).
   //   ?gallery=1            — jump to the standalone ChibiGallery
@@ -178,6 +195,14 @@ function AppContent() {
   const openPinGate = () => { setPin(''); setPinGateOpen(true); };
   const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
 
+  // Post-engagement PWA install prompt. Replaces the upfront step-7 prompt
+  // the old Onboarding.jsx fired. Opens only after kid+parent onboarding
+  // are done AND the first habit is complete (totalTasksDone >= 1), AND
+  // the app isn't already installed as standalone. Fires at most twice
+  // per user (day-1 + day-2 retry). See src/hooks/usePWAPromptGate.js.
+  const { shouldPrompt: shouldPromptPWA, markShown: markPWAShown } = usePWAPromptGate();
+  const { isIOS, androidPrompt, promptInstall } = usePWAInstall();
+
   useSpecialQuests(); // side-effect only — silently completes special quests
   // useEggSystem(); // paused Apr 2026 — spawner disabled, no more egg triggers
   useQuietAttention(view); // gentle voice brake when Louis zooms through screens
@@ -190,6 +215,39 @@ function AppContent() {
     import('./utils/feedback').then(m => m.flushFeedbackQueue()).catch(() => {});
   }, []);
 
+  // app.open — one per session. The analytics module dedups via
+  // sessionStorage so hot-reloads / StrictMode double-mounts don't
+  // double-count. Fires as soon as AppContent mounts (post-auth,
+  // post-onboarding) so we measure actual engaged sessions, not
+  // login-screen bounces.
+  useEffect(() => {
+    track('app.open');
+  }, [track]);
+
+  // tool.open / tool.complete — bridged from view transitions. We keep a
+  // ref to the currently-open tool + its open timestamp; when view moves
+  // off the tool, fire tool.complete with the elapsed duration. This
+  // keeps per-tool files untouched (DreiDankeTool / KraftwortTool / etc.
+  // remain out of the wiring scope). A tool that transitions to another
+  // tool fires complete-then-open correctly.
+  const activeToolRef = useRef(null); // { id, startedAt }
+  useEffect(() => {
+    const prev = activeToolRef.current;
+    const nextId = TOOL_VIEW_IDS[view] || null;
+
+    // Leaving a tool — fire tool.complete first.
+    if (prev && prev.id !== nextId) {
+      const durationSec = Math.max(0, Math.round((Date.now() - prev.startedAt) / 1000));
+      track('tool.complete', { tool: prev.id, durationSec });
+      activeToolRef.current = null;
+    }
+
+    // Entering a tool — fire tool.open + record start time for duration.
+    if (nextId && (!prev || prev.id !== nextId)) {
+      track('tool.open', { tool: nextId });
+      activeToolRef.current = { id: nextId, startedAt: Date.now() };
+    }
+  }, [view, track]);
 
   // Scroll to top whenever the active view changes; also record first-time visits
   useEffect(() => {
@@ -231,6 +289,19 @@ function AppContent() {
       <div className="flex items-center justify-center h-dvh bg-surface">
         <p className="font-headline text-xl font-bold text-primary">{t('app.loading')}</p>
       </div>
+    );
+  }
+
+  // Parent onboarding gate — Track A (22 Apr 2026). Runs BEFORE the kid's
+  // Onboarding.jsx so the parent sets up the PIN and learns where the
+  // lock icons live before handing the phone over. Existing users get
+  // parentOnboardingDone auto-set to !!onboardingDone in the TaskContext
+  // loader, so they skip this entirely.
+  if (state && !state.parentOnboardingDone) {
+    return (
+      <ParentOnboarding onComplete={(patch) => {
+        actions.patchState(patch);
+      }} />
     );
   }
 
@@ -506,6 +577,26 @@ function AppContent() {
         <CreatureDiscoveryToast
           creatureId={discoveryToast}
           onDismiss={() => setDiscoveryToast(null)}
+        />
+      )}
+      {/* Post-engagement PWA install prompt. Fires at the app-shell layer
+          (not inside Onboarding) after the first habit completes. Only
+          shown outside the Hub tab would feel disruptive, so we let it
+          render anywhere — the bottom sheet is already z-[800] and the
+          Gate hook's guards (onboardingDone, totalTasksDone >= 1,
+          !standalone, !pwaPromptShown) prevent it from firing mid-
+          onboarding or on an already-installed instance. */}
+      {shouldPromptPWA && (
+        <PWAInstallSheet
+          isIOS={isIOS}
+          androidPrompt={androidPrompt}
+          onInstall={async () => {
+            await promptInstall();
+            markPWAShown();
+          }}
+          onSkip={() => {
+            markPWAShown();
+          }}
         />
       )}
     </>

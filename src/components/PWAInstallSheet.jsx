@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const IOS_STEPS = [
   {
@@ -21,8 +22,15 @@ const IOS_STEPS = [
 /**
  * Bottom-sheet PWA install prompt.
  * Props: isIOS, androidPrompt, onInstall, onSkip
+ *
+ * Headline + body now live in i18n (pwa.prompt.title / .body) because
+ * this sheet is fired post-engagement — the copy had to shift from
+ * "please install" to "great job, now keep going". The iOS step cards
+ * stay hardcoded DE because they're procedural instructions about the
+ * Safari UI, not marketing copy.
  */
 export default function PWAInstallSheet({ isIOS, androidPrompt, onInstall, onSkip }) {
+  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -60,10 +68,10 @@ export default function PWAInstallSheet({ isIOS, androidPrompt, onInstall, onSki
         </div>
 
         <h2 className="font-headline font-bold text-2xl text-on-surface text-center mb-2">
-          Ronki auf den Homescreen!
+          {t('pwa.prompt.title')}
         </h2>
         <p className="font-body text-sm text-on-surface-variant text-center mb-6 leading-relaxed">
-          Öffne Ronki jeden Tag direkt vom Homescreen — kein Browser nötig.
+          {t('pwa.prompt.body')}
         </p>
 
         {/* ── iOS instructions ── */}

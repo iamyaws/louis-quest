@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
+import { useHaptic } from '../hooks/useHaptic';
 
 function AnimatedDigit({ d, size }) {
   // size: 'sm' (badge, text-lg) or 'lg' (expanded panel, text-4xl)
@@ -38,6 +39,7 @@ function AnimatedDigit({ d, size }) {
  */
 export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, onStore, onDismiss }) {
   const { t } = useTranslation();
+  const haptic = useHaptic();
   const [remaining, setRemaining] = useState(totalSeconds);
   const [paused, setPaused] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -65,7 +67,9 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
             fired.add('done');
             VoiceAudio.play('de_screentime_done_01', 0);
           }
-          if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+          // Was a long 200/100/200/100/200ms alarm — now a short success
+          // pattern so the buzz reads as "done" instead of alarm-clock startle.
+          haptic('success');
           onFinish?.();
           return 0;
         }

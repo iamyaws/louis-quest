@@ -1,0 +1,320 @@
+/**
+ * Kid-safe Supabase-native telemetry.
+ *
+ * Shipped 22 Apr 2026. Design notes:
+ *   - Zero new vendor. Reuses the existing Supabase client (same pattern as
+ *     src/utils/feedback.ts). All events hit one table: telemetry_events.
+ *   - Anonymous device_id (UUID v4) in localStorage, rotated annually.
+ *     Never tied to Supabase auth user.id — that link is the one thing a
+ *     kids' analytics pipeline must never make (parental consent scope
+ *     plus EU DSA data-minimisation).
+ *   - Queue in memory, flush on visibilitychange / every 30s / beforeunload.
+ *   - Offline queue in localStorage ('ronki_telemetry_queue'), capped at
+ *     200 events (drop-oldest). Kids' app: losing an event is fine.
+ *   - Hard-coded allowlist of event names + prop keys so accidental
+ *     user-generated content (hero name, journal text, mood reasons) can
+ *     never leak into props. Any prop whose value isn't a primitive gets
+ *     dropped silently.
+ *
+ * NEVER send: journal content, heroName, mood reason text, any free-form
+ * user string. The allowlist below is the hard constraint.
+ */
+
+import { supabase } from './supabase';
+
+// ── Event schema (hard allowlist, matches spec) ──────────────────────
+export type EventName =
+  | 'app.open'
+  | 'routine.complete'
+  | 'quest.complete'
+  | 'tool.open'
+  | 'tool.complete'
+  | 'mood.pick'
+  | 'game.start'
+  | 'game.end'
+  | 'ronki.hatch'
+  | 'ronki.evolve'
+  | 'journal.write'
+  | 'ausmalbild.redeem'
+  | 'parent.pin.enter'
+  | 'parent.dashboard.open'
+  | 'parent.setting.change';
+
+export type EventProps = Record<string, string | number | boolean>;
+
+// Keys allowed on props by event name. Any prop key NOT in this list gets
+// stripped silently before send. This is the defence-in-depth layer
+// against accidental user-string leaks (e.g. a future caller typo'ing
+// `heroName` instead of `toStage`).
+const ALLOWED_PROP_KEYS: Record<EventName, readonly string[]> = {
+  'app.open': [],
+  'routine.complete': [],
+  'quest.complete': ['questId', 'anchor'],
+  'tool.open': ['tool'],
+  'tool.complete': ['tool', 'durationSec'],
+  'mood.pick': ['mood', 'slot'],
+  'game.start': ['gameId'],
+  'game.end': ['gameId', 'durationSec', 'completed'],
+  'ronki.hatch': [],
+  'ronki.evolve': ['toStage'],
+  'journal.write': [],
+  'ausmalbild.redeem': ['sceneId'],
+  'parent.pin.enter': ['success'],
+  'parent.dashboard.open': [],
+  'parent.setting.change': ['key'],
+};
+
+// ── Storage keys ─────────────────────────────────────────────────────
+const DEVICE_ID_KEY = 'ronki_analytics_device_id';
+const DEVICE_ID_ROTATION_KEY = 'ronki_analytics_device_id_rotate_at';
+const QUEUE_KEY = 'ronki_telemetry_queue';
+const ENABLED_KEY = 'ronki_analytics_enabled';
+const SESSION_APP_OPEN_KEY = 'ronki_telemetry_app_open_fired';
+
+// ── Tunables ─────────────────────────────────────────────────────────
+const FLUSH_INTERVAL_MS = 30_000;
+const OFFLINE_QUEUE_CAP = 200;
+const ROTATION_MS = 365 * 24 * 60 * 60 * 1000; // 1 year
+
+// ── App version (best-effort; no fallback noise) ─────────────────────
+const APP_VERSION: string | undefined = (() => {
+  try {
+    return (import.meta as any).env?.VITE_APP_VERSION || undefined;
+  } catch {
+    return undefined;
+  }
+})();
+
+// ── In-memory state ──────────────────────────────────────────────────
+interface QueuedEvent {
+  device_id: string;
+  name: EventName;
+  props: EventProps;
+  ts: string;
+  app_version?: string;
+}
+
+let memoryQueue: QueuedEvent[] = [];
+let enabled = true;
+let initialized = false;
+let flushTimer: ReturnType<typeof setInterval> | null = null;
+
+// ── UUID v4 (no crypto.randomUUID fallback for older iOS) ────────────
+function uuidv4(): string {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+  } catch { /* fall through */ }
+  // RFC 4122 v4 — Math.random is fine here, device_id isn't secret.
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+// ── Device ID (lazy, rotates annually) ───────────────────────────────
+export function getDeviceId(): string {
+  try {
+    const now = Date.now();
+    let id = localStorage.getItem(DEVICE_ID_KEY);
+    const rotateAtRaw = localStorage.getItem(DEVICE_ID_ROTATION_KEY);
+    const rotateAt = rotateAtRaw ? parseInt(rotateAtRaw, 10) : 0;
+    if (!id || !rotateAt || now > rotateAt) {
+      id = uuidv4();
+      localStorage.setItem(DEVICE_ID_KEY, id);
+      localStorage.setItem(DEVICE_ID_ROTATION_KEY, String(now + ROTATION_MS));
+    }
+    return id;
+  } catch {
+    // Private mode / storage disabled — fall back to a transient id so
+    // the session still attributes correctly, but don't try to persist.
+    return uuidv4();
+  }
+}
+
+// ── Enable/disable ───────────────────────────────────────────────────
+export function setAnalyticsEnabled(next: boolean): void {
+  enabled = !!next;
+  try { localStorage.setItem(ENABLED_KEY, enabled ? '1' : '0'); } catch { /* ignore */ }
+}
+
+function readEnabledFromStorage(): boolean {
+  try {
+    const v = localStorage.getItem(ENABLED_KEY);
+    if (v === null) return true; // default on
+    return v === '1';
+  } catch { return true; }
+}
+
+// ── Sanitisation ─────────────────────────────────────────────────────
+/**
+ * Strip any prop key not in the allowlist for this event, and drop any
+ * non-primitive value. Final belt against accidental PII leaks.
+ */
+function sanitizeProps(name: EventName, props?: EventProps): EventProps {
+  if (!props) return {};
+  const allow = ALLOWED_PROP_KEYS[name];
+  const out: EventProps = {};
+  for (const k of Object.keys(props)) {
+    if (!allow.includes(k)) continue;
+    const v = props[k];
+    const t = typeof v;
+    if (t === 'string' || t === 'number' || t === 'boolean') {
+      out[k] = v as string | number | boolean;
+    }
+  }
+  return out;
+}
+
+/**
+ * Truncate timestamp to the hour for mood.pick events. Rationale: the
+ * exact "when did the kid feel sad" timing adds real fingerprinting risk
+ * (one mood event at 06:42 on 7 days reveals schedule); the hour is enough
+ * for the AM/PM segmentation we actually need from the slot prop.
+ */
+function timestampFor(name: EventName, now: Date): string {
+  if (name === 'mood.pick') {
+    const d = new Date(now);
+    d.setMinutes(0, 0, 0);
+    return d.toISOString();
+  }
+  return now.toISOString();
+}
+
+// ── Offline queue ────────────────────────────────────────────────────
+function readOfflineQueue(): QueuedEvent[] {
+  try {
+    const raw = localStorage.getItem(QUEUE_KEY);
+    return raw ? (JSON.parse(raw) as QueuedEvent[]) : [];
+  } catch { return []; }
+}
+
+function writeOfflineQueue(q: QueuedEvent[]): void {
+  try {
+    // Drop oldest if over cap — this is a kids' app, bounded memory wins.
+    const trimmed = q.length > OFFLINE_QUEUE_CAP ? q.slice(q.length - OFFLINE_QUEUE_CAP) : q;
+    localStorage.setItem(QUEUE_KEY, JSON.stringify(trimmed));
+  } catch { /* ignore storage errors */ }
+}
+
+function persistToOffline(events: QueuedEvent[]): void {
+  if (events.length === 0) return;
+  const current = readOfflineQueue();
+  writeOfflineQueue([...current, ...events]);
+}
+
+// ── Core track ───────────────────────────────────────────────────────
+export function track(name: EventName, props?: EventProps): void {
+  if (!enabled) return;
+  if (typeof window === 'undefined') return;
+
+  // Dedup app.open once per sessionStorage-lifetime so hot-reloads /
+  // React StrictMode double-mounts don't double-count sessions.
+  if (name === 'app.open') {
+    try {
+      if (sessionStorage.getItem(SESSION_APP_OPEN_KEY) === '1') return;
+      sessionStorage.setItem(SESSION_APP_OPEN_KEY, '1');
+    } catch { /* ignore — still send; non-critical */ }
+  }
+
+  if (!ALLOWED_PROP_KEYS[name]) return; // unknown event name — drop
+  const clean = sanitizeProps(name, props);
+  const evt: QueuedEvent = {
+    device_id: getDeviceId(),
+    name,
+    props: clean,
+    ts: timestampFor(name, new Date()),
+    app_version: APP_VERSION,
+  };
+  memoryQueue.push(evt);
+  ensureInitialized();
+}
+
+// ── Flush ────────────────────────────────────────────────────────────
+async function flush(opts: { blocking?: boolean } = {}): Promise<void> {
+  if (typeof window === 'undefined') return;
+  const online = typeof navigator === 'undefined' ? true : navigator.onLine !== false;
+
+  // Drain both in-memory and offline queues on every flush.
+  const batch = [...readOfflineQueue(), ...memoryQueue];
+  if (batch.length === 0) return;
+
+  // Clear sources first so concurrent track() calls don't duplicate on error.
+  memoryQueue = [];
+  try { localStorage.removeItem(QUEUE_KEY); } catch { /* ignore */ }
+
+  if (!online) {
+    persistToOffline(batch);
+    return;
+  }
+
+  try {
+    const rows = batch.map(e => ({
+      device_id: e.device_id,
+      name: e.name,
+      props: e.props,
+      ts: e.ts,
+      app_version: e.app_version ?? null,
+    }));
+    // Note: Supabase RLS allows INSERT for any authenticated user. An
+    // unauthenticated request (offline user, expired session) will come
+    // back with a 401; we re-queue below. beforeunload uses sendBeacon
+    // to avoid the network-cancel the browser issues on nav.
+    if (opts.blocking) {
+      // Keep it simple: await the insert. sendBeacon requires a REST
+      // endpoint (no supabase-js wrapper) and we prefer one code path.
+      const { error } = await supabase.from('telemetry_events').insert(rows);
+      if (error) persistToOffline(batch);
+    } else {
+      const { error } = await supabase.from('telemetry_events').insert(rows);
+      if (error) persistToOffline(batch);
+    }
+  } catch {
+    persistToOffline(batch);
+  }
+}
+
+// ── Initialization (wires listeners once) ────────────────────────────
+function ensureInitialized(): void {
+  if (initialized) return;
+  initialized = true;
+  enabled = readEnabledFromStorage();
+
+  if (typeof window === 'undefined') return;
+
+  // Interval flush every 30s.
+  flushTimer = setInterval(() => { void flush(); }, FLUSH_INTERVAL_MS);
+
+  // Flush on tab hide (iOS PWA: this is the one reliable hook).
+  window.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') void flush({ blocking: true });
+  });
+
+  // Flush any queued events from prior sessions the moment we come online.
+  window.addEventListener('online', () => { void flush(); });
+
+  // beforeunload is best-effort on mobile; visibilitychange above is the
+  // real safety net. We still listen so desktop close/refresh doesn't lose
+  // the last few events.
+  window.addEventListener('beforeunload', () => { void flush({ blocking: true }); });
+}
+
+// Eager init on module import so the online/visibility listeners are in
+// place before the first track() call. Safe no-op on SSR (guarded above).
+ensureInitialized();
+
+// ── Test / debug helpers (unused in prod paths) ──────────────────────
+export function _resetForTests(): void {
+  memoryQueue = [];
+  initialized = false;
+  if (flushTimer) { clearInterval(flushTimer); flushTimer = null; }
+  try {
+    localStorage.removeItem(QUEUE_KEY);
+    localStorage.removeItem(DEVICE_ID_KEY);
+    localStorage.removeItem(DEVICE_ID_ROTATION_KEY);
+    localStorage.removeItem(ENABLED_KEY);
+    sessionStorage.removeItem(SESSION_APP_OPEN_KEY);
+  } catch { /* ignore */ }
+}

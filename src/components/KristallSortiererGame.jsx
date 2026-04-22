@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { getCreatureSpritePath } from '../data/creatures';
 
 /**
@@ -126,6 +127,7 @@ function buildTray(levelIdx) {
 
 export default function KristallSortiererGame({ onComplete }) {
   const { actions } = useTask();
+  const haptic = useHaptic();
   const badgeClaimedRef = useRef(false);
   const shakeTimerRef = useRef(null);
 
@@ -186,7 +188,7 @@ export default function KristallSortiererGame({ onComplete }) {
     if (!allSorted) return;
     const t = setTimeout(() => {
       SFX.play('celeb');
-      if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+      haptic('celebration');
       claimBadgeOnce();
       if (levelIdx >= LEVELS.length - 1) {
         setPhase('gameDone');
@@ -201,10 +203,10 @@ export default function KristallSortiererGame({ onComplete }) {
     (id) => {
       if (phase !== 'playing') return;
       SFX.play('pop');
-      if (navigator.vibrate) navigator.vibrate(12);
+      haptic('tap');
       setSelectedId((cur) => (cur === id ? null : id));
     },
-    [phase]
+    [phase, haptic]
   );
 
   const tapBin = useCallback(
@@ -224,17 +226,18 @@ export default function KristallSortiererGame({ onComplete }) {
         setSelectedId(null);
         setShroomNudge((n) => n + 1);
         SFX.play('coin');
-        if (navigator.vibrate) navigator.vibrate(20);
+        haptic('select');
       } else {
-        // wrong bin — shake + keep selection for retry
+        // wrong bin — visual shake + crash SFX only. No haptic on error
+        // per haptic_research_2026_04.md: error haptics on kids' apps
+        // read like punishment. Visual-only for the wrong-bin signal.
         setShakeBinId(binColor);
         SFX.play('crash');
-        if (navigator.vibrate) navigator.vibrate([40, 30, 40]);
         if (shakeTimerRef.current) clearTimeout(shakeTimerRef.current);
         shakeTimerRef.current = setTimeout(() => setShakeBinId(null), 400);
       }
     },
-    [phase, selectedId, tray]
+    [phase, selectedId, tray, haptic]
   );
 
   const tapPlacedGem = useCallback(
@@ -245,9 +248,9 @@ export default function KristallSortiererGame({ onComplete }) {
       );
       setSelectedId(null);
       SFX.play('pop');
-      if (navigator.vibrate) navigator.vibrate(12);
+      haptic('tap');
     },
-    [phase]
+    [phase, haptic]
   );
 
   const nextLevel = useCallback(() => {

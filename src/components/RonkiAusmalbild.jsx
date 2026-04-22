@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import SFX from '../utils/sfx';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 /**
  * RonkiAusmalbild — the 50-Sterne coloring-page reward delivery.
@@ -167,6 +169,8 @@ const SCENES = [
 
 export default function RonkiAusmalbild({ onClose }) {
   const { state, actions } = useTask();
+  const haptic = useHaptic();
+  const { track } = useAnalytics();
 
   const [sceneIdx, setSceneIdx] = useState(0);
   const [selectedColor, setSelectedColor] = useState(PALETTE[3].hex); // default green
@@ -178,7 +182,7 @@ export default function RonkiAusmalbild({ onClose }) {
 
   const handleRegionTap = (regionId) => {
     SFX.play('pop');
-    try { if (navigator.vibrate) navigator.vibrate(10); } catch (_) {}
+    haptic('tap');
     setFills(prev => ({
       ...prev,
       [scene.id]: {
@@ -191,7 +195,7 @@ export default function RonkiAusmalbild({ onClose }) {
   const handleSave = () => {
     if (saved) return; // idempotent — don't double-save same tap cycle
     SFX.play('coin');
-    try { if (navigator.vibrate) navigator.vibrate([40, 30, 80]); } catch (_) {}
+    haptic('success');
     // Persist the completed page to state. Dedup by sceneId so repeat
     // saves update the existing entry instead of appending a 2nd, 3rd,
     // 4th copy (code-reviewer + QA both caught: kid taps save multiple
@@ -209,6 +213,14 @@ export default function RonkiAusmalbild({ onClose }) {
       ],
     });
     setSaved(true);
+    // Analytics: ausmalbild.redeem. sceneId is a stable enum defined in
+    // the SCENES array, never user input — safe to send. The idempotent
+    // guard above (`if (saved) return`) means we don't double-fire on
+    // rapid taps within the 2.2s post-save window; later saves to the
+    // same scene (e.g. recoloring) do fire a fresh event, which matches
+    // the product question we want to answer ("how often do kids
+    // revisit?").
+    track('ausmalbild.redeem', { sceneId: scene.id });
     setTimeout(() => setSaved(false), 2200);
   };
 

@@ -1,14 +1,33 @@
 import React from 'react';
 import { T } from '../constants';
+import { useTask } from '../context/TaskContext';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 export default function PinModal({ pin, setPin, onSuccess, onClose }) {
+  // PIN validation — accepts either the custom parentPin (once set during
+  // Track A or via Parental Dashboard) or the default "1234" while
+  // parentPinIsDefault is still true. Existing users who haven't set a
+  // custom PIN keep working because parentPin is null and parentPinIsDefault
+  // is true. Once a parent sets a PIN, 1234 stops working.
+  const { state } = useTask();
+  const { track } = useAnalytics();
+  const expectedPin = state?.parentPin || '1234';
+  const isDefault = state?.parentPinIsDefault !== false;
+
   const handleKey = (n) => {
     if (n === null) return;
     if (n === "\u232B") { setPin(p => p.slice(0, -1)); return; }
     const nx = pin + n;
     setPin(nx);
     if (nx.length === 4) {
-      if (nx === "1234") { onSuccess(); }
+      const ok = nx === expectedPin || (isDefault && nx === '1234');
+      // Analytics: parent.pin.enter. Fire once per completed 4-digit
+      // attempt with success=true|false. The digits themselves never
+      // leave the device — we only record whether the attempt matched.
+      // Useful for spotting brute-force guessing patterns (many fails)
+      // vs. parent forgetting their PIN.
+      track('parent.pin.enter', { success: !!ok });
+      if (ok) { onSuccess(); }
       setPin("");
     }
   };

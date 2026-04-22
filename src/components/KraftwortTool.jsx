@@ -45,12 +45,13 @@ export default function KraftwortTool({ onComplete }) {
   const handlePick = (word) => {
     if (phase !== 'picking') return;
     SFX.play('pop');
-    try { if (navigator.vibrate) navigator.vibrate(30); } catch (_) {}
+    // No haptics — emotional-regulation tool. Research: user is regulating,
+    // not transacting. Visual + audio only.
     setPicked(word);
     // Briefly show picked state, then Ronki echoes
     setTimeout(() => {
       SFX.play('coin');
-      try { if (navigator.vibrate) navigator.vibrate([40, 30, 80]); } catch (_) {}
+      // No haptics on echo either — keep the tool silent on completion.
       setPhase('echoed');
       // Persist — practice counter + today's kraftwort for Hub pickup
       const today = new Date().toISOString().slice(0, 10);

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import SFX from '../utils/sfx';
 import MoodChibi from './MoodChibi';
 
@@ -146,6 +147,7 @@ export function pickTodaysVisitor(state, today) {
 export default function CampfireVisitorsGame({ onClose }) {
   const { t, lang } = useTranslation();
   const { state, actions } = useTask();
+  const haptic = useHaptic();
 
   // Today's visitor — read from state if already picked today, else pick now
   const today = new Date().toISOString().slice(0, 10);
@@ -175,9 +177,10 @@ export default function CampfireVisitorsGame({ onClose }) {
     const have = inv[family] || 0;
     if (have <= 0) return;
     if (family !== wishedFam) {
-      // Shy head-shake — no fail state
+      // Shy head-shake — no fail state, no haptic either. Research flags
+      // error-like haptics on kids' apps as reading like punishment.
+      // Visual-only for wrong-match signals.
       setWrongHint(true);
-      try { if (navigator.vibrate) navigator.vibrate(40); } catch (_) {}
       setTimeout(() => setWrongHint(false), 700);
       return;
     }
@@ -189,7 +192,7 @@ export default function CampfireVisitorsGame({ onClose }) {
       return;
     }
     SFX.play('coin');
-    try { if (navigator.vibrate) navigator.vibrate([40, 20, 60, 20, 80]); } catch (_) {}
+    haptic('celebration');
     actions.giftCrystalToFreund?.(freund.id);
     const nextLevel = Math.min(5, friendshipLevel + 1);
     if (nextLevel >= 5 && friendshipLevel < 5) {

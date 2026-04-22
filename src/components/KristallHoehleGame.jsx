@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import SFX from '../utils/sfx';
 import MoodChibi from './MoodChibi';
 
@@ -125,6 +126,7 @@ function buildSeams(tier, count = 5) {
 export default function KristallHoehleGame({ onClose }) {
   const { t, lang } = useTranslation();
   const { state, actions } = useTask();
+  const haptic = useHaptic();
 
   const SESSION_SECS = 60;
   const [timeLeft, setTimeLeft] = useState(SESSION_SECS);
@@ -168,7 +170,7 @@ export default function KristallHoehleGame({ onClose }) {
     if (!seam || seam.taken) return;
     const tapsNeeded = TIERS[tierIndex].tapsPerCrystal;
     const nextTaps = seam.taps + 1;
-    try { if (navigator.vibrate) navigator.vibrate(20); } catch (_) {}
+    haptic('select');
     SFX.play('pop');
     // Spawn a couple of rock-dust particles at tap point
     const rect = ev.currentTarget.getBoundingClientRect();
@@ -189,7 +191,7 @@ export default function KristallHoehleGame({ onClose }) {
     if (nextTaps >= tapsNeeded) {
       // Crystal breaks free
       SFX.play('coin');
-      try { if (navigator.vibrate) navigator.vibrate([30, 20, 40]); } catch (_) {}
+      haptic('success');
       setSeams(prev => prev.map(s => s.id === seamId ? { ...s, taken: true } : s));
       // Fly-to-ledge animation
       const flyId = particleIdRef.current++;

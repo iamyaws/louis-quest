@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuestEater } from './QuestEater';
 import { getVariant } from '../data/companionVariants';
+import { triggerHaptic } from '../lib/haptics';
 import MoodChibi from './MoodChibi';
 import FireBreathPuff from './FireBreathPuff';
 
@@ -711,7 +712,10 @@ function SideRonki({ onTap, variant = 'amber', stage = 2, mood = 'normal' }) {
   const handleTap = onTap
     ? (e) => {
         e.stopPropagation();
-        try { if (navigator.vibrate) navigator.vibrate(30); } catch (_) { /* noop */ }
+        // Direct triggerHaptic call (not the hook) because this component is
+        // also rendered in the public Compendium route, outside TaskProvider.
+        // The pure lib reads enabled/mode set by authed tree's useHaptic().
+        triggerHaptic('tap');
         onTap();
       }
     : undefined;

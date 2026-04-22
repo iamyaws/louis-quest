@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { getCreatureSpritePath } from '../data/creatures';
 
 /**
@@ -112,6 +113,7 @@ function isWalkable(grid, r, c, rows, cols) {
 
 export default function WurzelLabyrinthGame({ onComplete }) {
   const { actions } = useTask();
+  const haptic = useHaptic();
   const badgeClaimedRef = useRef(false);
   const touchStartRef = useRef(null);
   const shakeTimerRef = useRef(null);
@@ -151,9 +153,11 @@ export default function WurzelLabyrinthGame({ onComplete }) {
   }, [actions]);
 
   const triggerShake = useCallback((r, c) => {
+    // Wall bump / off-grid tap — visual shake + crash SFX only.
+    // No haptic on the error path (haptic_research_2026_04: error
+    // haptics on kids' apps read like punishment).
     setShakeCell({ r, c, ts: Date.now() });
     SFX.play('crash');
-    if (navigator.vibrate) navigator.vibrate(40);
     if (shakeTimerRef.current) clearTimeout(shakeTimerRef.current);
     shakeTimerRef.current = setTimeout(() => setShakeCell(null), 350);
   }, []);
@@ -177,12 +181,12 @@ export default function WurzelLabyrinthGame({ onComplete }) {
       setMoves((m) => m + 1);
       setJetiWatch((n) => n + 1);
       SFX.play('pop');
-      if (navigator.vibrate) navigator.vibrate(15);
+      haptic('tap');
 
       // reached goal?
       if (nr === goal.r && nc === goal.c) {
         SFX.play('celeb');
-        if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+        haptic('celebration');
         claimBadgeOnce();
         if (levelIdx >= MAZES.length - 1) {
           setPhase('gameDone');
@@ -191,7 +195,7 @@ export default function WurzelLabyrinthGame({ onComplete }) {
         }
       }
     },
-    [phase, pos, grid, rows, cols, goal, levelIdx, claimBadgeOnce, triggerShake]
+    [phase, pos, grid, rows, cols, goal, levelIdx, claimBadgeOnce, triggerShake, haptic]
   );
 
   const handleCellTap = useCallback(

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { getCreatureSpritePath } from '../data/creatures';
 
 /**
@@ -86,6 +87,7 @@ function fallPool(level) {
 
 export default function ZahlenjagdGame({ onComplete }) {
   const { actions } = useTask();
+  const haptic = useHaptic();
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const animRef = useRef(null);
@@ -267,7 +269,7 @@ export default function ZahlenjagdGame({ onComplete }) {
     clearInterval(spawnRef.current);
     cancelAnimationFrame(animRef.current);
     SFX.play('celeb');
-    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+    haptic('success');
     // Always attempt to claim after a clean level
     claimBadgeOnce();
     if (wonAll) {
@@ -275,7 +277,7 @@ export default function ZahlenjagdGame({ onComplete }) {
     } else {
       setPhase('levelDone');
     }
-  }, [claimBadgeOnce]);
+  }, [claimBadgeOnce, haptic]);
 
   // Advance to next level (level 5 → gameDone)
   const nextLevel = useCallback(() => {
@@ -346,7 +348,7 @@ export default function ZahlenjagdGame({ onComplete }) {
         { id: hit.id, x: hit.x, y: hit.y, kind: 'good', ts: Date.now() },
       ]);
       SFX.play('coin');
-      if (navigator.vibrate) navigator.vibrate(30);
+      haptic('confirm');
       setWingFlap((n) => n + 1);
       if (newCatches >= CATCHES_PER_LEVEL) {
         finishLevel(level >= 5);
@@ -360,8 +362,9 @@ export default function ZahlenjagdGame({ onComplete }) {
         ...prev,
         { id: hit.id, x: hit.x, y: hit.y, kind: 'bad', ts: Date.now() },
       ]);
+      // Wrong tap — visual bad effect + crash SFX only, no haptic.
+      // Research: no error haptics on kids' apps — reads like punishment.
       SFX.play('crash');
-      if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
       const newLives = lives - 1;
       setLives(newLives);
       if (newLives <= 0) {
@@ -369,7 +372,7 @@ export default function ZahlenjagdGame({ onComplete }) {
         setTimeout(() => restartLevel(), 600);
       }
     }
-  }, [phase, target, catches, lives, level, finishLevel, restartLevel]);
+  }, [phase, target, catches, lives, level, finishLevel, restartLevel, haptic]);
 
   // Clean up effects
   useEffect(() => {

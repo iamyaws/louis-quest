@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import CooldownButton from './CooldownButton';
@@ -27,6 +28,7 @@ const DAYS = [
 
 export default function PoemQuest({ onBack }) {
   const { state, actions } = useTask();
+  const haptic = useHaptic();
   const { lang } = useTranslation();
 
   const poemState = state?.poemQuest || { done: [], completed: false, title: '' };
@@ -43,7 +45,7 @@ export default function PoemQuest({ onBack }) {
 
     actions.patchState({ poemQuest: { ...poemState, done: newDone, completed: nowAllDone } });
     SFX.play('pop');
-    if (navigator.vibrate) navigator.vibrate(80);
+    haptic('success');
 
     if (nowAllDone) {
       actions.addHP?.(100);

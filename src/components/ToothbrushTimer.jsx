@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { getVariant } from '../data/companionVariants';
 import PinModal from './PinModal';
 
@@ -32,6 +33,7 @@ const base = import.meta.env.BASE_URL;
 
 export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onParentOverride }) {
   const { state } = useTask();
+  const haptic = useHaptic();
   const variant = getVariant(state?.companionVariant);
 
   const [remaining, setRemaining] = useState(duration);
@@ -61,7 +63,9 @@ export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onPa
           setFinished(true);
           SFX.play('alarm');
           VoiceAudio.play('de_teeth_done');
-          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+          // Was a long 200/100/200ms alarm — shortened to success pattern
+          // so the end feels like a "done chime", not an alarm-clock buzz.
+          haptic('success');
           return 0;
         }
         // Voice + tick sound at stage transitions
@@ -70,7 +74,10 @@ export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onPa
         const newIdx = STAGES.indexOf(newStage);
         if (newIdx !== stageIdx) {
           SFX.play('pop');
-          if (navigator.vibrate) navigator.vibrate(100);
+          // Stage tick — quadrant-transition micro-feedback. Uses 'tap'
+          // (shortest named pattern) so rapid quadrant changes don't feel
+          // like repeated punches. Was a single 100ms.
+          haptic('tap');
           // Ronki voice for each quadrant
           const voiceMap = ['de_teeth_start', 'de_teeth_topright', 'de_teeth_bottomleft', 'de_teeth_bottomright'];
           if (voiceMap[newIdx]) VoiceAudio.play(voiceMap[newIdx]);
@@ -234,7 +241,7 @@ export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onPa
             setPinOpen(false); setPin('');
             clearInterval(intervalRef.current);
             SFX.play('coin');
-            if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+            haptic('success');
             (onParentOverride || onFinish)?.();
           }}
           onClose={() => { setPinOpen(false); setPin(''); }}

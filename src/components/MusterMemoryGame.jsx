@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { getCreatureSpritePath } from '../data/creatures';
 
 /**
@@ -53,6 +54,7 @@ function randomSequence(length) {
 
 export default function MusterMemoryGame({ onComplete }) {
   const { actions } = useTask();
+  const haptic = useHaptic();
   const timers = useRef([]);
   const badgeClaimedRef = useRef(false);
 
@@ -85,7 +87,7 @@ export default function MusterMemoryGame({ onComplete }) {
         setTimeout(() => {
           setShowIndex(i);
           SFX.play('pop');
-          if (navigator.vibrate) navigator.vibrate(20);
+          haptic('select');
         }, showStart)
       );
       timers.current.push(
@@ -102,7 +104,7 @@ export default function MusterMemoryGame({ onComplete }) {
         setTapIndex(0);
       }, seq.length * (SHOW_MS + GAP_MS))
     );
-  }, [clearTimers]);
+  }, [clearTimers, haptic]);
 
   // Kick off the first sequence on mount
   useEffect(() => {
@@ -132,13 +134,13 @@ export default function MusterMemoryGame({ onComplete }) {
       // correct
       setFlashId(`good-${itemId}-${Date.now()}`);
       SFX.play('coin');
-      if (navigator.vibrate) navigator.vibrate(20);
+      haptic('select');
       const newIdx = tapIndex + 1;
       setTapIndex(newIdx);
       if (newIdx >= sequence.length) {
         // sequence complete
         SFX.play('celeb');
-        if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+        haptic('celebration');
         claimBadgeOnce();
         // final level?
         if (levelIdx >= LEVELS.length - 1) {
@@ -164,11 +166,12 @@ export default function MusterMemoryGame({ onComplete }) {
         );
       }
     } else {
-      // wrong
+      // wrong — visual flash + crash SFX only, no haptic. Research
+      // flags error haptics on kids' apps as reading like punishment;
+      // wrong answer in a Simon-Says game is where that shows up hardest.
       setFlashId(`bad-${itemId}-${Date.now()}`);
       setPhase('wrongFlash');
       SFX.play('crash');
-      if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
       timers.current.push(
         setTimeout(() => {
           // Replay same sequence
@@ -176,7 +179,7 @@ export default function MusterMemoryGame({ onComplete }) {
         }, 1200)
       );
     }
-  }, [phase, sequence, tapIndex, levelIdx, claimBadgeOnce, playSequence]);
+  }, [phase, sequence, tapIndex, levelIdx, claimBadgeOnce, playSequence, haptic]);
 
   // Status message under Baumbart
   let statusText;

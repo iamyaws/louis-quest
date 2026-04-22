@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import { Pearl } from './CurrencyIcons';
@@ -22,6 +23,7 @@ const STAGES = [
 export default function Sanctuary({ onNavigate }) {
   const { t } = useTranslation();
   const { state, actions } = useTask();
+  const haptic = useHaptic();
   const voice = useVoice();
   const zones = useZones();
   const base = import.meta.env.BASE_URL;
@@ -46,7 +48,7 @@ export default function Sanctuary({ onNavigate }) {
 
   const handleCare = (action, careKey) => {
     SFX.play('pop');
-    if (navigator.vibrate) navigator.vibrate(100);
+    haptic('success');
     action();
     if (careKey) voice.say('care_action', { careAction: careKey });
   };

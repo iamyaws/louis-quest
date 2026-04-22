@@ -9,6 +9,7 @@ import StaminaExhausted from './StaminaExhausted';
 import StaminaIndicator from './StaminaIndicator';
 import VoiceAudio from '../utils/voiceAudio';
 import { MINT_GAMES } from '../data/mintGames';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 // Module-level cooldown so stamina voice line doesn't repeat every Games mount
 let lastStaminaVoiceMs = 0;
@@ -71,6 +72,7 @@ const GAMES = [
 export default function MiniGames({ onPlay, onPlayMint }) {
   const { t } = useTranslation();
   const { state } = useTask();
+  const { track } = useAnalytics();
   const access = useGameAccess();
   const { unlocked, reason, withinTimeWindow, windowStartHour, windowEndHour } = access;
   const stamina = useRonkiStamina();
@@ -108,6 +110,12 @@ export default function MiniGames({ onPlay, onPlayMint }) {
       setShowExhausted(true);
       return;
     }
+    // Analytics: game.start. Fires only on the successful handoff to the
+    // game view — gated tiles (locked / exhausted) don't pollute the
+    // funnel. game.end is handled by the game components themselves if
+    // we ever want duration/completion data; for now start-rate is the
+    // signal we actually want.
+    track('game.start', { gameId: game.id });
     onPlay(game.id);
   };
 
@@ -221,6 +229,9 @@ export default function MiniGames({ onPlay, onPlayMint }) {
                 }}
                 onClick={() => {
                   if (stamina.exhausted) { setShowExhausted(true); return; }
+                  // Same game.start semantic as the main tile list;
+                  // MINT replays from the earned-games rail still count.
+                  track('game.start', { gameId: game.id });
                   onPlayMint?.(game.id);
                 }}
               >

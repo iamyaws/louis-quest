@@ -393,6 +393,30 @@
   "onboarding.launch.button": "Let's go!",
   "onboarding.continue": "Continue",
 
+  "parentOnboarding.welcome.title": "Hello! You're setting Ronki up for your child.",
+  "parentOnboarding.welcome.body": "Glad you're here. Two minutes and everything's ready — then your child can start.",
+  "parentOnboarding.welcome.cta": "Let's go",
+  "parentOnboarding.what.title": "What is Ronki?",
+  "parentOnboarding.what.card1": "Daily routine: A warm companion for brushing teeth, getting dressed, and getting ready for school. No point-chasing, no pressure.",
+  "parentOnboarding.what.card2": "Feelings: Your child learns to name emotions and use simple tools like box-breathing — with Ronki as a friend.",
+  "parentOnboarding.what.card3": "Parent area: You control screen time, rewards, and routines. Everything behind a PIN so your child can't change it.",
+  "parentOnboarding.what.cta": "Continue",
+  "parentOnboarding.pin.title": "Set your PIN",
+  "parentOnboarding.pin.body": "Choose your parent PIN. It protects screen time, rewards, and routine changes.",
+  "parentOnboarding.pin.primary": "Set PIN now (recommended)",
+  "parentOnboarding.pin.secondary": "Later — keep 1234 active",
+  "parentOnboarding.pin.confirm": "Enter again to confirm",
+  "parentOnboarding.pin.mismatch": "The two PINs don't match. Try again.",
+  "parentOnboarding.preview.title": "How to find the parent area",
+  "parentOnboarding.preview.body": "Tap the lock icon in the top right of Quests, Shop, or Book.",
+  "parentOnboarding.preview.cta": "Got it",
+  "parentOnboarding.done.title": "Hand Ronki to your child!",
+  "parentOnboarding.done.body": "You can always return to the parent area — via the lock icon.",
+  "parentOnboarding.done.cta": "Hand phone to my child",
+
+  "pwa.prompt.title": "Great job!",
+  "pwa.prompt.body": "Ronki is your companion now. Add it to your home screen so you can find each other faster tomorrow.",
+
   "login.title": "Sign In",
   "login.email": "Email",
   "login.password": "Password",
@@ -1119,5 +1143,10 @@
   "unlockHint.journal.needMood": "🔓 Mood + {tasks} tasks — opens Journal",
   "unlockHint.journal.needMoodOnly": "🔓 Log your mood — opens Journal",
   "unlockHint.journal.needTasks": "🔓 {tasks} more tasks — opens Journal",
-  "unlockHint.shop.progress": "🔓 {current}/50 stars — opens Shop"
+  "unlockHint.shop.progress": "🔓 {current}/50 stars — opens Shop",
+
+  "analytics.disclosure.title": "Anonymous usage statistics",
+  "analytics.disclosure.body": "Ronki sends a few anonymous events (e.g. 'quest done') so we can improve the app. No names, no text, no location. You can turn this off in the Parent Area anytime.",
+  "analytics.disclosure.accept": "Got it",
+  "analytics.disclosure.decline": "Turn off now"
 }

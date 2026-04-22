@@ -209,12 +209,14 @@ export default function LoewenPoseTool({ onComplete }) {
   // Auto-advance each step after its duration elapses
   useEffect(() => {
     if (!step) return;
+    // No haptics — emotional-regulation tool. Research: a roar-synced buzz
+    // competes with the breath/body attention the pose is trying to build.
+    // Visual + audio carry the pose; the haptic flag on step stays for
+    // future opt-in but we honor "silent during regulation" today.
     if (step.haptic) {
       SFX.play('coin');
-      try { if (navigator.vibrate) navigator.vibrate([80, 40, 80, 40, 200]); } catch (_) {}
     } else {
       SFX.play('pop');
-      try { if (navigator.vibrate) navigator.vibrate(20); } catch (_) {}
     }
     // On the final step, persist once
     if (step.final && !persisted) {

@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { T, ANCHORS, RAINBOW, RAINBOW_LABELS, MOOD_EMOJIS, SCHOOL_QUESTS, VACATION_QUESTS, COMPANION_TYPES } from '../constants';
 import SFX from '../utils/sfx';
 import { useGame } from '../context/GameContext';
+import { triggerHaptic } from '../lib/haptics';
 import useWeather, { getWeatherInfo } from '../hooks/useWeather';
 
 const COMPANION_MESSAGES = [
@@ -26,7 +27,10 @@ export default function QuestBoard() {
 
   const handleComplete = (qId) => {
     actions.complete(qId);
-    if (navigator.vibrate) navigator.vibrate(80);
+    // Direct triggerHaptic — QuestBoard uses GameContext (not TaskContext)
+    // so it can't call the useHaptic hook. The pure lib still honors the
+    // global enabled/mode flags set by the authed app tree.
+    triggerHaptic('success');
     const msg = COMPANION_MESSAGES[Math.floor(Math.random() * COMPANION_MESSAGES.length)];
     setCompanionMsg(`${companionName} ${msg}`);
     setTimeout(() => setCompanionMsg(null), 4500);

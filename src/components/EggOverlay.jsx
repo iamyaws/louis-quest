@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
+import { useHaptic } from '../hooks/useHaptic';
 
 export default function EggOverlay({ egg, onCollect }) {
   const { lang } = useTranslation();
+  const haptic = useHaptic();
   const [collected, setCollected] = useState(false);
 
   const handleCollect = () => {
     if (collected) return;
     setCollected(true);
     SFX.play('pop');
-    if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
+    haptic('celebration');
     setTimeout(onCollect, 380);
   };
 

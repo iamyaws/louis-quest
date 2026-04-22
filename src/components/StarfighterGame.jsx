@@ -241,7 +241,9 @@ export default function StarfighterGame({ onComplete }) {
             setGameState('dead');
             return 0;
           }
-          if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+          // Lost a life — visual hit flash + SFX only, no haptic.
+          // Research: error/penalty haptics on kids' apps read like
+          // punishment; a hit is where that lands hardest.
           return l - 1;
         });
       }

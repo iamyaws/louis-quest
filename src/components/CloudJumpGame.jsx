@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
+import { useHaptic } from '../hooks/useHaptic';
 import CooldownButton from './CooldownButton';
 
 // ── Physics (logical 400px-wide coordinate space) ──
@@ -42,6 +43,7 @@ function saveHighscore(score, locale) {
 
 export default function CloudJumpGame({ onComplete }) {
   const { t, locale } = useTranslation();
+  const haptic = useHaptic();
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const animRef = useRef(null);
@@ -226,7 +228,7 @@ export default function CloudJumpGame({ onComplete }) {
     setPhase('dead');
     setScore(g.score);
     SFX.play('crash');
-    if (navigator.vibrate) navigator.vibrate(100);
+    haptic('success');
     cancelAnimationFrame(animRef.current);
     const { list, rank } = saveHighscore(g.score, locale);
     setHighscores(list);

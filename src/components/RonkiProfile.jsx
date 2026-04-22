@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import { getCatStage, getDragonArt } from '../utils/helpers';
 import { ARCS, findArc } from '../arcs/arcs';
@@ -189,6 +190,7 @@ function Kicker({ children }) {
 export default function RonkiProfile({ onNavigate }) {
   const { t, lang } = useTranslation();
   const { state, actions } = useTask();
+  const haptic = useHaptic();
   const { unlocked: gamesUnlocked } = useGameAccess();
   const [tab, setTab] = useState('about');
   // Finch-style drawer (Marc 23 Apr 2026): the Mein Drache tab block
@@ -275,7 +277,7 @@ export default function RonkiProfile({ onNavigate }) {
   const handleCare = (action, alreadyDone) => {
     if (alreadyDone) return;
     SFX.play('pop');
-    if (navigator.vibrate) navigator.vibrate(100);
+    haptic('success');
     action();
   };
 
@@ -284,7 +286,10 @@ export default function RonkiProfile({ onNavigate }) {
   // brief thank-you bubble, then reverts to normal mood.
   const handleSadReaction = (reactionId) => {
     SFX.play('pop');
-    if (navigator.vibrate) navigator.vibrate(40);
+    // 'select' — kid picks a comfort gesture, mirrors mood/variant-pick
+    // category. Intentionally softer than a care-success since the ritual
+    // is gentle-empathy, not a transaction.
+    haptic('select');
     actions.pickRonkiSadReaction?.(reactionId);
     const thanks = lang === 'de' ? 'Danke, Louis.' : 'Thank you, Louis.';
     setThankYou(thanks);
@@ -305,7 +310,8 @@ export default function RonkiProfile({ onNavigate }) {
   }, []);
   const handleChibiTap = () => {
     SFX.play('tap');
-    if (navigator.vibrate) navigator.vibrate(30);
+    // 'tap' — chibi-tap rolls a new quip, UI-nav feel, not a commit.
+    haptic('tap');
     setQuipRollKey(k => k + 1);
     setQuipVisible(true);
   };

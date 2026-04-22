@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
+import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import CooldownButton from './CooldownButton';
@@ -39,6 +40,7 @@ function getCompletionCopy(templateId, lang) {
 
 export default function QuestLineView({ questLineId, onBack }) {
   const { state, actions } = useTask();
+  const haptic = useHaptic();
   const { lang } = useTranslation();
   const [showCelebration, setShowCelebration] = useState(false);
 
@@ -85,7 +87,7 @@ export default function QuestLineView({ questLineId, onBack }) {
     if (completed.includes(dayId)) return;
     actions.completeQuestLineDay(questLineId, dayId);
     SFX.play('pop');
-    if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(80);
+    haptic('success');
 
     // Will this be the last day?
     if (doneCount + 1 >= totalDays) {
