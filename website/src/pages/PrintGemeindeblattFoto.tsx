@@ -132,16 +132,28 @@ export default function PrintGemeindeblattFoto() {
 
         .photo-canvas {
           position: relative;
+          /* Layout dimensions are 1440×1018, design is authored at this
+             size. But we render at 2× via CSS zoom so screenshots are
+             2880×2036, which saves as a JPG above the Gemeindeblatt
+             1 MB minimum with plenty of margin. Design-time math stays
+             simple; render-time output stays print-ready. */
           width: 1440px;
           /* 1440 × (210/297) ≈ 1018 — matches A4 landscape ratio so
              printing to A4 doesn't leave a white stripe at the bottom. */
           height: 1018px;
+          zoom: 2;
           background: #FDF8F0;
           overflow: hidden;
           box-shadow: 0 30px 60px rgba(0,0,0,0.18);
           border-radius: 4px;
           print-color-adjust: exact;
           -webkit-print-color-adjust: exact;
+        }
+        /* Print-mode: zoom would compound with the browser's page-fit
+           scaling and bloat the output. Reset to 1× in print so the
+           canvas scales naturally to A4 landscape. */
+        @media print {
+          .photo-canvas { zoom: 1; }
         }
 
         /* Ambient radial glows — warm TL (mustard), cool BR (sage) */
