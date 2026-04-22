@@ -215,6 +215,30 @@ function AppContent() {
     import('./utils/feedback').then(m => m.flushFeedbackQueue()).catch(() => {});
   }, []);
 
+  // Stamp lastLoginDate after hydration settles. Intentionally delayed so
+  // usePWAPromptGate's day-2 retry effect observes the pre-stamp value —
+  // without the delay, the hook would always see lastLoginDate === today
+  // and the retry would never fire.
+  //
+  // Guarded by a ref so it runs once per mount; the 150ms timeout lets
+  // the PWA hook's useEffect schedule (it runs on state load via its own
+  // dependencies) before we clobber the old date.
+  const lastLoginStampedRef = useRef(false);
+  useEffect(() => {
+    if (!state || lastLoginStampedRef.current) return;
+    if (!actions?.patchState) return;
+    const todayIso = new Date().toISOString().slice(0, 10);
+    if (state.lastLoginDate === todayIso) {
+      lastLoginStampedRef.current = true;
+      return;
+    }
+    const id = setTimeout(() => {
+      actions.patchState({ lastLoginDate: todayIso });
+      lastLoginStampedRef.current = true;
+    }, 150);
+    return () => clearTimeout(id);
+  }, [state, actions]);
+
   // app.open — one per session. The analytics module dedups via
   // sessionStorage so hot-reloads / StrictMode double-mounts don't
   // double-count. Fires as soon as AppContent mounts (post-auth,

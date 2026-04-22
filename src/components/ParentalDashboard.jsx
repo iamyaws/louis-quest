@@ -1072,6 +1072,24 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     setVoiceMutedState(next);
   };
 
+  // ── Haptics (three-state: off / gentle / normal) — 'gentle' is the
+  //    default for age 6 (halved pulse durations, widened pauses).
+  //    Research backbone in memory/Onboarding cross-browser churn audit. ──
+  const hapticsEnabled = state?.hapticsEnabled !== false;
+  const hapticsMode = state?.hapticsMode || 'gentle';
+  const setHapticsState = (enabled, mode) => {
+    actions?.patchState?.({ hapticsEnabled: enabled, hapticsMode: mode });
+  };
+
+  // ── Analytics consent (default true with first-run disclosure) ──
+  const analyticsEnabled = state?.analyticsEnabled !== false;
+  const toggleAnalytics = (next) => {
+    actions?.patchState?.({ analyticsEnabled: next });
+  };
+
+  // ── Default-PIN warning banner — surfaces until parent customizes ──
+  const showDefaultPinBanner = state?.parentPinIsDefault !== false;
+
   // ── Minigame access mode (22 Apr 2026 playtest rework) ──
   // Default flipped to 'frei' from routine-gated. Reasoning in
   // backlog: routine-gate backfired on weekends (Louis hit an invisible
@@ -1130,6 +1148,34 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
 
   return (
     <>
+      {/* Default-PIN warning banner — shows until parent customizes.
+           Yellow accent, low-intensity "nudge" tone; parent can ignore
+           and keep 1234 but it doesn't fade until they act. */}
+      {showDefaultPinBanner && (
+        <div
+          role="status"
+          className="rounded-2xl p-4 flex items-start gap-3"
+          style={{
+            background: 'linear-gradient(135deg, #fef9c3 0%, #fef08a 100%)',
+            border: '1.5px solid rgba(234,179,8,0.45)',
+            boxShadow: '0 2px 8px rgba(234,179,8,0.12)',
+          }}
+        >
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+               style={{ background: 'rgba(234,179,8,0.25)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#854d0e', fontVariationSettings: "'FILL' 1" }}>key</span>
+          </div>
+          <div className="flex-1">
+            <p className="font-label font-bold text-sm" style={{ color: '#713f12' }}>
+              PIN ist noch 1234
+            </p>
+            <p className="font-body text-xs mt-0.5 leading-relaxed" style={{ color: '#854d0e' }}>
+              Setze einen eigenen PIN, damit dein Kind den Eltern-Bereich nicht zufällig öffnet. Unten unter „Eltern-PIN".
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Funkelzeit Mode */}
       <div className="rounded-2xl p-5"
            style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
@@ -1449,6 +1495,86 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
             </p>
           </div>
         )}
+      </div>
+
+      {/* Haptik — three-state (Aus / Sanft / Normal). Default Sanft for
+           age 6 per research. Sanft = halved pulses, widened pauses so
+           the kid feels confirmation without startle. Normal = full
+           Apple-style transients (10-30ms). Aus = completely silent. */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(236,72,153,0.12)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#be185d', fontVariationSettings: "'FILL' 1" }}>vibration</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">Haptik</p>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Leichtes Vibrieren zur Bestätigung von Taps und Erfolgen. iOS Safari unterstützt dies nur eingeschränkt.
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { id: 'off', label: 'Aus', desc: 'Keine Vibration', enabled: false, mode: 'gentle' },
+            { id: 'gentle', label: 'Sanft', desc: 'Für kleine Kinder', enabled: true, mode: 'gentle' },
+            { id: 'normal', label: 'Normal', desc: 'Volle Stärke', enabled: true, mode: 'normal' },
+          ].map(opt => {
+            const active = opt.id === 'off' ? !hapticsEnabled : (hapticsEnabled && hapticsMode === opt.mode);
+            return (
+              <button
+                key={opt.id}
+                onClick={() => setHapticsState(opt.enabled, opt.mode)}
+                className="p-3 rounded-xl text-center active:scale-[0.97] transition-all"
+                style={{
+                  background: active ? 'rgba(236,72,153,0.1)' : 'rgba(255,255,255,0.6)',
+                  border: active ? '1.5px solid rgba(190,24,93,0.4)' : '1.5px solid rgba(0,0,0,0.08)',
+                }}
+              >
+                <p className="font-label font-bold text-sm" style={{ color: active ? '#be185d' : '#124346' }}>{opt.label}</p>
+                <p className="font-label text-xs text-on-surface-variant mt-1">{opt.desc}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Analytics — opt-out of anonymous usage telemetry. Default ON
+           with first-run disclosure in Track A. No content ever leaves
+           the device (event names + enum props only — hard allowlist
+           in src/lib/analytics.ts). */}
+      <div className="rounded-2xl p-5"
+           style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+               style={{ background: 'rgba(59,130,246,0.12)' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#1d4ed8', fontVariationSettings: "'FILL' 1" }}>analytics</span>
+          </div>
+          <p className="font-label font-bold text-sm text-on-surface">Nutzungsstatistiken</p>
+        </div>
+        <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+          Ronki sendet anonyme Ereignisse (z.B. „Quest fertig"), damit wir die App verbessern können. Keine Namen, keine Texte, kein Standort.
+        </p>
+        <div className="flex items-center justify-between p-4 rounded-2xl"
+             style={{ background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)' }}>
+          <div>
+            <p className="font-label font-bold text-sm text-on-surface">{analyticsEnabled ? 'An' : 'Aus'}</p>
+            <p className="font-label text-xs text-on-surface-variant mt-0.5">
+              {analyticsEnabled ? 'Anonyme Statistiken aktiv.' : 'Keine Daten werden gesendet.'}
+            </p>
+          </div>
+          <button
+            onClick={() => toggleAnalytics(!analyticsEnabled)}
+            className="relative w-14 h-8 rounded-full transition-all active:scale-95"
+            style={{
+              background: analyticsEnabled ? '#1d4ed8' : 'rgba(0,0,0,0.12)',
+              boxShadow: analyticsEnabled ? '0 2px 8px rgba(29,78,216,0.35)' : 'none',
+            }}
+            aria-label={analyticsEnabled ? 'Nutzungsstatistiken deaktivieren' : 'Nutzungsstatistiken aktivieren'}
+          >
+            <span className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
+                  style={{ transform: analyticsEnabled ? 'translateX(24px)' : 'translateX(0)' }} />
+          </button>
+        </div>
       </div>
 
       {/* Voice-Lines (Ronki spricht) */}
