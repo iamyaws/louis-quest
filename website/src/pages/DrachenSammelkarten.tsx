@@ -21,6 +21,7 @@ import { PageMeta } from '../components/PageMeta';
 import { PainterlyShell } from '../components/PainterlyShell';
 import { Footer } from '../components/Footer';
 import { EASE_OUT } from '../lib/motion';
+import { trackEvent } from '../lib/analytics';
 import { DRAGONS } from './PrintA6FlyerKidsCard';
 
 export default function DrachenSammelkarten() {
@@ -310,6 +311,7 @@ export default function DrachenSammelkarten() {
               </p>
               <a
                 href="https://app.ronki.de/?compendium=1"
+                onClick={() => trackEvent('Compendium Click', { source: 'sammelkarten_teaser' })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 bg-mustard text-teal-dark font-display font-bold text-sm shadow-sm hover:shadow-md transition-all hover:gap-3"

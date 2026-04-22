@@ -2,6 +2,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { submitWaitlistEmail, isValidEmail } from '../lib/waitlist';
 import { supabase } from '../lib/supabase';
+import { trackEvent } from '../lib/analytics';
 import { getLaunchCopy, LaunchState } from '../config/launch-state';
 import { Confetti } from './primitives/Confetti';
 import { WaitlistScreener } from './WaitlistScreener';
@@ -32,6 +33,7 @@ export function WaitlistCTA({ launchState, appUrl }: Props) {
       <div className="flex flex-col items-start gap-2">
         <motion.a
           href={resolvedAppUrl}
+          onClick={() => trackEvent('App Install Click', { source: 'waitlist_cta' })}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className="group relative inline-flex items-center gap-3 rounded-full bg-teal px-8 py-4 text-cream font-display font-semibold text-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"

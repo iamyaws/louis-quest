@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { submitWaitlistEmail, isValidEmail } from '../../lib/waitlist';
+import { trackEvent } from '../../lib/analytics';
 import { getLaunchCopy, LaunchState } from '../../config/launch-state';
 
 type Status =
@@ -25,6 +26,7 @@ export function WaitlistCTAModern({ launchState, appUrl }: Props) {
       <div className="flex flex-col items-start gap-2">
         <motion.a
           href={resolvedAppUrl}
+          onClick={() => trackEvent('App Install Click', { source: 'waitlist_cta_modern' })}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className="group relative inline-flex items-center gap-3 rounded-full bg-[#f5ecd4] px-8 py-4 text-[#12100c] font-display text-lg overflow-hidden"

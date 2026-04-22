@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { WaitlistCTA } from './WaitlistCTA';
+import { trackEvent } from '../lib/analytics';
 import { getLaunchCopy, LAUNCH_STATE } from '../config/launch-state';
 
 function TapeTopLeft() {
@@ -103,12 +104,14 @@ export function Footer() {
               <nav aria-label="Mitmachen" className="flex flex-col gap-2 text-sm">
                 <Link
                   to="/mitmachen"
+                  onClick={() => trackEvent('Mitmachen Click', { source: 'footer' })}
                   className="text-teal-dark hover:text-sage transition-colors w-fit py-2.5 font-display font-semibold"
                 >
                   Gründungs-Familien
                 </Link>
                 <a
                   href="https://discord.gg/e8yns9A4X"
+                  onClick={() => trackEvent('Discord Click', { source: 'footer' })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5 inline-flex items-center gap-1.5"
@@ -145,6 +148,7 @@ export function Footer() {
                 </Link>
                 <a
                   href="https://app.ronki.de/?compendium=1"
+                  onClick={() => trackEvent('Compendium Click', { source: 'footer' })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5 inline-flex items-center gap-1.5"

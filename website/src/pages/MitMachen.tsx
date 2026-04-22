@@ -23,6 +23,7 @@ import { PageMeta } from '../components/PageMeta';
 import { PainterlyShell } from '../components/PainterlyShell';
 import { Footer } from '../components/Footer';
 import { EASE_OUT } from '../lib/motion';
+import { trackEvent } from '../lib/analytics';
 
 const DISCORD_INVITE = 'https://discord.gg/e8yns9A4X';
 const APP_URL = 'https://app.ronki.de/';
@@ -372,11 +373,16 @@ function CTACard({
   }[accent];
 
   const LinkComp: any = external ? 'a' : href.startsWith('mailto:') ? 'a' : Link;
-  const linkProps = external
+  const linkProps: any = external
     ? { href, target: '_blank', rel: 'noopener noreferrer' }
     : href.startsWith('mailto:')
     ? { href }
     : { to: href };
+  // Tag which CTA was clicked — eyebrow doubles as event name
+  // (short, stable, 1:1 with what's on the page). All three land in
+  // Plausible as 'Mitmachen CTA' with a `cta` prop for filtering.
+  linkProps.onClick = () =>
+    trackEvent('Mitmachen CTA', { cta: eyebrow.toLowerCase() });
 
   return (
     <motion.div

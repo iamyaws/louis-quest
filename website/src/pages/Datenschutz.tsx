@@ -143,6 +143,10 @@ export default function Datenschutz() {
                   <strong className="text-teal-dark">ImprovMX (Reflectiv SAS):</strong> E-Mail-Weiterleitung für eingehende Nachrichten an hallo@ronki.de. Sitz: Frankreich (EU). Personenbezogene Daten (Absender-E-Mail, Betreff) werden nur zur Weiterleitung verarbeitet und nicht gespeichert.<br />
                   <span className="text-sm text-ink/65"><a href="https://improvmx.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">improvmx.com/privacy</a></span>
                 </li>
+                <li>
+                  <strong className="text-teal-dark">Plausible Analytics (Plausible Insights OÜ):</strong> Anonyme Reichweitenanalyse unserer Website. Plausible setzt keine Cookies, speichert keine IP-Adressen im Klartext und erstellt keine geräteübergreifenden Profile. Erfasst werden ausschließlich aggregierte Seitenaufrufe, Referrer (z. B. Suchmaschine, Social-Media-Plattform), grobe Geo-Region (Land) und Gerätetyp-Kategorie. Eine Zuordnung zu einzelnen Personen ist ausdrücklich nicht möglich. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Verbesserung unseres Angebots). Sitz: Estland (EU). Datenverarbeitung ausschließlich in der EU.<br />
+                  <span className="text-sm text-ink/65"><a href="https://plausible.io/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">plausible.io/privacy</a> &middot; <a href="https://plausible.io/data-policy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">plausible.io/data-policy</a></span>
+                </li>
               </ul>
               <p>
                 Eine Weitergabe an andere Dritte findet nicht statt, außer wir sind gesetzlich dazu verpflichtet (z. B. auf Anordnung einer Behörde).
