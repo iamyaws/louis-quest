@@ -669,6 +669,16 @@
 
   "care.stepsTo": "{count} more until {name}",
   "care.done": "Done!",
+  "care.satisfied": "satisfied",
+  "care.sectionTitle": "Take care of Ronki",
+  "care.stage.label": "Ronki's meadow",
+  "care.tapRonki.label": "Tap Ronki",
+  "care.mood.line.0": "So glad you're here.",
+  "care.mood.line.1": "Will you play with me today?",
+  "care.mood.line.2": "My tummy is rumbling a little…",
+  "care.mood.line.3": "Tell me what you did today.",
+  "care.mood.line.4": "Could you pet me?",
+  "care.mood.line.5": "I dreamt of flying cookies.",
   "care.wellbeing": "Daily Wellbeing",
   "care.affection": "Affection",
   "care.growthOrbs": "Growth Orbs",
@@ -1105,6 +1115,8 @@
 
   "game.forscher.section": "Your puzzle adventures",
   "game.forscher.replayHint": "Replay anytime",
+  "game.adventures.section": "Adventures with Ronki",
+  "game.classic.section": "Classic mini-games",
 
   "forscher.eyebrow": "Explorer's Corner",
   "forscher.title": "With Dr. Funkel",

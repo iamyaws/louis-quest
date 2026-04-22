@@ -7,10 +7,11 @@ import { Pearl } from './CurrencyIcons';
 import GearVault from './GearVault';
 import { ORB_MILESTONES, ORB_META } from '../constants';
 import { useVoice } from '../companion/useVoice';
-import VoiceBubble from './VoiceBubble';
 import { useZones } from '../world/useZones';
 import ZoneSelector from './ZoneSelector';
 import { isDevMode } from '../utils/mode';
+import BegleiterStage from './BegleiterStage';
+import { getCatStage } from '../utils/helpers';
 
 const STAGES = [
   { name: 'Ei', emoji: '🥚', threshold: 0 },
@@ -19,6 +20,68 @@ const STAGES = [
   { name: 'Stolz', emoji: '🔥', threshold: 18 },     // ~Day 6 (1 week)
   { name: 'Legendär', emoji: '⭐', threshold: 30 },  // ~Day 10
 ];
+
+/**
+ * renderCareButton — upgraded Begleiter care action (Füttern / Streicheln /
+ * Spielen). Distilled from Ronki Begleiter Polish.html (.care-btn + .care-icon
+ * styles). White pill on a soft shadow with a tinted icon square; on done
+ * the whole button dims to 50% opacity and the square paints solid in its
+ * own color so the child sees a clear "this one is taken care of" signal.
+ * No mini progress bar — the vitals ring on the stage above already
+ * communicates per-need status.
+ */
+function renderCareButton({ color, icon, label, done, onClick, doneLabel }) {
+  return (
+    <button
+      key={label}
+      type="button"
+      onClick={onClick}
+      disabled={done}
+      className="relative flex flex-col items-center gap-2 py-3.5 px-2.5 rounded-[18px] active:scale-[0.96] transition-all"
+      style={{
+        background: '#ffffff',
+        border: '1.5px solid rgba(18,67,70,0.08)',
+        boxShadow: '0 4px 10px -6px rgba(18,67,70,0.15)',
+        opacity: done ? 0.55 : 1,
+        cursor: done ? 'default' : 'pointer',
+      }}
+      aria-label={done ? label + ' — ' + doneLabel : label}
+    >
+      <div
+        className="w-11 h-11 rounded-[14px] flex items-center justify-center"
+        style={{
+          // Solid care color when done (active state the kid can read at
+          // a glance); soft tint otherwise.
+          background: done ? color : `color-mix(in oklab, ${color} 18%, transparent)`,
+          border: `1px solid color-mix(in oklab, ${color} 30%, transparent)`,
+          transition: 'background .3s ease',
+        }}
+      >
+        <span
+          className="material-symbols-outlined"
+          style={{
+            fontSize: 22,
+            color: done ? '#ffffff' : color,
+            fontVariationSettings: "'FILL' 1, 'wght' 600",
+          }}
+        >
+          {done ? 'check' : icon}
+        </span>
+      </div>
+      <b
+        className="font-label font-bold"
+        style={{
+          fontSize: 12,
+          lineHeight: 1,
+          letterSpacing: '0.04em',
+          color: '#124346',
+        }}
+      >
+        {label}
+      </b>
+    </button>
+  );
+}
 
 export default function Sanctuary({ onNavigate }) {
   const { t } = useTranslation();
@@ -34,6 +97,12 @@ export default function Sanctuary({ onNavigate }) {
     voice.say('sanctuary_open');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Transient pose passed to the BegleiterStage chibi. Flips back to
+  // 'idle' after 1.4s so Ronki plays a one-shot reaction (eating /
+  // happy / playing) on every tap. Declared before the early return so
+  // the hook order stays stable across renders.
+  const [stageMood, setStageMood] = useState('idle');
 
   if (!state) return null;
 
@@ -51,6 +120,11 @@ export default function Sanctuary({ onNavigate }) {
     haptic('success');
     action();
     if (careKey) voice.say('care_action', { careAction: careKey });
+    const pose = careKey === 'fed' ? 'eating'
+               : careKey === 'played' ? 'playing'
+               : 'happy';
+    setStageMood(pose);
+    setTimeout(() => setStageMood('idle'), 1400);
   };
 
   return (
@@ -102,189 +176,104 @@ export default function Sanctuary({ onNavigate }) {
                 style={{ color: 'rgba(18,67,70,0.6)', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
         </div>
 
-        {/* Companion Hero */}
-        <section className="relative rounded-[2.5rem] overflow-hidden mb-6 p-6 pb-8"
-                 style={{ background: 'rgba(249,243,235,0.6)', border: '1px solid rgba(255,255,255,0.5)' }}>
-          <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full blur-[60px]"
-               style={{ background: 'rgba(252,211,77,0.2)' }} />
-
-          <div className="relative z-10 flex justify-between mb-2">
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-label shadow-sm"
-                 style={{ background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' }}>
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#22c55e' }} />
-              {allCareDone ? t('care.status.loved') : t('care.status.happy')}
-            </div>
-            {/* Stage pill — dev only. Public mode keeps Ronki's identity stable
-                 (one companion, no ladder). */}
-            {isDevMode() && (
-              <div className="px-3 py-1 rounded-full shadow-sm font-label text-xs font-bold text-primary"
-                   style={{ background: 'rgba(255,255,255,0.9)' }}>
-                {stageName(currentStage)}
-              </div>
-            )}
+        {/* Status + Dev stage pill — lives above the stage now that the
+             hero card is gone. Keeps the "Geliebt / Glücklich" at-a-glance
+             badge and the dev-only stage name visible. */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-label shadow-sm"
+               style={{ background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#22c55e' }} />
+            {allCareDone ? t('care.status.loved') : t('care.status.happy')}
           </div>
-
-          {voice.line && (
-            <div className="flex justify-center mb-3">
-              <VoiceBubble line={voice.line} onDismiss={voice.dismiss} variant="chip" />
+          {isDevMode() && (
+            <div className="px-3 py-1 rounded-full shadow-sm font-label text-xs font-bold text-primary"
+                 style={{ background: 'rgba(255,255,255,0.9)' }}>
+              {stageName(currentStage)}
             </div>
           )}
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="relative w-56 h-56 flex items-center justify-center">
-              <img src={base + 'art/companion/' + (['dragon-egg','dragon-baby','dragon-young','dragon-majestic','dragon-legendary'][currentStage] || 'dragon-baby') + '.webp'} alt="Ronki" className="w-full h-full object-contain" />
+        </div>
+
+        {/* Painted meadow stage — replaces the flat hero card + horizontal
+             stat bars. Vitals ring visualises today's fed/petted/played
+             state (build-up only, no decay; see design decision notes on
+             Begleiter polish in basic-memory). */}
+        <BegleiterStage
+          fed={!!state.catFed}
+          petted={!!state.catPetted}
+          played={!!state.catPlayed}
+          variant={state?.companionVariant || 'amber'}
+          stage={getCatStage(state?.catEvo || 0)}
+          mood={stageMood}
+          satisfaction={Math.round((careDoneCount / 3) * 100)}
+          evoStageLabel={isDevMode() ? stageName(currentStage) : ''}
+          voiceLine={voice.line}
+          onDismissVoice={voice.dismiss}
+          onTapRonki={() => {
+            SFX.play('pop');
+            haptic('light');
+            voice.say('sanctuary_open');
+          }}
+        />
+
+        {/* Zone flavor — one painterly line that changes with location.
+             Moved below the stage so Ronki + meadow lead; location
+             context sits as a small caption underneath. */}
+        <p
+          className="text-sm font-body mb-5 italic transition-opacity duration-500 text-center"
+          style={{ color: zones.activeZone.accent, opacity: 0.85 }}
+          key={zones.activeZone.id}
+        >
+          {zones.activeZone.emoji} {t(zones.activeZone.flavorKey)}
+        </p>
+
+        {/* Evolution progress bar — dev only. Public mode stays free of
+             the stage ladder so Ronki's identity feels stable. */}
+        {isDevMode() && (
+          <div className="mb-6">
+            <div className="h-3 w-full rounded-full overflow-hidden shadow-inner"
+                 style={{ background: 'rgba(255,255,255,0.5)' }}>
+              <div className="h-full rounded-full" style={{ width: progressPct + '%', background: 'linear-gradient(90deg, #124346, #2d5a5e)' }} />
             </div>
-            <div className="w-full mt-4 text-center">
-              <h2 className="font-headline font-bold text-2xl text-primary">Ronki</h2>
-              <p className="text-xs font-label text-outline uppercase" style={{ letterSpacing: '0.2em' }}>{t('care.mysticCompanion')}</p>
-              {/* Zone flavor — one painterly line that changes with location */}
-              <p
-                className="text-sm font-body mt-2 italic transition-opacity duration-500"
-                style={{ color: zones.activeZone.accent, opacity: 0.85 }}
-                key={zones.activeZone.id}
-              >
-                {zones.activeZone.emoji} {t(zones.activeZone.flavorKey)}
+            {nextStage && (
+              <p className="text-xs font-label text-on-surface-variant mt-2 text-center">
+                {t('care.stepsTo', { count: nextStage.threshold - evo, name: stageName(currentStage + 1) })}
               </p>
-              {/* Evolution progress bar — dev only. Care mechanics still run
-                   in public (hunger, thirst, play) but without a stage ladder. */}
-              {isDevMode() && (
-                <>
-                  <div className="h-3 w-full rounded-full overflow-hidden shadow-inner mt-3"
-                       style={{ background: 'rgba(255,255,255,0.5)' }}>
-                    <div className="h-full rounded-full" style={{ width: progressPct + '%', background: 'linear-gradient(90deg, #124346, #2d5a5e)' }} />
-                  </div>
-                  {nextStage && (
-                    <p className="text-xs font-label text-on-surface-variant mt-2">
-                      {t('care.stepsTo', { count: nextStage.threshold - evo, name: stageName(currentStage + 1) })}
-                    </p>
-                  )}
-                </>
-              )}
-            </div>
+            )}
           </div>
-        </section>
+        )}
 
-        {/* Tamagotchi Stat Meters — painted parchment with gradient-washed bars */}
-        <section className="grid grid-cols-3 gap-3 mb-6">
-          {/* Hunger */}
-          <div className="rounded-2xl p-3"
-               style={{
-                 background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(254,243,199,0.6) 100%)',
-                 border: '1.5px solid rgba(234,179,8,0.22)',
-                 boxShadow: '0 4px 10px -4px rgba(18,67,70,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
-               }}>
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#d97706', fontVariationSettings: "'FILL' 1" }}>restaurant</span>
-              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>{t('care.hunger')}</span>
-            </div>
-            <div className="h-3 w-full rounded-full overflow-hidden" style={{ background: 'rgba(234,179,8,0.15)', boxShadow: 'inset 0 1px 2px rgba(161,98,7,0.15)' }}>
-              <div className="h-full rounded-full transition-all duration-500" style={{
-                width: state.catFed ? '85%' : '40%',
-                background: 'linear-gradient(90deg, #fde68a, #fcd34d 60%, #eab308)',
-                boxShadow: '0 0 8px rgba(252,211,77,0.5)',
-              }} />
-            </div>
-          </div>
-          {/* Glück */}
-          <div className="rounded-2xl p-3"
-               style={{
-                 background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(254,226,226,0.6) 100%)',
-                 border: '1.5px solid rgba(186,26,26,0.2)',
-                 boxShadow: '0 4px 10px -4px rgba(18,67,70,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
-               }}>
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#ba1a1a', fontVariationSettings: "'FILL' 1" }}>favorite</span>
-              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>{t('care.happiness')}</span>
-            </div>
-            <div className="h-3 w-full rounded-full overflow-hidden" style={{ background: 'rgba(186,26,26,0.12)', boxShadow: 'inset 0 1px 2px rgba(147,0,10,0.15)' }}>
-              <div className="h-full rounded-full transition-all duration-500" style={{
-                width: (allCareDone ? 95 : Math.min(95, careDoneCount * 30 + 5)) + '%',
-                background: 'linear-gradient(90deg, #fecaca, #f87171 55%, #dc2626)',
-                boxShadow: '0 0 8px rgba(239,68,68,0.45)',
-              }} />
-            </div>
-          </div>
-          {/* Energie */}
-          <div className="rounded-2xl p-3"
-               style={{
-                 background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(209,234,226,0.6) 100%)',
-                 border: '1.5px solid rgba(18,67,70,0.2)',
-                 boxShadow: '0 4px 10px -4px rgba(18,67,70,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
-               }}>
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#124346', fontVariationSettings: "'FILL' 1" }}>bolt</span>
-              <span className="font-label font-bold text-outline uppercase" style={{ fontSize: '12px', letterSpacing: '0.15em' }}>{t('care.energy')}</span>
-            </div>
-            <div className="h-3 w-full rounded-full overflow-hidden" style={{ background: 'rgba(18,67,70,0.12)', boxShadow: 'inset 0 1px 2px rgba(11,45,47,0.15)' }}>
-              <div className="h-full rounded-full transition-all duration-500" style={{
-                width: state.catPlayed ? '60%' : '30%',
-                background: 'linear-gradient(90deg, #a2d0d4, #5eead4 55%, #0d9488)',
-                boxShadow: '0 0 8px rgba(94,234,212,0.5)',
-              }} />
-            </div>
-          </div>
-        </section>
-
-        {/* Care Actions */}
-        <section className="grid grid-cols-3 gap-4 mb-6">
-          {/* Feed */}
-          <button className={'flex flex-col items-center gap-3 active:scale-90' + (state.catFed ? ' opacity-50' : '')}
-            onClick={() => !state.catFed && handleCare(actions.feedCompanion, 'fed')}
-            disabled={state.catFed}>
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
-                 style={{ background: state.catFed ? '#d1fae5' : '#ffffff', border: state.catFed ? '2px solid #34d399' : '1px solid rgba(18,67,70,0.05)' }}>
-              <span className="material-symbols-outlined text-4xl"
-                    style={{ color: state.catFed ? '#059669' : '#124346', fontVariationSettings: "'FILL' 1" }}>
-                {state.catFed ? 'check_circle' : 'cookie'}
-              </span>
-            </div>
-            <span className="font-headline font-bold text-sm">{t('care.feed')}</span>
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-sm" style={{ background: 'white' }}>
-              {state.catFed
-                ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>{t('care.done')}</span>
-                : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>+5</span></React.Fragment>
-              }
-            </div>
-          </button>
-
-          {/* Pet */}
-          <button className={'flex flex-col items-center gap-3 active:scale-90' + (state.catPetted ? ' opacity-50' : '')}
-            onClick={() => !state.catPetted && handleCare(actions.petCompanion, 'petted')}
-            disabled={state.catPetted}>
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
-                 style={{ background: state.catPetted ? '#d1fae5' : '#ffffff', border: state.catPetted ? '2px solid #34d399' : '1px solid rgba(18,67,70,0.05)' }}>
-              <span className="material-symbols-outlined text-4xl"
-                    style={{ color: state.catPetted ? '#059669' : '#725b00', fontVariationSettings: "'FILL' 1" }}>
-                {state.catPetted ? 'check_circle' : 'favorite'}
-              </span>
-            </div>
-            <span className="font-headline font-bold text-sm">{t('care.pet')}</span>
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-sm" style={{ background: 'white' }}>
-              {state.catPetted
-                ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>{t('care.done')}</span>
-                : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>+3</span></React.Fragment>
-              }
-            </div>
-          </button>
-
-          {/* Play */}
-          <button className={'flex flex-col items-center gap-3 active:scale-90' + (state.catPlayed ? ' opacity-50' : '')}
-            onClick={() => !state.catPlayed && handleCare(actions.playCompanion, 'played')}
-            disabled={state.catPlayed}>
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
-                 style={{ background: state.catPlayed ? '#d1fae5' : '#ffffff', border: state.catPlayed ? '2px solid #34d399' : '1px solid rgba(18,67,70,0.05)' }}>
-              <span className="material-symbols-outlined text-4xl"
-                    style={{ color: state.catPlayed ? '#059669' : '#124346', fontVariationSettings: "'FILL' 1" }}>
-                {state.catPlayed ? 'check_circle' : 'sports_baseball'}
-              </span>
-            </div>
-            <span className="font-headline font-bold text-sm">{t('care.play')}</span>
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-sm" style={{ background: 'white' }}>
-              {state.catPlayed
-                ? <span className="text-xs font-label font-bold" style={{ color: '#059669' }}>{t('care.done')}</span>
-                : <React.Fragment><Pearl size={12} /><span className="text-xs font-label font-bold" style={{ color: '#735c00' }}>+8</span></React.Fragment>
-              }
-            </div>
-          </button>
+        {/* ── Care Actions — upgraded design (tinted icon squares, color-matched
+             active states). No mini progress bar: the vitals ring above
+             already surfaces the same info. ── */}
+        <div className="font-label font-bold text-xs uppercase mb-2.5 px-0.5"
+             style={{ color: 'rgba(18,67,70,0.55)', letterSpacing: '0.08em' }}>
+          {t('care.sectionTitle')}
+        </div>
+        <section className="grid grid-cols-3 gap-2 mb-6">
+          {renderCareButton({
+            color: '#f59e0b',
+            icon: 'restaurant',
+            label: t('care.feed'),
+            done: !!state.catFed,
+            onClick: () => !state.catFed && handleCare(actions.feedCompanion, 'fed'),
+            doneLabel: t('care.done'),
+          })}
+          {renderCareButton({
+            color: '#ec4899',
+            icon: 'favorite',
+            label: t('care.pet'),
+            done: !!state.catPetted,
+            onClick: () => !state.catPetted && handleCare(actions.petCompanion, 'petted'),
+            doneLabel: t('care.done'),
+          })}
+          {renderCareButton({
+            color: '#10b981',
+            icon: 'bolt',
+            label: t('care.play'),
+            done: !!state.catPlayed,
+            onClick: () => !state.catPlayed && handleCare(actions.playCompanion, 'played'),
+            doneLabel: t('care.done'),
+          })}
         </section>
 
         {/* Wohlbefinden */}

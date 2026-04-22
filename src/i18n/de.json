@@ -669,6 +669,16 @@
 
   "care.stepsTo": "Noch {count} bis {name}",
   "care.done": "Erledigt!",
+  "care.satisfied": "zufrieden",
+  "care.sectionTitle": "Kümmere dich um Ronki",
+  "care.stage.label": "Ronkis Wiese",
+  "care.tapRonki.label": "Ronki antippen",
+  "care.mood.line.0": "Schön, dass du da bist.",
+  "care.mood.line.1": "Spielst du heute mit mir?",
+  "care.mood.line.2": "Mein Bauch grummelt ein bisschen…",
+  "care.mood.line.3": "Erzähl mir, was du heute erlebt hast.",
+  "care.mood.line.4": "Kannst du mich mal streicheln?",
+  "care.mood.line.5": "Ich hab von fliegenden Keksen geträumt.",
   "care.wellbeing": "Tägliches Wohlbefinden",
   "care.affection": "Zuneigung",
   "care.growthOrbs": "Wachstums-Orbs",
@@ -1105,6 +1115,8 @@
 
   "game.forscher.section": "Deine Knobel-Abenteuer",
   "game.forscher.replayHint": "Jederzeit spielbar",
+  "game.adventures.section": "Abenteuer mit Ronki",
+  "game.classic.section": "Klassische Mini-Spiele",
 
   "forscher.eyebrow": "Forscher-Ecke",
   "forscher.title": "Mit Dr. Funkel",
