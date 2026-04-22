@@ -41,11 +41,29 @@ export default function PinnedRonki({
   const eater = useQuestEater();
   const { state, computed } = useTask();
   // Ambient status — the pill becomes an at-a-glance companion chip:
-  //   ring fills with today's pct, face swaps to current ronkiMood,
+  //   ring fills with CURRENT ROUTINE BLOCK's pct (morning / evening /
+  //   bedtime depending on hour), face swaps to current ronkiMood,
   //   variant threads through so the colorway matches Louis's save.
-  // See backlog_pinned_ronki_status_chip.md.
-  const pct = computed?.pct ?? 0;
-  const allDone = computed?.allDone ?? false;
+  //
+  // Routine-based ring (Marc Apr 2026): "shouldn't one routine put the
+  // circle to full so that the kid can leave the app after the routine
+  // is done and Ronki is happy." Previously used done/total across all
+  // quests → required completing morning + evening + bedtime to fill.
+  // Now: time-of-day picks the active block, ring fills when THAT
+  // block's main quests are all done. Kid finishes morning → ring full
+  // → knows it's safe to put the phone away.
+  const _h = new Date().getHours();
+  const activeAnchor =
+    _h >= 6 && _h < 12 ? 'morning' :
+    _h >= 12 && _h < 18 ? 'evening' :
+    'bedtime';
+  const blockQuests = (state?.quests || []).filter(
+    q => q.anchor === activeAnchor && !q.sideQuest
+  );
+  const blockDone = blockQuests.filter(q => q.done).length;
+  const blockTotal = blockQuests.length;
+  const pct = blockTotal > 0 ? blockDone / blockTotal : 0;
+  const allDone = blockTotal > 0 && blockDone === blockTotal;
   const ambientMood = state?.ronkiMood || 'normal';
   const variant = state?.companionVariant || 'amber';
   const pillRef = useRef(null);
@@ -116,48 +134,67 @@ export default function PinnedRonki({
       onMouseUp={onTap ? (e) => e.currentTarget.style.transform = '' : undefined}
       onMouseLeave={onTap ? (e) => e.currentTarget.style.transform = '' : undefined}
     >
-      {/* Progress ring — today's pct. Amber in-progress, emerald at all-done.
-           Sits above the pill's radial gradient so it reads at a glance
-           from any tab. Circumference calculated so stroke-dasharray
-           drives a smooth fill. */}
-      <svg
-        aria-hidden="true"
-        width={size + 8}
-        height={size + 8}
-        viewBox={`0 0 ${size + 8} ${size + 8}`}
-        style={{
-          position: 'absolute',
-          inset: -4,
-          pointerEvents: 'none',
-          transform: 'rotate(-90deg)',
-        }}
-      >
-        <circle
-          cx={(size + 8) / 2}
-          cy={(size + 8) / 2}
-          r={(size + 4) / 2}
-          fill="none"
-          stroke="rgba(18,67,70,0.14)"
-          strokeWidth="2.5"
-        />
-        <circle
-          cx={(size + 8) / 2}
-          cy={(size + 8) / 2}
-          r={(size + 4) / 2}
-          fill="none"
-          stroke={allDone ? '#34d399' : '#fcd34d'}
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeDasharray={Math.PI * (size + 4)}
-          strokeDashoffset={Math.PI * (size + 4) * (1 - pct)}
-          style={{
-            transition: 'stroke-dashoffset 0.6s ease, stroke 0.3s ease',
-            filter: allDone
-              ? 'drop-shadow(0 0 6px rgba(52,211,153,0.7))'
-              : 'drop-shadow(0 0 4px rgba(252,211,77,0.55))',
-          }}
-        />
-      </svg>
+      {/* Progress ring — active routine block's pct. Amber in-progress,
+           emerald + subtle glow at all-done. Drawn on a slightly bigger
+           box so the stroke sits just outside the white pill border.
+           strokeLinecap: butt on the track (clean closed circle) + round
+           on the foreground arc only so the advancing tip feels soft
+           without creating visible stub "humps" on both ends. */}
+      {(() => {
+        const padding = 5;                      // distance from pill edge
+        const boxSize = size + padding * 2;
+        const stroke = Math.max(3, Math.round(size * 0.08)); // scales with size
+        const radius = (size + padding) / 2;
+        const circumference = 2 * Math.PI * radius;
+        return (
+          <svg
+            aria-hidden="true"
+            width={boxSize}
+            height={boxSize}
+            viewBox={`0 0 ${boxSize} ${boxSize}`}
+            style={{
+              position: 'absolute',
+              inset: -padding,
+              pointerEvents: 'none',
+              transform: 'rotate(-90deg)',
+              overflow: 'visible',
+            }}
+          >
+            {/* Track — full circle, flat caps, low contrast */}
+            <circle
+              cx={boxSize / 2}
+              cy={boxSize / 2}
+              r={radius}
+              fill="none"
+              stroke="rgba(18,67,70,0.14)"
+              strokeWidth={stroke}
+            />
+            {/* Foreground arc — strokeLinecap:round so the tip is soft.
+                 Only drawn when pct > 0 to avoid the stray end-cap dot
+                 at 0%. At allDone the arc covers the full circle, so the
+                 soft cap is hidden (seam sits behind itself). */}
+            {pct > 0 && (
+              <circle
+                cx={boxSize / 2}
+                cy={boxSize / 2}
+                r={radius}
+                fill="none"
+                stroke={allDone ? '#34d399' : '#fcd34d'}
+                strokeWidth={stroke}
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={circumference * (1 - pct)}
+                style={{
+                  transition: 'stroke-dashoffset 0.6s ease, stroke 0.3s ease',
+                  filter: allDone
+                    ? 'drop-shadow(0 0 6px rgba(52,211,153,0.75))'
+                    : 'drop-shadow(0 0 4px rgba(252,211,77,0.55))',
+                }}
+              />
+            )}
+          </svg>
+        );
+      })()}
 
       {/* Chibi inside the pill — threads real ronkiMood + variant so the
            face/particles match Ronki's state everywhere else (Lager,
