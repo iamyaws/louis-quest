@@ -62,6 +62,7 @@ import { useQuietAttention } from './hooks/useQuietAttention';
 // import EggOverlay from './components/EggOverlay'; // paused Apr 2026 (see useEggSystem note)
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import AlphaBanner from './components/AlphaBanner';
+import SWUpdateBanner from './components/SWUpdateBanner';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -502,6 +503,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <AlphaBanner />
+      <SWUpdateBanner />
       <AuthProvider>
         <AuthGate />
       </AuthProvider>
