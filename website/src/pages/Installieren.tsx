@@ -304,7 +304,7 @@ export default function Installieren() {
                         }}
                       >
                         {isInstall
-                          ? 'Public-Alpha. Kein Store, kein Download, keine Anmeldung. Wenn etwas klemmt, schreibt an hallo@ronki.de. Landet direkt bei Marc.'
+                          ? 'Public\u2011Alpha. Kein Store, kein Download, keine Anmeldung. Wenn etwas klemmt, schreibt an hallo@ronki.de. Landet direkt bei Marc.'
                           : 'Wir öffnen Ronki in kleinen Gruppen. Meist innerhalb von 48 Stunden nach Eintrag. Kein Spam, kein Store, keine Werbung.'}
                       </p>
                     </>

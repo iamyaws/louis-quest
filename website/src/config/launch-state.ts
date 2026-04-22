@@ -64,7 +64,9 @@ const COPY: Record<LaunchState, LaunchCopy> = {
     ctaHelper:
       'Frühe Version, läuft direkt im Browser. Kein Download, keine Anmeldung. Schreibt uns an hallo@ronki.de wenn was klemmt.',
     footerMicro:
-      'Ronki läuft in der Public-Alpha. Direkt im Browser, kostenlos, ohne Anmeldung.',
+      // Non-breaking hyphen (\u2011) between Public and Alpha so the browser
+      // never breaks the phrase across lines, even at narrow column widths.
+      'Ronki läuft in der Public\u2011Alpha. Direkt im Browser, kostenlos, ohne Anmeldung.',
     heroEyebrow: 'Public Alpha · jetzt spielbar',
     appUrl: 'https://app.ronki.de/',
   },

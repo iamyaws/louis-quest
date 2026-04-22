@@ -10,7 +10,7 @@ export function ClosingCTAModern() {
     ? ['Ein Klick.', 'Ein Start.']
     : ['Eine E-Mail.', 'Ein Tag.'];
   const blurb = isInstall
-    ? 'Öffne die App direkt im Browser. Kein App Store, kein Download, kostenlos. Public-Alpha, also noch nicht perfekt — aber schon da.'
+    ? 'Öffne die App direkt im Browser. Kein App Store, kein Download, kostenlos. Public\u2011Alpha, also noch nicht perfekt, aber schon da.'
     : 'Trag dich ein. Wir melden uns genau einmal: am Start-Tag. Danach hörst du nichts mehr von uns. Keine Werbung, kein Nachfassen.';
   return (
     <section
