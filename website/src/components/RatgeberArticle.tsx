@@ -263,7 +263,7 @@ export function RatgeberArticle({
               </p>
             </div>
             <div className="text-cream">
-              <WaitlistCTA launchState={LAUNCH_STATE} />
+              <WaitlistCTA launchState={LAUNCH_STATE} onDarkBackground />
             </div>
           </div>
         </div>

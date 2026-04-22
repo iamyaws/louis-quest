@@ -50,10 +50,15 @@ export function Footer() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-10"
+            /* Stack vertically up to medium viewports; only flip to side-
+               by-side at lg+ (1024px). Between sm and md the text column
+               was getting squeezed to ~230px by the CTA's min-w-[320px],
+               producing ugly 1-to-3-word-per-line wraps. lg+ has enough
+               room (~960px inner minus 320px CTA = 640px paragraph). */
+            className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-10"
           >
             <p
-              className="font-display font-semibold text-2xl sm:text-3xl leading-snug text-teal-dark flex-1"
+              className="font-display font-semibold text-2xl sm:text-3xl leading-snug text-teal-dark lg:flex-1 lg:max-w-2xl"
               style={{
                 hyphens: 'manual',
                 WebkitHyphens: 'manual',
@@ -62,7 +67,11 @@ export function Footer() {
             >
               {copy.footerMicro}
             </p>
-            <div className="w-full sm:w-auto sm:min-w-[320px] shrink-0">
+            {/* Fixed-ish width on lg+ so the long CTA helper-text doesn't
+                spread this column wide and squeeze the paragraph. 380px
+                fits 'Ronki ausprobieren →' comfortably plus helper text
+                wrapped on 2-3 lines. */}
+            <div className="w-full lg:w-[380px] shrink-0">
               <WaitlistCTA launchState={LAUNCH_STATE} />
             </div>
           </motion.div>

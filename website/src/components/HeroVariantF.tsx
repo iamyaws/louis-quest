@@ -89,8 +89,8 @@ export function HeroVariantF() {
           </motion.p>
 
           {/* CTA form */}
-          <motion.div {...fade(0.55)} className="mt-10 w-full max-w-md text-cream">
-            <WaitlistCTA launchState={LAUNCH_STATE} />
+          <motion.div {...fade(0.55)} className="mt-8 w-full max-w-md text-cream">
+            <WaitlistCTA launchState={LAUNCH_STATE} onDarkBackground />
           </motion.div>
 
           {/* Secondary hook — Ritual framing (option C).

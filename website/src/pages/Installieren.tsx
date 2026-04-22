@@ -312,7 +312,7 @@ export default function Installieren() {
                 })()}
               </div>
               <div className="text-cream">
-                <WaitlistCTA launchState={LAUNCH_STATE} />
+                <WaitlistCTA launchState={LAUNCH_STATE} onDarkBackground />
               </div>
             </div>
           </motion.div>

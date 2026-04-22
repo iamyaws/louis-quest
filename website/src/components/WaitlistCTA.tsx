@@ -18,9 +18,13 @@ type Status =
 type Props = {
   launchState: LaunchState;
   appUrl?: string;
+  /** Set to true when the CTA is rendered on a dark background (hero,
+   *  dark-teal callout). Swaps the button to mustard-on-teal-dark for
+   *  proper contrast — the default teal-on-teal-dark is unreadable. */
+  onDarkBackground?: boolean;
 };
 
-export function WaitlistCTA({ launchState, appUrl }: Props) {
+export function WaitlistCTA({ launchState, appUrl, onDarkBackground }: Props) {
   const copy = getLaunchCopy(launchState);
   // Route by the copy's declared action rather than the state name —
   // that way any future 'install'-action state (live, public-alpha,
@@ -29,20 +33,24 @@ export function WaitlistCTA({ launchState, appUrl }: Props) {
   const resolvedAppUrl = appUrl ?? copy.appUrl ?? '/app';
 
   if (copy.ctaAction === 'install') {
+    const btnBg = onDarkBackground
+      ? 'bg-mustard text-teal-dark hover:bg-mustard-soft'
+      : 'bg-teal text-cream';
+    const helperColor = onDarkBackground ? 'text-cream/80' : 'opacity-70';
     return (
-      <div className="flex flex-col items-start gap-2">
+      <div className="flex flex-col items-start gap-3">
         <motion.a
           href={resolvedAppUrl}
           onClick={() => trackEvent('App Install Click', { source: 'waitlist_cta' })}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="group relative inline-flex items-center gap-3 rounded-full bg-teal px-8 py-4 text-cream font-display font-semibold text-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+          className={`group relative inline-flex items-center gap-3 rounded-full px-8 py-4 font-display font-semibold text-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden ${btnBg}`}
         >
           <span className="relative z-10">{copy.ctaLabel}</span>
           <span className="relative z-10 transition-transform group-hover:translate-x-1">→</span>
         </motion.a>
         <p
-          className="text-sm opacity-70"
+          className={`text-sm ${helperColor}`}
           style={{
             hyphens: 'manual',
             WebkitHyphens: 'manual',
