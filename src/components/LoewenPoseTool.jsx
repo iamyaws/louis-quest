@@ -33,6 +33,8 @@ const STEPS = [
     body: 'Hände auf die Knie. Finger gespreizt wie Krallen.',
     mood: 'besorgt',
     durationMs: 5000,
+    // Cue row shown above the title — what the body actually does
+    cue: { icon: '🧎', label: 'Hinsetzen', hand: '🖐️' },
   },
   {
     phase: 'inhale',
@@ -40,6 +42,7 @@ const STEPS = [
     body: 'Nimm so viel Luft wie du kannst. Mund zu.',
     mood: 'besorgt',
     durationMs: 4000,
+    cue: { icon: '🫁', label: 'Einatmen', arrow: 'up' },
   },
   {
     phase: 'open',
@@ -47,6 +50,7 @@ const STEPS = [
     body: 'Augen groß. Mund weit offen. Zunge raus!',
     mood: 'besorgt',
     durationMs: 3000,
+    cue: { icon: '😮', label: 'Weit auf' },
   },
   {
     phase: 'roar',
@@ -55,6 +59,7 @@ const STEPS = [
     mood: 'gut',
     durationMs: 3500,
     haptic: true,
+    cue: { icon: '🦁', label: 'Brüllen', big: true },
   },
   {
     phase: 'settle',
@@ -62,6 +67,7 @@ const STEPS = [
     body: 'Fühl die Schultern fallen. Ronki auch.',
     mood: 'normal',
     durationMs: 4000,
+    cue: { icon: '🌬️', label: 'Ausatmen', arrow: 'down' },
   },
   {
     phase: 'done',
@@ -70,8 +76,127 @@ const STEPS = [
     mood: 'magisch',
     durationMs: 5000,
     final: true,
+    cue: { icon: '✨', label: 'Geschafft' },
   },
 ];
+
+// Simplified kid silhouette — shows the pose the CHILD should be doing
+// per step. SVG so it scales cleanly on phones. Each phase changes the
+// head + arms + mouth + breath indicator. Paired with chibi-Ronki so
+// the kid sees "what I do" + "Ronki mirrors me."
+function KidPose({ phase }) {
+  const headR = 18;
+  const cx = 80;
+  const cy = 60;
+  // Arm positions — arms always on knees in this pose
+  const armLeftEnd = { x: 55, y: 110 };
+  const armRightEnd = { x: 105, y: 110 };
+  // Open mouth sizing varies per phase
+  const mouthW = phase === 'open' ? 18 : phase === 'roar' ? 22 : 6;
+  const mouthH = phase === 'open' ? 12 : phase === 'roar' ? 18 : 2;
+  const eyeRadius = phase === 'roar' ? 3.5 : phase === 'open' ? 3 : 2;
+  // Breath indicator — expanding ring at chest for inhale
+  const showBreath = phase === 'inhale';
+  // Radial roar lines
+  const showRoar = phase === 'roar';
+  // Slight shoulder drop on settle
+  const shoulderY = phase === 'settle' || phase === 'done' ? 82 : 78;
+
+  return (
+    <svg viewBox="0 0 160 180" width="100%" height="100%" aria-hidden="true" style={{ maxHeight: 180 }}>
+      {/* Roar radial burst */}
+      {showRoar && (
+        <g opacity="0.75">
+          {[0, 45, 90, 135, 180, 225, 270, 315].map(deg => (
+            <line
+              key={deg}
+              x1={cx} y1={cy}
+              x2={cx + Math.cos((deg * Math.PI) / 180) * 45}
+              y2={cy + Math.sin((deg * Math.PI) / 180) * 45}
+              stroke="#f59e0b"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+          ))}
+        </g>
+      )}
+      {/* Inhale breath ring */}
+      {showBreath && (
+        <circle cx={cx} cy={110} r="22"
+          fill="none" stroke="#8b5cf6" strokeWidth="2" strokeDasharray="3 4"
+          style={{ animation: 'lpBreathRing 2s ease-in-out infinite' }}
+        />
+      )}
+      {/* Torso */}
+      <path
+        d={`M ${cx - 22} ${shoulderY} Q ${cx} ${shoulderY - 4} ${cx + 22} ${shoulderY} L ${cx + 26} 130 Q ${cx} 134 ${cx - 26} 130 Z`}
+        fill="#fef3c7"
+        stroke="#1a1a1a"
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+      {/* Legs — crossed-ish */}
+      <path
+        d={`M ${cx - 26} 130 Q ${cx - 32} 150 ${cx - 16} 156 L ${cx + 16} 156 Q ${cx + 32} 150 ${cx + 26} 130`}
+        fill="#fef3c7"
+        stroke="#1a1a1a"
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+      {/* Arms — from shoulders to knees, elbows bent */}
+      <path
+        d={`M ${cx - 20} ${shoulderY + 4} Q ${cx - 38} 98 ${armLeftEnd.x} ${armLeftEnd.y}`}
+        fill="none" stroke="#1a1a1a" strokeWidth="3.5" strokeLinecap="round"
+      />
+      <path
+        d={`M ${cx + 20} ${shoulderY + 4} Q ${cx + 38} 98 ${armRightEnd.x} ${armRightEnd.y}`}
+        fill="none" stroke="#1a1a1a" strokeWidth="3.5" strokeLinecap="round"
+      />
+      {/* "Claw" finger spreads on hands — 3 lines per hand fanning out */}
+      {[-1, 0, 1].map(i => (
+        <React.Fragment key={`l${i}`}>
+          <line
+            x1={armLeftEnd.x} y1={armLeftEnd.y}
+            x2={armLeftEnd.x + i * 3} y2={armLeftEnd.y + 7 + Math.abs(i) * 1.5}
+            stroke="#1a1a1a" strokeWidth="1.8" strokeLinecap="round"
+          />
+        </React.Fragment>
+      ))}
+      {[-1, 0, 1].map(i => (
+        <React.Fragment key={`r${i}`}>
+          <line
+            x1={armRightEnd.x} y1={armRightEnd.y}
+            x2={armRightEnd.x + i * 3} y2={armRightEnd.y + 7 + Math.abs(i) * 1.5}
+            stroke="#1a1a1a" strokeWidth="1.8" strokeLinecap="round"
+          />
+        </React.Fragment>
+      ))}
+      {/* Head */}
+      <circle cx={cx} cy={cy} r={headR} fill="#fff3c8" stroke="#1a1a1a" strokeWidth="2.2" />
+      {/* Eyes */}
+      <circle cx={cx - 6} cy={cy - 2} r={eyeRadius} fill="#1a1a1a" />
+      <circle cx={cx + 6} cy={cy - 2} r={eyeRadius} fill="#1a1a1a" />
+      {/* Mouth */}
+      <ellipse cx={cx} cy={cy + 8} rx={mouthW / 2} ry={mouthH / 2}
+        fill={phase === 'open' || phase === 'roar' ? '#dc2626' : '#1a1a1a'}
+        stroke="#1a1a1a" strokeWidth="1.5"
+      />
+      {/* Tongue on roar */}
+      {showRoar && (
+        <path
+          d={`M ${cx - 3} ${cy + 10} Q ${cx} ${cy + 20} ${cx + 3} ${cy + 10} Z`}
+          fill="#f472b6" stroke="#1a1a1a" strokeWidth="1.2"
+        />
+      )}
+      <style>{`
+        @keyframes lpBreathRing {
+          0%, 100% { r: 16; opacity: 0.4; }
+          50%      { r: 28; opacity: 0.9; }
+        }
+      `}</style>
+    </svg>
+  );
+}
 
 export default function LoewenPoseTool({ onComplete }) {
   const { state, actions } = useTask();
@@ -176,7 +301,9 @@ export default function LoewenPoseTool({ onComplete }) {
         </div>
       </div>
 
-      {/* Ronki mirrors the step. Roar step shows him with magisch glow. */}
+      {/* Two-figure row: KidPose (what YOU do) + Ronki (mirrors you).
+           Kid sees both so the imitation is explicit — not just
+           "interpret Ronki's mood" which was too subtle last pass. */}
       <div style={{
         flex: 1,
         display: 'flex', flexDirection: 'column',
@@ -184,37 +311,99 @@ export default function LoewenPoseTool({ onComplete }) {
         padding: '20px',
       }}>
         <div style={{
-          width: 200, height: 200,
-          position: 'relative',
-          transform: step.phase === 'roar'
-            ? 'scale(1.15)'
-            : step.phase === 'open'
-              ? 'scale(1.05)'
-              : 'scale(1)',
-          transition: 'transform 0.5s ease',
-          filter: step.phase === 'roar'
-            ? 'drop-shadow(0 0 30px rgba(252,211,77,0.9))'
-            : step.phase === 'done'
-              ? 'drop-shadow(0 0 20px rgba(249,168,212,0.8))'
-              : 'none',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          gap: 14, marginBottom: 18,
+          width: '100%', maxWidth: 440,
         }}>
-          <MoodChibi size={200} mood={step.mood} variant={variant} stage={2} bare />
-          {/* Roar visual — radial burst behind Ronki */}
-          {step.phase === 'roar' && (
-            <span aria-hidden="true" style={{
-              position: 'absolute', inset: '-40%',
-              background: 'radial-gradient(circle, rgba(252,211,77,0.55) 0%, transparent 60%)',
-              zIndex: -1,
-              animation: 'lpRoarBurst 1.4s ease-out',
-            }} />
-          )}
+          {/* Kid silhouette — "du" */}
+          <div style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+          }}>
+            <p style={{
+              margin: '0 0 6px', fontSize: 10, fontWeight: 800,
+              letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: '#6d28d9',
+            }}>Du</p>
+            <div style={{
+              width: 160, height: 180,
+              padding: 8, borderRadius: 20,
+              background: 'rgba(255,255,255,0.55)',
+              border: '1.5px solid rgba(109,40,217,0.25)',
+            }}>
+              <KidPose phase={step.phase} />
+            </div>
+          </div>
+          {/* Chibi Ronki — "Ronki macht mit" */}
+          <div style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+          }}>
+            <p style={{
+              margin: '0 0 6px', fontSize: 10, fontWeight: 800,
+              letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: '#6d28d9',
+            }}>Ronki</p>
+            <div style={{
+              width: 160, height: 180,
+              padding: 8, borderRadius: 20,
+              background: 'rgba(255,255,255,0.55)',
+              border: '1.5px solid rgba(109,40,217,0.25)',
+              position: 'relative',
+              display: 'grid', placeItems: 'center',
+            }}>
+              <div style={{
+                width: 130, height: 130, position: 'relative',
+                transform: step.phase === 'roar'
+                  ? 'scale(1.15)'
+                  : step.phase === 'open'
+                    ? 'scale(1.05)'
+                    : 'scale(1)',
+                transition: 'transform 0.5s ease',
+                filter: step.phase === 'roar'
+                  ? 'drop-shadow(0 0 24px rgba(252,211,77,0.9))'
+                  : step.phase === 'done'
+                    ? 'drop-shadow(0 0 18px rgba(249,168,212,0.8))'
+                    : 'none',
+              }}>
+                <MoodChibi size={130} mood={step.mood} variant={variant} stage={2} bare />
+                {step.phase === 'roar' && (
+                  <span aria-hidden="true" style={{
+                    position: 'absolute', inset: '-40%',
+                    background: 'radial-gradient(circle, rgba(252,211,77,0.55) 0%, transparent 60%)',
+                    zIndex: -1,
+                    animation: 'lpRoarBurst 1.4s ease-out',
+                  }} />
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* Cue row — big emoji + short label for instant-read of the
+             body action, above the descriptive title/body text. */}
+        {step.cue && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '6px 14px', borderRadius: 999,
+            background: step.phase === 'roar'
+              ? 'linear-gradient(135deg, #fcd34d, #f59e0b)'
+              : 'rgba(109,40,217,0.12)',
+            color: step.phase === 'roar' ? '#7c2d12' : '#6d28d9',
+            marginBottom: 12,
+            fontWeight: 800, fontSize: 12,
+            letterSpacing: '0.14em', textTransform: 'uppercase',
+          }}>
+            <span style={{ fontSize: step.cue.big ? 28 : 20, lineHeight: 1 }}>
+              {step.cue.icon}
+            </span>
+            <span>{step.cue.label}</span>
+          </div>
+        )}
+
         <p style={{
-          margin: '28px 0 10px',
+          margin: '0 0 10px',
           textAlign: 'center',
           fontFamily: 'Fredoka, sans-serif',
-          fontSize: 28, fontWeight: 600,
+          fontSize: 26, fontWeight: 600,
           color: step.phase === 'roar' ? '#b45309' : '#124346',
           letterSpacing: '-0.02em',
           textWrap: 'balance',
