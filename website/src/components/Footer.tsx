@@ -86,8 +86,20 @@ export function Footer() {
                 <Link to="/installieren" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Ronki installieren
                 </Link>
+                <a
+                  href="https://app.ronki.de/?compendium=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5 inline-flex items-center gap-1.5"
+                >
+                  Drachen-Compendium
+                  <span aria-hidden className="text-teal/50 text-[10px] leading-none">↗</span>
+                </a>
                 <Link to="/vorlagen" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
                   Vorlagen zum Ausdrucken
+                </Link>
+                <Link to="/drachen-sammelkarten" className="text-teal-dark/75 hover:text-teal-dark transition-colors w-fit py-2.5">
+                  Drachen-Sammelkarten
                 </Link>
               </nav>
             </div>

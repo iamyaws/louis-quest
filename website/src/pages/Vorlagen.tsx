@@ -133,6 +133,89 @@ export default function Vorlagen() {
         </div>
       </section>
 
+      {/* Sammelkarten cross-link — new-ish surface, worth a dedicated
+          section rather than squeezing into the Vorlagen grid since it
+          lives at /drachen-sammelkarten (its own page, not a nested
+          /vorlagen/* slug). */}
+      <section className="px-6 pb-20 sm:pb-24">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 0.7, ease: EASE_OUT }}
+            className="relative rounded-3xl bg-teal-dark text-cream overflow-hidden"
+          >
+            <div
+              aria-hidden
+              className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-mustard/15 blur-3xl"
+            />
+            <div
+              aria-hidden
+              className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-sage/20 blur-3xl"
+            />
+            <div className="relative flex flex-col md:flex-row gap-8 md:gap-10 items-center px-8 sm:px-12 py-12 sm:py-14">
+              <div className="flex-1">
+                <p className="text-xs uppercase tracking-[0.2em] text-mustard font-medium mb-4">
+                  Auch zum Ausdrucken
+                </p>
+                <h2 className="font-display font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight mb-4">
+                  Drachen-Sammelkarten{' '}
+                  <em className="italic text-mustard">zum Selbersammeln</em>.
+                </h2>
+                <p className="text-base sm:text-lg opacity-85 leading-relaxed mb-6 max-w-xl">
+                  Neun Drachen aus dem Ronki-Universum. Als A6-Karten zum Drucken,
+                  Ausschneiden, Unterschreiben und Tauschen am Schulhof.
+                </p>
+                <Link
+                  to="/drachen-sammelkarten"
+                  className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 bg-mustard text-teal-dark font-display font-bold text-sm shadow-sm hover:shadow-md transition-all hover:gap-3"
+                >
+                  Zum Karten-Set
+                  <span aria-hidden>→</span>
+                </Link>
+              </div>
+              <div className="flex-shrink-0 flex items-center gap-3 md:gap-4">
+                {['ronki', 'kruemel', 'flamme'].map((slug, i) => (
+                  <div
+                    key={slug}
+                    className="relative rounded-xl overflow-hidden"
+                    style={{
+                      width: 72,
+                      height: 100,
+                      transform: `rotate(${(i - 1) * 6}deg) translateY(${
+                        i === 1 ? '-4px' : '0'
+                      })`,
+                      background:
+                        'linear-gradient(180deg, #FDE589 0%, #F2BC5B 100%)',
+                      boxShadow:
+                        '0 8px 20px -6px rgba(0,0,0,0.35), inset 0 0 0 1.5px rgba(252,211,77,0.7)',
+                    }}
+                  >
+                    <img
+                      src={
+                        slug === 'ronki'
+                          ? '/art/branding/ronki-icon-heroic-256.webp'
+                          : slug === 'kruemel'
+                          ? '/art/companion/dragon-baby.webp'
+                          : '/art/companion/dragon-legendary.webp'
+                      }
+                      alt=""
+                      aria-hidden
+                      className="absolute inset-0 w-full h-full"
+                      style={{
+                        objectFit: slug === 'ronki' ? 'contain' : 'cover',
+                        padding: slug === 'ronki' ? '8px' : 0,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       <section className="px-6 py-16 sm:py-20 bg-cream/40">
         <div className="max-w-3xl mx-auto text-center">
           <motion.p

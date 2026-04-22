@@ -10,6 +10,7 @@ const Science = lazy(() => import('./pages/Science'));
 const FuerEltern = lazy(() => import('./pages/FuerEltern'));
 const FAQ_Page = lazy(() => import('./pages/FAQ_Page'));
 const Vorlagen = lazy(() => import('./pages/Vorlagen'));
+const DrachenSammelkarten = lazy(() => import('./pages/DrachenSammelkarten'));
 const VorlageMorgen = lazy(() => import('./pages/VorlageMorgen'));
 const VorlageAbend = lazy(() => import('./pages/VorlageAbend'));
 const VorlageKleineGeschwister = lazy(() => import('./pages/VorlageKleineGeschwister'));
@@ -19,6 +20,10 @@ const Ratgeber = lazy(() => import('./pages/Ratgeber'));
 // Private print-only utility pages; not in footer, not in sitemap, not in robots.
 const PrintA6Flyer = lazy(() => import('./pages/PrintA6Flyer'));
 const PrintA6FlyerKids = lazy(() => import('./pages/PrintA6FlyerKids'));
+const PrintA6FlyerKidsHatchling = lazy(() => import('./pages/PrintA6FlyerKidsHatchling'));
+const PrintA6FlyerKidsCard = lazy(() => import('./pages/PrintA6FlyerKidsCard'));
+const PrintA6FlyerKidsPass = lazy(() => import('./pages/PrintA6FlyerKidsPass'));
+const PrintSheetA4KidsCard = lazy(() => import('./pages/PrintSheetA4KidsCard'));
 const PrintA4Poster = lazy(() => import('./pages/PrintA4Poster'));
 const PrintA4PosterHort = lazy(() => import('./pages/PrintA4PosterHort'));
 const PrintA4PosterBaeckerei = lazy(() => import('./pages/PrintA4PosterBaeckerei'));
@@ -67,12 +72,17 @@ export function AppRoutes() {
         <Route path="/fuer-eltern" element={<FuerEltern />} />
         <Route path="/faq" element={<FAQ_Page />} />
         <Route path="/vorlagen" element={<Vorlagen />} />
+        <Route path="/drachen-sammelkarten" element={<DrachenSammelkarten />} />
         <Route path="/vorlagen/morgenroutine" element={<VorlageMorgen />} />
         <Route path="/vorlagen/abendroutine" element={<VorlageAbend />} />
         <Route path="/vorlagen/kleine-geschwister" element={<VorlageKleineGeschwister />} />
         <Route path="/installieren" element={<Installieren />} />
         <Route path="/print/a6-flyer" element={<PrintA6Flyer />} />
         <Route path="/print/a6-flyer-kids" element={<PrintA6FlyerKids />} />
+        <Route path="/print/a6-flyer-kids-hatchling" element={<PrintA6FlyerKidsHatchling />} />
+        <Route path="/print/a6-flyer-kids-card" element={<PrintA6FlyerKidsCard />} />
+        <Route path="/print/a6-flyer-kids-pass" element={<PrintA6FlyerKidsPass />} />
+        <Route path="/print/sheet-a4-kids-card" element={<PrintSheetA4KidsCard />} />
         <Route path="/print/a4-poster" element={<PrintA4Poster />} />
         <Route path="/print/a4-poster-hort" element={<PrintA4PosterHort />} />
         <Route path="/print/a4-poster-baeckerei" element={<PrintA4PosterBaeckerei />} />

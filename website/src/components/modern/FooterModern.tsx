@@ -32,6 +32,18 @@ export function FooterModern() {
               <Link to="/wissenschaft" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
                 Wissenschaft
               </Link>
+              <Link to="/drachen-sammelkarten" className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit">
+                Drachen-Sammelkarten
+              </Link>
+              <a
+                href="https://app.ronki.de/?compendium=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="opacity-75 hover:opacity-100 hover:text-[#c48a3a] transition-colors w-fit inline-flex items-center gap-1.5"
+              >
+                Drachen-Compendium
+                <span aria-hidden className="opacity-60 text-[10px] leading-none">↗</span>
+              </a>
             </nav>
           </div>
           <div>
