@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * SWUpdateBanner — shown at the top of the app when a new service-worker
@@ -21,6 +22,7 @@ import React, { useEffect, useState } from 'react';
  * App.jsx so both sticky strips stack cleanly.
  */
 export default function SWUpdateBanner() {
+  const { t } = useTranslation();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -64,13 +66,13 @@ export default function SWUpdateBanner() {
           aria-hidden
           className="inline-block w-1.5 h-1.5 rounded-full bg-[#FCD34D] shrink-0 animate-pulse"
         />
-        <span className="font-semibold tracking-wide">Neue Version verfügbar</span>
+        <span className="font-semibold tracking-wide">{t('sw.update.title')}</span>
         <button
           type="button"
           onClick={handleReload}
           className="ml-auto shrink-0 rounded-full bg-[#FCD34D] text-[#0F2C2E] font-bold tracking-wide px-3 py-1 text-[11px] hover:brightness-110 transition"
         >
-          Neu laden
+          {t('sw.update.button')}
         </button>
       </div>
     </div>
