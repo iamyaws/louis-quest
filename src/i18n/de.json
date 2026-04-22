@@ -421,8 +421,6 @@
   "game.starcatcher.desc": "Fange die fallenden Sterne!",
   "game.cloudjump.title": "Wolkensprung",
   "game.cloudjump.desc": "Spring von Wolke zu Wolke!",
-  "game.potion.title": "Trank-Labor",
-  "game.potion.desc": "Mische magische Tränke!",
   "game.play": "Spielen",
   "game.back": "Zurück",
   "game.score": "Punkte",
@@ -765,7 +763,6 @@
   "game.cloud.again": "Nochmal",
   "game.cloud.collect": "Stark! Weiter 💪",
 
-  "game.potion.title": "Kräutermischung",
   "game.potion.quit": "Beenden",
   "game.potion.mixTitle": "Mische die Zutaten!",
   "game.potion.choose2": "Wähle 2 Zutaten aus dem Tablett.",
@@ -971,7 +968,6 @@
   "gearslot.body": "Körper",
   "gearslot.accessory": "Accessoire",
 
-  "_todo.arc_audio": "Arc narrator audio TBD: regenerate once Freund voices picked (see voice-samples/). Current MP3s match old long texts.",
   "arc.first.title": "Das erste Abenteuer",
   "arc.first.chapter": "Prolog",
   "arc.first.beats.dream.before": "Hör mal. Ich hab geträumt.",
