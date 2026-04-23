@@ -101,27 +101,82 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
         </div>
       </div>
 
-      {/* "Platz finden" whisper when a type is selected but no position */}
-      {selectedType && !pendingPosition && (
-        <div
-          className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-          style={{
-            top: '40%',
-            padding: '7px 14px',
-            borderRadius: 999,
-            background: 'rgba(18,67,70,.82)',
-            backdropFilter: 'blur(8px)',
-            color: '#fef3c7',
-            font: '700 10px/1 "Plus Jakarta Sans", sans-serif',
-            letterSpacing: '.14em',
-            textTransform: 'uppercase',
-            boxShadow: '0 6px 14px -4px rgba(0,0,0,.4)',
-            border: '1px solid rgba(254,243,199,.25)',
-          }}
-        >
-          ✦ {lang === 'de' ? 'Platz finden' : 'Find a spot'} ✦
-        </div>
-      )}
+      {/* Floating decor ghost — shows the selected item bobbing above
+          a default center spot (or above the pendingPosition once the
+          kid taps). Matches Claude Design Frame 4's .floating-decor +
+          .drop-target + .place-whisper triplet. */}
+      {selectedType && (() => {
+        // Default to mid-scene (matches Claude Design positions) when
+        // the kid hasn't tapped yet. Once they tap, follow that position.
+        const tx = pendingPosition ? pendingPosition.x : 50;
+        const ty = pendingPosition ? pendingPosition.y : 28;
+        return (
+          <>
+            {/* Dashed drop-target ellipse showing WHERE it will land */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                left: `${tx}%`,
+                bottom: `${ty}%`,
+                transform: 'translate(-50%, 50%)',
+                width: 50, height: 14,
+                borderRadius: '50%',
+                background: 'rgba(252,211,77,.18)',
+                border: '2px dashed rgba(254,243,199,.85)',
+                boxShadow: '0 0 18px rgba(252,211,77,.3)',
+                animation: 'g-ring-pulse 1.6s ease-in-out infinite',
+                zIndex: 6,
+              }}
+            />
+            {/* Floating ghost of the selected item, bobbing above target */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                left: `${tx}%`,
+                bottom: `calc(${ty}% + 40px)`,
+                transform: 'translateX(-50%)',
+                filter: 'drop-shadow(0 6px 10px rgba(60,30,5,.4))',
+                animation: 'decor-ghost-bob 2s ease-in-out infinite',
+                zIndex: 7,
+              }}
+            >
+              <DecorPreview type={selectedType} />
+            </div>
+            {/* Place-whisper pill — only until kid taps a spot */}
+            {!pendingPosition && (
+              <div
+                className="absolute pointer-events-none"
+                style={{
+                  left: `${tx}%`,
+                  bottom: `calc(${ty}% + 92px)`,
+                  transform: 'translateX(-50%)',
+                  padding: '7px 14px',
+                  borderRadius: 999,
+                  background: 'rgba(18,67,70,.82)',
+                  backdropFilter: 'blur(8px)',
+                  color: '#fef3c7',
+                  font: '700 10px/1 "Plus Jakarta Sans", sans-serif',
+                  letterSpacing: '.14em',
+                  textTransform: 'uppercase',
+                  boxShadow: '0 6px 14px -4px rgba(0,0,0,.4)',
+                  border: '1px solid rgba(254,243,199,.25)',
+                  whiteSpace: 'nowrap',
+                  zIndex: 8,
+                }}
+              >
+                ✦ {lang === 'de' ? 'Platz finden' : 'Find a spot'} ✦
+              </div>
+            )}
+          </>
+        );
+      })()}
+
+      <style>{`
+        @keyframes decor-ghost-bob {
+          0%,100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(-8px); }
+        }
+      `}</style>
 
       {/* Category rail — vertical on the left */}
       <div

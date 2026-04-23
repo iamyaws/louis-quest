@@ -2,9 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTask } from '../../context/TaskContext';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { getCatStage } from '../../utils/helpers';
 import GardenScene from './GardenScene';
 import PlantSeedSheet from './PlantSeedSheet';
 import DecorPlacement from './DecorPlacement';
+import { makeDemoPlants, makeDemoDecor, DEMO_HINT_SPOTS, AMBIENT_ORBS } from './demoGarden';
 
 /**
  * GardenMode — full-screen garden view (Frame 2 of the v1 mockup).
@@ -38,27 +40,27 @@ export default function GardenMode({ onClose }) {
   // call plantSeed(...)/placeDecor(...) at the captured position.
   const [pendingPosition, setPendingPosition] = useState(null);
 
-  const plants = state?.garden?.plants || [];
-  const decor = state?.garden?.decor || [];
+  const realPlants = state?.garden?.plants || [];
+  const realDecor = state?.garden?.decor || [];
   const ownedDecor = state?.garden?.ownedDecor || [];
 
-  // Hint rings (shown in idle mode, hidden during plant/decor flows).
-  // In v1 we hint at two spots: an empty ground patch for planting
-  // if it's the weekly ritual day, and Ronki himself if a witness
-  // beat is pending (Phase 2 wires the second; v1 shows the first
-  // only when the last weekly planting was more than 6 days ago).
-  const hintSpots = useMemo(() => {
-    if (mode !== 'idle') return [];
-    const hints = [];
-    const last = state?.garden?.lastWeeklyPlanting;
-    const daysSincePlant = last
-      ? Math.floor((Date.now() - new Date(last).getTime()) / 86400000)
-      : 999;
-    if (daysSincePlant >= 6 || plants.length === 0) {
-      hints.push({ x: 50, y: 22 });  // center ground — "plant something here"
-    }
-    return hints;
-  }, [mode, state?.garden?.lastWeeklyPlanting, plants.length]);
+  // Variant-aware chibi props — Ronki renders with the kid's picked
+  // colorway (forest=green, violet=lavender, rose=pink, etc.).
+  const variant = state?.companionVariant || 'amber';
+  const stageIdx = Math.min(3, getCatStage(state?.catEvo ?? 0));
+  const mood = state?.ronkiMood || 'normal';
+
+  // Empty state fallback — when the kid hasn't planted or decorated
+  // anything yet, show pre-arranged demo content so the scene reads
+  // as alive (matches Claude Design v1 Frame 2). Real state takes
+  // over the moment they interact.
+  const plants = realPlants.length > 0 ? realPlants : makeDemoPlants();
+  const decor = realDecor.length > 0 ? realDecor : makeDemoDecor();
+
+  // Hint rings — 3 pre-defined spots marking "tap here to add something."
+  // Always shown in idle mode; hidden during plant/decor flows (the
+  // pendingPosition ghost takes over then).
+  const hintSpots = mode === 'idle' ? DEMO_HINT_SPOTS : [];
 
   // Scene tap handler — in plant/decor mode captures the position
   // where the kid wants to place the item. In idle mode it's inert
@@ -97,17 +99,40 @@ export default function GardenMode({ onClose }) {
           decor={decor}
           showRonki
           ronkiPosition={{
-            left: '32%',
-            bottom: mode === 'plant' ? '30%' : '8%',
-            size: 58,
-            mirror: false,
+            left: '42%',
+            bottom: mode === 'plant' ? '32%' : '4%',
+            size: 72,
           }}
+          ronkiVariant={variant}
+          ronkiStage={stageIdx}
+          ronkiMood={mood}
           showFire
+          firePosition={{ left: '58%', bottom: '8%', scale: 1.05 }}
           showSun
           hintSpots={hintSpots}
           onSceneTap={handleSceneTap}
         >
-          {/* Pending-position marker (ghost circle where the tap landed) */}
+          {/* Ambient gold orbs floating in the sky — atmospheric depth
+              lifted from Claude Design Frame 4. Purely decorative. */}
+          {AMBIENT_ORBS.map((o, i) => (
+            <span
+              key={i}
+              aria-hidden="true"
+              className="g-orb"
+              style={{
+                position: 'absolute',
+                left: `${o.x}%`,
+                bottom: `${o.y}%`,
+                transform: `translate(-50%, 50%) scale(${o.scale})`,
+                animationDelay: `${o.delay}s`,
+                pointerEvents: 'none',
+                zIndex: 2,
+              }}
+            />
+          ))}
+
+          {/* Pending-position marker — dashed drop-target ellipse where
+              the tap landed, matches Claude Design's .drop-target. */}
           {pendingPosition && (
             <div
               style={{
@@ -115,11 +140,11 @@ export default function GardenMode({ onClose }) {
                 left: `${pendingPosition.x}%`,
                 bottom: `${pendingPosition.y}%`,
                 transform: 'translate(-50%, 50%)',
-                width: 34, height: 34,
+                width: 50, height: 14,
                 borderRadius: '50%',
-                border: '2px dashed rgba(254,243,199,.9)',
-                background: 'rgba(252,211,77,.25)',
-                boxShadow: '0 0 14px rgba(252,211,77,.6)',
+                background: 'rgba(252,211,77,.18)',
+                border: '2px dashed rgba(254,243,199,.85)',
+                boxShadow: '0 0 18px rgba(252,211,77,.3)',
                 animation: 'g-ring-pulse 1.6s ease-in-out infinite',
                 pointerEvents: 'none',
                 zIndex: 7,
