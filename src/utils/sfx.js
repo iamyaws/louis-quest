@@ -67,6 +67,28 @@ const SFX = {
         o.type = "sine"; o.frequency.setValueAtTime(180, now); o.frequency.linearRampToValueAtTime(200, now + 0.3);
         g.gain.setValueAtTime(0.15, now); g.gain.linearRampToValueAtTime(0.08, now + 0.15); g.gain.linearRampToValueAtTime(0.15, now + 0.3); g.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
         o.start(now); o.stop(now + 0.5);
+      } else if (type === "sip") {
+        // Watery sip/gulp: a descending low sine (swallow) with a
+        // soft high sine overtone (droplet), both short. Built for the
+        // Hub water pill so the tap feels like a drink, not a click.
+        const gulp = ctx.createOscillator(); const gulpGain = ctx.createGain();
+        gulp.connect(gulpGain); gulpGain.connect(ctx.destination);
+        gulp.type = "sine";
+        gulp.frequency.setValueAtTime(420, now);
+        gulp.frequency.exponentialRampToValueAtTime(160, now + 0.22);
+        gulpGain.gain.setValueAtTime(0.0, now);
+        gulpGain.gain.linearRampToValueAtTime(0.22, now + 0.03);
+        gulpGain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+        gulp.start(now); gulp.stop(now + 0.3);
+
+        const drop = ctx.createOscillator(); const dropGain = ctx.createGain();
+        drop.connect(dropGain); dropGain.connect(ctx.destination);
+        drop.type = "sine";
+        drop.frequency.setValueAtTime(1800, now);
+        drop.frequency.exponentialRampToValueAtTime(900, now + 0.05);
+        dropGain.gain.setValueAtTime(0.14, now);
+        dropGain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+        drop.start(now); drop.stop(now + 0.07);
       } else if (type === "feed") {
         [600, 800, 1000, 1200].forEach((f, i) => {
           const o = ctx.createOscillator(); const g = ctx.createGain();

@@ -102,7 +102,10 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
             </button>
           )}
           {showHp && (
-            <div data-sterne-pill className="flex items-center rounded-full"
+            <button type="button"
+                 onClick={() => onNavigate?.('shop')}
+                 aria-label={lang === 'de' ? 'Zum Laden' : 'Open shop'}
+                 data-sterne-pill className="flex items-center rounded-full active:scale-95 transition-transform"
                  style={{
                    background: 'linear-gradient(180deg, #fff8e1 0%, #fde68a 100%)',
                    border: '1px solid rgba(180,83,9,0.25)',
@@ -122,7 +125,7 @@ export default function TopBar({ onNavigate, view, onOpenParental }) {
                   {lang === 'de' ? 'Sterne' : 'Stars'}
                 </span>
               </div>
-            </div>
+            </button>
           )}
         </div>
       </div>

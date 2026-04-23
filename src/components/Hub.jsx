@@ -571,7 +571,10 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
         {/* HP pill — Polish .hp spec. Tall "N / HELDENPUNKTE" shape,
              cream→amber vertical gradient, 22px pearl, primary-teal
              number + gold-ink label below. Proud score, not chip. */}
-        <div data-sterne-pill className="flex items-center rounded-full shrink-0"
+        <button type="button"
+             onClick={() => onNavigate?.('shop')}
+             aria-label={lang === 'de' ? 'Zum Laden' : 'Open shop'}
+             data-sterne-pill className="flex items-center rounded-full shrink-0 active:scale-95 transition-transform"
              style={{
                background: 'linear-gradient(180deg, #fff8e1 0%, #fde68a 100%)',
                border: '1px solid rgba(180,83,9,0.25)',
@@ -591,7 +594,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
               {lang === 'de' ? 'Sterne' : 'Stars'}
             </span>
           </div>
-        </div>
+        </button>
         </div>
       </header>
 
@@ -928,9 +931,9 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
               type="button"
               onClick={() => {
                 if (!canAdd) return;
-                // Sip feedback: sip sound + light haptic tap. Kid needs
+                // Sip feedback: watery gulp + light haptic tap. Kid needs
                 // confirmation that the tap registered (tester 25 Apr).
-                SFX.play('pop');
+                SFX.play('sip');
                 haptic('confirm');
                 actions.drinkWater?.();
               }}
