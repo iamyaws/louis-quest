@@ -136,7 +136,7 @@ const BOSS_ART = {
 //     dropped from 10-14 → 6 for the 6yo target readability bar.
 // ══════════════════════════════════════════════════════════════════════════
 // eslint-disable-next-line no-unused-vars
-export default function Hub({ onNavigate, onPlayMint }) {
+export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   const { state, computed, actions } = useTask();
   const { done, total, allDone, pct } = computed;
   const { t, lang } = useTranslation();
@@ -244,6 +244,18 @@ export default function Hub({ onNavigate, onPlayMint }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Sticky Tagebuch unlock — flip the persistent flag the first time the
+  // 3-tasks + mood threshold is met, so day-rollover mood resets don't
+  // re-lock the kid out (tester regression 25 Apr 2026).
+  useEffect(() => {
+    if (!state || state.journalEverUnlocked) return;
+    const tasks = state.totalTasksDone || 0;
+    const mood = state.moodAM != null || state.moodPM != null;
+    if (tasks >= 3 && mood) {
+      actions.patchState?.({ journalEverUnlocked: true });
+    }
+  }, [state?.totalTasksDone, state?.moodAM, state?.moodPM, state?.journalEverUnlocked, actions]);
+
   if (!state) return null;
 
   // ── Progressive disclosure — stage-reveal Hub sections by totalTasksDone.
@@ -299,7 +311,12 @@ export default function Hub({ onNavigate, onPlayMint }) {
   const tasksDone = state.totalTasksDone || 0;
   const moodLogged = state.moodAM != null || state.moodPM != null;
   const journalTasksRemaining = Math.max(0, 3 - tasksDone);
-  const journalLocked = !(tasksDone >= 3 && moodLogged);
+  // Sticky unlock: once the kid has met the 3-tasks + mood threshold, the
+  // Tagebuch stays accessible even after the day-rollover wipes moodAM/PM
+  // (regression flagged by tester 25 Apr 2026). Flipping the flag lives
+  // below in a useEffect so it only fires when conditions are first met.
+  const journalEverUnlocked = state.journalEverUnlocked === true;
+  const journalLocked = !(journalEverUnlocked || (tasksDone >= 3 && moodLogged));
   let journalUnlockHint = null;
   if (journalLocked) {
     if (!moodLogged && journalTasksRemaining > 0) {
@@ -528,6 +545,27 @@ export default function Hub({ onNavigate, onPlayMint }) {
           </button>
         </div>
 
+        {/* Right-hand group: parent-area lock + HP pill. The lock lives
+             here (25 Apr 2026) because the previous "shop-only" entry
+             point stranded parents when the Laden tab was still locked.
+             Matches the .parent-btn spec used on TopBar. */}
+        <div className="flex items-center gap-2.5 shrink-0">
+        {onOpenParental && (
+          <button onClick={onOpenParental}
+                  aria-label={lang === 'de' ? 'Eltern-Bereich' : 'Parent area'}
+                  className="flex items-center justify-center active:scale-95 transition-all shrink-0"
+                  style={{
+                    width: 32, height: 32, borderRadius: 10,
+                    background: 'rgba(255,248,242,0.82)',
+                    backdropFilter: 'blur(14px) saturate(160%)',
+                    WebkitBackdropFilter: 'blur(14px) saturate(160%)',
+                    border: '1px solid rgba(18,67,70,0.12)',
+                    color: 'rgba(18,67,70,0.42)',
+                    boxShadow: '0 2px 8px -3px rgba(18,67,70,0.15)',
+                  }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>lock</span>
+          </button>
+        )}
         {/* HP pill — Polish .hp spec. Tall "N / HELDENPUNKTE" shape,
              cream→amber vertical gradient, 22px pearl, primary-teal
              number + gold-ink label below. Proud score, not chip. */}
@@ -551,6 +589,7 @@ export default function Hub({ onNavigate, onPlayMint }) {
               {lang === 'de' ? 'Sterne' : 'Stars'}
             </span>
           </div>
+        </div>
         </div>
       </header>
 

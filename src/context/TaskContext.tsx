@@ -182,6 +182,12 @@ export interface TaskState {
   parentQuestLines?: ParentQuestLine[];
   /** Set once Louis dismisses the parent-zone intro overlay. */
   louisSeenParentIntro?: boolean;
+  /** Sticky Tagebuch unlock. Set the first time the kid met the combined
+   *  3-tasks + mood-logged threshold. Without this, the day-rollover in
+   *  applyDayTransition wipes moodAM/moodPM and the Tagebuch re-locks
+   *  mid-session until the kid logs today's mood — a regression flagged
+   *  by a tester 25 Apr 2026 ("had Tagebuch, lost it again"). */
+  journalEverUnlocked?: boolean;
   /** Entries logged each time Louis uses Gefühlsecke. Tracks feeling patterns for parents (future). */
   feelingsLog?: Array<{ ts: string; feeling: 'gut' | 'wuetend' | 'traurig' | 'aengstlich' | 'muede'; note?: string }>;
   /** MINT game badges Louis has earned (one per game, awarded on first completion). */
@@ -515,6 +521,7 @@ export function createInitialState(): TaskState {
     freundCallbacksPending: [],
     parentQuestLines: [],
     louisSeenParentIntro: false,
+    journalEverUnlocked: false,
     feelingsLog: [],
     mintBadgesEarned: [],
     mintGamesPlayed: [],
@@ -689,6 +696,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           freundCallbacksPending: raw.freundCallbacksPending || [],
           parentQuestLines: raw.parentQuestLines || [],
           louisSeenParentIntro: raw.louisSeenParentIntro ?? false,
+          journalEverUnlocked: raw.journalEverUnlocked ?? false,
           feelingsLog: raw.feelingsLog || [],
           mintBadgesEarned: raw.mintBadgesEarned || [],
           mintGamesPlayed: raw.mintGamesPlayed || [],

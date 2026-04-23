@@ -371,6 +371,7 @@ function AppContent() {
         {view === 'hub' && (
           <Hub
             onNavigate={setView}
+            onOpenParental={() => openPinGate()}
             onPlayMint={(gameId) => {
               setActiveMintGame(gameId);
               setView('mint-game');

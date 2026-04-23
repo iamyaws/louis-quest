@@ -42,9 +42,14 @@ export const TAB_UNLOCKS: TabUnlock[] = [
   },
   {
     tabId: 'journal',
+    // Sticky: once the combined threshold has been met, the Tagebuch stays
+    // open (journalEverUnlocked). Otherwise require today's mood + 3 tasks.
+    // Without stickiness the day-rollover reset of moodAM/PM re-locks the
+    // tab mid-session (tester 25 Apr 2026).
     isUnlocked: (s) =>
-      (s.totalTasksDone || 0) >= 3 &&
-      (s.moodAM != null || s.moodPM != null),
+      s.journalEverUnlocked === true ||
+      ((s.totalTasksDone || 0) >= 3 &&
+        (s.moodAM != null || s.moodPM != null)),
     hintKey: 'nav.lock.journal',
     toastKey: 'nav.unlock.journal',
     coachmarkKey: 'nav.coach.journal',

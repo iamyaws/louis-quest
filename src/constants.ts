@@ -89,7 +89,10 @@ export const REWARDS: Reward[] = [
 export const RAINBOW = ["\u{1F534}", "\u{1F7E0}", "\u{1F7E1}", "\u{1F7E2}", "\u{1F535}", "\u{1F7E3}"] as const;
 export const RAINBOW_LABELS = ["Rot", "Orange", "Gelb", "Gr\u00FCn", "Blau", "Lila"] as const;
 export const RAINBOW_EXAMPLES = ["Tomate, Erdbeere", "Karotte, Orange", "Banane, Paprika", "Brokkoli, Gurke", "Blaubeere", "Traube, Aubergine"] as const;
-export const MOOD_EMOJIS = ["\u{1F622}", "\u{1F615}", "\u{1F610}", "\u{1F642}", "\u{1F60A}", "\u{1F929}"] as const;
+// Mood emojis indexed to MOOD_LABELS ["Traurig","Besorgt","Okay","Gut","Magisch","Müde"].
+// Müde (5) needs a sleepy face; the star-struck emoji it used to carry now
+// sits on "Magisch" where it reads as magical excitement (tester 25 Apr 2026).
+export const MOOD_EMOJIS = ["\u{1F622}", "\u{1F628}", "\u{1F610}", "\u{1F60A}", "\u{1F929}", "\u{1F634}"] as const;
 
 export const SHOP_ITEMS: Record<string, ShopItem[]> = {
   hero: [

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { DEFAULT_BELOHNUNGEN } from '../constants';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -31,6 +31,14 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
   const dailyCapMin = state?.familyConfig?.funkelzeitDailyCapMin ?? 30;
   const usedToday = state?.funkelzeitMinutesToday || 0;
 
+  // Section refs so the two balance cards at the top of the shop act as
+  // scroll-to chips (tester 25 Apr 2026: tapping "Sterne" / "Funkelzeit"
+  // used to do nothing).
+  const familySectionRef = useRef(null);
+  const digitalSectionRef = useRef(null);
+  const scrollToSection = (ref) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const familyRewards = DEFAULT_BELOHNUNGEN.filter(b => b.active && (b.currency || 'hp') === 'hp');
   // Screen-time rewards are hidden entirely when mode === 'none'
   const screenRewards = funkelzeitMode === 'none'
@@ -41,8 +49,9 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
    * Central Funkelzeit-redeem entry: runs the mode-specific gate before
    * committing currency + starting the timer.
    *
-   * - entspannt: start immediately (current behavior)
-   * - normal: open parent-confirm overlay, no cap
+   * - entspannt: parent-confirm overlay (tester 25 Apr 2026 — screen time
+   *   always needs oversight; Familien-Abenteuer already gated)
+   * - normal: parent-confirm overlay, no cap
    * - strikt: check cap; if over, show cap-reached with override; else parent-confirm
    * - none: screen rewards are hidden, so this path never fires
    */
@@ -50,18 +59,14 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
     if (!reward || timerActive) return;
     if (screenMin < reward.cost) return;
 
-    if (funkelzeitMode === 'entspannt') {
-      commitFunkelzeitStart(reward);
-      return;
-    }
-
     if (funkelzeitMode === 'strikt') {
       if (usedToday + reward.minutes > dailyCapMin) {
         setCapReached(reward);
         return;
       }
     }
-    // normal + strikt (under cap) share the parent-confirm flow
+    // All non-'none' modes route through the parent-confirm overlay so the
+    // kid can't redeem screen time without a grown-up in the loop.
     setFunkelzeitConfirm(reward);
   };
 
@@ -310,8 +315,10 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
              (not colored amber/teal) so the line reads as caption, not
              secondary currency. ── */}
       <div className="grid grid-cols-2 gap-2.5">
-        {/* HP Balance */}
-        <div className="relative overflow-hidden"
+        {/* HP Balance — tap to scroll to Family Adventures section */}
+        <button type="button"
+             onClick={() => scrollToSection(familySectionRef)}
+             className="relative overflow-hidden text-left active:scale-[0.98] transition-transform"
              style={{
                padding: '14px 14px 12px',
                borderRadius: 18,
@@ -330,10 +337,12 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
           <p className="font-body" style={{ fontSize: 10, lineHeight: 1.3, color: '#6b655b', opacity: 0.85, marginTop: 2, fontWeight: 600 }}>
             Für Belohnungen aus dem Leben
           </p>
-        </div>
+        </button>
 
-        {/* Screen Minutes Balance */}
-        <div className="relative overflow-hidden"
+        {/* Screen Minutes Balance — tap to scroll to Digital Time section */}
+        <button type="button"
+             onClick={() => scrollToSection(digitalSectionRef)}
+             className="relative overflow-hidden text-left active:scale-[0.98] transition-transform"
              style={{
                padding: '14px 14px 12px',
                borderRadius: 18,
@@ -352,12 +361,12 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
           <p className="font-body" style={{ fontSize: 10, lineHeight: 1.3, color: '#6b655b', opacity: 0.85, marginTop: 2, fontWeight: 600 }}>
             Für Bildschirm-Zeit
           </p>
-        </div>
+        </button>
       </div>
 
       {/* ── Family Adventures (HP currency) ── */}
       {familyRewards.length > 0 && (
-        <div className="flex flex-col" style={{ gap: 10 }}>
+        <div ref={familySectionRef} className="flex flex-col" style={{ gap: 10, scrollMarginTop: 16 }}>
           {/* Section label — Fredoka 500/18px with 4px gold accent bar */}
           <div className="flex items-center" style={{ gap: 10, padding: '0 2px' }}>
             <span style={{ width: 4, height: 18, borderRadius: 2, background: '#b45309' }} />
@@ -413,7 +422,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
              screen content that belongs with the companion, not a third
              economy inside the reward bank. ── */}
       {screenRewards.length > 0 && (
-        <div className="flex flex-col" style={{ gap: 10 }}>
+        <div ref={digitalSectionRef} className="flex flex-col" style={{ gap: 10, scrollMarginTop: 16 }}>
           {/* Section label — teal accent bar */}
           <div className="flex items-center" style={{ gap: 10, padding: '0 2px' }}>
             <span style={{ width: 4, height: 18, borderRadius: 2, background: '#0d9488' }} />
