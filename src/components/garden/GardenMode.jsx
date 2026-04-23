@@ -54,12 +54,14 @@ export default function GardenMode({ onClose }) {
   const stageIdx = getCatStage(state?.catEvo ?? 0);
   const mood = state?.ronkiMood || 'normal';
 
-  // Empty state fallback — when the kid hasn't planted or decorated
-  // anything yet, show pre-arranged demo content so the scene reads
-  // as alive (matches Claude Design v1 Frame 2). Real state takes
-  // over the moment they interact.
-  const plants = realPlants.length > 0 ? realPlants : makeDemoPlants();
-  const decor = realDecor.length > 0 ? realDecor : makeDemoDecor();
+  // Blend logic: demo plants/decor fill in alongside real items until
+  // the kid has built up their own garden. Threshold 5 for both so the
+  // Hub preview + full-screen view carry enough visual weight through
+  // the early weeks. Once 5+ real plants/decor exist, demos retire.
+  // Marc flag 24 Apr 2026 — same blend as GardenPreview for consistency
+  // between the Hub backdrop and the full-screen mode.
+  const plants = realPlants.length >= 5 ? realPlants : [...makeDemoPlants(), ...realPlants];
+  const decor = realDecor.length >= 5 ? realDecor : [...makeDemoDecor(), ...realDecor];
 
   // Hint rings — 3 pre-defined spots marking "tap here to add something."
   // Always shown in idle mode; hidden during plant/decor flows (the

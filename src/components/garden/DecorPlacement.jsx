@@ -230,16 +230,21 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
         })}
       </div>
 
-      {/* Bottom strip — horizontally scrollable decor tiles */}
+      {/* Bottom strip — horizontally scrollable decor tiles.
+          Outer wrapper is pointer-events:none so the scene ground ABOVE
+          the strip stays tappable (Marc flag 24 Apr 2026: "cannot decor
+          or redecor the part under the menu bar"). Only the scrollable
+          strip itself catches clicks for tile selection. */}
       <div
-        className="absolute left-0 right-0 pointer-events-auto"
+        className="absolute left-0 right-0"
         style={{
           bottom: 0,
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          pointerEvents: 'none',
         }}
       >
         <div
-          className="no-scrollbar"
+          className="no-scrollbar pointer-events-auto"
           style={{
             display: 'flex',
             gap: 8,
