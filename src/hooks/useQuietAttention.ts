@@ -38,7 +38,7 @@ export function useQuietAttention(currentView: string): void {
     ) {
       lastFiredRef.current = now;
       // Graceful fallback: VoiceAudio.play() no-ops on missing file or muted state.
-      VoiceAudio.play('de_slowdown_01', 400);
+      VoiceAudio.playLocalized('slowdown_01', 400);
       // Reset the window so we don't fire again immediately on the 4th advance
       timestampsRef.current = [];
     }

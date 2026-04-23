@@ -34,17 +34,17 @@ const STAGES = [
 // doesn't go silent between quadrant transitions. Pool shared across both
 // fire windows, session-local exclusion so we don't hear the same line twice.
 const TEETH_MID_POOL = [
-  'de_teeth_mid_01',    // "Nicht aufhören! Die Ecken hinten sind knifflig."
-  'de_teeth_mid_02',    // "Kreise machen! So klein wie Erbsen."
-  'de_teeth_mid_03',    // "Hmm. Meine Zähne jucken auch..."
-  'de_teeth_mid_04',    // "Denk an die Rückseite!..."
-  'de_teeth_ronki_01',  // "Ich putz auch mit! Drachen-Zahnbürsten..."
-  'de_teeth_ronki_02',  // "Meine Zähne sind klein und spitz..."
-  'de_teeth_ronki_03',  // "Moment — wo ist meine Zahnbürste?..."
+  'teeth_mid_01',    // "Nicht aufhören! Die Ecken hinten sind knifflig."
+  'teeth_mid_02',    // "Kreise machen! So klein wie Erbsen."
+  'teeth_mid_03',    // "Hmm. Meine Zähne jucken auch..."
+  'teeth_mid_04',    // "Denk an die Rückseite!..."
+  'teeth_ronki_01',  // "Ich putz auch mit! Drachen-Zahnbürsten..."
+  'teeth_ronki_02',  // "Meine Zähne sind klein und spitz..."
+  'teeth_ronki_03',  // "Moment — wo ist meine Zahnbürste?..."
 ];
 // Three variants for the final cheer so 3 successive brush sessions don't
 // close on the same line. Randomized per session.
-const TEETH_DONE_POOL = ['de_teeth_done', 'de_teeth_done_02', 'de_teeth_done_03'];
+const TEETH_DONE_POOL = ['teeth_done', 'teeth_done_02', 'teeth_done_03'];
 
 function pickRandom(pool, exclude = null) {
   const choices = exclude ? pool.filter(p => p !== exclude) : pool;
@@ -81,7 +81,7 @@ export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onPa
   const stageIdx = STAGES.indexOf(currentStage);
 
   // Voice on mount
-  useEffect(() => { VoiceAudio.play('de_teeth_start'); }, []);
+  useEffect(() => { VoiceAudio.playLocalized('teeth_start'); }, []);
 
   // Countdown
   useEffect(() => {
@@ -97,8 +97,8 @@ export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onPa
           setFinished(true);
           SFX.play('alarm');
           // Pick a done variant — 3 options so successive sessions close
-          // differently. Falls back to 'de_teeth_done' naturally.
-          VoiceAudio.play(pickRandom(TEETH_DONE_POOL));
+          // differently. Falls back to 'teeth_done' naturally.
+          VoiceAudio.playLocalized(pickRandom(TEETH_DONE_POOL));
           // Was a long 200/100/200ms alarm — shortened to success pattern
           // so the end feels like a "done chime", not an alarm-clock buzz.
           haptic('success');
@@ -116,21 +116,22 @@ export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onPa
           // like repeated punches. Was a single 100ms.
           haptic('tap');
           // Ronki voice for each quadrant — stays stable (spatial guidance).
-          const voiceMap = ['de_teeth_start', 'de_teeth_topright', 'de_teeth_bottomleft', 'de_teeth_bottomright'];
-          if (voiceMap[newIdx]) VoiceAudio.play(voiceMap[newIdx]);
+          // Base IDs (no lang prefix) — playLocalized resolves de_ / en_ at play.
+          const voiceMap = ['teeth_start', 'teeth_topright', 'teeth_bottomleft', 'teeth_bottomright'];
+          if (voiceMap[newIdx]) VoiceAudio.playLocalized(voiceMap[newIdx]);
         }
         // Mid-session encouragement — fire once early, once late. Picked
         // on mount into midLinesRef, exclusion-pair so we never hear the
         // same line twice in one session.
         if (elapsed === earlyMidTick && midLinesRef.current.early) {
-          VoiceAudio.play(midLinesRef.current.early);
+          VoiceAudio.playLocalized(midLinesRef.current.early);
         }
         if (elapsed === lateMidTick && midLinesRef.current.late) {
-          VoiceAudio.play(midLinesRef.current.late);
+          VoiceAudio.playLocalized(midLinesRef.current.late);
         }
         // Halfway voice
         if (prev === Math.floor(duration / 2) + 1) {
-          VoiceAudio.play('de_teeth_halfway');
+          VoiceAudio.playLocalized('teeth_halfway');
         }
         return prev - 1;
       });

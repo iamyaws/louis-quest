@@ -37,7 +37,7 @@ export default function CreatureDiscoveryToast({ creatureId, onDismiss, onOpenDe
   useEffect(() => {
     if (!creatureId) return;
     setVisible(true);
-    VoiceAudio.play('de_discover_creature', 500);
+    VoiceAudio.playLocalized('discover_creature', 500);
   }, [creatureId]);
 
   const label = useMemo(() => {

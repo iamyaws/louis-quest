@@ -62,10 +62,10 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
           clearInterval(intervalRef.current);
           setFinished(true);
           SFX.play('alarm');
-          VoiceAudio.play('de_screen_done');
+          VoiceAudio.playLocalized('screen_done');
           if (!fired.has('done')) {
             fired.add('done');
-            VoiceAudio.play('de_screentime_done_01', 0);
+            VoiceAudio.playLocalized('screentime_done_01', 0);
           }
           // Was a long 200/100/200/100/200ms alarm — now a short success
           // pattern so the buzz reads as "done" instead of alarm-clock startle.
@@ -75,31 +75,31 @@ export default function ScreenTimer({ totalSeconds, cost, rewardName, onFinish, 
         }
         // Ronki voice milestones
         const halfPoint = Math.floor(totalSeconds / 2);
-        if (prev === halfPoint) VoiceAudio.play('de_screen_half');
-        if (prev === 300) VoiceAudio.play('de_screen_5min');  // 5 min left
-        if (prev === 120) VoiceAudio.play('de_screen_2min');  // 2 min left
-        if (prev === 60) VoiceAudio.play('de_screen_1min');   // 1 min left
+        if (prev === halfPoint) VoiceAudio.playLocalized('screen_half');
+        if (prev === 300) VoiceAudio.playLocalized('screen_5min');  // 5 min left
+        if (prev === 120) VoiceAudio.playLocalized('screen_2min');  // 2 min left
+        if (prev === 60) VoiceAudio.playLocalized('screen_1min');   // 1 min left
 
         // Threshold-based ramp-down voice alerts (ref-deduped per session)
         // 50% threshold — only for sessions >= 10 min, so short redemptions skip it
         if (!fired.has('50') && totalSeconds >= 600 && prev <= totalSeconds * 0.5) {
           fired.add('50');
-          VoiceAudio.play('de_screentime_50_01', 0);
+          VoiceAudio.playLocalized('screentime_50_01', 0);
         }
         // 20% threshold
         if (!fired.has('20') && prev <= totalSeconds * 0.2) {
           fired.add('20');
-          VoiceAudio.play('de_screentime_20_01', 0);
+          VoiceAudio.playLocalized('screentime_20_01', 0);
         }
         // 10% / last minute — fires when under 60s remaining
         if (!fired.has('10') && prev <= 60) {
           fired.add('10');
-          VoiceAudio.play('de_screentime_10_01', 0);
+          VoiceAudio.playLocalized('screentime_10_01', 0);
         }
         // Eye care reminders every 10 minutes
         if (prev > 60 && prev % 600 === 0) {
-          const eyeLines = ['de_screen_eyes', 'de_screen_eyes2', 'de_screen_eyes3'];
-          VoiceAudio.play(eyeLines[Math.floor(Math.random() * eyeLines.length)]);
+          const eyeLines = ['screen_eyes', 'screen_eyes2', 'screen_eyes3'];
+          VoiceAudio.playLocalized(eyeLines[Math.floor(Math.random() * eyeLines.length)]);
         }
         // Warning tick in last 60 seconds
         if (prev <= 61 && prev > 1 && prev % 10 === 0 && !warningPlayed.current) {

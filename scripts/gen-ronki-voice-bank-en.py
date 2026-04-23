@@ -114,6 +114,115 @@ EN_LINES = {
     'en_arc_cooldown_01': 'I am still resting. But your routines keep me warm.',
     'en_arc_cooldown_02': 'Phew, that was an adventure. I need a little sleep. See you soon!',
     'en_arc_active_01':   'We are in the middle of an adventure. Check the banner up top!',
+
+    # ── Identity language (parity pass 2026-04-25) ──
+    'en_identity_01': 'I told the fireflies you always brush your teeth. They were so impressed!',
+    'en_identity_02': 'The butterflies say you\u2019re the bravest hero they know.',
+    'en_identity_03': 'You know what? You\u2019re someone who can be counted on. I\u2019ve noticed that.',
+    'en_identity_04': 'The meadow tells stories about you. All good ones!',
+
+    # ── Mood-aware ──
+    'en_mood_sad_01':     'Hey... I\u2019m a bit quiet today too. Want to just sit together?',
+    'en_mood_sad_02':     'Some days are just like this. I\u2019m here.',
+    'en_mood_sad_03':     'I saw you. You\u2019re strong, even when it doesn\u2019t feel that way.',
+    'en_mood_sad_04':     'Know what helps? A hug. I can\u2019t really give one \u2014 but imagine one, okay?',
+    'en_mood_tired_01':   'I\u2019m yawning too. Let\u2019s take it slow today.',
+    'en_mood_tired_02':   'Being tired is okay. Then we rest.',
+    'en_mood_happy_01':   'Wow! You\u2019re glowing today! What happened?',
+    'en_mood_happy_02':   'I can feel your good mood. It\u2019s catching!',
+    'en_mood_happy_03':   'Such a bright day inside you! Take me along?',
+    'en_mood_okay_01':    'Somewhere-in-between is good too. Not every day has to sparkle.',
+    'en_mood_worried_01': 'Did something happen? You can tell me \u2014 or just be here.',
+    'en_mood_worried_02': 'I\u2019ll be quiet. Makes the head clearer.',
+
+    # ── Trait-gated ──
+    'en_trait_brave_01':    'You\u2019re someone who doesn\u2019t give up. I know that now.',
+    'en_trait_brave_02':    'Brave isn\u2019t being fearless. Brave is doing it anyway. That\u2019s you.',
+    'en_trait_gentle_01':   'Your calm is good for everyone. Me too.',
+    'en_trait_patient_01':  'You wait patiently \u2014 not everyone can. I\u2019m learning from you.',
+    'en_trait_mapmaker_01': 'The Explorer\u2019s back! What will you find today?',
+    'en_trait_curious_01':  'You always ask the best questions. What are you wondering today?',
+    'en_trait_multi_01':    'You have so many strengths already. You\u2019re going to be a great hero.',
+
+    # ── All-done celebration ──
+    'en_alldone_01': 'Everything! You did EVERYTHING! I might actually burst with pride!',
+    'en_alldone_02': 'Woohoo! Today was your day! Every single task \u2014 done!',
+    'en_alldone_03': 'Look! My scales are glittering. That only happens when you finish it all.',
+    'en_alldone_04': 'I\u2019m dancing! Look, I\u2019m dancing! We did it!',
+    'en_alldone_05': 'Today was such a good day. I was with you for every bit of it.',
+    'en_alldone_06': 'The fireflies are going to be so excited \u2014 I\u2019ve got to tell them everything!',
+    'en_alldone_07': 'You\u2019re my favourite person today. Okay, always. But especially today.',
+    'en_alldone_08': 'Done! Now we\u2019re both allowed to be tired. Tired together is the best kind.',
+
+    # ── Freund-met ──
+    'en_freund_met_01': 'A new friend! Look, look! They look so interesting!',
+    'en_freund_met_02': 'Oh! I\u2019ve met them before, I think. Or maybe not. Either way!',
+    'en_freund_met_03': 'Hi, new friend! We\u2019re glad to meet you.',
+    'en_freund_met_04': 'My heart is going thumpthumpthump. That happens with new friends.',
+    'en_freund_met_05': 'Come here. We have so much to tell.',
+    'en_freund_met_06': 'Phew! So many new names. Good thing you help me remember them.',
+}
+
+# Direct-play lines — played from feature code by ID, not via engine pick.
+# When a user is in EN mode, the feature code calls playLocalized(baseId)
+# which resolves to en_{baseId}; this dict is the EN side of that pair.
+DIRECT_PLAY_EN = {
+    # ── Stamina (MiniGames) ──
+    'en_stamina_low_01':       'Phew, I\u2019m getting tired of flying. But one more\u2019s okay, I think.',
+    'en_stamina_exhausted_01': 'I\u2019m all pooped out. Can you play without me for a bit?',
+    'en_stamina_restored_01':  'All rested! Let\u2019s get going again.',
+
+    # ── Screen timer ──
+    'en_screen_start': 'Your Sparkle Time\u2019s going. Have fun!',
+    'en_screen_half':  'Halfway through your time. All good?',
+    'en_screen_5min':  'Five minutes left. Let it wind down nicely.',
+    'en_screen_2min':  'Just two minutes left. Almost time to put it down.',
+    'en_screen_1min':  'One minute. Final stretch!',
+    'en_screen_done':  'Time\u2019s up. Great job \u2014 see you soon!',
+    'en_screen_eyes':  'Look away for a sec. Eyes want a break too.',
+    'en_screen_eyes2': 'Blink. Window, wall, far away.',
+    'en_screen_eyes3': 'Don\u2019t forget to blink.',
+
+    # ── Screentime tier milestones ──
+    'en_screentime_50_01':   'We still have a bit of time together. What feels fun?',
+    'en_screentime_20_01':   'Our time\u2019s almost up. Want to do something special with it?',
+    'en_screentime_10_01':   'One minute, then we pause. You\u2019re doing great.',
+    'en_screentime_done_01': 'Great job! See you later.',
+
+    # ── Tooth brushing timeline ──
+    'en_teeth_start':       'Brush time! We start top-left.',
+    'en_teeth_topright':    'Top right. Small circles.',
+    'en_teeth_bottomleft':  'Now bottom left.',
+    'en_teeth_bottomright': 'Last corner. Bottom right.',
+    'en_teeth_halfway':     'Halfway through. You\u2019re doing great.',
+    'en_teeth_done':        'Done! Super clean.',
+
+    # ── Brushing — mid-session variety (parallel to de_teeth_mid_*) ──
+    'en_teeth_mid_01':      'Don\u2019t stop! The back corners are tricky.',
+    'en_teeth_mid_02':      'Tiny circles! Pea-sized.',
+    'en_teeth_mid_03':      'Hmm. My teeth are itchy too. Maybe we should both brush.',
+    'en_teeth_mid_04':      'Don\u2019t forget the back! The brush is happy for every corner.',
+
+    # ── Brushing — Ronki brushes too ──
+    'en_teeth_ronki_01':    'I\u2019m brushing too! Dragon toothbrushes are a special kind.',
+    'en_teeth_ronki_02':    'My teeth are tiny and sharp. But I still have to brush.',
+    'en_teeth_ronki_03':    'Wait \u2014 where\u2019s my toothbrush? Ah, under the rock.',
+
+    # ── Brushing — done variants ──
+    'en_teeth_done_02':     'Done! I can see your teeth glitter from here.',
+    'en_teeth_done_03':     'Two minutes done! That\u2019s longer than I can hold my breath.',
+
+    # ── Journal ──
+    'en_journal_done_01': 'You wrote that beautifully.',
+    'en_journal_done_02': 'Your day sounds like something good.',
+    'en_journal_done_03': 'Thanks for sharing. I\u2019ll remember that.',
+
+    # ── Discovery ──
+    'en_discover_creature': 'Look! A new friend! Let\u2019s get to know them.',
+
+    # ── Egg (feature currently paused) ──
+    'en_egg_found': 'Oh! An egg! Where did that come from?',
+    'en_egg_hatch': 'It\u2019s moving! Something\u2019s about to happen!',
 }
 
 # Umlaut-heavy smoke-test isn't relevant for EN. Small 3-line sanity check
@@ -235,8 +344,10 @@ def main():
 
     if not args.smoke and not args.full:
         print(f'EN Ronki voice bank — {VOICE_NAME}')
-        print(f'  Total lines: {len(EN_LINES)}')
-        print(f'  Smoke subset: {len(SMOKE_IDS)}')
+        print(f'  Engine lines:  {len(EN_LINES)}')
+        print(f'  Direct-play:   {len(DIRECT_PLAY_EN)}')
+        print(f'  Total:         {len(EN_LINES) + len(DIRECT_PLAY_EN)}')
+        print(f'  Smoke subset:  {len(SMOKE_IDS)}')
         print('\nRun with --smoke first, then --full.')
         return
 
@@ -249,7 +360,12 @@ def main():
         return
 
     if args.full:
-        run_batch(api_key, EN_LINES, 'EN VOICE BANK', skip_existing=args.skip_existing)
+        skip = args.skip_existing
+        ok1, fail1 = run_batch(api_key, EN_LINES, 'ENGINE-ROUTED LINES (EN)', skip_existing=skip)
+        ok2, fail2 = run_batch(api_key, DIRECT_PLAY_EN, 'DIRECT-PLAY LINES (EN)', skip_existing=skip)
+        total_ok = ok1 + ok2
+        total_fail = fail1 + fail2
+        print(f'\n━━━ Full EN batch: {total_ok} ok, {total_fail} failed ━━━')
 
 
 if __name__ == '__main__':

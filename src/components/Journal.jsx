@@ -92,8 +92,8 @@ export default function Journal({ onNavigate, onOpenParental }) {
     track('journal.write');
     // Actual book close SFX (not Ronki's voice) + delayed Ronki encouragement
     SFX.play('pop');
-    const encouragements = ['de_journal_done_01', 'de_journal_done_02', 'de_journal_done_03'];
-    setTimeout(() => VoiceAudio.play(encouragements[Math.floor(Math.random() * encouragements.length)]), 800);
+    const encouragements = ['journal_done_01', 'journal_done_02', 'journal_done_03'];
+    setTimeout(() => VoiceAudio.playLocalized(encouragements[Math.floor(Math.random() * encouragements.length)]), 800);
     // v3 Zuklapp-Feier: show the celebration overlay first, then bookOpen
     // flips only when the child taps "Schön!". Keeps the ritual felt.
     setOverlayOpen(true);

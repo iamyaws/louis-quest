@@ -14,6 +14,9 @@
 
 const MUTE_KEY = 'ronki_voice_mute';
 const NARRATOR_MUTE_KEY = 'ronki_narrator_mute';
+// Mirrors src/i18n/LanguageContext STORAGE_KEY — duplicated here to avoid
+// a circular import from a singleton util into a React context.
+const LANG_STORAGE_KEY = 'ronki-lang';
 const BASE = import.meta.env.BASE_URL;
 
 let currentAudio: HTMLAudioElement | null = null;
@@ -24,6 +27,21 @@ function readNarratorMuted(): boolean {
   // Default is muted. Explicit '0' = unmuted. Keeps the rollout safe: any
   // device without the key gets the new quiet behaviour automatically.
   return localStorage.getItem(NARRATOR_MUTE_KEY) !== '0';
+}
+
+/**
+ * Read the current UI language from localStorage. Returns 'de' (default)
+ * or 'en'. Used by playLocalized to pick the right audio file at play time
+ * without making every feature component take a lang prop.
+ */
+function readLang(): 'de' | 'en' {
+  if (typeof localStorage === 'undefined') return 'de';
+  try {
+    const raw = localStorage.getItem(LANG_STORAGE_KEY);
+    return raw === 'en' ? 'en' : 'de';
+  } catch {
+    return 'de';
+  }
 }
 
 const VoiceAudio = {
@@ -81,6 +99,23 @@ const VoiceAudio = {
       currentAudio = audio;
     };
     delayTimer = setTimeout(doPlay, delayMs);
+  },
+
+  /**
+   * Play a voice line by base ID, prefixing with the current UI language.
+   *
+   * Example: `playLocalized('teeth_start')` plays `de_teeth_start.mp3` in
+   * German mode, `en_teeth_start.mp3` in English mode. Added in the
+   * 2026-04-25 EN parity pass so feature code (ToothbrushTimer, MiniGames,
+   * ScreenTimer, CreatureDiscoveryToast, Journal) doesn't need to be lang-
+   * aware — every direct-play call site uses the base ID and we route here.
+   *
+   * Callers that already know the full ID (e.g. engine-picked line IDs from
+   * `useVoice`) should keep using `play()` directly.
+   */
+  playLocalized(baseId: string, delayMs = 0) {
+    if (!baseId) return;
+    this.play(`${readLang()}_${baseId}`, delayMs);
   },
 
   /** Play a voice line by its ID (e.g., 'de_greet_01') */

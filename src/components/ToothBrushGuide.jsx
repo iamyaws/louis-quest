@@ -31,12 +31,12 @@ import PinModal from './PinModal';
  */
 
 const ZONES = [
-  { id: 'top-right-out', label: 'Oben rechts außen',        motion: 'Kleine Kreise',       seconds: 30, voiceId: 'de_brush_zone_1' },
-  { id: 'top-left-out',  label: 'Oben links außen',         motion: 'Kleine Kreise',       seconds: 30, voiceId: 'de_brush_zone_2' },
-  { id: 'top-back',      label: 'Oben hinten (Kauflächen)', motion: 'Rauf und runter',     seconds: 30, voiceId: 'de_brush_zone_3' },
-  { id: 'bot-right-out', label: 'Unten rechts außen',       motion: 'Kleine Kreise',       seconds: 30, voiceId: 'de_brush_zone_4' },
-  { id: 'bot-left-out',  label: 'Unten links außen',        motion: 'Kleine Kreise',       seconds: 30, voiceId: 'de_brush_zone_5' },
-  { id: 'tongue',        label: 'Zunge',                    motion: 'Sanft abbürsten',     seconds: 30, voiceId: 'de_brush_zone_6' },
+  { id: 'top-right-out', label: 'Oben rechts außen',        motion: 'Kleine Kreise',       seconds: 30, voiceId: 'brush_zone_1' },
+  { id: 'top-left-out',  label: 'Oben links außen',         motion: 'Kleine Kreise',       seconds: 30, voiceId: 'brush_zone_2' },
+  { id: 'top-back',      label: 'Oben hinten (Kauflächen)', motion: 'Rauf und runter',     seconds: 30, voiceId: 'brush_zone_3' },
+  { id: 'bot-right-out', label: 'Unten rechts außen',       motion: 'Kleine Kreise',       seconds: 30, voiceId: 'brush_zone_4' },
+  { id: 'bot-left-out',  label: 'Unten links außen',        motion: 'Kleine Kreise',       seconds: 30, voiceId: 'brush_zone_5' },
+  { id: 'tongue',        label: 'Zunge',                    motion: 'Sanft abbürsten',     seconds: 30, voiceId: 'brush_zone_6' },
 ];
 
 export default function ToothBrushGuide({ onFinish, onCancel, onParentOverride }) {
@@ -68,14 +68,14 @@ export default function ToothBrushGuide({ onFinish, onCancel, onParentOverride }
     if (zoneSecondsLeft <= 0) {
       if (zoneIdx + 1 >= ZONES.length) {
         // Final zone done — play completion line, then finish
-        VoiceAudio.play('de_brush_done_01');
+        VoiceAudio.playLocalized('brush_done_01');
         SFX.play('chime');
         onFinish?.();
         return;
       }
       const nextIdx = zoneIdx + 1;
       // Audio cue for the new zone — voice line (if audio exists) + SFX beep fallback
-      VoiceAudio.play(ZONES[nextIdx].voiceId);
+      VoiceAudio.playLocalized(ZONES[nextIdx].voiceId);
       SFX.play('pop');
       setZoneIdx(nextIdx);
       setZoneSecondsLeft(ZONES[nextIdx].seconds);

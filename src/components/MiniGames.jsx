@@ -110,11 +110,11 @@ export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
     const now = Date.now();
     if (now - lastStaminaVoiceMs < STAMINA_VOICE_COOLDOWN_MS) return;
     if (stamina.exhausted) {
-      VoiceAudio.play('de_stamina_exhausted_01', 600);
+      VoiceAudio.playLocalized('stamina_exhausted_01', 600);
       voiceFiredRef.current = true;
       lastStaminaVoiceMs = now;
     } else if (stamina.low) {
-      VoiceAudio.play('de_stamina_low_01', 800);
+      VoiceAudio.playLocalized('stamina_low_01', 800);
       voiceFiredRef.current = true;
       lastStaminaVoiceMs = now;
     }
