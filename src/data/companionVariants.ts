@@ -61,7 +61,7 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     id: 'amber',
     name: { de: 'Bernstein-Ronki', en: 'Amber Ronki' },
     // Warm orange/gold — campfire, sunrise, honey.
-    eggGradient: 'linear-gradient(160deg, #fde68a 0%, #f59e0b 55%, #b45309 100%)',
+    eggGradient: 'linear-gradient(160deg, #fde68a 0%, #f59e0b 55%, #A83E2C 100%)',
     glowColor: 'rgba(245,158,11,0.35)',
     borderColor: '#f59e0b',
     spritePath: 'art/companion/dragon-young.webp',

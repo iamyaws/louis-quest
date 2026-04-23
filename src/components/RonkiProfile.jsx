@@ -74,7 +74,7 @@ const MOOD_CARD_BORDER = {
   sad:    'rgba(90,115,150,0.22)',
   tired:  'rgba(93,125,148,0.22)',
 };
-const MOOD_CARD_INK = { normal: '#b45309', sad: '#2f3d5a', tired: '#26333c' };
+const MOOD_CARD_INK = { normal: '#A83E2C', sad: '#2f3d5a', tired: '#26333c' };
 const MOOD_CARD_HEAD = { normal: '#124346', sad: '#1f2d47', tired: '#1a2530' };
 const MOOD_CARD_SUB = { normal: 'rgba(18,67,70,0.72)', sad: 'rgba(47,61,90,0.78)', tired: 'rgba(38,51,60,0.78)' };
 
@@ -784,7 +784,7 @@ export default function RonkiProfile({ onNavigate }) {
                    echoes the icon color at low opacity. */}
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: lang === 'de' ? 'Spezies' : 'Species', value: FACTS.species[lang] || FACTS.species.de, icon: 'pets',       tint: '#b45309', bg: 'rgba(245,158,11,0.08)' },
+                  { label: lang === 'de' ? 'Spezies' : 'Species', value: FACTS.species[lang] || FACTS.species.de, icon: 'pets',       tint: '#A83E2C', bg: 'rgba(245,158,11,0.08)' },
                   { label: lang === 'de' ? 'Größe'   : 'Height',  value: FACTS.heights[stage],                    icon: 'straighten', tint: '#0369a1', bg: 'rgba(14,165,233,0.08)' },
                   { label: lang === 'de' ? 'Mag'     : 'Likes',   value: FACTS.likes[lang] || FACTS.likes.de,     icon: 'favorite',   tint: '#be185d', bg: 'rgba(236,72,153,0.08)' },
                   { label: lang === 'de' ? 'Talent'  : 'Talent',  value: FACTS.talent[lang] || FACTS.talent.de,   icon: 'local_fire_department', tint: '#c2410c', bg: 'rgba(249,115,22,0.08)' },
@@ -934,7 +934,7 @@ export default function RonkiProfile({ onNavigate }) {
                         <span style={{
                           fontFamily: 'Plus Jakarta Sans, sans-serif',
                           fontWeight: 800, fontSize: 12, lineHeight: 1,
-                          color: '#b45309',
+                          color: '#A83E2C',
                           textAlign: 'right',
                         }}>
                           {score}
@@ -1118,7 +1118,7 @@ export default function RonkiProfile({ onNavigate }) {
                     </div>
                     {!a.state && (
                       <span className="flex items-center gap-1 font-label font-bold shrink-0"
-                            style={{ fontSize: 12, color: '#b45309' }}>
+                            style={{ fontSize: 12, color: '#A83E2C' }}>
                         <Pearl size={12} />+{a.reward}
                       </span>
                     )}
@@ -1449,7 +1449,7 @@ export default function RonkiProfile({ onNavigate }) {
                       boxShadow: '0 2px 6px rgba(120,53,15,0.18)',
                     }}>
                       <span className="material-symbols-outlined"
-                            style={{ fontSize: 24, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                            style={{ fontSize: 24, color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>
                         sports_esports
                       </span>
                     </div>
@@ -1477,7 +1477,7 @@ export default function RonkiProfile({ onNavigate }) {
                        border: '1.5px dashed rgba(245,158,11,0.5)',
                      }}>
                   <span className="material-symbols-outlined block mb-2"
-                        style={{ fontSize: 36, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                        style={{ fontSize: 36, color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>
                     lock
                   </span>
                   <b className="font-headline block mb-1" style={{ fontSize: 16, color: '#124346' }}>
@@ -1622,12 +1622,12 @@ function ChronikCta({ state, lang, onNavigate }) {
         <span aria-hidden="true" style={{
           position: 'absolute', left: 0, top: 0, bottom: 0,
           width: 4,
-          background: 'linear-gradient(180deg, #fcd34d, #b45309)',
+          background: 'linear-gradient(180deg, #fcd34d, #A83E2C)',
         }} />
         <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
              style={{ background: 'rgba(245,158,11,0.1)' }}>
           <span className="material-symbols-outlined"
-                style={{ fontSize: 18, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                style={{ fontSize: 18, color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>
             menu_book
           </span>
         </div>
@@ -1682,7 +1682,7 @@ function ChronikCta({ state, lang, onNavigate }) {
       <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 relative"
            style={{ background: '#fff', border: '2px solid rgba(120,53,15,0.15)', boxShadow: '0 2px 8px rgba(120,53,15,0.12)', zIndex: 2 }}>
         <span className="material-symbols-outlined"
-              style={{ fontSize: 24, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+              style={{ fontSize: 24, color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>
           auto_stories
         </span>
       </div>
@@ -1701,7 +1701,7 @@ function ChronikCta({ state, lang, onNavigate }) {
       </div>
       <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 relative"
            style={{ background: '#fff', border: '2px solid rgba(120,53,15,0.15)', zIndex: 2 }}>
-        <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#b45309' }}>
+        <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#A83E2C' }}>
           chevron_right
         </span>
       </div>
@@ -1776,7 +1776,7 @@ function ErinnerungenList({ state, lang, t, onNavigate }) {
             : (lang === 'de' ? 'Eure Geschichte' : 'Your story')}
         </b>
         <span className="font-label font-bold uppercase tracking-widest"
-              style={{ fontSize: 10, color: '#b45309' }}>
+              style={{ fontSize: 10, color: '#A83E2C' }}>
           {entries.length} {entries.length === 1
             ? (lang === 'de' ? 'Erinnerung' : 'memory')
             : (lang === 'de' ? 'Erinnerungen' : 'memories')}
@@ -1800,7 +1800,7 @@ function ErinnerungenList({ state, lang, t, onNavigate }) {
         }}>
         <div style={{
           width: 44, height: 44, borderRadius: 14,
-          background: 'linear-gradient(135deg, #fcd34d, #b45309)',
+          background: 'linear-gradient(135deg, #fcd34d, #A83E2C)',
           display: 'grid', placeItems: 'center', flexShrink: 0,
           boxShadow: '0 3px 8px -3px rgba(180,83,9,0.4)',
         }}>
@@ -1820,7 +1820,7 @@ function ErinnerungenList({ state, lang, t, onNavigate }) {
           </span>
         </div>
         <span className="material-symbols-outlined"
-              style={{ fontSize: 22, color: '#b45309' }}>
+              style={{ fontSize: 22, color: '#A83E2C' }}>
           chevron_right
         </span>
       </button>
@@ -1829,7 +1829,7 @@ function ErinnerungenList({ state, lang, t, onNavigate }) {
         <div className="rounded-2xl p-6 text-center"
              style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.1)' }}>
           <span className="material-symbols-outlined block mb-2"
-                style={{ fontSize: 32, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                style={{ fontSize: 32, color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>
             auto_stories
           </span>
           <b className="font-headline block mb-1" style={{ fontSize: 15, color: '#124346' }}>

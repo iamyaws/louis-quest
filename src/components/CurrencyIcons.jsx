@@ -21,7 +21,7 @@ export function Star({ size = 24, dark = false, className = "" }) {
   const highlightOpacity = dark ? 0.65 : 0.75;
   const gradStops = dark
     ? { inner: "#fef3c7", mid: "#efb752", outer: "#92400e" }
-    : { inner: "#fef3c7", mid: "#f5c06a", outer: "#b45309" };
+    : { inner: "#fef3c7", mid: "#f5c06a", outer: "#A83E2C" };
 
   // Classic 5-point star, centered at (12,12), outer radius ~8.5, inner ~3.6.
   // Points start at top and rotate 72° around.

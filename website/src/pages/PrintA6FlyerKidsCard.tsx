@@ -580,7 +580,7 @@ export const cardCss = `
   }
   .dot.on {
     background: #FCD34D;
-    box-shadow: inset 0 0 0 0.3mm #B45309;
+    box-shadow: inset 0 0 0 0.3mm #A83E2C;
   }
   .dot.off {
     background: transparent;
@@ -740,7 +740,7 @@ export const cardCss = `
     color: #1A3C3F;
     line-height: 1.25;
   }
-  .bstep-text strong { color: #B45309; font-weight: 800; }
+  .bstep-text strong { color: #A83E2C; font-weight: 800; }
 
   /* QR row */
   .back-qr-row {

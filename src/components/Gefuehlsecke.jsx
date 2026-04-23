@@ -96,7 +96,7 @@ function Picker({ onPick }) {
     <div className="px-6 pt-10 pb-8 flex flex-col items-center">
       <p
         className="font-bold text-xs font-label uppercase tracking-[0.22em]"
-        style={{ color: '#b45309' }}
+        style={{ color: '#A83E2C' }}
       >
         Gefühlsecke
       </p>
@@ -245,7 +245,7 @@ function WuetendFlow({ onClose }) {
 
   return (
     <div className="px-6 pt-12 pb-8 flex flex-col items-center text-center">
-      <p className="font-bold text-xs font-label uppercase tracking-[0.22em]" style={{ color: '#b45309' }}>
+      <p className="font-bold text-xs font-label uppercase tracking-[0.22em]" style={{ color: '#A83E2C' }}>
         Box-Atmung
       </p>
       <h3
@@ -421,7 +421,7 @@ function AengstlichFlow({ onClose }) {
     <div className="px-2 pt-8 pb-4">
       <p
         className="font-bold text-xs font-label uppercase tracking-[0.22em] text-center"
-        style={{ color: '#b45309' }}
+        style={{ color: '#A83E2C' }}
       >
         Baum-Pose
       </p>

@@ -80,7 +80,7 @@ export default function PrintA6FlyerKidsHatchling() {
                    L 152 118 L 143 128 L 133 116 L 122 126 L 112 114
                    L 100 124 L 90 112 L 80 122 L 70 110 L 60 120 L 50 108 L 40 130 Z"
                 fill="url(#eggFill)"
-                stroke="#B45309"
+                stroke="#A83E2C"
                 strokeWidth="1.2"
                 strokeLinejoin="round"
               />
@@ -89,11 +89,11 @@ export default function PrintA6FlyerKidsHatchling() {
                 fill="url(#eggShade)"
               />
               {/* Speckles */}
-              <circle cx="66" cy="150" r="2.5" fill="#B45309" opacity="0.6" />
-              <circle cx="90" cy="165" r="1.8" fill="#B45309" opacity="0.5" />
-              <circle cx="118" cy="150" r="2.2" fill="#B45309" opacity="0.55" />
-              <circle cx="140" cy="170" r="1.6" fill="#B45309" opacity="0.5" />
-              <circle cx="76" cy="175" r="1.4" fill="#B45309" opacity="0.4" />
+              <circle cx="66" cy="150" r="2.5" fill="#A83E2C" opacity="0.6" />
+              <circle cx="90" cy="165" r="1.8" fill="#A83E2C" opacity="0.5" />
+              <circle cx="118" cy="150" r="2.2" fill="#A83E2C" opacity="0.55" />
+              <circle cx="140" cy="170" r="1.6" fill="#A83E2C" opacity="0.5" />
+              <circle cx="76" cy="175" r="1.4" fill="#A83E2C" opacity="0.4" />
             </svg>
 
             <img
@@ -109,13 +109,13 @@ export default function PrintA6FlyerKidsHatchling() {
               <path
                 d="M4 32 L 14 14 L 22 26 L 32 10 L 42 24 L 54 8"
                 fill="none"
-                stroke="#B45309"
+                stroke="#A83E2C"
                 strokeWidth="1.2"
               />
               <path
                 d="M4 32 C 12 36, 46 36, 54 32 Q 54 30, 52 28 L 4 32"
                 fill="#FDE589"
-                stroke="#B45309"
+                stroke="#A83E2C"
                 strokeWidth="1.2"
               />
             </svg>
@@ -123,13 +123,13 @@ export default function PrintA6FlyerKidsHatchling() {
               <path
                 d="M4 22 L 12 8 L 20 18 L 30 6 L 36 16"
                 fill="none"
-                stroke="#B45309"
+                stroke="#A83E2C"
                 strokeWidth="1.2"
               />
               <path
                 d="M4 22 C 10 26, 30 26, 36 22 Q 36 20, 34 18 L 4 22"
                 fill="#FDE589"
-                stroke="#B45309"
+                stroke="#A83E2C"
                 strokeWidth="1.2"
               />
             </svg>
@@ -262,7 +262,7 @@ export default function PrintA6FlyerKidsHatchling() {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           font-size: 8pt;
           font-weight: 800;
-          color: #B45309;
+          color: #A83E2C;
           letter-spacing: 0.28em;
           text-transform: uppercase;
           margin: 0 0 3mm;
@@ -363,7 +363,7 @@ export default function PrintA6FlyerKidsHatchling() {
           font-size: 8.5pt;
           font-weight: 700;
           font-style: italic;
-          color: #B45309;
+          color: #A83E2C;
           margin: 4mm 0 0;
         }
 
@@ -478,7 +478,7 @@ export default function PrintA6FlyerKidsHatchling() {
           text-align: center;
         }
         .signoff-hatch strong {
-          color: #B45309;
+          color: #A83E2C;
           font-weight: 800;
           font-size: 10pt;
         }

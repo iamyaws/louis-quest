@@ -144,12 +144,12 @@ export default function BossChest({ bossName, bossIcon, hpReward, unlockedItem, 
               <rect x="10" y="45" width="100" height="55" rx="8" fill="#92400E" stroke="#78350F" strokeWidth="3"/>
               <rect x="10" y="45" width="100" height="55" rx="8" fill="url(#chestGrad)" />
               {/* Chest rim */}
-              <rect x="10" y="45" width="100" height="14" rx="4" fill="#B45309"/>
+              <rect x="10" y="45" width="100" height="14" rx="4" fill="#A83E2C"/>
               {/* Chest lock */}
               <circle cx="60" cy="72" r="10" fill="#FCD34D" stroke="#F59E0B" strokeWidth="2"/>
               <rect x="56" y="70" width="8" height="12" rx="2" fill="#F59E0B"/>
               {/* Chest lid */}
-              <path d="M10 50 Q60 10 110 50" fill="#B45309" stroke="#92400E" strokeWidth="2"/>
+              <path d="M10 50 Q60 10 110 50" fill="#A83E2C" stroke="#92400E" strokeWidth="2"/>
               <path d="M15 50 Q60 18 105 50" fill="#D97706"/>
               {/* Shine */}
               <ellipse cx="40" cy="36" rx="12" ry="4" fill="rgba(255,255,255,0.3)" transform="rotate(-15 40 36)"/>
@@ -203,13 +203,13 @@ export default function BossChest({ bossName, bossIcon, hpReward, unlockedItem, 
               {/* Chest body (same) */}
               <rect x="10" y="65" width="100" height="55" rx="8" fill="#92400E" stroke="#78350F" strokeWidth="3"/>
               <rect x="10" y="65" width="100" height="55" rx="8" fill="url(#chestGradOpen)" />
-              <rect x="10" y="65" width="100" height="14" rx="4" fill="#B45309"/>
+              <rect x="10" y="65" width="100" height="14" rx="4" fill="#A83E2C"/>
               {/* Open interior glow */}
               <rect x="18" y="72" width="84" height="40" rx="4" fill="#FEF3C7"/>
               <rect x="18" y="72" width="84" height="40" rx="4" fill="url(#interiorGlow)"/>
               {/* Chest lid flipped open */}
               <g style={{ transformOrigin: "60px 65px", animation: "bossChestLidOpen 0.5s ease-out forwards" }}>
-                <path d="M10 70 Q60 30 110 70" fill="#B45309" stroke="#92400E" strokeWidth="2"/>
+                <path d="M10 70 Q60 30 110 70" fill="#A83E2C" stroke="#92400E" strokeWidth="2"/>
                 <path d="M15 70 Q60 38 105 70" fill="#D97706"/>
                 <ellipse cx="40" cy="56" rx="12" ry="4" fill="rgba(255,255,255,0.3)" transform="rotate(-15 40 56)"/>
               </g>

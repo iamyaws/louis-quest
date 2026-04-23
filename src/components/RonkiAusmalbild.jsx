@@ -246,7 +246,7 @@ export default function RonkiAusmalbild({ onClose }) {
         <div>
           <p style={{
             margin: 0, fontSize: 10, letterSpacing: '0.22em', fontWeight: 800,
-            textTransform: 'uppercase', color: '#b45309',
+            textTransform: 'uppercase', color: '#A83E2C',
           }}>
             Ausmalbild
           </p>
@@ -347,7 +347,7 @@ export default function RonkiAusmalbild({ onClose }) {
           <button key={s.id} onClick={() => setSceneIdx(i)}
             style={{
               padding: '6px 14px', borderRadius: 999,
-              border: sceneIdx === i ? '1.5px solid #b45309' : '1px solid rgba(180,83,9,0.2)',
+              border: sceneIdx === i ? '1.5px solid #A83E2C' : '1px solid rgba(180,83,9,0.2)',
               background: sceneIdx === i ? '#fcd34d' : '#fff',
               color: '#124346',
               fontFamily: 'Plus Jakarta Sans, sans-serif',
@@ -390,7 +390,7 @@ export default function RonkiAusmalbild({ onClose }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{
             margin: 0, fontSize: 10, letterSpacing: '0.2em', fontWeight: 800,
-            textTransform: 'uppercase', color: '#b45309',
+            textTransform: 'uppercase', color: '#A83E2C',
           }}>
             Ausgemalt · {filledCount}/{totalRegions}
           </p>

@@ -24,7 +24,7 @@ const STAGES = [
 ];
 
 const MOODS = [
-  { id: 'normal',  label: 'Normal',   ink: '#b45309' },
+  { id: 'normal',  label: 'Normal',   ink: '#A83E2C' },
   { id: 'sad',     label: 'Traurig',  ink: '#2f3d5a' },
   { id: 'tired',   label: 'Müde',     ink: '#26333c' },
   { id: 'besorgt', label: 'Besorgt',  ink: '#6d28d9' },

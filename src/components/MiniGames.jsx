@@ -170,7 +170,7 @@ export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
                }}>
             <span className="material-symbols-outlined text-2xl"
                   style={{
-                    color: !withinTimeWindow ? '#4338ca' : '#b45309',
+                    color: !withinTimeWindow ? '#4338ca' : '#A83E2C',
                     fontVariationSettings: "'FILL' 1",
                   }}>
               {!withinTimeWindow ? (reason === 'timeAfter' ? 'bedtime' : 'schedule') : 'lock'}
@@ -259,12 +259,12 @@ export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
                   <h3 className="font-headline font-bold text-lg" style={{ color: '#78350f' }}>
                     {lang === 'de' ? 'Kristall-Höhle' : 'Crystal cave'}
                   </h3>
-                  <p className="font-body text-sm mt-0.5" style={{ color: '#b45309' }}>
+                  <p className="font-body text-sm mt-0.5" style={{ color: '#A83E2C' }}>
                     {lang === 'de' ? 'Grab ein paar Kristalle aus' : 'Dig up some crystals'}
                   </p>
                 </div>
                 <span className="material-symbols-outlined shrink-0"
-                      style={{ color: '#b45309', fontSize: 20 }}>chevron_right</span>
+                      style={{ color: '#A83E2C', fontSize: 20 }}>chevron_right</span>
               </button>
             )}
 
@@ -417,7 +417,7 @@ export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
 // ── High Score Board sub-component ──
 function HighScoreBoard() {
   const HS_KEYS = [
-    { key: 'ronki_memory_highscores', label: 'Memory', icon: 'style', color: '#b45309', metric: 'Züge' },
+    { key: 'ronki_memory_highscores', label: 'Memory', icon: 'style', color: '#A83E2C', metric: 'Züge' },
     { key: 'ronki_clouds_highscores', label: 'Wolkensprung', icon: 'cloud', color: '#1e40af', metric: 'Punkte' },
     { key: 'ronki_stars_highscores', label: 'Sternenfänger', icon: 'star', color: '#6d28d9', metric: 'Sterne' },
   ];
@@ -452,7 +452,7 @@ function HighScoreBoard() {
                 <div key={i} className="flex items-center gap-3 py-1.5 px-2 rounded-lg"
                      style={{ background: i === 0 ? 'rgba(252,211,77,0.08)' : 'transparent' }}>
                   <span className="font-headline font-bold text-base w-6 text-center"
-                        style={{ color: i === 0 ? '#b45309' : i === 1 ? '#6b7280' : '#9ca3af' }}>
+                        style={{ color: i === 0 ? '#A83E2C' : i === 1 ? '#6b7280' : '#9ca3af' }}>
                     {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
                   </span>
                   <span className="flex-1 font-label font-bold text-sm text-on-surface">

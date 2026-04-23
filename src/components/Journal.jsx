@@ -23,7 +23,7 @@ const MOOD_COLORS = [
   { tint: '#dbeafe', ink: '#1e40af' }, // 0 Traurig — cool blue
   { tint: '#ede9fe', ink: '#6d28d9' }, // 1 Besorgt — quiet violet
   { tint: '#e5e7eb', ink: '#475569' }, // 2 Okay — neutral slate
-  { tint: '#fef3c7', ink: '#b45309' }, // 3 Gut — warm amber (default)
+  { tint: '#fef3c7', ink: '#A83E2C' }, // 3 Gut — warm amber (default)
   { tint: '#fce7f3', ink: '#be185d' }, // 4 Magisch — rosa
   { tint: '#cffafe', ink: '#0e7490' }, // 5 Müde — cyan
 ];
@@ -197,7 +197,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
           <div className="p-6 flex items-center gap-4"
                style={{ background: 'linear-gradient(135deg, rgba(252,211,77,0.18), rgba(18,67,70,0.08))' }}>
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                 style={{ background: 'linear-gradient(140deg, #b45309 0%, #7c2d12 100%)', boxShadow: '0 4px 12px rgba(124,45,18,0.35), inset 0 1px 0 rgba(255,255,255,0.25)' }}>
+                 style={{ background: 'linear-gradient(140deg, #A83E2C 0%, #7c2d12 100%)', boxShadow: '0 4px 12px rgba(124,45,18,0.35), inset 0 1px 0 rgba(255,255,255,0.25)' }}>
               <span className="material-symbols-outlined text-white text-3xl"
                     style={{ fontVariationSettings: "'FILL' 1" }}>menu_book</span>
             </div>
@@ -237,7 +237,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
               <div className="flex flex-wrap gap-1.5">
                 {gratitude.map(g => (
                   <span key={g} className="px-2.5 py-1 rounded-full font-label text-xs font-bold"
-                        style={{ background: 'rgba(252,211,77,0.12)', color: '#b45309' }}>
+                        style={{ background: 'rgba(252,211,77,0.12)', color: '#A83E2C' }}>
                     {g}
                   </span>
                 ))}
@@ -248,7 +248,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
               <div className="flex flex-wrap gap-1.5">
                 {achievements.map(a => (
                   <span key={a} className="px-2.5 py-1 rounded-full font-label text-xs font-bold"
-                        style={{ background: 'rgba(252,211,77,0.15)', color: '#b45309' }}>
+                        style={{ background: 'rgba(252,211,77,0.15)', color: '#A83E2C' }}>
                     ⭐ {a}
                   </span>
                 ))}
@@ -260,7 +260,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
           <div className="px-6 pb-5">
             <button onClick={handleReopen}
               className="w-full py-3 rounded-xl font-label font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all"
-              style={{ background: 'rgba(180,83,9,0.06)', color: '#b45309', border: '1px solid rgba(180,83,9,0.15)' }}>
+              style={{ background: 'rgba(180,83,9,0.06)', color: '#A83E2C', border: '1px solid rgba(180,83,9,0.15)' }}>
               <span className="material-symbols-outlined text-lg">edit</span>
               {t('journal.edit')}
             </button>
@@ -476,7 +476,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
                    tile radius 14, emoji 34px, no shadow/border on
                    unselected tiles. Selected uses cream→amber gradient
                    + rgba(180,83,9,0.35) border, NO scale(1.08). Crown:
-                   fontSize 16, color #b45309, rotate -5deg → 5deg. */}
+                   fontSize 16, color #A83E2C, rotate -5deg → 5deg. */}
               <div className="grid grid-cols-3"
                    style={{ gap: 8, padding: 12, borderRadius: 16, background: 'rgba(18,67,70,0.04)' }}>
                 {DAY_EMOJIS.map((e, i) => {
@@ -507,7 +507,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
                                 top: -6,
                                 right: -6,
                                 fontSize: 16,
-                                color: '#b45309',
+                                color: '#A83E2C',
                                 textShadow: '0 2px 4px rgba(252,211,77,0.6)',
                                 animation: 'emojiSparkle 1.8s ease-in-out infinite',
                               }}>
@@ -755,7 +755,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
                     const col = isPast ? colors[dayNum % colors.length] : '#f4ede5';
                     return (
                       <div key={i} className={`w-3 h-3 rounded-full mx-auto ${isToday ? 'ring-2 ring-primary/30' : ''}`}
-                           style={{ background: isToday && state.moodAM !== null ? '#b45309' : col }} />
+                           style={{ background: isToday && state.moodAM !== null ? '#A83E2C' : col }} />
                     );
                   })}
                 </div>
@@ -847,7 +847,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
                         <div className="flex flex-wrap gap-1.5">
                           {entry.gratitude.map(g => (
                             <span key={g} className="px-2.5 py-1 rounded-full font-label text-xs font-bold"
-                                  style={{ background: 'rgba(252,211,77,0.12)', color: '#b45309' }}>
+                                  style={{ background: 'rgba(252,211,77,0.12)', color: '#A83E2C' }}>
                               {g}
                             </span>
                           ))}
@@ -860,7 +860,7 @@ export default function Journal({ onNavigate, onOpenParental }) {
                         <div className="flex flex-wrap gap-1.5">
                           {entry.achievements.map(a => (
                             <span key={a} className="px-2.5 py-1 rounded-full font-label text-xs font-bold"
-                                  style={{ background: 'rgba(252,211,77,0.15)', color: '#b45309' }}>
+                                  style={{ background: 'rgba(252,211,77,0.15)', color: '#A83E2C' }}>
                               ⭐ {a}
                             </span>
                           ))}
@@ -978,10 +978,10 @@ export default function Journal({ onNavigate, onOpenParental }) {
                         background: 'rgba(252,211,77,0.2)',
                         border: '1px solid rgba(180,83,9,0.2)',
                         fontWeight: 800, fontSize: 11, lineHeight: 1,
-                        letterSpacing: '0.06em', color: '#b45309',
+                        letterSpacing: '0.06em', color: '#A83E2C',
                       }}>
                   <span className="material-symbols-outlined"
-                        style={{ fontSize: 14, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                        style={{ fontSize: 14, color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>
                     favorite
                   </span>
                   {t('journal.celebrateHp')}

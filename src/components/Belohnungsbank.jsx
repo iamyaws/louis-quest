@@ -126,7 +126,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
             className="material-symbols-outlined"
             style={{
               fontSize: 26,
-              color: isDigital ? '#0d9488' : '#b45309',
+              color: isDigital ? '#0d9488' : '#A83E2C',
               fontVariationSettings: "'FILL' 1, 'wght' 500",
             }}
           >
@@ -151,7 +151,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
                 fontWeight: 800,
                 fontSize: 12,
                 letterSpacing: '0.02em',
-                color: isDigital ? '#0f766e' : '#b45309',
+                color: isDigital ? '#0f766e' : '#A83E2C',
               }}
             >
               {isDigital ? <Hourglass size={13} /> : <Pearl size={13} />}
@@ -328,7 +328,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
              }}>
           <div className="flex items-center" style={{ gap: 8 }}>
             <Pearl size={22} />
-            <p className="font-label font-extrabold uppercase" style={{ fontSize: 10, letterSpacing: '0.2em', color: '#b45309' }}>{t('hub.boss.detail.heroPoints')}</p>
+            <p className="font-label font-extrabold uppercase" style={{ fontSize: 10, letterSpacing: '0.2em', color: '#A83E2C' }}>{t('hub.boss.detail.heroPoints')}</p>
           </div>
           <div className="flex items-baseline" style={{ gap: 4, marginTop: 2 }}>
             <span className="font-headline" style={{ fontWeight: 500, fontSize: 28, color: '#124346', letterSpacing: '-0.02em', lineHeight: 1 }}>{hp}</span>
@@ -369,7 +369,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
         <div ref={familySectionRef} className="flex flex-col" style={{ gap: 10, scrollMarginTop: 16 }}>
           {/* Section label — Fredoka 500/18px with 4px gold accent bar */}
           <div className="flex items-center" style={{ gap: 10, padding: '0 2px' }}>
-            <span style={{ width: 4, height: 18, borderRadius: 2, background: '#b45309' }} />
+            <span style={{ width: 4, height: 18, borderRadius: 2, background: '#A83E2C' }} />
             <h3 className="font-headline" style={{ margin: 0, fontFamily: 'Fredoka, sans-serif', fontWeight: 500, fontSize: 18, letterSpacing: '-0.01em', color: '#124346', flex: 1 }}>
               {t('shop.familyAdventures')}
             </h3>
@@ -463,7 +463,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
              background: 'linear-gradient(160deg, rgba(252,211,77,0.12) 0%, rgba(245,158,11,0.06) 100%)',
              border: '1px solid rgba(180,83,9,0.14)',
            }}>
-        <span className="material-symbols-outlined" style={{ color: '#b45309', fontSize: 24, fontVariationSettings: "'FILL' 1, 'wght' 500", marginTop: 2 }}>lightbulb</span>
+        <span className="material-symbols-outlined" style={{ color: '#A83E2C', fontSize: 24, fontVariationSettings: "'FILL' 1, 'wght' 500", marginTop: 2 }}>lightbulb</span>
         <div>
           <b className="font-label" style={{ display: 'block', fontWeight: 700, fontSize: 13, lineHeight: 1.2, letterSpacing: '0.04em', color: '#124346', marginBottom: 4 }}>
             {t('shop.howItWorks')}
@@ -521,7 +521,7 @@ export default function Belohnungsbank({ onNavigate, onStartTimer, timerActive, 
               >
                 <span
                   className="material-symbols-outlined text-4xl"
-                  style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}
+                  style={{ color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}
                 >
                   bedtime
                 </span>

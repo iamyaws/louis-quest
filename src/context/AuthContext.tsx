@@ -285,7 +285,7 @@ export function LoginScreen() {
               fontFamily: 'Plus Jakarta Sans, sans-serif',
               fontSize: 10,
               letterSpacing: '0.28em',
-              color: '#b45309',
+              color: '#A83E2C',
             }}
           >
             Deine Reise beginnt
@@ -317,7 +317,7 @@ export function LoginScreen() {
               <div className="space-y-2">
                 <label
                   className="font-label font-extrabold uppercase block"
-                  style={{ fontSize: 10, letterSpacing: '0.22em', color: '#b45309' }}
+                  style={{ fontSize: 10, letterSpacing: '0.22em', color: '#A83E2C' }}
                 >
                   {t('auth.parentEmail')}
                 </label>
@@ -447,7 +447,7 @@ export function LoginScreen() {
                 style={{
                   fontSize: 10,
                   letterSpacing: '0.22em',
-                  color: '#b45309',
+                  color: '#A83E2C',
                   background: 'rgba(254,243,199,0.7)',
                   border: '1px solid rgba(180,83,9,0.15)',
                 }}
@@ -471,7 +471,7 @@ export function LoginScreen() {
                 <div className="space-y-2">
                   <label
                     className="font-label font-extrabold uppercase block"
-                    style={{ fontSize: 10, letterSpacing: '0.22em', color: '#b45309' }}
+                    style={{ fontSize: 10, letterSpacing: '0.22em', color: '#A83E2C' }}
                   >
                     {t('auth.parentEmail')}
                   </label>
@@ -502,7 +502,7 @@ export function LoginScreen() {
                 <div className="space-y-2">
                   <label
                     className="font-label font-extrabold uppercase block"
-                    style={{ fontSize: 10, letterSpacing: '0.22em', color: '#b45309' }}
+                    style={{ fontSize: 10, letterSpacing: '0.22em', color: '#A83E2C' }}
                   >
                     {t('auth.password')}
                   </label>

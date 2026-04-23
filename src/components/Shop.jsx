@@ -34,7 +34,7 @@ export default function Shop() {
   const tabs = [
     { id: 'hero', l: 'Ausrüstung', i: '🎩', col: '#6D28D9' },
     { id: 'cat',  l: 'Begleiter',  i: '🐱', col: '#BE185D' },
-    { id: 'room', l: 'Zimmer',     i: '🏠', col: '#B45309' },
+    { id: 'room', l: 'Zimmer',     i: '🏠', col: '#A83E2C' },
   ];
 
   const activeCol = tabs.find(t => t.id === shopTab)?.col || T.primary;

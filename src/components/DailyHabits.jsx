@@ -67,7 +67,7 @@ export default function DailyHabits() {
              }}>
       {/* Section header — 4px gold accent bar + Fredoka 18/500 + counter pill */}
       <div className="flex items-center gap-2.5 mb-3">
-        <span className="shrink-0" style={{ width: 4, height: 18, borderRadius: 2, background: '#b45309' }} aria-hidden="true" />
+        <span className="shrink-0" style={{ width: 4, height: 18, borderRadius: 2, background: '#A83E2C' }} aria-hidden="true" />
         <h3 className="font-headline flex-1"
             style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 500, fontSize: 16, color: '#124346', letterSpacing: '-0.01em' }}>
           {lang === 'de' ? 'Nicht vergessen' : "Don't forget"}
@@ -76,7 +76,7 @@ export default function DailyHabits() {
               style={{
                 fontSize: 10,
                 letterSpacing: '0.16em',
-                color: allDone ? '#059669' : '#b45309',
+                color: allDone ? '#059669' : '#A83E2C',
                 padding: '3px 8px',
                 borderRadius: 999,
                 background: allDone ? 'rgba(52,211,153,0.18)' : 'rgba(180,83,9,0.1)',
@@ -135,7 +135,7 @@ export default function DailyHabits() {
                         padding: '5px 9px',
                         borderRadius: 8,
                         background: 'rgba(252,211,77,0.22)',
-                        color: '#b45309',
+                        color: '#A83E2C',
                         border: '1px solid rgba(180,83,9,0.18)',
                         letterSpacing: '0.04em',
                       }}>

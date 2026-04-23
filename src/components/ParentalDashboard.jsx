@@ -302,7 +302,7 @@ function OverviewTab({ state, lang, t }) {
       icon: 'auto_stories',
       title: 'Abenteuer läuft',
       sub: 'Freund-Arc aktiv',
-      color: '#b45309',
+      color: '#A83E2C',
       bg: 'rgba(180,83,9,0.08)',
     });
   } else if (offeredArcId) {
@@ -310,7 +310,7 @@ function OverviewTab({ state, lang, t }) {
       icon: 'email',
       title: 'Abenteuer wartet',
       sub: 'Neuer Arc wird angeboten',
-      color: '#b45309',
+      color: '#A83E2C',
       bg: 'rgba(180,83,9,0.08)',
     });
   }
@@ -345,7 +345,7 @@ function OverviewTab({ state, lang, t }) {
         boxShadow: '0 4px 16px rgba(252,211,77,0.15)',
       }}>
         <div className="flex items-center gap-2 mb-3">
-          <span className="material-symbols-outlined text-xl" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>today</span>
+          <span className="material-symbols-outlined text-xl" style={{ color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>today</span>
           <h3 className="font-headline font-bold text-base" style={{ color: '#78350f' }}>
             Heute zeigen wir {state.familyConfig?.childName || 'deinem Kind'}:
           </h3>
@@ -1401,7 +1401,7 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
         <div className="flex items-center gap-3 mb-2">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center"
                style={{ background: 'rgba(245,158,11,0.14)' }}>
-            <span className="material-symbols-outlined text-lg" style={{ color: '#b45309', fontVariationSettings: "'FILL' 1" }}>sports_esports</span>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>sports_esports</span>
           </div>
           <p className="font-label font-bold text-sm text-on-surface">Minispiele</p>
         </div>
@@ -1423,7 +1423,7 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
               >
                 <div className="w-5 h-5 rounded-full mt-0.5 shrink-0 flex items-center justify-center"
                      style={{
-                       background: active ? '#b45309' : 'transparent',
+                       background: active ? '#A83E2C' : 'transparent',
                        border: active ? 'none' : '2px solid rgba(0,0,0,0.2)',
                      }}>
                   {active && <span className="material-symbols-outlined text-white" style={{ fontSize: 14 }}>check</span>}
@@ -1493,7 +1493,7 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
                       border: active ? '1.5px solid rgba(180,83,9,0.4)' : '1.5px solid rgba(0,0,0,0.08)',
                     }}
                   >
-                    <p className="font-label font-bold text-sm" style={{ color: active ? '#b45309' : '#124346' }}>{opt.label}</p>
+                    <p className="font-label font-bold text-sm" style={{ color: active ? '#A83E2C' : '#124346' }}>{opt.label}</p>
                     <p className="font-label text-xs text-on-surface-variant mt-1">{opt.desc}</p>
                   </button>
                 );

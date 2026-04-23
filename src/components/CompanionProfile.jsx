@@ -74,7 +74,7 @@ export default function CompanionProfile() {
         <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.4rem", fontWeight: 700, color: T.textPrimary, marginTop: 8 }}>{state.catName || typeInfo.name}</div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 4, background: "linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.08))", border: "1.5px solid rgba(245,158,11,0.2)", borderRadius: 50, padding: "4px 14px" }}>
           <span style={{ fontSize: "1rem" }}>{stageInfo?.emoji}</span>
-          <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: "#B45309" }}>{stageInfo?.name}</span>
+          <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: "#A83E2C" }}>{stageInfo?.name}</span>
         </div>
       </div>
 

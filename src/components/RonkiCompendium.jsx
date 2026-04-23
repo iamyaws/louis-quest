@@ -89,7 +89,7 @@ export default function RonkiCompendium() {
           margin: 0,
           fontSize: 11, letterSpacing: '0.28em',
           textTransform: 'uppercase', fontWeight: 800,
-          color: '#b45309',
+          color: '#A83E2C',
         }}>
           Das Ronki-Sammelbuch
         </p>
@@ -430,7 +430,7 @@ export default function RonkiCompendium() {
           Noch mehr Ronkis kommen bald: neue Freunde, neue Spiele, neue Geschichten.
         </p>
         <p style={{ marginTop: 16 }}>
-          <a href="/" style={{ color: '#b45309', fontWeight: 700, textDecoration: 'none' }}>
+          <a href="/" style={{ color: '#A83E2C', fontWeight: 700, textDecoration: 'none' }}>
             Zurück zur App →
           </a>
         </p>
@@ -452,7 +452,7 @@ function Section({ kicker, title, subtitle, children }) {
           margin: 0,
           fontSize: 10, letterSpacing: '0.28em',
           textTransform: 'uppercase', fontWeight: 800,
-          color: '#b45309',
+          color: '#A83E2C',
         }}>
           {kicker}
         </p>

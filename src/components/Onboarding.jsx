@@ -530,7 +530,7 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
             {[
               { icon: 'task_alt', title: t('onboarding.guide.quests'), body: t('onboarding.guide.questsBody'), color: '#124346' },
               { icon: 'pets', title: t('onboarding.guide.care'), body: t('onboarding.guide.careBody'), color: '#f59e0b' },
-              { icon: 'auto_awesome', title: t('onboarding.guide.boss'), body: t('onboarding.guide.bossBody'), color: '#b45309' },
+              { icon: 'auto_awesome', title: t('onboarding.guide.boss'), body: t('onboarding.guide.bossBody'), color: '#A83E2C' },
             ].map((card, i) => (
               <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-white"
                    style={{ border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>

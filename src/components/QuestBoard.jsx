@@ -91,7 +91,7 @@ export default function QuestBoard() {
             animation: "celebText 2.5s ease-out forwards",
           }}>
             <span style={{ fontSize: "1.3rem" }}>{COMPANION_TYPES[state.companionType]?.emoji || "\uD83D\uDC31"}</span>
-            <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: "#B45309" }}>
+            <span style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1rem", fontWeight: 700, color: "#A83E2C" }}>
               {companionMsg}
             </span>
           </div>
@@ -146,7 +146,7 @@ export default function QuestBoard() {
         {/* Parent nudge when all done */}
         {allDone && (
           <div className="game-card" style={{ padding: 14, marginBottom: 14, background: "linear-gradient(135deg, #FEF3C7, #FFFBEB)", borderColor: "rgba(245,158,11,0.15)" }}>
-            <div style={{ textAlign: "center", fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: "#B45309" }}>
+            <div style={{ textAlign: "center", fontFamily: "'Fredoka',sans-serif", fontSize: ".95rem", fontWeight: 700, color: "#A83E2C" }}>
               {"Auch Mama und Papa d\u00FCrfen das Handy mal weglegen \uD83D\uDE04"}
             </div>
           </div>

@@ -13,7 +13,7 @@ const SLOT_META = {
 const RARITY_STYLES = {
   common: { bg: 'rgba(232,225,218,0.6)', border: 'rgba(0,0,0,0.08)', key: 'gear.rarity.common', color: '#7b7486' },
   rare: { bg: 'rgba(18,67,70,0.06)', border: 'rgba(18,67,70,0.15)', key: 'gear.rarity.rare', color: '#124346' },
-  epic: { bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.4)', key: 'gear.rarity.epic', color: '#b45309' },
+  epic: { bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.4)', key: 'gear.rarity.epic', color: '#A83E2C' },
 };
 
 export default function GearVault() {
@@ -126,7 +126,7 @@ export default function GearVault() {
                     <span className="material-symbols-outlined text-lg" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
                     <div>
                       <p className="font-label font-bold text-xs text-on-surface-variant uppercase">{t('gear.courage')}</p>
-                      <p className="font-headline font-bold text-lg" style={{ color: '#b45309' }}>+{totalStats.courage}</p>
+                      <p className="font-headline font-bold text-lg" style={{ color: '#A83E2C' }}>+{totalStats.courage}</p>
                     </div>
                   </div>
                 )}

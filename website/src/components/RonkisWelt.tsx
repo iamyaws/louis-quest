@@ -46,7 +46,7 @@ const FREUNDE: Freund[] = [
     subtitle: 'Wenn Freunde sich streiten',
     blurb: 'Er baut kleine Brücken, wo Worte fehlen.',
     image: '/art/freunde/brueckenbauer.webp',
-    accent: '#b45309',
+    accent: '#A83E2C',
   },
   {
     name: 'Flackerfuchs',

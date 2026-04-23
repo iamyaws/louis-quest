@@ -107,7 +107,7 @@ const MOOD_COLORS = [
   { tint: '#dbeafe', ink: '#1e40af' }, // 0 Traurig — cool blue
   { tint: '#ede9fe', ink: '#6d28d9' }, // 1 Besorgt — quiet violet
   { tint: '#e5e7eb', ink: '#475569' }, // 2 Okay — neutral slate
-  { tint: '#fef3c7', ink: '#b45309' }, // 3 Gut — warm amber
+  { tint: '#fef3c7', ink: '#A83E2C' }, // 3 Gut — warm amber
   { tint: '#fce7f3', ink: '#be185d' }, // 4 Magisch — rosa
   { tint: '#cffafe', ink: '#0e7490' }, // 5 Müde — cyan
 ];
@@ -671,7 +671,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
             <div className="flex items-start gap-3">
               <span className="text-xl flex-shrink-0" aria-hidden="true">🌅</span>
               <div>
-                <p className="font-label text-xs uppercase tracking-widest mb-1" style={{ color: '#b45309' }}>
+                <p className="font-label text-xs uppercase tracking-widest mb-1" style={{ color: '#A83E2C' }}>
                   {t('hub.commitment.label')}
                 </p>
                 <p className="font-body text-sm text-on-surface">
@@ -772,7 +772,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
                 style={{
                   fontSize: 11,
                   letterSpacing: '0.08em',
-                  color: '#b45309',
+                  color: '#A83E2C',
                 }}
               >
                 {t('unlockHint.ronki.heute')}
@@ -907,7 +907,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
           >
             <span
               className="font-label font-bold uppercase text-center"
-              style={{ fontSize: 10, letterSpacing: '0.08em', color: '#b45309' }}
+              style={{ fontSize: 10, letterSpacing: '0.08em', color: '#A83E2C' }}
             >
               {journalUnlockHint}
             </span>
@@ -994,7 +994,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
           >
             <span
               className="font-label font-bold uppercase text-center"
-              style={{ fontSize: 10, letterSpacing: '0.08em', color: '#b45309' }}
+              style={{ fontSize: 10, letterSpacing: '0.08em', color: '#A83E2C' }}
             >
               {shopUnlockHint}
             </span>
@@ -1027,14 +1027,14 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5"
-                 style={{ color: '#b45309' }}>
+                 style={{ color: '#A83E2C' }}>
                 {lang === 'de' ? 'Besuch am Lagerfeuer' : 'Visitor at the campfire'}
               </p>
               <p className="font-headline font-semibold text-[15px] leading-tight text-on-surface">
                 {lang === 'de' ? 'Jemand wartet auf dich' : 'Someone is waiting for you'}
               </p>
             </div>
-            <span className="material-symbols-outlined shrink-0" style={{ color: '#b45309', fontSize: 20 }}>chevron_right</span>
+            <span className="material-symbols-outlined shrink-0" style={{ color: '#A83E2C', fontSize: 20 }}>chevron_right</span>
           </button>
         )}
 
@@ -1068,7 +1068,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
               className="flex items-center justify-center shrink-0"
               style={{
                 width: 48, height: 48, borderRadius: 16,
-                background: 'radial-gradient(circle at 40% 30%, #fcd34d 0%, #f59e0b 70%, #b45309 100%)',
+                background: 'radial-gradient(circle at 40% 30%, #fcd34d 0%, #f59e0b 70%, #A83E2C 100%)',
                 boxShadow: '0 0 14px rgba(245,158,11,0.55)',
                 fontSize: 26,
               }}
@@ -1078,14 +1078,14 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-label font-bold text-[10px] uppercase tracking-[0.22em] mb-0.5"
-                 style={{ color: '#b45309' }}>
+                 style={{ color: '#A83E2C' }}>
                 {lang === 'de' ? 'Spielzimmer' : 'Play room'}
               </p>
               <p className="font-headline font-semibold text-[15px] leading-tight" style={{ color: '#78350f' }}>
                 {lang === 'de' ? 'Spiel mit Ronki' : 'Play with Ronki'}
               </p>
             </div>
-            <span className="material-symbols-outlined shrink-0" style={{ color: '#b45309', fontSize: 20 }}>chevron_right</span>
+            <span className="material-symbols-outlined shrink-0" style={{ color: '#A83E2C', fontSize: 20 }}>chevron_right</span>
           </button>
         )}
 
@@ -1224,7 +1224,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
                                 <div className="flex-1 flex items-center gap-2 p-3 rounded-xl"
                                      style={{ background: 'rgba(252,211,77,0.1)', border: '1px solid rgba(252,211,77,0.3)' }}>
                                   <span className="material-symbols-outlined text-base" style={{ color: '#f59e0b', fontVariationSettings: "'FILL' 1" }}>bolt</span>
-                                  <span className="font-label font-bold text-xs" style={{ color: '#b45309' }}>{t('hub.boss.detail.gearDmg', { bonus: courageBonus })}</span>
+                                  <span className="font-label font-bold text-xs" style={{ color: '#A83E2C' }}>{t('hub.boss.detail.gearDmg', { bonus: courageBonus })}</span>
                                   <span className="font-label text-xs text-on-surface-variant">{t('hub.boss.detail.gearCourage')}</span>
                                 </div>
                               )}

@@ -172,7 +172,7 @@ export default function QuestLineView({ questLineId, onBack }) {
           <div className="flex items-center gap-4 mb-4">
             <span className="text-5xl shrink-0" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}>{emoji}</span>
             <div className="flex-1 min-w-0">
-              <p className="font-label font-bold text-xs uppercase tracking-widest mb-0.5" style={{ color: '#b45309' }}>
+              <p className="font-label font-bold text-xs uppercase tracking-widest mb-0.5" style={{ color: '#A83E2C' }}>
                 {readOnlyDone
                   ? (lang === 'de' ? 'Geschafft!' : 'Completed!')
                   : (lang === 'de' ? 'Eltern-Quest' : 'Parent Quest')}
@@ -285,7 +285,7 @@ export default function QuestLineView({ questLineId, onBack }) {
                  layout. */}
             {todayDay && !readOnlyDone && (
               <div className="mb-5">
-                <p className="font-label font-bold text-xs uppercase tracking-widest mb-2" style={{ color: '#b45309' }}>
+                <p className="font-label font-bold text-xs uppercase tracking-widest mb-2" style={{ color: '#A83E2C' }}>
                   {lang === 'de' ? 'Heute' : 'Today'}
                 </p>
                 <div className="rounded-2xl overflow-hidden"
@@ -303,7 +303,7 @@ export default function QuestLineView({ questLineId, onBack }) {
                       <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full flex items-center gap-1"
                            style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)' }}>
                         <span className="font-label font-extrabold uppercase"
-                              style={{ fontSize: 10, letterSpacing: '0.2em', color: '#b45309' }}>
+                              style={{ fontSize: 10, letterSpacing: '0.2em', color: '#A83E2C' }}>
                           {lang === 'de' ? 'Tag' : 'Day'} {todayDay.dayNumber}
                         </span>
                       </div>
@@ -316,7 +316,7 @@ export default function QuestLineView({ questLineId, onBack }) {
                       )}
                       <div className="flex-1 min-w-0">
                         {!todayDay.artFile && (
-                          <p className="font-label font-bold text-xs uppercase tracking-widest mb-0.5" style={{ color: '#b45309' }}>
+                          <p className="font-label font-bold text-xs uppercase tracking-widest mb-0.5" style={{ color: '#A83E2C' }}>
                             {lang === 'de' ? 'Tag' : 'Day'} {todayDay.dayNumber}
                           </p>
                         )}

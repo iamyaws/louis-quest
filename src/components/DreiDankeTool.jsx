@@ -127,7 +127,7 @@ export default function DreiDankeTool({ onComplete }) {
         <div>
           <p style={{
             margin: 0, fontSize: 10, letterSpacing: '0.22em', fontWeight: 800,
-            textTransform: 'uppercase', color: '#b45309',
+            textTransform: 'uppercase', color: '#A83E2C',
           }}>
             Drei-Danke · Runde {Math.min(step + 1, 3)}/3
           </p>
@@ -179,7 +179,7 @@ export default function DreiDankeTool({ onComplete }) {
               position: 'absolute', top: -4, left: '50%',
               transform: 'translateX(-50%)',
               width: 40, height: 8,
-              background: 'linear-gradient(180deg, #b45309, #92400e)',
+              background: 'linear-gradient(180deg, #A83E2C, #92400e)',
               borderRadius: 4,
             }} />
             {/* Gratitude dots inside */}

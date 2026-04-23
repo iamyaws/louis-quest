@@ -349,7 +349,7 @@ function ZahneQuest() {
 // ─── Variant: MoodGrid (Buch) ─────────────────────────────────────────
 
 const MOODS: Array<{ id: string; label: string; face: string; tint: string; ink: string }> = [
-  { id: 'gut', label: 'Gut', face: '🙂', tint: '#fef3c7', ink: '#b45309' },
+  { id: 'gut', label: 'Gut', face: '🙂', tint: '#fef3c7', ink: '#A83E2C' },
   { id: 'magisch', label: 'Magisch', face: '🤩', tint: '#fce7f3', ink: '#be185d' },
   { id: 'okay', label: 'Okay', face: '😐', tint: '#e0e7ff', ink: '#4338ca' },
   { id: 'traurig', label: 'Traurig', face: '😔', tint: '#dbeafe', ink: '#1d4ed8' },
@@ -616,7 +616,7 @@ export function PhoneMockup({ variant, scale = 1 }: PhoneMockupProps) {
         }
         .pm-icon-morning {
           background: rgba(217,119,6,0.14);
-          color: #B45309;
+          color: #A83E2C;
         }
         .pm-icon-evening {
           background: rgba(99,102,241,0.14);
@@ -756,7 +756,7 @@ export function PhoneMockup({ variant, scale = 1 }: PhoneMockupProps) {
         .pm-qxp {
           font-size: calc(4.2pt * var(--s));
           font-weight: 800;
-          color: #B45309;
+          color: #A83E2C;
           background: rgba(252,211,77,0.28);
           padding: calc(0.4mm * var(--s)) calc(1mm * var(--s));
           border-radius: calc(1mm * var(--s));

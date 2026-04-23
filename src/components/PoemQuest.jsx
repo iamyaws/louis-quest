@@ -200,7 +200,7 @@ export default function PoemQuest({ onBack }) {
                       <span className="text-2xl shrink-0">{day.icon}</span>
                       <div className="flex-1 min-w-0">
                         <p className="font-label font-bold text-xs uppercase tracking-widest mb-0.5"
-                           style={{ color: isDone ? '#059669' : isNext ? '#b45309' : '#9ca3af' }}>
+                           style={{ color: isDone ? '#059669' : isNext ? '#A83E2C' : '#9ca3af' }}>
                           Tag {day.day}
                         </p>
                         <h3 className={`font-headline font-bold ${isNext ? 'text-lg' : 'text-base'} ${isDone ? 'line-through text-on-surface/50' : 'text-on-surface'}`}>

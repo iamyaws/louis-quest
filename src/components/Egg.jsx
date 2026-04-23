@@ -18,7 +18,7 @@ const EGG_THEMES = {
   phoenix: {
     base: "#F59E0B",
     highlight: "#FEF3C7",
-    dark: "#B45309",
+    dark: "#A83E2C",
     glow: "#FCD34D",
     speckle: "#D97706",
   },

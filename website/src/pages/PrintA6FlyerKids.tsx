@@ -185,7 +185,7 @@ export default function PrintA6FlyerKids() {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           font-size: 8pt;
           font-weight: 800;
-          color: #B45309;
+          color: #A83E2C;
           letter-spacing: 0.28em;
           text-transform: uppercase;
           margin: 0 0 3mm;
@@ -246,7 +246,7 @@ export default function PrintA6FlyerKids() {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           font-size: 9pt;
           font-weight: 800;
-          color: #B45309;
+          color: #A83E2C;
           margin: 4mm 0 0;
           letter-spacing: -0.01em;
         }
@@ -368,7 +368,7 @@ export default function PrintA6FlyerKids() {
           text-align: center;
         }
         .signoff-kid strong {
-          color: #B45309;
+          color: #A83E2C;
           font-weight: 800;
           font-size: 10pt;
         }

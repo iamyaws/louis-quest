@@ -21,7 +21,7 @@ export default function LoginBonus({ onCollect, claimed }) {
       <div style={{ flex: 1 }}>
         <div style={{
           fontFamily: "'Fredoka',sans-serif", fontSize: "1.05rem", fontWeight: 700,
-          color: "#B45309",
+          color: "#A83E2C",
         }}>
           Willkommen zurück, Held!
         </div>

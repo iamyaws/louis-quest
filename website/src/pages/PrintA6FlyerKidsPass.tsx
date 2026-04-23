@@ -180,7 +180,7 @@ export default function PrintA6FlyerKidsPass() {
                   cy="40"
                   r="36"
                   fill="none"
-                  stroke="#B45309"
+                  stroke="#A83E2C"
                   strokeWidth="1.5"
                   strokeDasharray="2 2"
                 />
@@ -189,7 +189,7 @@ export default function PrintA6FlyerKidsPass() {
                   cy="40"
                   r="28"
                   fill="none"
-                  stroke="#B45309"
+                  stroke="#A83E2C"
                   strokeWidth="0.8"
                 />
                 <text
@@ -198,7 +198,7 @@ export default function PrintA6FlyerKidsPass() {
                   textAnchor="middle"
                   fontSize="7"
                   fontWeight="800"
-                  fill="#B45309"
+                  fill="#A83E2C"
                   fontFamily="Plus Jakarta Sans, sans-serif"
                 >
                   ECHT ✦
@@ -209,7 +209,7 @@ export default function PrintA6FlyerKidsPass() {
                   textAnchor="middle"
                   fontSize="11"
                   fontWeight="900"
-                  fill="#B45309"
+                  fill="#A83E2C"
                   fontFamily="Plus Jakarta Sans, sans-serif"
                 >
                   RONKI
@@ -220,7 +220,7 @@ export default function PrintA6FlyerKidsPass() {
                   textAnchor="middle"
                   fontSize="6"
                   fontWeight="700"
-                  fill="#B45309"
+                  fill="#A83E2C"
                   fontFamily="Plus Jakarta Sans, sans-serif"
                   letterSpacing="1"
                 >
@@ -508,7 +508,7 @@ export default function PrintA6FlyerKidsPass() {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           font-size: 8.5pt;
           font-weight: 800;
-          color: #B45309;
+          color: #A83E2C;
           margin: 0 0 2mm;
           letter-spacing: 0.04em;
         }
@@ -527,7 +527,7 @@ export default function PrintA6FlyerKidsPass() {
           color: #1A3C3F;
         }
         .rules strong {
-          color: #B45309;
+          color: #A83E2C;
           font-weight: 800;
           margin-right: 1.5mm;
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -558,7 +558,7 @@ export default function PrintA6FlyerKidsPass() {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           font-weight: 800;
           font-size: 6.5pt;
-          color: #B45309;
+          color: #A83E2C;
           margin: 0;
           letter-spacing: 0.12em;
         }

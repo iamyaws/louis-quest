@@ -49,7 +49,7 @@ const COLORS = {
   citrin: {
     id: 'citrin',
     label: 'Gelb',
-    gem: 'radial-gradient(circle at 30% 25%, #fef3c7 0%, #fcd34d 55%, #b45309 100%)',
+    gem: 'radial-gradient(circle at 30% 25%, #fef3c7 0%, #fcd34d 55%, #A83E2C 100%)',
     bin: 'linear-gradient(180deg, #fef3c7 0%, #fcd34d 100%)',
     rim: '#78350f',
     glow: 'rgba(252,211,77,0.55)',

@@ -571,7 +571,7 @@ export function RatgeberArticle({
           border-left: 3px solid #FCD34D;
         }
         .ratgeber-callout--ausprobieren .ratgeber-callout__label {
-          color: #B45309;
+          color: #A83E2C;
         }
         .ratgeber-callout--achtung {
           background: rgba(217, 119, 6, 0.08);
@@ -579,7 +579,7 @@ export function RatgeberArticle({
           border-left: 3px solid #D97706;
         }
         .ratgeber-callout--achtung .ratgeber-callout__label {
-          color: #B45309;
+          color: #A83E2C;
         }
 
         /* ── StepCard ───────────────────────────────────────────────── */

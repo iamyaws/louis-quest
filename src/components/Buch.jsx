@@ -62,7 +62,7 @@ export default function Buch({ onNavigate }) {
             {lang === 'de' ? 'Ronki' : 'Ronki'}
           </button>
           <span className="font-label font-bold uppercase tracking-widest"
-                style={{ fontSize: 10, color: '#b45309', letterSpacing: '0.22em' }}>
+                style={{ fontSize: 10, color: '#A83E2C', letterSpacing: '0.22em' }}>
             {lang === 'de' ? 'Buch' : 'Book'}
           </span>
         </div>
@@ -86,7 +86,7 @@ export default function Buch({ onNavigate }) {
           <div className="rounded-2xl p-6 text-center"
                style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.1)' }}>
             <span className="material-symbols-outlined block mb-2"
-                  style={{ fontSize: 36, color: '#b45309', fontVariationSettings: "'FILL' 1" }}>
+                  style={{ fontSize: 36, color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>
               auto_stories
             </span>
             <b className="font-headline block mb-1" style={{ fontSize: 16, color: '#124346' }}>
@@ -147,7 +147,7 @@ function ChapterCard({ chapter, chapterNum, locale, lang }) {
       <header className="flex items-start justify-between gap-2 mb-2">
         <div>
           <span className="block font-label font-bold uppercase"
-                style={{ fontSize: 9, letterSpacing: '0.28em', color: '#b45309', marginBottom: 4 }}>
+                style={{ fontSize: 9, letterSpacing: '0.28em', color: '#A83E2C', marginBottom: 4 }}>
             {lang === 'de' ? `Kapitel ${chapterNum}` : `Chapter ${chapterNum}`}
           </span>
           <span className="font-body" style={{ fontSize: 11, color: '#6b655b', fontWeight: 600 }}>
@@ -211,12 +211,12 @@ function ChapterCard({ chapter, chapterNum, locale, lang }) {
                  border: '1px solid rgba(180,83,9,0.3)',
                  fontSize: 9, letterSpacing: '0.18em',
                  fontWeight: 800, textTransform: 'uppercase',
-                 color: '#b45309',
+                 color: '#A83E2C',
                  fontFamily: 'Plus Jakarta Sans, sans-serif',
                  boxShadow: '0 4px 10px -3px rgba(180,83,9,0.3)',
                }}>
             <span className="material-symbols-outlined"
-                  style={{ fontSize: 13, color: '#b45309', fontVariationSettings: "'FILL' 1, 'wght' 500" }}>
+                  style={{ fontSize: 13, color: '#A83E2C', fontVariationSettings: "'FILL' 1, 'wght' 500" }}>
               military_tech
             </span>
             {lang === 'de' ? 'Meilenstein' : 'Milestone'}
@@ -243,7 +243,7 @@ function ChapterCard({ chapter, chapterNum, locale, lang }) {
                    }}>
                 <span style={{
                   width: 8, height: 8, borderRadius: '50%',
-                  background: 'radial-gradient(circle at 35% 35%, #fef3c7 0%, #f59e0b 70%, #b45309 100%)',
+                  background: 'radial-gradient(circle at 35% 35%, #fef3c7 0%, #f59e0b 70%, #A83E2C 100%)',
                   boxShadow: '0 0 0 2px #fff, 0 0 0 3px rgba(180,83,9,0.2)',
                   marginLeft: -18,
                 }} />
@@ -343,7 +343,7 @@ function ChapterCard({ chapter, chapterNum, locale, lang }) {
                   border: '1px solid rgba(180,83,9,0.2)',
                   font: '800 11px/1 "Plus Jakarta Sans", sans-serif',
                   letterSpacing: '0.06em',
-                  color: '#b45309',
+                  color: '#A83E2C',
                 }}>
                   <span style={{ fontSize: 13 }}>⭐</span>
                   <b>+{chapter.xpEarned}</b>

@@ -406,7 +406,7 @@ export default function LoewenPoseTool({ onComplete }) {
           textAlign: 'center',
           fontFamily: 'Fredoka, sans-serif',
           fontSize: 26, fontWeight: 600,
-          color: step.phase === 'roar' ? '#b45309' : '#124346',
+          color: step.phase === 'roar' ? '#A83E2C' : '#124346',
           letterSpacing: '-0.02em',
           textWrap: 'balance',
         }}>

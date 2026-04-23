@@ -19,7 +19,7 @@ export default function Familienregeln() {
           borderColor: "rgba(245,158,11,0.2)",
         }}>
           <div style={{ fontSize: "3rem", marginBottom: 8 }}>{"\uD83D\uDC9B"}</div>
-          <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.3rem", fontWeight: 700, color: "#B45309", marginBottom: 12 }}>
+          <div style={{ fontFamily: "'Fredoka',sans-serif", fontSize: "1.3rem", fontWeight: 700, color: "#A83E2C", marginBottom: 12 }}>
             {"Lieb sein. Sich M\u00FChe geben. Zusammen sein."}
           </div>
           <div style={{
@@ -68,7 +68,7 @@ export default function Familienregeln() {
           </div>
           <div style={{
             fontFamily: "'Fredoka',sans-serif", fontSize: "1.05rem", fontWeight: 700,
-            color: "#B45309", background: "rgba(252,211,77,0.15)",
+            color: "#A83E2C", background: "rgba(252,211,77,0.15)",
             borderRadius: 14, padding: "10px 16px",
           }}>
             {"\uD83D\uDC9B"} Liam, Papa und Mama lieben dich.
