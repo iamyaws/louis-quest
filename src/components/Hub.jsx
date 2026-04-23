@@ -220,9 +220,22 @@ export default function Hub({ onNavigate, onPlayMint }) {
     if (checkBlock('bedtime', h => h >= 18 || h < 6)) { setZeigBlock('bedtime'); return; }
   }, [state?.quests, state?.zeigMomentShownDates, state?.zeigMomentCounts, state?.familyConfig?.zeigMomentEnabled, zeigBlock]);
 
-  // Ronki greets Louis once when Hub mounts.
+  // Ronki greets Louis once when Hub mounts — but NOT on days 0-2 so
+  // the first-run experience stays quiet. Day 1 already has the
+  // CampfireScene quip bubble; stacking a second VoiceBubble on top
+  // was the "two messages at once" issue Marc flagged.
   useEffect(() => {
-    voice.say('hub_open', { arcPhase });
+    const onboardingDate = state?.onboardingDate;
+    let daysSince = 0;
+    if (onboardingDate) {
+      const start = new Date(onboardingDate).getTime();
+      daysSince = Math.floor((Date.now() - start) / (1000 * 60 * 60 * 24));
+    } else {
+      daysSince = state?.totalTaskDays || 0;
+    }
+    if (daysSince >= 2) {
+      voice.say('hub_open', { arcPhase });
+    }
     // Re-evaluate organic mood triggers on every Hub entry. This is how
     // Ronki flips to 'gut' after Louis finished all his quests on the
     // Heute tab and came back — without opening the Ronki profile. See

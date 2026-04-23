@@ -408,11 +408,23 @@ export default function StarfighterGame({ onComplete }) {
     const nextLevel = level + 1;
     const canDoubleLaser = laserCount < 3;
     const canBiggerFireball = bulletSize < 10;
+    // If both upgrades are maxed, neither button is tappable. Without a
+    // fallback CTA the kid is stuck — found by a tester 25 Apr 2026. We
+    // still render the celebration copy so beating the level feels
+    // rewarded, but surface a "Weiter" button so there is always a
+    // forward path.
+    const bothMaxed = !canDoubleLaser && !canBiggerFireball;
 
     const pickUpgrade = (type) => {
       if (type === 'laser' && canDoubleLaser) setLaserCount(c => c + 1);
       if (type === 'fireball' && canBiggerFireball) setBulletSize(s => s + 3);
       VoiceAudio.play('sfx_wow');
+      SFX.play('coin');
+      setLevel(nextLevel);
+      setGameState('playing');
+    };
+
+    const skipUpgrade = () => {
       SFX.play('coin');
       setLevel(nextLevel);
       setGameState('playing');
@@ -471,6 +483,19 @@ export default function StarfighterGame({ onComplete }) {
             </p>
           </button>
         </div>
+
+        {/* Fallback CTA when both upgrades are maxed. Kid keeps their
+             current loadout and advances to the next level. */}
+        {bothMaxed && (
+          <button
+            onClick={skipUpgrade}
+            className="mt-8 px-8 py-4 rounded-full font-headline font-bold text-lg text-white active:scale-95 transition-all flex items-center justify-center gap-2"
+            style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 8px 24px rgba(252,211,77,0.35)' }}
+          >
+            {lang === 'de' ? 'Weiter' : 'Continue'}
+            <span className="material-symbols-outlined text-xl">arrow_forward</span>
+          </button>
+        )}
       </div>
     );
   }

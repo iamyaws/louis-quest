@@ -86,35 +86,18 @@ export interface FamilyConfig {
   zeigMomentParent?: 'mama' | 'papa';
 }
 
-// ── Louis's family as the default template ──
+// ── Generic default template (Louis-specifics moved to seed-only flow) ──
+// New accounts start with no siblings, no hardcoded "Zeit mit X" habit,
+// and no football practice. Parents fill siblings / habits in parent
+// onboarding (Familie step) or later from the Eltern-Bereich.
 export const DEFAULT_FAMILY_CONFIG: FamilyConfig = {
-  childName: 'Louis',
-  childBirthday: '2019-10-25',
+  childName: '',
   childPronouns: 'er',
-  siblings: [
-    {
-      name: 'Liam',
-      relationship: 'Bruder',
-      pronouns: 'er',
-      birthday: '2026-04-26',
-    },
-  ],
-  dailyHabits: [
-    { id: 'habit_vitaminD', name: 'Vitamin D', icon: '💊', iconDone: '✅', xp: 5 },
-    { id: 'habit_sibling', name: 'Zeit mit Liam', icon: '👶', iconDone: '✅', xp: 10 },
-  ],
-  recurringActivities: [
-    {
-      id: 'football',
-      name: 'Fußball Training',
-      icon: '⚽',
-      days: [1, 3],
-      xp: 10,
-      minutes: 10,
-    },
-  ],
+  siblings: [],
+  dailyHabits: [],
+  recurringActivities: [],
   parentMessage: {
-    enabled: false, // parents opt in from the dashboard — default is quiet
+    enabled: false, // parents opt in from the dashboard. Default is quiet.
     title: 'Botschaft für dich',
     body: 'Fehler sind okay. Deine Familie ist immer für dich da. 🧡',
     signature: 'Wir haben dich lieb.',

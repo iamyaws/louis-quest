@@ -32,9 +32,19 @@ export default function FreundCallbackCard() {
   const dueCallback = useMemo(() => {
     const list = state?.freundCallbacksPending || [];
     if (list.length === 0) return null;
+    // Day-2 floor: never surface a Freund callback during the first two
+    // days of use. The first-run experience needs to stay quiet so new
+    // parents aren't ambushed with lore pop-ups they haven't met yet.
+    const onboardingDate = state?.onboardingDate;
+    if (onboardingDate) {
+      const daysSince = Math.floor(
+        (Date.now() - new Date(onboardingDate).getTime()) / (1000 * 60 * 60 * 24),
+      );
+      if (daysSince < 2) return null;
+    }
     const now = Date.now();
     return list.find(cb => new Date(cb.triggerAt).getTime() <= now) || null;
-  }, [state?.freundCallbacksPending]);
+  }, [state?.freundCallbacksPending, state?.onboardingDate]);
 
   const freund = dueCallback ? FREUND_BY_ID.get(dueCallback.freundId) : null;
 

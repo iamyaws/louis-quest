@@ -1218,12 +1218,19 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const completeOnboarding = useCallback((cfg?: { eggType?: string; dragonVariant?: DragonVariant; companionVariant?: string; heroName?: string; heroGender?: string }) => {
     setState(prev => {
       if (!prev) return prev;
+      // Onboarding runs the hatch animation in-flow (HatchStep). The
+      // companion is visibly hatched by the time we reach the Hub, so
+      // bump catEvo past the Baby threshold (CAT_STAGES[1].threshold = 3)
+      // on completion. Without this, Hub renders a stage-0 egg right
+      // after a dramatic hatch, which reads as broken.
+      const babyEvo = Math.max(prev.catEvo || 0, CAT_STAGES[1]?.threshold ?? 3);
       const updated = {
         ...prev,
         onboardingDone: true,
         onboardingDate: prev.onboardingDate || new Date().toISOString().slice(0, 10),
         eggType: cfg?.eggType || prev.eggType,
         heroGender: cfg?.heroGender || prev.heroGender || null,
+        catEvo: babyEvo,
         // Piece 3: one-pick-forever colorway. Only set if the onboarding flow
         // actually passed one through (re-pick flow + initial onboarding do).
         companionVariant: cfg?.companionVariant || prev.companionVariant,

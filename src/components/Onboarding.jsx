@@ -120,10 +120,11 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                    style={{ filter: 'drop-shadow(0 20px 40px rgba(252,211,77,0.3))' }} />
             </div>
 
-            {/* Text */}
+            {/* Text — `whiteSpace: pre-line` lets the i18n value
+                 line-break "Thang Long" onto its own line via `\n`. */}
             <div className="max-w-md space-y-4">
               <h1 className="font-display text-4xl font-bold text-white tracking-tight leading-tight"
-                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)', whiteSpace: 'pre-line' }}>
                 {t('onboarding.welcome.title')}
               </h1>
               <p className="text-white/80 text-lg leading-relaxed px-4">
@@ -434,8 +435,9 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
   }
 
   // ══════════════════════════════════════════
-  // Step 5: Wachse zusammen (was step 4)
-  // Same scroll-safe pattern as steps 0 and 1.
+  // Step 5: "Hallo, kleiner Ronki!" — the growth beat.
+  // Shows the just-hatched companion sprite (personal, not a generic
+  // forest background), so the kid sees THEIR Ronki growing.
   // ══════════════════════════════════════════
   if (step === 5) {
     return (
@@ -450,13 +452,17 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
           <ProgressBar />
 
           <div className="my-auto flex flex-col items-center">
-            {/* World waking up illustration — trimmed from w-72 to w-56 */}
-            <div className="relative mb-6">
-              <div className="absolute inset-0 blur-3xl rounded-full scale-125 opacity-20"
-                   style={{ background: 'rgba(252,211,77,0.4)' }} />
-              <img src={base + 'art/onboarding/world-dawn.webp'} alt="Die Welt erwacht"
-                   className="relative z-10 w-56 h-auto mx-auto rounded-2xl"
-                   style={{ filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.12))' }} />
+            {/* Hatched Ronki portrait — variant colorway glow behind the
+                 actual sprite the kid just chose. Personal > generic. */}
+            <div className="relative mb-6 w-56 h-56 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full blur-3xl scale-110"
+                   style={{ background: selectedVariant.glowColor, opacity: 0.45 }} />
+              <div className="relative z-10 w-44 h-44 rounded-full overflow-hidden"
+                   style={{ boxShadow: `0 0 40px ${selectedVariant.glowColor}, 0 16px 32px rgba(0,0,0,0.12)` }}>
+                <img src={base + selectedVariant.spritePath}
+                     alt={selectedVariant.name[lang] || selectedVariant.name.de}
+                     className="w-full h-full object-cover" />
+              </div>
             </div>
 
             {/* Text — text-4xl for consistency with steps 0/1 + iPhone SE fit */}
@@ -517,12 +523,14 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
             </p>
           </div>
 
-          {/* Quick guide */}
+          {/* Quick guide — third card reframed from "Nebel besiegen /
+               Tages-Boss" (deprecated boss vocab) to "Sterne sammeln"
+               so the pitch matches the current unlock-progress loop. */}
           <div className="flex flex-col gap-4 w-full">
             {[
               { icon: 'task_alt', title: t('onboarding.guide.quests'), body: t('onboarding.guide.questsBody'), color: '#124346' },
               { icon: 'pets', title: t('onboarding.guide.care'), body: t('onboarding.guide.careBody'), color: '#f59e0b' },
-              { icon: 'swords', title: t('onboarding.guide.boss'), body: t('onboarding.guide.bossBody'), color: '#ba1a1a' },
+              { icon: 'auto_awesome', title: t('onboarding.guide.boss'), body: t('onboarding.guide.bossBody'), color: '#b45309' },
             ].map((card, i) => (
               <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-white"
                    style={{ border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>

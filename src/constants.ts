@@ -30,48 +30,50 @@ export const CAT_VARIANTS: Record<string, { name: string; col: string; ear: stri
   tabby: { name: "Tabby", col: "#A3724A", ear: "#D4A574", stripes: true, desc: "Gem\u00FCtlich und lieb!" },
 };
 
-// ── Questlines: sequential morning + evening routines, all 10 HP ──
+// ── Default routines (broad 5-9yo fit, Marc spec 25 Apr 2026) ──
+// Morgen = wake-up sequence + school prep. "Für Morgen" intentionally
+// minimal (one movement prompt) to keep afternoons unhurried. Gute Nacht =
+// wind-down, no school-specific items. Louis-specific entries removed
+// (Brotdose leeren, Unterschriften checken, Sonnencreme auftragen, Creme
+// auftragen, Gesicht reinigen) — parents add their own from the dashboard.
 
 export const SCHOOL_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
-  // Morning: "Bereit f\u00FCr den Tag"
-  { id: "s1", name: "Gesicht waschen", icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3, order: 1 },
-  { id: "s3", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3, order: 2 },
-  { id: "s4", name: "Anziehen", icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3, order: 3 },
-  { id: "s2", name: "Bett machen", icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 10, minutes: 4, order: 4 },
-  { id: "s5", name: "Schultasche packen", icon: "\u{1F392}", anchor: "morning", xp: 10, minutes: 4, order: 5 },
-  { id: "s6b", name: "Sonnencreme auftragen", icon: "\u2600\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 6 },
-  // Evening: School-prep → Homework → Hygiene → Bed
-  // 1. School-prep sub-routine
-  // Marc correction: Louis's actual job is to empty the lunchbox (take it out
-  // of the schoolbag + throw leftovers away), not wash it. Parents do the wash.
-  { id: "s_lunchbox", name: "Brotdose leeren", icon: "\u{1F371}", anchor: "evening", xp: 10, minutes: 3, order: 1 },
-  { id: "s_packcheck", name: "Schultasche checken", icon: "\u{1F392}", anchor: "evening", xp: 10, minutes: 3, order: 3 },
-  { id: "s_signature", name: "Unterschriften checken", icon: "\u270D\uFE0F", anchor: "evening", xp: 10, minutes: 2, order: 4 },
-  // 2. Homework
-  { id: "s7", name: "Hausaufgaben", icon: "\u{1F4DA}", anchor: "evening", xp: 10, minutes: 8, order: 5 },
-  // 3. Bedtime routine
-  { id: "s8", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "bedtime", xp: 10, minutes: 5, order: 1 },
-  { id: "s12", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "bedtime", xp: 10, minutes: 3, order: 2 },
-  { id: "s13", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "bedtime", xp: 10, minutes: 3, order: 3 },
-  { id: "s14", name: "Creme auftragen", icon: "\u2728", anchor: "bedtime", xp: 10, minutes: 2, order: 4 },
-  { id: "s15", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "bedtime", xp: 10, minutes: 2, order: 5 },
+  // Morgen: "Bereit f\u00FCr den Tag"
+  { id: "s_wake",      name: "Aus dem Bett kommen",                   icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 1 },
+  { id: "s_water",     name: "Wasser trinken",                        icon: "\u{1F4A7}", anchor: "morning", xp: 10, minutes: 1, order: 2 },
+  { id: "s_wash",      name: "Gesicht waschen",                       icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3, order: 3 },
+  { id: "s_breakfast", name: "Fr\u00FChst\u00FCcken",                icon: "\u{1F95E}", anchor: "morning", xp: 10, minutes: 8, order: 4 },
+  { id: "s_teeth_am",  name: "Z\u00E4hne putzen",                    icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3, order: 5 },
+  { id: "s_dress",     name: "Anziehen",                              icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3, order: 6 },
+  { id: "s_packcheck", name: "Schultasche noch einmal checken",       icon: "\u{1F392}", anchor: "morning", xp: 10, minutes: 2, order: 7 },
+  // Für Morgen (Nachmittag) — intentionally just one movement prompt.
+  { id: "s_move",      name: "10 Min bewegen",                        icon: "\u{1F3C3}", anchor: "evening", xp: 10, minutes: 10, order: 1 },
+  // Gute Nacht
+  { id: "s_dinner",    name: "Abendbrot",                             icon: "\u{1F35E}", anchor: "bedtime", xp: 10, minutes: 15, order: 1 },
+  { id: "s_teeth_pm",  name: "Z\u00E4hne putzen",                    icon: "\u{1FAA5}", anchor: "bedtime", xp: 10, minutes: 3, order: 2 },
+  { id: "s_wash_pm",   name: "Gesicht waschen",                       icon: "\u{1F9FC}", anchor: "bedtime", xp: 10, minutes: 3, order: 3 },
+  { id: "s_pyjama",    name: "Pyjama anziehen",                       icon: "\u{1F319}", anchor: "bedtime", xp: 10, minutes: 2, order: 4 },
+  { id: "s_cuddle",    name: "Kuschelzeit / Vorlesen",                icon: "\u{1F4D6}", anchor: "bedtime", xp: 10, minutes: 10, order: 5 },
 ];
 
+// Vacation mode drops the "Schultasche checken" step; afternoon movement
+// becomes "Draußen spielen" since there’s more time to play.
 export const VACATION_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
-  // Morning
-  { id: "v1", name: "Gesicht waschen", icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3, order: 1 },
-  { id: "v3", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3, order: 2 },
-  { id: "v4", name: "Anziehen", icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3, order: 3 },
-  { id: "v2", name: "Bett machen", icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 10, minutes: 4, order: 4 },
-  { id: "v5b", name: "Sonnencreme auftragen", icon: "\u2600\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 5 },
-  // Evening
-  { id: "v6", name: "5 Min lesen", icon: "\u{1F4D6}", anchor: "evening", xp: 10, minutes: 5, order: 1 },
-  { id: "v7", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "evening", xp: 10, minutes: 5, order: 2 },
-  // Bedtime
-  { id: "v10", name: "Z\u00E4hne putzen", icon: "\u{1FAA5}", anchor: "bedtime", xp: 10, minutes: 3, order: 1 },
-  { id: "v11", name: "Gesicht reinigen", icon: "\u{1F9F4}", anchor: "bedtime", xp: 10, minutes: 3, order: 2 },
-  { id: "v12", name: "Creme auftragen", icon: "\u2728", anchor: "bedtime", xp: 10, minutes: 2, order: 3 },
-  { id: "v13", name: "Pyjama anziehen", icon: "\u{1F319}", anchor: "bedtime", xp: 10, minutes: 2, order: 4 },
+  // Morgen
+  { id: "v_wake",      name: "Aus dem Bett kommen",                   icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 1 },
+  { id: "v_water",     name: "Wasser trinken",                        icon: "\u{1F4A7}", anchor: "morning", xp: 10, minutes: 1, order: 2 },
+  { id: "v_wash",      name: "Gesicht waschen",                       icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3, order: 3 },
+  { id: "v_breakfast", name: "Fr\u00FChst\u00FCcken",                icon: "\u{1F95E}", anchor: "morning", xp: 10, minutes: 8, order: 4 },
+  { id: "v_teeth_am",  name: "Z\u00E4hne putzen",                    icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3, order: 5 },
+  { id: "v_dress",     name: "Anziehen",                              icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3, order: 6 },
+  // Nachmittag
+  { id: "v_outside",   name: "Drau\u00DFen spielen",                 icon: "\u26BD", anchor: "evening", xp: 10, minutes: 15, order: 1 },
+  // Gute Nacht
+  { id: "v_dinner",    name: "Abendbrot",                             icon: "\u{1F35E}", anchor: "bedtime", xp: 10, minutes: 15, order: 1 },
+  { id: "v_teeth_pm",  name: "Z\u00E4hne putzen",                    icon: "\u{1FAA5}", anchor: "bedtime", xp: 10, minutes: 3, order: 2 },
+  { id: "v_wash_pm",   name: "Gesicht waschen",                       icon: "\u{1F9FC}", anchor: "bedtime", xp: 10, minutes: 3, order: 3 },
+  { id: "v_pyjama",    name: "Pyjama anziehen",                       icon: "\u{1F319}", anchor: "bedtime", xp: 10, minutes: 2, order: 4 },
+  { id: "v_cuddle",    name: "Kuschelzeit / Vorlesen",                icon: "\u{1F4D6}", anchor: "bedtime", xp: 10, minutes: 10, order: 5 },
 ];
 
 export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "hobby", xp: 10, minutes: 10, order: 1, target: 2 };
@@ -535,15 +537,18 @@ export function buildBirthdayQuestChain(siblingName: string, birthday: string): 
   };
 }
 
-// Legacy compat — default chain for Louis's family
-export const BIRTHDAY_QUEST_CHAIN: QuestChain = buildBirthdayQuestChain("Liam", "2026-04-26");
+// Legacy compat stub. The real birthday chain is built per sibling from
+// state.familyConfig.siblings[] once a parent configures one (see
+// BirthdayEpic.jsx + parent dashboard Familie tab). Keeping this export so
+// existing imports don't break, but it is a no-op until siblings exist.
+export const BIRTHDAY_QUEST_CHAIN: QuestChain = buildBirthdayQuestChain("Geschwister", "2099-01-01");
 
 // ═══ Side-Quests (optional bonus quests) ═══
 
 export const SIDE_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "sq_geschirr", name: "Geschirr einr\u00E4umen", icon: "\u{1F37D}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 90, target: 2, bonus: 3 },
   { id: "sq_zimmer", name: "Zimmer aufr\u00E4umen", icon: "\u{1F9F9}", anchor: "evening", xp: 15, minutes: 6, order: 91 },
-  { id: "sq1", name: "Geschwistern eine Geschichte vorlesen", icon: "\uD83D\uDCD6", anchor: "evening", xp: 15, minutes: 10, order: 92 },
+  { id: "sq1", name: "Jemandem etwas Nettes sagen",          icon: "\uD83D\uDC96", anchor: "evening", xp: 15, minutes: 2, order: 92 },
   { id: "sq2", name: "Etwas Kreatives machen", icon: "\uD83C\uDFA8", anchor: "evening", xp: 15, minutes: 15, order: 93 },
   { id: "sq3", name: "Jemandem helfen", icon: "\uD83E\uDD1D", anchor: "morning", xp: 15, minutes: 5, order: 94 },
   { id: "sq4", name: "Drau\u00DFen spielen", icon: "\u26BD", anchor: "morning", xp: 15, minutes: 15, order: 95 },

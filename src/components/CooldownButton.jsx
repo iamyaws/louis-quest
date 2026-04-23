@@ -46,9 +46,11 @@ export default function CooldownButton({ delay = 4, children, onClick, className
         filter: ready ? 'none' : 'saturate(0.6)',
       }}
     >
-      {/* Countdown ring — overlays the left side of the button */}
+      {/* Countdown ring — pinned to the left edge of the button. Sits at
+           left:10px with a 26px-wide ring, so its right edge lands at 36px.
+           The label's paddingLeft below must clear that. */}
       {!ready && (
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
+        <span className="absolute left-[10px] top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
           <svg width="26" height="26" className="-rotate-90">
             <circle cx="13" cy="13" r={R} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2.5" />
             <circle cx="13" cy="13" r={R} fill="none"
@@ -62,8 +64,11 @@ export default function CooldownButton({ delay = 4, children, onClick, className
           </span>
         </span>
       )}
-      {/* Label — shifted right when countdown is showing */}
-      <span className="flex items-center justify-center gap-2" style={{ paddingLeft: ready ? 0 : 20 }}>
+      {/* Label — shifted right when countdown is showing. Previous value
+           (20) allowed the ring to lap into the first letter of the label
+           (tester Apr 25 2026 saw a "1" circle on top of "Stark!"). Bumped
+           to 38 so the "S" starts after the ring ends. */}
+      <span className="flex items-center justify-center gap-2" style={{ paddingLeft: ready ? 0 : 38, paddingRight: ready ? 0 : 12 }}>
         {icon && ready && (
           <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>{icon}</span>
         )}

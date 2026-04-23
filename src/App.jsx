@@ -561,11 +561,11 @@ function AppContent() {
           stays in storage but doesn't render. Re-enable by restoring the
           JSX block above with the useEggSystem() hook. */}
       <CompanionToast trigger={toastTrigger} />
-      {state &&
-        state.onboardingDone &&
-        !state.louisSeenParentIntro &&
-        (state.totalTasksDone || 0) >= 3 &&
-        view === 'hub' && <ParentIntroOverlay />}
+      {/* ParentIntroOverlay retired 25 Apr 2026. The ParentOnboarding
+          flow now introduces the parent area up-front (and the Eltern-
+          Bereich entry icon in the top chrome makes it discoverable),
+          so a later "ah, hier gibts noch was für Mama & Papa" resume
+          popup is redundant. Component + state flag stay for history. */}
       {/* Variant-migration modal removed — Marc has already talked Louis through
           the change in person, so the in-app "Ronki hat eine neue Form" beat is
           redundant. The component file is kept for reference but no longer mounted. */}

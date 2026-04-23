@@ -145,40 +145,55 @@ function Hair({ style, color, size: s }) {
     );
   }
   if (style === 'long') {
-    // Long hair — longer drop down the sides past the jaw
+    // Long hair — crown cap + two sideburn drapes hanging past the jaw.
+    // Previous impl rendered one opaque shape over the whole head with
+    // a transparent "cutout" div that didn't actually mask anything —
+    // so the all-black preset swallowed the entire face (tester
+    // 25 Apr 2026). Rewritten as three opaque sub-shapes that leave
+    // the face area clear.
     return (
       <>
+        {/* Crown cap — matches `short` cap shape but a touch taller */}
         <div style={{
           ...common,
           top: s * 0.04,
-          left: s * 0.08,
-          width: s * 0.84,
-          height: s * 0.82,
-          borderRadius: '52% 52% 40% 40% / 40% 40% 60% 60%',
+          left: s * 0.10,
+          width: s * 0.80,
+          height: s * 0.40,
+          borderRadius: '60% 60% 40% 40% / 90% 90% 25% 25%',
         }} />
-        {/* Face cutout — re-open the face area so hair doesn't cover eyes */}
+        {/* Left sideburn drape — hangs past the jaw on the left */}
         <div style={{
-          position: 'absolute',
-          top: s * 0.28,
-          left: s * 0.18,
-          width: s * 0.64,
+          ...common,
+          top: s * 0.20,
+          left: s * 0.06,
+          width: s * 0.16,
           height: s * 0.58,
-          borderRadius: '48% 48% 48% 48% / 54% 54% 46% 46%',
-          background: 'transparent',
-          boxShadow: `inset 0 0 0 ${s * 0.5}px transparent`,
-          pointerEvents: 'none',
+          borderRadius: '40% 50% 50% 50% / 20% 30% 70% 60%',
+        }} />
+        {/* Right sideburn drape */}
+        <div style={{
+          ...common,
+          top: s * 0.20,
+          left: s * 0.78,
+          width: s * 0.16,
+          height: s * 0.58,
+          borderRadius: '50% 40% 50% 50% / 30% 20% 60% 70%',
         }} />
       </>
     );
   }
   if (style === 'curly') {
-    // Curly — render 5 overlapping circles at top for pompom effect
+    // Curly — five overlapping circles forming a tight pompom on top of
+    // the head. Earlier positions (y up to -0.02, radius up to 0.30)
+    // ballooned above the head and read as a croissant bun. Tightened
+    // so the curls sit ON the crown, not floating above it.
     const circles = [
-      { x: 0.18, y: 0.02, r: 0.26 },
-      { x: 0.40, y: -0.02, r: 0.30 },
-      { x: 0.56, y: 0.02, r: 0.26 },
-      { x: 0.10, y: 0.14, r: 0.22 },
-      { x: 0.65, y: 0.14, r: 0.22 },
+      { x: 0.18, y: 0.06, r: 0.20 },
+      { x: 0.38, y: 0.02, r: 0.22 },
+      { x: 0.55, y: 0.06, r: 0.20 },
+      { x: 0.10, y: 0.16, r: 0.18 },
+      { x: 0.66, y: 0.16, r: 0.18 },
     ];
     return (
       <>
