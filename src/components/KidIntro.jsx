@@ -176,55 +176,162 @@ export default function KidIntro({ onComplete }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className="relative z-10 min-h-full flex flex-col items-center justify-center px-8 py-12"
+            className="relative z-10 min-h-full flex flex-col"
             style={{
               paddingTop: 'calc(3rem + env(safe-area-inset-top, 0px))',
+              paddingLeft: 28,
+              paddingRight: 28,
               paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))',
             }}
           >
-            {/* Soft frosted-glass card so the forest stays visible behind */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="w-full max-w-md rounded-3xl px-8 py-10 text-center"
+            {/* Cream paper overlay — replaces the dark cinematic look
+                with the editorial-flyer aesthetic Marc uses on the A6
+                Eltern-Flyer prints (PrintSheetA4ElternFlyer.tsx, 24 Apr
+                2026). Background palette + typography pulled from the
+                Experiment-front variant: cream #FDF8F0 with a soft sage
+                radial in the top-right corner. Plus Jakarta Sans for
+                headlines, Be Vietnam Pro for body. The dawn forest is
+                masked entirely so the screen reads as a printed letter
+                from the parents-of-Ronki to the parent holding the
+                phone — same register as the flyer they'd pick up at
+                the Elternabend. */}
+            <div
+              aria-hidden="true"
+              className="fixed inset-0 z-0 pointer-events-none"
               style={{
-                background: 'rgba(255,255,255,0.94)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-                border: '2px solid rgba(252,211,77,0.5)',
+                background: '#FDF8F0',
+                backgroundImage:
+                  'radial-gradient(ellipse 100% 60% at 100% 0%, rgba(80,160,130,0.14) 0%, transparent 60%), radial-gradient(ellipse 80% 50% at 0% 100%, rgba(252,211,77,0.10) 0%, transparent 55%)',
+              }}
+            />
+
+            {/* Hairline rule above eyebrow — direct lift from the
+                Experiment-front pattern. Sage stroke, narrow width,
+                acts as a visual signature of "this is editorial, not
+                an app modal." */}
+            <hr
+              className="m-0 mb-3"
+              style={{
+                border: 0,
+                borderTop: '1px solid #50A082',
+                width: 36,
+              }}
+            />
+
+            <p
+              className="m-0 mb-4"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: '#50A082',
               }}
             >
-              {/* Small Ronki on top of the card — keeps the relationship alive */}
-              <div className="flex justify-center mb-5">
-                <MiniRonki size={64} mood="happy" breathing />
-              </div>
+              {t('handoff.kidToParent.eyebrow')}
+            </p>
 
-              <h1
-                className="font-headline text-3xl font-bold mb-3"
-                style={{ color: '#124346' }}
-              >
-                {t('handoff.kidToParent.title')}
-              </h1>
-              <p
-                className="font-body text-base mb-8 leading-relaxed"
-                style={{ color: '#124346', opacity: 0.85 }}
-              >
-                {t('handoff.kidToParent.body')}
-              </p>
-
-              <button
-                onClick={onComplete}
-                className="w-full py-5 px-8 rounded-full font-headline text-xl font-bold text-white active:scale-95 transition-transform"
+            {/* Headline — dark teal Plus Jakarta with italic sage accent
+                on the emphasis word. Mirrors `.ef-essay-headline` from
+                the Experiment flyer. The italic word is split out via
+                an <em> wrapping the kid-pivot phrase. */}
+            <h1
+              className="m-0 mb-3"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                fontSize: 28,
+                fontWeight: 800,
+                lineHeight: 1.1,
+                letterSpacing: '-0.02em',
+                color: '#1A3C3F',
+                textWrap: 'balance',
+              }}
+            >
+              {t('handoff.kidToParent.titleLead')}
+              <br />
+              <em
                 style={{
-                  background: 'linear-gradient(135deg, #124346, #2d5a5e)',
-                  boxShadow: '0 12px 30px rgba(18,67,70,0.35)',
+                  fontStyle: 'italic',
+                  color: '#50A082',
+                  fontWeight: 700,
                 }}
               >
-                {t('handoff.kidToParent.cta')}
-              </button>
-            </motion.div>
+                {t('handoff.kidToParent.titleAccent')}
+              </em>
+            </h1>
+
+            <p
+              className="m-0 mb-7"
+              style={{
+                fontFamily: "'Be Vietnam Pro', system-ui, sans-serif",
+                fontSize: 14.5,
+                lineHeight: 1.55,
+                color: 'rgba(26,60,63,0.82)',
+                textWrap: 'balance',
+                maxWidth: 320,
+              }}
+            >
+              {t('handoff.kidToParent.body')}
+            </p>
+
+            {/* Egg — small, sits in the breathing space between body
+                and CTA. Tiny Ronki peek is dropped here (the editorial
+                register doesn't want a mascot in frame); the egg alone
+                signals continuity with the greeting screen and the
+                printed flyer's wordmark. */}
+            <div className="flex-1 flex items-center justify-center my-2">
+              <motion.img
+                src={base + 'art/ronki-egg-logo.png'}
+                alt=""
+                style={{
+                  width: 130,
+                  filter:
+                    'drop-shadow(0 14px 28px rgba(252,180,90,0.45)) drop-shadow(0 6px 12px rgba(26,60,63,0.18))',
+                }}
+                initial={{ scale: 0.92, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
+              />
+            </div>
+
+            {/* CTA + shortcut — dark teal pill matches the
+                FrontExperiment signature zone. Shortcut is a lighter
+                text link below, no border. */}
+            <button
+              onClick={onComplete}
+              className="w-full active:scale-95 transition-transform flex items-center justify-center gap-2"
+              style={{
+                background: '#1A3C3F',
+                color: '#FDF8F0',
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                fontSize: 16,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                padding: '16px 28px',
+                borderRadius: 999,
+                border: 0,
+                boxShadow: '0 10px 24px rgba(26,60,63,0.22)',
+              }}
+            >
+              {t('handoff.kidToParent.cta')}
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_forward</span>
+            </button>
+
+            <button
+              onClick={onComplete}
+              className="w-full mt-2 active:opacity-60 transition-opacity"
+              style={{
+                background: 'transparent',
+                color: 'rgba(26,60,63,0.6)',
+                fontFamily: "'Be Vietnam Pro', system-ui, sans-serif",
+                fontSize: 13,
+                padding: '10px 0',
+                border: 0,
+              }}
+            >
+              {t('handoff.kidToParent.parentShortcut')}
+            </button>
           </motion.main>
         )}
     </div>

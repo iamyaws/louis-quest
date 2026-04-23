@@ -33,16 +33,24 @@ export function makeDemoPlants() {
   ];
 }
 
+// Shared with GardenMode so Ronki can sit directly ON the bench (Marc
+// flag 24 Apr 2026: "arrangement of Ronki on a tiny bench is amazing").
+// When both positions agree, the chibi reads as seated instead of
+// floating next to the bench.
+export const DEMO_BENCH_POSITION = { x: 30, y: 2 };
+
 export function makeDemoDecor() {
   return [
-    // Right-side cairn of 3 stones — grounded decoration
+    // Right-side cairn of 3 stones — grounded decoration near the fire
     { id: 'demo-stone-1',  type: 'stone',    position: { x: 70, y: 6 } },
     { id: 'demo-stone-2',  type: 'stone-sm', position: { x: 80, y: 4 } },
     { id: 'demo-stone-3',  type: 'stone',    position: { x: 86, y: 8 } },
     // Left-side lantern — warm light anchor
     { id: 'demo-lantern',  type: 'lantern',  position: { x: 4,  y: 14 } },
-    // Middle bench — "here's where you sit"
-    { id: 'demo-bench',    type: 'bench',    position: { x: 36, y: 2 } },
+    // Bench — Ronki sits on it (see DEMO_BENCH_POSITION + GardenMode
+    // ronkiPosition). The composition "chibi on a bench" is the
+    // emotional centerpiece Marc called out.
+    { id: 'demo-bench',    type: 'bench',    position: DEMO_BENCH_POSITION },
   ];
 }
 

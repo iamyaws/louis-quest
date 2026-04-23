@@ -27,6 +27,7 @@ import CampfireScene from './CampfireScene';
 import GardenPreview from './garden/GardenPreview';
 import GardenMode from './garden/GardenMode';
 import { pickTodaysVisitor } from './CampfireVisitorsGame';
+import { isEventSuppressed } from '../utils/eventOrchestration';
 import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
 // ForscherEcke / AttentionGlow / isForscherGraduated / useAttentionFlag
@@ -234,15 +235,16 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   // CampfireScene quip bubble; stacking a second VoiceBubble on top
   // was the "two messages at once" issue Marc flagged.
   useEffect(() => {
+    // Quiet window — voice greeting holds back for the first ~2 days so
+    // the kid lands on a quiet Hub right after onboarding. Falls back to
+    // totalTaskDays when no onboardingDate exists (legacy accounts) so
+    // pre-anchor users still get the same staggered ramp-up.
     const onboardingDate = state?.onboardingDate;
-    let daysSince = 0;
-    if (onboardingDate) {
-      const start = new Date(onboardingDate).getTime();
-      daysSince = Math.floor((Date.now() - start) / (1000 * 60 * 60 * 24));
-    } else {
-      daysSince = state?.totalTaskDays || 0;
-    }
-    if (daysSince >= 2) {
+    const fallbackDays = state?.totalTaskDays || 0;
+    const suppressed = onboardingDate
+      ? isEventSuppressed(onboardingDate, 'voiceGreeting')
+      : fallbackDays < 2;
+    if (!suppressed) {
       voice.say('hub_open', { arcPhase });
     }
     // Re-evaluate organic mood triggers on every Hub entry. This is how
@@ -394,12 +396,22 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   // Als Nächstes removed with the Apr 2026 Hub simplification — HEUTE
   // card already covers the "go to quests" CTA; see comment below.
 
-  // ── Today's visitor (for the Campfire Visitors card). Runs the same
-  //    settle-in + frequency gates as the game itself; null on silent
-  //    days is a FEATURE. Only shown once Louis has the habit ≥ 3 tasks
-  //    to match existing Hub card-reveal pacing.
+  // ── Today's visitor (for the Campfire Visitors card). Three gates:
+  //    · reveal(3): hides everything until the kid has done 3 tasks ever
+  //      (matches Hub-wide reveal pacing).
+  //    · pickTodaysVisitor's own settle-in (≥15 lifetime tasks) +
+  //      randomised frequency (45%); silent days show NOTHING by design
+  //      so absence is neutral, not "Ronki sad no fox today".
+  //    · isEventSuppressed('visitor'): post-onboarding quiet window
+  //      (~2 days). Stops the card from ambushing a returning kid who
+  //      already has ≥15 lifetime tasks but just signed back in / just
+  //      finished onboarding (Marc 24 Apr 2026 — orchestration was only
+  //      applied to voice + friend callbacks before, not here).
   const todayISO = new Date().toISOString().slice(0, 10);
-  const visitor = reveal(3) ? pickTodaysVisitor(state, todayISO) : null;
+  const visitor =
+    reveal(3) && !isEventSuppressed(state?.onboardingDate, 'visitor')
+      ? pickTodaysVisitor(state, todayISO)
+      : null;
   const visitorFreundMeta = visitor
     ? { drachenmutter: '🐉', pilzhueter: '🍄', eulenhueterin: '🦉', wolfbruder: '🐺', sternenkind: '✨' }[visitor.freundId]
     : null;
@@ -584,10 +596,14 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
                     backdropFilter: 'blur(14px) saturate(160%)',
                     WebkitBackdropFilter: 'blur(14px) saturate(160%)',
                     border: '1px solid rgba(18,67,70,0.12)',
-                    color: 'rgba(18,67,70,0.42)',
+                    color: 'rgba(18,67,70,0.55)',
                     boxShadow: '0 2px 8px -3px rgba(18,67,70,0.15)',
                   }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>lock</span>
+            {/* Marc flag 24 Apr 2026: lock icon read as "locked tab,"
+                not as "parental controls". family_restroom is already
+                used elsewhere in this app for the parent surface and
+                tests well with non-tech parents. */}
+            <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>family_restroom</span>
           </button>
         )}
         {/* HP pill — Polish .hp spec. Tall "N / HELDENPUNKTE" shape,

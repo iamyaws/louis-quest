@@ -4,6 +4,7 @@ import { useTask } from '../context/TaskContext';
 import { FREUND_BY_ID } from '../data/freunde';
 import { CHAPTERS } from '../data/creatures';
 import VoiceAudio from '../utils/voiceAudio';
+import { isEventSuppressed } from '../utils/eventOrchestration';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -32,16 +33,12 @@ export default function FreundCallbackCard() {
   const dueCallback = useMemo(() => {
     const list = state?.freundCallbacksPending || [];
     if (list.length === 0) return null;
-    // Day-2 floor: never surface a Freund callback during the first two
-    // days of use. The first-run experience needs to stay quiet so new
-    // parents aren't ambushed with lore pop-ups they haven't met yet.
-    const onboardingDate = state?.onboardingDate;
-    if (onboardingDate) {
-      const daysSince = Math.floor(
-        (Date.now() - new Date(onboardingDate).getTime()) / (1000 * 60 * 60 * 24),
-      );
-      if (daysSince < 2) return null;
-    }
+    // Quiet-window gate — moved to the shared eventOrchestration helper
+    // (24 Apr 2026) so future event surfaces don't have to re-derive
+    // the same day-since-onboarding math. Logic unchanged: never surface
+    // a Freund callback during the first ~2 days of use so new parents
+    // aren't ambushed with lore pop-ups they haven't met yet.
+    if (isEventSuppressed(state?.onboardingDate, 'friendCallback')) return null;
     const now = Date.now();
     return list.find(cb => new Date(cb.triggerAt).getTime() <= now) || null;
   }, [state?.freundCallbacksPending, state?.onboardingDate]);

@@ -20,7 +20,7 @@ export default function DiscoveryLog({ onNavigate }) {
   if (!state) return null;
 
   const completedArcs = state.arcEngine?.completedArcIds || [];
-  const heroName = state.familyConfig?.heroName || 'Louis';
+  const heroName = (state.familyConfig?.childName || '').trim();
 
   return (
     <div className="relative min-h-dvh pb-32">
@@ -51,9 +51,13 @@ export default function DiscoveryLog({ onNavigate }) {
             {lang === 'de' ? 'Abenteuer-Chronik' : 'Discovery Log'}
           </h1>
           <p className="font-body text-sm text-on-surface-variant mt-1">
-            {lang === 'de'
-              ? `Die Geschichte von ${heroName} & Ronki`
-              : `The story of ${heroName} & Ronki`}
+            {heroName
+              ? (lang === 'de'
+                  ? `Die Geschichte von ${heroName} & Ronki`
+                  : `The story of ${heroName} & Ronki`)
+              : (lang === 'de'
+                  ? 'Deine Abenteuer mit Ronki'
+                  : 'Your adventures with Ronki')}
           </p>
         </div>
 

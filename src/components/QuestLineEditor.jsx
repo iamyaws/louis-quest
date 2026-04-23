@@ -93,7 +93,7 @@ export default function QuestLineEditor() {
       <div>
         <h2 className="font-headline font-bold text-xl text-on-surface">Quest-Linien</h2>
         <p className="font-body text-sm text-on-surface-variant mt-1 leading-relaxed">
-          Erstelle persönliche Abenteuer für Louis. Referate, Geburtstage, neue Fertigkeiten.
+          Erstelle persönliche Abenteuer für {state?.familyConfig?.childName || 'dein Kind'}. Referate, Geburtstage, neue Fertigkeiten.
         </p>
       </div>
 
@@ -573,7 +573,7 @@ function FormMode({ lang, templateId, editingQL, onSave, onCancel, actions }) {
                 Meilensteine <span className="text-on-surface-variant/40">(mind. 4, max. 6)</span>
               </label>
               <p className="font-body text-xs text-on-surface-variant mb-3 leading-relaxed">
-                Kleine, klare Etappen in Louis' Tempo. Kein Zeitdruck.
+                Kleine, klare Etappen. Kein Zeitdruck.
               </p>
               <div className="space-y-2">
                 {milestones.map((m, i) => (
@@ -617,7 +617,7 @@ function FormMode({ lang, templateId, editingQL, onSave, onCancel, actions }) {
           </h3>
         </div>
         <p className="font-body text-xs text-on-surface-variant mb-3 leading-relaxed">
-          So sieht Louis das Abenteuer Tag für Tag.
+          So sieht das Abenteuer Tag für Tag aus.
         </p>
 
         {previewDays.length === 0 ? (
@@ -696,7 +696,7 @@ function FormMode({ lang, templateId, editingQL, onSave, onCancel, actions }) {
               <div className="flex-1">
                 <h3 className="font-headline font-bold text-base text-on-surface">Tage werden neu erzeugt</h3>
                 <p className="font-body text-sm text-on-surface-variant mt-1.5 leading-relaxed">
-                  Das Speichern erzeugt die Tage neu. Louis' bisherige Haken werden zurückgesetzt.
+                  Das Speichern erzeugt die Tage neu. Bisherige Haken werden zurückgesetzt.
                   Nur weitermachen, wenn das okay ist.
                 </p>
               </div>

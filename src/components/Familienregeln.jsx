@@ -2,9 +2,15 @@ import React from 'react';
 import { T } from '../constants';
 import { ViewHeader } from './ui';
 import { useGame } from '../context/GameContext';
+import { useTask } from '../context/TaskContext';
 
 export default function Familienregeln() {
   const { ui } = useGame();
+  const { state } = useTask();
+  const siblingName = state?.familyConfig?.siblings?.[0]?.name?.trim();
+  const loveLine = siblingName
+    ? `${siblingName}, Papa und Mama lieben dich.`
+    : `Papa und Mama lieben dich.`;
 
   return (
     <div className="view-enter" style={{ minHeight: "100dvh", background: T.bg }}>
@@ -71,7 +77,7 @@ export default function Familienregeln() {
             color: "#A83E2C", background: "rgba(252,211,77,0.15)",
             borderRadius: 14, padding: "10px 16px",
           }}>
-            {"\uD83D\uDC9B"} Liam, Papa und Mama lieben dich.
+            {"\uD83D\uDC9B"} {loveLine}
           </div>
         </div>
 

@@ -735,7 +735,7 @@ function FamilyTab({ state, actions, lang }) {
             </div>
           </label>
           <FieldRow label="Titel">
-            <TextInput value={draft.parentMessage.title} onChange={v => update('parentMessage.title', v)} placeholder="z.B. Botschaft für Louis" />
+            <TextInput value={draft.parentMessage.title} onChange={v => update('parentMessage.title', v)} placeholder={`z.B. Botschaft für ${state.familyConfig?.childName || 'dein Kind'}`} />
           </FieldRow>
           <FieldRow label="Nachricht">
             <textarea value={draft.parentMessage.body}
@@ -1321,7 +1321,7 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
           <p className="font-label font-bold text-sm text-on-surface">Zeig-Moment</p>
         </div>
         <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
-          Nach jeder Routine erinnert Ronki Louis daran, <strong>einer</strong> Bezugsperson zu zeigen, was er geschafft hat. Nach 14 Mal pro Block verblasst die Erinnerung. Standardmäßig aus — viele Familien finden's am Anfang zu viel.
+          Nach jeder Routine erinnert Ronki {state.familyConfig?.childName || 'dein Kind'} daran, <strong>einer</strong> Bezugsperson zu zeigen, was er geschafft hat. Nach 14 Mal pro Block verblasst die Erinnerung. Standardmäßig aus — viele Familien finden's am Anfang zu viel.
         </p>
         <div className="flex items-center justify-between mb-4 p-4 rounded-2xl"
              style={{ background: 'rgba(252,211,77,0.06)', border: '1px solid rgba(161,98,7,0.15)' }}>
@@ -1351,7 +1351,7 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
         {zmEnabled && (
           <div className="mb-4">
             <p className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-wide mb-2">
-              Wem zeigt Louis?
+              Wem zeigt {state.familyConfig?.childName || 'dein Kind'}?
             </p>
             <div className="grid grid-cols-2 gap-2">
               {[

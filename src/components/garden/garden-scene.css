@@ -133,6 +133,35 @@
 /* ── Decor ──────────────────────────────────────────────────── */
 .g-decor-item { position: absolute; z-index: 3; }
 
+/* Tappable affordance — in decor mode, placed items become tappable
+   for removal. Subtle scale on press so the kid feels the tap. */
+.g-decor-tappable {
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+.g-decor-tappable:hover {
+  filter: drop-shadow(0 0 8px rgba(252,211,77,.6));
+}
+.g-decor-tappable:active {
+  transform: scale(0.88);
+}
+
+/* no-scrollbar utility for the decor strip (DecorPlacement.jsx) */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Respect reduced-motion preference — disables the bob/pulse loops
+   for motion-sensitive kids. Accessibility audit flag 24 Apr 2026. */
+@media (prefers-reduced-motion: reduce) {
+  .g-hint-ring { animation: none; }
+  .g-orb { animation: none; }
+  .g-fire .flame, .g-fire .flame.b { animation: none; }
+  .g-fire .glow { animation: none; }
+  .g-ronki { animation: none; }
+  .g-ronki.mirror { animation: none; }
+  .g-crystal { animation: none; }
+  .g-shrine .flame { animation: none; }
+}
+
 .g-stone { display: inline-block; width: 22px; height: 12px; border-radius: 50%; background: linear-gradient(180deg, #b5a992 0%, #7a6e5a 100%); box-shadow: inset -2px -3px 4px rgba(0,0,0,.25), inset 2px 2px 0 rgba(255,255,255,.25); }
 .g-stone.sm { width: 14px; height: 8px; }
 

@@ -91,32 +91,30 @@ export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 
         showSun
       />
 
-      {/* Always-visible tap affordance. Positioned at top 30% — in the
-          sky area, cleanly below the topbar (which ends around top 23%)
-          and above the hills (which start at bottom 38% = top 62%).
-          Not hover-gated; works on touch + mouse. pointerEvents: none
-          so the whole card stays one tap target. */}
+      {/* Corner "Garten" pill — bottom-right, dark primary bg. Matches
+          the "Öffnen" style from Claude Design but renamed to "Garten"
+          per Marc 24 Apr 2026: "let's go back to the öffnen but rename
+          to the arrow + Garten". Less scene-intrusive than the earlier
+          center pill. pointer-events: none so card stays one tap target. */}
       <span
-        className="absolute left-1/2 inline-flex items-center gap-2 pointer-events-none"
+        className="absolute inline-flex items-center gap-1.5 pointer-events-none"
         style={{
-          top: '32%',
-          transform: 'translate(-50%, -50%)',
-          padding: '10px 20px 10px 14px',
+          right: 12, bottom: 12, zIndex: 5,
+          padding: '8px 14px 8px 10px',
           borderRadius: 999,
-          background: 'rgba(255,248,242,.94)',
+          background: 'rgba(18,67,70,.82)',
           backdropFilter: 'blur(10px)',
-          color: '#124346',
-          font: '700 11px/1 "Plus Jakarta Sans", sans-serif',
-          letterSpacing: '.18em',
+          color: '#fef3c7',
+          font: '700 10px/1 "Plus Jakarta Sans", sans-serif',
+          letterSpacing: '.2em',
           textTransform: 'uppercase',
-          border: '1px solid rgba(18,67,70,.15)',
-          boxShadow: '0 8px 18px -6px rgba(0,0,0,.3)',
-          zIndex: 5,
+          border: '1px solid rgba(254,243,199,.22)',
+          boxShadow: '0 6px 14px -4px rgba(0,0,0,.4)',
           whiteSpace: 'nowrap',
         }}
       >
-        <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#b45309' }}>arrow_outward</span>
-        {lang === 'de' ? 'Garten erkunden' : 'Explore garden'}
+        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_outward</span>
+        {lang === 'de' ? 'Garten' : 'Garden'}
       </span>
     </button>
   );

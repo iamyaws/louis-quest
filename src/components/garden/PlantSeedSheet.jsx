@@ -123,7 +123,7 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
                   {s.labelDe}
                 </div>
                 <div style={{
-                  font: '600 8px/1 "Plus Jakarta Sans", sans-serif',
+                  font: '600 9px/1 "Plus Jakarta Sans", sans-serif',
                   color: s.speedClass === 'langsam' ? '#7c3aed' : '#b45309',
                   letterSpacing: '.14em',
                   textTransform: 'uppercase',
@@ -164,12 +164,16 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
           <div style={{
             textAlign: 'center',
             marginTop: 10,
-            font: '500 10px/1.4 "Nunito", sans-serif',
+            font: '500 11px/1.4 "Nunito", sans-serif',
             color: '#6b655b',
           }}>
+            {/* Softened from "Tipp auf eine freie Stelle..." (imperative +
+                also a typo — "Tippe" would be correct) to an invitational
+                question that reads as Ronki asking, not the app instructing.
+                Agent feedback 24 Apr 2026. */}
             {lang === 'de'
-              ? 'Tipp auf eine freie Stelle im Garten, bevor du pflanzt.'
-              : 'Tap an empty spot in the garden before planting.'}
+              ? 'Wo möchtest du dein Bäumchen pflanzen?'
+              : 'Where would you like your sapling to go?'}
           </div>
         )}
       </motion.div>

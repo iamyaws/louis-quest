@@ -255,6 +255,7 @@ export default function GardenScene({
   showSun = true,
   className = '',
   onSceneTap,
+  onDecorClick,          // (id) => void — if set, decor items are tappable (decor mode)
   children,
   plantStageFn = defaultStage,
 }) {
@@ -317,17 +318,45 @@ export default function GardenScene({
       })}
 
       {/* Decor — rendered after plants so they overlap them visually if
-          placed in front. Kid chooses the placement order via position. */}
-      {decor.map((d) => (
-        <div
-          key={d.id}
-          className="g-decor-item"
-          style={{ left: `${d.position.x}%`, bottom: `${d.position.y}%` }}
-          data-type={d.type}
-        >
-          <Decor type={d.type} />
-        </div>
-      ))}
+          placed in front. Kid chooses the placement order via position.
+          In decor mode (onDecorClick set), each item becomes tappable —
+          tapping removes it from the scene (ownership persists so it
+          flows back to the strip for free re-placement). Marc flag 24
+          Apr 2026: "cannot put the object back into my bag". */}
+      {decor.map((d) => {
+        const style = { left: `${d.position.x}%`, bottom: `${d.position.y}%` };
+        if (onDecorClick) {
+          return (
+            <button
+              key={d.id}
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onDecorClick(d.id); }}
+              aria-label={`Dekoration entfernen: ${d.type}`}
+              className="g-decor-item g-decor-tappable"
+              style={{
+                ...style,
+                border: 'none',
+                background: 'none',
+                padding: 0,
+                cursor: 'pointer',
+              }}
+              data-type={d.type}
+            >
+              <Decor type={d.type} />
+            </button>
+          );
+        }
+        return (
+          <div
+            key={d.id}
+            className="g-decor-item"
+            style={style}
+            data-type={d.type}
+          >
+            <Decor type={d.type} />
+          </div>
+        );
+      })}
 
       {/* Fire — optional. In GardenPreview + GardenMode, always visible;
           in planting/decor modes, optional depending on composition.

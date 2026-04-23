@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { DECOR, DECOR_CATEGORIES, DECOR_BY_ID } from '../../data/gardenConstants';
 import { Pearl } from '../CurrencyIcons';
@@ -53,14 +53,14 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
     >
-      {/* Fertig pill — top-left */}
+      {/* Fertig pill — top-left. Min-height 48 for kid tap target. */}
       <button
         type="button"
         onClick={onCancel}
         className="absolute top-4 left-4 inline-flex items-center gap-1.5 pointer-events-auto active:scale-95 transition-transform"
         style={{
-          paddingTop: 'calc(8px + env(safe-area-inset-top, 0px))',
-          padding: '8px 14px 8px 10px',
+          padding: '12px 18px 12px 14px',
+          minHeight: 48,
           borderRadius: 999,
           background: 'rgba(255,248,242,.94)',
           backdropFilter: 'blur(14px)',
@@ -73,7 +73,7 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
           marginTop: 'env(safe-area-inset-top, 0px)',
         }}
       >
-        <span className="material-symbols-outlined" style={{ fontSize: 14, fontVariationSettings: "'FILL' 1" }}>check</span>
+        <span className="material-symbols-outlined" style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}>check</span>
         {lang === 'de' ? 'Fertig' : 'Done'}
       </button>
 
@@ -178,7 +178,10 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
         }
       `}</style>
 
-      {/* Category rail — vertical on the left */}
+      {/* Category rail — vertical on the left. Buttons 44×44 for kid
+          tap target; gap-2 between buttons so each reads as a distinct
+          choice (Claude Design fidelity review 24 Apr 2026). active:
+          scale-95 (not -90) — less aggressive press for 6-year-old touch. */}
       <div
         className="absolute left-3 pointer-events-auto"
         style={{
@@ -186,9 +189,9 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
           transform: 'translateY(-50%)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 6,
-          padding: 6,
-          borderRadius: 16,
+          gap: 8,
+          padding: 8,
+          borderRadius: 18,
           background: 'rgba(26,18,10,.72)',
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(254,243,199,.14)',
@@ -204,9 +207,10 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
               type="button"
               onClick={() => hasContent && setCategory(c.id)}
               disabled={!hasContent}
-              className="active:scale-90 transition-all"
+              aria-label={lang === 'de' ? c.labelDe : c.labelEn}
+              className="active:scale-95 transition-all"
               style={{
-                width: 40, height: 40,
+                width: 44, height: 44,
                 borderRadius: 12,
                 background: isSel
                   ? 'linear-gradient(180deg, #fde68a 0%, #f59e0b 100%)'
@@ -218,7 +222,7 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
                 opacity: hasContent ? 1 : 0.5,
               }}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
                 {c.icon}
               </span>
             </button>

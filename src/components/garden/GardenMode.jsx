@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTask } from '../../context/TaskContext';
 import { useTranslation } from '../../i18n/LanguageContext';
@@ -6,7 +6,7 @@ import { getCatStage } from '../../utils/helpers';
 import GardenScene from './GardenScene';
 import PlantSeedSheet from './PlantSeedSheet';
 import DecorPlacement from './DecorPlacement';
-import { makeDemoPlants, makeDemoDecor, DEMO_HINT_SPOTS, AMBIENT_ORBS } from './demoGarden';
+import { makeDemoPlants, makeDemoDecor, DEMO_HINT_SPOTS, AMBIENT_ORBS, DEMO_BENCH_POSITION } from './demoGarden';
 
 /**
  * GardenMode — full-screen garden view (Frame 2 of the v1 mockup).
@@ -46,8 +46,12 @@ export default function GardenMode({ onClose }) {
 
   // Variant-aware chibi props — Ronki renders with the kid's picked
   // colorway (forest=green, violet=lavender, rose=pink, etc.).
+  // No Math.min cap on stage — MoodChibi supports stages 4 (teen) + 5
+  // (legend) with extra aura/wing treatments. Code-review flag 24 Apr 2026:
+  // prior Math.min(3, ...) cap was blocking evolved kids from seeing their
+  // fully-grown Ronki.
   const variant = state?.companionVariant || 'amber';
-  const stageIdx = Math.min(3, getCatStage(state?.catEvo ?? 0));
+  const stageIdx = getCatStage(state?.catEvo ?? 0);
   const mood = state?.ronkiMood || 'normal';
 
   // Empty state fallback — when the kid hasn't planted or decorated
@@ -61,6 +65,37 @@ export default function GardenMode({ onClose }) {
   // Always shown in idle mode; hidden during plant/decor flows (the
   // pendingPosition ghost takes over then).
   const hintSpots = mode === 'idle' ? DEMO_HINT_SPOTS : [];
+
+  // Weekly ritual — Pflanzen is Sunday-only (Q6 A pick from the discovery;
+  // Marc re-confirmed 24 Apr 2026). On other days the Pflanzen chip is
+  // hidden so the kid learns the weekly rhythm by discovery. Dekorieren
+  // is always available — it's a make-it-yours loop, not a time artefact.
+  // Also hide if the kid already planted this Sunday (lastWeeklyPlanting
+  // matches today's ISO).
+  const today = new Date();
+  const isPflanztag = today.getDay() === 0;  // 0 = Sunday
+  const plantedToday = state?.garden?.lastWeeklyPlanting === today.toISOString().slice(0, 10);
+  const canPlant = isPflanztag && !plantedToday;
+
+  // Memoized handlers so DecorPlacement's placing effect doesn't re-fire
+  // on every parent render (code-review flag: onPlace was a fresh
+  // function each render, making the effect dep-unstable).
+  const handlePlace = useCallback((type, position) => {
+    const ok = actions.placeDecor(type, position);
+    if (ok) setPendingPosition(null);
+    return ok;
+  }, [actions]);
+
+  const handlePlantConfirm = useCallback((species) => {
+    if (!pendingPosition) {
+      const fallback = { x: 50 + (Math.random() * 20 - 10), y: 22 };
+      actions.plantSeed(species, fallback);
+    } else {
+      actions.plantSeed(species, pendingPosition);
+    }
+    setMode('idle');
+    setPendingPosition(null);
+  }, [actions, pendingPosition]);
 
   // Scene tap handler — in plant/decor mode captures the position
   // where the kid wants to place the item. In idle mode it's inert
@@ -98,9 +133,14 @@ export default function GardenMode({ onClose }) {
           plants={plants}
           decor={decor}
           showRonki
+          // Ronki sits ON the bench (DEMO_BENCH_POSITION shared with demo
+          // decor so they stay aligned). Left 30% matches bench left, and
+          // bottom 7% = bench base 2% + ~5% seat-height so the chibi reads
+          // as seated on it (Marc flag 24 Apr 2026: "arrangement of Ronki
+          // on a tiny bench is amazing").
           ronkiPosition={{
-            left: '42%',
-            bottom: mode === 'plant' ? '32%' : '4%',
+            left: `${DEMO_BENCH_POSITION.x}%`,
+            bottom: mode === 'plant' ? '32%' : '7%',
             size: 72,
           }}
           ronkiVariant={variant}
@@ -111,6 +151,9 @@ export default function GardenMode({ onClose }) {
           showSun
           hintSpots={hintSpots}
           onSceneTap={handleSceneTap}
+          // In decor mode, tapping a placed item removes it (ownership
+          // persists — it flows back to the strip for free re-placement).
+          onDecorClick={mode === 'decor' ? actions.removeDecor : undefined}
         >
           {/* Ambient gold orbs floating in the sky — atmospheric depth
               lifted from Claude Design Frame 4. Purely decorative. */}
@@ -162,7 +205,8 @@ export default function GardenMode({ onClose }) {
           onClick={onClose}
           className="inline-flex items-center gap-1.5 active:scale-95 transition-transform"
           style={{
-            padding: '8px 14px 8px 10px',
+            padding: '12px 18px 12px 14px',
+            minHeight: 48,
             borderRadius: 999,
             background: 'rgba(255,248,242,.94)',
             backdropFilter: 'blur(14px)',
@@ -174,7 +218,7 @@ export default function GardenMode({ onClose }) {
             textTransform: 'uppercase',
           }}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>close</span>
+          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>close</span>
           {lang === 'de' ? 'Zurück' : 'Back'}
         </button>
 
@@ -197,35 +241,41 @@ export default function GardenMode({ onClose }) {
         </div>
       </div>
 
-      {/* Action chips — idle mode shows "Pflanzen" and "Dekorieren" */}
+      {/* Action chips — idle mode. Pflanzen is Sunday-only (weekly
+          ritual per Q6 A); hidden on other days so the kid discovers
+          the rhythm. Dekorieren is always available. */}
       {mode === 'idle' && (
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 z-10"
              style={{ bottom: 'calc(28px + env(safe-area-inset-bottom, 0px))' }}>
-          <button
-            type="button"
-            onClick={() => setMode('plant')}
-            className="inline-flex items-center gap-2 active:scale-95 transition-transform"
-            style={{
-              padding: '10px 18px 10px 14px',
-              borderRadius: 999,
-              background: 'linear-gradient(180deg, #86efac 0%, #059669 100%)',
-              color: '#053b26',
-              font: '800 12px/1 "Plus Jakarta Sans", sans-serif',
-              letterSpacing: '.14em',
-              textTransform: 'uppercase',
-              boxShadow: '0 8px 18px -6px rgba(5,150,105,.5)',
-              border: '1px solid rgba(5,80,40,.2)',
-            }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}>grass</span>
-            {lang === 'de' ? 'Pflanzen' : 'Plant'}
-          </button>
+          {canPlant && (
+            <button
+              type="button"
+              onClick={() => setMode('plant')}
+              className="inline-flex items-center gap-2 active:scale-95 transition-transform"
+              style={{
+                padding: '12px 20px 12px 16px',
+                minHeight: 48,
+                borderRadius: 999,
+                background: 'linear-gradient(180deg, #86efac 0%, #059669 100%)',
+                color: '#053b26',
+                font: '800 12px/1 "Plus Jakarta Sans", sans-serif',
+                letterSpacing: '.14em',
+                textTransform: 'uppercase',
+                boxShadow: '0 8px 18px -6px rgba(5,150,105,.5)',
+                border: '1px solid rgba(5,80,40,.2)',
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>grass</span>
+              {lang === 'de' ? 'Pflanzen' : 'Plant'}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setMode('decor')}
             className="inline-flex items-center gap-2 active:scale-95 transition-transform"
             style={{
-              padding: '10px 18px 10px 14px',
+              padding: '12px 20px 12px 16px',
+              minHeight: 48,
               borderRadius: 999,
               background: 'linear-gradient(180deg, #fde68a 0%, #f59e0b 100%)',
               color: '#5c3a08',
@@ -236,7 +286,7 @@ export default function GardenMode({ onClose }) {
               border: '1px solid rgba(120,70,10,.2)',
             }}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
             {lang === 'de' ? 'Dekorieren' : 'Decorate'}
           </button>
         </div>
@@ -248,18 +298,7 @@ export default function GardenMode({ onClose }) {
           <PlantSeedSheet
             pendingPosition={pendingPosition}
             onCancel={backToIdle}
-            onPlant={(species) => {
-              if (!pendingPosition) {
-                // If the kid hasn't tapped a spot yet, default to a
-                // center ground patch so the sheet's "Hier pflanzen"
-                // button always works.
-                const fallback = { x: 50 + (Math.random() * 20 - 10), y: 22 };
-                actions.plantSeed(species, fallback);
-              } else {
-                actions.plantSeed(species, pendingPosition);
-              }
-              backToIdle();
-            }}
+            onPlant={handlePlantConfirm}
             lang={lang}
           />
         )}
@@ -273,11 +312,7 @@ export default function GardenMode({ onClose }) {
             currentSterne={state?.hp || 0}
             pendingPosition={pendingPosition}
             onCancel={backToIdle}
-            onPlace={(type, position) => {
-              const ok = actions.placeDecor(type, position);
-              if (ok) setPendingPosition(null);
-              return ok;
-            }}
+            onPlace={handlePlace}
             onDone={backToIdle}
             lang={lang}
           />

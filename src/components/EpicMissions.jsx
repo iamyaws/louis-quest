@@ -159,7 +159,10 @@ export default function EpicMissions() {
         </p>
       </section>
 
-      {/* Birthday Epic — Featured Quest */}
+      {/* Birthday Epic — Featured Quest. Only surfaced when the family has
+          configured at least one sibling; otherwise there's no birthday to
+          celebrate in this quest. */}
+      {(state.familyConfig?.siblings?.length ?? 0) > 0 && (
       <div className="mb-6">
         <button
           className="w-full rounded-2xl overflow-hidden text-left transition-all active:scale-[0.98] relative"
@@ -202,6 +205,7 @@ export default function EpicMissions() {
           )}
         </button>
       </div>
+      )}
 
       {/* Regular missions */}
       <div className="flex flex-col gap-6">

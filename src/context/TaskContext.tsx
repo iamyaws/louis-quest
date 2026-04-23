@@ -213,6 +213,13 @@ export interface TaskState {
   forscherFunkelUnlocked?: boolean;
   poemQuest?: { done: string[]; completed: boolean; title?: string };
   onboardingDate?: string; // ISO date string — set when onboarding completes
+  // Wave-3 callback anchor: the signature move the kid taught Ronki at
+  // hatch. Currently always 'fire' (set by TeachFireStep on 2026-04-23).
+  // Read by the journey-tier farewell surface (not yet built — see
+  // docs/discovery/2026-04-23-core-gameloop-time-stack/) to render lines
+  // like "Weißt du noch, wie du mir das beigebracht hast?" months later.
+  taughtSignature?: 'fire';
+  taughtAt?: string; // ISO date string — when the teach beat was completed
   familyConfig: FamilyConfig;
   _v2_economy_reset?: boolean;
   arcEngine?: ArcEngineState;
@@ -338,7 +345,7 @@ interface TaskActions {
   petCompanion: () => void;
   playCompanion: () => void;
   collectLoginBonus: () => void;
-  completeOnboarding: (cfg?: { eggType?: string; dragonVariant?: DragonVariant; companionVariant?: string; heroName?: string; heroGender?: string }) => void;
+  completeOnboarding: (cfg?: { eggType?: string; dragonVariant?: DragonVariant; companionVariant?: string; heroName?: string; heroGender?: string; taughtSignature?: 'fire'; taughtAt?: string }) => void;
   saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
   redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
   dismissCelebration: () => void;
@@ -784,6 +791,14 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // Intentionally left as-is: undefined on pre-variant saves triggers
           // the one-time CompanionVariantMigration modal. Once set, it sticks.
           companionVariant: (raw as any).companionVariant,
+          // Garden (core-gameloop-time-stack Phase 1) — lazy-shape.
+          // Undefined on saves predating the garden feature; stays
+          // undefined until the kid first interacts (plantSeed/placeDecor
+          // construct the default shape via getOrInitGarden). Without
+          // this field in the allowlist, planted seeds + placed decor
+          // were silently dropped on every reload.
+          // QA flag 24 Apr 2026 (C1): persistence bug.
+          garden: (raw as any).garden,
         };
         // One-time migration: reset inflated HP from old economy
         if (!raw._v2_economy_reset) {
@@ -1275,7 +1290,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const completeOnboarding = useCallback((cfg?: { eggType?: string; dragonVariant?: DragonVariant; companionVariant?: string; heroName?: string; heroGender?: string }) => {
+  const completeOnboarding = useCallback((cfg?: { eggType?: string; dragonVariant?: DragonVariant; companionVariant?: string; heroName?: string; heroGender?: string; taughtSignature?: 'fire'; taughtAt?: string }) => {
     setState(prev => {
       if (!prev) return prev;
       // Onboarding runs the hatch animation in-flow (HatchStep). The
@@ -1294,6 +1309,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         // Piece 3: one-pick-forever colorway. Only set if the onboarding flow
         // actually passed one through (re-pick flow + initial onboarding do).
         companionVariant: cfg?.companionVariant || prev.companionVariant,
+        // Wave-3 callback anchor — set once at hatch by TeachFireStep.
+        // Falls back to 'fire'/today so re-onboarding flows that don't
+        // re-run the teach beat still leave the anchors populated.
+        taughtSignature: cfg?.taughtSignature || prev.taughtSignature || 'fire',
+        taughtAt: cfg?.taughtAt || prev.taughtAt || new Date().toISOString().slice(0, 10),
       };
       const familyConfigPatch: Partial<FamilyConfig> = {};
       if (cfg?.heroName) familyConfigPatch.childName = cfg.heroName;

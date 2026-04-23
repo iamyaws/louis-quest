@@ -13,7 +13,7 @@ export default function BirthdayEpic({ onBack }) {
 
   // Family config
   const config = state?.familyConfig || DEFAULT_FAMILY_CONFIG;
-  const sibling = config.siblings?.[0] || { name: 'Liam', relationship: 'Bruder' };
+  const sibling = config.siblings?.[0] || { name: 'dein Geschwister', relationship: 'Geschwister' };
   const sibP = pronouns(config.childPronouns || 'er');
   const p = pronouns(config.childPronouns || 'er');
 

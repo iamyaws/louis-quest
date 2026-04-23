@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from '../i18n/LanguageContext';
 import VoiceAudio from '../utils/voiceAudio';
 import { COMPANION_VARIANTS, DEFAULT_VARIANT_ID, getVariant } from '../data/companionVariants';
+import MoodChibi from './MoodChibi';
+import TeachFireStep from './onboarding/TeachFireStep';
 // ── PWA install prompt moved out of Onboarding (22 Apr 2026) ──
 // Previously fired at step 7 (completion). That timing was wrong: the kid
 // had zero relationship with the app yet, so parents felt ambushed. The
@@ -17,7 +19,11 @@ const base = import.meta.env.BASE_URL;
 // feedback on evolution stages — they felt like a progression ladder, not
 // one stable friend — is why this replaces the 3-egg + evolution flow in
 // public mode. Evolution is kept intact for dev-mode users.
-const TOTAL_STEPS = 7;
+// Bumped 7 → 8 on 2026-04-23 to make room for the "Der erste Funke"
+// teach beat (TeachFireStep) inserted between "Hallo, kleiner Ronki"
+// (step 5) and the Launch step (now step 7). The teach beat is what
+// anchors state.taughtSignature for the eventual Wave-3 callback.
+const TOTAL_STEPS = 8;
 
 export default function Onboarding({ onComplete, startStep = 0 }) {
   const { t, lang, setLang } = useTranslation();
@@ -29,14 +35,27 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
   const selectedVariant = getVariant(selectedVariantId);
 
   // ── Progress bar (top) ──
+  // Pills are buttons so Marc (and parents) can jump between steps for
+  // testing/preview without restarting the flow. State carries forward —
+  // unset variant/name fall back to defaults if a forward jump skips a
+  // pick screen, so any step renders standalone.
   const ProgressBar = () => (
     <div className="w-full flex justify-center gap-2 mb-8">
       {Array.from({ length: TOTAL_STEPS }, (_, i) => (
-        <div key={i} className="h-2 rounded-full transition-all duration-500"
+        <button
+          key={i}
+          type="button"
+          onClick={() => setStep(i)}
+          aria-label={`Schritt ${i + 1} von ${TOTAL_STEPS}`}
+          aria-current={i === step ? 'step' : undefined}
+          className="rounded-full transition-all duration-500 cursor-pointer p-0"
           style={{
+            height: 8,
             width: i === step ? 48 : 32,
             background: i === step ? '#fcd34d' : i < step ? '#124346' : 'rgba(18,67,70,0.15)',
-          }} />
+            border: 'none',
+          }}
+        />
       ))}
     </div>
   );
@@ -163,13 +182,15 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
           <ProgressBar />
 
           <div className="my-auto flex flex-col items-center gap-6">
-            {/* Title */}
+            {/* Title — textWrap: balance prevents "Energie" widowing on
+                its own line at narrow widths (Marc flag 23 Apr 2026). */}
             <header className="space-y-3 text-center">
               <h1 className="text-4xl font-bold text-white leading-tight"
-                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
+                  style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)', textWrap: 'balance' }}>
                 {t('onboarding.quest.title')}
               </h1>
-              <p className="text-white/75 max-w-sm mx-auto text-lg leading-relaxed">
+              <p className="text-white/75 max-w-sm mx-auto text-lg leading-relaxed"
+                 style={{ textWrap: 'balance' }}>
                 {t('onboarding.quest.subtitle')}
               </p>
             </header>
@@ -453,15 +474,21 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
 
           <div className="my-auto flex flex-col items-center">
             {/* Hatched Ronki portrait — variant colorway glow behind the
-                 actual sprite the kid just chose. Personal > generic. */}
-            <div className="relative mb-6 w-56 h-56 flex items-center justify-center">
+                 chibi we just hatched. Painted sprite swapped for MoodChibi
+                 on 2026-04-23 so the post-hatch reveal matches every other
+                 surface (TopBar, Profile, Compendium) instead of breaking
+                 art style at the most emotional beat. */}
+            <div className="relative mb-6 w-80 h-80 flex items-center justify-center">
               <div className="absolute inset-0 rounded-full blur-3xl scale-110"
                    style={{ background: selectedVariant.glowColor, opacity: 0.45 }} />
-              <div className="relative z-10 w-44 h-44 rounded-full overflow-hidden"
-                   style={{ boxShadow: `0 0 40px ${selectedVariant.glowColor}, 0 16px 32px rgba(0,0,0,0.12)` }}>
-                <img src={base + selectedVariant.spritePath}
-                     alt={selectedVariant.name[lang] || selectedVariant.name.de}
-                     className="w-full h-full object-cover" />
+              <div className="relative z-10 w-80 h-80 flex items-center justify-center">
+                <MoodChibi
+                  size={320}
+                  variant={selectedVariant.id}
+                  stage={1}
+                  mood="magisch"
+                  bare
+                />
               </div>
             </div>
 
@@ -490,7 +517,24 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
   }
 
   // ══════════════════════════════════════════
-  // Step 6: Quick guide + launch (was step 5)
+  // Step 6: "Der erste Funke" — kid teaches Ronki to breathe fire.
+  // Hold-and-release mechanic; persists state.taughtSignature on launch
+  // so the eventual Wave-3 farewell surface can call back to this beat.
+  // Inserted 2026-04-23 — see docs/superpowers/specs/2026-04-23-…
+  // ══════════════════════════════════════════
+  if (step === 6) {
+    return (
+      <TeachFireStep
+        variant={selectedVariant}
+        t={t}
+        ProgressBar={ProgressBar}
+        onComplete={() => setStep(7)}
+      />
+    );
+  }
+
+  // ══════════════════════════════════════════
+  // Step 7: Quick guide + launch (was step 6 before TeachFireStep)
   // ══════════════════════════════════════════
   return (
     <div className="fixed inset-0 flex flex-col overflow-y-auto font-body bg-background">
@@ -501,16 +545,23 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
         <div className="max-w-lg mx-auto flex flex-col items-center gap-8">
           <ProgressBar />
 
-          {/* Ronki reveal — hatched companion sprite in the variant colorway */}
+          {/* Ronki reveal — chibi inside the burst halo. Painted sprite
+              swapped for MoodChibi on 2026-04-23 so the launch tile shows
+              the same Ronki the kid will see in the Hub a moment later. */}
           <div className="text-center space-y-4">
-            <div className="relative w-48 h-48 mx-auto">
+            <div className="relative w-72 h-72 mx-auto">
               <img src={base + 'art/onboarding/reveal-burst.webp'} alt=""
                    className="absolute inset-0 w-full h-full object-cover rounded-full opacity-60" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-28 h-28 rounded-2xl overflow-hidden"
-                     style={{ boxShadow: `0 0 30px ${selectedVariant.glowColor}` }}>
-                  <img src={base + selectedVariant.spritePath} alt={selectedVariant.name[lang] || selectedVariant.name.de}
-                       className="w-full h-full object-cover" />
+                <div className="w-56 h-56 flex items-center justify-center"
+                     style={{ filter: `drop-shadow(0 0 20px ${selectedVariant.glowColor})` }}>
+                  <MoodChibi
+                    size={224}
+                    variant={selectedVariant.id}
+                    stage={1}
+                    mood="normal"
+                    bare
+                  />
                 </div>
               </div>
             </div>
@@ -560,6 +611,14 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                 companionVariant: selectedVariantId,
                 heroName: heroName.trim() || undefined,
                 heroGender,
+                // Wave-3 callback anchors — set at hatch by the TeachFireStep
+                // beat (step 6). The journey-tier farewell surface (not yet
+                // built — see time-stack discovery 2026-04-23) reads these
+                // to render lines like "Weißt du noch, wie du mir das
+                // beigebracht hast?" months later. Always 'fire' for now;
+                // taughtAt is the calendar date the kid did the hold beat.
+                taughtSignature: 'fire',
+                taughtAt: new Date().toISOString().slice(0, 10),
               };
               // Drachenmutter meets the child — plays before the app loads
               VoiceAudio.playNarrator('narrator_intro_meet', 400);
@@ -649,19 +708,28 @@ function HatchStep({ variant, heroName, t, ProgressBar, onDone }) {
             aria-hidden="true"
           />
 
-          {/* Sprite reveal — appears as the egg cracks open */}
+          {/* Chibi reveal — appears as the egg cracks open. Painted sprite
+              swapped for MoodChibi on 2026-04-23. The motion wrapper keeps
+              the same scale/opacity entrance so the timing of the hatch
+              choreography is unchanged. */}
           <AnimatePresence>
             {phase === 'reveal' && (
-              <motion.img
+              <motion.div
                 key="sprite"
-                src={base + variant.spritePath}
-                alt=""
                 initial={{ scale: 0.4, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute w-44 h-44 object-contain z-10"
-                style={{ filter: `drop-shadow(0 8px 24px ${variant.glowColor})` }}
-              />
+                className="absolute z-10 flex items-center justify-center"
+                style={{ width: 320, height: 320, filter: `drop-shadow(0 8px 24px ${variant.glowColor})` }}
+              >
+                <MoodChibi
+                  size={320}
+                  variant={variant.id}
+                  stage={1}
+                  mood="magisch"
+                  bare
+                />
+              </motion.div>
             )}
           </AnimatePresence>
 
