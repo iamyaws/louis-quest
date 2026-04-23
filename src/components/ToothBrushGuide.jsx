@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
+import RonkiPortrait from './RonkiPortrait';
 import SFX from '../utils/sfx';
 import VoiceAudio from '../utils/voiceAudio';
 import PinModal from './PinModal';
@@ -149,21 +150,12 @@ function TascheMode({ zoneIdx, zoneSecondsLeft, wasHidden, onCancel, onParentOve
          style={{
            background: 'radial-gradient(ellipse at center, #0c3236 0%, #061618 70%, #020809 100%)',
          }}>
-      {/* Soft Ronki silhouette — dimmed, breathing */}
-      <div className="relative mb-8">
-        <img
-          src={base + 'art/companion/dragon-baby.webp'}
-          alt=""
-          aria-hidden="true"
-          className="w-40 h-auto select-none"
-          style={{
-            opacity: 0.22,
-            filter: 'brightness(0.75) drop-shadow(0 0 32px rgba(94,234,212,0.18))',
-            animation: 'ronki-breathe 3.6s ease-in-out infinite',
-          }}
-          draggable={false}
-          onError={(e) => { e.target.style.display = 'none'; }}
-        />
+      {/* Soft Ronki silhouette — dimmed, variant-aware chibi
+           (replaces the amber-only dragon-baby painted portrait;
+           Marc 23 Apr 2026). Opacity 0.35 keeps the "dimmed" feel
+           while letting the kid's variant color actually read. */}
+      <div className="relative mb-8" style={{ width: 160, height: 160, opacity: 0.35, filter: 'drop-shadow(0 0 32px rgba(94,234,212,0.18))' }}>
+        <RonkiPortrait size={160} />
       </div>
 
       {/* ONE big message — the whole point of Tasche-Modus */}

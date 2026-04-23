@@ -19,7 +19,7 @@ import SFX from '../utils/sfx';
  *   - Bedtime quests are done
  *   - eveningRitualCompletedAt !== today
  */
-import { getDragonArt } from '../utils/helpers';
+import RonkiPortrait from './RonkiPortrait';
 
 const base = import.meta.env.BASE_URL;
 
@@ -73,8 +73,6 @@ export default function EveningRitual({ stage = 1, onClose }) {
     onClose?.();
   };
 
-  const artFile = getDragonArt(stage);
-
   return (
     <div className="fixed inset-0 z-[600] flex flex-col items-center justify-center overflow-hidden"
          style={{ background: 'linear-gradient(160deg, #0a0a2e 0%, #1a0f3a 50%, #2d1b4e 100%)' }}>
@@ -95,12 +93,14 @@ export default function EveningRitual({ stage = 1, onClose }) {
       </div>
 
       <div className="relative z-10 flex flex-col items-center px-8 text-center max-w-md">
-        {/* Sleeping Ronki */}
-        <div className="w-40 h-40 rounded-full overflow-hidden mb-6 relative"
-             style={{ border: '2px solid rgba(252,211,77,0.35)', boxShadow: '0 0 40px rgba(252,211,77,0.2)' }}>
-          <img src={`${base}art/companion/${artFile}.webp`} alt=""
-               className="w-full h-full object-cover"
-               style={{ filter: 'brightness(0.7) saturate(0.8)' }} />
+        {/* Sleeping Ronki — variant-aware chibi (replaces the old
+             painted dragon-baby.webp that rendered amber for every kid
+             regardless of picked variant; Marc flag 23 Apr 2026).
+             mood="tired" drops Ronki into the evening sway + closed
+             eyes so he reads as sleepy for the bedtime ritual. */}
+        <div className="mb-6 flex items-center justify-center"
+             style={{ width: 160, height: 160 }}>
+          <RonkiPortrait size={160} mood="tired" ringed />
         </div>
 
         {phase === 'intro' && (

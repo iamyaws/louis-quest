@@ -4,6 +4,7 @@ import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import CooldownButton from './CooldownButton';
+import RonkiPortrait from './RonkiPortrait';
 
 /**
  * PoemQuest — 7-day quest-line for learning a poem.
@@ -235,8 +236,8 @@ export default function PoemQuest({ onBack }) {
         {/* Ronki encouragement */}
         <div className="mt-8 p-5 rounded-2xl flex items-start gap-4"
              style={{ background: 'rgba(18,67,70,0.04)', border: '1px solid rgba(18,67,70,0.08)' }}>
-          <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-white shadow-sm">
-            <img src={base + 'art/companion/dragon-baby.webp'} alt="Ronki" className="w-full h-full object-cover" />
+          <div className="shrink-0" style={{ width: 40, height: 40 }}>
+            <RonkiPortrait size={40} />
           </div>
           <p className="font-body text-sm text-on-surface-variant italic leading-relaxed">
             {doneCount === 0 && (lang === 'de' ? 'Wir schaffen das zusammen! Ein Tag nach dem anderen. 🐉' : 'We\'ll do this together! One day at a time. 🐉')}

@@ -1,0 +1,91 @@
+import React from 'react';
+import { useTask } from '../context/TaskContext';
+import { getCatStage } from '../utils/helpers';
+import MoodChibi from './MoodChibi';
+
+/**
+ * RonkiPortrait — state-aware chibi portrait of the kid's companion.
+ *
+ * Single wrapper for every surface that used to `<img src="dragon-baby.webp">`
+ * or `getDragonArt(stage)`. Pulls the kid-picked variant + current stage
+ * from TaskContext so the portrait always reflects the colorway the kid
+ * chose at onboarding. Any mood state Ronki happens to be in (normal,
+ * sad, tired, besorgt, magisch) renders automatically unless overridden.
+ *
+ * Rationale: before this wrapper, callsites imported an image file
+ * directly and baked in the painted Midjourney art — same dragon for
+ * every kid, regardless of variant. Louis picked a sunset-colored egg
+ * and still saw an amber dragon in EveningRitual, ToothBrushGuide,
+ * CompanionToast, etc. Marc flagged this 23 Apr 2026.
+ *
+ * Props:
+ *   size      — outer square pixel size (default 120)
+ *   variant   — override the kid's picked variant (rare; tests only)
+ *   stage     — override evolution stage. Default: derived from catEvo.
+ *   mood      — override mood. Default: state.ronkiMood or 'normal'.
+ *   bare      — pass-through to MoodChibi (skip outer circle bg)
+ *   ringed    — wrap in a subtle cream ring + soft shadow (matches the
+ *               legacy `<div className="rounded-full overflow-hidden">`
+ *               wrapper most callsites used around the old img).
+ *   className — extra classes on the outer wrapper
+ *   style     — extra styles on the outer wrapper
+ */
+export default function RonkiPortrait({
+  size = 120,
+  variant,
+  stage,
+  mood,
+  bare = false,
+  ringed = false,
+  className = '',
+  style,
+}) {
+  const { state } = useTask();
+
+  const resolvedVariant = variant ?? state?.companionVariant ?? 'amber';
+  const resolvedStage = stage ?? Math.min(3, getCatStage(state?.catEvo ?? 0));
+  const resolvedMood = mood ?? state?.ronkiMood ?? 'normal';
+
+  const chibi = (
+    <MoodChibi
+      size={size}
+      variant={resolvedVariant}
+      stage={resolvedStage}
+      mood={resolvedMood}
+      bare={bare}
+    />
+  );
+
+  if (!ringed) {
+    return (
+      <div className={className} style={style}>
+        {chibi}
+      </div>
+    );
+  }
+
+  // Ringed variant — drops the chibi into a soft circle frame similar
+  // to the old `overflow-hidden rounded-full` image wrappers, but with
+  // a cream border instead of cropping the chibi.
+  return (
+    <div
+      className={`rounded-full flex items-center justify-center ${className}`}
+      style={{
+        width: size,
+        height: size,
+        background: 'radial-gradient(circle at 50% 40%, rgba(255,248,242,0.12), rgba(18,67,70,0.25))',
+        border: '2px solid rgba(252,211,77,0.35)',
+        boxShadow: '0 0 40px rgba(252,211,77,0.18)',
+        ...style,
+      }}
+    >
+      <MoodChibi
+        size={Math.round(size * 0.9)}
+        variant={resolvedVariant}
+        stage={resolvedStage}
+        mood={resolvedMood}
+        bare
+      />
+    </div>
+  );
+}
