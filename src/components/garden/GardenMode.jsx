@@ -172,9 +172,15 @@ export default function GardenMode({ onClose }) {
           showSun
           hintSpots={hintSpots}
           onSceneTap={handleSceneTap}
-          // In decor mode, tapping a placed item removes it (ownership
-          // persists — it flows back to the strip for free re-placement).
-          onDecorClick={mode === 'decor' ? actions.removeDecor : undefined}
+          // In decor mode, tapping a placed REAL item removes it
+          // (ownership persists — it flows back to the strip for free
+          // re-placement). Demo items are filtered out so tapping them
+          // is a no-op with no ghost-removal confusion. Code-review C3
+          // flag 24 Apr 2026: tapping demo-bench fired removeDecor but
+          // state.garden.decor didn't contain it → silent nothing.
+          onDecorClick={mode === 'decor'
+            ? (id) => { if (!id.startsWith('demo-')) actions.removeDecor(id); }
+            : undefined}
         >
           {/* Ambient gold orbs floating in the sky — atmospheric depth
               lifted from Claude Design Frame 4. Purely decorative. */}

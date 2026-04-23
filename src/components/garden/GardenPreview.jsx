@@ -49,7 +49,8 @@ function makeDemoPlants() {
 export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 'de', height = 210, inset = true }) {
   const { state } = useTask();
   const variant = state?.companionVariant || 'amber';
-  const stageIdx = Math.min(3, getCatStage(state?.catEvo ?? 0));
+  // No stage cap — MoodChibi supports 0–5 natively (code-review I5).
+  const stageIdx = getCatStage(state?.catEvo ?? 0);
   const mood = state?.ronkiMood || 'normal';
 
   // Blend logic: until the kid has 5+ real plants, we mix demo plants in

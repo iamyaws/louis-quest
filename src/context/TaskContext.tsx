@@ -795,6 +795,12 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // Intentionally left as-is: undefined on pre-variant saves triggers
           // the one-time CompanionVariantMigration modal. Once set, it sticks.
           companionVariant: (raw as any).companionVariant,
+          // Onboarding + teach-beat anchors (code-review flag 24 Apr 2026:
+          // these were saved but never rehydrated, so the quiet-window
+          // math + Wave-3 callback fell back every reload).
+          onboardingDate: (raw as any).onboardingDate,
+          taughtSignature: (raw as any).taughtSignature,
+          taughtAt: (raw as any).taughtAt,
           // Garden (core-gameloop-time-stack Phase 1) — lazy-shape.
           // Undefined on saves predating the garden feature; stays
           // undefined until the kid first interacts (plantSeed/placeDecor

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { DECOR, DECOR_CATEGORIES, DECOR_BY_ID } from '../../data/gardenConstants';
 import { Pearl } from '../CurrencyIcons';
@@ -36,12 +36,13 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
   const tiles = useMemo(() => DECOR.filter(d => d.category === category), [category]);
 
   // When a type is selected AND we have a pending position, commit.
-  React.useEffect(() => {
+  // Clear selectedType on BOTH success AND failure so a failed place
+  // (e.g. insufficient Sterne) doesn't refire the effect with the same
+  // failed pair (code-review I7 flag 24 Apr 2026).
+  useEffect(() => {
     if (selectedType && pendingPosition) {
-      const ok = onPlace(selectedType, pendingPosition);
-      if (ok) {
-        setSelectedType(null);  // clear so next pick starts fresh
-      }
+      onPlace(selectedType, pendingPosition);
+      setSelectedType(null);
     }
   }, [selectedType, pendingPosition, onPlace]);
 

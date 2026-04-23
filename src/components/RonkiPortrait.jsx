@@ -43,7 +43,10 @@ export default function RonkiPortrait({
   const { state } = useTask();
 
   const resolvedVariant = variant ?? state?.companionVariant ?? 'amber';
-  const resolvedStage = stage ?? Math.min(3, getCatStage(state?.catEvo ?? 0));
+  // No Math.min(3, ...) cap — MoodChibi handles stages 4 (teen) + 5
+  // (legend) with their own aura/wing treatments. getCatStage already
+  // clamps to CAT_STAGES.length - 1.
+  const resolvedStage = stage ?? getCatStage(state?.catEvo ?? 0);
   const resolvedMood = mood ?? state?.ronkiMood ?? 'normal';
 
   const chibi = (

@@ -25,13 +25,20 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
 
   return (
     <>
-      {/* Scrim */}
+      {/* Scrim — covers only the area ABOVE the sheet so the kid can
+          still tap the ground in the visible lower portion to set a
+          pendingPosition. pointer-events: auto on the scrim itself
+          so tap-outside-sheet still dismisses. Code-review C2 flag
+          24 Apr 2026: previous inset-0 scrim ate every scene tap. */}
       <motion.div
-        className="absolute inset-0 z-20"
+        className="absolute left-0 right-0 top-0 z-20"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        style={{ background: 'rgba(26,18,10,.35)' }}
+        style={{
+          height: '40%',  // upper 40% — sheet occupies the lower 60%
+          background: 'linear-gradient(180deg, rgba(26,18,10,.45) 0%, rgba(26,18,10,.25) 60%, rgba(26,18,10,0) 100%)',
+        }}
         onClick={onCancel}
       />
 
