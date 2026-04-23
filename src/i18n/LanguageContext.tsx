@@ -5,12 +5,27 @@ import en from './en.json';
 // ── Types ──
 type Lang = 'de' | 'en';
 type Translations = Record<string, string>;
+type Vars = Record<string, string | number>;
 
 interface LanguageContextValue {
   lang: Lang;
   locale: string;            // BCP-47 locale for Intl APIs
   setLang: (l: Lang) => void;
-  t: (key: string, vars?: Record<string, string | number>) => string;
+  /**
+   * Translate a key. Second arg is polymorphic for convenience:
+   *   t('hello')                              // → translation or key
+   *   t('hello', 'Hello world')               // fallback string if key is missing
+   *   t('greet', { name: 'Louis' })           // vars interpolation
+   *   t('greet', { name: 'Louis' }, 'Hi {name}') // vars + fallback
+   *
+   * Fallback is used when the key is missing from BOTH the active lang
+   * and the German source-of-truth. Interpolates vars through the
+   * fallback too, so callers can write 'Hi {name}' defaults.
+   *
+   * Rationale: protects us from rename/missing-key regressions (like the
+   * April s_wake bug where a quest label rendered as raw id 'quest.s_wake').
+   */
+  t: (key: string, varsOrFallback?: Vars | string, fallback?: string) => string;
 }
 
 const TRANSLATIONS: Record<Lang, Translations> = { de, en };
@@ -43,6 +58,28 @@ const LanguageContext = createContext<LanguageContextValue>({
   t: (k) => k,
 });
 
+// Throttled dev-only missing-key warner. One warn per unique key per session
+// is enough to catch regressions without spamming the console during
+// renders-in-a-loop. Production builds never warn.
+const warnedMissingKeys = new Set<string>();
+function warnMissing(key: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if ((import.meta as any).env?.PROD) return;
+  if (warnedMissingKeys.has(key)) return;
+  warnedMissingKeys.add(key);
+  // eslint-disable-next-line no-console
+  console.warn(`[i18n] Missing translation for key "${key}" — falling back.`);
+}
+
+function interpolate(str: string, vars?: Vars): string {
+  if (!vars) return str;
+  let out = str;
+  for (const [k, v] of Object.entries(vars)) {
+    out = out.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
+  }
+  return out;
+}
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>(getInitialLang);
 
@@ -51,14 +88,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     try { localStorage.setItem(STORAGE_KEY, l); } catch {}
   }, []);
 
-  const t = useCallback((key: string, vars?: Record<string, string | number>): string => {
-    let str = TRANSLATIONS[lang][key] ?? TRANSLATIONS.de[key] ?? key;
-    if (vars) {
-      for (const [k, v] of Object.entries(vars)) {
-        str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
-      }
-    }
-    return str;
+  const t = useCallback<LanguageContextValue['t']>((key, varsOrFallback, fallback) => {
+    // Normalize the polymorphic second arg.
+    const vars: Vars | undefined =
+      typeof varsOrFallback === 'object' && varsOrFallback !== null ? varsOrFallback : undefined;
+    const explicitFallback: string | undefined =
+      typeof varsOrFallback === 'string' ? varsOrFallback : fallback;
+
+    const hit = TRANSLATIONS[lang][key] ?? TRANSLATIONS.de[key];
+    if (hit !== undefined) return interpolate(hit, vars);
+
+    // Miss: warn once per key (dev only), then use the explicit fallback
+    // if the caller gave us one; otherwise return the raw key so the
+    // broken surface is at least visible.
+    warnMissing(key);
+    return interpolate(explicitFallback ?? key, vars);
   }, [lang]);
 
   const value = useMemo(() => ({
