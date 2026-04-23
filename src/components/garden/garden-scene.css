@@ -130,6 +130,18 @@
   50% { transform: scale(1.25); opacity: .5; }
 }
 
+/* Witness-beat ring — larger, slower, more ceremonial than the hint
+   ring. Tap-target for dismissing Ronki's "come see" invitation. */
+.g-witness-ring {
+  animation: g-witness-pulse 3s ease-in-out infinite;
+  transition: transform 0.15s ease;
+}
+.g-witness-ring:active { transform: translate(-50%, 50%) scale(0.92); }
+@keyframes g-witness-pulse {
+  0%, 100% { box-shadow: 0 0 24px rgba(252,211,77,.45); }
+  50% { box-shadow: 0 0 42px rgba(252,211,77,.72); }
+}
+
 /* ── Decor ──────────────────────────────────────────────────── */
 .g-decor-item { position: absolute; z-index: 3; }
 

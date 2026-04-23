@@ -197,8 +197,9 @@ export default function KidIntro({ onComplete }) {
                 the Elternabend. */}
             <div
               aria-hidden="true"
-              className="fixed inset-0 z-0 pointer-events-none"
+              className="fixed inset-0 pointer-events-none"
               style={{
+                zIndex: -1,
                 background: '#FDF8F0',
                 backgroundImage:
                   'radial-gradient(ellipse 100% 60% at 100% 0%, rgba(80,160,130,0.14) 0%, transparent 60%), radial-gradient(ellipse 80% 50% at 0% 100%, rgba(252,211,77,0.10) 0%, transparent 55%)',

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useTask } from '../../context/TaskContext';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { getCatStage } from '../../utils/helpers';
+import { useGardenWitness, witnessVoiceLine } from '../../hooks/useGardenWitness';
 import GardenScene from './GardenScene';
 import PlantSeedSheet from './PlantSeedSheet';
 import DecorPlacement from './DecorPlacement';
@@ -33,12 +34,18 @@ import { makeDemoPlants, makeDemoDecor, DEMO_HINT_SPOTS, AMBIENT_ORBS, DEMO_BENC
 export default function GardenMode({ onClose }) {
   const { state, actions } = useTask();
   const { t, lang } = useTranslation();
-  const [mode, setMode] = useState('idle');  // 'idle' | 'plant' | 'decor'
+  const [mode, setMode] = useState('idle');  // 'idle' | 'plant' | 'decor' | 'witness'
 
   // A pending-placement position captured when the kid taps an empty
   // ground patch. The sheet/rail then confirms species/type, and we
   // call plantSeed(...)/placeDecor(...) at the captured position.
   const [pendingPosition, setPendingPosition] = useState(null);
+
+  // Witness beat — Phase 2. If a plant crossed a stage boundary since
+  // the kid last saw it, the hook returns { plant, newStage }. We show
+  // a pulsing ring around it + a Ronki speech bubble. Tap the plant or
+  // the bubble to dismiss → writes witnessedStages[plantId] = newStage.
+  const pendingWitness = useGardenWitness(state?.garden);
 
   const realPlants = state?.garden?.plants || [];
   const realDecor = state?.garden?.decor || [];
@@ -64,9 +71,21 @@ export default function GardenMode({ onClose }) {
   const decor = realDecor.length >= 5 ? realDecor : [...makeDemoDecor(), ...realDecor];
 
   // Hint rings — 3 pre-defined spots marking "tap here to add something."
-  // Always shown in idle mode; hidden during plant/decor flows (the
-  // pendingPosition ghost takes over then).
-  const hintSpots = mode === 'idle' ? DEMO_HINT_SPOTS : [];
+  // Always shown in idle mode UNLESS a witness beat is pending (the
+  // grown plant gets its own highlight then, hint rings would compete).
+  // Hidden during plant/decor flows (the pendingPosition ghost takes
+  // over then).
+  const hintSpots = (mode === 'idle' && !pendingWitness) ? DEMO_HINT_SPOTS : [];
+
+  // Witness beat voice line — computed once per pending beat.
+  const witnessLine = pendingWitness
+    ? witnessVoiceLine(pendingWitness.plant.species, pendingWitness.newStage, lang)
+    : null;
+
+  const dismissWitness = useCallback(() => {
+    if (!pendingWitness) return;
+    actions.witnessPlant(pendingWitness.plant.id, pendingWitness.newStage);
+  }, [actions, pendingWitness]);
 
   // Weekly ritual — Pflanzen is Sunday-only (Q6 A pick from the discovery;
   // Marc re-confirmed 24 Apr 2026). On other days the Pflanzen chip is
@@ -175,6 +194,61 @@ export default function GardenMode({ onClose }) {
               }}
             />
           ))}
+
+          {/* Witness beat — glow ring around the matured plant + Ronki
+              speech bubble anchored above it. Tap ring/bubble to
+              dismiss (marks witnessedStages[plantId] = newStage).
+              Phase 2 of the time-stack (Q7 C+ / Q8 D). */}
+          {pendingWitness && witnessLine && (
+            <>
+              <button
+                type="button"
+                onClick={dismissWitness}
+                aria-label={witnessLine.reveal}
+                className="g-witness-ring"
+                style={{
+                  position: 'absolute',
+                  left: `${pendingWitness.plant.position.x}%`,
+                  bottom: `${pendingWitness.plant.position.y}%`,
+                  transform: 'translate(-50%, 50%)',
+                  width: 96, height: 96,
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(252,211,77,.28) 0%, rgba(252,211,77,.08) 60%, transparent 80%)',
+                  border: '2px solid rgba(254,243,199,.7)',
+                  boxShadow: '0 0 36px rgba(252,211,77,.55)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  zIndex: 6,
+                }}
+              />
+              <button
+                type="button"
+                onClick={dismissWitness}
+                className="absolute"
+                style={{
+                  left: `${pendingWitness.plant.position.x}%`,
+                  bottom: `calc(${pendingWitness.plant.position.y}% + 100px)`,
+                  transform: 'translateX(-50%)',
+                  maxWidth: 240,
+                  padding: '10px 16px',
+                  borderRadius: 16,
+                  background: 'rgba(255,248,242,.96)',
+                  border: '1.5px solid rgba(252,211,77,.65)',
+                  boxShadow: '0 12px 28px -8px rgba(252,211,77,.45), 0 4px 12px -4px rgba(0,0,0,.2)',
+                  font: '600 13px/1.35 "Nunito", sans-serif',
+                  color: '#124346',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  zIndex: 7,
+                }}
+              >
+                <div style={{ font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '.22em', textTransform: 'uppercase', color: '#b45309', marginBottom: 4 }}>
+                  {lang === 'de' ? 'Ronki ruft' : 'Ronki calls'}
+                </div>
+                {witnessLine.reveal}
+              </button>
+            </>
+          )}
 
           {/* Pending-position marker — dashed drop-target ellipse where
               the tap landed, matches Claude Design's .drop-target. */}

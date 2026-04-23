@@ -422,6 +422,10 @@ interface TaskActions {
   /** Remove a decor item from the scene. Ownership persists (ownedDecor
    *  is not mutated) so the kid can re-place it later without re-paying. */
   removeDecor: (id: string) => void;
+  /** Mark a plant's current stage as "witnessed" (kid saw + dismissed
+   *  Ronki's invitation). Updates garden.witnessedStages[plantId].
+   *  No-op if the plant doesn't exist. Phase 2 of the time-stack. */
+  witnessPlant: (plantId: string, stage: import('../types').PlantStage) => void;
 }
 
 interface CelebrationEvent {
@@ -1966,6 +1970,25 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const witnessPlant = useCallback((plantId: string, stage: import('../types').PlantStage) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const garden = getOrInitGarden(prev);
+      const plant = garden.plants.find(p => p.id === plantId);
+      if (!plant) return prev;  // plant removed or never existed
+      return {
+        ...prev,
+        garden: {
+          ...garden,
+          witnessedStages: {
+            ...(garden.witnessedStages || {}),
+            [plantId]: stage,
+          },
+        },
+      };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -1989,7 +2012,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

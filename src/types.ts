@@ -322,6 +322,8 @@ export interface GardenDecor {
   position: { x: number; y: number };  // % of scene (0–100)
 }
 
+export type PlantStage = 'sprout' | 'young' | 'mid' | 'mature';
+
 export interface GardenState {
   plants: GardenPlant[];
   decor: GardenDecor[];
@@ -329,6 +331,12 @@ export interface GardenState {
   lastWeeklyPlanting: string | null;  // ISO date of the *Sunday* when last planted
   /** Decor types the kid has access to (defaults seeded on first load) */
   ownedDecor: DecorType[];
+  /** Per-plant: the highest stage the kid has already witnessed via a
+   *  Ronki invitation. When the computed current stage (from plantedAt)
+   *  exceeds this, a witness beat is due. Phase 2 of the core-gameloop-
+   *  time-stack — plants crossing a horizon boundary get an invitation
+   *  from Ronki on the Hub. See Q7 C+ / Q8 D in the discovery. */
+  witnessedStages?: Record<string, PlantStage>;
 }
 
 export interface ComputedState {
