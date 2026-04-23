@@ -16,6 +16,8 @@ import Journal from './components/Journal';
 import HeldenKodex from './components/HeldenKodex';
 import Onboarding from './components/Onboarding';
 import ParentOnboarding from './components/ParentOnboarding';
+import KidIntro from './components/KidIntro';
+import HandoffBackCard from './components/HandoffBackCard';
 import PWAInstallSheet from './components/PWAInstallSheet';
 import { usePWAInstall } from './hooks/usePWAInstall';
 import { usePWAPromptGate } from './hooks/usePWAPromptGate';
@@ -331,20 +333,47 @@ function AppContent() {
     );
   }
 
-  // Parent onboarding gate — Track A (22 Apr 2026). Runs BEFORE the kid's
-  // Onboarding.jsx so the parent sets up the PIN and learns where the
-  // lock icons live before handing the phone over. Existing users get
-  // parentOnboardingDone auto-set to !!onboardingDone in the TaskContext
-  // loader, so they skip this entirely.
-  if (state && !state.parentOnboardingDone) {
+  // ── Parent-first onboarding choreography (23 Apr 2026 rework) ──
+  // The sequence is: KidIntro (Phase 1+2) → ParentOnboarding (Phase 3) →
+  // HandoffBackCard (Phase 4) → Onboarding (Phase 5 hatch+name) → Hub
+  // (Phase 6 Lagerfeuer gentle pull). Each phase has its own state flag
+  // so returning mid-flow resumes at the right place. Existing users get
+  // all flags migrated to !!onboardingDone in the TaskContext loader so
+  // they skip the whole sequence.
+  //
+  // See docs/discovery/2026-04-23-onboarding-parent-first/transcript.md
+
+  // Phase 1 + 2 — Kid intro (forest, egg, Ronki peek, "Mama oder Papa?" handoff)
+  if (state && !state.kidIntroSeen) {
     return (
-      <ParentOnboarding onComplete={(patch) => {
-        actions.patchState(patch);
+      <KidIntro onComplete={() => {
+        actions.patchState({ kidIntroSeen: true });
       }} />
     );
   }
 
-  // Onboarding gate
+  // Phase 3 — Parent setup (Lean 5 steps: Welcome/PIN/Family/Analytics/Done)
+  if (state && !state.parentOnboardingDone) {
+    return (
+      <ParentOnboarding
+        existingFamilyConfig={state.familyConfig}
+        onComplete={(patch) => {
+          actions.patchState(patch);
+        }}
+      />
+    );
+  }
+
+  // Phase 4 — Handoff back to kid ("Fertig! / Jetzt bist du dran.")
+  if (state && !state.parentHandoffBackSeen) {
+    return (
+      <HandoffBackCard onContinue={() => {
+        actions.patchState({ parentHandoffBackSeen: true });
+      }} />
+    );
+  }
+
+  // Phase 5 — Kid onboarding (existing Onboarding.jsx: hatch + name)
   if (state && !state.onboardingDone) {
     return (
       <Onboarding onComplete={(cfg) => {
@@ -686,6 +715,16 @@ function AuthGate() {
       const startStep = parseInt(p.get('step') || '0', 10) || 0;
       return <Onboarding startStep={startStep} onComplete={() => {}} />;
     }
+    // QA route for the parent-first onboarding choreography (23 Apr 2026
+    // rework). Lets Marc smoke-test the full KidIntro → ParentOnboarding →
+    // HandoffBack → Onboarding sequence across viewports without a real
+    // Supabase account. Each phase advances the local pointer on
+    // onComplete; the last phase loops back to phase 0 so a designer can
+    // keep cycling. Use ?parentFirstPreview=1 or add &phase=N to jump.
+    if (p.get('parentFirstPreview') === '1') {
+      const startPhase = parseInt(p.get('phase') || '0', 10) || 0;
+      return <ParentFirstPreview startPhase={startPhase} />;
+    }
   }
 
   if (!user) {
@@ -733,6 +772,36 @@ class ErrorBoundaryInner extends React.Component {
   static getDerivedStateFromError(e) { return { hasError: true, error: e }; }
   componentDidCatch(e) { this.props.onError(e); }
   render() { return this.state.hasError ? null : this.props.children; }
+}
+
+// ── ParentFirstPreview ────────────────────────────────────────────────
+// QA harness for the 23-Apr-2026 onboarding rework. Walks through the
+// new choreography end-to-end (KidIntro → ParentOnboarding → HandoffBack
+// → Onboarding) using local state, no Supabase account required.
+// Reached via ?parentFirstPreview=1 (optionally &phase=N to jump in).
+// The final phase loops back to phase 0 so designers can cycle. For
+// Phase-6 (Lagerfeuer greeting) QA, open the real flow after signing
+// in — the bubble + visual thread render on Hub.jsx, not here.
+function ParentFirstPreview({ startPhase = 0 }) {
+  const [phase, setPhase] = React.useState(startPhase);
+  const next = () => setPhase((p) => (p >= 3 ? 0 : p + 1));
+
+  if (phase === 0) {
+    return <KidIntro onComplete={next} />;
+  }
+  if (phase === 1) {
+    return (
+      <ParentOnboarding
+        existingFamilyConfig={undefined}
+        onComplete={() => next()}
+      />
+    );
+  }
+  if (phase === 2) {
+    return <HandoffBackCard onContinue={next} />;
+  }
+  // phase 3 — kid Onboarding (existing component). Loops back to 0 on complete.
+  return <Onboarding onComplete={next} />;
 }
 
 export default function App() {

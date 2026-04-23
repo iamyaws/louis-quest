@@ -73,6 +73,20 @@ export interface TaskState {
   catEvo: number;
   loginBonusClaimed: boolean;
   onboardingDone: boolean;
+  /** Kid saw the Phase-1 forest intro ("Hallo! Bevor wir uns kennenlernen …")
+   *  and tapped through to the kid→parent handoff. Gates whether we show the
+   *  KidIntro before ParentOnboarding on first launch. Added in the
+   *  onboarding-parent-first rework (23 Apr 2026). */
+  kidIntroSeen?: boolean;
+  /** Parent tapped through the Phase-4 "Fertig! / Jetzt bist du dran." card
+   *  after finishing their 5-step setup. Gates the kid's entry to the
+   *  existing Onboarding.jsx (egg hatch + name). Added 23 Apr 2026. */
+  parentHandoffBackSeen?: boolean;
+  /** Kid has seen Ronki's first speech bubble at the Lagerfeuer (Phase 6
+   *  gentle pull: "Magst du mir zeigen, was du morgens machst?"). Drives
+   *  the one-shot overlay + visual thread to the routine card on first
+   *  Hub arrival. Added 23 Apr 2026. */
+  lagerfeuerGreeted?: boolean;
   journalMemory: string;
   journalGratitude: string[];
   journalDayEmoji: number | null;
@@ -461,6 +475,12 @@ export function createInitialState(): TaskState {
     catEvo: 0,
     loginBonusClaimed: false,
     onboardingDone: false,
+    // Onboarding-parent-first rework (23 Apr 2026): three new gates drive
+    // the KidIntro → ParentOnboarding → HandoffBack → kid Onboarding →
+    // Lagerfeuer-greeting choreography. All start false on a fresh save.
+    kidIntroSeen: false,
+    parentHandoffBackSeen: false,
+    lagerfeuerGreeted: false,
     journalMemory: '',
     journalGratitude: [],
     journalDayEmoji: null,
@@ -624,6 +644,14 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           catEvo: raw.catEvo || 0,
           loginBonusClaimed: raw.loginBonusClaimed || false,
           onboardingDone: raw.onboardingDone || false,
+          // Onboarding-parent-first rework (23 Apr 2026) — migration:
+          // pre-rework users already past onboardingDone shouldn't be dragged
+          // through the new intros/handoff/greeting retroactively. If their
+          // save has onboardingDone=true, we default all three new flags to
+          // true. Fresh installs get the full sequence.
+          kidIntroSeen: (raw as any).kidIntroSeen ?? !!raw.onboardingDone,
+          parentHandoffBackSeen: (raw as any).parentHandoffBackSeen ?? !!raw.onboardingDone,
+          lagerfeuerGreeted: (raw as any).lagerfeuerGreeted ?? !!raw.onboardingDone,
           journalMemory: raw.journalMemory || '',
           journalGratitude: raw.journalGratitude || [],
           journalDayEmoji: raw.journalDayEmoji ?? null,

@@ -304,7 +304,21 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   const showHeuteHint = hintPlacement === 'heute' && ronkiLocked;
   const showRonkiVoiceHint = hintPlacement === 'ronki' && ronkiLocked;
   const baseQuip = pickQuip(_h, quipRollKey);
-  const currentQuip = showRonkiVoiceHint ? t('unlockHint.ronki.voice') : baseQuip;
+  // ── Phase 6 Lagerfeuer gentle pull (parent-first onboarding rework) ──
+  // On first arrival at the Lagerfeuer (after parent setup + kid hatch),
+  // Ronki's quip is overridden with the targeted invitation pointing at
+  // the HEUTE card: "Magst du mir zeigen, was du morgens machst?". A
+  // visual thread (pulsing dotted line) draws the kid's eye from Ronki
+  // to the card. Dismissed when the kid taps the HEUTE card (which
+  // already navigates to quests) — sets lagerfeuerGreeted=true so the
+  // override clears on next render.
+  // See docs/discovery/2026-04-23-onboarding-parent-first/transcript.md
+  const showLagerfeuerGreeting = !state.lagerfeuerGreeted;
+  const currentQuip = showLagerfeuerGreeting
+    ? t('lagerfeuer.greeting.bubble')
+    : showRonkiVoiceHint
+      ? t('unlockHint.ronki.voice')
+      : baseQuip;
 
   // Tagebuch + Laden unlock hints (always-on on the relevant Hub cards
   // when those tabs are locked; Marc Apr 2026: "showcase it on the
@@ -690,13 +704,24 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
              per Marc) — see new mount point below the Als-Nächstes card. */}
 
         {/* ── HEUTE card (Aufgabentracker from A) + anchor rail ── */}
-        <button onClick={() => onNavigate?.('quests')}
+        <button onClick={() => {
+                  // Phase 6 dismissal: first tap of HEUTE after kid arrival
+                  // clears the lagerfeuer greeting so the quip reverts to
+                  // normal time-of-day lines on next Hub visit.
+                  if (showLagerfeuerGreeting) {
+                    actions.patchState?.({ lagerfeuerGreeted: true });
+                  }
+                  onNavigate?.('quests');
+                }}
                 className="w-full p-6 rounded-2xl relative overflow-hidden text-left active:scale-[0.98] transition-transform"
                 style={{
                   background: 'linear-gradient(135deg, rgba(255,255,255,0.94) 0%, rgba(255,244,224,0.88) 80%)',
                   backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255,255,255,0.9)',
-                  boxShadow: '0 12px 36px -8px rgba(18,67,70,0.18), inset 0 1px 0 rgba(255,255,255,0.6)'
+                  border: showLagerfeuerGreeting ? '2px solid rgba(252,211,77,0.9)' : '1px solid rgba(255,255,255,0.9)',
+                  boxShadow: showLagerfeuerGreeting
+                    ? '0 12px 36px -8px rgba(252,211,77,0.35), 0 0 0 6px rgba(252,211,77,0.18), inset 0 1px 0 rgba(255,255,255,0.6)'
+                    : '0 12px 36px -8px rgba(18,67,70,0.18), inset 0 1px 0 rgba(255,255,255,0.6)',
+                  animation: showLagerfeuerGreeting ? 'lagerfeuerPulse 2.4s ease-in-out infinite' : undefined,
                 }}>
           <span className="absolute top-3 right-20 text-base opacity-60 select-none" aria-hidden="true">✦</span>
           <span className="absolute bottom-3 left-5 text-xs opacity-40 select-none" aria-hidden="true">✦</span>
