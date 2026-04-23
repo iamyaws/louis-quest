@@ -16,6 +16,10 @@
  *   4. 'Experiment' — the UeberMich origin frame, why-we-built-it
  *
  * Shared ParentBack on the reverse (3 differentiators + QR + signoff).
+ * Fronts keep the text breathing — the QR lives only on the back (Marc:
+ * "do we need the QR on the front when it's also on the back?" — no.)
+ * A small app-mockup peek sits in the bottom-right corner of each front
+ * as a visual tip-in; text still does the heavy lifting.
  *
  * Print output: 2-page A4 PDF
  *   Page 1: 4 distinct fronts tiled 2×2
@@ -31,21 +35,19 @@
 import { useEffect } from 'react';
 import { PhoneMockup } from '../components/PhoneMockup';
 
-/* ── Shared app-mockup art block for every front ───────────── *
- * Repurposes the PhoneMockup component we built for the
- * Gemeindeblatt foto, scaled down for A6 (~42×75mm). Cream UI
- * background blends into cream-flyer variants; on the dark-teal
- * variant the cream phone reads as a brightly-lit screen in
- * a dim room — good contrast, intentional focus.
- *
- * Tilt is -4° by default (can be flipped per variant for the
- * flatlay-set rhythm across the 4 tiles). Drop-shadow is dual
- * for softness + definition; tighter on dark bg.
+/* ── Mockup peek — small decorative accent ─────────────────── *
+ * First attempt made the mockup dominant; Marc pushed back —
+ * "imagery feels too big … try to fit it into the previous
+ * version of your cover designs." So this is a small peek
+ * (~21×38mm at scale 0.65), absolute-positioned in the bottom-
+ * right corner, tilted for a flatlay vibe. Sibling of .ef-inner
+ * so it can bleed toward the flyer edge without fighting the
+ * text column's padding.
  * ─────────────────────────────────────────────────────────── */
 type AppArtVariant = 'morgen-anchor' | 'clean-aufgaben' | 'zahne-quest' | 'mood-grid';
 function AppArt({
   variant,
-  tilt = -4,
+  tilt = -7,
   theme = 'light',
 }: {
   variant: AppArtVariant;
@@ -53,21 +55,17 @@ function AppArt({
   theme?: 'light' | 'dark';
 }) {
   return (
-    <div className={`ef-stage ef-stage--${theme}`}>
-      <div className="ef-mockup" style={{ transform: `rotate(${tilt}deg)` }}>
-        <PhoneMockup variant={variant} scale={1.3} />
-      </div>
+    <div
+      className={`ef-peek ef-peek--${theme}`}
+      style={{ transform: `rotate(${tilt}deg)` }}
+      aria-hidden
+    >
+      <PhoneMockup variant={variant} scale={0.65} />
     </div>
   );
 }
 
 const APP_QR_URL =
-  'https://api.qrserver.com/v1/create-qr-code/?' +
-  'data=https%3A%2F%2Fwww.ronki.de' +
-  '&size=500x500&format=png&margin=8&color=1a3c3f&bgcolor=fdf8f0';
-
-// QR for the dark-teal variant uses cream background so it scans cleanly
-const APP_QR_URL_DARK =
   'https://api.qrserver.com/v1/create-qr-code/?' +
   'data=https%3A%2F%2Fwww.ronki.de' +
   '&size=500x500&format=png&margin=8&color=1a3c3f&bgcolor=fdf8f0';
@@ -94,23 +92,6 @@ function CutMarks() {
   );
 }
 
-/* ── Shared QR row (appears at bottom of every front) ─────── */
-
-function QrRow({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
-  const qrSrc = variant === 'dark' ? APP_QR_URL_DARK : APP_QR_URL;
-  return (
-    <div className={`ef-qr-row ef-qr-row--${variant}`}>
-      <img src={qrSrc} alt="QR-Code zu ronki.de" className="ef-qr" />
-      <div className="ef-qr-text">
-        <p className="ef-qr-main">
-          <strong>ronki.de</strong>
-        </p>
-        <p className="ef-qr-sub">Direkt im Browser, kostenlos.</p>
-      </div>
-    </div>
-  );
-}
-
 /* ── Front 1: „Stell dir vor, du sagst es nur einmal" ──── *
  * Typography-heavy hero-echo. Most universal — the promise.
  * ─────────────────────────────────────────────────────────── */
@@ -129,10 +110,13 @@ function FrontNurEinmal() {
           <span className="ef-mustard-underline">nur einmal</span>.
         </h2>
 
-        <AppArt variant="morgen-anchor" tilt={-4} />
-
-        <QrRow />
+        <p className="ef-body">
+          Zähne putzen, Tasche packen, Schuhe an. Ronki ist der
+          Drachen-Gefährte, der dein Kind daran erinnert. Nicht du.
+          Nicht zum zehnten Mal.
+        </p>
       </div>
+      <AppArt variant="morgen-anchor" tilt={-7} />
     </section>
   );
 }
@@ -149,18 +133,20 @@ function FrontPullover() {
         <p className="ef-eyebrow">Viertel nach sieben</p>
 
         <p className="ef-vignette">
-          Pulli an, Zähne nicht. Fleck. Umziehen. Ersatz-Pulli gefällt nicht.
-          Seufzer, auf beiden Seiten.
+          Der Pulli ist an, die Zähne noch nicht geputzt. Dann der
+          Zahnpasta-Fleck auf dem Lieblingspulli. Umziehen. Ersatz-Pulli
+          gefällt nicht. Seufzer und Frust, auf beiden Seiten.
+        </p>
+
+        <p className="ef-reveal">
+          So sieht ein Morgen aus, den jedes Elternteil kennt.
         </p>
 
         <p className="ef-promise">
-          Ronki macht den Morgen <em>ruhiger</em>.
+          Ronki macht ihn nicht perfekt. Nur ein bisschen <em>ruhiger</em>.
         </p>
-
-        <AppArt variant="clean-aufgaben" tilt={-4} />
-
-        <QrRow />
       </div>
+      <AppArt variant="clean-aufgaben" tilt={-6} />
     </section>
   );
 }
@@ -177,15 +163,19 @@ function FrontBloederRonki() {
         <p className="ef-eyebrow ef-eyebrow--dark">Vater-Sohn-Projekt</p>
 
         <blockquote className="ef-quote">
-          „Blöder Ronki, jetzt muss ich schon wieder meine Sachen machen."
+          „Blöder Ronki, jetzt muss ich schon wieder meine Sachen machen,
+          nur weil wir uns das ausgedacht haben."
         </blockquote>
 
         <p className="ef-attribution">&mdash; Louis, 7, Co-Designer</p>
 
-        <AppArt variant="zahne-quest" tilt={-4} theme="dark" />
-
-        <QrRow variant="dark" />
+        <p className="ef-body ef-body--dark">
+          Das sagt mein Sohn manchmal über die App, die wir gemeinsam
+          gebaut haben. Sie nervt ihn. Sie hilft ihm trotzdem. Das ist
+          das Echteste, was man über ein Vater-Sohn-Projekt sagen kann.
+        </p>
       </div>
+      <AppArt variant="zahne-quest" tilt={-6} theme="dark" />
     </section>
   );
 }
@@ -206,14 +196,17 @@ function FrontExperiment() {
         </h2>
 
         <p className="ef-body">
-          Ich arbeite als Gaming-Consultant. Ich weiß, wie Apps Kinder festhalten.
-          Ich wollte das nie in der Hand meines Kindes sehen.
+          Ich arbeite seit Jahren als Consultant für Gaming. Ich weiß,
+          wie Apps Kinder festhalten. Ein Teil von mir hat beruflich
+          daran mitgebaut. Ein anderer Teil wollte das nie in der Hand
+          seines eigenen Kindes sehen.
         </p>
 
-        <AppArt variant="mood-grid" tilt={-4} />
-
-        <QrRow />
+        <p className="ef-signature">
+          Marc Förster, Unterföhring
+        </p>
       </div>
+      <AppArt variant="mood-grid" tilt={-7} />
     </section>
   );
 }
@@ -457,51 +450,47 @@ const flyerFrontsCss = `
     top: 0; left: 0; right: 0;
     height: 4mm;
     background: linear-gradient(90deg, #FCD34D, #50A082);
+    z-index: 3;
   }
   .ef-inner {
     height: 100%;
-    padding: 8mm 7mm 6mm;
+    padding: 10mm 8mm 7mm;
     display: flex;
     flex-direction: column;
     position: relative;
     z-index: 2;
-    gap: 2mm;
   }
-  .ef-spacer { flex: 1; min-height: 2mm; }
 
-  /* ── App-art stage ─────────────────────────────────────── *
-   * Flex-grow area between text + QR. Mockup is absolutely
-   * positioned so it can overflow the stage visually (tilt
-   * gives it slight corner bleed) without breaking layout. */
-  .ef-stage {
-    flex: 1;
-    min-height: 0;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 1mm 0 2mm;
-  }
-  .ef-mockup {
-    width: 44mm;
-    height: 79mm;
-    border-radius: 3mm;
+  /* ── App-mockup peek ───────────────────────────────────── *
+   * Small absolute-positioned tip-in in the bottom-right
+   * corner. Sibling of .ef-inner so it sits above the text
+   * layer and can bleed toward the edge. scale=0.65 inside
+   * PhoneMockup gives ~21×38mm — small enough not to fight
+   * the headline, big enough to read as a real app screen.
+   * Lower-left edge stays clear so long body text isn't
+   * occluded (3rd line usually short of that corner).       */
+  .ef-peek {
+    position: absolute;
+    right: 3mm;
+    bottom: 4mm;
+    transform-origin: bottom right;
+    z-index: 3;
+    pointer-events: none;
+    border-radius: 2.5mm;
     overflow: hidden;
     box-shadow:
-      0 3mm 6mm rgba(26,60,63,0.22),
-      0 1mm 2mm rgba(26,60,63,0.12);
-    transform-origin: center center;
+      0 2mm 4mm rgba(26,60,63,0.22),
+      0 0.5mm 1mm rgba(26,60,63,0.12);
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
-  .ef-stage--dark .ef-mockup {
-    /* Cream UI on dark teal bg — add warm rim + deeper shadow
-       so the phone reads as a lit screen in a dim room, not
-       a pasted rectangle. */
+  .ef-peek--dark {
+    /* Cream UI on dark teal bg — warm rim + deeper shadow so
+       the phone reads as a lit screen in a dim room. */
     box-shadow:
-      0 0 0 0.3mm rgba(253,248,240,0.08),
-      0 4mm 8mm rgba(0,0,0,0.45),
-      0 1mm 2mm rgba(0,0,0,0.3);
+      0 0 0 0.25mm rgba(253,248,240,0.1),
+      0 2.5mm 5mm rgba(0,0,0,0.5),
+      0 0.5mm 1mm rgba(0,0,0,0.35);
   }
 
   .ef-eyebrow {
@@ -511,7 +500,7 @@ const flyerFrontsCss = `
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: #50A082;
-    margin: 0;
+    margin: 0 0 4mm;
   }
   .ef-eyebrow--dark {
     color: #FCD34D;
@@ -519,10 +508,10 @@ const flyerFrontsCss = `
 
   .ef-body {
     font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    font-size: 8pt;
-    line-height: 1.4;
+    font-size: 8.5pt;
+    line-height: 1.5;
     color: rgba(26,60,63,0.82);
-    margin: 0;
+    margin: 0 0 3mm;
   }
   .ef-body--dark {
     color: rgba(253,248,240,0.85);
@@ -537,11 +526,11 @@ const flyerFrontsCss = `
   .ef-headline--nur-einmal {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 800;
-    font-size: 18pt;
+    font-size: 21pt;
     line-height: 1.05;
     letter-spacing: -0.02em;
     color: #1A3C3F;
-    margin: 0;
+    margin: 0 0 5mm;
   }
   .ef-mustard-underline {
     position: relative;
@@ -569,27 +558,27 @@ const flyerFrontsCss = `
   }
   .ef-vignette {
     font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    font-size: 8.5pt;
-    line-height: 1.4;
-    color: rgba(26,60,63,0.88);
-    margin: 0;
+    font-size: 9pt;
+    line-height: 1.45;
+    color: rgba(26,60,63,0.9);
+    margin: 0 0 4mm;
   }
   .ef-reveal {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 10pt;
+    font-size: 11pt;
     font-style: italic;
     color: #50A082;
     line-height: 1.25;
-    margin: 0;
+    margin: 0 0 3mm;
   }
   .ef-promise {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 11pt;
+    font-size: 12pt;
     color: #1A3C3F;
     line-height: 1.2;
-    margin: 0;
+    margin: 0 0 3mm;
     letter-spacing: -0.01em;
   }
   .ef-promise em {
@@ -611,20 +600,20 @@ const flyerFrontsCss = `
   .ef-quote {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 13pt;
+    font-size: 14pt;
     font-style: italic;
-    line-height: 1.22;
+    line-height: 1.25;
     color: #FDF8F0;
-    margin: 0;
+    margin: 0 0 2mm;
     letter-spacing: -0.01em;
   }
   .ef-attribution {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-size: 7.5pt;
+    font-size: 8pt;
     font-weight: 700;
     color: #FCD34D;
     letter-spacing: 0.04em;
-    margin: 0;
+    margin: 0 0 4mm;
   }
 
   /* ── Variant 4: Experiment (cream + sage accent, philosophy) ── */
@@ -636,11 +625,11 @@ const flyerFrontsCss = `
   .ef-headline--experiment {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 800;
-    font-size: 13pt;
+    font-size: 15pt;
     line-height: 1.15;
     letter-spacing: -0.01em;
     color: #1A3C3F;
-    margin: 0;
+    margin: 0 0 4mm;
   }
   .ef-headline--experiment em {
     font-style: italic;
@@ -650,57 +639,10 @@ const flyerFrontsCss = `
   .ef-signature {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 7.5pt;
+    font-size: 8pt;
     color: rgba(26,60,63,0.65);
-    margin: 0;
+    margin: 0 0 3mm;
     letter-spacing: 0.04em;
-  }
-
-  /* ── Shared QR row ── */
-  .ef-qr-row {
-    display: flex;
-    align-items: center;
-    gap: 2.5mm;
-    padding-top: 3mm;
-    border-top: 0.3mm dashed rgba(26,60,63,0.25);
-  }
-  .ef-qr-row--dark {
-    border-top-color: rgba(253,248,240,0.25);
-  }
-  .ef-qr {
-    width: 15mm;
-    height: 15mm;
-    border-radius: 1mm;
-    border: 0.3mm solid rgba(26,60,63,0.12);
-    flex-shrink: 0;
-  }
-  .ef-qr-text { flex: 1; }
-  .ef-qr-main {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-size: 9pt;
-    color: #1A3C3F;
-    margin: 0;
-    line-height: 1.1;
-  }
-  .ef-qr-row--dark .ef-qr-main {
-    color: #FDF8F0;
-  }
-  .ef-qr-main strong {
-    color: #B45309;
-    font-weight: 800;
-  }
-  .ef-qr-row--dark .ef-qr-main strong {
-    color: #FCD34D;
-  }
-  .ef-qr-sub {
-    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    font-size: 7pt;
-    color: rgba(26,60,63,0.6);
-    margin: 0.5mm 0 0;
-    line-height: 1.3;
-  }
-  .ef-qr-row--dark .ef-qr-sub {
-    color: rgba(253,248,240,0.7);
   }
 `;
 

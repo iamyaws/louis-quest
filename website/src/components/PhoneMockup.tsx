@@ -246,9 +246,9 @@ function MorgenAnchor() {
             <MiniRing done={2} total={6} />
           </div>
           <div className="pm-quests">
-            <QuestRow icon={<span className="pm-emoji">🪥</span>} title="Zähne putzen" xp={12} status="done" />
-            <QuestRow icon={<span className="pm-emoji">👕</span>} title="Anziehen" hint="8° / 14°, Jacke mit" xp={10} status="next" />
-            <QuestRow icon={<span className="pm-emoji">🥐</span>} title="Frühstück" xp={15} status="todo" />
+            <QuestRow icon={<span className="pm-emoji">👕</span>} title="Anziehen" hint="8° / 14°, Jacke mit" xp={10} status="done" />
+            <QuestRow icon={<span className="pm-emoji">🥐</span>} title="Frühstück" xp={15} status="next" />
+            <QuestRow icon={<span className="pm-emoji">🪥</span>} title="Zähne putzen" xp={12} status="todo" />
           </div>
         </section>
       </div>
@@ -419,9 +419,9 @@ function CleanAufgaben() {
             </div>
           </div>
           <div className="pm-quests">
-            <QuestRow icon={<span className="pm-emoji">🪥</span>} title="Zähne putzen" xp={12} status="done" />
             <QuestRow icon={<span className="pm-emoji">👕</span>} title="Anziehen" xp={10} status="done" />
             <QuestRow icon={<span className="pm-emoji">🥐</span>} title="Frühstück" xp={15} status="done" />
+            <QuestRow icon={<span className="pm-emoji">🪥</span>} title="Zähne putzen" xp={12} status="done" />
           </div>
         </section>
       </div>
