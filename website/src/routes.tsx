@@ -27,6 +27,7 @@ const PrintA6FlyerKidsPass = lazy(() => import('./pages/PrintA6FlyerKidsPass'));
 const PrintSheetA4KidsCard = lazy(() => import('./pages/PrintSheetA4KidsCard'));
 const PrintSheetA4ElternFlyer = lazy(() => import('./pages/PrintSheetA4ElternFlyer'));
 const PrintGemeindeblattFoto = lazy(() => import('./pages/PrintGemeindeblattFoto'));
+const PrintGemeindeblattFotoEn = lazy(() => import('./pages/PrintGemeindeblattFotoEn'));
 const PrintA4Poster = lazy(() => import('./pages/PrintA4Poster'));
 const PrintA4PosterHort = lazy(() => import('./pages/PrintA4PosterHort'));
 const PrintA4PosterBaeckerei = lazy(() => import('./pages/PrintA4PosterBaeckerei'));
@@ -89,6 +90,7 @@ export function AppRoutes() {
         <Route path="/print/sheet-a4-kids-card" element={<PrintSheetA4KidsCard />} />
         <Route path="/print/sheet-a4-eltern-flyer" element={<PrintSheetA4ElternFlyer />} />
         <Route path="/print/gemeindeblatt-foto" element={<PrintGemeindeblattFoto />} />
+        <Route path="/print/gemeindeblatt-foto-en" element={<PrintGemeindeblattFotoEn />} />
         <Route path="/print/a4-poster" element={<PrintA4Poster />} />
         <Route path="/print/a4-poster-hort" element={<PrintA4PosterHort />} />
         <Route path="/print/a4-poster-baeckerei" element={<PrintA4PosterBaeckerei />} />

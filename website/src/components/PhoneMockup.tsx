@@ -21,6 +21,59 @@
 
 import { CSSProperties, ReactNode } from 'react';
 
+type Locale = 'de' | 'en';
+
+/**
+ * Locale strings for the mockup. Keep variant-scoped keys nested so each
+ * variant's dictionary can grow without colliding. Only variants that have
+ * been translated need both locales; untranslated variants stay DE-only and
+ * ignore the locale prop.
+ */
+const L = {
+  de: {
+    back: 'Lager',
+    nav: {
+      lager: 'Lager',
+      quests: 'Quests',
+      laden: 'Laden',
+      buch: 'Buch',
+      ronki: 'Ronki',
+    },
+    morgenAnchor: {
+      eyebrow: 'Mittwoch · Woche 3',
+      h1Prefix: 'Deine Aufgaben, ',
+      h1Suffix: '.',
+      sectionTitle: 'Morgen',
+      sectionHint: 'Noch 4 offen.',
+      taskGetDressed: 'Anziehen',
+      taskGetDressedHint: '8° / 14°, Jacke mit',
+      taskBreakfast: 'Frühstück',
+      taskBrushTeeth: 'Zähne putzen',
+    },
+  },
+  en: {
+    back: 'Camp',
+    nav: {
+      lager: 'Camp',
+      quests: 'Quests',
+      laden: 'Shop',
+      buch: 'Book',
+      ronki: 'Ronki',
+    },
+    morgenAnchor: {
+      eyebrow: 'Wednesday · Week 3',
+      h1Prefix: 'Your quests, ',
+      h1Suffix: '.',
+      sectionTitle: 'Morning',
+      sectionHint: '4 left to go.',
+      taskGetDressed: 'Get dressed',
+      taskGetDressedHint: '8° / 14°, bring a jacket',
+      taskBreakfast: 'Breakfast',
+      taskBrushTeeth: 'Brush teeth',
+    },
+  },
+} as const;
+
 type PhoneMockupVariant =
   | 'morgen-anchor'
   | 'zahne-quest'
@@ -32,6 +85,11 @@ interface PhoneMockupProps {
   variant: PhoneMockupVariant;
   /** Scale factor for all internal dimensions. 1 = print. Web: 1.5-3. */
   scale?: number;
+  /**
+   * Display language. Defaults to German. Currently only `morgen-anchor`
+   * honours the locale; other variants render DE regardless.
+   */
+  locale?: Locale;
 }
 
 // ─── Shared sub-components ────────────────────────────────────────────
@@ -39,9 +97,11 @@ interface PhoneMockupProps {
 function TopBar({
   hp = 128,
   rightSlot,
+  locale = 'de',
 }: {
   hp?: number | null;
   rightSlot?: ReactNode;
+  locale?: Locale;
 }) {
   return (
     <div className="pm-topbar">
@@ -49,7 +109,7 @@ function TopBar({
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        <span>Lager</span>
+        <span>{L[locale].back}</span>
       </div>
       {rightSlot
         ? rightSlot
@@ -75,11 +135,18 @@ function ParentLockButton() {
   );
 }
 
-function NavBar({ active }: { active: 'lager' | 'quests' | 'laden' | 'buch' | 'ronki' }) {
+function NavBar({
+  active,
+  locale = 'de',
+}: {
+  active: 'lager' | 'quests' | 'laden' | 'buch' | 'ronki';
+  locale?: Locale;
+}) {
+  const t = L[locale].nav;
   const items: Array<{ key: typeof active; label: string; icon: ReactNode }> = [
     {
       key: 'lager',
-      label: 'Lager',
+      label: t.lager,
       icon: (
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M12 2 L7 9 H9 L5 15 H8 L4 21 H20 L16 15 H19 L15 9 H17 Z" />
@@ -88,7 +155,7 @@ function NavBar({ active }: { active: 'lager' | 'quests' | 'laden' | 'buch' | 'r
     },
     {
       key: 'quests',
-      label: 'Quests',
+      label: t.quests,
       icon: (
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M12 2 L14.5 8.5 L22 9.3 L16.5 14 L18 21 L12 17.5 L6 21 L7.5 14 L2 9.3 L9.5 8.5 Z" />
@@ -97,7 +164,7 @@ function NavBar({ active }: { active: 'lager' | 'quests' | 'laden' | 'buch' | 'r
     },
     {
       key: 'laden',
-      label: 'Laden',
+      label: t.laden,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M5 7 h14 l-1.5 13 H6.5 z" />
@@ -107,7 +174,7 @@ function NavBar({ active }: { active: 'lager' | 'quests' | 'laden' | 'buch' | 'r
     },
     {
       key: 'buch',
-      label: 'Buch',
+      label: t.buch,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M4 5 a2 2 0 0 1 2-2 h12 v17 H6 a2 2 0 0 0-2 2 V5 z" />
@@ -118,7 +185,7 @@ function NavBar({ active }: { active: 'lager' | 'quests' | 'laden' | 'buch' | 'r
     },
     {
       key: 'ronki',
-      label: 'Ronki',
+      label: t.ronki,
       icon: (
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <circle cx="7" cy="9" r="2.3" />
@@ -224,15 +291,18 @@ const MoonIcon = (
 
 // ─── Variant: MorgenAnchor ────────────────────────────────────────────
 
-function MorgenAnchor() {
+function MorgenAnchor({ locale = 'de' }: { locale?: Locale }) {
+  const t = L[locale].morgenAnchor;
   return (
     <>
-      <TopBar hp={128} />
+      <TopBar hp={128} locale={locale} />
       <div className="pm-body">
         <div className="pm-header">
-          <p className="pm-eyebrow">Mittwoch · Woche 3</p>
+          <p className="pm-eyebrow">{t.eyebrow}</p>
           <h1 className="pm-h1">
-            Deine Aufgaben, <em>Louis</em>.
+            {t.h1Prefix}
+            <em>Louis</em>
+            {t.h1Suffix}
           </h1>
         </div>
 
@@ -240,19 +310,19 @@ function MorgenAnchor() {
           <div className="pm-anchor-head">
             <div className="pm-anchor-icon pm-icon-morning">{SunIcon}</div>
             <div className="pm-anchor-body">
-              <h3>Morgen</h3>
-              <p>Noch 4 offen.</p>
+              <h3>{t.sectionTitle}</h3>
+              <p>{t.sectionHint}</p>
             </div>
             <MiniRing done={2} total={6} />
           </div>
           <div className="pm-quests">
-            <QuestRow icon={<span className="pm-emoji">👕</span>} title="Anziehen" hint="8° / 14°, Jacke mit" xp={10} status="done" />
-            <QuestRow icon={<span className="pm-emoji">🥐</span>} title="Frühstück" xp={15} status="next" />
-            <QuestRow icon={<span className="pm-emoji">🪥</span>} title="Zähne putzen" xp={12} status="todo" />
+            <QuestRow icon={<span className="pm-emoji">👕</span>} title={t.taskGetDressed} hint={t.taskGetDressedHint} xp={10} status="done" />
+            <QuestRow icon={<span className="pm-emoji">🥐</span>} title={t.taskBreakfast} xp={15} status="next" />
+            <QuestRow icon={<span className="pm-emoji">🪥</span>} title={t.taskBrushTeeth} xp={12} status="todo" />
           </div>
         </section>
       </div>
-      <NavBar active="quests" />
+      <NavBar active="quests" locale={locale} />
     </>
   );
 }
@@ -432,11 +502,11 @@ function CleanAufgaben() {
 
 // ─── Main component ──────────────────────────────────────────────────
 
-export function PhoneMockup({ variant, scale = 1 }: PhoneMockupProps) {
+export function PhoneMockup({ variant, scale = 1, locale = 'de' }: PhoneMockupProps) {
   const style = { '--mockup-scale': scale } as CSSProperties;
   return (
     <div className="phone-mockup" style={style}>
-      {variant === 'morgen-anchor' && <MorgenAnchor />}
+      {variant === 'morgen-anchor' && <MorgenAnchor locale={locale} />}
       {variant === 'nacht-anchor' && <NachtAnchor />}
       {variant === 'zahne-quest' && <ZahneQuest />}
       {variant === 'mood-grid' && <MoodGrid />}
