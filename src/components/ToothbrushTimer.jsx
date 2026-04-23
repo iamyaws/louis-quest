@@ -29,6 +29,28 @@ const STAGES = [
   { pct: 1.00, label: 'Fertig!',      emoji: '🎉', side: 'done' },
 ];
 
+// Mid-session companion lines — encouragement + "Ronki brushes too" duet.
+// Fires at two random points per session (early + late gap) so brushing
+// doesn't go silent between quadrant transitions. Pool shared across both
+// fire windows, session-local exclusion so we don't hear the same line twice.
+const TEETH_MID_POOL = [
+  'de_teeth_mid_01',    // "Nicht aufhören! Die Ecken hinten sind knifflig."
+  'de_teeth_mid_02',    // "Kreise machen! So klein wie Erbsen."
+  'de_teeth_mid_03',    // "Hmm. Meine Zähne jucken auch..."
+  'de_teeth_mid_04',    // "Denk an die Rückseite!..."
+  'de_teeth_ronki_01',  // "Ich putz auch mit! Drachen-Zahnbürsten..."
+  'de_teeth_ronki_02',  // "Meine Zähne sind klein und spitz..."
+  'de_teeth_ronki_03',  // "Moment — wo ist meine Zahnbürste?..."
+];
+// Three variants for the final cheer so 3 successive brush sessions don't
+// close on the same line. Randomized per session.
+const TEETH_DONE_POOL = ['de_teeth_done', 'de_teeth_done_02', 'de_teeth_done_03'];
+
+function pickRandom(pool, exclude = null) {
+  const choices = exclude ? pool.filter(p => p !== exclude) : pool;
+  return choices[Math.floor(Math.random() * choices.length)];
+}
+
 const base = import.meta.env.BASE_URL;
 
 export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onParentOverride }) {
@@ -39,6 +61,13 @@ export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onPa
   const [remaining, setRemaining] = useState(duration);
   const [finished, setFinished] = useState(false);
   const intervalRef = useRef(null);
+  // Mid-line bookkeeping — picked once per session on mount so we know
+  // which line played early and can exclude it from the late slot.
+  const midLinesRef = useRef({ early: null, late: null });
+  if (midLinesRef.current.early === null) {
+    midLinesRef.current.early = pickRandom(TEETH_MID_POOL);
+    midLinesRef.current.late = pickRandom(TEETH_MID_POOL, midLinesRef.current.early);
+  }
   // Parent-PIN override — when a parent can see the child already
   // finished brushing but the timer still has 30-90s on the clock,
   // tapping "Eltern: fertig" + PIN completes the task immediately.
@@ -56,18 +85,26 @@ export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onPa
 
   // Countdown
   useEffect(() => {
+    // Mid-line fire points — inside the silent gaps between quadrant voices.
+    // For a 180s session that lands at ~30s and ~120s elapsed, well clear
+    // of the 45/90/135s quadrant transitions. Scales with `duration`.
+    const earlyMidTick = Math.max(20, Math.floor(duration / 6));   // ~30s @ 180s
+    const lateMidTick  = Math.max(30, Math.floor((2 * duration) / 3)); // ~120s @ 180s
     intervalRef.current = setInterval(() => {
       setRemaining(prev => {
         if (prev <= 1) {
           clearInterval(intervalRef.current);
           setFinished(true);
           SFX.play('alarm');
-          VoiceAudio.play('de_teeth_done');
+          // Pick a done variant — 3 options so successive sessions close
+          // differently. Falls back to 'de_teeth_done' naturally.
+          VoiceAudio.play(pickRandom(TEETH_DONE_POOL));
           // Was a long 200/100/200ms alarm — shortened to success pattern
           // so the end feels like a "done chime", not an alarm-clock buzz.
           haptic('success');
           return 0;
         }
+        const elapsed = duration - prev;
         // Voice + tick sound at stage transitions
         const newPct = 1 - ((prev - 1) / duration);
         const newStage = STAGES.reduce((acc, s) => newPct >= s.pct ? s : acc, STAGES[0]);
@@ -78,9 +115,18 @@ export default function ToothbrushTimer({ duration = 180, onFinish, onSkip, onPa
           // (shortest named pattern) so rapid quadrant changes don't feel
           // like repeated punches. Was a single 100ms.
           haptic('tap');
-          // Ronki voice for each quadrant
+          // Ronki voice for each quadrant — stays stable (spatial guidance).
           const voiceMap = ['de_teeth_start', 'de_teeth_topright', 'de_teeth_bottomleft', 'de_teeth_bottomright'];
           if (voiceMap[newIdx]) VoiceAudio.play(voiceMap[newIdx]);
+        }
+        // Mid-session encouragement — fire once early, once late. Picked
+        // on mount into midLinesRef, exclusion-pair so we never hear the
+        // same line twice in one session.
+        if (elapsed === earlyMidTick && midLinesRef.current.early) {
+          VoiceAudio.play(midLinesRef.current.early);
+        }
+        if (elapsed === lateMidTick && midLinesRef.current.late) {
+          VoiceAudio.play(midLinesRef.current.late);
         }
         // Halfway voice
         if (prev === Math.floor(duration / 2) + 1) {

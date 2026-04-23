@@ -119,34 +119,32 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
     }
 
     actions.complete(id);
-    // ── Ronki 'quest_complete' voice trigger — was dormant (no fire site)
-    //    until the Apr 2026 voice rewire. Fires on every main-quest tap that
-    //    flips done=false → true. Engine still honours 24h per-line cooldown
-    //    so the same phrase can't repeat, and streak-tagged lines (minQuestsToday≥3)
-    //    gate themselves on the questsCompletedToday context. 300ms delay
-    //    inside VoiceAudio.play keeps it from clashing with the tap SFX.
-    voice.say('quest_complete');
-    // ── Analytics: fire quest.complete with questId + anchor. Guard
-    //    against repeatable quests (target > 1) so we only count the
-    //    final tap that drives the quest to "fully done". If the quest
-    //    was already done this handler wouldn't run (canTap gates it
-    //    upstream), so quest.complete = 1 event per quest per day.
-    const anchor = quest?.anchor || 'unknown';
-    track('quest.complete', { questId: id, anchor });
-
-    // routine.complete — fires once per day when this tap takes the
-    //    last outstanding main quest to done. We compute the flip
-    //    synchronously against the just-mutated state rather than
-    //    waiting for the next render (state here is stale). Filter is
+    // ── Final-tap detection — mirrors the routine.complete analytics
+    //    logic so we can fire the "everything done" voice instead of the
+    //    normal quest_complete one. State here is stale (pre-mutation),
+    //    so we subtract this tap's quest from the remaining count by id.
     //    mainQuests only — side-quests don't gate routine completion.
+    let isFinalTap = false;
     if (quest && !quest.sideQuest) {
       const mainQuests = (state.quests || []).filter(q => !q.sideQuest);
       const remaining = mainQuests.filter(q => !q.done && q.id !== id).length;
       const priorAllDone = mainQuests.every(q => q.done);
       if (!priorAllDone && remaining === 0) {
+        isFinalTap = true;
         track('routine.complete');
       }
     }
+
+    // ── Ronki voice: 'all_done' when this tap flips the day complete
+    //    (peak-warmth celebration lines), otherwise 'quest_complete'
+    //    (per-tap reaction). Engine's 24h per-line cooldown keeps both
+    //    pools from feeling repetitive. 300ms delay inside VoiceAudio.play
+    //    keeps the voice from clashing with the tap SFX.
+    voice.say(isFinalTap ? 'all_done' : 'quest_complete');
+
+    // ── Analytics: fire quest.complete with questId + anchor.
+    const anchor = quest?.anchor || 'unknown';
+    track('quest.complete', { questId: id, anchor });
 
     // Ronki reacts with voice instead of generic pop
     const reactions = ['sfx_complete', 'sfx_wow', 'sfx_proud', 'sfx_excited', 'sfx_tap_happy'];
@@ -200,7 +198,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
              fünf"). ── */}
       <section className="mb-5">
         {/* Heute eyebrow: primary teal — matches the blue-sky biome on
-             this view (was gold #b45309 which clashed). Louis stays
+             this view (was gold #A83E2C which clashed). Louis stays
              gold-deep as a personal accent against the teal headline. */}
         <p className="font-label font-bold text-[11px] uppercase tracking-[0.22em] mb-2"
            style={{ color: '#124346' }}>
@@ -209,8 +207,8 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
         <h1 className="font-headline text-2xl leading-[1.1]"
             style={{ letterSpacing: '-0.015em', fontWeight: 500, textWrap: 'balance', color: '#124346' }}>
           {allDone
-            ? <>{lang === 'de' ? 'Alles geschafft, ' : 'All done, '}<em className="not-italic" style={{ color: '#b45309' }}>{heroName}</em>.</>
-            : <>{lang === 'de' ? 'Deine Aufgaben, ' : 'Your tasks, '}<em className="not-italic" style={{ color: '#b45309' }}>{heroName}</em>.</>}
+            ? <>{lang === 'de' ? 'Alles geschafft, ' : 'All done, '}<em className="not-italic" style={{ color: '#A83E2C' }}>{heroName}</em>.</>
+            : <>{lang === 'de' ? 'Deine Aufgaben, ' : 'Your tasks, '}<em className="not-italic" style={{ color: '#A83E2C' }}>{heroName}</em>.</>}
         </h1>
         <div className="flex items-center gap-3 mt-3">
           <div className="flex-1 h-2 rounded-full overflow-hidden"
@@ -439,7 +437,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                                    border: fullyDone
                                      ? '1.5px solid #34d399'
                                      : isNext
-                                     ? '1.5px solid #b45309'
+                                     ? '1.5px solid #A83E2C'
                                      : '1.5px solid rgba(18,67,70,0.14)',
                                    boxShadow: isNext
                                      ? '0 0 0 3px rgba(252,211,77,0.25), 0 2px 6px -1px rgba(252,211,77,0.5)'
@@ -571,7 +569,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                                 <span className="font-label font-extrabold text-[11px] shrink-0 whitespace-nowrap"
                                       style={{
                                         background: 'rgba(252,211,77,0.22)',
-                                        color: '#b45309',
+                                        color: '#A83E2C',
                                         border: '1px solid rgba(180,83,9,0.18)',
                                         padding: '6px 9px',
                                         borderRadius: 8,
@@ -612,7 +610,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                      }}>
               <div className="flex items-center justify-between gap-3 mb-3.5">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-4 h-[2.5px] rounded-full" style={{ background: '#b45309' }} />
+                  <div className="w-4 h-[2.5px] rounded-full" style={{ background: '#A83E2C' }} />
                   <h2 className="font-headline text-base"
                       style={{ color: '#124346', fontWeight: 500, letterSpacing: '-0.005em' }}>
                     {t('task.bonus')}
@@ -620,7 +618,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                 </div>
                 <span className="font-label font-extrabold text-[11px] shrink-0"
                       style={{
-                        color: '#b45309',
+                        color: '#A83E2C',
                         background: 'rgba(255,255,255,0.6)',
                         border: '1px solid rgba(180,83,9,0.2)',
                         padding: '5px 9px',
@@ -668,7 +666,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                       </p>
                       <span className="font-label font-bold uppercase mt-0.5 inline-block"
                             style={{
-                              color: q.done ? '#059669' : '#b45309',
+                              color: q.done ? '#059669' : '#A83E2C',
                               fontSize: 10,
                               letterSpacing: '0.1em',
                             }}>

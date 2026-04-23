@@ -142,6 +142,34 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_trait_curious_01',   text: 'Du stellst immer die besten Fragen. Was fragst du dich heute?', triggers: ['idle'], requiredTraits: ['curious'] },
   { id: 'de_trait_multi_01',     text: 'Du hast schon so viele Stärken. Du wirst ein großer Held.', triggers: ['hub_open'], requireAllTraits: ['brave', 'gentle', 'patient', 'mapmaker'] },
 
+  // ═══════════════════════════════════════
+  // ALL DONE — the big moment when Louis finishes every main quest today.
+  // Fires via voice.say('all_done') from TaskList when a tap flips allDone
+  // from false → true. Distinct from quest_complete (which fires on every
+  // individual tap). These are Ronki celebrating WITH the kid — peak warmth,
+  // dragon-y flourishes, never preachy.
+  // ═══════════════════════════════════════
+  { id: 'de_alldone_01', text: 'Alles! Du hast ALLES geschafft! Ich glaub, ich könnte platzen vor Stolz!', triggers: ['all_done'] },
+  { id: 'de_alldone_02', text: 'Wuuuhuu! Heute war dein Tag! Jede einzelne Aufgabe — fertig!', triggers: ['all_done'] },
+  { id: 'de_alldone_03', text: 'Schau mal! Meine Schuppen glitzern. Das passiert nur, wenn du alles schaffst.', triggers: ['all_done'] },
+  { id: 'de_alldone_04', text: 'Ich tanze! Guck, ich tanze! Wir haben\'s geschafft!', triggers: ['all_done'] },
+  { id: 'de_alldone_05', text: 'Heute war so ein guter Tag. Ich hab jeden Moment mit dir erlebt.', triggers: ['all_done'] },
+  { id: 'de_alldone_06', text: 'Die Glühwürmchen werden ganz aufgeregt — ich muss denen alles erzählen!', triggers: ['all_done'] },
+  { id: 'de_alldone_07', text: 'Du bist heute mein Lieblingsmensch. Okay, immer. Aber heute besonders.', triggers: ['all_done'] },
+  { id: 'de_alldone_08', text: 'Fertig! Jetzt dürfen wir beide müde sein. Gemeinsam müde ist am schönsten.', triggers: ['all_done'] },
+
+  // ═══════════════════════════════════════
+  // FREUND MET — Ronki reacting to a new friend appearing (Freund unlock,
+  // Micropedia first-discovery, Arc reunion beat). Wire via
+  // voice.say('freund_met') at the fire site when one lands.
+  // ═══════════════════════════════════════
+  { id: 'de_freund_met_01', text: 'Ein neuer Freund! Schau mal, schau mal! Der sieht so interessant aus!', triggers: ['freund_met'] },
+  { id: 'de_freund_met_02', text: 'Oh! Den hab ich schon mal gesehen, glaub ich. Oder vielleicht auch nicht. Trotzdem!', triggers: ['freund_met'] },
+  { id: 'de_freund_met_03', text: 'Hallo, neuer Freund! Wir freuen uns, dich zu treffen.', triggers: ['freund_met'] },
+  { id: 'de_freund_met_04', text: 'Mein Herz macht pongpongpong. Das passiert bei neuen Freunden.', triggers: ['freund_met'] },
+  { id: 'de_freund_met_05', text: 'Komm her. Wir haben viel zu erzählen.', triggers: ['freund_met'] },
+  { id: 'de_freund_met_06', text: 'Uff! So viele neue Namen. Gut, dass du mir hilfst, die zu merken.', triggers: ['freund_met'] },
+
   // NOTE: de_stamina_* and de_screentime_* audio files exist in public/audio/ronki/
   // and are played directly via VoiceAudio.play(id) from MiniGames.jsx and ScreenTimer.jsx.
   // They are NOT registered here because that would make the VoiceEngine pick them

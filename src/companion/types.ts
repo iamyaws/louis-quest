@@ -11,6 +11,8 @@ export type Trigger =
   | 'hub_open'
   | 'sanctuary_open'
   | 'quest_complete'
+  | 'all_done'       // fires when the final main-quest tap flips allDone=true
+  | 'freund_met'     // fires when a new Freund is unlocked/revealed
   | 'care_action'
   | 'idle';
 export type CareAction = 'fed' | 'petted' | 'played';

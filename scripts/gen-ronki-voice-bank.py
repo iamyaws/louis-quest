@@ -156,6 +156,27 @@ ENGINE_LINES = {
     'de_trait_mapmaker_01': 'Der Entdecker ist zurück! Was findest du heute?',
     'de_trait_curious_01':  'Du stellst immer die besten Fragen. Was fragst du dich heute?',
     'de_trait_multi_01':    'Du hast schon so viele Stärken. Du wirst ein großer Held.',
+
+    # ── All-routines-done celebration (new Apr 2026) — fires once when
+    # the final tap flips allDone=true. Peak-warmth lines, dragon flourishes. ──
+    'de_alldone_01': 'Alles! Du hast ALLES geschafft! Ich glaub, ich könnte platzen vor Stolz!',
+    'de_alldone_02': 'Wuuuhuu! Heute war dein Tag! Jede einzelne Aufgabe — fertig!',
+    'de_alldone_03': 'Schau mal! Meine Schuppen glitzern. Das passiert nur, wenn du alles schaffst.',
+    'de_alldone_04': 'Ich tanze! Guck, ich tanze! Wir haben\'s geschafft!',
+    'de_alldone_05': 'Heute war so ein guter Tag. Ich hab jeden Moment mit dir erlebt.',
+    'de_alldone_06': 'Die Glühwürmchen werden ganz aufgeregt — ich muss denen alles erzählen!',
+    'de_alldone_07': 'Du bist heute mein Lieblingsmensch. Okay, immer. Aber heute besonders.',
+    'de_alldone_08': 'Fertig! Jetzt dürfen wir beide müde sein. Gemeinsam müde ist am schönsten.',
+
+    # ── Freund-met variations (new Apr 2026) — Ronki reacting to a new
+    # Freund unlocking / appearing. Wire voice.say('freund_met') at the
+    # fire site when one lands (Pilzhüter reunion, Micropedia first-discovery). ──
+    'de_freund_met_01': 'Ein neuer Freund! Schau mal, schau mal! Der sieht so interessant aus!',
+    'de_freund_met_02': 'Oh! Den hab ich schon mal gesehen, glaub ich. Oder vielleicht auch nicht. Trotzdem!',
+    'de_freund_met_03': 'Hallo, neuer Freund! Wir freuen uns, dich zu treffen.',
+    'de_freund_met_04': 'Mein Herz macht pongpongpong. Das passiert bei neuen Freunden.',
+    'de_freund_met_05': 'Komm her. Wir haben viel zu erzählen.',
+    'de_freund_met_06': 'Uff! So viele neue Namen. Gut, dass du mir hilfst, die zu merken.',
 }
 
 DIRECT_PLAY_LINES = {
@@ -188,6 +209,24 @@ DIRECT_PLAY_LINES = {
     'de_teeth_bottomright': 'Letzte Ecke. Unten rechts.',
     'de_teeth_halfway':     'Die Hälfte ist geschafft. Du machst das super.',
     'de_teeth_done':        'Fertig! Super sauber.',
+
+    # ── Brushing — mid-session encouragement variations (Apr 2026).
+    # Played randomly between quadrant transitions so brushing doesn't feel
+    # scripted. ToothbrushTimer picks one from the pool at ~45s and ~105s. ──
+    'de_teeth_mid_01':      'Nicht aufhören! Die Ecken hinten sind knifflig.',
+    'de_teeth_mid_02':      'Kreise machen! So klein wie Erbsen.',
+    'de_teeth_mid_03':      'Hmm. Meine Zähne jucken auch. Vielleicht sollten wir beide putzen.',
+    'de_teeth_mid_04':      'Denk an die Rückseite! Die Zahnbürste freut sich über jede Ecke.',
+
+    # ── Brushing — Ronki brushing his own teeth alongside (Marc's pitch).
+    # Same random pool as mid_* — makes the session feel like a duet. ──
+    'de_teeth_ronki_01':    'Ich putz auch mit! Drachen-Zahnbürsten gibt\'s extra.',
+    'de_teeth_ronki_02':    'Meine Zähne sind klein und spitz. Aber putzen muss ich trotzdem.',
+    'de_teeth_ronki_03':    'Moment — wo ist meine Zahnbürste? Ah, unter dem Stein.',
+
+    # ── Brushing — warmer done variations (pick one of three randomly). ──
+    'de_teeth_done_02':     'Fertig! Ich kann deine Zähne von hier glitzern sehen.',
+    'de_teeth_done_03':     'Zwei Minuten geschafft! Das ist länger als mein Atem anhält.',
 
     # ── Journal done (random of 3 on save) ──
     'de_journal_done_01': 'Das hast du schön aufgeschrieben.',
@@ -280,16 +319,28 @@ def generate(api_key, line_id, text):
     return out_path, len(audio)
 
 
-def run_batch(api_key, lines_dict, label):
+def run_batch(api_key, lines_dict, label, skip_existing=False):
     print(f'\n▶ {label}: {len(lines_dict)} lines')
     print(f'  Voice: {VOICE_NAME} ({VOICE_ID})')
     print(f'  Model: {MODEL_ID}')
-    print(f'  Output: {OUTPUT_DIR}\n')
+    print(f'  Output: {OUTPUT_DIR}')
+    if skip_existing:
+        print(f'  Mode:   skip-existing (only regenerates missing files)')
+    print('')
 
     ok = 0
     fail = 0
+    skipped = 0
     for i, (line_id, text) in enumerate(lines_dict.items(), 1):
         preview = text if len(text) < 55 else text[:52] + '…'
+        target = os.path.join(OUTPUT_DIR, f'{line_id}.mp3')
+        # Skip any file that already exists and is non-trivial size — lets us
+        # add new lines to the dict without re-burning quota on the ~90 that
+        # already have Harry audio.
+        if skip_existing and os.path.exists(target) and os.path.getsize(target) > 1024:
+            print(f'[{i:02d}/{len(lines_dict)}] {line_id:<28} skip (exists)')
+            skipped += 1
+            continue
         print(f'[{i:02d}/{len(lines_dict)}] {line_id:<28} {preview}')
         try:
             path, size = generate(api_key, line_id, text)
@@ -302,7 +353,8 @@ def run_batch(api_key, lines_dict, label):
         if i < len(lines_dict):
             time.sleep(0.7)
 
-    print(f'\n{label} done: {ok} ok, {fail} failed')
+    tail = f', {skipped} skipped' if skip_existing else ''
+    print(f'\n{label} done: {ok} ok, {fail} failed{tail}')
     return ok, fail
 
 
@@ -311,7 +363,11 @@ def main():
     ap.add_argument('--smoke', action='store_true',
                     help='Generate 5 umlaut-heavy lines only (quick listen-test)')
     ap.add_argument('--full', action='store_true',
-                    help='Generate the full bank (~80 lines)')
+                    help='Generate the full bank (~110 lines)')
+    ap.add_argument('--skip-existing', action='store_true',
+                    help='Only regenerate lines whose MP3 is missing. Pair with '
+                         '--full to add new lines without re-burning quota on '
+                         'already-rendered ones.')
     args = ap.parse_args()
 
     if not args.smoke and not args.full:
@@ -335,8 +391,9 @@ def main():
         return
 
     if args.full:
-        ok1, fail1 = run_batch(api_key, ENGINE_LINES, 'ENGINE-ROUTED LINES')
-        ok2, fail2 = run_batch(api_key, DIRECT_PLAY_LINES, 'DIRECT-PLAY LINES')
+        skip = args.skip_existing
+        ok1, fail1 = run_batch(api_key, ENGINE_LINES, 'ENGINE-ROUTED LINES', skip_existing=skip)
+        ok2, fail2 = run_batch(api_key, DIRECT_PLAY_LINES, 'DIRECT-PLAY LINES', skip_existing=skip)
         total_ok = ok1 + ok2
         total_fail = fail1 + fail2
         print(f'\n━━━ Full batch: {total_ok} ok, {total_fail} failed ━━━')
