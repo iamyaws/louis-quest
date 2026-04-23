@@ -19,7 +19,7 @@
  * - Web hero: ~2.5; web inline: ~1.5
  */
 
-import { CSSProperties } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 
 type PhoneMockupVariant =
   | 'morgen-anchor'
@@ -41,7 +41,7 @@ function TopBar({
   rightSlot,
 }: {
   hp?: number | null;
-  rightSlot?: JSX.Element;
+  rightSlot?: ReactNode;
 }) {
   return (
     <div className="pm-topbar">
@@ -76,7 +76,7 @@ function ParentLockButton() {
 }
 
 function NavBar({ active }: { active: 'lager' | 'quests' | 'laden' | 'buch' | 'ronki' }) {
-  const items: Array<{ key: typeof active; label: string; icon: JSX.Element }> = [
+  const items: Array<{ key: typeof active; label: string; icon: ReactNode }> = [
     {
       key: 'lager',
       label: 'Lager',
@@ -178,7 +178,7 @@ function QuestRow({
   xp,
   status,
 }: {
-  icon: JSX.Element;
+  icon: ReactNode;
   title: string;
   hint?: string;
   xp: number;
