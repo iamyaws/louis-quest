@@ -65,9 +65,13 @@ export default function GardenMode({ onClose }) {
   // (the hint-ring pills + "Pflanzen" / "Dekorieren" chips drive flow).
   const handleSceneTap = (pos) => {
     if (mode === 'plant' || mode === 'decor') {
-      // Only accept taps in the lower 60% (the ground area)
-      if (pos.y > 40) return;
-      setPendingPosition({ x: pos.x, y: 100 - pos.y });  // flip y → bottom%
+      // pos.y here is viewport-% from TOP (0 = top, 100 = bottom).
+      // GardenScene positions use bottom-%, so we flip. Reject taps
+      // in the upper 45% of the scene (sky/hills) — accept only the
+      // lower 55% (ground area). That ensures plants/decor land on
+      // the ground and never clip behind the Hub's top chrome.
+      if (pos.y < 45) return;
+      setPendingPosition({ x: pos.x, y: 100 - pos.y });  // flip → bottom%
     }
   };
 
@@ -79,12 +83,12 @@ export default function GardenMode({ onClose }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50"
+      className="fixed inset-0"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      style={{ background: '#000' }}
+      style={{ background: '#000', zIndex: 9999 }}
     >
       {/* The scene fills the whole viewport */}
       <div className="absolute inset-0">
