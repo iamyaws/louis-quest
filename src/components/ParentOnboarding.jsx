@@ -43,6 +43,11 @@ export default function ParentOnboarding({ onComplete }) {
   // Final values passed to patchState on completion. null PIN means the
   // parent chose "Später" and 1234 stays active (parentPinIsDefault: true).
   const [chosenPin, setChosenPin] = useState(null);
+  // Analytics consent — default OFF (opt-in per Art. 8 DSGVO). The Fertig
+  // screen renders the disclosure card + toggle; the value committed to
+  // state.analyticsEnabled is whatever the parent leaves this at when they
+  // tap "Handy an mein Kind".
+  const [analyticsOptIn, setAnalyticsOptIn] = useState(false);
 
   const ProgressBar = () => (
     <div className="w-full flex justify-center gap-2 mb-8">
@@ -105,6 +110,10 @@ export default function ParentOnboarding({ onComplete }) {
       // 1234 remains active. If they set a custom PIN, flip the default
       // flag to false so the PinModal stops accepting 1234.
       parentPinIsDefault: chosenPin === null,
+      // Analytics consent (opt-in). Default false; set true only if the
+      // parent flipped the toggle on the Fertig screen after reading the
+      // disclosure.
+      analyticsEnabled: analyticsOptIn,
     });
   };
 
@@ -504,7 +513,46 @@ export default function ParentOnboarding({ onComplete }) {
             </p>
           </div>
 
-          <div className="mt-10 w-full max-w-xs">
+          {/* Analytics disclosure + opt-in toggle. Default OFF: we do NOT
+              send telemetry unless the parent flips this ON. Copy is the
+              same anonymised language the Datenschutz page uses. Also
+              reachable from the Parental Dashboard later (Sichtbar-Switch). */}
+          <div className="mt-8 w-full max-w-md">
+            <div className="rounded-2xl p-4 text-left space-y-3"
+                 style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.18)' }}>
+              <div className="flex items-start gap-3">
+                <span className="material-symbols-outlined text-white/80 mt-0.5"
+                      style={{ fontSize: 22, fontVariationSettings: "'FILL' 0" }}>
+                  analytics
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-label text-white font-bold text-sm uppercase tracking-wide">
+                    {t('analytics.disclosure.title')}
+                  </p>
+                  <p className="text-white/75 text-xs leading-relaxed mt-1">
+                    {t('analytics.disclosure.body')}
+                  </p>
+                </div>
+              </div>
+              <label className="flex items-center gap-3 pt-1 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={analyticsOptIn}
+                  onChange={(e) => setAnalyticsOptIn(e.target.checked)}
+                  className="w-5 h-5 rounded"
+                  style={{ accentColor: '#fcd34d' }}
+                  aria-label={t('analytics.disclosure.accept')}
+                />
+                <span className="text-white/90 text-sm font-body">
+                  {analyticsOptIn
+                    ? t('analytics.disclosure.accept')
+                    : t('analytics.disclosure.decline')}
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div className="mt-8 w-full max-w-xs">
             <button onClick={finish}
               className="w-full py-5 rounded-full font-headline text-xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-all"
               style={{ background: '#fcd34d', color: '#725b00', boxShadow: '0 12px 24px rgba(252,211,77,0.4), 0 4px 0 #d4a830' }}>

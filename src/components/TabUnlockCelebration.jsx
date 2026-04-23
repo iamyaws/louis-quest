@@ -85,15 +85,29 @@ export default function TabUnlockCelebration({ view }) {
   }, [toastFor]);
 
   // ── Effect 2: show coachmark on first visit to a newly-unlocked tab ──
+  // Race note: the 220ms delay lets the view-transition paint before the
+  // coachmark mounts. React's useEffect-cleanup guarantees the timer is
+  // cleared if `view` changes before it fires, so a mid-window tab-switch
+  // can't trigger the old coachmark. The `cancelled` flag is belt-and-
+  // braces for the async gap between clearTimeout being called and the
+  // browser actually running our callback (theoretically zero, but
+  // defensive — if the JS timer loop mis-schedules after cleanup, the
+  // flag stops the stale call from taking effect).
   useEffect(() => {
     if (!state) return;
     const unlock = TAB_UNLOCKS.find(u => u.tabId === view);
     if (!unlock) return;                       // hub / quests have no coachmark
     if (!unlock.isUnlocked(state)) return;     // can only reach if unlocked or active
     if ((state.tabCoachmarksSeen || {})[view]) return;
-    // Small delay so the coachmark lands after the view transition paint
-    const timer = setTimeout(() => setCoachFor(view), 220);
-    return () => clearTimeout(timer);
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      if (cancelled) return;
+      setCoachFor(view);
+    }, 220);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [view, state]);
 
   const dismissCoach = () => {

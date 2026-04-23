@@ -1,10 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import HeroChibi, { SKIN_TONES, HAIR_STYLES, EXPRESSIONS, DEFAULT_FACE } from './HeroChibi';
 import SFX from '../utils/sfx';
 import { useHaptic } from '../hooks/useHaptic';
+
+// Kid-readable labels for the skin swatches (aria only; the swatch itself
+// is visual). Keeping this map out of the main SKIN_TONES export so HeroChibi
+// stays a pure-presentation module.
+const SKIN_TONE_LABELS_DE = {
+  pale:  'Helle Haut',
+  light: 'Beige Haut',
+  warm:  'Warme Haut',
+  tan:   'Karamell Haut',
+  deep:  'Dunkle Haut',
+};
+const SKIN_TONE_LABELS_EN = {
+  pale:  'Pale skin',
+  light: 'Beige skin',
+  warm:  'Warm skin',
+  tan:   'Tan skin',
+  deep:  'Deep skin',
+};
 
 /**
  * HeroBuilder — character builder modal for the kid's avatar.
@@ -32,6 +50,13 @@ export default function HeroBuilder({ open, onClose }) {
   // state on every picker tap. Only commit on "Fertig".
   const [draft, setDraft] = useState(() => state?.heroFace || DEFAULT_FACE);
 
+  // Focus management — capture what was focused when the sheet opened so
+  // we can restore it on close. Otherwise the tab key leaks into the hub
+  // below and (critically) screen-reader users lose their place.
+  const previouslyFocused = useRef(null);
+  const sheetRef = useRef(null);
+  const firstFocusableRef = useRef(null);
+
   // Reset draft when the modal opens (so closing without saving doesn't
   // leak partial selections into the next open).
   useEffect(() => {
@@ -39,6 +64,40 @@ export default function HeroBuilder({ open, onClose }) {
       setDraft(state?.heroFace || DEFAULT_FACE);
     }
   }, [open, state?.heroFace]);
+
+  // Escape-to-close + focus-capture/restore. Both behaviours are standard
+  // dialog expectations (WAI-ARIA APG), and without them the HeroBuilder
+  // is the first modal in the app that leaks keyboard focus into the
+  // background — an accessibility regression flagged in the launch-prep
+  // code review (Apr 2026).
+  useEffect(() => {
+    if (!open) return undefined;
+    previouslyFocused.current = (typeof document !== 'undefined'
+      ? (document.activeElement)
+      : null);
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose?.();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    // Move focus into the sheet so screen readers announce the dialog.
+    // A short timeout lets the portal mount first.
+    const fid = window.setTimeout(() => {
+      firstFocusableRef.current?.focus?.();
+    }, 60);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.clearTimeout(fid);
+      // Return focus to the element that opened the sheet. If it's gone
+      // (unmounted) we silently skip — better than blowing up.
+      const target = previouslyFocused.current;
+      if (target && typeof target.focus === 'function' && document.contains(target)) {
+        try { target.focus(); } catch { /* ignore */ }
+      }
+    };
+  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -70,8 +129,13 @@ export default function HeroBuilder({ open, onClose }) {
       }}
     >
       <div
+        ref={sheetRef}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg rounded-t-3xl overflow-hidden flex flex-col"
+        // tabIndex=-1 lets us programmatically focus the sheet without
+        // landing in the middle of the picker row; kid-focus feels right
+        // on the drag-handle area.
+        tabIndex={-1}
         style={{
           background: 'linear-gradient(180deg, #fff8f2 0%, #fef3c7 100%)',
           boxShadow: '0 -20px 50px -12px rgba(18,67,70,0.5)',
@@ -122,6 +186,9 @@ export default function HeroBuilder({ open, onClose }) {
                 boxShadow: 'inset -2px -3px 4px rgba(0,0,0,0.12)',
               }} />
             )}
+            labelFor={(opt) => (
+              (lang === 'de' ? SKIN_TONE_LABELS_DE : SKIN_TONE_LABELS_EN)[opt.id] || opt.id
+            )}
           />
 
           {/* Hair picker */}
@@ -158,6 +225,7 @@ export default function HeroBuilder({ open, onClose }) {
         {/* Sticky save button */}
         <div className="px-5 pt-3 pb-4" style={{ background: 'rgba(255,248,242,0.9)', borderTop: '1px solid rgba(18,67,70,0.08)' }}>
           <button
+            ref={firstFocusableRef}
             onClick={handleSave}
             className="w-full py-4 rounded-full font-headline font-bold text-lg active:scale-[0.97] transition-all"
             style={{

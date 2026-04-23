@@ -64,11 +64,27 @@ function ToolErrorFallback({ onBack }) {
 export default class ToolErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    // errorCount: tracks how many times this boundary has caught an error
+    // for the CURRENT toolName. If the kid bounces back and re-enters the
+    // same crashing tool twice, we stop trying to re-render it and keep
+    // the fallback sticky — otherwise the pattern [Hub → broken tool →
+    // fallback → Hub → same tool again → same crash] loops indefinitely.
+    // Resets whenever toolName changes (different tool = different bug).
+    this.state = { hasError: false, errorCount: 0, lastCrashedTool: null };
   }
 
   static getDerivedStateFromError() {
     return { hasError: true };
+  }
+
+  componentDidUpdate(prevProps) {
+    // A different tool is being rendered → reset our crash counter. This
+    // lets each tool have its own 2-strike budget.
+    if (prevProps.toolName !== this.props.toolName) {
+      if (this.state.errorCount > 0) {
+        this.setState({ errorCount: 0, lastCrashedTool: null, hasError: false });
+      }
+    }
   }
 
   componentDidCatch(error, info) {
@@ -80,10 +96,27 @@ export default class ToolErrorBoundary extends React.Component {
       error,
       info,
     );
+    this.setState(prev => ({
+      errorCount: (prev.lastCrashedTool === this.props.toolName
+        ? prev.errorCount
+        : 0) + 1,
+      lastCrashedTool: this.props.toolName || 'unknown',
+    }));
   }
 
   handleBack = () => {
-    this.setState({ hasError: false });
+    // Only reset hasError if we're under the retry budget. After 2 strikes
+    // for the same tool, keep hasError true so re-entering re-shows the
+    // fallback immediately instead of re-attempting the broken mount.
+    // The parent onBack() still navigates away; that's what actually
+    // matters for escaping the loop.
+    const toolName = this.props.toolName || 'unknown';
+    const sameToolFailedBefore = this.state.lastCrashedTool === toolName;
+    const retrySafe = !sameToolFailedBefore || this.state.errorCount < 2;
+    if (retrySafe) {
+      this.setState({ hasError: false });
+    }
+    // Always fire the back callback — the user chose to leave, respect it.
     if (typeof this.props.onBack === 'function') {
       this.props.onBack();
     }

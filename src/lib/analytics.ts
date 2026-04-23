@@ -141,11 +141,15 @@ export function setAnalyticsEnabled(next: boolean): void {
 }
 
 function readEnabledFromStorage(): boolean {
+  // Default OFF per Art. 8 + Art. 25 DSGVO. The app must wait for the
+  // parent to explicitly opt in via the ParentOnboarding disclosure or
+  // the Parental Dashboard toggle before any event is sent. `useAnalytics`
+  // mirrors state.analyticsEnabled into this flag on every render.
   try {
     const v = localStorage.getItem(ENABLED_KEY);
-    if (v === null) return true; // default on
+    if (v === null) return false;
     return v === '1';
-  } catch { return true; }
+  } catch { return false; }
 }
 
 // ── Sanitisation ─────────────────────────────────────────────────────
@@ -309,6 +313,7 @@ ensureInitialized();
 export function _resetForTests(): void {
   memoryQueue = [];
   initialized = false;
+  enabled = true;
   if (flushTimer) { clearInterval(flushTimer); flushTimer = null; }
   try {
     localStorage.removeItem(QUEUE_KEY);
@@ -317,4 +322,12 @@ export function _resetForTests(): void {
     localStorage.removeItem(ENABLED_KEY);
     sessionStorage.removeItem(SESSION_APP_OPEN_KEY);
   } catch { /* ignore */ }
+}
+
+// Direct flush trigger for tests. Production code flushes via
+// visibilitychange / interval / beforeunload — jsdom's event-dispatch
+// semantics for the cross-document/window bubble are not rock-solid, so
+// tests use this instead of poking the DOM.
+export async function _flushForTests(): Promise<void> {
+  await flush({ blocking: true });
 }

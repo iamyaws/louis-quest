@@ -19,7 +19,10 @@ import {
 
 export function useAnalytics() {
   const { state } = useTask();
-  const enabled = state?.analyticsEnabled ?? true;
+  // Default OFF: analytics is opt-in under Art. 8 DSGVO (child consent).
+  // The parent opts IN via ParentOnboarding disclosure; this reflects
+  // state.analyticsEnabled (default false in TaskContext initial state).
+  const enabled = state?.analyticsEnabled ?? false;
 
   // Keep the module-level enabled flag in sync with TaskContext. A parent
   // toggle in the Dashboard (separate pass) persists via patchState;

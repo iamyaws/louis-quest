@@ -18,8 +18,8 @@ import { useTranslation } from '../i18n/LanguageContext';
  * Styling mirrors AlphaBanner so it sits visually in the same top-of-app
  * strip but with a brighter accent (amber) so parents/kids notice it.
  *
- * Not currently mounted — see audit notes. Mount under AlphaBanner in
- * App.jsx so both sticky strips stack cleanly.
+ * Mount point: App.jsx app-shell, stacked directly under AlphaBanner so
+ * both sticky strips stack cleanly.
  */
 export default function SWUpdateBanner() {
   const { t } = useTranslation();

@@ -492,11 +492,12 @@ export function createInitialState(): TaskState {
     hapticsEnabled: true,
     hapticsMode: 'gentle',
     // Analytics — device_id generated lazily by src/lib/analytics.ts.
-    // Default ON per EU DSA guidelines (data-minimisation posture
-    // qualifies as service-improvement legitimate-interest). Track A
-    // discloses this to parents + exposes the toggle in the Dashboard.
+    // Default OFF (opt-in) per Art. 8 DSGVO (child consent) + Art. 25
+    // (privacy by default). Parents opt IN from ParentOnboarding's
+    // disclosure screen; the Parental Dashboard also exposes the toggle.
+    // Flipped from ON to OFF in the launch-prep code review (Apr 2026).
     analyticsDeviceId: undefined,
-    analyticsEnabled: true,
+    analyticsEnabled: false,
     // RPG-Modus — off by default, parent-opt-in for older kids.
     rpgModeEnabled: false,
     // Hero chibi — undefined until the kid discovers the builder.
@@ -656,10 +657,12 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // Haptics — default gentle for age-6 safety.
           hapticsEnabled: raw.hapticsEnabled ?? true,
           hapticsMode: raw.hapticsMode ?? 'gentle',
-          // Analytics — existing users default ON, matching fresh-install
-          // default. Device_id stays undefined until analytics.ts lazy-init.
+          // Analytics — existing users default OFF (opt-in), matching
+          // fresh-install. Prior installs that briefly defaulted ON during
+          // the 22-23 Apr 2026 dev window revert here too — explicit opt-in
+          // wins. Device_id stays undefined until analytics.ts lazy-init.
           analyticsDeviceId: raw.analyticsDeviceId,
-          analyticsEnabled: raw.analyticsEnabled ?? true,
+          analyticsEnabled: raw.analyticsEnabled ?? false,
           // RPG-Modus — off for all existing users; parent-opt-in later.
           rpgModeEnabled: raw.rpgModeEnabled ?? false,
           // Hero chibi composition — preserved verbatim if saved, else
@@ -898,6 +901,13 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       catFed: false,
       catPetted: false,
       catPlayed: false,
+      // Reset the daily-habit completion map so today's taps re-enable the
+      // habit quests. Without this, doneMap carries over from yesterday,
+      // `completeHabit` short-circuits via the idempotent guard, AND the
+      // diminishing-returns multiplier reads a nonzero count → first habit
+      // today rewards 0 HP instead of full. Caught in the launch-prep
+      // code review (Apr 2026) before any kid hit the wall.
+      dailyHabits: {},
       loginBonusClaimed: false,
       journalMemory: '',
       journalGratitude: [],
