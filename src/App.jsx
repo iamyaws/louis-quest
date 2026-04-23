@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth, LoginScreen } from './context/AuthContext';
 import { TaskProvider, useTask } from './context/TaskContext';
+import { CelebrationQueueProvider, useCelebrationQueue } from './context/CelebrationQueue';
 import { useTranslation } from './i18n/LanguageContext';
 import PinModal from './components/PinModal';
 import NavBar from './components/NavBar';
@@ -207,8 +208,22 @@ function AppContent() {
   // useEggSystem(); // paused Apr 2026 — spawner disabled, no more egg triggers
   useQuietAttention(view); // gentle voice brake when Louis zooms through screens
 
-  const [discoveryToast, setDiscoveryToast] = useState(null);
-  useMicropediaDiscovery((id) => setDiscoveryToast(id));
+  // Creature discovery runs through CelebrationQueue so it can't stack on
+  // top of other celebration surfaces (Marc 25 Apr 2026: "no fireworks
+  // in the kid's brain"). CreatureDiscoveryToast stays the presenter;
+  // the queue owns timing, dedupe, quiet-hours + SFX throttling.
+  const { enqueue: enqueueCelebration } = useCelebrationQueue();
+  useMicropediaDiscovery((id) => {
+    enqueueCelebration({
+      id: `discover-${id}`,
+      kind: 'toast',
+      ttl: 8000,
+      sfx: 'coin',
+      render: ({ dismiss }) => (
+        <CreatureDiscoveryToast creatureId={id} onDismiss={dismiss} />
+      ),
+    });
+  });
 
   useEffect(() => {
     // Flush any queued feedback from previous offline sessions
@@ -599,12 +614,9 @@ function AppContent() {
           onDismiss={() => setScreenTimer(null)}
         />
       )}
-      {discoveryToast && (
-        <CreatureDiscoveryToast
-          creatureId={discoveryToast}
-          onDismiss={() => setDiscoveryToast(null)}
-        />
-      )}
+      {/* CreatureDiscoveryToast is rendered by CelebrationQueue's
+           current-surface slot; it mounts only when the queue pops a
+           `discover-*` event. See useMicropediaDiscovery wiring above. */}
       {/* Post-engagement PWA install prompt. Fires at the app-shell layer
           (not inside Onboarding) after the first habit completes. Only
           shown outside the Hub tab would feel disruptive, so we let it
@@ -682,9 +694,11 @@ function AuthGate() {
 
   return (
     <TaskProvider>
-      <QuestEaterProvider>
-        <AppContent />
-      </QuestEaterProvider>
+      <CelebrationQueueProvider>
+        <QuestEaterProvider>
+          <AppContent />
+        </QuestEaterProvider>
+      </CelebrationQueueProvider>
     </TaskProvider>
   );
 }

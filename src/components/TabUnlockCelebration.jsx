@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { TAB_UNLOCKS } from '../data/tabUnlocks';
-import SFX from '../utils/sfx';
+import { useCelebrationQueue } from '../context/CelebrationQueue';
 
 /**
  * TabUnlockCelebration — lightweight onboarding scaffolding for the
@@ -27,7 +27,7 @@ import SFX from '../utils/sfx';
 export default function TabUnlockCelebration({ view }) {
   const { state, actions } = useTask();
   const { t } = useTranslation();
-  const [toastFor, setToastFor] = useState(null);    // tabId currently shown as toast
+  const { enqueue } = useCelebrationQueue();
   const [coachFor, setCoachFor] = useState(null);    // tabId currently shown as coachmark
   const prevUnlockedRef = useRef(null);              // Set<string>
   const migratedRef = useRef(false);
@@ -56,7 +56,10 @@ export default function TabUnlockCelebration({ view }) {
     }
   }, [state, actions]);
 
-  // ── Effect 1: detect unlock transitions → fire toast ──
+  // ── Effect 1: detect unlock transitions → enqueue toast ──
+  // Routing through CelebrationQueue keeps the unlock pop from stacking
+  // on top of other celebration surfaces (e.g. a creature discovery that
+  // fires the same tick).
   useEffect(() => {
     if (!state) return;
     const nowUnlocked = new Set(
@@ -70,19 +73,25 @@ export default function TabUnlockCelebration({ view }) {
     for (const tabId of nowUnlocked) {
       if (prev.has(tabId)) continue;           // already unlocked before
       if (seen[tabId]) continue;               // already toasted (belt + braces)
-      setToastFor(tabId);
-      SFX.play('pop');
+      const unlock = TAB_UNLOCKS.find(u => u.tabId === tabId);
+      if (!unlock) continue;
+      enqueue({
+        id: `tab-unlock-${tabId}`,
+        kind: 'toast',
+        ttl: 3200,
+        sfx: 'pop',
+        // Unlock is a milestone moment — let it through even in the
+        // day-1/2 quiet window so the kid sees the feedback after their
+        // very first completed tasks.
+        bypassQuietHours: true,
+        render: ({ dismiss }) => (
+          <TabUnlockToast unlock={unlock} t={t} onDismiss={dismiss} />
+        ),
+      });
       actions.markTabUnlockSeen?.(tabId);
-      break; // only one toast at a time — others queue naturally on next flip
+      break; // only one unlock per state tick — others queue naturally on next flip
     }
-  }, [state, actions]);
-
-  // Auto-dismiss toast
-  useEffect(() => {
-    if (!toastFor) return;
-    const timer = setTimeout(() => setToastFor(null), 3200);
-    return () => clearTimeout(timer);
-  }, [toastFor]);
+  }, [state, actions, enqueue, t]);
 
   // ── Effect 2: show coachmark on first visit to a newly-unlocked tab ──
   // Race note: the 220ms delay lets the view-transition paint before the
@@ -115,7 +124,6 @@ export default function TabUnlockCelebration({ view }) {
     setCoachFor(null);
   };
 
-  const toastUnlock = toastFor ? TAB_UNLOCKS.find(u => u.tabId === toastFor) : null;
   const coachUnlock = coachFor ? TAB_UNLOCKS.find(u => u.tabId === coachFor) : null;
 
   // Anchor the coachmark pointer at the target nav button. The card itself
@@ -146,34 +154,8 @@ export default function TabUnlockCelebration({ view }) {
 
   return (
     <>
-      {/* Unlock toast — gold pill, top-center, floats over AlphaBanner so
-           parents see it too. Non-blocking, no interaction required. */}
-      {toastUnlock && createPortal(
-        <div
-          role="status"
-          aria-live="polite"
-          className="fixed left-1/2 z-[120]"
-          style={{
-            top: 'calc(env(safe-area-inset-top, 0px) + var(--alpha-banner-h, 28px) + 12px)',
-            transform: 'translateX(-50%)',
-            animation: 'tabUnlockToastIn 0.3s ease-out, tabUnlockToastOut 0.4s ease-in 2.8s forwards',
-            maxWidth: 'calc(100vw - 32px)',
-          }}
-        >
-          <div
-            className="rounded-full px-5 py-2.5 font-body font-semibold text-[14px] whitespace-nowrap"
-            style={{
-              background: 'linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%)',
-              color: '#124346',
-              boxShadow: '0 12px 28px -8px rgba(245,158,11,0.55), 0 4px 10px -2px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.6)',
-              border: '1px solid rgba(252,211,77,0.6)',
-            }}
-          >
-            {t(toastUnlock.toastKey)}
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* Unlock toast is rendered by CelebrationQueue via `TabUnlockToast`
+           below. This wrapper now only handles the first-tap coachmark. */}
 
       {/* First-tap coachmark — full-screen scrim + bottom card. Single tap
            anywhere dismisses. Localized. */}
@@ -267,5 +249,43 @@ export default function TabUnlockCelebration({ view }) {
         }
       `}</style>
     </>
+  );
+}
+
+/**
+ * TabUnlockToast — the gold pill at the top of the viewport, rendered
+ * by CelebrationQueue. The queue owns dismiss timing; this component is
+ * a pure presenter. Entry animation plays via tabUnlockToastIn; the
+ * exit animation is skipped for now because the queue tears the node
+ * down at ttl. A follow-up can add a controlled fade-out.
+ */
+function TabUnlockToast({ unlock, t, onDismiss }) {
+  return createPortal(
+    <div
+      role="status"
+      aria-live="polite"
+      onClick={onDismiss}
+      className="fixed left-1/2 z-[120]"
+      style={{
+        top: 'calc(env(safe-area-inset-top, 0px) + var(--alpha-banner-h, 28px) + 12px)',
+        transform: 'translateX(-50%)',
+        animation: 'tabUnlockToastIn 0.3s ease-out',
+        maxWidth: 'calc(100vw - 32px)',
+        cursor: 'pointer',
+      }}
+    >
+      <div
+        className="rounded-full px-5 py-2.5 font-body font-semibold text-[14px] whitespace-nowrap"
+        style={{
+          background: 'linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%)',
+          color: '#124346',
+          boxShadow: '0 12px 28px -8px rgba(245,158,11,0.55), 0 4px 10px -2px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.6)',
+          border: '1px solid rgba(252,211,77,0.6)',
+        }}
+      >
+        {t(unlock.toastKey)}
+      </div>
+    </div>,
+    document.body
   );
 }

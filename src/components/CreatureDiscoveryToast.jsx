@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { SEED_BY_ID } from '../data/creatures';
 import VoiceAudio from '../utils/voiceAudio';
-import SFX from '../utils/sfx';
 
 const base = import.meta.env.BASE_URL;
 
@@ -30,27 +29,15 @@ const LABELS = {
 export default function CreatureDiscoveryToast({ creatureId, onDismiss, onOpenDetail }) {
   const { lang } = useTranslation();
   const [visible, setVisible] = useState(false);
-  // Guards against a race where a tap-dismiss and the 8s auto-dismiss
-  // fire onDismiss twice within the 200-300ms fade window.
-  const dismissedRef = useRef(false);
-  const autoTimerRef = useRef(null);
 
+  // CelebrationQueue owns the coin SFX (throttled) and the auto-dismiss
+  // timer via `ttl`. This component stays a pure presenter: fade in on
+  // mount, play the voice line once, fade out when the parent (queue)
+  // pops it off.
   useEffect(() => {
     if (!creatureId) return;
-    dismissedRef.current = false;
     setVisible(true);
-    SFX.play('coin');
     VoiceAudio.play('de_discover_creature', 500);
-    // 4s was too short for first-graders to absorb the moment (tester
-    // 25 Apr 2026). 8s gives enough time to read the name + tap through
-    // if curious, and still dismisses on its own so kids aren't stuck.
-    autoTimerRef.current = setTimeout(() => {
-      if (dismissedRef.current) return;
-      dismissedRef.current = true;
-      setVisible(false);
-      setTimeout(() => onDismiss?.(), 300);
-    }, 8000);
-    return () => clearTimeout(autoTimerRef.current);
   }, [creatureId]);
 
   const label = useMemo(() => {
@@ -71,11 +58,9 @@ export default function CreatureDiscoveryToast({ creatureId, onDismiss, onOpenDe
 
   const handleTap = (e) => {
     e.stopPropagation();
-    if (dismissedRef.current) return;
-    dismissedRef.current = true;
-    clearTimeout(autoTimerRef.current);
     if (onOpenDetail) onOpenDetail(creatureId);
     setVisible(false);
+    // Let the exit animation play before handing control back to the queue.
     setTimeout(() => onDismiss?.(), 200);
   };
 
