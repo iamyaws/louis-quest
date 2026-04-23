@@ -35,9 +35,9 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_greet_03', text: 'Oh! Da bist du ja! Ich hab was entdeckt…', triggers: ['hub_open'] },
   { id: 'de_greet_m01', text: 'Guten Morgen! Ich hab schon gegähnt.', triggers: ['hub_open'], timeOfDay: ['morning'] },
   { id: 'de_greet_m02', text: 'Morgens bin ich immer ein bisschen verschlafen. Du auch?', triggers: ['hub_open'], timeOfDay: ['morning'] },
-  { id: 'de_greet_m03', text: 'Die Sonne ist aufgegangen! Lass uns loslegen!', triggers: ['hub_open'], timeOfDay: ['morning'] },
+  // Cut 2026-04-19 (audit): 'Die Sonne ist aufgegangen! Lass uns loslegen!' — generic motivational filler
   { id: 'de_greet_a01', text: 'Wie war die Schule? Erzähl mir alles!', triggers: ['hub_open'], timeOfDay: ['afternoon'] },
-  { id: 'de_greet_a02', text: 'Nachmittag! Ich hab den ganzen Tag auf dich gewartet.', triggers: ['hub_open'], timeOfDay: ['afternoon'] },
+  // Cut 2026-04-19 (audit): 'Nachmittag! Ich hab den ganzen Tag auf dich gewartet.' — reads as needy
   { id: 'de_greet_e01', text: 'Abend! Bald wird es gemütlich.', triggers: ['hub_open'], timeOfDay: ['evening'] },
   { id: 'de_greet_e02', text: 'Hast du heute was Cooles erlebt? Ich will alles wissen.', triggers: ['hub_open'], timeOfDay: ['evening'] },
   { id: 'de_greet_n01', text: 'Gute Nacht bald! Noch ein bisschen zusammen?', triggers: ['hub_open'], timeOfDay: ['night'] },
@@ -50,7 +50,7 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_sanct_02', text: 'Riechst du das? Die Wiese riecht nach Abenteuer!', triggers: ['sanctuary_open'] },
   { id: 'de_sanct_03', text: 'Psst — hör mal! Da raschelt was im Gras!', triggers: ['sanctuary_open'] },
   { id: 'de_sanct_04', text: 'Schau mal! Eine Libelle! Die ist schneller als ich!', triggers: ['sanctuary_open'] },
-  { id: 'de_sanct_05', text: 'Ich hab dich vermisst. War es lang? Für mich schon.', triggers: ['sanctuary_open'] },
+  // Cut 2026-04-19 (audit): 'Ich hab dich vermisst…' — redundant with de_greet_02
   { id: 'de_sanct_06', text: 'Weißt du was? Ich hab heute versucht, einen Schmetterling zu fangen. Hat nicht geklappt.', triggers: ['sanctuary_open'] },
   { id: 'de_sanct_07', text: 'Mein Lieblingsplatz ist genau hier. Wo ist deiner?', triggers: ['sanctuary_open'] },
 
@@ -61,20 +61,20 @@ export const linesDe: VoiceLine[] = [
   { id: 'de_w_rain_02', text: 'Tropf tropf tropf! Hörst du das auch?', triggers: ['hub_open', 'sanctuary_open'], weather: ['rain'] },
   { id: 'de_w_cold_01', text: 'Brrr! Zieh dich warm an heute! Ich hab ja Schuppen.', triggers: ['hub_open', 'sanctuary_open'], weather: ['cold'] },
   { id: 'de_w_hot_01', text: 'So warm! Ich könnte den ganzen Tag in der Sonne liegen.', triggers: ['hub_open', 'sanctuary_open'], weather: ['hot', 'clear'] },
-  { id: 'de_w_hot_02', text: 'Sonnenschein! Vergiss die Sonnencreme nicht!', triggers: ['hub_open', 'sanctuary_open'], weather: ['hot'] },
+  // Cut 2026-04-19 (audit): 'Sonnenschein! Vergiss die Sonnencreme nicht!' — violates "never lectures" rule
   { id: 'de_w_snow_01', text: 'SCHNEE! Ich — ich hab noch nie Schnee gesehen! Naja, letztes Mal schon.', triggers: ['hub_open', 'sanctuary_open'], weather: ['snow'] },
-  { id: 'de_w_clear_01', text: 'Blauer Himmel! Der perfekte Tag für ein Abenteuer!', triggers: ['hub_open', 'sanctuary_open'], weather: ['clear'] },
+  // Cut 2026-04-19 (audit): 'Blauer Himmel! Der perfekte Tag für ein Abenteuer!' — generic adventure-ad copy
 
   // ═══════════════════════════════════════
   // QUEST COMPLETE — celebrating together
   // ═══════════════════════════════════════
   { id: 'de_quest_01', text: 'Hast du das gerade geschafft? Wow!', triggers: ['quest_complete'] },
-  { id: 'de_quest_02', text: 'Ja! So macht man das! 💪', triggers: ['quest_complete'] },
+  // Cut 2026-04-19 (audit): 'Ja! So macht man das! 💪' — emoji in TTS + generic
   { id: 'de_quest_03', text: 'Ich hab zugeguckt. Das war richtig gut.', triggers: ['quest_complete'] },
-  { id: 'de_quest_04', text: 'Weiter so! Ronki glaubt an dich!', triggers: ['quest_complete'] },
-  { id: 'de_quest_05', text: 'Eins weniger! Du rockst das!', triggers: ['quest_complete'] },
+  // Cut 2026-04-19 (audit): 'Weiter so! Ronki glaubt an dich!' — third-person coach-talk
+  // Cut 2026-04-19 (audit): 'Eins weniger! Du rockst das!' — aging slang
   { id: 'de_quest_streak_01', text: 'Drei schon? Du bist heute nicht zu stoppen!', triggers: ['quest_complete'], minQuestsToday: 3 },
-  { id: 'de_quest_streak_02', text: 'Nochmal? Du machst gar keine Pause!', triggers: ['quest_complete'], minQuestsToday: 4 },
+  // Cut 2026-04-19 (audit): 'Nochmal? Du machst gar keine Pause!' — ambiguous tone, could read critical
 
   // ═══════════════════════════════════════
   // CARE ACTIONS — companion interactions
@@ -134,7 +134,8 @@ export const linesDe: VoiceLine[] = [
   // Unlock after earning the named trait from an arc completion
   // ═══════════════════════════════════════
   { id: 'de_trait_brave_01',     text: 'Du bist jemand, der nicht aufgibt. Das weiß ich jetzt.', triggers: ['hub_open', 'quest_complete'], requiredTraits: ['brave'] },
-  { id: 'de_trait_brave_02',     text: 'Mutig sein heißt nicht, keine Angst zu haben. Du weißt das.', triggers: ['hub_open'], requiredTraits: ['brave'] },
+  // Rewritten 2026-04-19 (audit): was 'Mutig sein heißt nicht, keine Angst zu haben. Du weißt das.' (too adult-philosophical)
+  { id: 'de_trait_brave_02',     text: 'Mutig ist nicht, keine Angst zu haben. Mutig ist trotzdem machen. Das bist du.', triggers: ['hub_open'], requiredTraits: ['brave'] },
   { id: 'de_trait_gentle_01',    text: 'Deine Ruhe tut allen gut. Auch mir.', triggers: ['hub_open', 'sanctuary_open'], requiredTraits: ['gentle'] },
   { id: 'de_trait_patient_01',   text: 'Du wartest geduldig — das können nicht alle. Ich lerne von dir.', triggers: ['hub_open'], requiredTraits: ['patient'] },
   { id: 'de_trait_mapmaker_01',  text: 'Der Entdecker ist zurück! Was findest du heute?', triggers: ['hub_open'], requiredTraits: ['mapmaker'] },
