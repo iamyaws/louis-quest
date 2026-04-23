@@ -33,15 +33,22 @@
   opacity: .85;
 }
 
-/* Hills */
+/* Hills — vertical gradients + soft inner shadow give them roundness
+   instead of reading as flat blobs (Marc flag 24 Apr: "bushes in the
+   background look a little flat and could be polished"). */
 .g-hills { position: absolute; bottom: 38%; left: -4%; right: -4%; height: 28%; pointer-events: none; }
-.g-hills .hill { position: absolute; bottom: 0; border-radius: 55% 55% 0 0 / 100% 100% 0 0; filter: blur(.5px); }
-.g-hills .hill.h1 { left: -8%; width: 70%; height: 72%; background: #97a878; opacity: .8; }
-.g-hills .hill.h2 { left: 28%; width: 60%; height: 88%; background: #8ba26d; }
-.g-hills .hill.h3 { right: -10%; width: 68%; height: 68%; background: #a8b280; opacity: .85; }
-.g-scene[data-sky="night"] .g-hills .hill.h1 { background: #3f4a3a; }
-.g-scene[data-sky="night"] .g-hills .hill.h2 { background: #354a32; }
-.g-scene[data-sky="night"] .g-hills .hill.h3 { background: #445543; }
+.g-hills .hill {
+  position: absolute; bottom: 0;
+  border-radius: 55% 55% 0 0 / 100% 100% 0 0;
+  filter: blur(.5px);
+  box-shadow: inset 0 -8px 14px rgba(0,0,0,.18);
+}
+.g-hills .hill.h1 { left: -8%; width: 70%; height: 72%; background: linear-gradient(180deg, #a9ba8a 0%, #7a9068 100%); opacity: .85; }
+.g-hills .hill.h2 { left: 28%; width: 60%; height: 88%; background: linear-gradient(180deg, #9eb57d 0%, #6b8652 100%); }
+.g-hills .hill.h3 { right: -10%; width: 68%; height: 68%; background: linear-gradient(180deg, #b8c28e 0%, #899963 100%); opacity: .9; }
+.g-scene[data-sky="night"] .g-hills .hill.h1 { background: linear-gradient(180deg, #4c5a45 0%, #2d3828 100%); }
+.g-scene[data-sky="night"] .g-hills .hill.h2 { background: linear-gradient(180deg, #3f5238 0%, #243020 100%); }
+.g-scene[data-sky="night"] .g-hills .hill.h3 { background: linear-gradient(180deg, #52614a 0%, #324030 100%); }
 
 /* Treeline — tiny distant trees */
 .g-treeline { position: absolute; bottom: 40%; left: 0; right: 0; height: 22px; pointer-events: none; display: flex; gap: 1px; }

@@ -245,6 +245,7 @@ export default function GardenScene({
   sky,
   season,
   showFire = true,
+  firePosition,
   showRonki = true,
   ronkiPosition,
   ronkiVariant = 'amber',
@@ -329,8 +330,16 @@ export default function GardenScene({
       ))}
 
       {/* Fire — optional. In GardenPreview + GardenMode, always visible;
-          in planting/decor modes, optional depending on composition. */}
-      {showFire && <Fire left="52%" bottom="8%" scale={1} />}
+          in planting/decor modes, optional depending on composition.
+          firePosition prop overrides default placement (preview raises
+          it so the Hub's nameplate pill doesn't cover the flame). */}
+      {showFire && (
+        <Fire
+          left={firePosition?.left ?? '52%'}
+          bottom={firePosition?.bottom ?? '8%'}
+          scale={firePosition?.scale ?? 1}
+        />
+      )}
 
       {/* Ronki — optional. Size tunes with viewport (smaller in preview).
           Variant/stage/mood pulled from props so the scene respects the
