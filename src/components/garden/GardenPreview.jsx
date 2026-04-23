@@ -32,12 +32,15 @@ function makeDemoPlants() {
   return [
     // Mature oak (deep back-right, anchors the horizon)
     { id: 'demo-mature-oak',   species: 'oak',    plantedAt: daysAgo(180), position: { x: 88, y: 16 } },
-    // Mid pine (middle, slightly further back)
-    { id: 'demo-mid-pine',     species: 'pine',   plantedAt: daysAgo(95),  position: { x: 50, y: 22 } },
+    // Mid pine — moved from x=50 (too close to fire at x=55) → x=68 so
+    // it sits between the fire and the right-edge oak without clashing.
+    // Marc flag 24 Apr 2026: "tree too close to the campfire".
+    { id: 'demo-mid-pine',     species: 'pine',   plantedAt: daysAgo(95),  position: { x: 68, y: 20 } },
     // Mid apple (left, forward)
     { id: 'demo-mid-apple',    species: 'apple',  plantedAt: daysAgo(60),  position: { x: 10, y: 12 } },
-    // Young birch (right-middle, mid depth)
-    { id: 'demo-young-birch',  species: 'birch',  plantedAt: daysAgo(20),  position: { x: 72, y: 10 } },
+    // Young birch (right-middle, mid depth) — nudged right a touch to
+    // make room for the pine
+    { id: 'demo-young-birch',  species: 'birch',  plantedAt: daysAgo(20),  position: { x: 78, y: 8 } },
     // Fresh sapling (front-left, closest to the viewer)
     { id: 'demo-sprout',       species: 'linden', plantedAt: daysAgo(3),   position: { x: 20, y: 4 } },
   ];

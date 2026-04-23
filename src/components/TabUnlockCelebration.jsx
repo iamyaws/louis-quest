@@ -235,13 +235,15 @@ export default function TabUnlockCelebration({ view }) {
       )}
 
       <style>{`
-        @keyframes tabUnlockToastIn {
-          from { opacity: 0; transform: translate(-50%, -8px); }
-          to   { opacity: 1; transform: translate(-50%, 0); }
+        @keyframes tabUnlockToastSlideIn {
+          0%   { opacity: 0; transform: translateX(120%); }
+          60%  { opacity: 1; transform: translateX(-8%); }
+          100% { opacity: 1; transform: translateX(0); }
         }
-        @keyframes tabUnlockToastOut {
-          from { opacity: 1; transform: translate(-50%, 0); }
-          to   { opacity: 0; transform: translate(-50%, -8px); }
+        @keyframes tabUnlockConfetti {
+          0%   { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+          40%  { opacity: 1; }
+          100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.4); opacity: 0; }
         }
         @keyframes tabCoachIn {
           from { opacity: 0; }
@@ -260,22 +262,68 @@ export default function TabUnlockCelebration({ view }) {
  * down at ttl. A follow-up can add a controlled fade-out.
  */
 function TabUnlockToast({ unlock, t, onDismiss }) {
+  // Marc flag 24 Apr 2026: top-center pill was covering the PinnedRonki
+  // in the topbar. Moved to top-right below the Sterne pill, sliding in
+  // from offscreen-right, with a small confetti burst for celebration.
+  // 12 confetti particles — fixed positions + staggered delays + mixed
+  // sizes. Pure CSS, no external deps.
+  const confettiParticles = Array.from({ length: 12 }).map((_, i) => {
+    // Distribute angles across 360° with slight jitter, distances 40-90px
+    const angle = (i / 12) * 360 + (i % 3) * 12;
+    const distance = 44 + (i % 4) * 14;
+    const rad = (angle * Math.PI) / 180;
+    const dx = Math.cos(rad) * distance;
+    const dy = Math.sin(rad) * distance;
+    const palette = ['#fcd34d', '#f59e0b', '#fde68a', '#fb7185', '#34d399', '#60a5fa'];
+    const color = palette[i % palette.length];
+    const size = 6 + (i % 3) * 2;
+    const delay = (i % 4) * 40;
+    return { i, dx, dy, color, size, delay };
+  });
+
   return createPortal(
     <div
       role="status"
       aria-live="polite"
       onClick={onDismiss}
-      className="fixed left-1/2 z-[120]"
+      className="fixed z-[120]"
       style={{
-        top: 'calc(env(safe-area-inset-top, 0px) + var(--alpha-banner-h, 28px) + 12px)',
-        transform: 'translateX(-50%)',
-        animation: 'tabUnlockToastIn 0.3s ease-out',
-        maxWidth: 'calc(100vw - 32px)',
+        top: 'calc(env(safe-area-inset-top, 0px) + var(--alpha-banner-h, 28px) + 56px)',
+        right: 16,
+        animation: 'tabUnlockToastSlideIn 0.45s cubic-bezier(0.2, 0.8, 0.35, 1.15)',
+        maxWidth: 'calc(100vw - 120px)',
         cursor: 'pointer',
       }}
     >
+      {/* Confetti burst radiating outward from the pill's center.
+           Absolute-positioned at left:50%, top:50% so they fan out of
+           the pill itself. Purely decorative; pointer-events none. */}
       <div
-        className="rounded-full px-5 py-2.5 font-body font-semibold text-[14px] whitespace-nowrap"
+        aria-hidden="true"
+        className="absolute pointer-events-none"
+        style={{ left: '50%', top: '50%', width: 0, height: 0 }}
+      >
+        {confettiParticles.map(p => (
+          <span
+            key={p.i}
+            style={{
+              position: 'absolute',
+              left: 0, top: 0,
+              width: p.size, height: p.size,
+              background: p.color,
+              borderRadius: '50%',
+              boxShadow: `0 0 6px ${p.color}`,
+              transform: 'translate(-50%, -50%) scale(0)',
+              animation: `tabUnlockConfetti 1.2s cubic-bezier(0.2, 0.8, 0.4, 1) ${p.delay}ms forwards`,
+              '--dx': `${p.dx}px`,
+              '--dy': `${p.dy}px`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div
+        className="relative rounded-full px-5 py-2.5 font-body font-semibold text-[14px] whitespace-nowrap"
         style={{
           background: 'linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%)',
           color: '#124346',

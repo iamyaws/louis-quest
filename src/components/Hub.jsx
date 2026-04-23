@@ -470,8 +470,14 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
          preserved for any surface that still wants the Lagerfeuer-only
          view (currently none; safe to remove in a later pass).
          ═════════════════════════════════════════════════════════════════ */}
+      {/* zIndex: 15 puts the scene container ABOVE main's invisible
+          paddingTop area (main is z-10) so the "Garten erkunden" pill
+          actually receives clicks. Header bumped to z-20 below so
+          topbar chrome still visually sits above the scene.
+          Marc flag 24 Apr 2026: pill was visually there but not
+          clickable — main's padding was eating the click. */}
       <div className="absolute left-0 right-0 top-0 overflow-hidden"
-           style={{ zIndex: 1, height: 340 }}>
+           style={{ zIndex: 15, height: 340 }}>
         <GardenPreview
           plants={state?.garden?.plants || []}
           decor={state?.garden?.decor || []}
@@ -495,7 +501,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
          ═════════════════════════════════════════════════════════════════ */}
       <header className="relative flex justify-between items-center gap-3"
               style={{
-                zIndex: 10,
+                zIndex: 20,
                 padding: '10px 20px 14px',
                 paddingTop: 'calc(10px + env(safe-area-inset-top, 0px))',
               }}>
