@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { SEED_BY_ID } from '../data/creatures';
 import VoiceAudio from '../utils/voiceAudio';
@@ -30,20 +30,27 @@ const LABELS = {
 export default function CreatureDiscoveryToast({ creatureId, onDismiss, onOpenDetail }) {
   const { lang } = useTranslation();
   const [visible, setVisible] = useState(false);
+  // Guards against a race where a tap-dismiss and the 8s auto-dismiss
+  // fire onDismiss twice within the 200-300ms fade window.
+  const dismissedRef = useRef(false);
+  const autoTimerRef = useRef(null);
 
   useEffect(() => {
     if (!creatureId) return;
+    dismissedRef.current = false;
     setVisible(true);
     SFX.play('coin');
     VoiceAudio.play('de_discover_creature', 500);
     // 4s was too short for first-graders to absorb the moment (tester
     // 25 Apr 2026). 8s gives enough time to read the name + tap through
     // if curious, and still dismisses on its own so kids aren't stuck.
-    const t = setTimeout(() => {
+    autoTimerRef.current = setTimeout(() => {
+      if (dismissedRef.current) return;
+      dismissedRef.current = true;
       setVisible(false);
       setTimeout(() => onDismiss?.(), 300);
     }, 8000);
-    return () => clearTimeout(t);
+    return () => clearTimeout(autoTimerRef.current);
   }, [creatureId]);
 
   const label = useMemo(() => {
@@ -64,16 +71,12 @@ export default function CreatureDiscoveryToast({ creatureId, onDismiss, onOpenDe
 
   const handleTap = (e) => {
     e.stopPropagation();
-    if (onOpenDetail) {
-      onOpenDetail(creatureId);
-      setVisible(false);
-      setTimeout(() => onDismiss?.(), 200);
-    } else {
-      // No detail view wired — tap still dismisses so the toast doesn't
-      // stick around if the kid swipes it away.
-      setVisible(false);
-      setTimeout(() => onDismiss?.(), 200);
-    }
+    if (dismissedRef.current) return;
+    dismissedRef.current = true;
+    clearTimeout(autoTimerRef.current);
+    if (onOpenDetail) onOpenDetail(creatureId);
+    setVisible(false);
+    setTimeout(() => onDismiss?.(), 200);
   };
 
   return (
