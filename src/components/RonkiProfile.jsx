@@ -291,7 +291,10 @@ export default function RonkiProfile({ onNavigate }) {
     // is gentle-empathy, not a transaction.
     haptic('select');
     actions.pickRonkiSadReaction?.(reactionId);
-    const thanks = lang === 'de' ? 'Danke, Louis.' : 'Thank you, Louis.';
+    const kidName = (state?.familyConfig?.childName || '').trim();
+    const thanks = lang === 'de'
+      ? (kidName ? `Danke, ${kidName}.` : 'Danke.')
+      : (kidName ? `Thank you, ${kidName}.` : 'Thank you.');
     setThankYou(thanks);
     setTimeout(() => setThankYou(t => (t === thanks ? null : t)), 2800);
   };
@@ -324,7 +327,8 @@ export default function RonkiProfile({ onNavigate }) {
   const stageName = (lang === 'en' ? STAGE_NAMES_EN : STAGE_NAMES_DE)[stage];
   const stageColor = STAGE_COLORS[stage];
   const daysTogether = state.totalTaskDays || 0;
-  const heroName = state.familyConfig?.heroName || 'Louis';
+  const heroName = (state.familyConfig?.childName || '').trim();
+  const heroDisplay = heroName || (lang === 'de' ? 'dein Held' : 'your hero');
   // Freund arcs don't count as "complete" until the delayed callback (beat 4)
   // has fired. Until then, they live in engine.completedArcIds but not in
   // freundArcsCompleted — so we filter them out here to avoid spoiling the
@@ -770,11 +774,11 @@ export default function RonkiProfile({ onNavigate }) {
               }}>
                 {completedArcs.length > 0
                   ? (lang === 'de'
-                    ? `Ronki schlüpfte am Tag, als ${heroName} sein erstes Abenteuer begann. Seitdem haben die beiden ${completedArcs.length} Abenteuer bestanden und ${daysTogether} Tage Seite an Seite verbracht. ${FACTS.motto.de}`
-                    : `Ronki hatched on the day ${heroName} started their first adventure. Since then, they've survived ${completedArcs.length} adventure${completedArcs.length !== 1 ? 's' : ''} and spent ${daysTogether} days side by side. ${FACTS.motto.en}`)
+                    ? `Ronki schlüpfte am Tag, als ${heroDisplay} sein erstes Abenteuer begann. Seitdem haben die beiden ${completedArcs.length} Abenteuer bestanden und ${daysTogether} Tage Seite an Seite verbracht. ${FACTS.motto.de}`
+                    : `Ronki hatched on the day ${heroDisplay} started their first adventure. Since then, they've survived ${completedArcs.length} adventure${completedArcs.length !== 1 ? 's' : ''} and spent ${daysTogether} days side by side. ${FACTS.motto.en}`)
                   : (lang === 'de'
-                    ? `Ronki ist gerade erst geschlüpft und wartet auf das erste gemeinsame Abenteuer mit ${heroName}. ${FACTS.motto.de}`
-                    : `Ronki just hatched and is waiting for their first adventure with ${heroName}. ${FACTS.motto.en}`)
+                    ? `Ronki ist gerade erst geschlüpft und wartet auf das erste gemeinsame Abenteuer mit ${heroDisplay}. ${FACTS.motto.de}`
+                    : `Ronki just hatched and is waiting for their first adventure with ${heroDisplay}. ${FACTS.motto.en}`)
                 }
               </p>
               {/* Über fact-card grid — Polish v2 Variant A v1 styling
@@ -1066,62 +1070,65 @@ export default function RonkiProfile({ onNavigate }) {
             </>
           ) : (
             <>
-              {/* Normal-day Pflege — same horizontal-card layout as the
-                   sanfte-Reaktion cards on bad days (Marc's ask 22 Apr 2026
-                   "bring Pflege heute in a look like the screenshoted
-                   version"). Circle-icon-left, title + sub + reward on
-                   the right. Checked style when the action is done today. */}
-              <Kicker>{lang === 'de' ? 'Pflege heute' : 'Care today'}</Kicker>
-              <section style={{ marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {/* Normal-day Pflege — three-tile layout matching the
+                   Begleiter Polish screenshot Marc shared 23 Apr 2026.
+                   Kicker "Kümmere dich um Ronki", tiles stacked icon over
+                   label over a progress bar. Progress bar is binary today:
+                   empty while undone, fills 100% when done (0.45s transition).
+                   Matches VitalsRing's binary-arc semantics from 8348a92. */}
+              <Kicker>{lang === 'de' ? 'Kümmere dich um Ronki' : 'Take care of Ronki'}</Kicker>
+              <section style={{ marginBottom: 14, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                 {[
-                  { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'cookie',          title: t('care.feed'), sub: lang === 'de' ? 'Einen kleinen Snack für Ronki' : 'A small snack for Ronki',      reward: 5, iconBg: 'rgba(245,158,11,0.15)', iconColor: '#f59e0b' },
-                  { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',        title: t('care.pet'),  sub: lang === 'de' ? 'Kurz den Kopf kraulen' : 'Ruffle his head gently',                  reward: 3, iconBg: 'rgba(236,72,153,0.15)', iconColor: '#ec4899' },
-                  { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'sports_baseball', title: t('care.play'), sub: lang === 'de' ? 'Ball werfen, zusammen rennen' : 'Throw a ball, run together',      reward: 8, iconBg: 'rgba(18,67,70,0.12)',    iconColor: '#124346' },
+                  { key: 'fed',    state: state.catFed,    onTap: actions.feedCompanion, icon: 'restaurant', title: t('care.feed'), iconBg: '#ffedd5', iconColor: '#f59e0b', barColor: '#f59e0b' },
+                  { key: 'petted', state: state.catPetted, onTap: actions.petCompanion,  icon: 'favorite',   title: t('care.pet'),  iconBg: '#fce7f3', iconColor: '#ec4899', barColor: '#ec4899' },
+                  { key: 'played', state: state.catPlayed, onTap: actions.playCompanion, icon: 'bolt',       title: t('care.play'), iconBg: '#d1fae5', iconColor: '#059669', barColor: '#10b981' },
                 ].map(a => (
                   <button key={a.key}
                     onClick={() => handleCare(a.onTap, a.state)}
                     disabled={a.state}
-                    className="w-full flex items-center gap-3 active:scale-[0.98] transition-transform text-left"
+                    className="flex flex-col items-center active:scale-[0.96] transition-transform"
                     style={{
-                      padding: '14px 16px',
-                      borderRadius: 18,
-                      background: a.state
-                        ? 'linear-gradient(135deg, rgba(52,211,153,0.08), rgba(52,211,153,0.02))'
-                        : 'linear-gradient(135deg, #ffffff, rgba(255,255,255,0.85))',
-                      border: a.state
-                        ? '1.5px solid rgba(52,211,153,0.35)'
-                        : '1.5px solid rgba(245,158,11,0.2)',
-                      boxShadow: '0 4px 12px -6px rgba(245,158,11,0.18)',
-                      opacity: a.state ? 0.85 : 1,
+                      padding: '14px 10px 12px',
+                      borderRadius: 20,
+                      background: '#ffffff',
+                      border: '1.5px solid rgba(0,0,0,0.06)',
+                      boxShadow: '0 4px 10px -6px rgba(0,0,0,0.10)',
+                      opacity: a.state ? 0.9 : 1,
                     }}>
                     <div style={{
-                      width: 44, height: 44, borderRadius: 14,
-                      background: a.state ? 'rgba(52,211,153,0.15)' : a.iconBg,
-                      display: 'grid', placeItems: 'center', flexShrink: 0,
+                      width: 48, height: 48, borderRadius: 14,
+                      background: a.iconBg,
+                      display: 'grid', placeItems: 'center',
                     }}>
                       <span className="material-symbols-outlined"
                             style={{
-                              fontSize: 24,
-                              color: a.state ? '#059669' : a.iconColor,
+                              fontSize: 26,
+                              color: a.iconColor,
                               fontVariationSettings: "'FILL' 1",
                             }}>
-                        {a.state ? 'check_circle' : a.icon}
+                        {a.state ? 'check' : a.icon}
                       </span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <b className="font-headline" style={{ fontSize: 15, lineHeight: 1.2, color: '#124346', display: 'block' }}>
-                        {a.title}
-                      </b>
-                      <span className="font-body" style={{ fontSize: 12, lineHeight: 1.3, color: a.state ? '#059669' : 'rgba(18,67,70,0.65)' }}>
-                        {a.state ? t('care.done') : a.sub}
-                      </span>
+                    <b className="font-headline" style={{ fontSize: 14, lineHeight: 1.1, color: '#124346', marginTop: 10, textAlign: 'center' }}>
+                      {a.title}
+                    </b>
+                    {/* Progress bar — binary fill; animates 0% → 100% on tap */}
+                    <div style={{
+                      width: '100%',
+                      height: 5,
+                      background: 'rgba(18,67,70,0.10)',
+                      borderRadius: 4,
+                      marginTop: 8,
+                      overflow: 'hidden',
+                    }}>
+                      <div style={{
+                        width: a.state ? '100%' : '0%',
+                        height: '100%',
+                        background: a.barColor,
+                        borderRadius: 4,
+                        transition: 'width 0.45s cubic-bezier(0.4, 0, 0.2, 1)',
+                      }} />
                     </div>
-                    {!a.state && (
-                      <span className="flex items-center gap-1 font-label font-bold shrink-0"
-                            style={{ fontSize: 12, color: '#A83E2C' }}>
-                        <Pearl size={12} />+{a.reward}
-                      </span>
-                    )}
                   </button>
                 ))}
               </section>
