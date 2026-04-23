@@ -29,6 +29,37 @@
  */
 
 import { useEffect } from 'react';
+import { PhoneMockup } from '../components/PhoneMockup';
+
+/* ── Shared app-mockup art block for every front ───────────── *
+ * Repurposes the PhoneMockup component we built for the
+ * Gemeindeblatt foto, scaled down for A6 (~42×75mm). Cream UI
+ * background blends into cream-flyer variants; on the dark-teal
+ * variant the cream phone reads as a brightly-lit screen in
+ * a dim room — good contrast, intentional focus.
+ *
+ * Tilt is -4° by default (can be flipped per variant for the
+ * flatlay-set rhythm across the 4 tiles). Drop-shadow is dual
+ * for softness + definition; tighter on dark bg.
+ * ─────────────────────────────────────────────────────────── */
+type AppArtVariant = 'morgen-anchor' | 'clean-aufgaben' | 'zahne-quest' | 'mood-grid';
+function AppArt({
+  variant,
+  tilt = -4,
+  theme = 'light',
+}: {
+  variant: AppArtVariant;
+  tilt?: number;
+  theme?: 'light' | 'dark';
+}) {
+  return (
+    <div className={`ef-stage ef-stage--${theme}`}>
+      <div className="ef-mockup" style={{ transform: `rotate(${tilt}deg)` }}>
+        <PhoneMockup variant={variant} scale={1.3} />
+      </div>
+    </div>
+  );
+}
 
 const APP_QR_URL =
   'https://api.qrserver.com/v1/create-qr-code/?' +
@@ -98,13 +129,8 @@ function FrontNurEinmal() {
           <span className="ef-mustard-underline">nur einmal</span>.
         </h2>
 
-        <p className="ef-body">
-          Zähne putzen, Tasche packen, Schuhe an. Ronki ist der
-          Drachen-Gefährte, der dein Kind daran erinnert. Nicht du. Nicht zum
-          zehnten Mal.
-        </p>
+        <AppArt variant="morgen-anchor" tilt={-4} />
 
-        <div className="ef-spacer" />
         <QrRow />
       </div>
     </section>
@@ -123,20 +149,16 @@ function FrontPullover() {
         <p className="ef-eyebrow">Viertel nach sieben</p>
 
         <p className="ef-vignette">
-          Der Pulli ist an, die Zähne noch nicht geputzt. Dann der
-          Zahnpasta-Fleck auf dem Lieblingspulli. Umziehen. Ersatz-Pulli
-          gefällt nicht. Seufzer und Frust, auf beiden Seiten.
-        </p>
-
-        <p className="ef-reveal">
-          So sieht ein Morgen aus, den jedes Elternteil kennt.
+          Pulli an, Zähne nicht. Fleck. Umziehen. Ersatz-Pulli gefällt nicht.
+          Seufzer, auf beiden Seiten.
         </p>
 
         <p className="ef-promise">
-          Ronki macht ihn nicht perfekt. Nur ein bisschen ruhiger.
+          Ronki macht den Morgen <em>ruhiger</em>.
         </p>
 
-        <div className="ef-spacer" />
+        <AppArt variant="clean-aufgaben" tilt={-4} />
+
         <QrRow />
       </div>
     </section>
@@ -155,19 +177,13 @@ function FrontBloederRonki() {
         <p className="ef-eyebrow ef-eyebrow--dark">Vater-Sohn-Projekt</p>
 
         <blockquote className="ef-quote">
-          „Blöder Ronki, jetzt muss ich schon wieder meine Sachen machen, nur
-          weil wir uns das ausgedacht haben."
+          „Blöder Ronki, jetzt muss ich schon wieder meine Sachen machen."
         </blockquote>
 
         <p className="ef-attribution">&mdash; Louis, 7, Co-Designer</p>
 
-        <p className="ef-body ef-body--dark">
-          Das sagt mein Sohn manchmal über die App, die wir gemeinsam gebaut
-          haben. Sie nervt ihn. Sie hilft ihm trotzdem. Das ist das Echteste,
-          was man über ein Vater-Sohn-Projekt sagen kann.
-        </p>
+        <AppArt variant="zahne-quest" tilt={-4} theme="dark" />
 
-        <div className="ef-spacer" />
         <QrRow variant="dark" />
       </div>
     </section>
@@ -190,17 +206,12 @@ function FrontExperiment() {
         </h2>
 
         <p className="ef-body">
-          Ich arbeite seit Jahren als Consultant für Gaming. Ich weiß, wie
-          Apps Kinder festhalten. Ein Teil von mir hat beruflich daran
-          mitgebaut. Ein anderer Teil wollte das nie in der Hand seines
-          eigenen Kindes sehen.
+          Ich arbeite als Gaming-Consultant. Ich weiß, wie Apps Kinder festhalten.
+          Ich wollte das nie in der Hand meines Kindes sehen.
         </p>
 
-        <p className="ef-signature">
-          Marc Förster, Unterföhring
-        </p>
+        <AppArt variant="mood-grid" tilt={-4} />
 
-        <div className="ef-spacer" />
         <QrRow />
       </div>
     </section>
@@ -449,13 +460,49 @@ const flyerFrontsCss = `
   }
   .ef-inner {
     height: 100%;
-    padding: 10mm 8mm 7mm;
+    padding: 8mm 7mm 6mm;
     display: flex;
     flex-direction: column;
     position: relative;
     z-index: 2;
+    gap: 2mm;
   }
-  .ef-spacer { flex: 1; min-height: 3mm; }
+  .ef-spacer { flex: 1; min-height: 2mm; }
+
+  /* ── App-art stage ─────────────────────────────────────── *
+   * Flex-grow area between text + QR. Mockup is absolutely
+   * positioned so it can overflow the stage visually (tilt
+   * gives it slight corner bleed) without breaking layout. */
+  .ef-stage {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1mm 0 2mm;
+  }
+  .ef-mockup {
+    width: 44mm;
+    height: 79mm;
+    border-radius: 3mm;
+    overflow: hidden;
+    box-shadow:
+      0 3mm 6mm rgba(26,60,63,0.22),
+      0 1mm 2mm rgba(26,60,63,0.12);
+    transform-origin: center center;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .ef-stage--dark .ef-mockup {
+    /* Cream UI on dark teal bg — add warm rim + deeper shadow
+       so the phone reads as a lit screen in a dim room, not
+       a pasted rectangle. */
+    box-shadow:
+      0 0 0 0.3mm rgba(253,248,240,0.08),
+      0 4mm 8mm rgba(0,0,0,0.45),
+      0 1mm 2mm rgba(0,0,0,0.3);
+  }
 
   .ef-eyebrow {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -464,7 +511,7 @@ const flyerFrontsCss = `
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: #50A082;
-    margin: 0 0 4mm;
+    margin: 0;
   }
   .ef-eyebrow--dark {
     color: #FCD34D;
@@ -472,10 +519,10 @@ const flyerFrontsCss = `
 
   .ef-body {
     font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    font-size: 8.5pt;
-    line-height: 1.5;
+    font-size: 8pt;
+    line-height: 1.4;
     color: rgba(26,60,63,0.82);
-    margin: 0 0 3mm;
+    margin: 0;
   }
   .ef-body--dark {
     color: rgba(253,248,240,0.85);
@@ -490,11 +537,11 @@ const flyerFrontsCss = `
   .ef-headline--nur-einmal {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 800;
-    font-size: 21pt;
+    font-size: 18pt;
     line-height: 1.05;
     letter-spacing: -0.02em;
     color: #1A3C3F;
-    margin: 0 0 5mm;
+    margin: 0;
   }
   .ef-mustard-underline {
     position: relative;
@@ -522,28 +569,32 @@ const flyerFrontsCss = `
   }
   .ef-vignette {
     font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    font-size: 9pt;
-    line-height: 1.45;
-    color: rgba(26,60,63,0.9);
-    margin: 0 0 4mm;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    color: rgba(26,60,63,0.88);
+    margin: 0;
   }
   .ef-reveal {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 11pt;
+    font-size: 10pt;
     font-style: italic;
     color: #50A082;
     line-height: 1.25;
-    margin: 0 0 3mm;
+    margin: 0;
   }
   .ef-promise {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 12pt;
+    font-size: 11pt;
     color: #1A3C3F;
     line-height: 1.2;
-    margin: 0 0 3mm;
+    margin: 0;
     letter-spacing: -0.01em;
+  }
+  .ef-promise em {
+    font-style: italic;
+    color: #50A082;
   }
 
   /* ── Variant 3: Blöder Ronki (dark teal + quote dominant) ── */
@@ -560,20 +611,20 @@ const flyerFrontsCss = `
   .ef-quote {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 14pt;
+    font-size: 13pt;
     font-style: italic;
-    line-height: 1.25;
+    line-height: 1.22;
     color: #FDF8F0;
-    margin: 0 0 2mm;
+    margin: 0;
     letter-spacing: -0.01em;
   }
   .ef-attribution {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-size: 8pt;
+    font-size: 7.5pt;
     font-weight: 700;
     color: #FCD34D;
     letter-spacing: 0.04em;
-    margin: 0 0 4mm;
+    margin: 0;
   }
 
   /* ── Variant 4: Experiment (cream + sage accent, philosophy) ── */
@@ -585,11 +636,11 @@ const flyerFrontsCss = `
   .ef-headline--experiment {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 800;
-    font-size: 15pt;
+    font-size: 13pt;
     line-height: 1.15;
     letter-spacing: -0.01em;
     color: #1A3C3F;
-    margin: 0 0 4mm;
+    margin: 0;
   }
   .ef-headline--experiment em {
     font-style: italic;
@@ -599,9 +650,9 @@ const flyerFrontsCss = `
   .ef-signature {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 8pt;
+    font-size: 7.5pt;
     color: rgba(26,60,63,0.65);
-    margin: 0 0 3mm;
+    margin: 0;
     letter-spacing: 0.04em;
   }
 
