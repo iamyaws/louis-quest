@@ -15,6 +15,7 @@ import { BADGES } from '../constants';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useVoice } from '../companion/useVoice';
 import VoiceBubble from './VoiceBubble';
+import UnlockStamps from './UnlockStamps';
 // Arc system paused — see backlog_arc_offer_rework.md. Imports kept commented
 // so the re-enable diff is a one-liner when the rework ships.
 // import { useArc } from '../arcs/useArc';
@@ -897,21 +898,13 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
              card. Copy adapts based on what the kid still needs (log mood
              / finish more tasks / both). Only shows while Tagebuch is
              locked AND the Stimmung card itself is revealed. */}
-        {reveal(1) && journalUnlockHint && (
-          <div
-            className="-mt-2 self-center px-3 py-1.5 rounded-full"
-            style={{
-              background: 'rgba(252,211,77,0.16)',
-              border: '1px solid rgba(180,83,9,0.22)',
-            }}
-          >
-            <span
-              className="font-label font-bold uppercase text-center"
-              style={{ fontSize: 10, letterSpacing: '0.08em', color: '#A83E2C' }}
-            >
-              {journalUnlockHint}
-            </span>
-          </div>
+        {reveal(1) && journalLocked && (
+          <UnlockStamps
+            label={t('unlockHint.journal.label')}
+            filled={Math.min(3, tasksDone) + (moodLogged ? 1 : 0)}
+            total={4}
+            detail={journalUnlockHint || undefined}
+          />
         )}
 
         {/* ── Wasser pill — baseline care, now paired with Mood above.
@@ -984,21 +977,13 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
              Louis sees his Sterne count ticking toward the shop opening.
              Rides just above the Wasser pill (or in its slot when Wasser
              is still gated). */}
-        {reveal(1) && shopUnlockHint && (
-          <div
-            className="-mt-2 self-center px-3 py-1.5 rounded-full"
-            style={{
-              background: 'rgba(252,211,77,0.16)',
-              border: '1px solid rgba(180,83,9,0.22)',
-            }}
-          >
-            <span
-              className="font-label font-bold uppercase text-center"
-              style={{ fontSize: 10, letterSpacing: '0.08em', color: '#A83E2C' }}
-            >
-              {shopUnlockHint}
-            </span>
-          </div>
+        {reveal(1) && shopLocked && (
+          <UnlockStamps
+            label={t('unlockHint.shop.label')}
+            filled={Math.floor(Math.min(50, state.hp || 0) / 10)}
+            total={5}
+            detail={shopUnlockHint || undefined}
+          />
         )}
 
         {/* ── Campfire Visitor card — only shows on days a Freund stops
