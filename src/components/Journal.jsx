@@ -932,16 +932,24 @@ export default function Journal({ onNavigate, onOpenParental }) {
               transition={{ type: 'spring', stiffness: 380, damping: 22, mass: 0.8 }}
               onClick={e => e.stopPropagation()}>
               {/* Nodding Ronki — reuse hero-journal art (no new asset needed).
-                   1.2s rotate -3deg ↔ 3deg with a tiny y-float. */}
+                   1.2s rotate -3deg ↔ 3deg with a tiny y-float.
+                   `overflow: hidden` + `position: relative` keep the
+                   painterly art pinned inside the 90×90 circle so it
+                   doesn't bleed over the heading (tester 25 Apr 2026).
+                   Bottom margin bumped to 22 for clearer title space. */}
               <div style={{
-                width: 90, height: 90, margin: '0 auto 14px',
+                width: 90, height: 90, margin: '0 auto 22px',
                 display: 'grid', placeItems: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                borderRadius: '50%',
                 animation: 'ronkiNod 1.2s ease-in-out infinite',
               }}>
                 <img src={base + 'art/hero-journal.webp'}
                      alt=""
                      style={{
-                       width: '100%', height: '100%', objectFit: 'contain',
+                       display: 'block',
+                       width: '100%', height: '100%', objectFit: 'cover',
                        filter: 'drop-shadow(0 6px 10px rgba(180,83,9,0.3))',
                      }} />
               </div>

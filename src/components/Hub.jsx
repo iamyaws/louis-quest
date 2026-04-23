@@ -7,6 +7,7 @@ import { useGameAccess } from '../hooks/useGameAccess';
 import HeroChibi from './HeroChibi';
 import HeroBuilder from './HeroBuilder';
 import SFX from '../utils/sfx';
+import { useHaptic } from '../hooks/useHaptic';
 import Egg from './Egg';
 import { Pearl } from './CurrencyIcons';
 import AnimatedCount from './AnimatedCount';
@@ -138,6 +139,7 @@ const BOSS_ART = {
 // eslint-disable-next-line no-unused-vars
 export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   const { state, computed, actions } = useTask();
+  const haptic = useHaptic();
   const { done, total, allDone, pct } = computed;
   const { t, lang } = useTranslation();
   const { track } = useAnalytics();
@@ -914,43 +916,64 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
                "body care" bookend on the Hub (Marc's reorder Apr 2026).
                Progressive disclosure: joins at 3 tasks, same threshold as
                Als Nächstes — baseline-care layer arrives together. ── */}
-        {reveal(3) && (
-          <div className="w-full px-4 py-3 rounded-2xl flex items-center gap-2.5"
-               style={{ background: '#fff', border: '1px solid rgba(18,67,70,0.06)' }}>
-          <span className="material-symbols-outlined shrink-0"
-                style={{ color: '#124346', fontSize: 20, fontVariationSettings: "'FILL' 1" }}>
-            water_drop
-          </span>
-          <span className="font-label font-semibold text-[11px] uppercase tracking-[0.14em] shrink-0"
-                style={{ color: '#124346' }}>
-            {t('hub.water.title')}
-          </span>
-          <div className="flex-1 flex gap-1">
-            {[0,1,2,3,4,5].map(i => {
-              const filled = i < (state.dailyWaterCount || 0);
-              const isNext = i === (state.dailyWaterCount || 0);
-              return (
-                <button
-                  key={i}
-                  className="flex-1 h-2 rounded-md transition-all"
-                  style={{
-                    background: filled ? '#124346' : (isNext ? 'rgba(18,67,70,0.22)' : 'rgba(18,67,70,0.08)'),
-                    border: 'none',
-                    cursor: isNext ? 'pointer' : 'default',
-                  }}
-                  disabled={!isNext && !filled}
-                  onClick={() => isNext && actions.drinkWater?.()}
-                  aria-label={isNext ? t('hub.water.hint') : undefined}
-                />
-              );
-            })}
-          </div>
-          <span className="font-label font-bold text-[12px] shrink-0 text-right"
-                style={{ color: '#6b655b', minWidth: 30 }}>
-            {(state.dailyWaterCount || 0)}/6
-          </span>
-          </div>
-        )}
+        {reveal(3) && (() => {
+          // Whole-pill tap adds water (tester 25 Apr 2026: the small
+          // per-slot click zones were frustrating). The slots still
+          // animate to show progress; they're purely visual inside the
+          // button now.
+          const waterCount = state.dailyWaterCount || 0;
+          const canAdd = waterCount < 6;
+          return (
+            <button
+              type="button"
+              onClick={() => {
+                if (!canAdd) return;
+                // Sip feedback: sip sound + light haptic tap. Kid needs
+                // confirmation that the tap registered (tester 25 Apr).
+                SFX.play('pop');
+                haptic('confirm');
+                actions.drinkWater?.();
+              }}
+              disabled={!canAdd}
+              aria-label={canAdd ? t('hub.water.hint') : undefined}
+              className="w-full px-4 py-3 rounded-2xl flex items-center gap-2.5 active:scale-[0.99] transition-all"
+              style={{
+                background: '#fff',
+                border: '1px solid rgba(18,67,70,0.06)',
+                cursor: canAdd ? 'pointer' : 'default',
+                textAlign: 'left',
+              }}
+            >
+              <span className="material-symbols-outlined shrink-0"
+                    style={{ color: '#124346', fontSize: 20, fontVariationSettings: "'FILL' 1" }}>
+                water_drop
+              </span>
+              <span className="font-label font-semibold text-[11px] uppercase tracking-[0.14em] shrink-0"
+                    style={{ color: '#124346' }}>
+                {t('hub.water.title')}
+              </span>
+              <span className="flex-1 flex gap-1" aria-hidden="true">
+                {[0,1,2,3,4,5].map(i => {
+                  const filled = i < waterCount;
+                  const isNext = i === waterCount;
+                  return (
+                    <span
+                      key={i}
+                      className="flex-1 h-2 rounded-md transition-all"
+                      style={{
+                        background: filled ? '#124346' : (isNext ? 'rgba(18,67,70,0.22)' : 'rgba(18,67,70,0.08)'),
+                      }}
+                    />
+                  );
+                })}
+              </span>
+              <span className="font-label font-bold text-[12px] shrink-0 text-right"
+                    style={{ color: '#6b655b', minWidth: 30 }}>
+                {waterCount}/6
+              </span>
+            </button>
+          );
+        })()}
 
         {/* Laden unlock hint — shows current Sterne progress toward the
              50-star shop unlock. Gated on reveal(1) (first task done) so
