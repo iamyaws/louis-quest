@@ -4,28 +4,40 @@
  * Grundschul-Eltern-Cafe tables, Kinderarzt-Wartezimmer, anywhere
  * parents might pick a flyer off a stack and read it in 20 seconds.
  *
- * The 4 fronts each hit a different emotional register — parent-reader
- * picks up one, it lands (or doesn't), they keep or pass. Variety of
- * entry-points means different parents see the flyer that speaks to them.
+ * Composition (bold-redesign pass, synthesis of 4 expert critiques —
+ * advertising copywriter / brand strategist / OOH designer / editorial
+ * art director — who all agreed the earlier "phone-mockup peek" was
+ * fighting a brand about LESS screen):
  *
- * Content drawn from voice work already shipped:
- *   1. 'Nur einmal' — the hero promise from HeroVariantF
- *   2. 'Pullover-Zahnpasta' — the opening vignette from the
- *      Unterföhringer Gemeindeblatt article, parents-morning-chaos
- *   3. 'Blöder Ronki' — Louis' unfiltered quote, authenticity angle
- *   4. 'Experiment' — the UeberMich origin frame, why-we-built-it
+ *   Shared scaffolding, variant-specific register:
+ *   · NO top-bar gradient (it was a brand-flag bolt-on)
+ *   · NO phone mockup (it was a placeholder at A6 scale)
+ *   · Full-bleed color field, variant-specific mood
+ *   · Each variant composed in its own editorial register:
+ *     1. Nur einmal  — POSTER: 2-zone cream/mustard, headline straddles
+ *        the seam with "nur einmal" sitting IN the mustard (the underline
+ *        finally earns its space)
+ *     2. Pullover    — REPORTAGE: dateline run-in ("VIERTEL NACH SIEBEN,
+ *        UNTERFÖHRING —"), vignette flows as prose, sage bottom zone
+ *        with a pencil-filter zahnpasta-splotch — the card IS the pullover
+ *     3. Blöder Ronki — PULL-QUOTE: full-bleed dark teal, oversized opening
+ *        curly-quote „ at ~72pt mustard bleeding into the margin, quote
+ *        set with a hanging indent, small-caps attribution
+ *     4. Experiment  — SIGNED LETTER: cream top, dark-teal bottom, hairline
+ *        rule above eyebrow, narrower measure, small-caps signature block
+ *        "MARC FÖRSTER · UNTERFÖHRING · APRIL 2026" reversed out on teal
  *
- * Shared ParentBack on the reverse (3 differentiators + QR + signoff).
- * Fronts keep the text breathing — the QR lives only on the back (Marc:
- * "do we need the QR on the front when it's also on the back?" — no.)
- * A small app-mockup peek sits in the bottom-right corner of each front
- * as a visual tip-in; text still does the heavy lifting.
+ *   Family binding: the 2 light covers (promise, vignette) pair against
+ *   the 2 dark covers (quote, manifesto). At 3m a parent reads 4 distinct
+ *   things; at arm's length they read as a matched family.
+ *
+ * Shared ParentBack on the reverse carries the QR + 3 differentiators.
  *
  * Print output: 2-page A4 PDF
  *   Page 1: 4 distinct fronts tiled 2×2
  *   Page 2: 4× ParentBack tiled 2×2
  *
- * Workflow (same as Sammelkarten sheet):
+ * Workflow:
  *   1. Print page 1 → 4 different fronts on one A4
  *   2. Flip paper, print page 2 → shared back on the other side
  *   3. Cut along center cross → 4 double-sided flyers
@@ -33,37 +45,6 @@
  */
 
 import { useEffect } from 'react';
-import { PhoneMockup } from '../components/PhoneMockup';
-
-/* ── Mockup peek — small decorative accent ─────────────────── *
- * First attempt made the mockup dominant; Marc pushed back —
- * "imagery feels too big … try to fit it into the previous
- * version of your cover designs." So this is a small peek
- * (~21×38mm at scale 0.65), absolute-positioned in the bottom-
- * right corner, tilted for a flatlay vibe. Sibling of .ef-inner
- * so it can bleed toward the flyer edge without fighting the
- * text column's padding.
- * ─────────────────────────────────────────────────────────── */
-type AppArtVariant = 'morgen-anchor' | 'clean-aufgaben' | 'zahne-quest' | 'mood-grid';
-function AppArt({
-  variant,
-  tilt = -7,
-  theme = 'light',
-}: {
-  variant: AppArtVariant;
-  tilt?: number;
-  theme?: 'light' | 'dark';
-}) {
-  return (
-    <div
-      className={`ef-peek ef-peek--${theme}`}
-      style={{ transform: `rotate(${tilt}deg)` }}
-      aria-hidden
-    >
-      <PhoneMockup variant={variant} scale={0.65} />
-    </div>
-  );
-}
 
 const APP_QR_URL =
   'https://api.qrserver.com/v1/create-qr-code/?' +
@@ -71,10 +52,9 @@ const APP_QR_URL =
   '&size=500x500&format=png&margin=8&color=1a3c3f&bgcolor=fdf8f0';
 
 function CutMarks() {
-  // Tick marks were 4mm long × 0.35mm thick — too faint, Marc nearly
-  // missed them when cutting the first print. Bumped to 5mm × 0.7mm
-  // with the center crosshair at 6mm × 0.5mm. Still subtle enough not
-  // to dominate the design, but visible against a printed background.
+  // Tick marks were 4mm × 0.35mm — too faint. Now 5mm × 0.7mm with a
+  // subtle center crosshair (0.5mm, 45% opacity) so scissors have a
+  // visible guide without dominating the design.
   return (
     <svg
       className="cut-marks"
@@ -92,127 +72,193 @@ function CutMarks() {
   );
 }
 
+/* ── Pencil-filter splotch ─────────────────────────────────── *
+ * Ported from PrintGemeindeblattFoto. feTurbulence + displacement
+ * gives an organic hand-drawn edge so the mustard blob reads as
+ * "the stain from the story" rather than a flat SVG circle.
+ * ─────────────────────────────────────────────────────────── */
+function ZahnpastaSplotch() {
+  return (
+    <svg
+      className="ef-splotch"
+      viewBox="0 0 60 60"
+      aria-hidden
+    >
+      <defs>
+        <filter id="pencil-splotch">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.8"
+            numOctaves="2"
+            result="noise"
+          />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" />
+        </filter>
+      </defs>
+      {/* Off-center irregular blob — zahnpasta from the story */}
+      <ellipse
+        cx="30"
+        cy="30"
+        rx="22"
+        ry="18"
+        fill="#FCD34D"
+        opacity="0.88"
+        filter="url(#pencil-splotch)"
+      />
+      {/* A smaller satellite drop, as if it splattered */}
+      <ellipse
+        cx="48"
+        cy="20"
+        rx="4"
+        ry="3"
+        fill="#FCD34D"
+        opacity="0.7"
+        filter="url(#pencil-splotch)"
+      />
+    </svg>
+  );
+}
+
 /* ── Front 1: „Stell dir vor, du sagst es nur einmal" ──── *
- * Typography-heavy hero-echo. Most universal — the promise.
+ * Poster register. 2-zone cream/mustard. Headline splits
+ * across the seam so "nur einmal" lands inside the mustard
+ * block — the underline-highlight concept made structural.
  * ─────────────────────────────────────────────────────────── */
 
 function FrontNurEinmal() {
   return (
     <section className="flyer-page ef-flyer ef-flyer--nur-einmal">
-      <div className="ef-inner">
+      <div className="ef-zone ef-zone--top">
         <p className="ef-eyebrow">Für Eltern</p>
-
-        <h2 className="ef-headline ef-headline--nur-einmal">
+        <h2 className="ef-poster-top">
           Stell dir vor,
           <br />
           du sagst es
-          <br />
-          <span className="ef-mustard-underline">nur einmal</span>.
         </h2>
-
-        <p className="ef-body">
-          Zähne putzen, Tasche packen, Schuhe an. Ronki ist der
-          Drachen-Gefährte, der dein Kind daran erinnert. Nicht du.
-          Nicht zum zehnten Mal.
-        </p>
       </div>
-      <AppArt variant="morgen-anchor" tilt={-7} />
+      <div className="ef-zone ef-zone--bottom ef-zone--mustard">
+        <h2 className="ef-poster-bottom">nur einmal.</h2>
+        <p className="ef-body-on-mustard">
+          Zähne putzen, Tasche packen, Schuhe an. Ronki erinnert —
+          nicht du, nicht zum zehnten Mal.
+        </p>
+        <p className="ef-url-on-mustard">ronki.de</p>
+      </div>
     </section>
   );
 }
 
 /* ── Front 2: Pullover-Zahnpasta-Vignette ─────────────── *
- * The morning-chaos scene from the Gemeindeblatt article.
- * Highest resonance with real-parent-experience.
+ * Reportage register. Dateline run-in to the first sentence,
+ * vignette flows as prose. Sage bottom zone carries the
+ * reveal + promise, plus a pencil-filter toothpaste splotch
+ * so the card literally IS the pullover-with-the-stain.
  * ─────────────────────────────────────────────────────────── */
 
 function FrontPullover() {
   return (
     <section className="flyer-page ef-flyer ef-flyer--pullover">
-      <div className="ef-inner">
-        <p className="ef-eyebrow">Viertel nach sieben</p>
-
+      <div className="ef-zone ef-zone--top ef-zone--pullover-top">
         <p className="ef-vignette">
-          Der Pulli ist an, die Zähne noch nicht geputzt. Dann der
+          <span className="ef-dateline">Viertel nach sieben, Unterföhring —</span>
+          {' '}der Pulli ist an, die Zähne noch nicht geputzt. Dann der
           Zahnpasta-Fleck auf dem Lieblingspulli. Umziehen. Ersatz-Pulli
           gefällt nicht. Seufzer und Frust, auf beiden Seiten.
         </p>
-
-        <p className="ef-reveal">
+      </div>
+      <div className="ef-zone ef-zone--bottom ef-zone--sage">
+        <ZahnpastaSplotch />
+        <p className="ef-reveal-on-sage">
           So sieht ein Morgen aus, den jedes Elternteil kennt.
         </p>
-
-        <p className="ef-promise">
-          Ronki macht ihn nicht perfekt. Nur ein bisschen <em>ruhiger</em>.
+        <p className="ef-promise-on-sage">
+          Ronki macht ihn nicht perfekt.
+          <br />
+          Nur ein bisschen <em>ruhiger</em>.
         </p>
+        <p className="ef-url-on-sage">ronki.de</p>
       </div>
-      <AppArt variant="clean-aufgaben" tilt={-6} />
     </section>
   );
 }
 
 /* ── Front 3: „Blöder Ronki" (Louis-Zitat) ───────────── *
- * Dark-teal bg for contrast + visual variety on the sheet.
- * Authenticity angle — the kid roasts his own dad's app.
+ * Pull-quote register, NYT-Mag style. Full-bleed dark teal,
+ * oversized opening curly-quote „ bleeds into top-left
+ * margin at ~72pt mustard, quote set with a hanging indent
+ * so left edges align past the punctuation. Small-caps
+ * attribution. The quote IS the composition — no block,
+ * no mockup, no decoration.
  * ─────────────────────────────────────────────────────────── */
 
 function FrontBloederRonki() {
   return (
     <section className="flyer-page ef-flyer ef-flyer--bloeder">
-      <div className="ef-inner">
-        <p className="ef-eyebrow ef-eyebrow--dark">Vater-Sohn-Projekt</p>
+      <div className="ef-bleed">
+        <p className="ef-eyebrow ef-eyebrow--on-dark">Vater-Sohn-Projekt</p>
 
-        <blockquote className="ef-quote">
-          „Blöder Ronki, jetzt muss ich schon wieder meine Sachen machen,
-          nur weil wir uns das ausgedacht haben."
-        </blockquote>
+        <div className="ef-quote-stack">
+          <span className="ef-giant-quote" aria-hidden>
+            „
+          </span>
+          <blockquote className="ef-pull-quote">
+            Blöder Ronki, jetzt muss ich schon wieder meine Sachen machen,
+            nur weil wir uns das ausgedacht haben.
+          </blockquote>
+        </div>
 
-        <p className="ef-attribution">&mdash; Louis, 7, Co-Designer</p>
+        <p className="ef-attribution-caps">— Louis, 7, Co-Designer</p>
 
-        <p className="ef-body ef-body--dark">
+        <p className="ef-body-on-dark">
           Das sagt mein Sohn manchmal über die App, die wir gemeinsam
-          gebaut haben. Sie nervt ihn. Sie hilft ihm trotzdem. Das ist
-          das Echteste, was man über ein Vater-Sohn-Projekt sagen kann.
+          gebaut haben. Sie nervt ihn. Sie hilft ihm trotzdem.
         </p>
+
+        <p className="ef-url-on-dark">ronki.de</p>
       </div>
-      <AppArt variant="zahne-quest" tilt={-6} theme="dark" />
     </section>
   );
 }
 
 /* ── Front 4: „Ronki ist ein Experiment" ─────────────── *
- * The why-we-built-it origin frame from UeberMich.
- * Builds trust for parents who want philosophy first.
+ * Signed-letter register, Monocle-essay feel. Cream top
+ * with a hairline rule above the eyebrow, ragged-right
+ * headline, narrower body measure. Dark-teal bottom zone
+ * carries the signature as small-caps set with middle-dot
+ * separators — reads as Marc's byline, not a marketing CTA.
  * ─────────────────────────────────────────────────────────── */
 
 function FrontExperiment() {
   return (
     <section className="flyer-page ef-flyer ef-flyer--experiment">
-      <div className="ef-inner">
+      <div className="ef-zone ef-zone--top">
+        <hr className="ef-hairline" />
         <p className="ef-eyebrow">Warum wir das machen</p>
-
-        <h2 className="ef-headline ef-headline--experiment">
-          Ronki ist kein Produkt. <em>Es ist ein Experiment.</em>
+        <h2 className="ef-essay-headline">
+          Ronki ist kein Produkt.
+          <br />
+          <em>Es ist ein Experiment.</em>
         </h2>
-
-        <p className="ef-body">
+        <p className="ef-essay-body">
           Ich arbeite seit Jahren als Consultant für Gaming. Ich weiß,
-          wie Apps Kinder festhalten. Ein Teil von mir hat beruflich
-          daran mitgebaut. Ein anderer Teil wollte das nie in der Hand
+          wie Apps Kinder festhalten. Ein Teil von mir hat daran
+          mitgebaut. Ein anderer Teil wollte das nie in der Hand
           seines eigenen Kindes sehen.
         </p>
-
-        <p className="ef-signature">
-          Marc Förster, Unterföhring
-        </p>
       </div>
-      <AppArt variant="mood-grid" tilt={-7} />
+      <div className="ef-zone ef-zone--bottom ef-zone--ink">
+        <p className="ef-signature-caps">
+          Marc Förster &middot; Unterföhring &middot; April 2026
+        </p>
+        <p className="ef-url-on-dark">ronki.de</p>
+      </div>
     </section>
   );
 }
 
 /* ── ParentBack: shared on all 4 cells, reverse side ──── *
  * Consistent pitch: 3 differentiators + QR + signoff.
+ * Unchanged from previous pass — Marc's happy with it.
  * ─────────────────────────────────────────────────────────── */
 
 function ParentBack() {
@@ -432,67 +478,54 @@ const sheetCss = `
   }
 `;
 
-/* ── Front-variants CSS ─────────────────────────────────── */
+/* ── Front-variants CSS — bold-redesign pass ─────────────── */
 
 const flyerFrontsCss = `
-  /* Base flyer container. Each variant adds its own bg + accent. */
+  /* Base flyer container. Each variant adds its own bg + accent.
+     No top-bar gradient anymore — the 4mm mustard→sage ribbon was
+     an app-landing-page flag on a brand that wants to whisper. */
   .ef-flyer {
     width: 105mm;
     height: 148mm;
     overflow: hidden;
     position: relative;
+    display: flex;
+    flex-direction: column;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
-  .ef-flyer::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4mm;
-    background: linear-gradient(90deg, #FCD34D, #50A082);
-    z-index: 3;
+
+  /* ── Zones ─────────────────────────────────────────────── *
+   * Two-zone layout. Top zone flexes to fit the text body;
+   * bottom zone has a fixed proportional height per variant.
+   * Each zone has its own padding + color; no overlap.      */
+  .ef-zone {
+    position: relative;
+    padding: 9mm 8mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
   }
-  .ef-inner {
-    height: 100%;
-    padding: 10mm 8mm 7mm;
+  .ef-zone--top {
+    flex: 1 1 auto;
+    padding-top: 11mm;
+  }
+  .ef-zone--bottom {
+    flex: 0 0 auto;
+    padding-top: 8mm;
+    padding-bottom: 8mm;
+  }
+
+  /* Full-bleed variant (Blöder Ronki) — single zone, no split */
+  .ef-bleed {
+    flex: 1 1 auto;
+    padding: 11mm 8mm 8mm;
     display: flex;
     flex-direction: column;
     position: relative;
-    z-index: 2;
   }
 
-  /* ── App-mockup peek ───────────────────────────────────── *
-   * Small absolute-positioned tip-in in the bottom-right
-   * corner. Sibling of .ef-inner so it sits above the text
-   * layer and can bleed toward the edge. scale=0.65 inside
-   * PhoneMockup gives ~21×38mm — small enough not to fight
-   * the headline, big enough to read as a real app screen.
-   * Lower-left edge stays clear so long body text isn't
-   * occluded (3rd line usually short of that corner).       */
-  .ef-peek {
-    position: absolute;
-    right: 3mm;
-    bottom: 4mm;
-    transform-origin: bottom right;
-    z-index: 3;
-    pointer-events: none;
-    border-radius: 2.5mm;
-    overflow: hidden;
-    box-shadow:
-      0 2mm 4mm rgba(26,60,63,0.22),
-      0 0.5mm 1mm rgba(26,60,63,0.12);
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-  }
-  .ef-peek--dark {
-    /* Cream UI on dark teal bg — warm rim + deeper shadow so
-       the phone reads as a lit screen in a dim room. */
-    box-shadow:
-      0 0 0 0.25mm rgba(253,248,240,0.1),
-      0 2.5mm 5mm rgba(0,0,0,0.5),
-      0 0.5mm 1mm rgba(0,0,0,0.35);
-  }
-
+  /* ── Shared eyebrow ─────────────────────────────────── */
   .ef-eyebrow {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-size: 7pt;
@@ -500,149 +533,281 @@ const flyerFrontsCss = `
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: #50A082;
-    margin: 0 0 4mm;
+    margin: 0 0 5mm;
   }
-  .ef-eyebrow--dark {
-    color: #FCD34D;
-  }
+  .ef-eyebrow--on-dark { color: #FCD34D; }
 
-  .ef-body {
-    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    font-size: 8.5pt;
-    line-height: 1.5;
-    color: rgba(26,60,63,0.82);
-    margin: 0 0 3mm;
+  /* ── Shared URL foot (small text, bottom of bottom zone) ─ */
+  .ef-url-on-mustard,
+  .ef-url-on-sage,
+  .ef-url-on-dark {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin: auto 0 0;
   }
-  .ef-body--dark {
-    color: rgba(253,248,240,0.85);
-  }
+  .ef-url-on-mustard { color: rgba(26,60,63,0.7); }
+  .ef-url-on-sage    { color: rgba(253,248,240,0.85); }
+  .ef-url-on-dark    { color: rgba(253,248,240,0.7); }
 
-  /* ── Variant 1: Nur Einmal (cream + big type) ── */
+  /* ────────────────────────────────────────────────────── *
+   * Variant 1: NUR EINMAL — poster register              *
+   * Cream top, mustard bottom. Headline splits across    *
+   * the seam; "nur einmal" lives inside the mustard.     *
+   * ────────────────────────────────────────────────────── */
+
   .ef-flyer--nur-einmal {
     background: #FDF8F0;
     background-image:
       radial-gradient(ellipse 90% 60% at 100% 0%, rgba(80,160,130,0.15) 0%, transparent 60%);
   }
-  .ef-headline--nur-einmal {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-weight: 800;
-    font-size: 21pt;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    color: #1A3C3F;
-    margin: 0 0 5mm;
-  }
-  .ef-mustard-underline {
-    position: relative;
-    display: inline-block;
-    white-space: nowrap;
-  }
-  .ef-mustard-underline::after {
-    content: "";
-    position: absolute;
-    bottom: 0.2mm;
-    left: 0;
-    right: 0;
-    height: 3.5mm;
-    background: rgba(252,211,77,0.55);
-    z-index: -1;
-    border-radius: 1mm;
+  .ef-flyer--nur-einmal .ef-zone--top { flex: 1 1 56%; }
+  .ef-flyer--nur-einmal .ef-zone--bottom { flex: 0 0 44%; }
+
+  .ef-zone--mustard {
+    background: #FCD34D;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 100% 100%, rgba(180,83,9,0.1) 0%, transparent 55%);
   }
 
-  /* ── Variant 2: Pullover (cream + mustard glow + vignette style) ── */
+  .ef-poster-top {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 26pt;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: #1A3C3F;
+    margin: 0;
+  }
+  .ef-poster-bottom {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 32pt;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    color: #1A3C3F;
+    font-style: italic;
+    margin: 0 0 5mm;
+  }
+  .ef-body-on-mustard {
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    font-size: 8.5pt;
+    line-height: 1.45;
+    color: rgba(26,60,63,0.88);
+    margin: 0;
+    max-width: 80mm;
+  }
+
+  /* ────────────────────────────────────────────────────── *
+   * Variant 2: PULLOVER — reportage register             *
+   * Cream top with a dateline-run-in vignette. Sage      *
+   * bottom zone carries the reveal + promise + a         *
+   * pencil-filter zahnpasta splotch, off-center.          *
+   * ────────────────────────────────────────────────────── */
+
   .ef-flyer--pullover {
     background: #FDF8F0;
     background-image:
-      radial-gradient(ellipse 120% 70% at 50% 0%, rgba(252,211,77,0.18) 0%, transparent 60%),
-      radial-gradient(ellipse 90% 50% at 100% 100%, rgba(80,160,130,0.12) 0%, transparent 55%);
+      radial-gradient(ellipse 120% 70% at 50% 0%, rgba(252,211,77,0.14) 0%, transparent 60%);
+  }
+  .ef-flyer--pullover .ef-zone--top { flex: 1 1 54%; }
+  .ef-flyer--pullover .ef-zone--bottom { flex: 0 0 46%; }
+  .ef-zone--pullover-top { padding-top: 13mm; }
+
+  .ef-zone--sage {
+    background: #50A082;
+    background-image:
+      radial-gradient(ellipse 90% 60% at 0% 100%, rgba(26,60,63,0.2) 0%, transparent 55%);
+    overflow: hidden;
+  }
+
+  .ef-dateline {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 7pt;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #B45309;
   }
   .ef-vignette {
     font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    font-size: 9pt;
-    line-height: 1.45;
-    color: rgba(26,60,63,0.9);
-    margin: 0 0 4mm;
-  }
-  .ef-reveal {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-weight: 700;
-    font-size: 11pt;
-    font-style: italic;
-    color: #50A082;
-    line-height: 1.25;
-    margin: 0 0 3mm;
-  }
-  .ef-promise {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-weight: 700;
-    font-size: 12pt;
-    color: #1A3C3F;
-    line-height: 1.2;
-    margin: 0 0 3mm;
-    letter-spacing: -0.01em;
-  }
-  .ef-promise em {
-    font-style: italic;
-    color: #50A082;
+    font-size: 10pt;
+    line-height: 1.55;
+    color: rgba(26,60,63,0.88);
+    margin: 0;
+    max-width: 85mm;
   }
 
-  /* ── Variant 3: Blöder Ronki (dark teal + quote dominant) ── */
+  .ef-splotch {
+    position: absolute;
+    width: 32mm;
+    height: 32mm;
+    top: 4mm;
+    right: -6mm;
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(-14deg);
+  }
+
+  .ef-reveal-on-sage {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 8.5pt;
+    font-style: italic;
+    color: rgba(253,248,240,0.85);
+    line-height: 1.3;
+    margin: 0 0 3mm;
+    max-width: 68mm;
+    position: relative;
+    z-index: 2;
+  }
+  .ef-promise-on-sage {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 14pt;
+    color: #FDF8F0;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 3mm;
+    max-width: 75mm;
+    position: relative;
+    z-index: 2;
+  }
+  .ef-promise-on-sage em {
+    font-style: italic;
+    color: #FCD34D;
+    font-weight: 800;
+  }
+
+  /* ────────────────────────────────────────────────────── *
+   * Variant 3: BLÖDER RONKI — pull-quote register        *
+   * Full-bleed dark teal. Oversized opening curly-quote  *
+   * bleeds into top-left margin. Quote set with a hang-  *
+   * ing indent so left edges align past the punctuation. *
+   * ────────────────────────────────────────────────────── */
+
   .ef-flyer--bloeder {
     background: #1A3C3F;
     background-image:
-      radial-gradient(ellipse 100% 70% at 0% 0%, rgba(45,90,94,0.5) 0%, transparent 60%),
-      radial-gradient(ellipse 90% 60% at 100% 100%, rgba(80,160,130,0.2) 0%, transparent 55%);
+      radial-gradient(ellipse 100% 70% at 0% 0%, rgba(45,90,94,0.55) 0%, transparent 60%),
+      radial-gradient(ellipse 90% 60% at 100% 100%, rgba(80,160,130,0.22) 0%, transparent 55%);
   }
-  .ef-flyer--bloeder::before {
-    background: linear-gradient(90deg, #50A082, #FCD34D);
-    opacity: 0.8;
+
+  .ef-quote-stack {
+    position: relative;
+    margin: 2mm 0 6mm;
+    padding-left: 14mm;
   }
-  .ef-quote {
+  .ef-giant-quote {
+    position: absolute;
+    top: -11mm;
+    left: -2mm;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 72pt;
+    line-height: 0.85;
+    color: #FCD34D;
+    opacity: 0.9;
+  }
+  .ef-pull-quote {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 14pt;
+    font-size: 15pt;
     font-style: italic;
     line-height: 1.25;
     color: #FDF8F0;
-    margin: 0 0 2mm;
-    letter-spacing: -0.01em;
-  }
-  .ef-attribution {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-size: 8pt;
-    font-weight: 700;
-    color: #FCD34D;
-    letter-spacing: 0.04em;
-    margin: 0 0 4mm;
+    margin: 0;
+    letter-spacing: -0.015em;
   }
 
-  /* ── Variant 4: Experiment (cream + sage accent, philosophy) ── */
+  .ef-attribution-caps {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 7.5pt;
+    font-weight: 800;
+    color: #FCD34D;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 0 0 5mm;
+  }
+  .ef-body-on-dark {
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    font-size: 8.5pt;
+    line-height: 1.5;
+    color: rgba(253,248,240,0.82);
+    margin: 0;
+    max-width: 80mm;
+  }
+  .ef-bleed .ef-url-on-dark {
+    margin-top: auto;
+    padding-top: 6mm;
+  }
+
+  /* ────────────────────────────────────────────────────── *
+   * Variant 4: EXPERIMENT — signed-letter register       *
+   * Cream top with a hairline rule above the eyebrow.    *
+   * Narrower measure. Dark-teal bottom zone carries the  *
+   * signature as small-caps with middle-dot separators.  *
+   * ────────────────────────────────────────────────────── */
+
   .ef-flyer--experiment {
     background: #FDF8F0;
     background-image:
-      radial-gradient(ellipse 100% 70% at 0% 100%, rgba(80,160,130,0.15) 0%, transparent 60%);
+      radial-gradient(ellipse 100% 60% at 100% 0%, rgba(80,160,130,0.12) 0%, transparent 60%);
   }
-  .ef-headline--experiment {
+  .ef-flyer--experiment .ef-zone--top { flex: 1 1 68%; }
+  .ef-flyer--experiment .ef-zone--bottom { flex: 0 0 32%; }
+
+  .ef-zone--ink {
+    background: #1A3C3F;
+    background-image:
+      radial-gradient(ellipse 90% 60% at 100% 100%, rgba(80,160,130,0.18) 0%, transparent 55%);
+    justify-content: center;
+  }
+
+  .ef-hairline {
+    border: 0;
+    border-top: 0.3mm solid #50A082;
+    margin: 0 0 5mm;
+    width: 14mm;
+  }
+  .ef-essay-headline {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 800;
-    font-size: 15pt;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    font-size: 16pt;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
     color: #1A3C3F;
-    margin: 0 0 4mm;
+    margin: 0 0 5mm;
+    max-width: 70mm;
   }
-  .ef-headline--experiment em {
+  .ef-essay-headline em {
     font-style: italic;
     color: #50A082;
     font-weight: 700;
   }
-  .ef-signature {
+  .ef-essay-body {
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    font-size: 8.5pt;
+    line-height: 1.55;
+    color: rgba(26,60,63,0.82);
+    margin: 0;
+    max-width: 72mm;
+  }
+
+  .ef-signature-caps {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 9pt;
     font-weight: 700;
-    font-size: 8pt;
-    color: rgba(26,60,63,0.65);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #FDF8F0;
     margin: 0 0 3mm;
-    letter-spacing: 0.04em;
+    text-align: center;
+  }
+  .ef-zone--ink .ef-url-on-dark {
+    text-align: center;
+    color: rgba(253,248,240,0.55);
   }
 `;
 
