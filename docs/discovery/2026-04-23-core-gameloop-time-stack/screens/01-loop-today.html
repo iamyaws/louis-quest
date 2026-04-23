@@ -1,0 +1,75 @@
+<h2>Ronki — the core gameloop as I see it today</h2>
+<p class="subtitle">Before we touch anything, let me show you what I think the loop is. If this picture is wrong, the rest of the discovery will be wrong too. Tell me where it's off.</p>
+
+<div class="mockup">
+  <div class="mockup-header">Daily ritual loop (the core)</div>
+  <div class="mockup-body">
+    <div style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;font-family:system-ui;padding:18px 0">
+      <div style="background:#fff8e1;border:2px solid #fcd34d;border-radius:14px;padding:14px 18px;min-width:130px;text-align:center"><div style="font-size:22px">🔥</div><strong>Open app</strong><div style="font-size:12px;color:#6b4a23;margin-top:4px">Lagerfeuer (Hub)</div></div>
+      <div style="font-size:24px;color:#8a4a12">→</div>
+      <div style="background:#fff8e1;border:2px solid #fcd34d;border-radius:14px;padding:14px 18px;min-width:130px;text-align:center"><div style="font-size:22px">🙂</div><strong>Mood check</strong><div style="font-size:12px;color:#6b4a23;margin-top:4px">optional</div></div>
+      <div style="font-size:24px;color:#8a4a12">→</div>
+      <div style="background:#fff8e1;border:2px solid #fcd34d;border-radius:14px;padding:14px 18px;min-width:130px;text-align:center"><div style="font-size:22px">☀️</div><strong>Routine</strong><div style="font-size:12px;color:#6b4a23;margin-top:4px">tap-done × N</div></div>
+      <div style="font-size:24px;color:#8a4a12">→</div>
+      <div style="background:#fff8e1;border:2px solid #fcd34d;border-radius:14px;padding:14px 18px;min-width:130px;text-align:center"><div style="font-size:22px">✨</div><strong>"Gut!" + Sterne</strong><div style="font-size:12px;color:#6b4a23;margin-top:4px">Funkelzeit earned</div></div>
+      <div style="font-size:24px;color:#8a4a12">→</div>
+      <div style="background:#fff8e1;border:2px solid #fcd34d;border-radius:14px;padding:14px 18px;min-width:130px;text-align:center"><div style="font-size:22px">🎁</div><strong>Belohnung</strong><div style="font-size:12px;color:#6b4a23;margin-top:4px">screen time / treat</div></div>
+    </div>
+    <p style="text-align:center;font-size:13px;color:#6b4a23;margin:0 0 4px">Morning + Evening, two anchors per day. Everything else is enrichment around this spine.</p>
+  </div>
+</div>
+
+<h3 style="margin-top:24px">Where is the loop right now? Tap whichever zones feel strained, off, or undercooked.</h3>
+<p class="subtitle">Multi-select. The labels are short on purpose — I'll dig into whichever you tap.</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="spine" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>The spine itself</h3>
+      <p>Open → mood → routine → "gut" → reward. Rhythm is fine, but something inside it is mushy (which step?).</p>
+    </div>
+  </div>
+  <div class="option" data-choice="ronki-presence" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Ronki's presence in the loop</h3>
+      <p>The companion is there but doesn't feel woven in. Quips, mood, feeding, friends — all separate surfaces.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="reward-end">
+    <div class="letter" onclick="toggleSelect(this.parentElement)">C</div>
+    <div class="content" onclick="toggleSelect(this.parentElement)">
+      <h3>The reward end</h3>
+      <p>Sterne → Belohnungsbank → screen-time. Feels transactional. The "what was today FOR" payoff is thin.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="enrichment-sprawl" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>Enrichment sprawl</h3>
+      <p>Journal, Visitors, Spielzimmer, emotional tools, MINT, Yoga, Boss, Gear, Orbs — too many half-loops competing for the same attention budget.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="evening" onclick="toggleSelect(this)">
+    <div class="letter">E</div>
+    <div class="content">
+      <h3>Evening side</h3>
+      <p>Morning works (the parental-relief story). Evening is quieter, less defined. Bedtime / Drei-Danke / Buch could be one ritual but aren't.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="meaning" onclick="toggleSelect(this)">
+    <div class="letter">F</div>
+    <div class="content">
+      <h3>Meaning over weeks</h3>
+      <p>Day-to-day is fine. Week-over-week and month-over-month feel undercooked — the kid's "story" doesn't visibly accumulate.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="picture-wrong" onclick="toggleSelect(this)">
+    <div class="letter">!</div>
+    <div class="content">
+      <h3>The picture itself is wrong</h3>
+      <p>What I drew above isn't the core loop. Tap this and tell me what the actual loop is.</p>
+    </div>
+  </div>
+</div>
