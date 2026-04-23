@@ -9,7 +9,7 @@ import type { VoiceLine } from '../types';
 
 export const linesEn: VoiceLine[] = [
   // ── Greetings ──
-  { id: 'en_greet_any_01', text: 'Louis! I was waiting for you!', triggers: ['hub_open'] },
+  { id: 'en_greet_any_01', text: '{name}! I was waiting for you!', triggers: ['hub_open'] },
   { id: 'en_greet_morning_01', text: 'Up already? Me too, just now.', triggers: ['hub_open'], timeOfDay: ['morning'] },
   { id: 'en_greet_afternoon_01', text: 'Afternoon! How was school?', triggers: ['hub_open'], timeOfDay: ['afternoon'] },
   { id: 'en_greet_evening_01', text: 'Evening. I had so many dreams today.', triggers: ['hub_open'], timeOfDay: ['evening'] },
@@ -25,7 +25,7 @@ export const linesEn: VoiceLine[] = [
   { id: 'en_sanct_06', text: 'Did you laugh today? Me too.', triggers: ['sanctuary_open'] },
 
   // ── Weather ──
-  { id: 'en_weather_rain_01', text: 'Louis! Did you hear the rain?', triggers: ['hub_open', 'sanctuary_open'], weather: ['rain'] },
+  { id: 'en_weather_rain_01', text: '{name}! Did you hear the rain?', triggers: ['hub_open', 'sanctuary_open'], weather: ['rain'] },
   { id: 'en_weather_cold_01', text: 'It\u2019s cold! Brrr, cuddle up.', triggers: ['hub_open', 'sanctuary_open'], weather: ['cold'] },
   { id: 'en_weather_hot_01', text: 'The sun! I keep blinking.', triggers: ['hub_open', 'sanctuary_open'], weather: ['hot', 'clear'] },
   { id: 'en_weather_snow_01', text: 'Snow! I\u2019ve never seen snow\u2026 wait, yes, last year.', triggers: ['hub_open', 'sanctuary_open'], weather: ['snow'] },

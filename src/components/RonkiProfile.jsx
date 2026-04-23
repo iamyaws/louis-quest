@@ -1145,7 +1145,11 @@ export default function RonkiProfile({ onNavigate }) {
                there should also be the box breathing thingy." */}
           {!hasLearnedBox && (practiceCount > 0 || ronkiMood === 'sad' || ronkiMood === 'tired') && (
             <>
-              <Kicker>{lang === 'de' ? 'Louis bringt Ronki bei' : 'Louis teaches Ronki'}</Kicker>
+              {/* Kicker personalised per child — "Louis" used to be hardcoded.
+                  Fallback string drops the name cleanly if no childName is set. */}
+              <Kicker>{lang === 'de'
+                ? (heroName ? `${heroName} bringt Ronki bei` : 'Du bringst Ronki bei')
+                : (heroName ? `${heroName} teaches Ronki` : 'You teach Ronki')}</Kicker>
               <section style={{
                          padding: '16px 18px 18px',
                          borderRadius: 20,

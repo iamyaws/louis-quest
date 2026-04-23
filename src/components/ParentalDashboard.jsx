@@ -1048,7 +1048,9 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     actions?.updateFamilyConfig?.({ ...config, funkelzeitDailyCapMin: mins });
   };
   const FZ_MODES = [
-    { id: 'entspannt', emoji: '😌', label: 'Entspannt', desc: 'Louis aktiviert Funkelzeit frei.' },
+    // Funkelzeit mode descriptions — personalised per child. Falls back to a
+    // generic "dein Kind" when no childName is set (pre-onboarding edges).
+    { id: 'entspannt', emoji: '😌', label: 'Entspannt', desc: `${(state?.familyConfig?.childName || 'Dein Kind')} aktiviert Funkelzeit frei.` },
     { id: 'normal', emoji: '👋', label: 'Normal: Eltern-OK', desc: "Eltern tippen 'Los!' bevor Funkelzeit startet." },
     { id: 'strikt', emoji: '🛑', label: 'Strikt: mit Tages-Limit', desc: 'Eltern-OK und maximal {N} Minuten pro Tag.' },
     { id: 'none', emoji: '🚫', label: 'Keine Funkelzeit', desc: 'Bildschirmzeit wird nicht als Belohnung genutzt.' },

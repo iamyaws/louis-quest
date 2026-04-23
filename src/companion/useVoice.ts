@@ -22,6 +22,35 @@ import type {
 const HISTORY_KEY = 'ronki_voice_history_v1';
 const BUBBLE_MS = 15000;
 
+/**
+ * Replace the `{name}` placeholder with the child's name from familyConfig.
+ *
+ * Lines using a leading `{name}! …` token gracefully drop the whole prefix
+ * when no name is available (e.g., pre-onboarding, or configs with empty
+ * childName) — otherwise the bubble reads `"! I was waiting for you!"`
+ * which is both grammatically wrong and looks like a bug.
+ *
+ * Multi-kid rollout requirement (Marc 25 Apr 2026): names must be dynamic.
+ * Previously EN bank hard-coded 'Louis!' in two lines. DE bank avoided names
+ * entirely. Going forward, any line that wants the child's name uses `{name}`
+ * and the substitution happens here right before the text hits the bubble.
+ * The pre-generated MP3 audio doesn't contain the name either way — it's a
+ * text-bubble-only personalisation.
+ */
+function substituteName(text: string, name: string): string {
+  const clean = (name || '').trim();
+  if (!clean) {
+    // Drop `{name}` plus adjacent punctuation + spaces so the remaining
+    // text reads naturally. Covers leading 'Hey, {name}!' and 'Hi {name}.'
+    // patterns as well as the common '{name}! Rest of line.' shape.
+    return text
+      .replace(/[,\s]*\{name\}[!.,?]?\s*/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  return text.replace(/\{name\}/g, clean);
+}
+
 // Mood index → MoodTag. Order must match MOOD_EMOJIS in src/constants.ts:
 // 0 → 😢 traurig, 1 → 😕 besorgt, 2 → 😐 okay, 3 → 🙂 gut, 4 → 😊 magisch, 5 → 🤩 müde
 const MOOD_INDEX_TO_TAG: (import('./types').MoodTag | null)[] = [
@@ -130,7 +159,12 @@ export function useVoice(): UseVoiceResult {
       if (!picked) return;
       historyRef.current = recordUse(picked.id, historyRef.current);
       saveHistory(historyRef.current);
-      setLine(picked);
+      // Personalise any `{name}` placeholder in the text bubble before it
+      // lands on the screen. Audio is unchanged (MP3s are recorded with
+      // no name). See substituteName() comment.
+      const childName = s.familyConfig?.childName || '';
+      const personalised = substituteName(picked.text, childName);
+      setLine(personalised === picked.text ? picked : { ...picked, text: personalised });
       // Play the pre-generated ElevenLabs audio for this line
       // Delay greeting lines so the kid settles into the view first
       const isViewOpen = trigger === 'hub_open' || trigger === 'sanctuary_open';
