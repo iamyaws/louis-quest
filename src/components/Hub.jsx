@@ -24,6 +24,8 @@ import BeatCompletionModal from './BeatCompletionModal';
 import ClothingSheet from './ClothingSheet';
 import CloudWaves from './CloudWaves';
 import CampfireScene from './CampfireScene';
+import GardenPreview from './garden/GardenPreview';
+import GardenMode from './garden/GardenMode';
 import { pickTodaysVisitor } from './CampfireVisitorsGame';
 import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
@@ -170,6 +172,10 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   const [showEveningRitual, setShowEveningRitual] = useState(false);
   const [showGefuehlsecke, setShowGefuehlsecke] = useState(false);
   const [zeigBlock, setZeigBlock] = useState(null);
+  // Garden-mode open state (Phase 1 of core-gameloop-time-stack).
+  // Tapping the GardenPreview flips this true → full-screen GardenMode
+  // mounts as an overlay. GardenMode's "Zurück" pill sets it back to false.
+  const [gardenOpen, setGardenOpen] = useState(false);
 
   // Expedition state — stubs for now. CampfireScene accepts 'idle' /
   // 'away' / 'returning' and renders Ronki sitting by the fire / a paw
@@ -454,30 +460,25 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
       )}
 
       {/* ═════════════════════════════════════════════════════════════════
-         B · CAMPFIRE SCENE — zero-asset CSS scene with day/golden/night
-         variants that shift automatically with the clock hour. Replaces
-         the old lager-stage1-4.png Midjourney sequence (-8MB of assets)
-         with a painterly CSS scene Louis loved in Claude Design's
-         Feature Previews. Includes side-view chibi Ronki sitting by
-         the fire, flame flicker, wing flap, and night stars.
-         `state='idle'` = Ronki home; 'away' / 'returning' hooks are
-         wired for the simplified Expedition feature landing next.
+         B · GARDEN PREVIEW — replaces the Lagerfeuer-only CampfireScene.
+         The Lagerfeuer now lives INSIDE the garden (Q9 Hub-backdrop pick
+         of the core-gameloop-time-stack discovery). Plants accumulate
+         week-over-week; decor is free-placed. Tap opens GardenMode
+         (full-screen) — see 06-garden-hub-backdrop.html Frame 1 for
+         the v1 sketch and Frame 2 for the mode we open into.
+         CampfireScene kept imported but dormant — the old scene is
+         preserved for any surface that still wants the Lagerfeuer-only
+         view (currently none; safe to remove in a later pass).
          ═════════════════════════════════════════════════════════════════ */}
       <div className="absolute left-0 right-0 top-0 overflow-hidden"
-           style={{ zIndex: 1 }}>
-        <CampfireScene
-          hour={_h}
-          state={expeditionState}
-          statusText={expeditionStatusText}
-          statusSub={expeditionStatusSub}
-          greetingText={currentQuip}
-          onRonkiTap={() => setQuipRollKey(k => k + 1)}
-          onDiaryTap={() => setOpenBeat('expedition-diary')}
-          variant={state?.companionVariant || 'amber'}
-          stage={getCatStage(state?.catEvo || 0)}
-          mood={state?.ronkiMood || 'normal'}
-          weather={weather?.current ? getWeatherCategory(weather.current.weatherCode) : undefined}
+           style={{ zIndex: 1, height: 340 }}>
+        <GardenPreview
+          plants={state?.garden?.plants || []}
+          decor={state?.garden?.decor || []}
+          onOpen={() => setGardenOpen(true)}
+          lang={lang}
           height={340}
+          inset={false}
         />
         {/* Fade into cream paper so cards below land on a clean surface */}
         <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none"
@@ -1514,6 +1515,13 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
       {/* Hero chibi builder — opens from the top-bar avatar tap.
            Progressive discovery: no onboarding step, kid finds it. */}
       <HeroBuilder open={heroBuilderOpen} onClose={() => setHeroBuilderOpen(false)} />
+
+      {/* Garden mode overlay — full-screen when the Hub's GardenPreview
+           is tapped. Mounts outside the normal scroll so it escapes
+           the Hub's overflow/padding. Closed via its "Zurück" pill. */}
+      {gardenOpen && (
+        <GardenMode onClose={() => setGardenOpen(false)} />
+      )}
     </div>
   );
 }
