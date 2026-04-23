@@ -1,4 +1,5 @@
 import React from 'react';
+import MoodChibi from '../MoodChibi';
 import './garden-scene.css';
 
 /**
@@ -210,19 +211,15 @@ function Decor({ type }) {
   }
 }
 
-// ── Ronki chibi (simplified CSS version — side-view, breathing) ───────
-function RonkiChibi({ size = 62, mirror = false }) {
+// ── Ronki chibi — delegates to MoodChibi so the scene respects the
+// kid's picked variant (forest → green, violet → lavender, etc.).
+// Before this, we had a local CSS Ronki with a hardcoded amber palette,
+// which meant the Hub garden always showed a yellow dragon regardless
+// of what the kid picked at hatch. Marc flag 23 Apr 2026.
+function RonkiChibi({ size = 62, variant = 'amber', stage = 2, mood = 'normal' }) {
   return (
-    <div className={`g-ronki ${mirror ? 'mirror' : ''}`} style={{ width: size, height: size + 4 }}>
-      <span className="body" />
-      <span className="belly" />
-      <span className="horn l" />
-      <span className="horn r" />
-      <span className="eye l" />
-      <span className="eye r" />
-      <span className="cheek l" />
-      <span className="cheek r" />
-      <span className="mouth" />
+    <div style={{ width: size, height: size, pointerEvents: 'none' }}>
+      <MoodChibi size={size} variant={variant} stage={stage} mood={mood} bare />
     </div>
   );
 }
@@ -250,6 +247,9 @@ export default function GardenScene({
   showFire = true,
   showRonki = true,
   ronkiPosition,
+  ronkiVariant = 'amber',
+  ronkiStage = 2,
+  ronkiMood = 'normal',
   hintSpots,
   showSun = true,
   className = '',
@@ -259,7 +259,7 @@ export default function GardenScene({
 }) {
   const resolvedSky = sky ?? autoSky();
   const resolvedSeason = season ?? autoSeason();
-  const ronki = ronkiPosition ?? { left: '30%', bottom: '6%', size: 52, mirror: false };
+  const ronki = ronkiPosition ?? { left: '30%', bottom: '6%', size: 52 };
 
   // Fixed tree-line tick count — tiny treeline at horizon (15 ticks)
   const treelineTicks = Array.from({ length: 15 });
@@ -332,13 +332,16 @@ export default function GardenScene({
           in planting/decor modes, optional depending on composition. */}
       {showFire && <Fire left="52%" bottom="8%" scale={1} />}
 
-      {/* Ronki — optional. Size tunes with viewport (smaller in preview). */}
+      {/* Ronki — optional. Size tunes with viewport (smaller in preview).
+          Variant/stage/mood pulled from props so the scene respects the
+          kid's picked colorway (Marc flag 24 Apr 2026: Veilchen-Ronki
+          still showed yellow on the Hub). */}
       {showRonki && (
         <div
           className="g-ronki-wrap"
-          style={{ left: ronki.left, bottom: ronki.bottom }}
+          style={{ left: ronki.left, bottom: ronki.bottom, transform: 'translateX(-50%)' }}
         >
-          <RonkiChibi size={ronki.size} mirror={ronki.mirror} />
+          <RonkiChibi size={ronki.size} variant={ronkiVariant} stage={ronkiStage} mood={ronkiMood} />
         </div>
       )}
 

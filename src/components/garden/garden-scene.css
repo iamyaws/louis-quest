@@ -16,9 +16,12 @@
 .g-scene[data-sky="dusk"]  { --g-sky: linear-gradient(180deg, #ffd5a5 0%, #ffc591 28%, #f9b879 48%, #e9c48d 68%, #c7b488 82%, #9ba876 100%); }
 .g-scene[data-sky="night"] { --g-sky: linear-gradient(180deg, #1e1b4b 0%, #312e81 28%, #3d2b6b 55%, #5a4a6a 82%, #4a5042 100%); }
 
-/* Sun / moon */
+/* Sun / moon — centered horizontally (Marc flag 24 Apr: moon was
+   top-right and overlapped the Hub's topbar chrome). Kept top 16% so
+   it sits below the topbar safely. */
 .g-sun {
-  position: absolute; top: 14%; left: 70%;
+  position: absolute; top: 16%; left: 50%;
+  transform: translateX(-50%);
   width: 58px; height: 58px; border-radius: 50%;
   background: radial-gradient(circle at 40% 40%, #fff8dc 0%, #fde68a 45%, #fcd34d 100%);
   box-shadow: 0 0 60px rgba(252,211,77,.55), 0 0 22px rgba(255,248,220,.8);

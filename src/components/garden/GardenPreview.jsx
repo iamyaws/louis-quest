@@ -1,49 +1,74 @@
 import React from 'react';
+import { useTask } from '../../context/TaskContext';
+import { getCatStage } from '../../utils/helpers';
 import GardenScene from './GardenScene';
 
 /**
  * GardenPreview — Hub-sized card surface that replaces CampfireScene.
  *
- * Shows a painted scene with hills, trees, fire, and chibi Ronki. Taps
- * anywhere bubble up via `onOpen` so the parent (Hub) transitions into
- * full-screen Garden mode.
+ * Scene with hills, trees, fire, and variant-aware chibi Ronki. Taps
+ * anywhere bubble up via `onOpen`. On mouse hover a "Garten erkunden"
+ * pill fades in (pure CSS :hover) — it's invisible by default so the
+ * Hub's topbar area stays clean, and the tap target is always the
+ * whole card (no need to aim at the pill).
  *
- * Intentionally minimal — this is backdrop for the Hub's daily cards.
- * The kid sees it on every open; it's atmosphere, not a task surface.
+ * Marc feedback 24 Apr 2026:
+ *   · No permanent text overlay (removed "Dein Garten" title, "Öffnen"
+ *     corner pill, and the center "Tipp · hier wächst dein Garten"
+ *     banner — they crowded the scene and peeked behind the topbar).
+ *   · Ronki 2× size (62 → 124) so he reads as a companion, not a speck.
+ *   · Fire + Ronki raised so the nameplate pill below doesn't cover them.
+ *   · One sapling in the demo plants so not every tree is full-grown.
+ *   · Variant-aware — routes state.companionVariant through to the chibi.
  *
  * Props:
  *   · plants    (array)  — state.garden.plants
  *   · decor     (array)  — state.garden.decor
  *   · onOpen    (fn)     — callback when the preview is tapped
- *   · lang      (string) — 'de' | 'en' for the title/tap-hint copy
- *   · height    (number) — scene height in px (default 210; Hub uses 340)
+ *   · lang      (string) — 'de' | 'en'
+ *   · height    (number) — scene height in px (Hub uses 340)
  *   · inset     (bool)   — card mode (rounded + margin) vs edge-to-edge
  */
 
-// Demo plants shown when the kid hasn't planted anything yet. Gives
-// day-1 users a populated garden so the preview never looks empty. All
-// positioned at low bottom% (0–18%) so they sit on the ground line and
-// can't peek behind the Hub's top chrome (Marc's 23 Apr 2026 bug:
-// mature-tree canopy overlapping the Marc pill). These are visual-only —
-// real state.garden.plants takes precedence as soon as the kid plants.
-const DEMO_PLANTS = [
-  { id: 'demo-mature-r', species: 'oak',    plantedAt: '2025-10-01', position: { x: 82, y: 4 } },
-  { id: 'demo-mid-l',    species: 'apple',  plantedAt: '2025-12-01', position: { x: 12, y: 10 } },
-  { id: 'demo-pine-c',   species: 'pine',   plantedAt: '2026-01-15', position: { x: 42, y: 18 } },
-  { id: 'demo-young-r',  species: 'birch',  plantedAt: '2026-02-20', position: { x: 72, y: 8 } },
-];
+// Demo plants for day-1 users so the preview reads as alive. Includes
+// a recent sapling (plantedAt = this week) and a mix of older stages
+// so the garden doesn't look like a fully-mature orchard. Real state
+// plants take over as soon as the kid plants.
+function makeDemoPlants() {
+  const today = new Date();
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const daysAgo = (n) => { const d = new Date(today); d.setDate(d.getDate() - n); return iso(d); };
+  return [
+    // Mature oak (planted ~6 months ago)
+    { id: 'demo-mature-oak',  species: 'oak',    plantedAt: daysAgo(180), position: { x: 82, y: 4 } },
+    // Mid-stage apple tree (planted ~2 months ago)
+    { id: 'demo-mid-apple',   species: 'apple',  plantedAt: daysAgo(60),  position: { x: 12, y: 10 } },
+    // Mid-stage pine (planted ~3 months ago)
+    { id: 'demo-mid-pine',    species: 'pine',   plantedAt: daysAgo(95),  position: { x: 48, y: 12 } },
+    // Young birch (planted ~2 weeks ago)
+    { id: 'demo-young-birch', species: 'birch',  plantedAt: daysAgo(14),  position: { x: 72, y: 8 } },
+    // Fresh sapling (planted this week) — gives the kid an anchor to
+    // remember "the small one is recent" even before they plant anything
+    { id: 'demo-sprout',      species: 'linden', plantedAt: daysAgo(3),   position: { x: 22, y: 5 } },
+  ];
+}
 
 export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 'de', height = 210, inset = true }) {
+  const { state } = useTask();
+  const variant = state?.companionVariant || 'amber';
+  const stageIdx = Math.min(3, getCatStage(state?.catEvo ?? 0));
+  const mood = state?.ronkiMood || 'normal';
+
   // If the kid has nothing planted yet, show demo plants so the scene
   // reads as alive. Real plants take over the moment they plant.
-  const plantsToRender = plants.length > 0 ? plants : DEMO_PLANTS;
+  const plantsToRender = plants.length > 0 ? plants : makeDemoPlants();
 
   return (
     <button
       type="button"
       onClick={onOpen}
       aria-label={lang === 'de' ? 'Garten erkunden' : 'Explore garden'}
-      className="relative w-full block active:scale-[0.99] transition-transform"
+      className="g-preview relative w-full block active:scale-[0.99] transition-transform"
       style={{
         height,
         borderRadius: inset ? 18 : 0,
@@ -63,27 +88,29 @@ export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 
         plants={plantsToRender}
         decor={decor}
         showRonki
-        // Ronki sits mid-scene (higher than ground) — matches the old
-        // CampfireScene placement Marc wants preserved. Size bumped from
-        // 36 → 62 so he reads as a companion, not a speck.
-        ronkiPosition={{ left: '30%', bottom: '30%', size: 62, mirror: true }}
+        // Fire + Ronki raised from bottom 22-30% → bottom 42-45% so the
+        // "VEILCHEN-RONKI" / variant-name pill that sits at y=228 in Hub
+        // lands cleanly BELOW them instead of covering the fire.
+        // Size doubled to 124 per Marc's ask.
+        ronkiPosition={{ left: '34%', bottom: '40%', size: 124 }}
+        ronkiVariant={variant}
+        ronkiStage={stageIdx}
+        ronkiMood={mood}
         showFire
         showSun
       />
 
-      {/* Single permanent CTA pill — centered, always visible (not hover-
-          gated). Replaces the older two-pill setup ("Dein Garten" corner
-          title + "Öffnen" pill + empty-state banner). Marc's 23 Apr 2026
-          feedback: "show 'Garten erkunden' always, remove 'Öffnen',
-          remove the 'hier wächst dein Garten' banner." */}
+      {/* Hover-only CTA — fades in on mouse hover (desktop). On touch
+          the whole card is tappable so no persistent label needed.
+          Matches Claude Design v1 mockup's behavior. */}
       <span
-        className="absolute left-1/2 inline-flex items-center gap-2 pointer-events-none"
+        className="g-preview-cta absolute left-1/2 inline-flex items-center gap-2 pointer-events-none"
         style={{
-          top: '18%',
-          transform: 'translateX(-50%)',
+          top: '46%',
+          transform: 'translate(-50%, -50%)',
           padding: '9px 18px 9px 14px',
           borderRadius: 999,
-          background: 'rgba(255,248,242,.92)',
+          background: 'rgba(255,248,242,.94)',
           backdropFilter: 'blur(10px)',
           color: '#124346',
           font: '700 11px/1 "Plus Jakarta Sans", sans-serif',
@@ -93,11 +120,17 @@ export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 
           boxShadow: '0 6px 14px -4px rgba(0,0,0,.22)',
           zIndex: 5,
           whiteSpace: 'nowrap',
+          opacity: 0,
+          transition: 'opacity .2s ease',
         }}
       >
         <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#b45309' }}>arrow_outward</span>
         {lang === 'de' ? 'Garten erkunden' : 'Explore garden'}
       </span>
+
+      <style>{`
+        .g-preview:hover .g-preview-cta { opacity: 1; }
+      `}</style>
     </button>
   );
 }
