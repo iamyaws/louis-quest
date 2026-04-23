@@ -88,11 +88,13 @@ export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 
         plants={plantsToRender}
         decor={decor}
         showRonki
-        // Fire + Ronki raised from bottom 22-30% → bottom 42-45% so the
-        // "VEILCHEN-RONKI" / variant-name pill that sits at y=228 in Hub
-        // lands cleanly BELOW them instead of covering the fire.
-        // Size doubled to 124 per Marc's ask.
-        ronkiPosition={{ left: '34%', bottom: '40%', size: 124 }}
+        // Ronki stands ON the ground next to the fire. bottom 12% puts
+        // his feet on the ground surface (ground tops out around bottom
+        // 42%) and his 124px body reaches to ~48% from bottom — which
+        // is above the Hub's nameplate pill at y=228 but NOT floating
+        // in the sky. Earlier value bottom 40% put him in the sky next
+        // to the moon (Marc flag 24 Apr 2026).
+        ronkiPosition={{ left: '32%', bottom: '12%', size: 124 }}
         ronkiVariant={variant}
         ronkiStage={stageIdx}
         ronkiMood={mood}
