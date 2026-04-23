@@ -8,6 +8,7 @@ import { ArcStoryboard } from '../components/ArcStoryboard';
 import { RonkisWelt } from '../components/RonkisWelt';
 import { IntrinsicMotivation } from '../components/IntrinsicMotivation';
 import { AntiFeatures } from '../components/AntiFeatures';
+import { FeaturedRatgeber } from '../components/FeaturedRatgeber';
 import { PWAInstall } from '../components/PWAInstall';
 import { FAQ } from '../components/FAQ';
 import { Footer } from '../components/Footer';
@@ -31,6 +32,7 @@ export default function Home() {
       <RonkisWelt />
       <IntrinsicMotivation />
       <AntiFeatures />
+      <FeaturedRatgeber />
       <PWAInstall />
       <FAQPageSchema
         items={[
