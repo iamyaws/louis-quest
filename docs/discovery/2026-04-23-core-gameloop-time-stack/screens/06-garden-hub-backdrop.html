@@ -1,0 +1,1482 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Ronki — Garden (v1 · Hub Backdrop)</title>
+<meta name="viewport" content="width=1600" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<style>
+  :root {
+    --primary: #124346;
+    --primary-2: #1f4d51;
+    --primary-3: #2d5a5e;
+    --gold: #fcd34d;
+    --gold-deep: #b45309;
+    --gold-ink: #725b00;
+    --cream: #fff8f2;
+    --cream-2: #fdf0d9;
+    --paper: #f9eed8;
+    --ink: #1e1b17;
+    --mute: #6b655b;
+    --line: rgba(18,67,70,.10);
+    --line-2: rgba(18,67,70,.18);
+    --emerald: #34d399;
+    --emerald-dark: #059669;
+    --ember: #f59e0b;
+
+    --f-head: "Fredoka", system-ui, sans-serif;
+    --f-body: "Nunito", system-ui, sans-serif;
+    --f-label: "Plus Jakarta Sans", system-ui, sans-serif;
+  }
+
+  html, body { margin: 0; padding: 0; background: #26211d; font-family: var(--f-body); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  button { font: inherit; color: inherit; border: none; background: none; cursor: pointer; padding: 0; }
+  .ms {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal; font-style: normal;
+    font-size: 20px; line-height: 1;
+    letter-spacing: normal;
+    text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+  }
+
+  /* ─── Stage ─────────────────────────────────────────────── */
+  .stage {
+    min-height: 100vh;
+    padding: 56px 48px 80px;
+    background:
+      radial-gradient(1400px 700px at 20% -10%, #3d342d 0%, transparent 65%),
+      radial-gradient(1000px 600px at 100% 100%, #1f1a16 0%, transparent 60%),
+      #26211d;
+  }
+  .head {
+    max-width: 1520px; margin: 0 auto 40px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    color: #f6ead8;
+  }
+  .wordmark { display: flex; align-items: center; gap: 14px; }
+  .wordmark .mark {
+    width: 44px; height: 44px; border-radius: 14px;
+    background: linear-gradient(135deg, #86efac 0%, #059669 100%);
+    display: grid; place-items: center;
+    box-shadow: 0 8px 20px -6px rgba(52,211,153,.35), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .wordmark .mark::after { content: '🌱'; font-size: 22px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.2)); }
+  .wordmark h1 { margin: 0; font: 600 32px/1 var(--f-head); letter-spacing: -0.01em; color: #fef3c7; }
+  .wordmark p { margin: 4px 0 0; font: 500 12px/1 var(--f-label); letter-spacing: .22em; text-transform: uppercase; color: rgba(255,242,217,.55); }
+  .head .meta { text-align: right; font: 500 12px/1.5 var(--f-label); color: rgba(255,242,217,.55); letter-spacing: .08em; text-transform: uppercase; }
+  .head .meta strong { display: block; font-weight: 700; color: #f6ead8; font-size: 13px; margin-bottom: 4px; letter-spacing: .18em; }
+
+  .lab {
+    max-width: 1520px; margin: 0 auto;
+    display: grid; grid-template-columns: 380px 1fr; gap: 56px;
+    align-items: start;
+  }
+
+  /* ─── Side notes ──────────────────────────────────────── */
+  .notes { color: #e8dcc5; position: sticky; top: 40px; }
+  .notes .kicker { font: 700 11px/1 var(--f-label); letter-spacing: .28em; text-transform: uppercase; color: #86efac; margin-bottom: 16px; }
+  .notes h2 { margin: 0 0 20px; font: 500 36px/1.1 var(--f-head); letter-spacing: -0.015em; color: #fef3c7; }
+  .notes p { margin: 0 0 18px; font: 400 15px/1.65 var(--f-body); color: rgba(232,220,197,.78); }
+  .notes p em { color: #fcd34d; font-style: normal; font-weight: 600; }
+  .notes .change-list { margin-top: 28px; border-top: 1px solid rgba(246,234,216,.12); padding-top: 22px; }
+  .notes .change-list h3 { font: 700 11px/1 var(--f-label); letter-spacing: .22em; text-transform: uppercase; color: rgba(246,234,216,.5); margin: 0 0 14px; }
+  .change { display: grid; grid-template-columns: 16px 1fr; gap: 10px; padding: 8px 0; align-items: start; border-bottom: 1px dashed rgba(246,234,216,.08); }
+  .change:last-child { border-bottom: 0; }
+  .change .dot { width: 6px; height: 6px; border-radius: 50%; background: #86efac; margin-top: 8px; }
+  .change b { display: block; color: #f6ead8; font-family: var(--f-label); font-size: 13px; font-weight: 700; }
+  .change span { font-size: 13px; color: rgba(232,220,197,.65); }
+  .notes .guardrail { margin-top: 28px; padding: 16px 18px; background: rgba(127, 29, 29, .25); border-left: 3px solid #f87171; border-radius: 10px; }
+  .notes .guardrail h3 { margin: 0 0 8px; font: 800 10px/1 var(--f-label); letter-spacing: .22em; text-transform: uppercase; color: #fca5a5; }
+  .notes .guardrail p { margin: 0; font: 500 13px/1.5 var(--f-body); color: rgba(254, 226, 226, .8); }
+
+  /* ─── Frames grid ─────────────────────────────────────── */
+  .frames {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 56px 40px;
+    justify-items: center; align-items: start;
+  }
+  .frame { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .frame-label { color: #f6ead8; font: 700 11px/1 var(--f-label); letter-spacing: .24em; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+  .frame-label .no { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: rgba(134,239,172,.15); border: 1px solid rgba(134,239,172,.4); color: #86efac; font: 800 11px/1 var(--f-label); }
+  .frame-label .lbl { color: #fef3c7; }
+  .frame-sub { color: rgba(232,220,197,.5); font: 500 11px/1 var(--f-body); letter-spacing: 0; text-transform: none; padding-left: 34px; margin-top: -12px; text-align: left; align-self: stretch; max-width: 320px; }
+
+  /* ─── Phone shell ─────────────────────────────────────── */
+  .phone {
+    width: 340px; height: 736px;
+    border-radius: 48px; background: #111; padding: 10px;
+    box-shadow: 0 40px 60px -20px rgba(0,0,0,.5), 0 20px 30px -10px rgba(0,0,0,.35), inset 0 0 0 2px #2a2a2a;
+    position: relative;
+  }
+  .phone-screen { width: 100%; height: 100%; border-radius: 38px; overflow: hidden; position: relative; background: #fff8f2; }
+  .notch { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 98px; height: 28px; border-radius: 14px; background: #111; z-index: 50; }
+
+  /* ─── The garden scene (shared) ────────────────────────── */
+  .scene {
+    position: absolute; inset: 0; overflow: hidden;
+    /* warm golden hour; seasonally tintable via --sky */
+    background: var(--sky, linear-gradient(180deg, #ffd5a5 0%, #ffc591 28%, #f9b879 48%, #e9c48d 68%, #c7b488 82%, #9ba876 100%));
+  }
+  .sun {
+    position: absolute; top: 14%; left: 70%;
+    width: 58px; height: 58px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, #fff8dc 0%, #fde68a 45%, #fcd34d 100%);
+    box-shadow: 0 0 60px rgba(252,211,77,.55), 0 0 22px rgba(255,248,220,.8);
+    opacity: .92;
+  }
+  .sun::after { content: ''; position: absolute; inset: -26px; border-radius: 50%; background: radial-gradient(circle, rgba(252,211,77,.3), transparent 60%); }
+
+  .hills { position: absolute; bottom: 38%; left: -4%; right: -4%; height: 28%; pointer-events: none; }
+  .hill { position: absolute; bottom: 0; border-radius: 55% 55% 0 0 / 100% 100% 0 0; filter: blur(.5px); }
+  .hill.h1 { left: -8%; width: 70%; height: 72%; background: #97a878; opacity: .8; }
+  .hill.h2 { left: 28%; width: 60%; height: 88%; background: #8ba26d; }
+  .hill.h3 { right: -10%; width: 68%; height: 68%; background: #a8b280; opacity: .85; }
+
+  .treeline { position: absolute; bottom: 40%; left: 0; right: 0; height: 22px; pointer-events: none; display: flex; gap: 1px; }
+  .tl-t { flex: 1; height: 100%; background: radial-gradient(ellipse at 50% 100%, #5c7a4a 0%, #4a6b3a 60%, transparent 100%); opacity: .55; }
+  .tl-t:nth-child(3n) { transform: translateY(-4px); }
+  .tl-t:nth-child(5n) { transform: translateY(-8px); height: 124%; }
+
+  .ground {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 42%;
+    background:
+      radial-gradient(ellipse 80% 30% at 60% 30%, rgba(120,96,60,.35), transparent 70%),
+      linear-gradient(180deg, #9fb076 0%, #8fa266 40%, #758f55 100%);
+  }
+  .ground::before {
+    content: ''; position: absolute; top: -6px; left: 0; right: 0; height: 12px;
+    background: repeating-linear-gradient(90deg, transparent 0 3px, rgba(120, 150, 80, .7) 3px 4px, transparent 4px 7px, rgba(100, 130, 65, .8) 7px 8px, transparent 8px 12px);
+  }
+  .earth-patch { position: absolute; border-radius: 50%; background: radial-gradient(ellipse, rgba(135, 95, 55, .55), rgba(135, 95, 55, .05) 70%); pointer-events: none; }
+
+  /* Sky variants (data-sky on .scene) */
+  .scene[data-sky="dawn"]  { --sky: linear-gradient(180deg, #fde68a 0%, #fbbf77 28%, #f08a5d 48%, #c17574 68%, #7a6a7a 82%, #607c5c 100%); }
+  .scene[data-sky="day"]   { --sky: linear-gradient(180deg, #bce5f5 0%, #a8d8eb 28%, #c8e0b6 55%, #a3b97c 82%, #8aa66a 100%); }
+  .scene[data-sky="dusk"]  { --sky: linear-gradient(180deg, #ffd5a5 0%, #ffc591 28%, #f9b879 48%, #e9c48d 68%, #c7b488 82%, #9ba876 100%); }
+  .scene[data-sky="night"] { --sky: linear-gradient(180deg, #1e1b4b 0%, #312e81 28%, #3d2b6b 55%, #5a4a6a 82%, #4a5042 100%); }
+  .scene[data-sky="night"] .sun { background: radial-gradient(circle at 40% 40%, #fff 0%, #e5e7eb 45%, #94a3b8 100%); box-shadow: 0 0 40px rgba(226,232,240,.4); opacity: .85; }
+  .scene[data-sky="night"] .hill.h1 { background: #3f4a3a; }
+  .scene[data-sky="night"] .hill.h2 { background: #354a32; }
+  .scene[data-sky="night"] .hill.h3 { background: #445543; }
+  .scene[data-sky="night"] .ground { background: radial-gradient(ellipse 80% 30% at 60% 30%, rgba(60,50,80,.4), transparent 70%), linear-gradient(180deg, #4a5a42 0%, #3d4a38 100%); }
+
+  /* Season tweaks (data-season on .scene) */
+  .scene[data-season="winter"] .ground { background: linear-gradient(180deg, #f0ece4 0%, #d9d2c3 60%, #b5ae9e 100%); }
+  .scene[data-season="winter"] .ground::before { background: repeating-linear-gradient(90deg, transparent 0 3px, rgba(255,255,255,.8) 3px 4px, transparent 4px 10px); }
+  .scene[data-season="winter"] .hill.h1, .scene[data-season="winter"] .hill.h2, .scene[data-season="winter"] .hill.h3 { filter: saturate(.3) brightness(1.2) blur(.5px); }
+  .scene[data-season="spring"] .ground { background: linear-gradient(180deg, #b5d092 0%, #a3c27a 40%, #8aaf5f 100%); }
+  .scene[data-season="autumn"] .mid-canopy, .scene[data-season="autumn"] .mature-canopy { filter: hue-rotate(-45deg) saturate(1.2) brightness(1.05); }
+  .scene[data-season="autumn"] .young-canopy { filter: hue-rotate(-45deg) saturate(1.2); }
+
+  /* Lagerfeuer */
+  .fire { position: absolute; z-index: 4; width: 54px; height: 60px; filter: drop-shadow(0 6px 10px rgba(120,40,10,.4)); }
+  .fire-pit { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 52px; height: 14px; border-radius: 50%; background: radial-gradient(ellipse, #5a3a22 0%, #3a2512 80%); }
+  .fire-log-a, .fire-log-b { position: absolute; bottom: 4px; width: 24px; height: 6px; border-radius: 3px; background: linear-gradient(180deg, #8a5a35 0%, #5c3a1f 100%); }
+  .fire-log-a { left: 6px; transform: rotate(-18deg); }
+  .fire-log-b { right: 6px; transform: rotate(18deg); }
+  .fire-flame { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); width: 22px; height: 32px; background: radial-gradient(ellipse at 50% 100%, #fff8dc 0%, #fde68a 20%, #f59e0b 55%, #b45309 90%, transparent 100%); border-radius: 50% 50% 44% 44% / 80% 80% 20% 20%; animation: flicker 1.8s ease-in-out infinite; transform-origin: 50% 100%; }
+  .fire-flame.b { width: 14px; height: 22px; opacity: .75; animation-delay: .3s; animation-duration: 1.3s; }
+  @keyframes flicker { 0%,100% { transform: translateX(-50%) scale(1, 1) rotate(-.5deg); } 50% { transform: translateX(-50%) scale(1.06, .94) rotate(.5deg); } }
+  .fire-glow { position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%); width: 90px; height: 30px; border-radius: 50%; background: radial-gradient(ellipse, rgba(252,211,77,.5), transparent 70%); animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: .6; } 50% { opacity: .85; } }
+
+  /* Plants */
+  .plant { position: absolute; z-index: 3; transform-origin: 50% 100%; }
+  .plant-shadow { position: absolute; left: 50%; bottom: -2px; transform: translateX(-50%); width: 70%; height: 6px; border-radius: 50%; background: radial-gradient(ellipse, rgba(50,40,20,.3), transparent 70%); }
+
+  .sprout { position: relative; width: 16px; height: 22px; display: flex; flex-direction: column; align-items: center; }
+  .sprout-stem { width: 2px; height: 14px; margin-top: auto; background: linear-gradient(180deg, #6b8e4f, #4a6d33); border-radius: 2px; }
+  .sprout-leaf-l, .sprout-leaf-r { position: absolute; top: 2px; width: 9px; height: 11px; background: radial-gradient(ellipse at 40% 40%, #86efac 0%, #4a9e5d 80%); border-radius: 100% 20% 100% 20%; }
+  .sprout-leaf-l { left: 0; transform: rotate(-20deg); }
+  .sprout-leaf-r { right: 0; transform: rotate(20deg) scaleX(-1); }
+
+  .young { position: relative; width: 40px; height: 56px; display: flex; flex-direction: column; align-items: center; }
+  .young-trunk { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 5px; height: 22px; background: linear-gradient(180deg, #8a5a35 0%, #5c3a1f 100%); border-radius: 2px; }
+  .young-canopy { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(ellipse at 35% 30%, #9ed884 0%, #5b8f49 60%, #3f6b30 100%); box-shadow: inset -3px -4px 6px rgba(0,0,0,.15); }
+  .young-canopy::after { content: ''; position: absolute; top: 4px; left: 6px; width: 10px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.25); }
+
+  .mid { position: relative; width: 58px; height: 88px; display: flex; flex-direction: column; align-items: center; }
+  .mid-trunk { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 8px; height: 34px; background: linear-gradient(180deg, #9a6842 0%, #5c3a1f 100%); border-radius: 3px; }
+  .mid-canopy { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); width: 54px; height: 58px; border-radius: 50% 48% 52% 50%; background: radial-gradient(ellipse at 35% 30%, #a8dd8d 0%, #649b52 55%, #3f6b30 100%); box-shadow: inset -4px -6px 10px rgba(0,0,0,.18); }
+  .mid-canopy::before { content: ''; position: absolute; top: -4px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle, #a8dd8d, #649b52); }
+  .mid-canopy::after { content: ''; position: absolute; top: 8px; left: 10px; width: 14px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.22); }
+
+  .mature-tree { position: relative; width: 78px; height: 120px; }
+  .mature-trunk { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 14px; height: 46px; background: linear-gradient(180deg, #a0704a 0%, #5c3a1f 100%); border-radius: 4px; box-shadow: inset -2px 0 0 rgba(0,0,0,.2); }
+  .mature-canopy { position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%); width: 78px; height: 86px; border-radius: 50% 45% 52% 48%; background: radial-gradient(circle at 30% 30%, #b6e69c 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, #7cb060 0%, #4a8044 55%, #2d5622 100%); box-shadow: inset -6px -8px 14px rgba(0,0,0,.22); }
+  .mature-canopy::before { content: ''; position: absolute; top: -6px; left: 10px; width: 32px; height: 28px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #b6e69c, #5b8f49); }
+  .mature-canopy::after { content: ''; position: absolute; top: -4px; right: 8px; width: 26px; height: 22px; border-radius: 50%; background: radial-gradient(circle, #9cc77e, #5b8f49); }
+
+  .pine { position: relative; width: 40px; height: 68px; }
+  .pine-trunk { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 5px; height: 14px; background: linear-gradient(180deg, #7a5030 0%, #4c2f18 100%); border-radius: 2px; }
+  .pine-c { position: absolute; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 26px solid #497b3b; filter: drop-shadow(0 1px 0 rgba(0,0,0,.15)); }
+  .pine-c.c1 { bottom: 12px; }
+  .pine-c.c2 { bottom: 28px; border-left-width: 17px; border-right-width: 17px; border-bottom-width: 22px; border-bottom-color: #578c43; }
+  .pine-c.c3 { bottom: 42px; border-left-width: 13px; border-right-width: 13px; border-bottom-width: 18px; border-bottom-color: #649b52; }
+
+  .seed-dot { position: absolute; z-index: 3; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle, #6b4a2a 0%, #3a2512 80%); box-shadow: inset 1px 1px 2px rgba(255,255,255,.25); }
+  .seed-dot::after { content: '✦'; position: absolute; top: -16px; left: 50%; transform: translateX(-50%); color: #fef3c7; font-size: 14px; text-shadow: 0 0 8px rgba(252,211,77,.8); animation: sparkle 1.4s ease-in-out infinite; }
+  @keyframes sparkle { 0%,100% { opacity: .4; transform: translateX(-50%) scale(.8); } 50% { opacity: 1; transform: translateX(-50%) scale(1.1); } }
+
+  .hint-ring { position: absolute; z-index: 6; width: 26px; height: 26px; border-radius: 50%; background: rgba(252, 211, 77, .3); border: 2px solid rgba(254, 243, 199, .8); box-shadow: 0 0 12px rgba(252,211,77,.5); animation: ring-pulse 2.4s ease-in-out infinite; pointer-events: none; }
+  @keyframes ring-pulse { 0%,100% { transform: scale(1); opacity: .8; } 50% { transform: scale(1.25); opacity: .5; } }
+
+  /* Decor */
+  .decor { position: absolute; z-index: 3; }
+  .stone { width: 22px; height: 12px; border-radius: 50%; background: linear-gradient(180deg, #b5a992 0%, #7a6e5a 100%); box-shadow: inset -2px -3px 4px rgba(0,0,0,.25), inset 2px 2px 0 rgba(255,255,255,.25); }
+  .stone.s { width: 14px; height: 8px; }
+  .lantern { width: 22px; height: 48px; position: relative; }
+  .lantern-pole { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 3px; height: 34px; background: linear-gradient(180deg, #7a5030, #4c2f18); border-radius: 2px; }
+  .lantern-lamp { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 18px; height: 22px; border-radius: 40% 40% 48% 48% / 40% 40% 60% 60%; background: radial-gradient(circle at 50% 45%, #fff8dc 0%, #fcd34d 55%, #b45309 100%); box-shadow: 0 0 14px rgba(252,211,77,.65); }
+  .bench { width: 48px; height: 20px; position: relative; }
+  .bench-seat { position: absolute; top: 8px; left: 0; right: 0; height: 5px; background: linear-gradient(180deg, #9a6842 0%, #6a4422 100%); border-radius: 3px; box-shadow: 0 1px 0 rgba(0,0,0,.25); }
+  .bench-leg-a, .bench-leg-b { position: absolute; top: 12px; width: 3px; height: 8px; background: #5c3a1f; border-radius: 1px; }
+  .bench-leg-a { left: 4px; } .bench-leg-b { right: 4px; }
+  .bench-back { position: absolute; top: 0; left: 4px; right: 4px; height: 10px; border-left: 3px solid #6a4422; border-right: 3px solid #6a4422; border-top: 3px solid #6a4422; border-radius: 4px 4px 0 0; }
+  .fence-seg { width: 40px; height: 20px; position: relative; }
+  .fence-seg::before, .fence-seg::after { content: ''; position: absolute; width: 4px; height: 18px; bottom: 0; background: linear-gradient(180deg, #c49a6f, #8a5e3a); border-radius: 2px 2px 1px 1px; }
+  .fence-seg::before { left: 4px; } .fence-seg::after { right: 4px; }
+  .fence-seg > span { position: absolute; left: 0; right: 0; top: 8px; height: 2px; background: #a47a52; border-radius: 1px; }
+  .mushroom { width: 18px; height: 18px; position: relative; }
+  .mushroom-cap { position: absolute; top: 0; left: 0; width: 18px; height: 10px; border-radius: 50% 50% 0 0; background: radial-gradient(ellipse at 35% 40%, #fca5a5, #b91c1c); }
+  .mushroom-cap::after { content: ''; position: absolute; top: 2px; left: 3px; width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,.75); box-shadow: 6px 1px 0 rgba(255,255,255,.7), 3px 4px 0 rgba(255,255,255,.6); }
+  .mushroom-stem { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 6px; height: 10px; border-radius: 3px; background: linear-gradient(180deg, #fef3c7, #fcd34d); }
+
+  /* Ronki */
+  .ronki { position: absolute; z-index: 5; width: 62px; height: 66px; filter: drop-shadow(0 4px 6px rgba(80,40,10,.3)); animation: ronki-breathe 4.2s ease-in-out infinite; transform-origin: 50% 100%; }
+  @keyframes ronki-breathe { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-2px) rotate(1deg); } }
+  .ronki.mirror { transform: scaleX(-1); }
+  .ronki.mirror { animation-name: ronki-breathe-m; }
+  @keyframes ronki-breathe-m { 0%,100% { transform: scaleX(-1) translateY(0) rotate(-1deg); } 50% { transform: scaleX(-1) translateY(-2px) rotate(1deg); } }
+  .ronki-body { position: absolute; inset: 10% 6% 0 6%; background: linear-gradient(180deg, #fef3c7 0%, #fcd34d 55%, #f59e0b 100%); border-radius: 50% 50% 46% 46% / 55% 55% 45% 45%; box-shadow: inset -4px -6px 0 rgba(180,83,9,.2), inset 3px 4px 0 rgba(255,255,255,.45); }
+  .ronki-belly { position: absolute; left: 30%; top: 50%; width: 40%; height: 32%; background: radial-gradient(ellipse at 50% 40%, #fff8e1 0%, transparent 70%); border-radius: 50%; }
+  .ronki-horn { position: absolute; top: 4%; width: 10%; height: 17%; background: linear-gradient(180deg, #fef3c7, #b45309); border-radius: 50% 50% 20% 20%; }
+  .ronki-horn.l { left: 28%; transform: rotate(-12deg); }
+  .ronki-horn.r { right: 28%; transform: rotate(12deg); }
+  .ronki-eye { position: absolute; top: 36%; width: 8%; height: 11%; background: #1e1b17; border-radius: 50%; }
+  .ronki-eye.l { left: 32%; }
+  .ronki-eye.r { right: 32%; }
+  .ronki-eye::after { content: ''; position: absolute; top: 20%; left: 20%; width: 40%; height: 35%; background: #fff; border-radius: 50%; }
+  .ronki-mouth { position: absolute; left: 50%; top: 56%; transform: translateX(-50%); width: 18%; height: 8%; border-bottom: 2.5px solid #7a3f0a; border-radius: 0 0 20px 20px; }
+  .ronki-cheek-l, .ronki-cheek-r { position: absolute; top: 50%; width: 8%; height: 5%; border-radius: 50%; background: rgba(244, 114, 114, .5); }
+  .ronki-cheek-l { left: 24%; }
+  .ronki-cheek-r { right: 24%; }
+  .ronki-bubble { position: absolute; z-index: 8; padding: 7px 12px; border-radius: 14px; background: rgba(255,248,242,.96); border: 1px solid rgba(18,67,70,.15); box-shadow: 0 4px 12px -4px rgba(0,0,0,.2); font: 600 11px/1.3 var(--f-body); color: var(--primary); max-width: 180px; text-align: center; }
+  .ronki-bubble::after { content: ''; position: absolute; bottom: -5px; left: 26px; width: 10px; height: 10px; background: rgba(255,248,242,.96); border-right: 1px solid rgba(18,67,70,.15); border-bottom: 1px solid rgba(18,67,70,.15); transform: rotate(45deg); }
+
+  /* ═══════ FRAME 1 · LIVE LAGER VIEWPORT (mirrors production) ══════ */
+  /* Thin alpha status strip */
+  .alpha-strip { position: absolute; top: 0; left: 0; right: 0; z-index: 25; height: 28px; background: #0e1f22; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; font: 600 9px/1 var(--f-label); color: #fef3c7; letter-spacing: .02em; }
+  .alpha-strip .left { display: inline-flex; align-items: center; gap: 6px; }
+  .alpha-strip .dot { width: 5px; height: 5px; border-radius: 50%; background: #fcd34d; box-shadow: 0 0 6px rgba(252,211,77,.8); }
+  .alpha-strip .muted { color: rgba(254, 243, 199, .6); margin-left: 2px; }
+  .alpha-strip .right { display: inline-flex; align-items: center; gap: 10px; }
+  .alpha-strip .right b { color: #fcd34d; font-weight: 700; }
+  .alpha-strip .lang { color: rgba(254, 243, 199, .6); }
+
+  /* Garden preview stage — contained, tappable */
+  .garden-preview {
+    position: relative; margin: 52px 10px 0; height: 210px; border-radius: 18px;
+    overflow: hidden; cursor: pointer;
+    box-shadow: 0 10px 24px -12px rgba(18,67,70,.35), inset 0 0 0 1px rgba(255,255,255,.12);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .garden-preview:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(18,67,70,.45); }
+  .garden-preview .scene { position: absolute; inset: 0; }
+  /* Expand affordance: pill bottom-right */
+  .gp-expand {
+    position: absolute; right: 10px; bottom: 10px; z-index: 4;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 11px 6px 9px; border-radius: 999px;
+    background: rgba(18,67,70,.78); backdrop-filter: blur(10px);
+    color: #fef3c7;
+    font: 700 9px/1 var(--f-label); letter-spacing: .18em; text-transform: uppercase;
+    border: 1px solid rgba(254,243,199,.2);
+    box-shadow: 0 4px 10px -4px rgba(0,0,0,.4);
+  }
+  .gp-expand .ms { font-size: 13px; }
+  .gp-title {
+    position: absolute; left: 12px; top: 10px; z-index: 4;
+    font: 700 9px/1 var(--f-label); letter-spacing: .22em; text-transform: uppercase;
+    color: #fef3c7; text-shadow: 0 1px 3px rgba(0,0,0,.35);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .gp-title::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #86efac; box-shadow: 0 0 8px rgba(134,239,172,.9); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: .6; } 50% { opacity: 1; } }
+  /* Tap hint pill floating over center — subtle */
+  .gp-tap {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3;
+    padding: 8px 16px; border-radius: 999px;
+    background: rgba(255,248,242,.88); backdrop-filter: blur(14px);
+    color: var(--primary);
+    font: 600 10px/1 var(--f-label); letter-spacing: .14em; text-transform: uppercase;
+    border: 1px solid rgba(18,67,70,.15);
+    box-shadow: 0 6px 14px -4px rgba(0,0,0,.25);
+    opacity: 0; transition: opacity .2s ease;
+    pointer-events: none;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .garden-preview:hover .gp-tap { opacity: 1; }
+  .gp-tap .ms { font-size: 14px; color: var(--gold-deep); }
+  /* Scale the inner garden scene subtly so it feels like a "window" */
+  .garden-preview .scene > * { transition: transform .35s ease; }
+
+  /* OLD campfire-stage (kept as fallback) */
+  .campfire-stage {
+    position: relative; margin: 52px 0 0; height: 210px; overflow: hidden;
+    background: linear-gradient(180deg, #2a3b5c 0%, #1f2c48 40%, #3a2a4a 100%);
+  }
+  .campfire-stage::before {
+    /* warm radial glow from fire */
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 160px 100px at 58% 72%, rgba(252, 211, 77, .45) 0%, rgba(252, 211, 77, .2) 30%, transparent 60%);
+  }
+  .campfire-stage::after {
+    /* stars */
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(1px 1px at 10% 15%, rgba(254,243,199,.9), transparent), radial-gradient(1px 1px at 25% 30%, rgba(254,243,199,.7), transparent), radial-gradient(1px 1px at 70% 12%, rgba(254,243,199,.8), transparent), radial-gradient(1px 1px at 88% 25%, rgba(254,243,199,.7), transparent), radial-gradient(1px 1px at 45% 20%, rgba(254,243,199,.6), transparent), radial-gradient(1px 1px at 92% 8%, rgba(254,243,199,.85), transparent);
+  }
+  .campfire-trees { position: absolute; bottom: 60px; left: 0; right: 0; height: 60px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 6px; }
+  .cft { width: 24px; height: 44px; background: #1a1f2e; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); opacity: .72; }
+  .cft.big { width: 30px; height: 56px; }
+  .cft.sm { width: 18px; height: 32px; }
+  .cft.o2 { background: #2a2f3e; }
+  /* Ground line in front of trees */
+  .campfire-ground { position: absolute; left: 0; right: 0; bottom: 42px; height: 28px; background: linear-gradient(180deg, #2d2440 0%, #1a1729 100%); }
+  /* Ronki log */
+  .campfire-log { position: absolute; left: 18%; bottom: 26px; width: 100px; height: 18px; background: linear-gradient(180deg, #c9a87a 0%, #8a6a46 100%); border-radius: 10px; box-shadow: 0 3px 6px -2px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.15); }
+  .campfire-log::before { content: ''; position: absolute; left: -4px; top: 2px; width: 12px; height: 14px; background: radial-gradient(ellipse, #5a3f25 0%, transparent 70%); border-radius: 50%; }
+  /* Actual fire flame in the scene */
+  .campfire-flame { position: absolute; left: 56%; bottom: 40px; width: 24px; height: 32px; background: radial-gradient(ellipse at 50% 100%, #fff8dc 0%, #fde68a 25%, #f59e0b 60%, #ea580c 85%, transparent 100%); border-radius: 50% 50% 44% 44% / 80% 80% 20% 20%; animation: flicker 1.8s ease-in-out infinite; transform-origin: 50% 100%; filter: drop-shadow(0 0 10px rgba(252, 211, 77, .6)); }
+  .campfire-flame::before { content: ''; position: absolute; inset: 30% 20% 0 20%; background: radial-gradient(ellipse at 50% 100%, #fff 0%, #fde68a 60%, transparent 100%); border-radius: 50%; }
+  /* Ronki sitting on the log */
+  .campfire-ronki { position: absolute; left: 24%; bottom: 42px; width: 48px; height: 46px; }
+  /* Label pill below stage */
+  .stage-label { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); padding: 6px 16px; background: #fff8f2; border-radius: 999px; font: 700 9px/1 var(--f-label); letter-spacing: .18em; text-transform: uppercase; color: var(--primary); border: 1px solid rgba(18,67,70,.12); box-shadow: 0 4px 10px -4px rgba(0,0,0,.2); z-index: 3; white-space: nowrap; }
+
+
+  /* The overlay sits ABOVE the garden. Top fades the scene slightly.
+     In "garden-mode" the overlay fades out. */
+  .hub-overlay {
+    position: absolute; inset: 0; z-index: 10;
+    display: flex; flex-direction: column;
+    transition: opacity .45s ease, transform .45s ease;
+  }
+  .hub-overlay.dismissed { opacity: 0; pointer-events: none; transform: translateY(6px); }
+
+  /* Let garden peek through: the topbar + nav stay crisp (blurred glass),
+     middle cards have a cream backdrop so greeting / today / nook feel
+     grounded like real cards on a paper surface. */
+  .hub-scroll {
+    flex: 1; padding: 64px 18px 96px;
+    display: flex; flex-direction: column; gap: 14px;
+    background: linear-gradient(180deg, rgba(255,248,242,.0) 0%, rgba(255,248,242,.55) 22%, rgba(255,248,242,.88) 46%, #fff8f2 62%, #fff8f2 100%);
+    overflow: hidden;
+  }
+
+  /* Topbar */
+  .hub-topbar {
+    position: absolute; top: 46px; left: 12px; right: 12px; z-index: 12;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .avatar-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,248,242,.82);
+    backdrop-filter: blur(14px) saturate(160%);
+    padding: 4px 12px 4px 4px; border-radius: 999px;
+    border: 1px solid rgba(18,67,70,.12);
+    box-shadow: 0 4px 14px -4px rgba(18,67,70,.22);
+  }
+  .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(160deg, #fde68a 0%, #f59e0b 100%);
+    border: 2px solid #fff; display: grid; place-items: center; font-size: 14px;
+  }
+  .avatar-pill .name { font: 600 12px/1 var(--f-head); color: var(--primary); }
+  .avatar-pill .lvl { font: 700 8px/1 var(--f-label); color: var(--gold-ink); letter-spacing: .16em; text-transform: uppercase; margin-top: 2px; }
+  .hp {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 11px 5px 5px; border-radius: 999px;
+    background: linear-gradient(180deg, #fff8e1 0%, #fde68a 100%);
+    border: 1px solid rgba(180,83,9,.25);
+    box-shadow: 0 4px 12px -4px rgba(252,211,77,.6), inset 0 1px 0 rgba(255,255,255,.7);
+  }
+  .pearl { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #fef3c7 0%, #f5c06a 55%, #b45309 100%); box-shadow: 0 0 0 1.5px rgba(255,255,255,.5), 0 0 8px rgba(252,211,77,.6); position: relative; }
+  .pearl::after { content:''; position:absolute; top: 3px; left: 4px; width: 6px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.75); transform: rotate(-20deg); }
+  .hp b { font: 800 13px/1 var(--f-label); color: var(--primary); letter-spacing: -0.01em; }
+  .hp span { font: 600 8px/1 var(--f-label); color: var(--gold-ink); letter-spacing: .16em; text-transform: uppercase; display: block; margin-top: 2px; }
+
+  /* Greeting */
+  .greet { padding: 4px 6px 2px; }
+  .greet .eyebrow { font: 600 9px/1 var(--f-label); letter-spacing: .24em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+  .greet .eyebrow .dotline { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(180,83,9,.3), transparent); }
+  .greet h1 { margin: 0; font: 500 22px/1.1 var(--f-head); letter-spacing: -0.015em; color: var(--primary); text-wrap: balance; }
+  .greet h1 em { font-style: normal; color: var(--gold-deep); }
+
+  /* Ronki bubble above the today-card */
+  .hub-bubble {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 12px 7px 8px; border-radius: 999px;
+    background: rgba(255,248,242,.94); backdrop-filter: blur(10px);
+    border: 1px solid rgba(18,67,70,.12);
+    box-shadow: 0 4px 10px -4px rgba(18,67,70,.18);
+    align-self: center; margin-top: 2px; position: relative;
+  }
+  .hub-bubble .ronki-dot { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fef3c7 0%, #f59e0b 70%, #b45309 100%); box-shadow: 0 0 0 2px rgba(252,211,77,.25); }
+  .hub-bubble b { font: 600 11px/1.2 var(--f-body); color: var(--primary); }
+  .hub-bubble::after { content: ''; position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%) rotate(45deg); width: 8px; height: 8px; background: rgba(255,248,242,.94); border-right: 1px solid rgba(18,67,70,.12); border-bottom: 1px solid rgba(18,67,70,.12); }
+
+  /* Today card */
+  .today {
+    position: relative; padding: 14px 14px 12px; border-radius: 18px;
+    background: #ffffff; border: 1px solid var(--line);
+    box-shadow: 0 10px 24px -10px rgba(18,67,70,.15), inset 0 1px 0 rgba(255,255,255,.9);
+    overflow: hidden;
+  }
+  .today::before { content: ''; position: absolute; top: -30px; right: -30px; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, rgba(252,211,77,.18), transparent 65%); }
+  .today .row { display: flex; align-items: center; gap: 12px; position: relative; }
+  .today .copy { flex: 1; min-width: 0; }
+  .today .eyebrow { font: 700 8px/1 var(--f-label); letter-spacing: .24em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 4px; }
+  .today h3 { margin: 0; font: 500 16px/1.15 var(--f-head); color: var(--primary); letter-spacing: -0.01em; }
+  .today p { margin: 2px 0 0; font: 500 10px/1.4 var(--f-body); color: var(--mute); }
+  .ring { position: relative; width: 54px; height: 54px; flex-shrink: 0; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+  .ring .num b { font: 700 16px/1 var(--f-head); color: var(--primary); }
+  .ring .num span { font: 700 7px/1 var(--f-label); color: var(--mute); letter-spacing: .18em; margin-top: 2px; }
+  .chapters { display: flex; gap: 5px; padding: 10px 0 0; margin-top: 10px; border-top: 1px dashed var(--line-2); }
+  .ch { flex: 1; padding: 7px 4px 5px; border-radius: 9px; background: #faf3e8; border: 1px solid rgba(18,67,70,.06); display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  .ch.done { background: #ecfdf5; border-color: rgba(5,150,105,.22); }
+  .ch.active { background: linear-gradient(180deg, #fef9e7 0%, #fef3c7 100%); border-color: rgba(252,211,77,.5); box-shadow: 0 3px 8px -4px rgba(252,211,77,.4); }
+  .ch .ic { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; background: rgba(18,67,70,.08); color: var(--primary); }
+  .ch.done .ic { background: #34d399; color: #064e3b; }
+  .ch.active .ic { background: #fcd34d; color: #725b00; }
+  .ch .ic .ms { font-size: 14px; font-variation-settings: 'FILL' 1, 'wght' 500; }
+  .ch b { font: 700 8px/1.1 var(--f-label); letter-spacing: .04em; color: var(--primary); text-transform: uppercase; }
+  .ch span { font: 600 7px/1 var(--f-label); color: var(--mute); letter-spacing: .06em; }
+  .ch.done b { color: var(--emerald-dark); }
+
+  /* Section head */
+  .section-head { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 0; }
+  .section-head h4 { margin: 0; font: 600 10px/1 var(--f-label); letter-spacing: .22em; text-transform: uppercase; color: var(--primary-3); }
+  .section-head button { font: 700 10px/1 var(--f-label); color: var(--gold-deep); letter-spacing: .08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 3px; }
+  .section-head button .ms { font-size: 12px; }
+
+  /* Bonus */
+  .bonus { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bonus-card { position: relative; padding: 10px 10px; border-radius: 13px; background: linear-gradient(160deg, #fffdf5 0%, #fef3c7 120%); border: 1px solid rgba(161,98,7,.18); box-shadow: 0 4px 10px -6px rgba(161,98,7,.15); display: flex; flex-direction: column; gap: 6px; min-height: 82px; overflow: hidden; }
+  .bonus-card::before { content: ''; position: absolute; bottom: -20px; right: -20px; width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle, rgba(252,211,77,.3), transparent 60%); }
+  .bonus-card .tag { font: 800 7px/1 var(--f-label); letter-spacing: .22em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 1px; }
+  .bonus-card b { font: 500 12px/1.2 var(--f-head); color: var(--primary); letter-spacing: -0.01em; text-wrap: pretty; position: relative; }
+  .bonus-card .reward { margin-top: auto; display: inline-flex; align-items: center; gap: 4px; font: 700 9px/1 var(--f-label); color: var(--gold-deep); position: relative; }
+  .bonus-card .reward .pearl { width: 10px; height: 10px; }
+  .bonus-card.done { background: linear-gradient(160deg, #ecfdf5 0%, rgba(52,211,153,.15) 120%); border-color: rgba(5,150,105,.25); }
+  .bonus-card.done b { color: #065f46; text-decoration: line-through; text-decoration-color: rgba(5,150,105,.4); }
+  .bonus-card.done .reward { color: var(--emerald-dark); }
+
+  /* Adventure */
+  .adventure { position: relative; padding: 0; border-radius: 14px; overflow: hidden; background: linear-gradient(135deg, #1a2542 0%, #2d1c3d 55%, #3d2b4a 100%); box-shadow: 0 10px 20px -10px rgba(26,37,66,.55), inset 0 1px 0 rgba(255,255,255,.06); }
+  .adventure::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 85% 20%, rgba(252,211,77,.2), transparent 40%), radial-gradient(circle at 10% 90%, rgba(94,234,212,.14), transparent 45%); pointer-events: none; }
+  .adventure-inner { position: relative; padding: 10px 12px; display: flex; gap: 10px; align-items: center; }
+  .adventure .icon { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; background: radial-gradient(circle at 50% 40%, #fcd34d 0%, transparent 60%), linear-gradient(135deg, rgba(252,211,77,.2), rgba(255,255,255,.05)); display: grid; place-items: center; border: 1px solid rgba(252,211,77,.35); box-shadow: 0 0 14px -4px rgba(252,211,77,.4), inset 0 1px 0 rgba(255,255,255,.15); }
+  .adventure .icon::after { content: '✦'; font-size: 18px; color: #fef3c7; text-shadow: 0 0 10px rgba(252,211,77,.8); }
+  .adventure .body { flex: 1; min-width: 0; color: #fff; }
+  .adventure .kicker { font: 700 8px/1 var(--f-label); letter-spacing: .22em; text-transform: uppercase; color: #fcd34d; margin-bottom: 3px; }
+  .adventure h4 { margin: 0; font: 500 13px/1.15 var(--f-head); color: #fef3c7; letter-spacing: -0.01em; }
+  .adventure .progress { margin-top: 6px; display: flex; align-items: center; gap: 8px; font: 600 9px/1 var(--f-label); color: rgba(254,243,199,.7); }
+  .bar { flex: 1; height: 4px; border-radius: 999px; background: rgba(255,255,255,.1); overflow: hidden; }
+  .bar > div { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #fcd34d, #f59e0b); box-shadow: 0 0 8px rgba(252,211,77,.5); }
+
+  /* ─── Live Lager cards ──────────────────────────────── */
+  .card-stack { padding: 20px 14px 140px; display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 5; }
+  /* Heute card — simple version matching live */
+  .heute-live {
+    position: relative; padding: 14px 16px 14px; border-radius: 16px;
+    background: #ffffff; border: 1px solid var(--line);
+    box-shadow: 0 6px 14px -8px rgba(18,67,70,.18);
+  }
+  .heute-live .row { display: flex; align-items: flex-start; gap: 12px; }
+  .heute-live .copy { flex: 1; min-width: 0; }
+  .heute-live .eyebrow { font: 700 8px/1 var(--f-label); letter-spacing: .24em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 6px; }
+  .heute-live h3 { margin: 0; font: 500 17px/1.15 var(--f-head); color: var(--primary); letter-spacing: -0.01em; }
+  .heute-live p { margin: 3px 0 0; font: 500 10px/1.35 var(--f-body); color: var(--mute); }
+  .heute-live .ring { position: relative; width: 58px; height: 58px; flex-shrink: 0; }
+  .heute-live .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .heute-live .ring .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+  .heute-live .ring .num b { font: 700 17px/1 var(--f-head); color: var(--primary); }
+  .heute-live .ring .num span { font: 600 8px/1 var(--f-label); color: var(--mute); letter-spacing: .08em; }
+  .heute-live .phases { display: flex; gap: 6px; margin-top: 12px; align-items: center; }
+  .heute-live .phases .star-tiny { width: 8px; height: 8px; color: var(--gold-deep); font-size: 10px; line-height: 1; flex-shrink: 0; }
+  .heute-live .phase { flex: 1; height: 4px; border-radius: 999px; background: #e8ddc7; overflow: hidden; }
+  .heute-live .phase.done { background: linear-gradient(90deg, #10b981 0%, #059669 100%); }
+  .heute-live .phase-labels { display: flex; justify-content: space-between; margin-top: 6px; padding: 0 14px; }
+  .heute-live .phase-labels span { font: 700 8px/1 var(--f-label); letter-spacing: .18em; text-transform: uppercase; color: var(--mute); }
+
+  /* Stimmung card — soft yellow */
+  .stimmung-live {
+    position: relative; padding: 12px 14px; border-radius: 16px;
+    background: linear-gradient(180deg, #fffdf5 0%, #fef3c7 100%);
+    border: 1px solid rgba(161,98,7,.18);
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 6px 14px -8px rgba(161,98,7,.2);
+  }
+  .stimmung-live .face { width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fde68a, #f59e0b); display: grid; place-items: center; flex-shrink: 0; position: relative; box-shadow: inset -2px -3px 4px rgba(0,0,0,.1); }
+  .stimmung-live .face::before, .stimmung-live .face::after { content: ''; position: absolute; top: 12px; width: 4px; height: 4px; border-radius: 50%; background: #1c1917; }
+  .stimmung-live .face::before { left: 10px; } .stimmung-live .face::after { right: 10px; }
+  .stimmung-live .face i { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 12px; height: 5px; border: 2px solid #1c1917; border-top: none; border-radius: 0 0 10px 10px; }
+  .stimmung-live .body { flex: 1; }
+  .stimmung-live .eyebrow { font: 700 8px/1 var(--f-label); letter-spacing: .24em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 3px; }
+  .stimmung-live .mood { font: 600 14px/1 var(--f-head); color: var(--primary); }
+  .stimmung-live .pen { color: var(--mute); font-size: 16px; }
+
+  /* Wasser row */
+  .wasser-row {
+    display: flex; align-items: center; gap: 10px; padding: 6px 14px;
+  }
+  .wasser-row .drop { color: var(--primary); font-size: 18px; flex-shrink: 0; }
+  .wasser-row b { font: 700 10px/1 var(--f-label); letter-spacing: .22em; text-transform: uppercase; color: var(--primary); flex-shrink: 0; }
+  .wasser-row .pills { flex: 1; display: flex; gap: 3px; }
+  .wasser-row .pill { flex: 1; height: 11px; border-radius: 3px; background: var(--primary); }
+  .wasser-row .count { font: 700 11px/1 var(--f-label); color: var(--primary); flex-shrink: 0; }
+
+  /* Spielzimmer card */
+  .spielzimmer-live {
+    position: relative; padding: 12px 14px; border-radius: 16px;
+    background: linear-gradient(180deg, #fef3c7 0%, #fcd34d 100%);
+    border: 1px solid rgba(180,83,9,.25);
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 6px 14px -4px rgba(252,211,77,.45);
+  }
+  .spielzimmer-live .icon-box { width: 42px; height: 42px; border-radius: 10px; background: linear-gradient(160deg, #f59e0b, #b45309); display: grid; place-items: center; color: #fef3c7; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+  .spielzimmer-live .icon-box .ms { font-size: 22px; font-variation-settings: 'FILL' 1, 'wght' 500; }
+  .spielzimmer-live .body { flex: 1; }
+  .spielzimmer-live .eyebrow { font: 700 8px/1 var(--f-label); letter-spacing: .24em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 3px; }
+  .spielzimmer-live .title { font: 600 14px/1 var(--f-head); color: var(--primary); }
+  .spielzimmer-live .chev { color: var(--gold-deep); font-size: 20px; }
+
+  /* Live top chrome — avatar pill (Marc TAG 1) + lock + star 77 */
+  .live-topbar {
+    position: absolute; top: 36px; left: 12px; right: 12px; z-index: 22;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .live-avatar-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,248,242,.94); backdrop-filter: blur(14px);
+    padding: 4px 14px 4px 4px; border-radius: 999px;
+    border: 1px solid rgba(18,67,70,.1);
+    box-shadow: 0 4px 10px -4px rgba(0,0,0,.25);
+  }
+  .live-avatar-pill .av { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; background: radial-gradient(circle at 35% 30%, #fbbf24, #92400e); display: grid; place-items: center; font-size: 14px; overflow: hidden; position: relative; }
+  .live-avatar-pill .av::before { content: ''; position: absolute; top: 8px; left: 8px; width: 3px; height: 3px; background: #1c1917; border-radius: 50%; box-shadow: 10px 0 0 #1c1917; }
+  .live-avatar-pill .av::after { content: ''; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 10px; height: 5px; border: 1.5px solid #1c1917; border-top: none; border-radius: 0 0 8px 8px; }
+  .live-avatar-pill .name { font: 600 13px/1 var(--f-head); color: var(--primary); }
+  .live-avatar-pill .tag { font: 700 8px/1 var(--f-label); color: var(--gold-ink); letter-spacing: .18em; text-transform: uppercase; margin-top: 2px; }
+  .live-right { display: flex; align-items: center; gap: 8px; }
+  .live-lock {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: rgba(255,248,242,.94); backdrop-filter: blur(14px);
+    display: grid; place-items: center; color: var(--primary);
+    border: 1px solid rgba(18,67,70,.1);
+    box-shadow: 0 4px 10px -4px rgba(0,0,0,.25);
+  }
+  .live-lock .ms { font-size: 16px; }
+  .live-star-badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px 5px 6px; border-radius: 999px;
+    background: linear-gradient(180deg, #fef3c7 0%, #fcd34d 100%);
+    border: 1px solid rgba(180,83,9,.3);
+    box-shadow: 0 4px 10px -4px rgba(252,211,77,.55);
+  }
+  .live-star-badge .s-ic { color: var(--gold-deep); font-size: 16px; font-family: 'Material Symbols Outlined' !important; font-feature-settings: 'liga' !important; font-variation-settings: 'FILL' 1, 'wght' 500; }
+  .live-star-badge b { font: 800 14px/1 var(--f-label); color: var(--primary); }
+  .live-star-badge span { font: 700 7px/1 var(--f-label); color: var(--gold-ink); letter-spacing: .18em; text-transform: uppercase; display: block; margin-top: 2px; }
+
+  /* Live navbar (Lager/Heute/Ronki/Tagebuch/Laden) */
+  .live-nav {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 20;
+    padding: 10px 8px 20px;
+    background: #fff8f2;
+    border-top: 1px solid rgba(18,67,70,.06);
+    display: flex; justify-content: space-around; align-items: center;
+  }
+  .live-nav-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 4px; min-width: 54px; color: var(--mute); position: relative; }
+  .live-nav-btn .ms { font-size: 20px; }
+  .live-nav-btn b { font: 700 8px/1 var(--f-label); letter-spacing: .14em; text-transform: uppercase; }
+  .live-nav-btn.active { color: #fef3c7; background: var(--primary); border-radius: 14px; padding: 8px 16px; }
+  .live-nav-btn.active .ms { font-variation-settings: 'FILL' 1, 'wght' 500; font-size: 18px; }
+  .live-nav-btn .star-pip { position: absolute; top: 2px; left: 6px; color: var(--gold-deep); font-size: 8px; line-height: 1; }
+
+  /* Garden peek behind cards — visible at very bottom */
+  .garden-peek {
+    position: absolute; left: 0; right: 0; bottom: 64px; height: 160px; z-index: 3;
+    pointer-events: none; overflow: hidden;
+  }
+  .garden-peek::before {
+    /* fade bottom into cream so it doesn't compete with nav */
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 0%, transparent 40%, rgba(255,248,242,.4) 80%, #fff8f2 100%);
+    z-index: 2;
+  }
+  .garden-peek .pk-hill { position: absolute; bottom: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+  .garden-peek .pk-hill.h1 { left: -10%; right: -10%; height: 90px; background: linear-gradient(180deg, #b7cc9e 0%, #8fb078 100%); }
+  .garden-peek .pk-hill.h2 { left: 30%; right: -20%; height: 70px; background: linear-gradient(180deg, #8fb078 0%, #6a8c5a 100%); opacity: .85; }
+  .garden-peek .pk-hill.h3 { left: -20%; right: 55%; height: 55px; background: linear-gradient(180deg, #9fba8a 0%, #7a9a65 100%); opacity: .75; }
+  .garden-peek .pk-house { position: absolute; right: 28%; bottom: 55px; width: 12px; height: 10px; background: #a0704a; clip-path: polygon(20% 100%, 20% 50%, 50% 20%, 80% 50%, 80% 100%); }
+
+  /* NavBar (old — kept for references) */
+  .hub-nav {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 20;
+    padding: 10px 12px 18px;
+    background: rgba(255,248,242,.92); backdrop-filter: blur(18px) saturate(160%);
+    border-top-left-radius: 26px; border-top-right-radius: 26px;
+    box-shadow: 0 -10px 22px -10px rgba(18,67,70,.18);
+    display: flex; justify-content: space-around; align-items: center;
+  }
+  .hub-nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 5px 3px; min-width: 44px; color: var(--mute); }
+  .hub-nav-btn .ms { font-size: 18px; }
+  .hub-nav-btn b { font: 700 7px/1 var(--f-label); letter-spacing: .14em; text-transform: uppercase; }
+  .hub-nav-btn.active { color: #fff; background: linear-gradient(180deg, var(--primary-3) 0%, var(--primary) 100%); border-radius: 16px; padding: 7px 12px; box-shadow: 0 6px 14px -4px rgba(18,67,70,.4); }
+  .hub-nav-btn.active .ms { font-variation-settings: 'FILL' 1, 'wght' 500; }
+  /* Show a hint that the Ronki tab is where the garden lives */
+  .hub-nav-btn.garden {
+    position: relative;
+  }
+  .hub-nav-btn.garden::after {
+    content: ''; position: absolute; top: 4px; right: 8px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #86efac; box-shadow: 0 0 6px rgba(134,239,172,.8);
+  }
+
+  /* ─── Frame 2: Garden mode, UI dismissed ──────────────── */
+  .zurueck-pill {
+    position: absolute; top: 56px; left: 16px; z-index: 30;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 7px 12px 7px 8px; border-radius: 999px;
+    background: rgba(255,248,242,.78); backdrop-filter: blur(12px);
+    border: 1px solid rgba(18,67,70,.15); color: var(--primary);
+    box-shadow: 0 4px 10px -4px rgba(0,0,0,.2);
+  }
+  .zurueck-pill .ms { font-size: 15px; }
+  .zurueck-pill b { font: 700 11px/1 var(--f-label); letter-spacing: .1em; text-transform: uppercase; }
+  .garden-banner {
+    position: absolute; top: 56px; right: 16px; z-index: 30;
+    padding: 7px 12px; border-radius: 999px;
+    background: rgba(18, 67, 70, .72); backdrop-filter: blur(10px);
+    color: #fef3c7;
+    font: 700 10px/1 var(--f-label); letter-spacing: .2em; text-transform: uppercase;
+  }
+
+  /* ─── Frame 3: Plant-a-seed sheet ─────────────────────── */
+  .sheet-scrim { position: absolute; inset: 0; z-index: 40; background: linear-gradient(180deg, transparent 0%, rgba(40,20,5,.3) 50%, rgba(40,20,5,.55) 100%); pointer-events: none; }
+  .seed-sheet { position: absolute; bottom: 0; left: 0; right: 0; z-index: 45; background: #fff8f2; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 10px 0 20px; box-shadow: 0 -20px 40px -10px rgba(0,0,0,.3); }
+  .sheet-grip { width: 36px; height: 4px; border-radius: 999px; background: rgba(18,67,70,.22); margin: 4px auto 8px; }
+  .sheet-head { padding: 4px 18px 12px; }
+  .sheet-kick { font: 800 9px/1 var(--f-label); letter-spacing: .24em; text-transform: uppercase; color: var(--emerald-dark); margin-bottom: 4px; }
+  .sheet-h3 { margin: 0; font: 500 18px/1.15 var(--f-head); color: var(--primary); letter-spacing: -0.005em; }
+  .seed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 4px 14px 14px; }
+  .seed-card { position: relative; padding: 10px 8px; border-radius: 14px; background: #fff; border: 1.5px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  .seed-card.sel { background: linear-gradient(180deg, #ecfdf5 0%, rgba(52,211,153,.14) 100%); border-color: rgba(5,150,105,.5); box-shadow: 0 4px 10px -4px rgba(52,211,153,.35); }
+  .seed-art { width: 48px; height: 48px; display: grid; place-items: end center; overflow: hidden; }
+  .seed-name { font: 700 11px/1.15 var(--f-body); color: var(--primary); }
+  .seed-time { font: 600 9px/1 var(--f-label); color: var(--mute); letter-spacing: .1em; text-transform: uppercase; margin-top: 2px; }
+  .seed-cta { margin: 6px 16px 0; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 14px; background: linear-gradient(180deg, #34d399 0%, #059669 100%); color: #fff; font: 800 12px/1 var(--f-label); letter-spacing: .1em; text-transform: uppercase; box-shadow: 0 6px 14px -4px rgba(5,150,105,.5); }
+  .seed-cta .ms { font-size: 16px; }
+  .species { width: 42px; height: 42px; position: relative; }
+  .species.oak { background: radial-gradient(circle at 50% 40%, #a8dd8d 0%, #5b8f49 55%, #3f6b30 100%); border-radius: 50% 48% 52% 50%; box-shadow: inset -2px -3px 6px rgba(0,0,0,.18); }
+  .species.oak::after { content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 8px; height: 10px; background: linear-gradient(180deg, #9a6842, #5c3a1f); border-radius: 2px; }
+  .species.pine::before { content: ''; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 34px solid #497b3b; }
+  .species.pine::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 6px; height: 8px; background: #5c3a1f; border-radius: 1px; }
+  .species.birch::before { content: ''; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #d4e8a8 0%, #8bb05c 70%); }
+  .species.birch::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 10px; background: linear-gradient(180deg, #f5f5f5 0%, #d4d4d4 50%, #292524 55%, #d4d4d4 60%, #f5f5f5 100%); background-size: 100% 4px; border-radius: 1px; }
+  .species.apple::before { content: ''; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #b6e69c 0%, #649b52 70%); box-shadow: 3px -3px 0 -5px #ef4444, -4px 2px 0 -5px #ef4444, 2px 6px 0 -5px #ef4444; }
+  .species.apple::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 5px; height: 8px; background: linear-gradient(180deg, #9a6842, #5c3a1f); border-radius: 1px; }
+  .species.linden::before { content: ''; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 36px; height: 30px; border-radius: 50%; background: radial-gradient(ellipse at 40% 30%, #c8e88a 0%, #88a84a 70%); }
+  .species.linden::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 6px; height: 10px; background: linear-gradient(180deg, #a0704a, #5c3a1f); border-radius: 1px; }
+  .species.fir::before { content: ''; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 36px solid #3a6b32; }
+  .species.fir::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 5px; height: 8px; background: #4c2f18; border-radius: 1px; }
+
+  /* ─── Frame 4: Fantasy decor · slim chrome ────────────── */
+  /* Left vertical rail: categories */
+  .decor-rail {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 46;
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 8px 6px;
+    background: rgba(20, 14, 28, .72);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 18px;
+    border: 1px solid rgba(252, 211, 77, .18);
+    box-shadow: 0 12px 28px -8px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .cat-btn {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: grid; place-items: center; color: rgba(254, 243, 199, .6);
+    transition: all .15s ease;
+  }
+  .cat-btn .ms { font-size: 22px; }
+  .cat-btn b { position: absolute; right: calc(100% + 10px); top: 50%; transform: translateY(-50%); white-space: nowrap; font: 700 9px/1 var(--f-label); letter-spacing: .18em; text-transform: uppercase; color: #fef3c7; background: rgba(20,14,28,.9); padding: 5px 9px; border-radius: 6px; opacity: 0; pointer-events: none; }
+  .cat-btn.sel { background: linear-gradient(160deg, #fcd34d 0%, #f59e0b 100%); color: #3d2b0a; box-shadow: 0 6px 14px -4px rgba(252,211,77,.55), inset 0 1px 0 rgba(255,255,255,.4); }
+  .cat-btn.sel .ms { font-variation-settings: 'FILL' 1, 'wght' 600; }
+
+  /* Star budget badge top-right */
+  .star-budget {
+    position: absolute; top: 56px; right: 16px; z-index: 46;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px 6px 6px; border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 248, 225, .94) 0%, rgba(253, 230, 138, .94) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(180, 83, 9, .3);
+    box-shadow: 0 6px 14px -4px rgba(252, 211, 77, .5), inset 0 1px 0 rgba(255,255,255,.6);
+  }
+  .star-budget .pearl { width: 18px; height: 18px; }
+  .star-budget b { font: 800 13px/1 var(--f-label); color: var(--primary); letter-spacing: -0.01em; }
+  .star-budget span { font: 700 8px/1 var(--f-label); letter-spacing: .18em; text-transform: uppercase; color: var(--gold-ink); display: block; margin-top: 2px; }
+
+  /* Bottom item strip — compact, scrolls horizontally */
+  .decor-strip {
+    position: absolute; left: 70px; right: 14px; bottom: 18px; z-index: 45;
+    display: flex; gap: 6px; padding: 8px 8px;
+    background: rgba(20, 14, 28, .72);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 16px;
+    border: 1px solid rgba(252, 211, 77, .18);
+    box-shadow: 0 12px 28px -8px rgba(0,0,0,.45);
+    overflow-x: auto;
+  }
+  .decor-strip::-webkit-scrollbar { display: none; }
+  .decor-tile {
+    flex-shrink: 0; width: 64px; padding: 6px 4px 6px;
+    border-radius: 10px;
+    background: rgba(255, 248, 242, .06);
+    border: 1px solid rgba(252, 211, 77, .1);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    position: relative; color: #fef3c7;
+  }
+  .decor-tile.sel {
+    background: linear-gradient(180deg, rgba(252, 211, 77, .22) 0%, rgba(252, 211, 77, .08) 100%);
+    border-color: rgba(252, 211, 77, .55);
+    box-shadow: 0 4px 10px -2px rgba(252,211,77,.3), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .decor-tile.locked { opacity: .5; }
+  .decor-tile.locked::after {
+    content: ''; position: absolute; top: 4px; right: 4px; width: 12px; height: 12px;
+    background: rgba(20, 14, 28, .7); border-radius: 50%;
+    background-image: radial-gradient(circle, transparent 2px, rgba(20,14,28,.7) 2px);
+  }
+  .decor-art { height: 34px; width: 100%; display: grid; place-items: end center; position: relative; }
+  .decor-price { display: inline-flex; align-items: center; gap: 3px; font: 800 10px/1 var(--f-label); color: #fcd34d; }
+  .decor-price .star { width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #fef3c7 0%, #fcd34d 55%, #b45309 100%); }
+  .decor-name { font: 600 8px/1.1 var(--f-body); color: rgba(254, 243, 199, .75); text-align: center; letter-spacing: .02em; }
+  .decor-tile.sel .decor-name { color: #fef3c7; }
+
+  /* Floating item follows finger */
+  .floating-decor { position: absolute; z-index: 44; filter: drop-shadow(0 10px 14px rgba(0,0,0,.4)); animation: float-bob 1.6s ease-in-out infinite; }
+  @keyframes float-bob { 0%,100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, calc(-50% - 4px)) scale(1.03); } }
+  .drop-target { position: absolute; z-index: 43; width: 56px; height: 24px; border-radius: 50%; border: 2px dashed rgba(254,243,199,.9); background: rgba(252,211,77,.22); transform: translate(-50%, -50%); box-shadow: 0 0 20px rgba(252,211,77,.3); }
+  .drop-target::after { content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; border-radius: 50%; background: rgba(254,243,199,.9); box-shadow: 0 0 10px rgba(254,243,199,.8); }
+
+  /* Whisper above floating item */
+  .place-whisper {
+    position: absolute; z-index: 47;
+    padding: 5px 10px; border-radius: 999px;
+    background: rgba(20, 14, 28, .85); color: #fef3c7;
+    font: 600 9px/1 var(--f-label); letter-spacing: .14em; text-transform: uppercase;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  /* ═══ Fantasy decor art (CSS) ══════════════════════════ */
+  /* Crystal shard */
+  .crystal { position: relative; width: 22px; height: 34px; }
+  .crystal::before { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, #c4b5fd 0%, #8b5cf6 45%, #5b21b6 100%); clip-path: polygon(50% 0, 100% 35%, 80% 100%, 20% 100%, 0 35%); filter: drop-shadow(0 0 8px rgba(139, 92, 246, .5)); }
+  .crystal::after { content: ''; position: absolute; left: 30%; top: 20%; width: 14%; height: 50%; background: rgba(255,255,255,.7); transform: skew(-10deg); }
+  .crystal.sm { width: 14px; height: 22px; }
+
+  /* Rune stone — standing stone with glowing glyph */
+  .runestone { position: relative; width: 26px; height: 34px; }
+  .runestone::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; top: 4px; background: linear-gradient(180deg, #9ca3af 0%, #4b5563 100%); border-radius: 50% 50% 4px 4px / 18% 18% 4% 4%; box-shadow: inset -3px -2px 4px rgba(0,0,0,.3), inset 2px 2px 0 rgba(255,255,255,.15); }
+  .runestone::after { content: ''; position: absolute; left: 50%; top: 30%; transform: translateX(-50%); width: 8px; height: 14px; background:
+    conic-gradient(from 0deg at 50% 50%, transparent 0 45deg, #86efac 45deg 55deg, transparent 55deg 135deg, #86efac 135deg 145deg, transparent 145deg 225deg, #86efac 225deg 235deg, transparent 235deg);
+    filter: drop-shadow(0 0 4px rgba(134, 239, 172, .9));
+    mask: linear-gradient(180deg, #000 0 40%, transparent 40% 60%, #000 60% 100%);
+  }
+
+  /* Faerie mushroom ring — 3 mushrooms */
+  .faerie-ring { position: relative; width: 34px; height: 18px; }
+  .faerie-ring .fmush { position: absolute; bottom: 0; }
+  .faerie-ring .fmush-cap { width: 10px; height: 6px; border-radius: 50% 50% 0 0; background: radial-gradient(ellipse at 35% 40%, #c4b5fd, #6d28d9); filter: drop-shadow(0 0 6px rgba(139, 92, 246, .6)); }
+  .faerie-ring .fmush-cap::after { content: ''; position: absolute; top: 1px; left: 2px; width: 2px; height: 2px; border-radius: 50%; background: rgba(255,255,255,.8); box-shadow: 4px 1px 0 rgba(255,255,255,.6); }
+  .faerie-ring .fmush-stem { width: 4px; height: 6px; background: linear-gradient(180deg, #fef3c7, #fcd34d); border-radius: 2px; margin: 0 auto; }
+  .faerie-ring .fmush.m1 { left: 0; } .faerie-ring .fmush.m2 { left: 12px; bottom: 2px; } .faerie-ring .fmush.m3 { right: 0; }
+
+  /* Star well — little stone well with star above */
+  .starwell { position: relative; width: 28px; height: 32px; }
+  .starwell-base { position: absolute; bottom: 0; left: 0; right: 0; height: 14px; background: linear-gradient(180deg, #9ca3af 0%, #4b5563 100%); border-radius: 50% 50% 4px 4px / 30% 30% 4% 4%; }
+  .starwell-base::after { content: ''; position: absolute; top: 4px; left: 3px; right: 3px; height: 3px; background: repeating-linear-gradient(90deg, #6b7280 0 3px, #4b5563 3px 5px); border-radius: 1px; }
+  .starwell-roof { position: absolute; top: 6px; left: 2px; right: 2px; height: 6px; background: linear-gradient(180deg, #7a5030, #4c2f18); clip-path: polygon(0 100%, 50% 0, 100% 100%); }
+  .starwell-star { position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-size: 10px; color: #fef3c7; text-shadow: 0 0 8px rgba(252,211,77,.9); animation: sparkle 1.8s ease-in-out infinite; }
+
+  /* Ember shrine — tiny altar with flame */
+  .shrine { position: relative; width: 26px; height: 30px; }
+  .shrine-base { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; background: linear-gradient(180deg, #a8a29e, #57534e); border-radius: 2px; }
+  .shrine-pillar-l, .shrine-pillar-r { position: absolute; bottom: 6px; width: 4px; height: 14px; background: linear-gradient(180deg, #d6d3d1, #78716c); border-radius: 1px; }
+  .shrine-pillar-l { left: 3px; } .shrine-pillar-r { right: 3px; }
+  .shrine-top { position: absolute; bottom: 18px; left: 0; right: 0; height: 4px; background: linear-gradient(180deg, #78716c, #44403c); border-radius: 2px 2px 0 0; }
+  .shrine-flame { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 8px; height: 12px; background: radial-gradient(ellipse at 50% 100%, #fff8dc 0%, #fde68a 30%, #f59e0b 70%, transparent 100%); border-radius: 50% 50% 44% 44% / 80% 80% 20% 20%; animation: flicker 1.8s ease-in-out infinite; transform-origin: 50% 100%; filter: drop-shadow(0 0 4px rgba(252,211,77,.6)); }
+
+  /* Lantern tree — small branch with hanging lanterns */
+  .lantern-tree { position: relative; width: 34px; height: 40px; }
+  .lantern-tree-branch { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 3px; height: 24px; background: linear-gradient(180deg, #78350f, #451a03); border-radius: 2px; }
+  .lantern-tree-branch::before { content: ''; position: absolute; top: 0; left: -12px; width: 14px; height: 3px; background: #78350f; border-radius: 2px; transform: rotate(-12deg); transform-origin: right center; }
+  .lantern-tree-branch::after { content: ''; position: absolute; top: 2px; right: -12px; width: 14px; height: 3px; background: #78350f; border-radius: 2px; transform: rotate(12deg); transform-origin: left center; }
+  .lantern-tree-lamp { position: absolute; width: 7px; height: 9px; border-radius: 40% 40% 50% 50%; background: radial-gradient(circle at 50% 40%, #fff8dc, #fcd34d 60%, #b45309); box-shadow: 0 0 8px rgba(252,211,77,.8); }
+  .lantern-tree-lamp.l1 { top: 4px; left: 0; }
+  .lantern-tree-lamp.l2 { top: 6px; right: 0; }
+  .lantern-tree-lamp.l3 { top: 10px; left: 50%; transform: translateX(-50%); }
+
+  /* Ronki idol — small carved Ronki statue */
+  .idol { position: relative; width: 22px; height: 28px; }
+  .idol-base { position: absolute; bottom: 0; left: 2px; right: 2px; height: 5px; background: linear-gradient(180deg, #a8a29e, #57534e); border-radius: 2px; }
+  .idol-body { position: absolute; bottom: 4px; left: 0; right: 0; height: 22px; background: radial-gradient(ellipse at 40% 30%, #d6d3d1 0%, #78716c 80%); border-radius: 50% 50% 45% 45% / 55% 55% 45% 45%; }
+  .idol-horn-l, .idol-horn-r { position: absolute; top: 2px; width: 3px; height: 5px; background: #57534e; border-radius: 50% 50% 20% 20%; }
+  .idol-horn-l { left: 6px; transform: rotate(-14deg); } .idol-horn-r { right: 6px; transform: rotate(14deg); }
+  .idol-eye-l, .idol-eye-r { position: absolute; top: 12px; width: 2px; height: 3px; background: #1c1917; border-radius: 50%; }
+  .idol-eye-l { left: 7px; } .idol-eye-r { right: 7px; }
+
+  /* Star bridge — small arched bridge */
+  .bridge { position: relative; width: 42px; height: 18px; }
+  .bridge::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 12px; background: linear-gradient(180deg, #a0704a, #5c3a1f); clip-path: path('M 0 12 Q 21 -2 42 12 L 42 12 L 0 12 Z'); border-radius: 2px; }
+  .bridge::after { content: ''; position: absolute; bottom: 8px; left: 4px; right: 4px; height: 3px; background: linear-gradient(180deg, #c49a6f, #8a5e3a); border-radius: 2px; opacity: .8; clip-path: path('M 0 3 Q 17 -2 34 3 L 34 3 L 0 3 Z'); }
+
+  /* Sky orb — floating glowing sphere */
+  .orb { position: relative; width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff8dc 0%, #fcd34d 40%, #f59e0b 80%, transparent 100%); box-shadow: 0 0 16px rgba(252,211,77,.8), 0 0 32px rgba(252,211,77,.4); animation: orb-bob 3s ease-in-out infinite; }
+  @keyframes orb-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .orb::after { content: ''; position: absolute; top: 20%; left: 25%; width: 25%; height: 20%; border-radius: 50%; background: rgba(255,255,255,.7); }
+
+  /* Flower patch */
+  .flowers { position: relative; width: 30px; height: 16px; }
+  .flowers .f { position: absolute; width: 8px; height: 8px; border-radius: 50%; }
+  .flowers .f::before, .flowers .f::after { content: ''; position: absolute; width: 4px; height: 4px; border-radius: 50%; }
+  .flowers .f1 { left: 0; bottom: 4px; background: radial-gradient(circle, #fbbf24 0%, #d97706 100%); }
+  .flowers .f2 { left: 10px; bottom: 0; background: radial-gradient(circle, #f9a8d4 0%, #db2777 100%); }
+  .flowers .f3 { left: 20px; bottom: 6px; background: radial-gradient(circle, #c4b5fd 0%, #7c3aed 100%); }
+  .flowers .f4 { left: 7px; bottom: 8px; background: radial-gradient(circle, #fff 0%, #fde68a 100%); width: 5px; height: 5px; }
+  .flowers .f5 { left: 22px; bottom: 1px; background: radial-gradient(circle, #fff 0%, #fbcfe8 100%); width: 5px; height: 5px; }
+  .flowers::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 0%, #4a6d33 30%, #4a6d33 70%, transparent 100%); border-radius: 1px; }
+
+  /* Friendship totem — stacked stones with painted face */
+  .totem { position: relative; width: 18px; height: 30px; }
+  .totem-s { position: absolute; left: 50%; transform: translateX(-50%); border-radius: 50%; background: linear-gradient(180deg, #b5a992 0%, #7a6e5a 100%); box-shadow: inset -2px -2px 3px rgba(0,0,0,.2), inset 2px 2px 0 rgba(255,255,255,.2); }
+  .totem-s.s1 { bottom: 0; width: 18px; height: 10px; }
+  .totem-s.s2 { bottom: 8px; width: 14px; height: 9px; }
+  .totem-s.s3 { bottom: 16px; width: 10px; height: 8px; background: linear-gradient(180deg, #d6d3d1 0%, #8a7e6a 100%); }
+  .totem-s.s3::before { content: ''; position: absolute; top: 2px; left: 2px; width: 2px; height: 2px; background: #1c1917; border-radius: 50%; box-shadow: 4px 0 0 #1c1917; }
+  .totem-s.s3::after { content: ''; position: absolute; top: 5px; left: 3px; width: 4px; height: 1px; background: #1c1917; border-radius: 1px; }
+
+  /* Dreamcatcher — hoop with feathers */
+  .dream { position: relative; width: 20px; height: 32px; }
+  .dream-hoop { position: absolute; top: 0; left: 0; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #a0704a; background: radial-gradient(circle, transparent 40%, rgba(254,243,199,.2) 70%, transparent 72%); }
+  .dream-hoop::before { content: ''; position: absolute; inset: 3px; border-radius: 50%; border: 1px dashed rgba(254, 243, 199, .5); }
+  .dream-feather-l, .dream-feather-r, .dream-feather-m { position: absolute; bottom: 0; width: 2px; height: 14px; background: linear-gradient(180deg, #c4b5fd, #7c3aed); border-radius: 1px; }
+  .dream-feather-l { left: 3px; transform: rotate(-10deg); }
+  .dream-feather-m { left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #fde68a, #f59e0b); }
+  .dream-feather-r { right: 3px; transform: rotate(10deg); background: linear-gradient(180deg, #f9a8d4, #db2777); }
+
+  /* Tweaks-conditioned states (driven by body[data-*]) */
+  /* Hub overlay dims when garden-mode is pushed via tweak */
+  body[data-hub-dimmed="on"] .frame-1 .hub-overlay { opacity: .25; transform: translateY(4px); pointer-events: none; }
+  body[data-hub-dimmed="on"] .frame-1 .hub-overlay .hub-topbar,
+  body[data-hub-dimmed="on"] .frame-1 .hub-overlay .hub-nav { opacity: 1; } /* keep chrome crisp if you want */
+  body[data-ronki-visible="off"] .ronki { display: none; }
+  body[data-fire="off"] .fire { display: none; }
+  body[data-hints="off"] .hint-ring { display: none; }
+  body[data-sapling="off"] .plant.sapling { display: none; }
+  /* Tree-growth slider drives which trees are shown */
+  body[data-growth="1"] .plant.grow-2, body[data-growth="1"] .plant.grow-3, body[data-growth="1"] .plant.grow-4 { display: none; }
+  body[data-growth="2"] .plant.grow-3, body[data-growth="2"] .plant.grow-4 { display: none; }
+  body[data-growth="3"] .plant.grow-4 { display: none; }
+  /* growth=4 → all shown */
+
+  /* Rings */
+  @keyframes ringin { from { stroke-dashoffset: 282; } }
+  .ring svg circle:last-child { animation: ringin 1.2s cubic-bezier(.65,0,.35,1) both; }
+</style>
+</head>
+<body data-hub-dimmed="off" data-ronki-visible="on" data-fire="on" data-hints="on" data-growth="4" data-sky="dusk" data-season="summer" data-sapling="on">
+  <div class="stage">
+    <header class="head">
+      <div class="wordmark">
+        <span class="mark"></span>
+        <div>
+          <h1>Ronki</h1>
+          <p>Garden · v1 · Hub-Backdrop</p>
+        </div>
+      </div>
+      <div class="meta">
+        <strong>Sketch · v1 · tweakable</strong>
+        Live-Hub über Garten · Modus · Samen · Dekor
+      </div>
+    </header>
+
+    <div class="lab">
+      <aside class="notes">
+        <div class="kicker">Die Idee hinter v1</div>
+        <h2>Ein Garten, der mit dem Kind mitwächst.</h2>
+        <p>Frame 1 ist das echte Hub — Topbar · Ronki-Gruß · Heute-Karte mit Ring &amp; Kapiteln · Bonus-Quests · Abenteuer · Navbar — nur der <em>campfire-Hintergrund wird durch den Garten ersetzt</em>. Alles andere bleibt wie in der Live-Version. Das heißt: das Kind sieht, dass der Garten da ist, aber das Hub funktioniert wie immer.</p>
+        <p>Mit dem Tweak „Hub abdunkeln" wischt die UI nach unten weg — man ist im Gartenmodus (Frame 2). Von da aus: Samen säen (Frame 3) oder Dekor platzieren (Frame 4). Pflanzen wachsen <em>in Echtzeit mit der Kindheit</em>, nicht mit Klicks.</p>
+
+        <div class="change-list">
+          <h3>Was der Tweak-Panel steuert</h3>
+          <div class="change"><span class="dot"></span><div><b>Hub abdunkeln</b><span>Simuliert den Übergang Hub → Gartenmodus in Frame 1.</span></div></div>
+          <div class="change"><span class="dot"></span><div><b>Tageszeit</b><span>Dawn · Day · Dusk · Night — Himmel, Sonne, Gras reagieren.</span></div></div>
+          <div class="change"><span class="dot"></span><div><b>Jahreszeit</b><span>Frühling · Sommer · Herbst · Winter — Laub &amp; Gras passen sich an.</span></div></div>
+          <div class="change"><span class="dot"></span><div><b>Wachstums-Zeitraffer</b><span>1–4 Wochen: Bäume tauchen schrittweise auf. Zeit macht Garten.</span></div></div>
+          <div class="change"><span class="dot"></span><div><b>Ronki · Feuer · Hints</b><span>Optional sichtbar, um das Still-Life-Gefühl zu testen.</span></div></div>
+        </div>
+
+        <div class="guardrail">
+          <h3>Was es nicht gibt</h3>
+          <p>Kein Gemütlichkeits-Meter. Kein Verfall, kein Streak. Das Kind entscheidet, was schön ist.</p>
+        </div>
+      </aside>
+
+      <div class="frames">
+        <!-- ═══════════════ FRAME 1 — HUB STANDARD (Live) ═══════════════ -->
+        <div class="frame frame-1">
+          <div class="frame-label"><span class="no">1</span><span class="lbl">Lager · Live</span></div>
+          <div class="phone">
+            <div class="phone-screen" style="background: #fff8f2;">
+              <div class="notch"></div>
+
+              <!-- Alpha strip at the very top -->
+              <div class="alpha-strip">
+                <div class="left"><span class="dot"></span>Alpha<span class="muted"> · Frühe Version, Daten können sich ändern</span></div>
+                <div class="right"><span class="lang">DE · EN</span><b>Rückmeldung</b></div>
+              </div>
+
+              <!-- Top chrome: Marc pill + lock + star badge -->
+              <div class="live-topbar">
+                <div class="live-avatar-pill">
+                  <div class="av"></div>
+                  <div>
+                    <div class="name">Marc</div>
+                    <div class="tag">Tag 1</div>
+                  </div>
+                </div>
+                <div class="live-right">
+                  <div class="live-lock"><span class="ms">lock</span></div>
+                  <div class="live-star-badge">
+                    <span class="ms s-ic">star</span>
+                    <div>
+                      <b>77</b>
+                      <span>Sterne</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Garden preview stage (tap to expand to full garden) -->
+              <div class="garden-preview" role="button" aria-label="Garten öffnen">
+                <div class="scene" data-sky="dusk" data-season="summer">
+                  <div class="sun" style="top: 18%; right: 14%; width: 34px; height: 34px;"></div>
+                  <div class="hills">
+                    <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+                  </div>
+                  <div class="treeline">
+                    <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                    <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                    <div class="tl-t"></div><div class="tl-t"></div>
+                  </div>
+                  <div class="ground"></div>
+
+                  <!-- Trees planted so far (growth-progressed) -->
+                  <div class="plant" style="left: 10%; bottom: 22%;">
+                    <div class="mid" style="transform: scale(.72); transform-origin: bottom;"><div class="mid-canopy"></div><div class="mid-trunk"></div></div>
+                    <div class="plant-shadow"></div>
+                  </div>
+                  <div class="plant" style="right: 6%; bottom: 16%;">
+                    <div class="mature-tree" style="transform: scale(.7); transform-origin: bottom;"><div class="mature-canopy"></div><div class="mature-trunk"></div></div>
+                    <div class="plant-shadow"></div>
+                  </div>
+                  <div class="plant" style="left: 42%; bottom: 24%;">
+                    <div class="pine" style="transform: scale(.65); transform-origin: bottom;"><div class="pine-c c1"></div><div class="pine-c c2"></div><div class="pine-c c3"></div><div class="pine-trunk"></div></div>
+                  </div>
+                  <div class="plant" style="left: 62%; bottom: 10%;">
+                    <div class="sprout" style="transform: scale(.75);"><div class="sprout-leaf-l"></div><div class="sprout-leaf-r"></div><div class="sprout-stem"></div></div>
+                    <div class="plant-shadow"></div>
+                  </div>
+
+                  <!-- A soft fire glow still lives here -->
+                  <div class="fire" style="left: 74%; bottom: 12%; transform: scale(.7); transform-origin: bottom;">
+                    <div class="fire-glow"></div>
+                    <div class="fire-pit"></div>
+                    <div class="fire-log-a"></div><div class="fire-log-b"></div>
+                    <div class="fire-flame"></div><div class="fire-flame b"></div>
+                  </div>
+
+                  <!-- Ronki wandering in the preview -->
+                  <div class="ronki" style="left: 28%; bottom: 14%; width: 30px; height: 32px;">
+                    <div class="ronki-body"></div><div class="ronki-belly"></div>
+                    <div class="ronki-horn l"></div><div class="ronki-horn r"></div>
+                    <div class="ronki-eye l"></div><div class="ronki-eye r"></div>
+                    <div class="ronki-cheek-l"></div><div class="ronki-cheek-r"></div>
+                    <div class="ronki-mouth"></div>
+                  </div>
+                </div>
+
+                <div class="gp-title">Dein Garten</div>
+                <div class="gp-tap"><span class="ms">open_in_full</span> Garten erkunden</div>
+                <div class="gp-expand"><span class="ms">arrow_outward</span> Öffnen</div>
+              </div>
+
+              <!-- Cards stack -->
+              <div class="card-stack">
+                <!-- Heute -->
+                <div class="heute-live">
+                  <div class="row">
+                    <div class="copy">
+                      <div class="eyebrow">Heute</div>
+                      <h3>6 Aufgaben übrig</h3>
+                      <p>Bleib dran, dein Drache wächst!</p>
+                    </div>
+                    <div class="ring">
+                      <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(18,67,70,.08)" stroke-width="9"/>
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="#fcd34d" stroke-width="9" stroke-linecap="round" stroke-dasharray="282" stroke-dashoffset="130"/>
+                      </svg>
+                      <div class="num"><b>7</b><span>/13</span></div>
+                    </div>
+                  </div>
+                  <div class="phases">
+                    <span class="star-tiny">✦</span>
+                    <div class="phase done"></div>
+                    <div class="phase"></div>
+                    <div class="phase"></div>
+                  </div>
+                  <div class="phase-labels">
+                    <span>Morgen</span><span>Abend</span><span>Nacht</span>
+                  </div>
+                </div>
+
+                <!-- Stimmung -->
+                <div class="stimmung-live">
+                  <div class="face"><i></i></div>
+                  <div class="body">
+                    <div class="eyebrow">Stimmung</div>
+                    <div class="mood">Gut</div>
+                  </div>
+                  <span class="ms pen">edit</span>
+                </div>
+
+                <!-- Wasser row -->
+                <div class="wasser-row">
+                  <span class="ms drop">water_drop</span>
+                  <b>Wasser</b>
+                  <div class="pills">
+                    <div class="pill"></div><div class="pill"></div><div class="pill"></div>
+                    <div class="pill"></div><div class="pill"></div><div class="pill"></div>
+                  </div>
+                  <span class="count">6/6</span>
+                </div>
+
+                <!-- Spielzimmer -->
+                <div class="spielzimmer-live">
+                  <div class="icon-box"><span class="ms">sports_esports</span></div>
+                  <div class="body">
+                    <div class="eyebrow">Spielzimmer</div>
+                    <div class="title">Spiel mit Ronki</div>
+                  </div>
+                  <span class="ms chev">chevron_right</span>
+                </div>
+              </div>
+
+              <!-- Garden peek at the bottom (behind cards) -->
+              <div class="garden-peek">
+                <div class="pk-hill h2"></div>
+                <div class="pk-hill h3"></div>
+                <div class="pk-hill h1"></div>
+                <div class="pk-house"></div>
+              </div>
+
+              <!-- Live navbar -->
+              <nav class="live-nav">
+                <button class="live-nav-btn active"><span class="ms">local_fire_department</span><b>Lager</b></button>
+                <button class="live-nav-btn"><span class="ms">wb_sunny</span><b>Heute</b></button>
+                <button class="live-nav-btn"><span class="ms">pets</span><b>Ronki</b></button>
+                <button class="live-nav-btn"><span class="star-pip">✦</span><span class="ms">menu_book</span><b>Tagebuch</b></button>
+                <button class="live-nav-btn"><span class="star-pip">✦</span><span class="ms">shopping_bag</span><b>Laden</b></button>
+              </nav>
+            </div>
+          </div>
+          <div class="frame-sub">Live-Lager 1:1 nachgebaut — Alpha-Strip, Marc-Pille, Sterne-Badge, Campfire-Bühne, Heute · Stimmung · Wasser · Spielzimmer, Garten schimmert hinter den Karten durch. Hier liegt später das zarte Garten-Hintergrundbild statt nur Hügeln.</div>
+        </div>
+
+        <!-- ═══════════════ FRAME 2 — GARTEN-MODUS ═══════════════ -->
+        <div class="frame">
+          <div class="frame-label"><span class="no">2</span><span class="lbl">Garten-Modus · UI weg</span></div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div class="notch"></div>
+              <div class="scene" data-sky="dusk" data-season="summer">
+                <div class="sun"></div>
+                <div class="hills">
+                  <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+                </div>
+                <div class="treeline">
+                  <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                  <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                  <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                </div>
+                <div class="ground"></div>
+
+                <div class="plant grow-1" style="left: 10%; bottom: 24%;">
+                  <div class="mid"><div class="mid-canopy"></div><div class="mid-trunk"></div></div>
+                  <div class="plant-shadow"></div>
+                </div>
+                <div class="plant grow-2" style="right: 2%; bottom: 18%;">
+                  <div class="mature-tree"><div class="mature-canopy"></div><div class="mature-trunk"></div></div>
+                  <div class="plant-shadow"></div>
+                </div>
+                <div class="plant grow-3" style="right: 22%; bottom: 14%;">
+                  <div class="young"><div class="young-canopy"></div><div class="young-trunk"></div></div>
+                  <div class="plant-shadow"></div>
+                </div>
+                <div class="plant grow-2" style="left: 30%; bottom: 30%;">
+                  <div class="pine"><div class="pine-c c1"></div><div class="pine-c c2"></div><div class="pine-c c3"></div><div class="pine-trunk"></div></div>
+                </div>
+                <div class="plant grow-4 sapling" style="left: 18%; bottom: 6%;">
+                  <div class="sprout"><div class="sprout-leaf-l"></div><div class="sprout-leaf-r"></div><div class="sprout-stem"></div></div>
+                  <div class="plant-shadow"></div>
+                </div>
+
+                <div class="fire" style="left: 54%; bottom: 8%;">
+                  <div class="fire-glow"></div><div class="fire-pit"></div>
+                  <div class="fire-log-a"></div><div class="fire-log-b"></div>
+                  <div class="fire-flame"></div><div class="fire-flame b"></div>
+                </div>
+
+                <div class="decor" style="left: 70%; bottom: 6%;"><div class="stone"></div></div>
+                <div class="decor" style="left: 80%; bottom: 4%;"><div class="stone s"></div></div>
+                <div class="decor" style="left: 86%; bottom: 8%;"><div class="stone"></div></div>
+                <div class="decor" style="left: 4%; bottom: 14%;"><div class="lantern"><div class="lantern-pole"></div><div class="lantern-lamp"></div></div></div>
+                <div class="decor" style="left: 36%; bottom: 2%;"><div class="bench"><div class="bench-back"></div><div class="bench-seat"></div><div class="bench-leg-a"></div><div class="bench-leg-b"></div></div></div>
+
+                <div class="ronki mirror" style="left: 30%; bottom: 2%;">
+                  <div class="ronki-body"></div><div class="ronki-belly"></div>
+                  <div class="ronki-horn l"></div><div class="ronki-horn r"></div>
+                  <div class="ronki-eye l"></div><div class="ronki-eye r"></div>
+                  <div class="ronki-cheek-l"></div><div class="ronki-cheek-r"></div>
+                  <div class="ronki-mouth"></div>
+                </div>
+
+                <div class="hint-ring" style="left: 58%; bottom: 26%;"></div>
+                <div class="hint-ring" style="left: 18%; bottom: 12%;"></div>
+                <div class="hint-ring" style="right: 20%; bottom: 22%;"></div>
+              </div>
+
+              <div class="zurueck-pill"><span class="ms">close</span><b>Zurück</b></div>
+              <div class="garden-banner">Dein Garten</div>
+            </div>
+          </div>
+          <div class="frame-sub">Wisch nach oben oder tippe auf die Szene. Hub verschwindet, Ronki dreht sich zum Sapling. Drei Ringe markieren interaktive Flecken.</div>
+        </div>
+
+        <!-- ═══════════════ FRAME 3 ═══════════════ -->
+        <div class="frame">
+          <div class="frame-label"><span class="no">3</span><span class="lbl">Samen säen · Sonntag</span></div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div class="notch"></div>
+              <div class="scene" data-sky="dusk" data-season="summer" style="filter: brightness(.88);">
+                <div class="sun"></div>
+                <div class="hills">
+                  <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+                </div>
+                <div class="treeline">
+                  <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                  <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                  <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                </div>
+                <div class="ground"></div>
+
+                <div class="plant" style="left: 10%; bottom: 54%;">
+                  <div class="mid" style="transform: scale(.8);"><div class="mid-canopy"></div><div class="mid-trunk"></div></div>
+                </div>
+                <div class="plant" style="right: 4%; bottom: 50%;">
+                  <div class="mature-tree" style="transform: scale(.7);"><div class="mature-canopy"></div><div class="mature-trunk"></div></div>
+                </div>
+                <div class="plant" style="left: 30%; bottom: 58%;">
+                  <div class="pine" style="transform: scale(.7);"><div class="pine-c c1"></div><div class="pine-c c2"></div><div class="pine-c c3"></div><div class="pine-trunk"></div></div>
+                </div>
+
+                <div class="seed-dot" style="left: 50%; bottom: 44%;"></div>
+
+                <div class="ronki" style="left: 14%; bottom: 44%; width: 54px; height: 58px;">
+                  <div class="ronki-body"></div><div class="ronki-belly"></div>
+                  <div class="ronki-horn l"></div><div class="ronki-horn r"></div>
+                  <div class="ronki-eye l"></div><div class="ronki-eye r"></div>
+                  <div class="ronki-cheek-l"></div><div class="ronki-cheek-r"></div>
+                  <div class="ronki-mouth"></div>
+                </div>
+                <div class="ronki-bubble" style="left: 58px; bottom: calc(44% + 60px);">
+                  Was pflanzt du diese Woche?
+                </div>
+              </div>
+
+              <div class="sheet-scrim"></div>
+              <div class="seed-sheet">
+                <div class="sheet-grip"></div>
+                <div class="sheet-head">
+                  <div class="sheet-kick">Sonntag · Pflanztag</div>
+                  <h3 class="sheet-h3">Was kommt diese Woche in die Erde?</h3>
+                </div>
+                <div class="seed-grid">
+                  <button class="seed-card"><div class="seed-art"><div class="species oak"></div></div><div class="seed-name">Eiche</div><div class="seed-time">langsam</div></button>
+                  <button class="seed-card sel"><div class="seed-art"><div class="species apple"></div></div><div class="seed-name">Apfel</div><div class="seed-time">mittel</div></button>
+                  <button class="seed-card"><div class="seed-art"><div class="species birch"></div></div><div class="seed-name">Birke</div><div class="seed-time">mittel</div></button>
+                  <button class="seed-card"><div class="seed-art"><div class="species pine"></div></div><div class="seed-name">Kiefer</div><div class="seed-time">mittel</div></button>
+                  <button class="seed-card"><div class="seed-art"><div class="species linden"></div></div><div class="seed-name">Linde</div><div class="seed-time">langsam</div></button>
+                  <button class="seed-card"><div class="seed-art"><div class="species fir"></div></div><div class="seed-name">Tanne</div><div class="seed-time">langsam</div></button>
+                </div>
+                <button class="seed-cta"><span class="ms">grass</span>Hier pflanzen</button>
+              </div>
+            </div>
+          </div>
+          <div class="frame-sub">Ronki steht in der Szene und fragt. Sechs gemalte Arten, ein Samenpunkt auf dem gewählten Platz.</div>
+        </div>
+
+        <!-- ═══════════════ FRAME 4 ═══════════════ -->
+        <div class="frame">
+          <div class="frame-label"><span class="no">4</span><span class="lbl">Magie platzieren</span></div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div class="notch"></div>
+              <div class="scene" data-sky="dusk" data-season="summer">
+                <div class="sun"></div>
+                <div class="hills">
+                  <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+                </div>
+                <div class="treeline">
+                  <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                  <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                  <div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div><div class="tl-t"></div>
+                </div>
+                <div class="ground"></div>
+
+                <!-- Trees (nudged further to the edges so center is free for magic) -->
+                <div class="plant" style="left: 4%; bottom: 22%;">
+                  <div class="mid"><div class="mid-canopy"></div><div class="mid-trunk"></div></div>
+                  <div class="plant-shadow"></div>
+                </div>
+                <div class="plant" style="right: 2%; bottom: 18%;">
+                  <div class="mature-tree"><div class="mature-canopy"></div><div class="mature-trunk"></div></div>
+                  <div class="plant-shadow"></div>
+                </div>
+                <div class="plant" style="left: 26%; bottom: 30%;">
+                  <div class="pine"><div class="pine-c c1"></div><div class="pine-c c2"></div><div class="pine-c c3"></div><div class="pine-trunk"></div></div>
+                </div>
+
+                <!-- Already-placed magic items — show the world is alive -->
+                <div class="decor" style="left: 8%; bottom: 14%;">
+                  <div class="lantern-tree">
+                    <div class="lantern-tree-branch"></div>
+                    <div class="lantern-tree-lamp l1"></div>
+                    <div class="lantern-tree-lamp l2"></div>
+                    <div class="lantern-tree-lamp l3"></div>
+                  </div>
+                </div>
+                <div class="decor" style="right: 24%; bottom: 12%;">
+                  <div class="starwell">
+                    <div class="starwell-star">✦</div>
+                    <div class="starwell-roof"></div>
+                    <div class="starwell-base"></div>
+                  </div>
+                </div>
+                <div class="decor" style="left: 38%; bottom: 6%;">
+                  <div class="faerie-ring">
+                    <div class="fmush m1"><div class="fmush-cap"></div><div class="fmush-stem"></div></div>
+                    <div class="fmush m2"><div class="fmush-cap"></div><div class="fmush-stem"></div></div>
+                    <div class="fmush m3"><div class="fmush-cap"></div><div class="fmush-stem"></div></div>
+                  </div>
+                </div>
+                <div class="decor" style="right: 8%; bottom: 8%;">
+                  <div class="shrine">
+                    <div class="shrine-flame"></div>
+                    <div class="shrine-top"></div>
+                    <div class="shrine-pillar-l"></div>
+                    <div class="shrine-pillar-r"></div>
+                    <div class="shrine-base"></div>
+                  </div>
+                </div>
+                <div class="decor" style="left: 58%; bottom: 4%;">
+                  <div class="flowers">
+                    <div class="f f1"></div><div class="f f2"></div><div class="f f3"></div>
+                    <div class="f f4"></div><div class="f f5"></div>
+                  </div>
+                </div>
+                <div class="decor" style="left: 22%; bottom: 66%;">
+                  <div class="orb"></div>
+                </div>
+                <div class="decor" style="right: 14%; bottom: 62%;">
+                  <div class="orb" style="animation-delay: -1s; transform: scale(.7);"></div>
+                </div>
+
+                <!-- Ghost preview showing where the held item would land -->
+                <div class="drop-target" style="left: 50%; bottom: 28%;"></div>
+                <div class="floating-decor" style="left: 50%; bottom: 38%;">
+                  <div class="crystal"></div>
+                </div>
+                <div class="place-whisper" style="left: 50%; bottom: calc(38% + 40px);">
+                  ✦ Platz finden ✦
+                </div>
+
+                <!-- Ronki watches from the side -->
+                <div class="ronki" style="right: 36%; bottom: 16%; width: 42px; height: 44px;">
+                  <div class="ronki-body"></div><div class="ronki-belly"></div>
+                  <div class="ronki-horn l"></div><div class="ronki-horn r"></div>
+                  <div class="ronki-eye l"></div><div class="ronki-eye r"></div>
+                  <div class="ronki-cheek-l"></div><div class="ronki-cheek-r"></div>
+                  <div class="ronki-mouth"></div>
+                </div>
+              </div>
+
+              <!-- Chrome: slim, floating, side + corner -->
+              <div class="zurueck-pill"><span class="ms">check</span><b>Fertig</b></div>
+
+              <div class="star-budget">
+                <div class="pearl"></div>
+                <div>
+                  <b>48</b>
+                  <span>Sterne</span>
+                </div>
+              </div>
+
+              <div class="decor-rail">
+                <button class="cat-btn"><span class="ms">grass</span></button>
+                <button class="cat-btn sel"><span class="ms">auto_awesome</span></button>
+                <button class="cat-btn"><span class="ms">castle</span></button>
+                <button class="cat-btn"><span class="ms">pets</span></button>
+              </div>
+
+              <div class="decor-strip">
+                <button class="decor-tile sel"><div class="decor-art"><div class="crystal sm"></div></div><div class="decor-price"><span class="star"></span>6</div><div class="decor-name">Kristall</div></button>
+                <button class="decor-tile"><div class="decor-art"><div class="runestone" style="transform: scale(.75); transform-origin: bottom;"></div></div><div class="decor-price"><span class="star"></span>8</div><div class="decor-name">Rune</div></button>
+                <button class="decor-tile"><div class="decor-art"><div class="faerie-ring" style="transform: scale(.7); transform-origin: bottom;"><div class="fmush m1"><div class="fmush-cap"></div><div class="fmush-stem"></div></div><div class="fmush m2"><div class="fmush-cap"></div><div class="fmush-stem"></div></div><div class="fmush m3"><div class="fmush-cap"></div><div class="fmush-stem"></div></div></div></div><div class="decor-price"><span class="star"></span>5</div><div class="decor-name">Feenring</div></button>
+                <button class="decor-tile"><div class="decor-art"><div class="shrine" style="transform: scale(.75); transform-origin: bottom;"><div class="shrine-flame"></div><div class="shrine-top"></div><div class="shrine-pillar-l"></div><div class="shrine-pillar-r"></div><div class="shrine-base"></div></div></div><div class="decor-price"><span class="star"></span>10</div><div class="decor-name">Schrein</div></button>
+                <button class="decor-tile"><div class="decor-art"><div class="orb" style="transform: scale(.75);"></div></div><div class="decor-price"><span class="star"></span>4</div><div class="decor-name">Himmels&shy;kugel</div></button>
+                <button class="decor-tile"><div class="decor-art"><div class="dream" style="transform: scale(.75); transform-origin: bottom;"><div class="dream-hoop"></div><div class="dream-feather-l"></div><div class="dream-feather-m"></div><div class="dream-feather-r"></div></div></div><div class="decor-price"><span class="star"></span>7</div><div class="decor-name">Traum&shy;fänger</div></button>
+                <button class="decor-tile locked"><div class="decor-art"><div class="idol" style="transform: scale(.8); transform-origin: bottom;"><div class="idol-body"></div><div class="idol-horn-l"></div><div class="idol-horn-r"></div><div class="idol-eye-l"></div><div class="idol-eye-r"></div><div class="idol-base"></div></div></div><div class="decor-price"><span class="star"></span>12</div><div class="decor-name">Ronki-Idol</div></button>
+                <button class="decor-tile locked"><div class="decor-art"><div class="totem" style="transform: scale(.75); transform-origin: bottom;"><div class="totem-s s1"></div><div class="totem-s s2"></div><div class="totem-s s3"></div></div></div><div class="decor-price"><span class="star"></span>9</div><div class="decor-name">Totem</div></button>
+              </div>
+            </div>
+          </div>
+          <div class="frame-sub">Seiten-Rail für Kategorien (Natur · Magie · Struktur · Lebewesen). Unten nur eine dünne Leiste mit Items. Der Garten ist die Bühne — alles andere weicht.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tweaks scaffold + React -->
+  <div id="tweaks-root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+
+  <script type="text/babel">
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "sky": "dusk",
+      "season": "summer",
+      "growth": 4,
+      "hubDimmed": false,
+      "ronkiVisible": true,
+      "fire": true,
+      "hints": true,
+      "sapling": true
+    }/*EDITMODE-END*/;
+
+    const { useEffect } = React;
+
+    function applyToDom(v) {
+      document.body.setAttribute('data-sky', v.sky);
+      document.body.setAttribute('data-season', v.season);
+      document.body.setAttribute('data-growth', String(v.growth));
+      document.body.setAttribute('data-hub-dimmed', v.hubDimmed ? 'on' : 'off');
+      document.body.setAttribute('data-ronki-visible', v.ronkiVisible ? 'on' : 'off');
+      document.body.setAttribute('data-fire', v.fire ? 'on' : 'off');
+      document.body.setAttribute('data-hints', v.hints ? 'on' : 'off');
+      document.body.setAttribute('data-sapling', v.sapling ? 'on' : 'off');
+
+      // All scenes mirror sky + season
+      document.querySelectorAll('.scene').forEach((s) => {
+        s.setAttribute('data-sky', v.sky);
+        s.setAttribute('data-season', v.season);
+      });
+    }
+
+    function TweaksApp() {
+      const [v, set] = useTweaks(TWEAK_DEFAULTS);
+      useEffect(() => { applyToDom(v); }, [v]);
+
+      return (
+        <TweaksPanel title="Tweaks">
+          <TweakSection label="Hub → Garten">
+            <TweakToggle label="Hub abdunkeln" value={v.hubDimmed} onChange={(x) => set({ hubDimmed: x })} />
+          </TweakSection>
+
+          <TweakSection label="Szene">
+            <TweakRadio
+              label="Tageszeit"
+              value={v.sky}
+              options={[
+                { label: 'Dawn', value: 'dawn' },
+                { label: 'Day', value: 'day' },
+                { label: 'Dusk', value: 'dusk' },
+                { label: 'Night', value: 'night' },
+              ]}
+              onChange={(x) => set({ sky: x })}
+            />
+            <TweakRadio
+              label="Jahreszeit"
+              value={v.season}
+              options={[
+                { label: 'Frühling', value: 'spring' },
+                { label: 'Sommer', value: 'summer' },
+                { label: 'Herbst', value: 'autumn' },
+                { label: 'Winter', value: 'winter' },
+              ]}
+              onChange={(x) => set({ season: x })}
+            />
+            <TweakSlider
+              label="Wachstum"
+              value={v.growth}
+              min={1} max={4} step={1}
+              unit={v.growth === 1 ? ' Baum' : ' Bäume'}
+              onChange={(x) => set({ growth: x })}
+            />
+          </TweakSection>
+
+          <TweakSection label="Elemente">
+            <TweakToggle label="Ronki sichtbar" value={v.ronkiVisible} onChange={(x) => set({ ronkiVisible: x })} />
+            <TweakToggle label="Lagerfeuer" value={v.fire} onChange={(x) => set({ fire: x })} />
+            <TweakToggle label="Tipp-Ringe (F2)" value={v.hints} onChange={(x) => set({ hints: x })} />
+            <TweakToggle label="Sapling (neu gepflanzt)" value={v.sapling} onChange={(x) => set({ sapling: x })} />
+          </TweakSection>
+        </TweaksPanel>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('tweaks-root')).render(<TweaksApp />);
+  </script>
+</body>
+</html>

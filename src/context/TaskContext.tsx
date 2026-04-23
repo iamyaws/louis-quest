@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import type { Quest, GameState, Boss, EggItem, CollectedEgg } from '../types';
+import type { Quest, GameState, Boss, EggItem, CollectedEgg, PlantSpecies, DecorType, GardenPlant, GardenDecor } from '../types';
+import { DECOR_BY_ID, DEFAULT_OWNED_DECOR } from '../data/gardenConstants';
 import type { FamilyConfig, DragonVariant } from '../types/familyConfig';
 import type { ArcEngineState, RoutineBeat } from '../arcs/types';
 import type { DreamHighlightsData, PrevDaySnapshot } from '../dream/types'; // used in applyDayTransition (Task 4)
@@ -310,6 +311,12 @@ export interface TaskState {
   /** Today's Kraftwort (from KraftwortTool). Hub reads this to surface
    *  the chosen word as an ambient chip. Refreshes daily via date match. */
   todaysKraftwort?: { word: string; label: string; emoji: string; date: string } | null;
+  /** Garden state (Phase 1 of core-gameloop-time-stack). Lives as the
+   *  Hub's painted backdrop; plants accumulate week-over-week, decor is
+   *  free-placed by the kid. Lazily initialized on first interaction —
+   *  state with `garden === undefined` renders an empty garden preview
+   *  and all garden actions construct the default shape on demand. */
+  garden?: import('../types').GardenState;
 }
 
 interface TaskComputed {
@@ -391,6 +398,23 @@ interface TaskActions {
   /** Campfire Visitors: record a completed gift-exchange with a Freund,
    *  bumping friendship (capped at 5 per friend). */
   giftCrystalToFreund: (freundId: string) => void;
+
+  // ── Garden (Phase 1 of core-gameloop-time-stack) ──
+  /** Plant a seed of the given species at the given scene position.
+   *  Free — planting is the weekly ritual, not a shop transaction.
+   *  Updates lastWeeklyPlanting to today so the Sunday offer cools until
+   *  next week. */
+  plantSeed: (species: PlantSpecies, position: { x: number; y: number }) => void;
+  /** Place a decor item in the garden. Returns true on success.
+   *  If not yet owned, deducts the decor's Sterne cost from state.hp
+   *  and adds the type to ownedDecor. If HP too low, returns false
+   *  without mutating. Already-owned items place for free. */
+  placeDecor: (type: DecorType, position: { x: number; y: number }) => boolean;
+  /** Update position of an existing placed decor item. */
+  moveDecor: (id: string, position: { x: number; y: number }) => void;
+  /** Remove a decor item from the scene. Ownership persists (ownedDecor
+   *  is not mutated) so the kid can re-place it later without re-paying. */
+  removeDecor: (id: string) => void;
 }
 
 interface CelebrationEvent {
@@ -1830,6 +1854,98 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Garden actions (Phase 1 of core-gameloop-time-stack) ─────────────
+  // Garden state lives at state.garden and is created lazily on first
+  // interaction. No migration needed — older state loads with garden
+  // undefined and these actions construct the default shape on demand.
+  const getOrInitGarden = (prev: TaskState) => prev.garden ?? {
+    plants: [],
+    decor: [],
+    lastWeeklyPlanting: null,
+    ownedDecor: [...DEFAULT_OWNED_DECOR],
+  };
+
+  const plantSeed = useCallback((species: PlantSpecies, position: { x: number; y: number }) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const garden = getOrInitGarden(prev);
+      const today = new Date().toISOString().slice(0, 10);
+      const newPlant: GardenPlant = {
+        id: `${species}-${today}-${Math.random().toString(36).slice(2, 8)}`,
+        species,
+        plantedAt: today,
+        position,
+      };
+      return {
+        ...prev,
+        garden: {
+          ...garden,
+          plants: [...garden.plants, newPlant],
+          lastWeeklyPlanting: today,
+        },
+      };
+    });
+  }, []);
+
+  const placeDecor = useCallback((type: DecorType, position: { x: number; y: number }): boolean => {
+    let success = false;
+    setState(prev => {
+      if (!prev) return prev;
+      const garden = getOrInitGarden(prev);
+      const info = DECOR_BY_ID[type];
+      if (!info) return prev;
+
+      const alreadyOwned = garden.ownedDecor.includes(type);
+      const cost = alreadyOwned ? 0 : info.price;
+      const currentHp = prev.hp || 0;
+      if (cost > currentHp) return prev;  // silently fail — UI disables tiles you can't afford
+
+      const newDecor: GardenDecor = {
+        id: `${type}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+        type,
+        position,
+      };
+
+      success = true;
+      return {
+        ...prev,
+        hp: currentHp - cost,
+        garden: {
+          ...garden,
+          decor: [...garden.decor, newDecor],
+          ownedDecor: alreadyOwned ? garden.ownedDecor : [...garden.ownedDecor, type],
+        },
+      };
+    });
+    return success;
+  }, []);
+
+  const moveDecor = useCallback((id: string, position: { x: number; y: number }) => {
+    setState(prev => {
+      if (!prev?.garden) return prev;
+      return {
+        ...prev,
+        garden: {
+          ...prev.garden,
+          decor: prev.garden.decor.map(d => d.id === id ? { ...d, position } : d),
+        },
+      };
+    });
+  }, []);
+
+  const removeDecor = useCallback((id: string) => {
+    setState(prev => {
+      if (!prev?.garden) return prev;
+      return {
+        ...prev,
+        garden: {
+          ...prev.garden,
+          decor: prev.garden.decor.filter(d => d.id !== id),
+        },
+      };
+    });
+  }, []);
+
   // ── Computed values ──
   const computed: TaskComputed = state ? (() => {
     const mainQuests = state.quests.filter(q => !q.sideQuest);
@@ -1853,7 +1969,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

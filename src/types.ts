@@ -288,6 +288,47 @@ export interface GameState {
   collectedEggs?: CollectedEgg[];
   eggTriggersFired?: Record<string, boolean>;
   gamesPlayedEver?: string[]; // cumulative, never resets daily
+  // ── Garden (core-gameloop-time-stack Phase 1) ──
+  // The Pflanzen garden that lives as the Hub's backdrop. Cumulative-over-
+  // countable artefact — plants accumulate week-over-week and visibly
+  // mature at horizon boundaries (Q7 C+ milestone-aged, computed from
+  // plantedAt rather than stored as transitions). Decor items are free-
+  // placed by the kid with no rating or completion meter (Q9 Hub-backdrop
+  // pivot). See docs/discovery/2026-04-23-core-gameloop-time-stack/.
+  garden?: GardenState;
+}
+
+// ── Garden types ──────────────────────────────────────────────────────
+export type PlantSpecies = 'oak' | 'apple' | 'birch' | 'pine' | 'linden' | 'fir';
+export type DecorType =
+  // Natur
+  | 'stone' | 'stone-sm' | 'lantern' | 'bench' | 'fence' | 'mushroom'
+  // Magie
+  | 'crystal' | 'runestone' | 'faerie-ring' | 'shrine' | 'orb' | 'dreamcatcher'
+  | 'idol' | 'totem';
+
+export type DecorCategory = 'natur' | 'magie' | 'struktur' | 'lebewesen';
+
+export interface GardenPlant {
+  id: string;              // 'oak-2026-04-23-<rand>'
+  species: PlantSpecies;
+  plantedAt: string;       // ISO date (yyyy-mm-dd)
+  position: { x: number; y: number };  // % of scene (0–100)
+}
+
+export interface GardenDecor {
+  id: string;
+  type: DecorType;
+  position: { x: number; y: number };  // % of scene (0–100)
+}
+
+export interface GardenState {
+  plants: GardenPlant[];
+  decor: GardenDecor[];
+  /** Last Sunday planting offer fulfillment — prevents duplicate offers same week */
+  lastWeeklyPlanting: string | null;  // ISO date of the *Sunday* when last planted
+  /** Decor types the kid has access to (defaults seeded on first load) */
+  ownedDecor: DecorType[];
 }
 
 export interface ComputedState {
