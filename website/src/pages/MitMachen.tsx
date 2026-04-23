@@ -62,7 +62,7 @@ export default function MitMachen() {
               .
             </h1>
             <p className="mt-6 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
-              Seit Monaten bauen mein Sohn und ich Ronki. Jetzt, in der
+              Seit einigen Wochen bauen mein Sohn und ich Ronki. Jetzt, in der
               Public&#8209;Alpha, suchen wir die ersten Familien, die es mit
               uns formen. Bevor daraus etwas Größeres wird.
             </p>
