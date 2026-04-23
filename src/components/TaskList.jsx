@@ -17,6 +17,7 @@ import { biomeBackground } from '../utils/biomeBackgrounds';
 import { useQuestEater } from './QuestEater';
 import { flavorForQuest } from './FireBreathPuff';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { useVoice } from '../companion/useVoice';
 
 // Quest IDs that trigger the toothbrush timer
 const TEETH_QUEST_IDS = new Set(['s3', 's12', 'v3', 'v10']);
@@ -50,6 +51,7 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
   const { state, computed, actions } = useTask();
   const haptic = useHaptic();
   const { track } = useAnalytics();
+  const voice = useVoice();
   const { done, total, allDone, pct, byGroup } = computed;
   const { weather } = useWeather();
   const [showWeather, setShowWeather] = useState(false);
@@ -117,6 +119,13 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
     }
 
     actions.complete(id);
+    // ── Ronki 'quest_complete' voice trigger — was dormant (no fire site)
+    //    until the Apr 2026 voice rewire. Fires on every main-quest tap that
+    //    flips done=false → true. Engine still honours 24h per-line cooldown
+    //    so the same phrase can't repeat, and streak-tagged lines (minQuestsToday≥3)
+    //    gate themselves on the questsCompletedToday context. 300ms delay
+    //    inside VoiceAudio.play keeps it from clashing with the tap SFX.
+    voice.say('quest_complete');
     // ── Analytics: fire quest.complete with questId + anchor. Guard
     //    against repeatable quests (target > 1) so we only count the
     //    final tap that drives the quest to "fully done". If the quest

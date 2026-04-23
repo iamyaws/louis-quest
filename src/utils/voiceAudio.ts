@@ -121,11 +121,17 @@ const VoiceAudio = {
 
   isMuted(): boolean {
     if (typeof localStorage === 'undefined') return true;
-    return localStorage.getItem(MUTE_KEY) !== '0';
+    // Default is UNMUTED (Apr 2026 flip) — new users hear Ronki by default
+    // now that Harry's voice bank has replaced the placeholder set. Explicit
+    // '1' = muted by user choice. Anything else (null / '0' / absent) = unmuted.
+    return localStorage.getItem(MUTE_KEY) === '1';
   },
 
   setMuted(muted: boolean): void {
     if (typeof localStorage === 'undefined') return;
+    // '1' = user muted explicitly. '0' = user unmuted explicitly. The default
+    // when no key is set is UNMUTED (see isMuted()). We still write '1'/'0'
+    // so an explicit choice sticks across sessions/default flips.
     localStorage.setItem(MUTE_KEY, muted ? '1' : '0');
     if (muted) this.stop();
   },
