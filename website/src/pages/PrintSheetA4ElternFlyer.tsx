@@ -72,10 +72,13 @@ function CutMarks() {
   );
 }
 
-/* ── Pencil-filter splotch ─────────────────────────────────── *
- * Ported from PrintGemeindeblattFoto. feTurbulence + displacement
- * gives an organic hand-drawn edge so the mustard blob reads as
- * "the stain from the story" rather than a flat SVG circle.
+/* ── Zahnpasta-Fleck splotch ───────────────────────────────── *
+ * First pass used a mustard ellipse and Marc flagged it — toothpaste
+ * is white, not yellow, so the metaphor was broken. This version is
+ * a warm off-white splat with a drip trail and a falling droplet,
+ * pencil-filtered so the edges feel hand-drawn. Reads as "the stain
+ * from the story" without crossing into illustration (no t-shirt,
+ * no mascot — we keep the editorial reportage register).
  * ─────────────────────────────────────────────────────────── */
 function ZahnpastaSplotch() {
   return (
@@ -92,27 +95,39 @@ function ZahnpastaSplotch() {
             numOctaves="2"
             result="noise"
           />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6" />
         </filter>
       </defs>
-      {/* Off-center irregular blob — zahnpasta from the story */}
-      <ellipse
-        cx="30"
-        cy="30"
-        rx="22"
-        ry="18"
-        fill="#FCD34D"
-        opacity="0.88"
+      {/* Main splat — asymmetric blob where zahnpasta hit the pullover */}
+      <path
+        d="M 10,22 C 7,14 13,8 22,7 C 32,6 42,9 45,16 C 48,22 44,28 36,30 C 27,32 17,31 12,28 C 9,26 10,24 10,22 Z"
+        fill="#FAF5E8"
+        opacity="0.96"
         filter="url(#pencil-splotch)"
       />
-      {/* A smaller satellite drop, as if it splattered */}
-      <ellipse
-        cx="48"
-        cy="20"
-        rx="4"
-        ry="3"
-        fill="#FCD34D"
-        opacity="0.7"
+      {/* Drip trail — tapered teardrop running down the chest */}
+      <path
+        d="M 23,28 C 22,34 21,42 23,48 C 24.2,51 26.8,51 28,48 C 30,42 30,34 28,28 Z"
+        fill="#FAF5E8"
+        opacity="0.92"
+        filter="url(#pencil-splotch)"
+      />
+      {/* Falling droplet — implied gravity */}
+      <circle
+        cx="30"
+        cy="54"
+        r="2"
+        fill="#FAF5E8"
+        opacity="0.85"
+        filter="url(#pencil-splotch)"
+      />
+      {/* Side splatter dot, tiny — for authenticity */}
+      <circle
+        cx="47"
+        cy="18"
+        r="1.4"
+        fill="#FAF5E8"
+        opacity="0.75"
         filter="url(#pencil-splotch)"
       />
     </svg>
@@ -623,12 +638,16 @@ const flyerFrontsCss = `
   }
 
   .ef-dateline {
+    /* Clay #A83E2C replaces Burnt #B45309 (Apr 2026). Redder hue (9°
+       vs 24°), less saturated, reads as "brick/pigment" instead of
+       "muddy dated orange". Used only on editorial accents like this
+       dateline — the Ronki wordmark itself stays in brand teal. */
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-size: 7pt;
     font-weight: 800;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #B45309;
+    color: #A83E2C;
   }
   .ef-vignette {
     font-family: 'Be Vietnam Pro', system-ui, sans-serif;
@@ -932,7 +951,10 @@ const parentBackCss = `
     letter-spacing: -0.01em;
   }
   .pb-qr-main strong {
-    color: #B45309;
+    /* ronki.de wordmark stays in brand teal — Marc: "I wouldn't use
+       the clay color for the Ronki font." The visual pop comes from
+       weight (800) + size inheritance, not hue. */
+    color: #1A3C3F;
     font-weight: 800;
   }
   .pb-qr-sub {
