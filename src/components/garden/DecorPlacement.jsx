@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { DECOR, DECOR_CATEGORIES, DECOR_BY_ID } from '../../data/gardenConstants';
 import { Pearl } from '../CurrencyIcons';
@@ -35,15 +35,20 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
 
   const tiles = useMemo(() => DECOR.filter(d => d.category === category), [category]);
 
-  // When a type is selected AND we have a pending position, commit.
-  // Clear selectedType on BOTH success AND failure so a failed place
-  // (e.g. insufficient Sterne) doesn't refire the effect with the same
-  // failed pair (code-review I7 flag 24 Apr 2026).
+  // Ref-guarded commit: tracks the last (type, posKey) we actually
+  // committed so a re-render (or rapid double-tap) can't double-fire
+  // onPlace with the same pair. useCallback-memoized onPlace in the
+  // parent already reduces the risk, but the ref is belt-and-braces —
+  // P1 QA item 24 Apr 2026: "DecorPlacement commit effect can refire
+  // with stale pair under rapid interaction."
+  const lastCommittedRef = useRef('');
   useEffect(() => {
-    if (selectedType && pendingPosition) {
-      onPlace(selectedType, pendingPosition);
-      setSelectedType(null);
-    }
+    if (!selectedType || !pendingPosition) return;
+    const key = `${selectedType}@${pendingPosition.x.toFixed(1)}x${pendingPosition.y.toFixed(1)}`;
+    if (lastCommittedRef.current === key) return;
+    lastCommittedRef.current = key;
+    onPlace(selectedType, pendingPosition);
+    setSelectedType(null);
   }, [selectedType, pendingPosition, onPlace]);
 
   return (

@@ -1,9 +1,11 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTask } from '../../context/TaskContext';
+import { useCelebrationQueue } from '../../context/CelebrationQueue';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { getCatStage } from '../../utils/helpers';
 import { useGardenWitness, witnessVoiceLine } from '../../hooks/useGardenWitness';
+import { DECOR_BY_ID } from '../../data/gardenConstants';
 import GardenScene from './GardenScene';
 import PlantSeedSheet from './PlantSeedSheet';
 import DecorPlacement from './DecorPlacement';
@@ -31,8 +33,51 @@ import { makeDemoPlants, makeDemoDecor, DEMO_HINT_SPOTS, AMBIENT_ORBS, DEMO_BENC
  * state through. Action callbacks (plantSeed/placeDecor) come from
  * the same context.
  */
+// Tiny toast renderer used by plant/decor success + decor-failure
+// feedback. Lightweight on purpose — shares the same frosted-cream +
+// gold accent language as the rest of the garden chrome.
+function GardenActionToast({ kind, text, onDismiss }) {
+  const isErr = kind === 'error';
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      onClick={onDismiss}
+      className="fixed left-1/2 z-[200]"
+      style={{
+        top: 'calc(env(safe-area-inset-top, 0px) + 72px)',
+        transform: 'translateX(-50%)',
+        padding: '10px 18px 10px 14px',
+        borderRadius: 999,
+        background: isErr
+          ? 'linear-gradient(135deg, #fecaca 0%, #ef4444 100%)'
+          : 'linear-gradient(135deg, #86efac 0%, #059669 100%)',
+        color: isErr ? '#7f1d1d' : '#053b26',
+        font: '700 12px/1.2 "Plus Jakarta Sans", sans-serif',
+        letterSpacing: '.08em',
+        boxShadow: isErr
+          ? '0 12px 24px -8px rgba(239,68,68,.5)'
+          : '0 12px 24px -8px rgba(5,150,105,.5)',
+        border: isErr ? '1px solid rgba(127,29,29,.25)' : '1px solid rgba(5,80,40,.2)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 8,
+        cursor: 'pointer',
+        maxWidth: 'calc(100vw - 32px)',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <span className="material-symbols-outlined" style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}>
+        {isErr ? 'error' : 'check_circle'}
+      </span>
+      {text}
+    </div>
+  );
+}
+
 export default function GardenMode({ onClose }) {
   const { state, actions } = useTask();
+  const { enqueue } = useCelebrationQueue();
   const { t, lang } = useTranslation();
   const [mode, setMode] = useState('idle');  // 'idle' | 'plant' | 'decor' | 'witness'
 
@@ -107,22 +152,58 @@ export default function GardenMode({ onClose }) {
   // Memoized handlers so DecorPlacement's placing effect doesn't re-fire
   // on every parent render (code-review flag: onPlace was a fresh
   // function each render, making the effect dep-unstable).
+  // Both handlers now enqueue a celebration-queue toast so the kid
+  // gets real confirmation/error feedback (P1 QA 24 Apr 2026).
   const handlePlace = useCallback((type, position) => {
     const ok = actions.placeDecor(type, position);
-    if (ok) setPendingPosition(null);
+    if (ok) {
+      setPendingPosition(null);
+      const info = DECOR_BY_ID[type];
+      const label = info ? (lang === 'de' ? info.labelDe : info.labelEn) : type;
+      enqueue({
+        id: `decor-placed-${Date.now()}`,
+        kind: 'toast',
+        ttl: 1800,
+        sfx: 'pop',
+        bypassQuietHours: true,
+        render: ({ dismiss }) => (
+          <GardenActionToast kind="success" text={lang === 'de' ? `${label} gesetzt` : `${label} placed`} onDismiss={dismiss} />
+        ),
+      });
+    } else {
+      enqueue({
+        id: `decor-fail-${type}`,
+        kind: 'toast',
+        ttl: 2400,
+        bypassQuietHours: true,
+        render: ({ dismiss }) => (
+          <GardenActionToast kind="error" text={lang === 'de' ? 'Nicht genug Sterne' : 'Not enough stars'} onDismiss={dismiss} />
+        ),
+      });
+    }
     return ok;
-  }, [actions]);
+  }, [actions, enqueue, lang]);
 
   const handlePlantConfirm = useCallback((species) => {
-    if (!pendingPosition) {
-      const fallback = { x: 50 + (Math.random() * 20 - 10), y: 22 };
-      actions.plantSeed(species, fallback);
-    } else {
-      actions.plantSeed(species, pendingPosition);
-    }
+    const pos = pendingPosition ?? { x: 50 + (Math.random() * 20 - 10), y: 22 };
+    actions.plantSeed(species, pos);
     setMode('idle');
     setPendingPosition(null);
-  }, [actions, pendingPosition]);
+    enqueue({
+      id: `plant-seeded-${Date.now()}`,
+      kind: 'toast',
+      ttl: 2000,
+      sfx: 'pop',
+      bypassQuietHours: true,
+      render: ({ dismiss }) => (
+        <GardenActionToast
+          kind="success"
+          text={lang === 'de' ? 'Gepflanzt — schau bald wieder vorbei' : 'Planted — check back soon'}
+          onDismiss={dismiss}
+        />
+      ),
+    });
+  }, [actions, pendingPosition, enqueue, lang]);
 
   // Scene tap handler — in plant/decor mode captures the position
   // where the kid wants to place the item. In idle mode it's inert
@@ -130,11 +211,11 @@ export default function GardenMode({ onClose }) {
   const handleSceneTap = (pos) => {
     if (mode === 'plant' || mode === 'decor') {
       // pos.y here is viewport-% from TOP (0 = top, 100 = bottom).
-      // GardenScene positions use bottom-%, so we flip. Reject taps
-      // in the upper 45% of the scene (sky/hills) — accept only the
-      // lower 55% (ground area). That ensures plants/decor land on
-      // the ground and never clip behind the Hub's top chrome.
-      if (pos.y < 45) return;
+      // Reject sky/upper-hills taps (upper 30%) — accept the lower 70%.
+      // The PlantSeedSheet only covers the bottom ~52% of the screen
+      // so there's still ~18% of tappable ground visible between the
+      // upper-sky rejection line and the sheet top edge.
+      if (pos.y < 30) return;
       setPendingPosition({ x: pos.x, y: 100 - pos.y });  // flip → bottom%
     }
   };

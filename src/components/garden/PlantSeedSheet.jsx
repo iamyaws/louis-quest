@@ -66,7 +66,12 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
         {lang === 'de' ? 'Was pflanzt du diese Woche?' : 'What are you planting this week?'}
       </motion.div>
 
-      {/* Bottom sheet */}
+      {/* Bottom sheet — tightened so the scene ground stays visible
+          AND tappable above the sheet. Header condensed to a single
+          row + grid gap reduced. Kid can see the hills + fire while
+          the sheet is open and tap a spot on the visible ground
+          between the upper-sky rejection line (pos.y >= 30%) and
+          the sheet top (~52% from top on a 14px grid). */}
       <motion.div
         className="absolute left-0 right-0 bottom-0 z-30"
         initial={{ y: '100%' }}
@@ -77,26 +82,26 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
           background: '#fff8f2',
           borderTopLeftRadius: 26,
           borderTopRightRadius: 26,
-          padding: '10px 18px calc(22px + env(safe-area-inset-bottom, 0px))',
+          padding: '8px 18px calc(18px + env(safe-area-inset-bottom, 0px))',
           boxShadow: '0 -20px 40px -10px rgba(0,0,0,.35)',
         }}
       >
         {/* Grip */}
-        <div style={{ width: 42, height: 4, borderRadius: 999, background: 'rgba(18,67,70,.22)', margin: '4px auto 14px' }} />
+        <div style={{ width: 42, height: 4, borderRadius: 999, background: 'rgba(18,67,70,.22)', margin: '4px auto 10px' }} />
 
-        {/* Header */}
-        <div style={{ padding: '0 2px 10px' }}>
+        {/* Condensed header: kicker + headline on one tight block */}
+        <div style={{ padding: '0 2px 8px' }}>
           <div style={{
             font: '800 9px/1 "Plus Jakarta Sans", sans-serif',
             letterSpacing: '.24em',
             textTransform: 'uppercase',
             color: '#b45309',
-            marginBottom: 4,
+            marginBottom: 3,
           }}>
             {lang === 'de' ? 'Sonntag · Pflanztag' : 'Sunday · planting day'}
           </div>
-          <h3 style={{ margin: 0, font: '500 19px/1.2 "Fredoka", sans-serif', color: '#124346', letterSpacing: '-0.01em' }}>
-            {lang === 'de' ? 'Was kommt diese Woche in die Erde?' : 'What goes in the ground this week?'}
+          <h3 style={{ margin: 0, font: '500 17px/1.15 "Fredoka", sans-serif', color: '#124346', letterSpacing: '-0.01em' }}>
+            {lang === 'de' ? 'Was kommt in die Erde?' : 'What goes in the ground?'}
           </h3>
         </div>
 

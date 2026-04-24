@@ -23,7 +23,6 @@ import UnlockStamps from './UnlockStamps';
 import BeatCompletionModal from './BeatCompletionModal';
 import ClothingSheet from './ClothingSheet';
 import CloudWaves from './CloudWaves';
-import CampfireScene from './CampfireScene';
 import GardenPreview from './garden/GardenPreview';
 import GardenMode from './garden/GardenMode';
 import { pickTodaysVisitor } from './CampfireVisitorsGame';
@@ -62,45 +61,6 @@ const COMPANION_ART = {
 };
 
 const MOOD_LABELS = ["Traurig", "Besorgt", "Okay", "Gut", "Magisch", "Müde"];
-
-// Ronki's first-person quip pools — bubble text above the campfire Ronki.
-// Pool chosen by time-of-day; tapping Ronki rotates to another random line
-// from the same pool. Marc stripped the weather/°C suffix (Apr 21 2026)
-// because it crowded the bubble and duplicated the Heute-tab weather chip.
-const MORNING_QUIPS = [
-  'Ich bin heute voller Vorfreude.',
-  'Der Tag riecht gut — findest du nicht?',
-  'Was machen wir heute zuerst?',
-  'Ich hab die halbe Nacht geträumt.',
-  'Hast du gut geschlafen?',
-  'Ich rieche schon den Tag.',
-];
-const AFTERNOON_QUIPS = [
-  'Das Feuer wärmt so schön.',
-  'Ich hab auf dich gewartet.',
-  'Setz dich, erzähl was.',
-  'Das ist ein guter Tag.',
-  'Ich mag dich, wenn du wiederkommst.',
-  'Guck mal die Wolken.',
-];
-const EVENING_QUIPS = [
-  'Die Sterne kommen raus.',
-  'Heute war viel los, oder?',
-  'Ich mag diese leise Stunde.',
-  'Gleich schlafen wir gut.',
-  'Langsam wird\u2019s kuschelig.',
-  'Das Feuer summt noch ein bisschen.',
-];
-
-function pickQuip(hr, roll) {
-  const pool = hr < 11 ? MORNING_QUIPS : hr < 17 ? AFTERNOON_QUIPS : EVENING_QUIPS;
-  // Deterministic daily first quip (so Louis sees the same line when
-  // he reopens within the day), but tap-to-roll uses a counter to pick
-  // a different line each tap. Math.abs so negative indices don't fail.
-  const dayIdx = Math.floor(Date.now() / 86_400_000);
-  const idx = Math.abs((dayIdx + roll * 2654435761) % pool.length);
-  return pool[idx];
-}
 
 // Per-mood color palette — matches Journal's MOOD_COLORS so "Gut" feels
 // warm-amber, "Magisch" rosa, "Traurig" cool-blue etc. Used for the
@@ -169,7 +129,6 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   const [showBossDetail, setShowBossDetail] = useState(false);
   const [openBeat, setOpenBeat] = useState(null);
   const [showClothing, setShowClothing] = useState(false);
-  const [quipRollKey, setQuipRollKey] = useState(0);
   const [showEveningRitual, setShowEveningRitual] = useState(false);
   const [showGefuehlsecke, setShowGefuehlsecke] = useState(false);
   const [zeigBlock, setZeigBlock] = useState(null);
@@ -177,16 +136,6 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   // Tapping the GardenPreview flips this true → full-screen GardenMode
   // mounts as an overlay. GardenMode's "Zurück" pill sets it back to false.
   const [gardenOpen, setGardenOpen] = useState(false);
-
-  // Expedition state — stubs for now. CampfireScene accepts 'idle' /
-  // 'away' / 'returning' and renders Ronki sitting by the fire / a paw
-  // trail / a glowing diary pickup respectively. The simplified state
-  // machine (surprise-based, not routine-gated per Marc's call-out)
-  // lands in a follow-up; for now Ronki is always home so Louis sees
-  // the baseline scene every time.
-  const expeditionState = 'idle';
-  const expeditionStatusText = null;
-  const expeditionStatusSub = null;
 
   // forscherSeen attention flag removed with the Hub simplification —
   // the Forscher-Ecke card no longer mounts here, so the NEU badge is
@@ -295,38 +244,20 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
     night:  'art/background/IAMYAWS_Panoramic_mobile_wallpaper_of_a_deep_night_sky._Rich__c902cc19-afa0-4c99-a434-6e206610ddf9_0.webp',
   };
   const _h = new Date().getHours();
-  // Current quip for the campfire bubble. Re-derived each render so
-  // tapping Ronki (which bumps quipRollKey) swaps to a different line
-  // from the same time-of-day pool.
-  //
-  // Unlock hint placement test (Apr 2026, see backlog_progressive_hub_disclosure.md):
-  //   ?hint=heute  → small footer pill inside the HEUTE card
-  //   ?hint=ronki  → override Ronki's campfire quip with a first-person
-  //                  unlock invitation ("Mach deine erste Aufgabe — dann wach
-  //                  ich auf"). Only applies while Ronki tab is locked.
-  //   default      → neither (ship current behavior until Marc picks a variant)
+  // Unlock hint placement test (Apr 2026, see backlog_progressive_hub_disclosure.md).
+  // `?hint=heute` surfaces a footer pill inside the HEUTE card when
+  // Ronki-tab is still locked. The `ronki` voice-hint variant went away
+  // with the CampfireScene → GardenPreview swap (no bubble to host it).
   const hintPlacement = typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('hint')
     : null;
   const ronkiLocked = (state.totalTasksDone || 0) < 1;
   const showHeuteHint = hintPlacement === 'heute' && ronkiLocked;
-  const showRonkiVoiceHint = hintPlacement === 'ronki' && ronkiLocked;
-  const baseQuip = pickQuip(_h, quipRollKey);
-  // ── Phase 6 Lagerfeuer gentle pull (parent-first onboarding rework) ──
-  // On first arrival at the Lagerfeuer (after parent setup + kid hatch),
-  // Ronki's quip is overridden with the targeted invitation pointing at
-  // the HEUTE card: "Magst du mir zeigen, was du morgens machst?". A
-  // visual thread (pulsing dotted line) draws the kid's eye from Ronki
-  // to the card. Dismissed when the kid taps the HEUTE card (which
-  // already navigates to quests) — sets lagerfeuerGreeted=true so the
-  // override clears on next render.
+  // Phase 6 Lagerfeuer gentle pull — gold pulse + border accent on the
+  // HEUTE card on first Hub arrival. Dismissed on first tap of that card
+  // via actions.patchState({lagerfeuerGreeted: true}).
   // See docs/discovery/2026-04-23-onboarding-parent-first/transcript.md
   const showLagerfeuerGreeting = !state.lagerfeuerGreeted;
-  const currentQuip = showLagerfeuerGreeting
-    ? t('lagerfeuer.greeting.bubble')
-    : showRonkiVoiceHint
-      ? t('unlockHint.ronki.voice')
-      : baseQuip;
 
   // Tagebuch + Laden unlock hints (always-on on the relevant Hub cards
   // when those tabs are locked; Marc Apr 2026: "showcase it on the
