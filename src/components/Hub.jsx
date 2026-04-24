@@ -809,6 +809,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
                         setTimeout(() => setShowGefuehlsecke(true), 400);
                       }
                     }}
+                    aria-label={`${t('hub.mood.label')}: ${t('mood.' + MOOD_ENUM[idx])}`}
                     className="w-[56px] h-[56px] text-2xl rounded-2xl transition-all active:scale-90 flex items-center justify-center"
                     style={{ background: 'rgba(252,211,77,0.08)', border: '2px solid rgba(252,211,77,0.22)' }}>
                     {MOOD_EMOJIS[idx]}

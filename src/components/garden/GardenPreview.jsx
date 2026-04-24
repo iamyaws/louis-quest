@@ -2,6 +2,7 @@ import React from 'react';
 import { useTask } from '../../context/TaskContext';
 import { getCatStage } from '../../utils/helpers';
 import GardenScene from './GardenScene';
+import { makeDemoPlants } from './demoGarden';
 
 /**
  * GardenPreview — Hub-sized card surface that replaces CampfireScene.
@@ -20,31 +21,9 @@ import GardenScene from './GardenScene';
  *     doesn't compete with trees/fire/Ronki.
  */
 
-// Demo plants for day-1 users. Y-values spread across 6–24% from
-// bottom so the garden has depth (sapling in front, mature tree
-// deeper, pine middle). Copied spacing from the Claude Design v1
-// mockup's preview scene after Marc flagged "arrangement was better
-// in Claude Design attempt" (24 Apr 2026).
-function makeDemoPlants() {
-  const today = new Date();
-  const iso = (d) => d.toISOString().slice(0, 10);
-  const daysAgo = (n) => { const d = new Date(today); d.setDate(d.getDate() - n); return iso(d); };
-  return [
-    // Mature oak (deep back-right, anchors the horizon)
-    { id: 'demo-mature-oak',   species: 'oak',    plantedAt: daysAgo(180), position: { x: 88, y: 16 } },
-    // Mid pine — moved from x=50 (too close to fire at x=55) → x=68 so
-    // it sits between the fire and the right-edge oak without clashing.
-    // Marc flag 24 Apr 2026: "tree too close to the campfire".
-    { id: 'demo-mid-pine',     species: 'pine',   plantedAt: daysAgo(95),  position: { x: 68, y: 20 } },
-    // Mid apple (left, forward)
-    { id: 'demo-mid-apple',    species: 'apple',  plantedAt: daysAgo(60),  position: { x: 10, y: 12 } },
-    // Young birch (right-middle, mid depth) — nudged right a touch to
-    // make room for the pine
-    { id: 'demo-young-birch',  species: 'birch',  plantedAt: daysAgo(20),  position: { x: 78, y: 8 } },
-    // Fresh sapling (front-left, closest to the viewer)
-    { id: 'demo-sprout',       species: 'linden', plantedAt: daysAgo(3),   position: { x: 20, y: 4 } },
-  ];
-}
+// makeDemoPlants is imported from ./demoGarden (single source of truth
+// shared with GardenMode). Prior inline copy drifted from the canonical
+// set; code-review I4 / P3 cleanup 24 Apr 2026.
 
 export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 'de', height = 210, inset = true }) {
   const { state } = useTask();

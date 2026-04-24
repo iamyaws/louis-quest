@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { useTranslation } from '../i18n/LanguageContext';
 import VoiceAudio from '../utils/voiceAudio';
 import { COMPANION_VARIANTS, DEFAULT_VARIANT_ID, getVariant } from '../data/companionVariants';
@@ -660,11 +660,19 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
 // ══════════════════════════════════════════
 function HatchStep({ variant, heroName, t, ProgressBar, onDone }) {
   const [phase, setPhase] = useState('wobble'); // 'wobble' | 'crack' | 'reveal'
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase('crack'), 1200);
-    const t2 = setTimeout(() => setPhase('reveal'), 1700);
-    const t3 = setTimeout(() => onDone(), 3000);
+    // Reduced-motion: snap through the phases fast so the kid still
+    // sees "wobble → crack → reveal" but without sustained animation
+    // (vestibular / sensory-sensitivity friendly). Original timeline:
+    // 1200 / 1700 / 3000 → reduced: 100 / 200 / 600.
+    const [wobble, crack, done] = prefersReducedMotion
+      ? [100, 200, 600]
+      : [1200, 1700, 3000];
+    const t1 = setTimeout(() => setPhase('crack'), wobble);
+    const t2 = setTimeout(() => setPhase('reveal'), crack);
+    const t3 = setTimeout(() => onDone(), done);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);

@@ -18,18 +18,24 @@ function daysAgo(n) {
   return iso(d);
 }
 
+// Single source of truth for the demo garden used by BOTH the Hub
+// preview (GardenPreview) and full-screen (GardenMode). Positions match
+// what Marc approved on the Hub preview: pine moved off the fire
+// (x=50 → x=68), birch nudged right (x=78, y=8), apple kept forward.
+// Previously duplicated inline in GardenPreview with slight drift —
+// consolidated here per code-review I4 / P3 cleanup 24 Apr 2026.
 export function makeDemoPlants() {
   return [
-    // Mature oak (deep back-right, anchors the horizon)
+    // Mature oak — deep back-right, anchors the horizon
     { id: 'demo-mature-oak',  species: 'oak',    plantedAt: daysAgo(180), position: { x: 88, y: 16 } },
-    // Mid pine (middle-right, further back)
-    { id: 'demo-mid-pine',    species: 'pine',   plantedAt: daysAgo(95),  position: { x: 50, y: 30 } },
-    // Mid apple (left, forward)
-    { id: 'demo-mid-apple',   species: 'apple',  plantedAt: daysAgo(60),  position: { x: 10, y: 24 } },
-    // Young birch (right, forward-mid)
-    { id: 'demo-young-birch', species: 'birch',  plantedAt: daysAgo(20),  position: { x: 78, y: 14 } },
-    // Fresh sapling (front-left, closest to the viewer)
-    { id: 'demo-sprout',      species: 'linden', plantedAt: daysAgo(3),   position: { x: 18, y: 6 } },
+    // Mid pine — between fire and right-edge oak (not overlapping fire)
+    { id: 'demo-mid-pine',    species: 'pine',   plantedAt: daysAgo(95),  position: { x: 68, y: 20 } },
+    // Mid apple — left forward
+    { id: 'demo-mid-apple',   species: 'apple',  plantedAt: daysAgo(60),  position: { x: 10, y: 12 } },
+    // Young birch — right forward-mid
+    { id: 'demo-young-birch', species: 'birch',  plantedAt: daysAgo(20),  position: { x: 78, y: 8 } },
+    // Fresh sapling — front-left, closest to the viewer
+    { id: 'demo-sprout',      species: 'linden', plantedAt: daysAgo(3),   position: { x: 20, y: 4 } },
   ];
 }
 

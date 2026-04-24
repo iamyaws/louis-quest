@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import MoodChibi from '../MoodChibi';
 import FireBreathPuff from '../FireBreathPuff';
 
@@ -37,6 +37,10 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
   const [fireFlavor, setFireFlavor] = useState('flame');
   const holdStart = useRef(null);
   const timersRef = useRef([]);
+  // Motion-a11y: shorten + simplify animations when the OS requests it.
+  // The kid still sees the state progression, just without the 2s sustained
+  // inhale-scale or the long intro hold. P2 Tier 3 pass 24 Apr 2026.
+  const prefersReducedMotion = useReducedMotion();
 
   // Auto-advance intro → prompt
   useEffect(() => {
@@ -101,12 +105,15 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
 
   // Inhale-scale on the chibi wrapper. Scales up while holding, then
   // lingers for the solo retry beat (Ronki repeats the lesson on his own).
+  // Reduced-motion: flatten the scale entirely (kid sees the state flip
+  // via color/copy instead of sustained scale animation).
   const isInhaling = phase === 'inhaling' || phase === 'solo';
-  const chibiScale = isInhaling ? 1.08 : 1;
-  const inhaleDuration =
+  const chibiScale = prefersReducedMotion ? 1 : (isInhaling ? 1.08 : 1);
+  const inhaleDuration = prefersReducedMotion ? 0.01 : (
     phase === 'inhaling' ? 2.0 :
     phase === 'solo'     ? 0.9 :
-    0.4;
+    0.4
+  );
 
   // Copy line per phase. Retry uses a softer prompt instead of repeating
   // the intro line, so a too-early kid hears "noch ein bisschen länger"

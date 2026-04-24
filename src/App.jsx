@@ -725,6 +725,25 @@ function AuthGate() {
       const startPhase = parseInt(p.get('phase') || '0', 10) || 0;
       return <ParentFirstPreview startPhase={startPhase} />;
     }
+
+    // Dev fast-path — lands straight on the Hub, skipping auth + all
+    // onboarding gates. Useful for UI iteration + local testing without
+    // a Supabase user. Use `?devHub=1` (optionally `&variant=forest`
+    // to set the chibi colorway). DEV-only — the flag is ignored in
+    // production builds.
+    if (p.get('devHub') === '1' && import.meta.env.DEV) {
+      const variant = p.get('variant') || 'forest';
+      return (
+        <TaskProvider>
+          <CelebrationQueueProvider>
+            <QuestEaterProvider>
+              <DevHubPrime variant={variant} />
+              <AppContent />
+            </QuestEaterProvider>
+          </CelebrationQueueProvider>
+        </TaskProvider>
+      );
+    }
   }
 
   if (!user) {
@@ -772,6 +791,33 @@ class ErrorBoundaryInner extends React.Component {
   static getDerivedStateFromError(e) { return { hasError: true, error: e }; }
   componentDidCatch(e) { this.props.onError(e); }
   render() { return this.state.hasError ? null : this.props.children; }
+}
+
+// ── DevHubPrime ───────────────────────────────────────────────────────
+// On-mount prime that flips every onboarding gate true so the app
+// renders straight into the Hub. DEV-only — gated by import.meta.env.DEV
+// in AuthGate before this ever mounts. No-op when state is already
+// onboarded (kid using the fast-path after the first prime).
+function DevHubPrime({ variant = 'forest' }) {
+  const { state, actions } = useTask();
+  React.useEffect(() => {
+    if (!state || !actions) return;
+    if (!state.onboardingDone) {
+      actions.completeOnboarding({
+        companionVariant: variant,
+        heroName: 'Dev',
+        heroGender: 'boy',
+      });
+    }
+    if (!state.kidIntroSeen || !state.parentHandoffBackSeen) {
+      actions.patchState?.({
+        kidIntroSeen: true,
+        parentHandoffBackSeen: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state?.onboardingDone, state?.kidIntroSeen, state?.parentHandoffBackSeen]);
+  return null;
 }
 
 // ── ParentFirstPreview ────────────────────────────────────────────────

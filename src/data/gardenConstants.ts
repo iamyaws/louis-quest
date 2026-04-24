@@ -82,18 +82,19 @@ export const DECOR_CATEGORIES: { id: DecorCategory; labelDe: string; labelEn: st
 ];
 
 // ── Growth thresholds (Q7 C+ milestone-aged) ──────────────────────────
-// Days since plantedAt required to reach each stage. 'mittel' speedClass
-// hits these directly; 'langsam' multiplies by SPEED_MULT['langsam'].
-// Stage computation is a pure function of (today - plantedAt) so no
-// stored transitions; see useGardenGrowth.ts in Phase 2.
+// Days since plantedAt required to reach each stage. Stage computation
+// is a pure function of (today - plantedAt) so no stored transitions;
+// see useGardenWitness.ts for the runtime check.
+// Note: 'langsam' species don't yet get a multiplier — the speedClass
+// metadata ships with the species but isn't wired into the threshold
+// math. A `SPEED_MULT` table existed here briefly but was never
+// imported; removed in the P3 cleanup 24 Apr 2026. Wiring slowness
+// is a future design decision (how many extra days should oak take
+// vs apple? unresolved) — revisit when we get real user data on
+// pacing satisfaction.
 export const GROWTH_THRESHOLDS = {
   sprout: 0,      // visible immediately after planting
   young: 7,       // ~1 week — first monthly crossing of the app lifecycle
   mid: 30,        // ~1 month
   mature: 90,     // ~1 season
-} as const;
-
-export const SPEED_MULT = {
-  mittel: 1.0,
-  langsam: 1.5,
 } as const;
