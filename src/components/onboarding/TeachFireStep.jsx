@@ -36,9 +36,14 @@ const base = import.meta.env.BASE_URL;
 // there is no "too early" branch anymore (the 2-round loop replaces
 // the old duration-gated retry from v1).
 const MIN_HOLD_MS = 220;
-const SMOKE_TO_PROMPT_DELAY = 1600;  // how long the "cough" beat lingers
-const SUCCESS_TO_SOLO_DELAY = 1000;
-const SOLO_TO_DONE_DELAY = 1100;
+// Bumped 1600→2100 so the smoke can fully dissipate (1.5s animation)
+// before the next-round prompt copy swaps in. Marc feedback 24 Apr 2026:
+// "fire and smoke could be visible slightly longer".
+const SMOKE_TO_PROMPT_DELAY = 2100;
+// Bumped 1000→1300 so the kid has a beat to register the flame before
+// Ronki repeats it solo.
+const SUCCESS_TO_SOLO_DELAY = 1300;
+const SOLO_TO_DONE_DELAY = 1200;
 const INTRO_DURATION_MS = 2200;
 
 // Front-facing chibi mouth anchor inside the 360×360 wrapper.
@@ -48,7 +53,12 @@ const INTRO_DURATION_MS = 2200;
 //   same anchor (visual lineage: glow backdrop + puff origin = same spot).
 const MOUTH_TOP = '68%';   // slight up-bias so flame reads as above mouth line
 const MOUTH_LEFT = '54%';  // right of center so the flame cone extends rightward
-const FIRE_SCALE = 1.4;    // bigger than SideRonki's default flame
+// Flame scale 1.4→1.65 + duration 1.1→1.5 per Marc 24 Apr 2026: "the
+// fire itself could be a little bigger and longer too". Smoke matches
+// duration so both beats breathe at the same tempo.
+const FIRE_SCALE = 1.65;
+const FIRE_DURATION_S = 1.5;
+const SMOKE_DURATION_S = 1.5;
 
 export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
   // 'intro' → 'prompt' → 'inhaling' → 'smoke' → 'prompt' → 'inhaling'
@@ -224,7 +234,9 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
               {/* Mouth glow — radial warm pulse behind the flame origin
                   so fire reads as erupting from the mouth. Only pulses
                   on the real-flame beats (round 2). Re-keyed via fireKey
-                  so it restarts when the solo retry fires. */}
+                  so it restarts when the solo retry fires. Sized +
+                  duration-matched to FIRE_SCALE / FIRE_DURATION_S so the
+                  pulse and flame breathe together. */}
               {showMouthGlow && (
                 <span
                   key={`glow-${fireKey}`}
@@ -233,14 +245,14 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
                     position: 'absolute',
                     top: '72%',
                     left: '50%',
-                    width: 90,
-                    height: 60,
+                    width: 118,
+                    height: 78,
                     borderRadius: '50%',
                     background:
-                      'radial-gradient(ellipse at 50% 50%, rgba(253,224,71,0.7) 0%, rgba(249,115,22,0.4) 45%, rgba(249,115,22,0) 80%)',
+                      'radial-gradient(ellipse at 50% 50%, rgba(253,224,71,0.72) 0%, rgba(249,115,22,0.42) 45%, rgba(249,115,22,0) 80%)',
                     transform: 'translate(-50%, -50%)',
-                    filter: 'blur(4px)',
-                    animation: 'teachMouthGlow 1.1s ease-out forwards',
+                    filter: 'blur(5px)',
+                    animation: `teachMouthGlow ${FIRE_DURATION_S}s ease-out forwards`,
                     pointerEvents: 'none',
                     zIndex: 7,
                   }}
@@ -253,6 +265,7 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
                 top={MOUTH_TOP}
                 left={MOUTH_LEFT}
                 scale={FIRE_SCALE}
+                duration={fireFlavor === 'smoke' ? SMOKE_DURATION_S : FIRE_DURATION_S}
               />
             </motion.div>
           </div>

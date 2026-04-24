@@ -29,7 +29,7 @@ import React from 'react';
  * SideRonki's side-profile default (42% / 58%). See
  * backlog_teach_fire_step_v2.md "Problem 1 — fire-mouth alignment".
  */
-export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, scale = 1 }) {
+export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, scale = 1, duration = 1.1 }) {
   if (!fireKey) return null;
 
   const baseStyle = {
@@ -178,6 +178,10 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
     // backlog_teach_fire_step_v2.md (Problem 2 — failure-first learning).
     const puffs = [0, 1, 2];
     const fx = scale;
+    // Stagger each puff's entry by ~13% of the total duration so the
+    // dissipation still reads as three beats regardless of how long the
+    // animation runs. Teach step passes 1.5s; QuestEater would pass 1.1s.
+    const staggerPerPuff = duration * 0.13;
     return (
       <span
         key={fireKey}
@@ -205,7 +209,7 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
                 'radial-gradient(ellipse at 35% 40%, rgba(249,250,251,0.92) 0%, rgba(203,213,225,0.72) 55%, rgba(107,114,128,0.18) 100%)',
               filter: 'blur(0.6px)',
               opacity: 0,
-              animation: `fbpSmoke${i} 1.1s ease-out ${i * 0.14}s forwards`,
+              animation: `fbpSmoke${i} ${duration}s ease-out ${i * staggerPerPuff}s forwards`,
             }}
           />
         ))}
@@ -239,7 +243,7 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
         borderRadius: '0 50% 50% 0 / 0 60% 60% 0',
         filter: 'drop-shadow(0 0 8px rgba(249,115,22,0.7))',
         transformOrigin: '0% 50%',
-        animation: 'cfFireBreath 1.1s ease-out forwards',
+        animation: `cfFireBreath ${duration}s ease-out forwards`,
         zIndex: 8,
       }}
     />
