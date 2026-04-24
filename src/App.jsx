@@ -15,6 +15,7 @@ import Sanctuary from './components/Sanctuary';
 import Journal from './components/Journal';
 import HeldenKodex from './components/HeldenKodex';
 import Onboarding from './components/Onboarding';
+import TeachFirePreview from './components/TeachFirePreview';
 import ParentOnboarding from './components/ParentOnboarding';
 import KidIntro from './components/KidIntro';
 import HandoffBackCard from './components/HandoffBackCard';
@@ -714,6 +715,13 @@ function AuthGate() {
     if (p.get('onboardingPreview') === '1') {
       const startStep = parseInt(p.get('step') || '0', 10) || 0;
       return <Onboarding startStep={startStep} onComplete={() => {}} />;
+    }
+    // Dedicated iteration harness for TeachFireStep v2 — replay pill +
+    // variant swatches so Marc can loop the fire/smoke sequence without
+    // refreshing the browser between runs. Public route like
+    // onboardingPreview — no auth required. See TeachFirePreview.jsx.
+    if (p.get('teachFirePreview') === '1') {
+      return <TeachFirePreview />;
     }
     // QA route for the parent-first onboarding choreography (23 Apr 2026
     // rework). Lets Marc smoke-test the full KidIntro → ParentOnboarding →
