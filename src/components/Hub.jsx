@@ -26,7 +26,7 @@ import CloudWaves from './CloudWaves';
 import GardenPreview from './garden/GardenPreview';
 import GardenMode from './garden/GardenMode';
 import { pickTodaysVisitor } from './CampfireVisitorsGame';
-import { isEventSuppressed } from '../utils/eventOrchestration';
+import { useEventSurface } from '../hooks/useEventSurface';
 import EveningRitual from './EveningRitual';
 import Gefuehlsecke from './Gefuehlsecke';
 // ForscherEcke / AttentionGlow / isForscherGraduated / useAttentionFlag
@@ -180,20 +180,13 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   }, [state?.quests, state?.zeigMomentShownDates, state?.zeigMomentCounts, state?.familyConfig?.zeigMomentEnabled, zeigBlock]);
 
   // Ronki greets Louis once when Hub mounts — but NOT on days 0-2 so
-  // the first-run experience stays quiet. Day 1 already has the
-  // CampfireScene quip bubble; stacking a second VoiceBubble on top
-  // was the "two messages at once" issue Marc flagged.
+  // the first-run experience stays quiet. Quiet-window math centralized
+  // in useEventSurface (with the 2-day legacy fallback for pre-anchor
+  // accounts that lack state.onboardingDate).
+  const voiceGate = useEventSurface('voiceGreeting', { legacyFallbackDays: 2 });
+  const visitorGate = useEventSurface('visitor');
   useEffect(() => {
-    // Quiet window — voice greeting holds back for the first ~2 days so
-    // the kid lands on a quiet Hub right after onboarding. Falls back to
-    // totalTaskDays when no onboardingDate exists (legacy accounts) so
-    // pre-anchor users still get the same staggered ramp-up.
-    const onboardingDate = state?.onboardingDate;
-    const fallbackDays = state?.totalTaskDays || 0;
-    const suppressed = onboardingDate
-      ? isEventSuppressed(onboardingDate, 'voiceGreeting')
-      : fallbackDays < 2;
-    if (!suppressed) {
+    if (!voiceGate.suppressed) {
       voice.say('hub_open', { arcPhase });
     }
     // Re-evaluate organic mood triggers on every Hub entry. This is how
@@ -340,7 +333,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
   //      applied to voice + friend callbacks before, not here).
   const todayISO = new Date().toISOString().slice(0, 10);
   const visitor =
-    reveal(3) && !isEventSuppressed(state?.onboardingDate, 'visitor')
+    reveal(3) && !visitorGate.suppressed
       ? pickTodaysVisitor(state, todayISO)
       : null;
   const visitorFreundMeta = visitor

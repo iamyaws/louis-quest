@@ -4,7 +4,7 @@ import { useTask } from '../context/TaskContext';
 import { FREUND_BY_ID } from '../data/freunde';
 import { CHAPTERS } from '../data/creatures';
 import VoiceAudio from '../utils/voiceAudio';
-import { isEventSuppressed } from '../utils/eventOrchestration';
+import { useEventSurface } from '../hooks/useEventSurface';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -30,18 +30,17 @@ export default function FreundCallbackCard() {
   const [portraitFailed, setPortraitFailed] = useState(false);
   const [audioPlayed, setAudioPlayed] = useState(false);
 
+  // Quiet-window gate — centralized in useEventSurface (24 Apr 2026).
+  // Never surface a Freund callback during the first ~2 days of use
+  // so new parents aren't ambushed with lore pop-ups.
+  const { suppressed } = useEventSurface('friendCallback');
   const dueCallback = useMemo(() => {
     const list = state?.freundCallbacksPending || [];
     if (list.length === 0) return null;
-    // Quiet-window gate — moved to the shared eventOrchestration helper
-    // (24 Apr 2026) so future event surfaces don't have to re-derive
-    // the same day-since-onboarding math. Logic unchanged: never surface
-    // a Freund callback during the first ~2 days of use so new parents
-    // aren't ambushed with lore pop-ups they haven't met yet.
-    if (isEventSuppressed(state?.onboardingDate, 'friendCallback')) return null;
+    if (suppressed) return null;
     const now = Date.now();
     return list.find(cb => new Date(cb.triggerAt).getTime() <= now) || null;
-  }, [state?.freundCallbacksPending, state?.onboardingDate]);
+  }, [state?.freundCallbacksPending, suppressed]);
 
   const freund = dueCallback ? FREUND_BY_ID.get(dueCallback.freundId) : null;
 
