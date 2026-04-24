@@ -129,15 +129,15 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
                 zIndex: 6,
               }}
             />
-            {/* Floating ghost of the selected item, bobbing above target */}
+            {/* Floating ghost of the selected item, bobbing above target.
+                Class-based animation so prefers-reduced-motion can
+                suppress it via garden-scene.css. */}
             <div
-              className="absolute pointer-events-none"
+              className="absolute pointer-events-none g-decor-ghost-bob"
               style={{
                 left: `${tx}%`,
                 bottom: `calc(${ty}% + 40px)`,
-                transform: 'translateX(-50%)',
                 filter: 'drop-shadow(0 6px 10px rgba(60,30,5,.4))',
-                animation: 'decor-ghost-bob 2s ease-in-out infinite',
                 zIndex: 7,
               }}
             >
@@ -209,7 +209,8 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
               onClick={() => hasContent && setCategory(c.id)}
               disabled={!hasContent}
               aria-label={lang === 'de' ? c.labelDe : c.labelEn}
-              className="active:scale-95 transition-all"
+              aria-pressed={isSel}
+              className="g-cat-btn active:scale-[0.96] transition-all"
               style={{
                 width: 44, height: 44,
                 borderRadius: 12,

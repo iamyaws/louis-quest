@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTask } from '../../context/TaskContext';
 import { useTranslation } from '../../i18n/LanguageContext';
@@ -65,10 +65,16 @@ export default function GardenMode({ onClose }) {
   // the kid has built up their own garden. Threshold 5 for both so the
   // Hub preview + full-screen view carry enough visual weight through
   // the early weeks. Once 5+ real plants/decor exist, demos retire.
-  // Marc flag 24 Apr 2026 — same blend as GardenPreview for consistency
-  // between the Hub backdrop and the full-screen mode.
-  const plants = realPlants.length >= 5 ? realPlants : [...makeDemoPlants(), ...realPlants];
-  const decor = realDecor.length >= 5 ? realDecor : [...makeDemoDecor(), ...realDecor];
+  // Memoized so GardenScene doesn't re-render the full plant+decor tree
+  // on every state tick (UI/UX Pro Max perf finding 24 Apr 2026).
+  const plants = useMemo(
+    () => realPlants.length >= 5 ? realPlants : [...makeDemoPlants(), ...realPlants],
+    [realPlants]
+  );
+  const decor = useMemo(
+    () => realDecor.length >= 5 ? realDecor : [...makeDemoDecor(), ...realDecor],
+    [realDecor]
+  );
 
   // Hint rings — 3 pre-defined spots marking "tap here to add something."
   // Always shown in idle mode UNLESS a witness beat is pending (the
@@ -305,18 +311,23 @@ export default function GardenMode({ onClose }) {
         </button>
 
         <div
+          role="heading"
+          aria-level={1}
+          aria-label={lang === 'de' ? 'Dein Garten' : 'Your garden'}
           className="inline-flex items-center"
           style={{
-            padding: '8px 14px',
+            padding: '10px 16px',
+            minHeight: 44,
             borderRadius: 999,
-            background: 'rgba(18,67,70,.78)',
+            background: 'rgba(18,67,70,.85)',
             backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(254,243,199,.2)',
-            color: '#fef3c7',
-            font: '700 11px/1 "Plus Jakarta Sans", sans-serif',
+            border: '1px solid rgba(254,243,199,.24)',
+            color: '#fffbeb',
+            font: '700 12px/1 "Plus Jakarta Sans", sans-serif',
             letterSpacing: '.2em',
             textTransform: 'uppercase',
-            boxShadow: '0 4px 10px -4px rgba(0,0,0,.4)',
+            boxShadow: '0 4px 10px -4px rgba(0,0,0,.45)',
+            textShadow: '0 1px 2px rgba(0,0,0,.35)',
           }}
         >
           {lang === 'de' ? 'Dein Garten' : 'Your garden'}

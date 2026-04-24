@@ -131,7 +131,9 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
                 </div>
                 <div style={{
                   font: '600 9px/1 "Plus Jakarta Sans", sans-serif',
-                  color: s.speedClass === 'langsam' ? '#7c3aed' : '#b45309',
+                  /* Darkened langsam from #7c3aed → #6d28d9 for 5:1 contrast
+                     on white (UI/UX Pro Max). */
+                  color: s.speedClass === 'langsam' ? '#6d28d9' : '#b45309',
                   letterSpacing: '.14em',
                   textTransform: 'uppercase',
                 }}>

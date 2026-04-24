@@ -589,14 +589,17 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
         {onOpenParental && (
           <button onClick={onOpenParental}
                   aria-label={lang === 'de' ? 'Eltern-Bereich' : 'Parent area'}
-                  className="flex items-center justify-center active:scale-95 transition-all shrink-0"
+                  title={lang === 'de' ? 'Eltern-Bereich' : 'Parent area'}
+                  className="flex items-center justify-center active:scale-[0.96] transition-all shrink-0"
                   style={{
-                    width: 32, height: 32, borderRadius: 10,
+                    /* 32 → 44 (WCAG min touch target). UI/UX Pro Max
+                       flag 24 Apr 2026: was failing minimum tap size. */
+                    width: 44, height: 44, borderRadius: 12,
                     background: 'rgba(255,248,242,0.82)',
                     backdropFilter: 'blur(14px) saturate(160%)',
                     WebkitBackdropFilter: 'blur(14px) saturate(160%)',
                     border: '1px solid rgba(18,67,70,0.12)',
-                    color: 'rgba(18,67,70,0.55)',
+                    color: 'rgba(18,67,70,0.6)',
                     boxShadow: '0 2px 8px -3px rgba(18,67,70,0.15)',
                   }}>
             {/* Marc flag 24 Apr 2026: lock icon read as "locked tab,"

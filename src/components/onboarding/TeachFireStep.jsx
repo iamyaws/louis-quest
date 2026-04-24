@@ -180,6 +180,8 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
             transition={{ duration: 0.22, ease: 'easeOut' }}
             className="text-white/90 text-lg leading-relaxed max-w-sm"
             style={{ textWrap: 'balance', minHeight: '3em' }}
+            aria-live="polite"
+            aria-atomic="true"
           >
             {t(copyKey)}
           </motion.p>

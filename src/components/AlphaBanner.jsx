@@ -55,8 +55,10 @@ export default function AlphaBanner() {
           type="button"
           onClick={() => setLang(lang === 'de' ? 'en' : 'de')}
           aria-label={t('lang.switchTo')}
-          className="ml-auto shrink-0 font-semibold tracking-wide opacity-70 hover:opacity-100 transition-opacity"
-          style={{ fontSize: 10, letterSpacing: '0.12em' }}
+          className="ml-auto shrink-0 font-semibold tracking-wide opacity-80 hover:opacity-100 transition-opacity"
+          /* 10px → 12px + padding bumps height to 28px — still compact
+             for an alpha banner but readable. UI/UX Pro Max flag 24 Apr. */
+          style={{ fontSize: 12, letterSpacing: '0.12em', padding: '4px 8px', minHeight: 28 }}
         >
           {lang === 'de' ? 'DE ▸ EN' : 'EN ▸ DE'}
         </button>

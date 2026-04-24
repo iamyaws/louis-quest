@@ -161,8 +161,10 @@
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
-/* Respect reduced-motion preference — disables the bob/pulse loops
-   for motion-sensitive kids. Accessibility audit flag 24 Apr 2026. */
+/* Respect reduced-motion preference — disables every bob/pulse/flicker
+   loop for motion-sensitive kids. UI/UX Pro Max audit 24 Apr 2026:
+   added .g-witness-pulse + decor-ghost-bob to the suppression list;
+   they were animating even with reduce requested. */
 @media (prefers-reduced-motion: reduce) {
   .g-hint-ring { animation: none; }
   .g-orb { animation: none; }
@@ -172,6 +174,24 @@
   .g-ronki.mirror { animation: none; }
   .g-crystal { animation: none; }
   .g-shrine .flame { animation: none; }
+  .g-witness-ring { animation: none; }
+  .g-decor-ghost-bob { animation: none; }
+}
+
+/* Decor-ghost floating preview — lifted out of DecorPlacement's inline
+   <style> so the animation lives with the rest of the garden CSS.
+   Applied via className so it participates in reduced-motion suppression. */
+.g-decor-ghost-bob { animation: g-decor-ghost-bob 2s ease-in-out infinite; }
+@keyframes g-decor-ghost-bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+/* Focus-visible ring on the decor category rail — icon-only buttons
+   need a clear keyboard-focus affordance (WCAG). */
+.g-cat-btn:focus-visible {
+  outline: 2px solid #fcd34d;
+  outline-offset: 2px;
 }
 
 .g-stone { display: inline-block; width: 22px; height: 12px; border-radius: 50%; background: linear-gradient(180deg, #b5a992 0%, #7a6e5a 100%); box-shadow: inset -2px -3px 4px rgba(0,0,0,.25), inset 2px 2px 0 rgba(255,255,255,.25); }

@@ -301,7 +301,9 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                 {/* Boy */}
                 <button
                   onClick={() => setHeroGender('boy')}
-                  className="relative rounded-2xl p-4 flex flex-col items-center gap-3 active:scale-[0.97] transition-all"
+                  aria-pressed={heroGender === 'boy'}
+                  aria-label={t('onboarding.hero.boy')}
+                  className="relative rounded-2xl p-4 flex flex-col items-center gap-3 active:scale-[0.97] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
                   style={{
                     background: heroGender === 'boy' ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.6)',
                     border: heroGender === 'boy' ? '2.5px solid #fcd34d' : '2px solid rgba(255,255,255,0.2)',
@@ -321,7 +323,9 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                 {/* Girl */}
                 <button
                   onClick={() => setHeroGender('girl')}
-                  className="relative rounded-2xl p-4 flex flex-col items-center gap-3 active:scale-[0.97] transition-all"
+                  aria-pressed={heroGender === 'girl'}
+                  aria-label={t('onboarding.hero.girl')}
+                  className="relative rounded-2xl p-4 flex flex-col items-center gap-3 active:scale-[0.97] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
                   style={{
                     background: heroGender === 'girl' ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.6)',
                     border: heroGender === 'girl' ? '2.5px solid #fcd34d' : '2px solid rgba(255,255,255,0.2)',
