@@ -1,0 +1,43 @@
+name: Deploy Experiment (Drachennest) to GitHub Pages
+
+# Mirrors deploy-dev.yml but targets the experiment/drachennest branch
+# and serves at /Ronki/experiment/. Allows the Drachennest reframe to be
+# tested in parallel with main (Vercel · app.ronki.de) and dev
+# (gh-pages /Ronki/dev/) without disturbing either.
+
+on:
+  push:
+    branches: [experiment/drachennest]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm install
+
+      - name: Build with /Ronki/experiment/ base path
+        run: npx vite build --base /Ronki/experiment/ --outDir dist-experiment
+
+      - name: Patch manifest & SW for /experiment/ path
+        run: |
+          sed -i 's|"/Ronki/"|"/Ronki/experiment/"|g' dist-experiment/manifest.json
+          sed -i 's|/Ronki/|/Ronki/experiment/|g' dist-experiment/sw.js
+
+      - name: Deploy to gh-pages /experiment/ subfolder
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist-experiment
+          destination_dir: experiment
+          keep_files: true

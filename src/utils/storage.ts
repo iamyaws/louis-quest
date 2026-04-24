@@ -1,11 +1,18 @@
 // ── Ronki Storage — IndexedDB local + Supabase cloud sync ──
+//
+// EXPERIMENT BRANCH NOTE (drachennest): the storage names are namespaced
+// with "_drachennest" so this branch's saves stay isolated from main/dev
+// when both are served from the same origin (e.g. iamyaws.github.io/Ronki/dev/
+// vs /Ronki/experiment/). The Drachennest reframe can be tested in parallel
+// without clobbering Louis's existing dev state. When the experiment
+// merges back to main the suffix gets removed in the same commit.
 import type { GameState } from '../types';
 import { supabase } from '../lib/supabase';
 
-const DB_NAME = "herodex";
+const DB_NAME = "herodex_drachennest";
 const STORE = "state";
-const KEY = "hdx2";
-const LS_KEY = "hdx2";
+const KEY = "hdx2_drachennest";
+const LS_KEY = "hdx2_drachennest";
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {

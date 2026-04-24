@@ -45,23 +45,23 @@ describe('storage', () => {
   it('saves and loads data via IndexedDB', async () => {
     const testState = { hero: { name: 'Test' }, quests: [], xp: 100 };
     await storage.save(testState);
-    expect(mockStore['hdx2']).toEqual(testState);
+    expect(mockStore['hdx2_drachennest']).toEqual(testState);
   });
 
   it('clears data', async () => {
-    mockStore['hdx2'] = { test: true };
+    mockStore['hdx2_drachennest'] = { test: true };
     await storage.clear();
-    expect(mockStore['hdx2']).toBeUndefined();
+    expect(mockStore['hdx2_drachennest']).toBeUndefined();
   });
 
   it('migrates from localStorage to IndexedDB on load', async () => {
     const testData = { hero: { name: 'Test' }, quests: [] };
-    localStorage.setItem('hdx2', JSON.stringify(testData));
+    localStorage.setItem('hdx2_drachennest', JSON.stringify(testData));
 
     const result = await storage.load();
     expect(result).toEqual(testData);
     // localStorage should be cleared after migration
-    expect(localStorage.getItem('hdx2')).toBeNull();
+    expect(localStorage.getItem('hdx2_drachennest')).toBeNull();
   });
 
   it('falls back to localStorage when IndexedDB fails on save', async () => {
