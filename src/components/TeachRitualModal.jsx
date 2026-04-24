@@ -33,6 +33,13 @@ import { getVariant } from '../data/companionVariants';
 // Default flavor-keyed backgrounds. Each is a radial gradient tuned to
 // feel environmental, not decorative — the modal is the whole view
 // during the ritual, so the bg does heavy lifting.
+//
+// Rainbow bg (Marc 24 Apr 2026): the first-cut flat purple radial read
+// as "just another color." Rainbow ritual is the biggest unlock (after
+// 3 boss-arcs) so its backdrop should carry rainbow DNA. Warm-orange
+// center fades through pink → violet → deep indigo for a rainbow
+// tonality without becoming chaotic; pairs with the existing
+// conic-gradient rainbow flame.
 const FLAVOR_BACKGROUNDS = {
   heart:
     'radial-gradient(ellipse at 50% 30%, #7f1d3a 0%, #4a0f27 55%, #1a0610 100%)',
@@ -41,7 +48,7 @@ const FLAVOR_BACKGROUNDS = {
   ember:
     'radial-gradient(ellipse at 50% 30%, #9a3412 0%, #571c0b 55%, #150604 100%)',
   rainbow:
-    'radial-gradient(ellipse at 50% 30%, #5b21b6 0%, #3b0764 55%, #0f0420 100%)',
+    'radial-gradient(ellipse at 50% 28%, #f97316 0%, #ec4899 22%, #a855f7 44%, #3730a3 70%, #0f0420 100%)',
   // flame fallback (rarely used — onboarding owns the base flame) in
   // case future flows want to re-teach the base flame post-onboarding.
   flame:

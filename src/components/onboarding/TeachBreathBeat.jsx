@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import MoodChibi from '../MoodChibi';
 import FireBreathPuff from '../FireBreathPuff';
@@ -46,12 +46,38 @@ const SUCCESS_TO_SOLO_DELAY = 1300;
 const SOLO_TO_DONE_DELAY = 1200;
 const INTRO_DURATION_MS = 2200;
 
-// Front-facing chibi mouth anchor inside the 360×360 wrapper.
+// Chibi container — nominal 540px (50% larger than v2's 360px per Marc
+// 24 Apr 2026 "ronki could be 50% bigger"). Actual size measured at
+// runtime so on narrow viewports the chibi scales down proportionally
+// instead of overflowing. MoodChibi's internal layout is percent-based,
+// so passing the measured size keeps horns/eyes/mouth correctly placed.
+const NOMINAL_CHIBI_SIZE = 540;
+
+// Front-facing chibi mouth anchor inside the chibi wrapper. Percent-
+// based so the anchor stays locked to the mouth regardless of the
+// measured container size.
 const MOUTH_TOP = '68%';
 const MOUTH_LEFT = '54%';
-const FIRE_SCALE = 1.65;
-const FIRE_DURATION_S = 1.5;
-const SMOKE_DURATION_S = 1.5;
+
+// Per-flavor fire size + duration. Each successive ritual in the unlock
+// order renders a bigger, longer breath — the progression system made
+// tangible. flame (onboarding) is the baseline; rainbow is the biggest
+// because it's the last unlock (after 3 boss-arc completions). Each
+// step is ~+10% scale + ~+10% duration so the escalation feels earned
+// but not cartoonish. See backlog_fire_breath_progression.md.
+const FIRE_SIZE_BY_FLAVOR = {
+  flame:   { scale: 2.5,  duration: 1.5  },
+  sparkle: { scale: 2.75, duration: 1.65 },
+  heart:   { scale: 3.0,  duration: 1.8  },
+  ember:   { scale: 3.25, duration: 1.95 },
+  rainbow: { scale: 3.5,  duration: 2.1  },
+};
+
+// Inhale scale — chibi puffs up during the hold. Was 1.08 (subtle) in
+// v2; bumped to 1.55 per Marc ("full intake should be also 50% than
+// right now" = ~+50% from the 1.08 state). Reduced-motion still gets
+// a flat 1.0.
+const INHALE_SCALE = 1.55;
 
 export default function TeachBreathBeat({
   variant,
@@ -73,6 +99,39 @@ export default function TeachBreathBeat({
   const holdStart = useRef(null);
   const timersRef = useRef([]);
   const prefersReducedMotion = useReducedMotion();
+
+  // Responsive chibi sizing. Measures the container via ResizeObserver
+  // so MoodChibi renders at the right size for the viewport. Falls back
+  // to NOMINAL on SSR / pre-mount. Narrow phones (375-wide) cap at
+  // viewport width minus onboarding horizontal padding.
+  const containerRef = useRef(null);
+  const [chibiSize, setChibiSize] = useState(NOMINAL_CHIBI_SIZE);
+  useEffect(() => {
+    if (typeof ResizeObserver === 'undefined') return;
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(entries => {
+      for (const e of entries) {
+        const w = Math.floor(e.contentRect.width);
+        if (w > 0) setChibiSize(w);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Size + duration for this ritual's target flavor. Smoke inherits the
+  // same scale so round 1's failed cough reads at the same magnitude as
+  // the successful round 2 breath.
+  const { scale: FIRE_SCALE, duration: FIRE_DURATION_S } = useMemo(
+    () => FIRE_SIZE_BY_FLAVOR[targetFlavor] || FIRE_SIZE_BY_FLAVOR.flame,
+    [targetFlavor],
+  );
+  // Mouth-glow dimensions scale proportionally with the flame scale so
+  // the glow envelope stays consistent with the flame at any tier.
+  // Baseline glow was 118×78 at flame scale 1.65; keep that ratio.
+  const glowW = Math.round(118 * (FIRE_SCALE / 1.65));
+  const glowH = Math.round(78 * (FIRE_SCALE / 1.65));
 
   // Auto-advance intro → prompt
   useEffect(() => {
@@ -142,7 +201,7 @@ export default function TeachBreathBeat({
     'normal';
 
   const isInhaling = phase === 'inhaling' || phase === 'solo';
-  const chibiScale = prefersReducedMotion ? 1 : (isInhaling ? 1.08 : 1);
+  const chibiScale = prefersReducedMotion ? 1 : (isInhaling ? INHALE_SCALE : 1);
   const inhaleDuration = prefersReducedMotion ? 0.01 : (
     phase === 'inhaling' ? 2.0 :
     phase === 'solo'     ? 0.9 :
@@ -177,15 +236,27 @@ export default function TeachBreathBeat({
         </header>
       )}
 
-      {/* Chibi stage — 360×360 container with fire/smoke + mouth glow */}
-      <div className="relative" style={{ width: 360, height: 360 }}>
+      {/* Chibi stage — nominal 540×540 container (50% bigger than v2 per
+          Marc 24 Apr 2026). `width: min(NOMINAL, 92vw)` caps on narrow
+          phones so the chibi never overflows horizontally. aspect-ratio
+          keeps the box square. ResizeObserver measures actual width and
+          feeds it to MoodChibi's size prop so internal layout (horns,
+          eyes, mouth anchor) stays correctly placed at any viewport. */}
+      <div
+        ref={containerRef}
+        className="relative"
+        style={{
+          width: `min(${NOMINAL_CHIBI_SIZE}px, 92vw)`,
+          aspectRatio: '1 / 1',
+        }}
+      >
         <motion.div
           animate={{ scale: chibiScale }}
           transition={{ duration: inhaleDuration, ease: 'easeInOut' }}
           style={{ position: 'absolute', inset: 0, transformOrigin: '50% 90%' }}
         >
           <MoodChibi
-            size={360}
+            size={chibiSize}
             variant={variant.id}
             stage={1}
             mood={chibiMood}
@@ -200,8 +271,8 @@ export default function TeachBreathBeat({
                 position: 'absolute',
                 top: '72%',
                 left: '50%',
-                width: 118,
-                height: 78,
+                width: glowW,
+                height: glowH,
                 borderRadius: '50%',
                 background:
                   'radial-gradient(ellipse at 50% 50%, rgba(253,224,71,0.72) 0%, rgba(249,115,22,0.42) 45%, rgba(249,115,22,0) 80%)',
@@ -220,7 +291,7 @@ export default function TeachBreathBeat({
             top={MOUTH_TOP}
             left={MOUTH_LEFT}
             scale={FIRE_SCALE}
-            duration={fireFlavor === 'smoke' ? SMOKE_DURATION_S : FIRE_DURATION_S}
+            duration={FIRE_DURATION_S}
           />
         </motion.div>
       </div>

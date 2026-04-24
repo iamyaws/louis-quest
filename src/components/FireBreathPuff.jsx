@@ -40,8 +40,12 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
   if (flavor === 'ember') {
     // Eight small embers spray out in an arc. Each is a colored dot with
     // its own animation delay so they feel tossed, not choreographed.
+    // Top/left/scale/duration overridable so TeachBreathBeat can anchor
+    // at the chibi mouth + grow per ritual progression.
+    const reach = 44 * scale;
+    const dotSize = 6 * scale;
     return (
-      <span key={fireKey} aria-hidden="true" style={{ ...baseStyle, top: '38%', left: '56%', width: 60, height: 40, zIndex: 8 }}>
+      <span key={fireKey} aria-hidden="true" style={{ ...baseStyle, top: top ?? '38%', left: left ?? '56%', width: 60 * scale, height: 40 * scale, zIndex: 8 }}>
         {Array.from({ length: 8 }).map((_, i) => {
           const angle = -60 + (i * 16); // -60° to 52°
           return (
@@ -51,13 +55,13 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
                 position: 'absolute',
                 top: '50%',
                 left: 0,
-                width: 6,
-                height: 6,
+                width: dotSize,
+                height: dotSize,
                 borderRadius: '50%',
                 background: i % 2 ? '#fcd34d' : '#f97316',
-                boxShadow: '0 0 6px 2px rgba(252,211,77,0.6)',
+                boxShadow: `0 0 ${6 * scale}px ${2 * scale}px rgba(252,211,77,0.6)`,
                 transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(0px)`,
-                animation: `fbpEmber${i} 1.1s ease-out forwards`,
+                animation: `fbpEmber${i} ${duration}s ease-out forwards`,
                 opacity: 0,
               }}
             />
@@ -67,7 +71,7 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
           @keyframes fbpEmber${i} {
             0%   { opacity: 0; transform: translate(-50%,-50%) rotate(${-60 + i * 16}deg) translateX(0px); }
             25%  { opacity: 1; }
-            100% { opacity: 0; transform: translate(-50%,-50%) rotate(${-60 + i * 16}deg) translateX(44px); }
+            100% { opacity: 0; transform: translate(-50%,-50%) rotate(${-60 + i * 16}deg) translateX(${reach}px); }
           }
         `).join('\n')}</style>
       </span>
@@ -76,19 +80,20 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
 
   if (flavor === 'sparkle') {
     // 4 stars drift upward in a gentle column, fading as they rise.
+    // Top/left/scale/duration overridable (see ember comment).
     return (
-      <span key={fireKey} aria-hidden="true" style={{ ...baseStyle, top: '20%', left: '58%', width: 40, height: 60, zIndex: 8 }}>
+      <span key={fireKey} aria-hidden="true" style={{ ...baseStyle, top: top ?? '20%', left: left ?? '58%', width: 40 * scale, height: 60 * scale, zIndex: 8 }}>
         {[0, 1, 2, 3].map((i) => (
           <span
             key={i}
             style={{
               position: 'absolute',
               bottom: 0,
-              left: `${10 + i * 8}px`,
-              fontSize: 14 + (i % 2) * 4,
+              left: `${(10 + i * 8) * scale}px`,
+              fontSize: (14 + (i % 2) * 4) * scale,
               opacity: 0,
-              animation: `fbpSparkle 1.1s ease-out ${i * 0.08}s forwards`,
-              filter: 'drop-shadow(0 0 4px rgba(252,211,77,0.9))',
+              animation: `fbpSparkle ${duration}s ease-out ${i * 0.08 * duration / 1.1}s forwards`,
+              filter: `drop-shadow(0 0 ${4 * scale}px rgba(252,211,77,0.9))`,
             }}
           >
             ✦
@@ -97,8 +102,8 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
         <style>{`
           @keyframes fbpSparkle {
             0%   { opacity: 0; transform: translateY(0) scale(0.6); }
-            35%  { opacity: 1; transform: translateY(-20px) scale(1); }
-            100% { opacity: 0; transform: translateY(-44px) scale(1.2); }
+            35%  { opacity: 1; transform: translateY(-${20 * scale}px) scale(1); }
+            100% { opacity: 0; transform: translateY(-${44 * scale}px) scale(1.2); }
           }
         `}</style>
       </span>
@@ -108,39 +113,41 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
   if (flavor === 'heart') {
     // Pink heart shape using two circles + a rotated square, rising and
     // fading. Pulses briefly at full opacity before it floats up.
+    // Scale + position overridable for the ritual.
+    const sz = 36 * scale;
     return (
       <span
         key={fireKey}
         aria-hidden="true"
         style={{
           ...baseStyle,
-          top: '30%',
-          left: '58%',
-          width: 36,
-          height: 36,
+          top: top ?? '30%',
+          left: left ?? '58%',
+          width: sz,
+          height: sz,
           zIndex: 8,
-          animation: 'fbpHeart 1.1s ease-out forwards',
-          filter: 'drop-shadow(0 0 8px rgba(244,114,182,0.6))',
+          animation: `fbpHeart ${duration}s ease-out forwards`,
+          filter: `drop-shadow(0 0 ${8 * scale}px rgba(244,114,182,0.6))`,
         }}
       >
         <span style={{
-          position: 'absolute', top: 4, left: 4, width: 16, height: 16, borderRadius: '50%',
+          position: 'absolute', top: 4 * scale, left: 4 * scale, width: 16 * scale, height: 16 * scale, borderRadius: '50%',
           background: '#ec4899',
         }} />
         <span style={{
-          position: 'absolute', top: 4, right: 4, width: 16, height: 16, borderRadius: '50%',
+          position: 'absolute', top: 4 * scale, right: 4 * scale, width: 16 * scale, height: 16 * scale, borderRadius: '50%',
           background: '#ec4899',
         }} />
         <span style={{
-          position: 'absolute', top: 10, left: 8, width: 20, height: 20,
+          position: 'absolute', top: 10 * scale, left: 8 * scale, width: 20 * scale, height: 20 * scale,
           background: '#ec4899', transform: 'rotate(45deg)',
         }} />
         <style>{`
           @keyframes fbpHeart {
             0%   { opacity: 0; transform: scale(0.4) translateY(0); }
-            30%  { opacity: 1; transform: scale(1) translateY(-4px); }
-            60%  { opacity: 1; transform: scale(1.05) translateY(-12px); }
-            100% { opacity: 0; transform: scale(1) translateY(-28px); }
+            30%  { opacity: 1; transform: scale(1) translateY(-${4 * scale}px); }
+            60%  { opacity: 1; transform: scale(1.05) translateY(-${12 * scale}px); }
+            100% { opacity: 0; transform: scale(1) translateY(-${28 * scale}px); }
           }
         `}</style>
       </span>
@@ -149,22 +156,23 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
 
   if (flavor === 'rainbow') {
     // Same cone shape as flame but the radial-gradient cycles through a
-    // rainbow of hues instead of warm flame colors.
+    // rainbow of hues instead of warm flame colors. Scale + position
+    // overridable for the ritual (pairs with the rainbow-style modal bg).
     return (
       <span
         key={fireKey}
         aria-hidden="true"
         style={{
           ...baseStyle,
-          top: '42%',
-          left: '58%',
-          width: 60,
-          height: 32,
+          top: top ?? '42%',
+          left: left ?? '58%',
+          width: 60 * scale,
+          height: 32 * scale,
           background: 'conic-gradient(from 0deg at 15% 50%, #f97316, #fde047, #4ade80, #22d3ee, #818cf8, #ec4899, #f97316)',
           borderRadius: '0 50% 50% 0 / 0 60% 60% 0',
-          filter: 'drop-shadow(0 0 10px rgba(244,114,182,0.55))',
+          filter: `drop-shadow(0 0 ${10 * scale}px rgba(244,114,182,0.55))`,
           transformOrigin: '0% 50%',
-          animation: 'cfFireBreath 1.1s ease-out forwards',
+          animation: `cfFireBreath ${duration}s ease-out forwards`,
           zIndex: 8,
         }}
       />
