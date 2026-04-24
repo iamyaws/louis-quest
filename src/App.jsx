@@ -16,6 +16,7 @@ import Journal from './components/Journal';
 import HeldenKodex from './components/HeldenKodex';
 import Onboarding from './components/Onboarding';
 import TeachFirePreview from './components/TeachFirePreview';
+import TeachRitualPreview from './components/TeachRitualPreview';
 import ParentOnboarding from './components/ParentOnboarding';
 import KidIntro from './components/KidIntro';
 import HandoffBackCard from './components/HandoffBackCard';
@@ -722,6 +723,13 @@ function AuthGate() {
     // onboardingPreview — no auth required. See TeachFirePreview.jsx.
     if (p.get('teachFirePreview') === '1') {
       return <TeachFirePreview />;
+    }
+    // Harness for the post-onboarding unlock rituals (Herzfeuer /
+    // Funkenstern / Glut / Regenbogenfeuer). Replay pill + flavor
+    // swatches let Marc iterate on copy + palette per flavor without
+    // triggering the real milestone gates. See TeachRitualPreview.jsx.
+    if (p.get('teachRitualPreview') === '1') {
+      return <TeachRitualPreview />;
     }
     // QA route for the parent-first onboarding choreography (23 Apr 2026
     // rework). Lets Marc smoke-test the full KidIntro → ParentOnboarding →
