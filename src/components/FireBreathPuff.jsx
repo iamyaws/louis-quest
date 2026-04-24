@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * FireBreathPuff — renders one of five fire-breath variants keyed by the
+ * FireBreathPuff — renders one of six fire-breath variants keyed by the
  * `flavor` prop. Used by both the Lager CampfireScene SideRonki and the
  * TopBar PinnedRonki so the same completion event draws the same shape
  * in both surfaces. See backlog_ronki_fire_breath_variations.md.
@@ -12,14 +12,24 @@ import React from 'react';
  *   - 'sparkle' → shining star column (MINT games, discovery, habits)
  *   - 'heart'   → pink heart puff (emotional beats — Freund arcs)
  *   - 'rainbow' → rainbow gradient puff (magisch mood, Funkelzeit redeem)
+ *   - 'smoke'   → grey drifting puff (onboarding teach — attempt 1 cough)
  *
  * Each variant runs for the same ~1.1s window so the completion rhythm
  * feels consistent across flavors.
  *
  * `fireKey` is a monotonically-increasing integer — re-keying forces a
  * fresh mount so the animation replays from frame 0 on every event.
+ *
+ * Position overrides (flame + smoke only):
+ *   - `top`, `left` — override default absolute position (CSS strings)
+ *   - `scale` — multiplies width/height (default 1)
+ *
+ * Added so the onboarding TeachFireStep can anchor the flame at the
+ * front-facing chibi's mouth (~73% top / 52% left) instead of
+ * SideRonki's side-profile default (42% / 58%). See
+ * backlog_teach_fire_step_v2.md "Problem 1 — fire-mouth alignment".
  */
-export default function FireBreathPuff({ flavor = 'flame', fireKey }) {
+export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, scale = 1 }) {
   if (!fireKey) return null;
 
   const baseStyle = {
@@ -161,6 +171,59 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey }) {
     );
   }
 
+  if (flavor === 'smoke') {
+    // Grey drifting puff — three soft oval clouds staggered outward from
+    // the mouth. Used for onboarding's first-attempt "cough" beat so the
+    // kid reads "Ronki tried but didn't quite make it". See
+    // backlog_teach_fire_step_v2.md (Problem 2 — failure-first learning).
+    const puffs = [0, 1, 2];
+    const fx = scale;
+    return (
+      <span
+        key={fireKey}
+        aria-hidden="true"
+        style={{
+          ...baseStyle,
+          top: top ?? '42%',
+          left: left ?? '56%',
+          width: 64 * fx,
+          height: 40 * fx,
+          zIndex: 8,
+        }}
+      >
+        {puffs.map((i) => (
+          <span
+            key={i}
+            style={{
+              position: 'absolute',
+              top: `${10 - i * 3}px`,
+              left: 0,
+              width: (22 + i * 6) * fx,
+              height: (14 + i * 3) * fx,
+              borderRadius: '50%',
+              background:
+                'radial-gradient(ellipse at 35% 40%, rgba(249,250,251,0.92) 0%, rgba(203,213,225,0.72) 55%, rgba(107,114,128,0.18) 100%)',
+              filter: 'blur(0.6px)',
+              opacity: 0,
+              animation: `fbpSmoke${i} 1.1s ease-out ${i * 0.14}s forwards`,
+            }}
+          />
+        ))}
+        <style>{puffs
+          .map(
+            (i) => `
+          @keyframes fbpSmoke${i} {
+            0%   { opacity: 0; transform: translate(0, 0) scale(0.55); }
+            30%  { opacity: 0.9; transform: translate(${(10 + i * 6) * fx}px, ${(-2 - i * 2) * fx}px) scale(1); }
+            100% { opacity: 0; transform: translate(${(30 + i * 10) * fx}px, ${(-12 - i * 5) * fx}px) scale(1.35); }
+          }
+        `,
+          )
+          .join('\n')}</style>
+      </span>
+    );
+  }
+
   // Default: flame — the original orange-red flame cone.
   return (
     <span
@@ -168,10 +231,10 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey }) {
       aria-hidden="true"
       style={{
         ...baseStyle,
-        top: '42%',
-        left: '58%',
-        width: 54,
-        height: 30,
+        top: top ?? '42%',
+        left: left ?? '58%',
+        width: 54 * scale,
+        height: 30 * scale,
         background: 'radial-gradient(ellipse at 15% 50%, #fef3c7 0%, #fcd34d 25%, #f97316 55%, #dc2626 100%)',
         borderRadius: '0 50% 50% 0 / 0 60% 60% 0',
         filter: 'drop-shadow(0 0 8px rgba(249,115,22,0.7))',

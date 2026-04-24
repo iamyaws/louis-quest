@@ -6,33 +6,55 @@ import FireBreathPuff from '../FireBreathPuff';
 /**
  * TeachFireStep — onboarding's "Der erste Funke" beat.
  *
- * Establishes the kid-as-expert / Ronki-as-learner relationship at hatch.
- * Kid holds the button → Ronki visibly inhales (chibi wrapper scale 1→1.08
- * over 2s) → release ≥1.5s fires a full FireBreathPuff → 1s later Ronki
- * does it solo. The hold-and-release encodes the lesson kinesthetically:
- * the kid demonstrated *the breath*, not just tapped a button.
+ * v2 (24 Apr 2026): 2-round deterministic failure→success loop + better
+ * fire-mouth alignment. See backlog_teach_fire_step_v2.md for the Marc
+ * spec. v1 ethos preserved: kid-as-expert / Ronki-as-learner, hold-and-
+ * release mechanic that encodes the lesson kinesthetically.
+ *
+ * Flow:
+ *   intro (2.2s auto) → prompt (attempt 1) → inhaling → smoke (cough, 1.6s)
+ *                     → prompt (attempt 2) → inhaling → released (fire)
+ *                     → solo → done
+ *
+ * First release always produces a smoke puff with a soft "that was too
+ * short" copy. Second release always produces the real flame → Ronki
+ * solo repeat → continue. The kid learns "fail once, keep going, make
+ * it happen" — failure encoded as part of the path to success.
  *
  * Generative for the time-stack journey tier — the eventual Wave-3
  * farewell surface reads `state.taughtSignature` + `state.taughtAt` to
  * render callbacks like "Weißt du noch, wie du mir das beigebracht hast?"
  *
- * Forgiving by design: <1.5s release shows soft retry copy + ember puff;
- * after 2 retries an early release auto-passes. No skip button — the
- * threshold is low enough that a normal hold succeeds.
+ * Forgiving by design: no skip button, no retry counter; the loop is
+ * always exactly two rounds regardless of how long the kid holds.
  */
 
 const base = import.meta.env.BASE_URL;
 
-const HOLD_THRESHOLD_MS = 1500;
-const MAX_RETRIES = 2;
+// Minimum press duration to count as a deliberate "hold" — filters
+// accidental double-taps. Any release above this advances the round;
+// there is no "too early" branch anymore (the 2-round loop replaces
+// the old duration-gated retry from v1).
+const MIN_HOLD_MS = 220;
+const SMOKE_TO_PROMPT_DELAY = 1600;  // how long the "cough" beat lingers
 const SUCCESS_TO_SOLO_DELAY = 1000;
 const SOLO_TO_DONE_DELAY = 1100;
 const INTRO_DURATION_MS = 2200;
 
+// Front-facing chibi mouth anchor inside the 360×360 wrapper.
+//   Stage-1 chibi renders at bottom:5%, height:360*0.6*0.78 ≈ 168.5px.
+//   Mouth sits at top:54% of the chibi body = ~73% of the outer wrapper.
+//   Kept as constants so the mouth glow + flame/smoke puff share the
+//   same anchor (visual lineage: glow backdrop + puff origin = same spot).
+const MOUTH_TOP = '68%';   // slight up-bias so flame reads as above mouth line
+const MOUTH_LEFT = '54%';  // right of center so the flame cone extends rightward
+const FIRE_SCALE = 1.4;    // bigger than SideRonki's default flame
+
 export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
-  // 'intro' → 'prompt' → 'inhaling' → 'released' → 'solo' → 'done'
+  // 'intro' → 'prompt' → 'inhaling' → 'smoke' → 'prompt' → 'inhaling'
+  // → 'released' → 'solo' → 'done'
   const [phase, setPhase] = useState('intro');
-  const [retries, setRetries] = useState(0);
+  const [attemptNum, setAttemptNum] = useState(1);  // 1 = will smoke; 2 = will fire
   const [fireKey, setFireKey] = useState(0);
   const [fireFlavor, setFireFlavor] = useState('flame');
   const holdStart = useRef(null);
@@ -49,7 +71,7 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
     return () => clearTimeout(id);
   }, [phase]);
 
-  // Cleanup pending success-path timers if the component unmounts mid-flow
+  // Cleanup pending timers if the component unmounts mid-flow
   useEffect(() => () => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
@@ -67,10 +89,28 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
     const duration = performance.now() - (holdStart.current || 0);
     holdStart.current = null;
 
-    // Auto-pass the third attempt regardless of duration so a fidgety kid
-    // never gets stuck on this step. Threshold + retries together form
-    // the safety net; no skip button needed.
-    if (duration >= HOLD_THRESHOLD_MS || retries >= MAX_RETRIES) {
+    // Filter accidental double-taps (<MIN_HOLD_MS) by falling straight
+    // back to prompt without advancing. Otherwise: round-branch.
+    if (duration < MIN_HOLD_MS) {
+      setPhase('prompt');
+      return;
+    }
+
+    if (attemptNum === 1) {
+      // Round 1 — always smoke/cough. Deterministic per Marc's spec.
+      // Kid reads "Oh, das war zu kurz — nochmal versuchen!" and the
+      // loop advances to round 2 after SMOKE_TO_PROMPT_DELAY.
+      setFireFlavor('smoke');
+      setFireKey(k => k + 1);
+      setPhase('smoke');
+
+      const t1 = setTimeout(() => {
+        setAttemptNum(2);
+        setPhase('prompt');
+      }, SMOKE_TO_PROMPT_DELAY);
+      timersRef.current.push(t1);
+    } else {
+      // Round 2 — always fire. Celebration → Ronki solo repeat → done.
       setFireFlavor('flame');
       setFireKey(k => k + 1);
       setPhase('released');
@@ -86,22 +126,18 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
         setPhase('done');
       }, SUCCESS_TO_SOLO_DELAY + SOLO_TO_DONE_DELAY);
       timersRef.current.push(t2);
-    } else {
-      // Too early — small ember puff (visually distinct from the flame
-      // success), tooEarly copy, retry counter ticks. Phase falls back
-      // to 'prompt' so the kid can immediately try again.
-      setFireFlavor('ember');
-      setFireKey(k => k + 1);
-      setRetries(r => r + 1);
-      setPhase('prompt');
     }
   };
 
-  // Mood: magisch on success/celebration, normal otherwise. Magisch adds
-  // the gold-rose aura + sparkle particles which match the "he learned
-  // it" beat without us having to author a custom celebration animation.
+  // Mood: magisch only on the real success beat + solo repeat. Round-1
+  // smoke uses 'besorgt' (worried face) to match the cough vibe without
+  // needing a new mood skin. P2 note: once backlog_ronki_mood_animations
+  // lands a 'husten'/cough mood, swap to that.
   const isCelebrating = phase === 'released' || phase === 'solo' || phase === 'done';
-  const chibiMood = isCelebrating ? 'magisch' : 'normal';
+  const chibiMood =
+    phase === 'smoke'     ? 'besorgt' :
+    isCelebrating         ? 'magisch' :
+    'normal';
 
   // Inhale-scale on the chibi wrapper. Scales up while holding, then
   // lingers for the solo retry beat (Ronki repeats the lesson on his own).
@@ -115,18 +151,30 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
     0.4
   );
 
-  // Copy line per phase. Retry uses a softer prompt instead of repeating
-  // the intro line, so a too-early kid hears "noch ein bisschen länger"
-  // instead of the original "Er will Feuer machen…" framing.
+  // Copy line per phase × attempt. Attempt 2's prompt uses a "nochmal"
+  // framing so the kid hears "alright, one more time" instead of the
+  // same intro framing twice.
   const copyKey =
     phase === 'intro'    ? 'onboarding.teach.intro' :
-    phase === 'prompt'   ? (retries > 0 ? 'onboarding.teach.tooEarly' : 'onboarding.teach.tryFail') :
+    phase === 'prompt'   ? (attemptNum === 2 ? 'onboarding.teach.tryAgain' : 'onboarding.teach.tryFail') :
     phase === 'inhaling' ? 'onboarding.teach.holdHint' :
+    phase === 'smoke'    ? 'onboarding.teach.smokeFail' :
     phase === 'released' ? 'onboarding.teach.celebrate' :
                            'onboarding.teach.soloLine';
 
+  // Hold button shown on prompt + while inhaling. Hidden during the
+  // smoke beat (force kid to read the "zu kurz" copy before the next
+  // round), during release/solo (Ronki is doing his thing), and at done.
   const showHoldButton = phase === 'prompt' || phase === 'inhaling';
   const showContinue = phase === 'done';
+
+  // Mouth-glow backdrop — warm radial pulse at the mouth anchor when
+  // the real flame fires (round 2 release + solo repeat). Creates
+  // visual lineage between the face and the flame so fire reads as
+  // coming FROM the mouth, not floating beside the chibi. Option A of
+  // the v2 spec (keep front-facing pose, fix alignment). Suppressed
+  // under reduced-motion to avoid the pulse.
+  const showMouthGlow = !prefersReducedMotion && (phase === 'released' || phase === 'solo');
 
   return (
     <div className="fixed inset-0 overflow-y-auto font-body">
@@ -154,11 +202,11 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
             </h1>
           </header>
 
-          {/* Chibi stage — relative wrapper so FireBreathPuff (absolute,
-               default top:42% / left:58%) lands near Ronki's mouth, same
-               pattern SideRonki uses inside CampfireScene. Sized 360 so
-               the freshly-hatched Ronki reads as the main character of
-               this beat, not a thumbnail (Marc 24 Apr 2026). */}
+          {/* Chibi stage — relative wrapper sized 360 so the freshly-
+              hatched Ronki reads as the main character of this beat.
+              Fire/smoke puff + mouth glow are siblings of the chibi,
+              all anchored to the chibi's mouth (~68% top / 54% left of
+              this container). See MOUTH_TOP/LEFT constants. */}
           <div className="relative" style={{ width: 360, height: 360 }}>
             <motion.div
               animate={{ scale: chibiScale }}
@@ -172,7 +220,40 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
                 mood={chibiMood}
                 bare
               />
-              <FireBreathPuff fireKey={fireKey} flavor={fireFlavor} />
+
+              {/* Mouth glow — radial warm pulse behind the flame origin
+                  so fire reads as erupting from the mouth. Only pulses
+                  on the real-flame beats (round 2). Re-keyed via fireKey
+                  so it restarts when the solo retry fires. */}
+              {showMouthGlow && (
+                <span
+                  key={`glow-${fireKey}`}
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    top: '72%',
+                    left: '50%',
+                    width: 90,
+                    height: 60,
+                    borderRadius: '50%',
+                    background:
+                      'radial-gradient(ellipse at 50% 50%, rgba(253,224,71,0.7) 0%, rgba(249,115,22,0.4) 45%, rgba(249,115,22,0) 80%)',
+                    transform: 'translate(-50%, -50%)',
+                    filter: 'blur(4px)',
+                    animation: 'teachMouthGlow 1.1s ease-out forwards',
+                    pointerEvents: 'none',
+                    zIndex: 7,
+                  }}
+                />
+              )}
+
+              <FireBreathPuff
+                fireKey={fireKey}
+                flavor={fireFlavor}
+                top={MOUTH_TOP}
+                left={MOUTH_LEFT}
+                scale={FIRE_SCALE}
+              />
             </motion.div>
           </div>
 
@@ -256,13 +337,19 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
           <style> block, so FireBreathPuff (which references it) only
           plays correctly when CampfireScene is mounted. Onboarding runs
           before that — replicate the keyframe here so the puff plays
-          standalone. */}
+          standalone. Also local: teachMouthGlow keyframe for the v2
+          mouth pulse. */}
       <style>{`
         @keyframes cfFireBreath {
           0%   { opacity: 0; transform: scaleX(0.2) scaleY(0.6); }
           25%  { opacity: 1; transform: scaleX(1) scaleY(1); }
           80%  { opacity: 0.8; transform: scaleX(1.3) scaleY(0.9); }
           100% { opacity: 0; transform: scaleX(1.6) scaleY(0.5); }
+        }
+        @keyframes teachMouthGlow {
+          0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+          25%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
         }
       `}</style>
     </div>
