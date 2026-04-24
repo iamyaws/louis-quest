@@ -53,23 +53,38 @@ const INTRO_DURATION_MS = 2200;
 // so passing the measured size keeps horns/eyes/mouth correctly placed.
 const NOMINAL_CHIBI_SIZE = 540;
 
-// Front-facing chibi mouth anchor inside the chibi wrapper. Percent-
-// based so the anchor stays locked to the mouth regardless of the
-// measured container size.
-const MOUTH_TOP = '68%';
-const MOUTH_LEFT = '54%';
+// Per-flavor mouth anchor. Each flavor's internal emission origin sits
+// at a different offset inside its own wrapper box:
+//   · flame/heart/rainbow — cone/shape originates near wrapper top-left
+//     (cone extends rightward, heart mass near upper edge).
+//   · smoke — cloud puffs drift right-and-up from wrapper left edge.
+//   · sparkle — stars are bottom-anchored inside their wrapper and
+//     drift upward. Wrapper must be placed so its BOTTOM lands at the
+//     mouth line (anchor top pushed well above mouth).
+//   · ember — dots radiate from wrapper's LEFT-MIDDLE. Anchor shifted
+//     up slightly so mid-wrapper hits the mouth line.
+// Tuned empirically 24 Apr 2026 after Marc flagged sparkle + ember
+// weren't aligned to the mouth like heart + rainbow were.
+const FLAVOR_MOUTH_ANCHORS = {
+  flame:   { top: '68%', left: '54%' },
+  smoke:   { top: '68%', left: '54%' },
+  heart:   { top: '68%', left: '54%' },
+  rainbow: { top: '68%', left: '54%' },
+  sparkle: { top: '38%', left: '50%' },
+  ember:   { top: '56%', left: '48%' },
+};
 
 // Per-flavor fire size + duration. Each successive ritual in the unlock
 // order renders a bigger, longer breath — the progression system made
 // tangible. flame (onboarding) is the baseline; rainbow is the biggest
-// because it's the last unlock (after 3 boss-arc completions). Each
-// step is ~+10% scale + ~+10% duration so the escalation feels earned
-// but not cartoonish. See backlog_fire_breath_progression.md.
+// because it's the last unlock (after 3 boss-arc completions). sparkle
+// + ember bumped 24 Apr 2026 per Marc ("could both also be bigger") to
+// bring them in line with heart + rainbow at-a-glance heft.
 const FIRE_SIZE_BY_FLAVOR = {
   flame:   { scale: 2.5,  duration: 1.5  },
-  sparkle: { scale: 2.75, duration: 1.65 },
+  sparkle: { scale: 3.2,  duration: 1.8  },
   heart:   { scale: 3.0,  duration: 1.8  },
-  ember:   { scale: 3.25, duration: 1.95 },
+  ember:   { scale: 3.5,  duration: 1.95 },
   rainbow: { scale: 3.5,  duration: 2.1  },
 };
 
@@ -288,8 +303,8 @@ export default function TeachBreathBeat({
           <FireBreathPuff
             fireKey={fireKey}
             flavor={fireFlavor}
-            top={MOUTH_TOP}
-            left={MOUTH_LEFT}
+            top={(FLAVOR_MOUTH_ANCHORS[fireFlavor] || FLAVOR_MOUTH_ANCHORS.flame).top}
+            left={(FLAVOR_MOUTH_ANCHORS[fireFlavor] || FLAVOR_MOUTH_ANCHORS.flame).left}
             scale={FIRE_SCALE}
             duration={FIRE_DURATION_S}
           />

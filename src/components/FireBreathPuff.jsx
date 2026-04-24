@@ -38,12 +38,14 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
   };
 
   if (flavor === 'ember') {
-    // Eight small embers spray out in an arc. Each is a colored dot with
+    // Eight embers spray out in an arc. Each is a colored dot with
     // its own animation delay so they feel tossed, not choreographed.
+    // Base dot 6→10 + reach 44→58 per Marc 24 Apr 2026 ("Glut could
+    // also be bigger") — dots now carry weight at ritual scale.
     // Top/left/scale/duration overridable so TeachBreathBeat can anchor
     // at the chibi mouth + grow per ritual progression.
-    const reach = 44 * scale;
-    const dotSize = 6 * scale;
+    const reach = 58 * scale;
+    const dotSize = 10 * scale;
     return (
       <span key={fireKey} aria-hidden="true" style={{ ...baseStyle, top: top ?? '38%', left: left ?? '56%', width: 60 * scale, height: 40 * scale, zIndex: 8 }}>
         {Array.from({ length: 8 }).map((_, i) => {
@@ -59,7 +61,7 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
                 height: dotSize,
                 borderRadius: '50%',
                 background: i % 2 ? '#fcd34d' : '#f97316',
-                boxShadow: `0 0 ${6 * scale}px ${2 * scale}px rgba(252,211,77,0.6)`,
+                boxShadow: `0 0 ${8 * scale}px ${3 * scale}px rgba(252,211,77,0.7)`,
                 transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(0px)`,
                 animation: `fbpEmber${i} ${duration}s ease-out forwards`,
                 opacity: 0,
@@ -80,6 +82,9 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
 
   if (flavor === 'sparkle') {
     // 4 stars drift upward in a gentle column, fading as they rise.
+    // Base font bumped 14/18 → 18/24 per Marc 24 Apr 2026 ("Funkensterne
+    // could also be bigger") — at ritual scale the individual stars
+    // now have real presence instead of reading as specks.
     // Top/left/scale/duration overridable (see ember comment).
     return (
       <span key={fireKey} aria-hidden="true" style={{ ...baseStyle, top: top ?? '20%', left: left ?? '58%', width: 40 * scale, height: 60 * scale, zIndex: 8 }}>
@@ -90,10 +95,10 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
               position: 'absolute',
               bottom: 0,
               left: `${(10 + i * 8) * scale}px`,
-              fontSize: (14 + (i % 2) * 4) * scale,
+              fontSize: (18 + (i % 2) * 6) * scale,
               opacity: 0,
               animation: `fbpSparkle ${duration}s ease-out ${i * 0.08 * duration / 1.1}s forwards`,
-              filter: `drop-shadow(0 0 ${4 * scale}px rgba(252,211,77,0.9))`,
+              filter: `drop-shadow(0 0 ${6 * scale}px rgba(252,211,77,0.95))`,
             }}
           >
             ✦
@@ -102,8 +107,8 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
         <style>{`
           @keyframes fbpSparkle {
             0%   { opacity: 0; transform: translateY(0) scale(0.6); }
-            35%  { opacity: 1; transform: translateY(-${20 * scale}px) scale(1); }
-            100% { opacity: 0; transform: translateY(-${44 * scale}px) scale(1.2); }
+            35%  { opacity: 1; transform: translateY(-${28 * scale}px) scale(1); }
+            100% { opacity: 0; transform: translateY(-${56 * scale}px) scale(1.2); }
           }
         `}</style>
       </span>
