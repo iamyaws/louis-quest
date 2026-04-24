@@ -189,7 +189,7 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                   style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)', textWrap: 'balance' }}>
                 {t('onboarding.quest.title')}
               </h1>
-              <p className="text-white/75 max-w-sm mx-auto text-lg leading-relaxed"
+              <p className="text-white/90 max-w-sm mx-auto text-lg leading-relaxed"
                  style={{ textWrap: 'balance' }}>
                 {t('onboarding.quest.subtitle')}
               </p>
@@ -253,14 +253,14 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                   style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
                 {t('onboarding.hero.createTitle')}
               </h2>
-              <p className="text-white/70 text-base leading-relaxed">
+              <p className="text-white/85 text-base leading-relaxed">
                 {t('onboarding.hero.askName')}
               </p>
             </div>
 
             {/* Name input */}
             <div className="w-full max-w-sm">
-              <label className="block font-label font-bold text-xs uppercase tracking-widest text-white/60 mb-2 px-1">
+              <label className="block font-label font-bold text-sm uppercase tracking-widest text-white/75 mb-2 px-1">
                 {t('onboarding.hero.namePlaceholder')}
               </label>
               <input
@@ -409,7 +409,7 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                       }}
                       aria-hidden="true"
                     />
-                    <h3 className="font-headline text-base font-bold text-on-surface leading-tight">
+                    <h3 className="font-headline text-lg font-bold text-on-surface leading-tight px-2" style={{ textWrap: 'balance' }}>
                       {label}
                     </h3>
                     {selected && (
@@ -692,7 +692,14 @@ function HatchStep({ variant, heroName, t, ProgressBar, onDone }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               className="font-display text-3xl font-bold text-white tracking-tight leading-tight"
-              style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}
+              style={{
+                fontFamily: 'Fredoka, sans-serif',
+                // Dual shadow — dark layer for contrast against the white
+                // hatch-glow, amber bloom for warmth. UI/UX audit 24 Apr 2026:
+                // reveal text was dipping to unreadable during the white-glow
+                // peak of the animation.
+                textShadow: '0 2px 14px rgba(0,0,0,0.38), 0 0 24px rgba(252,211,77,0.5)',
+              }}
             >
               {t('onboarding.hatch.revealed', { name: heroName || t('topbar.heroFallback') })}
             </motion.h1>

@@ -169,17 +169,20 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
             </motion.div>
           </div>
 
-          {/* Phase-keyed copy line. Plain <p> on purpose — motion's
-              key-based re-mount was leaving the new element stuck at
-              opacity:0 in dev (StrictMode double-render + remount race).
-              A static text swap reads fine; the visual emphasis comes
-              from the chibi + button states changing, not the copy line. */}
-          <p
-            className="text-white/85 text-lg leading-relaxed max-w-sm"
+          {/* Phase-keyed copy line. motion.p with key → re-mounts on
+              phase change with a gentle fade-in (initial opacity 0.35
+              not 0, so even if animation skips the text stays visible
+              — avoids the old StrictMode remount-stuck-at-0 issue). */}
+          <motion.p
+            key={copyKey}
+            initial={{ opacity: 0.35, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="text-white/90 text-lg leading-relaxed max-w-sm"
             style={{ textWrap: 'balance', minHeight: '3em' }}
           >
             {t(copyKey)}
-          </p>
+          </motion.p>
 
           {/* Action zone — hold button OR continue button */}
           <div className="w-full max-w-xs mt-2 min-h-[120px] flex flex-col items-center justify-center gap-3">

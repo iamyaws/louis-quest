@@ -112,7 +112,7 @@ export default function KidIntro({ onComplete }) {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.9, ease: 'easeOut' }}
                 >
-                  <MiniRonki size={58} mood="happy" breathing />
+                  <MiniRonki size={70} mood="happy" breathing />
                 </motion.div>
               </div>
             </div>
@@ -241,9 +241,11 @@ export default function KidIntro({ onComplete }) {
               className="m-0 mb-3"
               style={{
                 fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-                fontSize: 28,
+                // 28 → 26 to avoid orphan words on 375px iPhones (UI/UX
+                // audit 24 Apr 2026). textWrap balance already set.
+                fontSize: 26,
                 fontWeight: 800,
-                lineHeight: 1.1,
+                lineHeight: 1.12,
                 letterSpacing: '-0.02em',
                 color: '#1A3C3F',
                 textWrap: 'balance',
