@@ -11,6 +11,9 @@ import { QuestEaterProvider } from './components/QuestEater';
 import TaskList from './components/TaskList';
 import Belohnungsbank from './components/Belohnungsbank';
 import Hub from './components/Hub';
+// Drachennest reframe: RoomHub replaces the legacy Hub on this branch.
+// Existing Hub kept in imports for fallback / comparison via ?legacyHub=1.
+import RoomHub from './components/drachennest/RoomHub';
 import Sanctuary from './components/Sanctuary';
 import Journal from './components/Journal';
 import HeldenKodex from './components/HeldenKodex';
@@ -415,14 +418,29 @@ function AppContent() {
         )}
         {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} onOpenParental={() => openPinGate()} />}
         {view === 'hub' && (
-          <Hub
-            onNavigate={setView}
-            onOpenParental={() => openPinGate()}
-            onPlayMint={(gameId) => {
-              setActiveMintGame(gameId);
-              setView('mint-game');
-            }}
-          />
+          // Drachennest reframe — RoomHub is the new primary surface.
+          // Add ?legacyHub=1 to the URL to fall back to the original Hub
+          // for side-by-side comparison without leaving the branch.
+          (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('legacyHub') === '1') ? (
+            <Hub
+              onNavigate={setView}
+              onOpenParental={() => openPinGate()}
+              onPlayMint={(gameId) => {
+                setActiveMintGame(gameId);
+                setView('mint-game');
+              }}
+            />
+          ) : (
+            <RoomHub
+              onNavigate={(target) => {
+                if (target === 'aufgaben') setView('list');
+                else if (target === 'belohnungen') setView('shop');
+                else if (target === 'buch') setView('buch');
+                else if (target === 'spiele') setView('games');
+                else setView(target);
+              }}
+            />
+          )
         )}
         {view === 'care' && <Sanctuary onNavigate={setView} />}
         {view === 'journal' && <Journal onNavigate={setView} onOpenParental={() => openPinGate()} />}

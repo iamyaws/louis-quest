@@ -120,6 +120,12 @@ export interface TaskState {
   catPetted: boolean;
   catPlayed: boolean;
   catEvo: number;
+  /** Drachennest reframe (24 Apr 2026): Ronki's vital meters.
+   *  Each 0..100. Topped up by quest completions (anchor-routed) + the
+   *  three care verbs (Füttern / Streicheln / Spielen). Kid-positive —
+   *  never decays to "starving"; the floor is whatever happens not to
+   *  push it lower. The vitals are HIS signal; stars stay the kid's. */
+  ronkiVitals?: { hunger: number; liebe: number; energie: number };
   loginBonusClaimed: boolean;
   onboardingDone: boolean;
   /** Kid saw the Phase-1 forest intro ("Hallo! Bevor wir uns kennenlernen …")
@@ -418,6 +424,10 @@ interface TaskActions {
   /** Clear pendingRitual without teaching the flavor. Currently unused
    *  in product; exposed for Phase E (parent defer toggle) + tests. */
   dismissPendingRitual: () => void;
+  /** Drachennest reframe: standing care verbs that top up Ronki's vital
+   *  meters when the kid taps Füttern / Streicheln / Spielen. Caps at
+   *  100 per vital. The amounts mirror the Begleiter Polish design. */
+  careForRonki: (kind: 'hunger' | 'liebe' | 'energie') => void;
   saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
   redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
   dismissCelebration: () => void;
@@ -580,6 +590,7 @@ export function createInitialState(): TaskState {
     catPetted: false,
     catPlayed: false,
     catEvo: 0,
+    ronkiVitals: { hunger: 70, liebe: 70, energie: 70 },
     loginBonusClaimed: false,
     onboardingDone: false,
     // Onboarding-parent-first rework (23 Apr 2026): three new gates drive
@@ -759,6 +770,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           catPetted: raw.catPetted || false,
           catPlayed: raw.catPlayed || false,
           catEvo: raw.catEvo || 0,
+          // Drachennest reframe: rehydrate vital meters; default to 70 each
+          // for legacy saves that pre-date the field.
+          ronkiVitals: (raw as any).ronkiVitals || { hunger: 70, liebe: 70, energie: 70 },
           loginBonusClaimed: raw.loginBonusClaimed || false,
           onboardingDone: raw.onboardingDone || false,
           // Onboarding-parent-first rework (23 Apr 2026) — migration:
@@ -1300,7 +1314,26 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions, pendingRitual };
+      // Drachennest reframe: the kid completing a task tops up one of
+      // Ronki's vital meters based on the quest's anchor. Morning quests
+      // feed Hunger ("you helped me wake up / eat / drink"); afternoon
+      // and hobby quests feed Liebe ("we connected today"); bedtime
+      // quests feed Energie ("you helped me rest"). Hp/stars stay the
+      // kid's score; vitals are Ronki's parallel signal.
+      const VITAL_BUMP_BY_ANCHOR: Record<string, { vital: 'hunger'|'liebe'|'energie', amt: number }> = {
+        morning: { vital: 'hunger', amt: 12 },
+        evening: { vital: 'liebe',  amt: 10 },
+        hobby:   { vital: 'liebe',  amt: 10 },
+        bedtime: { vital: 'energie', amt: 14 },
+      };
+      const bump = q.anchor && VITAL_BUMP_BY_ANCHOR[q.anchor];
+      const ronkiVitals = (() => {
+        const v = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
+        if (!bump) return v;
+        return { ...v, [bump.vital]: Math.min(100, v[bump.vital] + bump.amt) };
+      })();
+
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions, pendingRitual, ronkiVitals };
     });
     setToastTrigger(t => t + 1);
     // Re-evaluate organic mood triggers right after the completion
@@ -1517,6 +1550,22 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => {
       if (!prev || !prev.pendingRitual) return prev;
       return { ...prev, pendingRitual: undefined };
+    });
+  }, []);
+
+  // ── Drachennest reframe: standing care verbs ──
+  // Füttern / Streicheln / Spielen as a direct kid → Ronki action.
+  // Amounts (+20 / +15 / +25) match the Begleiter Polish design.
+  // Capped at 100. Independent of any quest completion path.
+  const careForRonki = useCallback((kind: 'hunger' | 'liebe' | 'energie') => {
+    const amounts = { hunger: 20, liebe: 15, energie: 25 } as const;
+    setState(prev => {
+      if (!prev) return prev;
+      const v = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
+      return {
+        ...prev,
+        ronkiVitals: { ...v, [kind]: Math.min(100, v[kind] + amounts[kind]) },
+      };
     });
   }, []);
 
@@ -2203,7 +2252,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

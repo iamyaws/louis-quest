@@ -37,23 +37,41 @@ export const CAT_VARIANTS: Record<string, { name: string; col: string; ear: stri
 // (Brotdose leeren, Unterschriften checken, Sonnencreme auftragen, Creme
 // auftragen, Gesicht reinigen) — parents add their own from the dashboard.
 
+// Drachennest reframe note: each quest has an optional `ronkiAsk` voice
+// line. The reframe is "Ronki asks the kid for help" instead of "kid is
+// told to do their routine". Voice follows feedback_no_ai_writing.md
+// (no em-dashes, no tidy three-beat fragments). Falls back gracefully
+// to `name` if ronkiAsk is missing.
 export const SCHOOL_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   // Morgen: "Bereit f\u00FCr den Tag"
-  { id: "s_wake",      name: "Aus dem Bett kommen",                   icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 1 },
-  { id: "s_water",     name: "Wasser trinken",                        icon: "\u{1F4A7}", anchor: "morning", xp: 10, minutes: 1, order: 2 },
-  { id: "s_wash",      name: "Gesicht waschen",                       icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3, order: 3 },
-  { id: "s_breakfast", name: "Fr\u00FChst\u00FCcken",                icon: "\u{1F95E}", anchor: "morning", xp: 10, minutes: 8, order: 4 },
-  { id: "s_teeth_am",  name: "Z\u00E4hne putzen",                    icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3, order: 5 },
-  { id: "s_dress",     name: "Anziehen",                              icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3, order: 6 },
-  { id: "s_packcheck", name: "Schultasche noch einmal checken",       icon: "\u{1F392}", anchor: "morning", xp: 10, minutes: 2, order: 7 },
+  { id: "s_wake",      name: "Aus dem Bett kommen",                   icon: "\u{1F6CF}\uFE0F", anchor: "morning", xp: 10, minutes: 2, order: 1,
+    ronkiAsk: "Stehst du mit mir auf? Allein ist es so still im Zimmer." },
+  { id: "s_water",     name: "Wasser trinken",                        icon: "\u{1F4A7}", anchor: "morning", xp: 10, minutes: 1, order: 2,
+    ronkiAsk: "Mein Hals ist trocken vom Schlafen. Holst du uns ein Glas Wasser?" },
+  { id: "s_wash",      name: "Gesicht waschen",                       icon: "\u{1F9FC}", anchor: "morning", xp: 10, minutes: 3, order: 3,
+    ronkiAsk: "Ich putz mich auch frisch wenn du dich wäschst." },
+  { id: "s_breakfast", name: "Fr\u00FChst\u00FCcken",                icon: "\u{1F95E}", anchor: "morning", xp: 10, minutes: 8, order: 4,
+    ronkiAsk: "Mein Bauch grummelt schon. Frühstückst du was Leckeres?" },
+  { id: "s_teeth_am",  name: "Z\u00E4hne putzen",                    icon: "\u{1FAA5}", anchor: "morning", xp: 10, minutes: 3, order: 5,
+    ronkiAsk: "Putzt du die Zähne? Ich hör so gern wenn die Bürste rumkratzt." },
+  { id: "s_dress",     name: "Anziehen",                              icon: "\u{1F455}", anchor: "morning", xp: 10, minutes: 3, order: 6,
+    ronkiAsk: "Was ziehst du heute an? Ich mag dich in jeder Farbe." },
+  { id: "s_packcheck", name: "Schultasche noch einmal checken",       icon: "\u{1F392}", anchor: "morning", xp: 10, minutes: 2, order: 7,
+    ronkiAsk: "Hast du alles eingepackt was du heute brauchst?" },
   // Für Morgen (Nachmittag) — intentionally just one movement prompt.
-  { id: "s_move",      name: "10 Min bewegen",                        icon: "\u{1F3C3}", anchor: "evening", xp: 10, minutes: 10, order: 1 },
+  { id: "s_move",      name: "10 Min bewegen",                        icon: "\u{1F3C3}", anchor: "evening", xp: 10, minutes: 10, order: 1,
+    ronkiAsk: "Ich brauch ein bisschen Bewegung sonst werd ich ganz steif. Magst du mit mir hüpfen?" },
   // Gute Nacht
-  { id: "s_dinner",    name: "Abendbrot",                             icon: "\u{1F35E}", anchor: "bedtime", xp: 10, minutes: 15, order: 1 },
-  { id: "s_teeth_pm",  name: "Z\u00E4hne putzen",                    icon: "\u{1FAA5}", anchor: "bedtime", xp: 10, minutes: 3, order: 2 },
-  { id: "s_wash_pm",   name: "Gesicht waschen",                       icon: "\u{1F9FC}", anchor: "bedtime", xp: 10, minutes: 3, order: 3 },
-  { id: "s_pyjama",    name: "Pyjama anziehen",                       icon: "\u{1F319}", anchor: "bedtime", xp: 10, minutes: 2, order: 4 },
-  { id: "s_cuddle",    name: "Kuschelzeit / Vorlesen",                icon: "\u{1F4D6}", anchor: "bedtime", xp: 10, minutes: 10, order: 5 },
+  { id: "s_dinner",    name: "Abendbrot",                             icon: "\u{1F35E}", anchor: "bedtime", xp: 10, minutes: 15, order: 1,
+    ronkiAsk: "Kommst du was essen? Ich setz mich neben dich an den Tisch." },
+  { id: "s_teeth_pm",  name: "Z\u00E4hne putzen",                    icon: "\u{1FAA5}", anchor: "bedtime", xp: 10, minutes: 3, order: 2,
+    ronkiAsk: "Letzte Putzrunde für heute. Sonst bleibt das Abendbrot zwischen den Zähnen kleben." },
+  { id: "s_wash_pm",   name: "Gesicht waschen",                       icon: "\u{1F9FC}", anchor: "bedtime", xp: 10, minutes: 3, order: 3,
+    ronkiAsk: "Wasch dir den Tag aus dem Gesicht damit du gut schlafen kannst." },
+  { id: "s_pyjama",    name: "Pyjama anziehen",                       icon: "\u{1F319}", anchor: "bedtime", xp: 10, minutes: 2, order: 4,
+    ronkiAsk: "Ich mag wenn du den weichen Pyjama anziehst. Dann kuschelt sich's besser." },
+  { id: "s_cuddle",    name: "Kuschelzeit / Vorlesen",                icon: "\u{1F4D6}", anchor: "bedtime", xp: 10, minutes: 10, order: 5,
+    ronkiAsk: "Liest du mir noch was vor bevor wir einschlafen?" },
 ];
 
 // Vacation mode drops the "Schultasche checken" step; afternoon movement

@@ -28,6 +28,12 @@ export interface Quest {
   completions?: number;
   sideQuest?: boolean;
   arcBeatId?: string;   // if set, completing this quest advances the given arc beat
+  /** Drachennest reframe (24 Apr 2026): Ronki's voice line asking for
+   *  this task. Reframes "do this routine" as "Ronki needs your help".
+   *  Optional — quests without it fall back to the neutral name. Voice
+   *  follows feedback_no_ai_writing.md (no em-dashes, no tidy three-beat
+   *  fragments; longer slightly-stumbly sentences). */
+  ronkiAsk?: string;
 }
 
 export interface QuestChain {
