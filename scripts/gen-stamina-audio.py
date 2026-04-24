@@ -1,7 +1,7 @@
 import json, os, urllib.request, time
 
 API_KEY = ''
-with open(r'C:\Users\öööö\louis-quest\.env', 'r', encoding='utf-8') as f:
+with open(r'C:\Users\öööö\louis-quest\.env.local', 'r', encoding='utf-8') as f:
     for line in f:
         if line.startswith('ELEVENLABS_API_KEY=') or line.startswith('VITE_ELEVENLABS_API_KEY='):
             API_KEY = line.strip().split('=', 1)[1].strip('"').strip("'")

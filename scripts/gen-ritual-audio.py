@@ -16,7 +16,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 VOICE_ID = 'hpp4J3VqNfWAUOO0d1Us'  # Bella = Drachenmutter
 MODEL_ID = 'eleven_multilingual_v2'
 OUTPUT_DIR = r'C:\Users\öööö\louis-quest\public\audio\narrator'
-ENV_PATH = r'C:\Users\öööö\louis-quest\.env'
+ENV_PATH = r'C:\Users\öööö\louis-quest\.env.local'
 
 VOICE_SETTINGS = {
     'stability': 0.75,

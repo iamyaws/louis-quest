@@ -63,7 +63,7 @@ VOICE_SETTINGS = {
 }
 
 OUTPUT_DIR = r'C:\Users\öööö\louis-quest\public\audio\ronki'
-ENV_PATH = r'C:\Users\öööö\louis-quest\.env'
+ENV_PATH = r'C:\Users\öööö\louis-quest\.env.local'
 
 
 # ─── Lines to generate ──────────────────────────────────────────────────────
