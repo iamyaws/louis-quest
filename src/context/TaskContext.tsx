@@ -634,10 +634,20 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   // ── Load on mount (cloud-aware) ──
   useEffect(() => {
     (async () => {
-      const raw = (user
-        ? await storage.syncLoad(user.id)
-        : await storage.load()
-      ) as (GameState & TaskState) | null;
+      let raw: (GameState & TaskState) | null = null;
+      try {
+        // Any exception during rehydration used to leave setLoading(true)
+        // forever → app stuck on "Lädt..." pill. Marc flag 24 Apr 2026:
+        // phone stuck on Loading. Fallback to a fresh-start initial state
+        // so the kid at least sees SOMETHING instead of a dead screen.
+        raw = (user
+          ? await storage.syncLoad(user.id)
+          : await storage.load()
+        ) as (GameState & TaskState) | null;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('[storage] load failed, booting fresh:', err);
+      }
       if (raw && raw.quests) {
         // Drop quests whose id no longer exists in the source lists.
         // This catches stale persisted quests after a quest is removed
@@ -828,8 +838,15 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         // Fresh start
         setState(createInitialState());
       }
+      // Always flip loading off, even if rebuild failed halfway — a
+      // partially-populated state is better than a stuck Loading screen.
       setLoading(false);
-    })();
+    })().catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error('[TaskContext] rehydration threw, booting fresh:', err);
+      try { setState(createInitialState()); } catch { /* last-ditch */ }
+      setLoading(false);
+    });
   }, []);
 
   // ── Save on state change (debounced local + cloud) ──

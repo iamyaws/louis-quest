@@ -72,16 +72,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Safety net: if the Supabase call hangs (cold start, flaky
+    // network, bad token), don't leave the kid on a "Loading" screen
+    // forever. After 5s, assume no session and let the app boot.
+    // Marc flag 24 Apr 2026: phone stuck on Loading — one silent
+    // getSession() hang was all it took to brick the experience.
+    let settled = false;
+    const fallbackTimer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        setLoading(false);
+      }
+    }, 5000);
+
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        if (settled) return;  // timer already fired — let storage layer
+                              // try to recover state anonymously
+        settled = true;
+        clearTimeout(fallbackTimer);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      })
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.warn('[auth] getSession failed, booting anonymously:', err);
+        if (settled) return;
+        settled = true;
+        clearTimeout(fallbackTimer);
+        setLoading(false);
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(fallbackTimer);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
