@@ -46,7 +46,14 @@ export default defineConfig({
   server: {
     port: 5173,
     open: true,
-    hmr: { path: '/', clientPort: 5173 },
+    // Drachennest experiment branch: removed the hardcoded
+    // clientPort: 5173 so the HMR WebSocket auto-detects whatever
+    // --port the dev server was started with. Without this, running
+    // on port 5180 made the HMR client try to connect to 5173, the
+    // WebSocket failed, and Vite did a full-page reload every ~3s
+    // (that's why the prototype was "flashing white"). Auto-detect
+    // is the safer default.
+    hmr: { path: '/' },
   },
   build: {
     rollupOptions: {
