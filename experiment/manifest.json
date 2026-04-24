@@ -1,0 +1,26 @@
+{
+  "name": "Ronki — Dein Helden-Abenteuer",
+  "short_name": "Ronki",
+  "description": "Gamifizierter Aufgaben-Tracker für Kinder mit Held, Katze und täglichen Quests",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#124346",
+  "theme_color": "#124346",
+  "categories": ["games", "kids", "education"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
