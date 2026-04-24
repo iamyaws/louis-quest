@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { DECOR, DECOR_CATEGORIES, DECOR_BY_ID } from '../../data/gardenConstants';
 import { Pearl } from '../CurrencyIcons';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 /**
  * DecorPlacement — side-rail + bottom strip + placement flow.
@@ -30,6 +31,7 @@ import { Pearl } from '../CurrencyIcons';
  *   · lang (string)
  */
 export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pendingPosition, onPlace, onCancel, lang = 'de' }) {
+  const { t } = useTranslation();
   const [category, setCategory] = useState('natur');
   const [selectedType, setSelectedType] = useState(null);
 
@@ -80,7 +82,7 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
         }}
       >
         <span className="material-symbols-outlined" style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}>check</span>
-        {lang === 'de' ? 'Fertig' : 'Done'}
+        {t('garden.decor.done')}
       </button>
 
       {/* Sterne budget — top-right */}
@@ -170,7 +172,7 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
                   zIndex: 8,
                 }}
               >
-                ✦ {lang === 'de' ? 'Platz finden' : 'Find a spot'} ✦
+                ✦ {t('garden.decor.findSpot')} ✦
               </div>
             )}
           </>
@@ -328,7 +330,7 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
                       textTransform: 'uppercase',
                     }}
                   >
-                    {lang === 'de' ? 'Deins' : 'Yours'}
+                    {t('garden.decor.owned')}
                   </div>
                 )}
               </button>
@@ -343,7 +345,7 @@ export default function DecorPlacement({ ownedDecor = [], currentSterne = 0, pen
               textAlign: 'center',
               flex: 1,
             }}>
-              {lang === 'de' ? 'Bald verfügbar ✦' : 'Coming soon ✦'}
+              {t('garden.decor.comingSoon')}
             </div>
           )}
         </div>

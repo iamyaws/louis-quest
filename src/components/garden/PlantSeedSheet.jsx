@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { SPECIES } from '../../data/gardenConstants';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 /**
  * PlantSeedSheet — bottom sheet for picking a species to plant.
@@ -21,6 +22,7 @@ import { SPECIES } from '../../data/gardenConstants';
  *   · lang (string)
  */
 export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lang = 'de' }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState(SPECIES[1].id);  // default to apple (mittel)
 
   return (
@@ -63,7 +65,7 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
           pointerEvents: 'none',
         }}
       >
-        {lang === 'de' ? 'Was pflanzt du diese Woche?' : 'What are you planting this week?'}
+        {t('garden.seed.prompt')}
       </motion.div>
 
       {/* Bottom sheet — tightened so the scene ground stays visible
@@ -98,10 +100,10 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
             color: '#b45309',
             marginBottom: 3,
           }}>
-            {lang === 'de' ? 'Sonntag · Pflanztag' : 'Sunday · planting day'}
+            {t('garden.seed.sundayKicker')}
           </div>
           <h3 style={{ margin: 0, font: '500 17px/1.15 "Fredoka", sans-serif', color: '#124346', letterSpacing: '-0.01em' }}>
-            {lang === 'de' ? 'Was kommt in die Erde?' : 'What goes in the ground?'}
+            {t('garden.seed.sheetTitle')}
           </h3>
         </div>
 
@@ -132,7 +134,7 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
                   color: '#124346',
                   marginTop: 4,
                 }}>
-                  {s.labelDe}
+                  {lang === 'de' ? s.labelDe : s.labelEn}
                 </div>
                 <div style={{
                   font: '600 9px/1 "Plus Jakarta Sans", sans-serif',
@@ -171,7 +173,7 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
           }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>grass</span>
-          {lang === 'de' ? 'Hier pflanzen' : 'Plant here'}
+          {t('garden.seed.cta')}
         </button>
 
         {!pendingPosition && (
@@ -185,9 +187,7 @@ export default function PlantSeedSheet({ pendingPosition, onPlant, onCancel, lan
                 also a typo — "Tippe" would be correct) to an invitational
                 question that reads as Ronki asking, not the app instructing.
                 Agent feedback 24 Apr 2026. */}
-            {lang === 'de'
-              ? 'Wo möchtest du dein Bäumchen pflanzen?'
-              : 'Where would you like your sapling to go?'}
+            {t('garden.seed.placementPrompt')}
           </div>
         )}
       </motion.div>

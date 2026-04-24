@@ -168,7 +168,7 @@ export default function GardenMode({ onClose }) {
         sfx: 'pop',
         bypassQuietHours: true,
         render: ({ dismiss }) => (
-          <GardenActionToast kind="success" text={lang === 'de' ? `${label} gesetzt` : `${label} placed`} onDismiss={dismiss} />
+          <GardenActionToast kind="success" text={t('garden.toast.placed', { item: label })} onDismiss={dismiss} />
         ),
       });
     } else {
@@ -178,12 +178,12 @@ export default function GardenMode({ onClose }) {
         ttl: 2400,
         bypassQuietHours: true,
         render: ({ dismiss }) => (
-          <GardenActionToast kind="error" text={lang === 'de' ? 'Nicht genug Sterne' : 'Not enough stars'} onDismiss={dismiss} />
+          <GardenActionToast kind="error" text={t('garden.toast.notEnoughStars')} onDismiss={dismiss} />
         ),
       });
     }
     return ok;
-  }, [actions, enqueue, lang]);
+  }, [actions, enqueue, t, lang]);
 
   const handlePlantConfirm = useCallback((species) => {
     const pos = pendingPosition ?? { x: 50 + (Math.random() * 20 - 10), y: 22 };
@@ -199,12 +199,12 @@ export default function GardenMode({ onClose }) {
       render: ({ dismiss }) => (
         <GardenActionToast
           kind="success"
-          text={lang === 'de' ? 'Gepflanzt — schau bald wieder vorbei' : 'Planted — check back soon'}
+          text={t('garden.toast.planted')}
           onDismiss={dismiss}
         />
       ),
     });
-  }, [actions, pendingPosition, enqueue, lang]);
+  }, [actions, pendingPosition, enqueue, t]);
 
   // Scene tap handler — in plant/decor mode captures the position
   // where the kid wants to place the item. In idle mode it's inert
@@ -336,7 +336,7 @@ export default function GardenMode({ onClose }) {
                 }}
               >
                 <div style={{ font: '800 9px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '.22em', textTransform: 'uppercase', color: '#b45309', marginBottom: 4 }}>
-                  {lang === 'de' ? 'Ronki ruft' : 'Ronki calls'}
+                  {t('garden.witness.kicker')}
                 </div>
                 {witnessLine.reveal}
               </button>
@@ -388,13 +388,13 @@ export default function GardenMode({ onClose }) {
           }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>close</span>
-          {lang === 'de' ? 'Zurück' : 'Back'}
+          {t('garden.back')}
         </button>
 
         <div
           role="heading"
           aria-level={1}
-          aria-label={lang === 'de' ? 'Dein Garten' : 'Your garden'}
+          aria-label={t('garden.yourGarden')}
           className="inline-flex items-center"
           style={{
             padding: '10px 16px',
@@ -411,7 +411,7 @@ export default function GardenMode({ onClose }) {
             textShadow: '0 1px 2px rgba(0,0,0,.35)',
           }}
         >
-          {lang === 'de' ? 'Dein Garten' : 'Your garden'}
+          {t('garden.yourGarden')}
         </div>
       </div>
 
@@ -440,7 +440,7 @@ export default function GardenMode({ onClose }) {
               }}
             >
               <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>grass</span>
-              {lang === 'de' ? 'Pflanzen' : 'Plant'}
+              {t('garden.action.plant')}
             </button>
           )}
           <button
@@ -461,7 +461,7 @@ export default function GardenMode({ onClose }) {
             }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-            {lang === 'de' ? 'Dekorieren' : 'Decorate'}
+            {t('garden.action.decorate')}
           </button>
         </div>
       )}

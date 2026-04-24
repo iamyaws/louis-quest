@@ -1,5 +1,7 @@
 import React from 'react';
 import MoodChibi from '../MoodChibi';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { DECOR_BY_ID } from '../../data/gardenConstants';
 import './garden-scene.css';
 
 /**
@@ -262,6 +264,7 @@ export default function GardenScene({
   children,
   plantStageFn = defaultStage,
 }) {
+  const { t, lang } = useTranslation();
   const resolvedSky = sky ?? autoSky();
   const resolvedSeason = season ?? autoSeason();
   const ronki = ronkiPosition ?? { left: '30%', bottom: '6%', size: 52 };
@@ -363,12 +366,14 @@ export default function GardenScene({
       {decor.map((d) => {
         const style = { left: `${d.position.x}%`, bottom: `${d.position.y}%` };
         if (onDecorClick) {
+          const info = DECOR_BY_ID[d.type];
+          const typeLabel = info ? (lang === 'de' ? info.labelDe : info.labelEn) : d.type;
           return (
             <button
               key={d.id}
               type="button"
               onClick={(e) => { e.stopPropagation(); onDecorClick(d.id); }}
-              aria-label={`Dekoration entfernen: ${d.type}`}
+              aria-label={t('garden.decor.removeAria', { type: typeLabel })}
               className="g-decor-item g-decor-tappable"
               style={{
                 ...style,

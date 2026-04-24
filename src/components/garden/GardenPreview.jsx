@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTask } from '../../context/TaskContext';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { getCatStage } from '../../utils/helpers';
 import GardenScene from './GardenScene';
 import { makeDemoPlants } from './demoGarden';
@@ -25,8 +26,9 @@ import { makeDemoPlants } from './demoGarden';
 // shared with GardenMode). Prior inline copy drifted from the canonical
 // set; code-review I4 / P3 cleanup 24 Apr 2026.
 
-export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 'de', height = 210, inset = true }) {
+export default function GardenPreview({ plants = [], decor = [], onOpen, height = 210, inset = true }) {
   const { state } = useTask();
+  const { t } = useTranslation();
   const variant = state?.companionVariant || 'amber';
   // No stage cap — MoodChibi supports 0–5 natively (code-review I5).
   const stageIdx = getCatStage(state?.catEvo ?? 0);
@@ -41,7 +43,7 @@ export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 
     <button
       type="button"
       onClick={onOpen}
-      aria-label={lang === 'de' ? 'Garten erkunden' : 'Explore garden'}
+      aria-label={t('garden.openCta')}
       className="g-preview relative w-full block active:scale-[0.99] transition-transform"
       style={{
         height,
@@ -98,7 +100,7 @@ export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 
         }}
       >
         <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_outward</span>
-        {lang === 'de' ? 'Garten' : 'Garden'}
+        {t('garden.openPillShort')}
       </span>
     </button>
   );
