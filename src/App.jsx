@@ -831,8 +831,20 @@ function DevHubPrime({ variant = 'forest' }) {
         parentHandoffBackSeen: true,
       });
     }
+    // Dev-only pendingRitual priming — useful for testing the Feuer tab
+    // without grinding to the milestone threshold. Usage:
+    //   ?devHub=1&pendingRitual=sparkle
+    //   ?devHub=1&pendingRitual=heart
+    //   ?devHub=1&pendingRitual=ember
+    //   ?devHub=1&pendingRitual=rainbow
+    const p = new URLSearchParams(window.location.search);
+    const pendingFlag = p.get('pendingRitual');
+    const validFlavors = ['sparkle', 'heart', 'ember', 'rainbow'];
+    if (pendingFlag && validFlavors.includes(pendingFlag) && state.pendingRitual !== pendingFlag) {
+      actions.patchState?.({ pendingRitual: pendingFlag });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state?.onboardingDone, state?.kidIntroSeen, state?.parentHandoffBackSeen]);
+  }, [state?.onboardingDone, state?.kidIntroSeen, state?.parentHandoffBackSeen, state?.pendingRitual]);
   return null;
 }
 

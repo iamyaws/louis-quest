@@ -29,6 +29,40 @@ import { useAuth } from './AuthContext';
  */
 export type FireBreathFlavor = 'flame' | 'sparkle' | 'heart' | 'ember' | 'rainbow';
 
+/**
+ * Totals-based milestones. Each entry maps a flavor to the minimum
+ * totalTasksDone for its teach ritual to unlock. Uses totalTasksDone
+ * as the universal "kid has engaged with the game" proxy — a single
+ * counter is easier to reason about than per-kind sub-counts, and it
+ * still produces an escalating curve (Louis does ~5-10 tasks/day):
+ *
+ *   sparkle (Funkenstern)     @ 30 tasks   — ~4-6 days
+ *   heart   (Herzfeuer)       @ 70 tasks   — ~2 weeks
+ *   ember   (Glut)            @ 130 tasks  — ~4-5 weeks
+ *   rainbow (Regenbogenfeuer) @ 200 tasks  — ~2-3 months
+ *
+ * Tune via this constant — no other call-site changes required. When
+ * totalTasksDone crosses a threshold AND the flavor is not yet taught
+ * AND no other ritual is pending, complete() queues it as
+ * state.pendingRitual. The kid discovers the ritual on their next
+ * Ronki-profile Feuer-tab visit; tapping the "Ritual wartet" card
+ * mounts TeachRitualModal which calls teachBreath() on completion.
+ */
+export const RITUAL_TASK_THRESHOLDS: Record<Exclude<FireBreathFlavor, 'flame'>, number> = {
+  sparkle: 30,
+  heart: 70,
+  ember: 130,
+  rainbow: 200,
+};
+
+/** Flavor unlock order — the order we check when picking which ritual
+ *  to queue if multiple thresholds happen to cross in the same tick
+ *  (e.g. a kid catching up via a large batch completion). Earliest
+ *  threshold fires first. */
+export const RITUAL_UNLOCK_ORDER: Exclude<FireBreathFlavor, 'flame'>[] = [
+  'sparkle', 'heart', 'ember', 'rainbow',
+];
+
 // ── Journal entry for history ──
 export interface JournalEntry {
   date: string;
@@ -242,6 +276,14 @@ export interface TaskState {
    *  from this map falls back to 'flame' when a quest fires. See
    *  backlog_fire_breath_progression.md. */
   taughtBreaths?: Partial<Record<FireBreathFlavor, string>>;
+  /** Currently-pending teach ritual, queued by complete() when the kid
+   *  crosses a totalTasksDone threshold (see RITUAL_TASK_THRESHOLDS).
+   *  Undefined when no ritual is waiting. The Ronki-profile Feuer tab
+   *  shows a "Ritual wartet" card that mounts TeachRitualModal when
+   *  tapped; on completion teachBreath() is called and this field is
+   *  cleared. Stays set if the kid dismisses without completing, so
+   *  the ritual remains discoverable on next visit. */
+  pendingRitual?: Exclude<FireBreathFlavor, 'flame'>;
   familyConfig: FamilyConfig;
   _v2_economy_reset?: boolean;
   arcEngine?: ArcEngineState;
@@ -373,6 +415,9 @@ interface TaskActions {
    *  Used by post-onboarding teach rituals (sparkle/heart/ember/
    *  rainbow) to unlock the flavor for future QuestEater completions. */
   teachBreath: (flavor: FireBreathFlavor) => void;
+  /** Clear pendingRitual without teaching the flavor. Currently unused
+   *  in product; exposed for Phase E (parent defer toggle) + tests. */
+  dismissPendingRitual: () => void;
   saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
   redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
   dismissCelebration: () => void;
@@ -842,6 +887,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // flavorForQuest so non-flame animations only play after their
           // ritual has been completed. See backlog_fire_breath_progression.md.
           taughtBreaths: (raw as any).taughtBreaths,
+          pendingRitual: (raw as any).pendingRitual,
           // Garden (core-gameloop-time-stack Phase 1) — lazy-shape.
           // Undefined on saves predating the garden feature; stays
           // undefined until the kid first interacts (plantSeed/placeDecor
@@ -1217,7 +1263,26 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const prevTotal = (prev.totalQuestCompletions ?? {})[id] || 0;
       const totalQuestCompletions = { ...(prev.totalQuestCompletions ?? {}), [id]: prevTotal + 1 };
 
-      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions };
+      // Fire-breath ritual trigger. If totalTasksDone just crossed a
+      // threshold AND the flavor isn't taught yet AND no ritual is
+      // already pending, queue it. The Feuer tab in RonkiProfile shows
+      // a "Ritual wartet" card that the kid taps to start the ritual.
+      // Only fires once per threshold crossing (the wasAbove check).
+      let pendingRitual = prev.pendingRitual;
+      if (!pendingRitual) {
+        const taught = prev.taughtBreaths || {};
+        for (const flavor of RITUAL_UNLOCK_ORDER) {
+          const threshold = RITUAL_TASK_THRESHOLDS[flavor];
+          const wasAbove = (prev.totalTasksDone || 0) >= threshold;
+          const isAbove = totalTasksDone >= threshold;
+          if (!taught[flavor] && isAbove && !wasAbove) {
+            pendingRitual = flavor;
+            break;  // one ritual at a time; later crossings wait their turn
+          }
+        }
+      }
+
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions, pendingRitual };
     });
     setToastTrigger(t => t + 1);
     // Re-evaluate organic mood triggers right after the completion
@@ -1409,6 +1474,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   // once the kid completes the 2-round success beat. Stamps today's ISO
   // date into state.taughtBreaths[flavor]; noop if the flavor is already
   // taught (protects against double-fire from navigation races).
+  // Also clears pendingRitual if the just-taught flavor matches it, so
+  // complete() can queue the next one on subsequent milestone crossings.
   const teachBreath = useCallback((flavor: FireBreathFlavor) => {
     setState(prev => {
       if (!prev) return prev;
@@ -1419,7 +1486,19 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           ...(prev.taughtBreaths || {}),
           [flavor]: new Date().toISOString().slice(0, 10),
         },
+        pendingRitual: prev.pendingRitual === flavor ? undefined : prev.pendingRitual,
       };
+    });
+  }, []);
+
+  // ── Dismiss a pending ritual without completing it ──
+  // Currently unused (the pending ritual stays offered until the kid
+  // completes it — that's the design) but exposed for parent-dashboard
+  // defer toggle (Phase E) + test harnesses.
+  const dismissPendingRitual = useCallback(() => {
+    setState(prev => {
+      if (!prev || !prev.pendingRitual) return prev;
+      return { ...prev, pendingRitual: undefined };
     });
   }, []);
 
@@ -2106,7 +2185,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

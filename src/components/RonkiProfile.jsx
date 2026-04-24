@@ -12,6 +12,7 @@ import SFX from '../utils/sfx';
 import { useGameAccess } from '../hooks/useGameAccess';
 import { biomeBackground } from '../utils/biomeBackgrounds';
 import MoodChibi from './MoodChibi';
+import FireBreathCollection from './FireBreathCollection';
 
 /**
  * Companion Profile — Ronki Profile Polish v2.
@@ -1000,14 +1001,20 @@ export default function RonkiProfile({ onNavigate }) {
             {[
               { id: 'pflege',       label: lang === 'de' ? 'Pflege'       : 'Care',     icon: 'favorite' },
               { id: 'freunde',      label: lang === 'de' ? 'Freunde'      : 'Friends',  icon: 'groups' },
-              { id: 'spiele',       label: lang === 'de' ? 'Spiele'       : 'Games',    icon: 'sports_esports' },
+              // Feuer replaced Spiele 24 Apr 2026 (Marc) — the mini-games
+              // pass-through moved to the main NavBar, and this slot now
+              // shows the kid's fire-breath collection + pending-ritual
+              // handoff. Shows a pulse dot when pendingRitual is set so
+              // the kid sees something new in their profile.
+              { id: 'feuer',        label: lang === 'de' ? 'Feuer'        : 'Fire',     icon: 'local_fire_department',
+                pulse: !!state?.pendingRitual },
               // Erinnerungen segment dropped 24 Apr 2026 (Marc) — memory
               // access now lives as a single "Eure Chronik" CTA inside
               // the Pflege flow that opens the Buch directly.
             ].map(s => (
               <button key={s.id}
                 onClick={() => setSegment(s.id)}
-                className="flex-1 flex items-center justify-center gap-1.5 transition-all"
+                className="flex-1 flex items-center justify-center gap-1.5 transition-all relative"
                 style={{
                   padding: '10px 4px',
                   borderRadius: 11,
@@ -1022,6 +1029,24 @@ export default function RonkiProfile({ onNavigate }) {
                   {s.icon}
                 </span>
                 {s.label}
+                {/* Pulse dot — signals "there's something waiting here",
+                    e.g. a pending teach ritual on the Feuer tab. */}
+                {s.pulse && segment !== s.id && (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 6,
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      background: '#f97316',
+                      boxShadow: '0 0 8px rgba(249,115,22,0.8)',
+                      animation: 'rp-pulse 1.4s ease-in-out infinite',
+                    }}
+                  />
+                )}
               </button>
             ))}
           </div>
@@ -1436,70 +1461,15 @@ export default function RonkiProfile({ onNavigate }) {
             </section>
           )}
 
-          {/* ═══ SPIELE SEGMENT ═══
-               Thin pass for now — the Spiele destination links through
-               to the existing games hub. When locked (gamesUnlocked=false),
-               shows a quiet locked state that tells Louis what he needs
-               to do first (finish today's quests) rather than a dashed
-               tease. Future: embed a small games thumbnail grid. */}
-          {segment === 'spiele' && (
-            <section style={{ marginBottom: 14 }}>
-              <Kicker>{lang === 'de' ? 'Mini-Spiele' : 'Mini games'}</Kicker>
-              {gamesUnlocked ? (
-                <button
-                  onClick={() => onNavigate?.('games')}
-                  className="w-full rounded-2xl p-5 text-left active:scale-[0.98] transition-all"
-                  style={{
-                    background: 'linear-gradient(160deg, #fcd34d, #f59e0b)',
-                    boxShadow: '0 8px 18px -6px rgba(245,158,11,0.45)',
-                  }}>
-                  <div className="flex items-center gap-4">
-                    <div style={{
-                      width: 48, height: 48, borderRadius: '50%',
-                      background: '#fff', display: 'grid', placeItems: 'center', flexShrink: 0,
-                      boxShadow: '0 2px 6px rgba(120,53,15,0.18)',
-                    }}>
-                      <span className="material-symbols-outlined"
-                            style={{ fontSize: 24, color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>
-                        sports_esports
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span style={{ display: 'block', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 800, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.9)', marginBottom: 3 }}>
-                        {lang === 'de' ? 'Bereit' : 'Ready'}
-                      </span>
-                      <b style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 800, fontSize: 16, lineHeight: 1.15, color: '#2a2005' }}>
-                        {t('ronki.playWithRonki')}
-                      </b>
-                      <span style={{ display: 'block', fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: 12, lineHeight: 1.3, color: '#5c4508', marginTop: 2 }}>
-                        {t('ronki.playWithRonki.subtitle')}
-                      </span>
-                    </div>
-                    <span className="material-symbols-outlined"
-                          style={{ fontSize: 24, color: '#78350f', fontVariationSettings: "'FILL' 1" }}>
-                      arrow_forward
-                    </span>
-                  </div>
-                </button>
-              ) : (
-                <div className="rounded-2xl p-5 text-center"
-                     style={{
-                       background: 'linear-gradient(160deg, #fffdf5, #fef3c7)',
-                       border: '1.5px dashed rgba(245,158,11,0.5)',
-                     }}>
-                  <span className="material-symbols-outlined block mb-2"
-                        style={{ fontSize: 36, color: '#A83E2C', fontVariationSettings: "'FILL' 1" }}>
-                    lock
-                  </span>
-                  <b className="font-headline block mb-1" style={{ fontSize: 16, color: '#124346' }}>
-                    {lang === 'de' ? 'Noch nicht bereit' : 'Not ready yet'}
-                  </b>
-                  <p className="font-body text-sm" style={{ color: '#92400e', lineHeight: 1.4 }}>
-                    {t('ronki.playWithRonki.locked')}
-                  </p>
-                </div>
-              )}
-            </section>
+          {/* ═══ FEUER SEGMENT ═══
+               Replaced the thin "Spiele" pass-through 24 Apr 2026 (Marc).
+               Games are still reachable via the main NavBar; this slot
+               now hosts the fire-breath progression collection — a visual
+               compendium of unlocked vs. locked breaths + the pending
+               teach-ritual card when totalTasksDone crosses a threshold.
+               See backlog_fire_breath_progression.md. */}
+          {segment === 'feuer' && (
+            <FireBreathCollection />
           )}
 
           {/* ═══ ERINNERUNGEN SEGMENT ═══
@@ -1571,6 +1541,15 @@ export default function RonkiProfile({ onNavigate }) {
           </div>
         </div>
       )}
+
+      {/* Local keyframes used by sub-nav pulse (Feuer tab when a ritual
+          is pending) + any other small attention beats. */}
+      <style>{`
+        @keyframes rp-pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50%      { transform: scale(1.35); opacity: 0.7; }
+        }
+      `}</style>
     </div>
   );
 }
