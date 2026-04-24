@@ -40,6 +40,15 @@ export const ARTICLES: Article[] = [
     image: '/art/bioms/Naschgarten_temptaion-garden.webp',
   },
   {
+    slug: 'was-kinder-apps-machen',
+    title: 'Was Kinder-Apps mit deinem Kind machen',
+    description:
+      'Pokémon Go, Streaks, Paywalls, Werbung die selbst ein Spiel ist: was ich nach anderthalb Jahren Kinder-Apps mit meinem Sohn gelernt habe und was bei uns funktioniert.',
+    category: 'Digitale Mündigkeit',
+    readMinutes: 12,
+    image: '/art/marketing/was-kinder-apps-machen.png',
+  },
+  {
     slug: 'dark-patterns-kinder-apps',
     title: 'Dark Patterns in Kinder-Apps: Was Eltern 2026 wissen sollten',
     description:

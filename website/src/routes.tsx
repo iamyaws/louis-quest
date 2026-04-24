@@ -34,6 +34,7 @@ const PrintA4PosterBaeckerei = lazy(() => import('./pages/PrintA4PosterBaeckerei
 const PrintA4PosterKinderarzt = lazy(() => import('./pages/PrintA4PosterKinderarzt'));
 const PrintA4PosterZaehne = lazy(() => import('./pages/PrintA4PosterZaehne'));
 const PrintA4PosterAntiEngagement = lazy(() => import('./pages/PrintA4PosterAntiEngagement'));
+const RatgeberWasKinderAppsMachen = lazy(() => import('./pages/ratgeber/WasKinderAppsMachen'));
 const RatgeberMorgenTroedeln = lazy(() => import('./pages/ratgeber/MorgenTroedeln'));
 const RatgeberStickerChartAlternative = lazy(() => import('./pages/ratgeber/StickerChartAlternative'));
 const RatgeberDarkPatternsKinderApps = lazy(() => import('./pages/ratgeber/DarkPatternsKinderApps'));
@@ -98,6 +99,7 @@ export function AppRoutes() {
         <Route path="/print/a4-poster-zaehne" element={<PrintA4PosterZaehne />} />
         <Route path="/print/a4-poster-anti-engagement" element={<PrintA4PosterAntiEngagement />} />
         <Route path="/ratgeber" element={<Ratgeber />} />
+        <Route path="/ratgeber/was-kinder-apps-machen" element={<RatgeberWasKinderAppsMachen />} />
         <Route path="/ratgeber/morgen-troedeln" element={<RatgeberMorgenTroedeln />} />
         <Route path="/ratgeber/sticker-chart-alternative" element={<RatgeberStickerChartAlternative />} />
         <Route path="/ratgeber/dark-patterns-kinder-apps" element={<RatgeberDarkPatternsKinderApps />} />

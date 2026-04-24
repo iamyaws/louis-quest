@@ -96,6 +96,7 @@ Current (April 2026): **beta**. CTA = "Frühzugang anfordern". Still runs the wa
 - **No dark patterns.** No fake scarcity, no streak pressure, no manipulative copy.
 - **No fake testimonials.** Removed. Impressum declares AI-art sources (Midjourney, Gemini/Imagen).
 - **Target audience.** German parents of 5-9 year olds. Not tech-savvy, not early adopters.
+- **No AI-smooth parallel triplets in founder voice.** Three-item rhetorical closes like "Kein Fluff. Kein Lifehack. Nur was passiert ist." sit griffig but smell AI. Prefer longer, slightly stumbling sentences with conversational qualifiers ("ehrlich gesagt", "irgendwie", "in der Zeit", "kurz vorweg"), e.g. "Ehrlich gesagt auch einiges was ich selbst falsch gemacht habe in der Zeit." Applies to posts, manifestos, founder-letters, creator-DMs, and any draft in Marc's first-person voice. Does not apply to product UI copy or SEO-page body.
 
 ## Ritual vs. Routine positioning (April 2026)
 
