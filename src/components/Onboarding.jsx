@@ -283,10 +283,10 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                 autoCapitalize="words"
                 autoComplete="off"
                 enterKeyHint="next"
-                className="w-full px-6 py-4 rounded-2xl text-xl font-headline font-bold text-on-surface placeholder:text-on-surface/30 outline-none transition-all"
+                className="w-full px-6 py-4 rounded-2xl text-xl font-headline font-bold text-on-surface placeholder:text-on-surface/30 outline-none transition-all focus:ring-4 focus:ring-teal-300/50"
                 style={{
                   background: 'rgba(255,255,255,0.95)',
-                  border: heroName.trim() ? '2.5px solid #fcd34d' : '2px solid rgba(255,255,255,0.3)',
+                  border: heroName.trim() ? '2.5px solid #fcd34d' : '2px solid rgba(18,67,70,0.35)',
                   boxShadow: heroName.trim() ? '0 0 20px rgba(252,211,77,0.2)' : '0 2px 8px rgba(0,0,0,0.08)',
                 }}
               />
@@ -593,7 +593,10 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
                   </span>
                 </div>
                 <div>
-                  <h4 className="font-headline font-bold text-base text-on-surface">{card.title}</h4>
+                  {/* text-base → text-lg + sage accent so titles distinguish
+                      from body. UI/UX audit 24 Apr 2026: prior equal-weight
+                      card title + body broke hierarchy. */}
+                  <h4 className="font-headline font-bold text-lg leading-tight" style={{ color: '#0f766e' }}>{card.title}</h4>
                   <p className="font-body text-sm text-on-surface-variant leading-relaxed mt-1">{card.body}</p>
                 </div>
               </div>

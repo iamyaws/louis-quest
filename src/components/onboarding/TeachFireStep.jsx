@@ -213,7 +213,11 @@ export default function TeachFireStep({ variant, t, ProgressBar, onComplete }) {
                 >
                   <span aria-hidden="true">🔥</span>
                 </button>
-                <p className="text-white/65 text-sm font-label uppercase tracking-widest">
+                {/* Icon + label clarifies "hold" beyond the word alone —
+                    kid sees the touch-hold glyph AND reads it. Opacity
+                    bumped /65 → /85 for outdoor readability. */}
+                <p className="text-white/85 text-sm font-label uppercase tracking-widest inline-flex items-center gap-2">
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>touch_app</span>
                   {t('onboarding.teach.holdLabel')}
                 </p>
               </>
