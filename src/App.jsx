@@ -339,53 +339,12 @@ function AppContent() {
   }
 
   // ── Parent-first onboarding choreography (23 Apr 2026 rework) ──
-  // The sequence is: KidIntro (Phase 1+2) → ParentOnboarding (Phase 3) →
-  // HandoffBackCard (Phase 4) → Onboarding (Phase 5 hatch+name) → Hub
-  // (Phase 6 Lagerfeuer gentle pull). Each phase has its own state flag
-  // so returning mid-flow resumes at the right place. Existing users get
-  // all flags migrated to !!onboardingDone in the TaskContext loader so
-  // they skip the whole sequence.
-  //
-  // See docs/discovery/2026-04-23-onboarding-parent-first/transcript.md
-
-  // Phase 1 + 2 — Kid intro (forest, egg, Ronki peek, "Mama oder Papa?" handoff)
-  if (state && !state.kidIntroSeen) {
-    return (
-      <KidIntro onComplete={() => {
-        actions.patchState({ kidIntroSeen: true });
-      }} />
-    );
-  }
-
-  // Phase 3 — Parent setup (Lean 5 steps: Welcome/PIN/Family/Analytics/Done)
-  if (state && !state.parentOnboardingDone) {
-    return (
-      <ParentOnboarding
-        existingFamilyConfig={state.familyConfig}
-        onComplete={(patch) => {
-          actions.patchState(patch);
-        }}
-      />
-    );
-  }
-
-  // Phase 4 — Handoff back to kid ("Fertig! / Jetzt bist du dran.")
-  if (state && !state.parentHandoffBackSeen) {
-    return (
-      <HandoffBackCard onContinue={() => {
-        actions.patchState({ parentHandoffBackSeen: true });
-      }} />
-    );
-  }
-
-  // Phase 5 — Kid onboarding (existing Onboarding.jsx: hatch + name)
-  if (state && !state.onboardingDone) {
-    return (
-      <Onboarding onComplete={(cfg) => {
-        actions.completeOnboarding(cfg);
-      }} />
-    );
-  }
+  // [DRACHENNEST EXPERIMENT BRANCH] Both onboardings auto-bypassed via
+  // ExperimentAutoPrime mounted further up the provider tree (sibling
+  // to AppContent so the prime hooks don't disturb AppContent's hook
+  // ordering — early attempt put the useEffect inline here and React
+  // caught a hook-count mismatch). When experiment graduates to main,
+  // restore the gated returns from `git log -- src/App.jsx`.
 
   // Long-press backdoor removed — the lock button on Buch + Laden gives a
   // focused, intentional parental entry, and a 1.5s anywhere-hold was
@@ -780,19 +739,55 @@ function AuthGate() {
     }
   }
 
-  if (!user) {
-    return <LoginScreen />;
-  }
+  // [DRACHENNEST EXPERIMENT BRANCH] LoginScreen bypassed — the
+  // experiment runs locally with the supabase stub (no real auth) so
+  // user is always null. Marc's call 24 Apr 2026: "deactivate both
+  // onboardings" + "preview within Claude Code". Logging in is one
+  // gate too many for prototype iteration. AppContent's auto-prime
+  // useEffect handles the parent-first onboarding bypass downstream.
+  // Restore the `if (!user) return <LoginScreen />;` block when the
+  // experiment graduates to main.
 
   return (
     <TaskProvider>
       <CelebrationQueueProvider>
         <QuestEaterProvider>
+          {/* [DRACHENNEST] Auto-prime sits as a sibling so its hook
+              stack stays separate from AppContent's. Onboarding gates
+              get bypassed without disturbing AppContent rendering. */}
+          <ExperimentAutoPrime />
           <AppContent />
         </QuestEaterProvider>
       </CelebrationQueueProvider>
     </TaskProvider>
   );
+}
+
+// [DRACHENNEST EXPERIMENT BRANCH] One-shot auto-prime for the
+// onboarding flags so the prototype always boots straight to RoomHub.
+// Renders nothing; runs an effect that patches state once. Lives as a
+// sibling of AppContent so its hooks don't disturb that component's
+// hook ordering.
+function ExperimentAutoPrime() {
+  const { state, actions } = useTask();
+  React.useEffect(() => {
+    if (!state || !actions) return;
+    if (!state.kidIntroSeen || !state.parentOnboardingDone || !state.parentHandoffBackSeen) {
+      actions.patchState?.({
+        kidIntroSeen: true,
+        parentOnboardingDone: true,
+        parentHandoffBackSeen: true,
+      });
+    }
+    if (!state.onboardingDone) {
+      actions.completeOnboarding?.({
+        companionVariant: 'forest',
+        heroName: 'Louis',
+        heroGender: 'boy',
+      });
+    }
+  }, [state?.kidIntroSeen, state?.parentOnboardingDone, state?.parentHandoffBackSeen, state?.onboardingDone, actions]);
+  return null;
 }
 
 function ErrorBoundary({ children }) {
@@ -823,7 +818,17 @@ function ErrorBoundary({ children }) {
 class ErrorBoundaryInner extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false }; }
   static getDerivedStateFromError(e) { return { hasError: true, error: e }; }
-  componentDidCatch(e) { this.props.onError(e); }
+  componentDidCatch(e, info) {
+    // Surface real error during dev so it's debuggable. Without this
+    // the ErrorBoundary's UI just says "Etwas ist schiefgelaufen" with
+    // no clue what threw.
+    // eslint-disable-next-line no-console
+    console.error('[ErrorBoundary] caught:', e, info?.componentStack);
+    if (typeof window !== 'undefined') {
+      window.__lastError = { message: e?.message, stack: e?.stack, componentStack: info?.componentStack };
+    }
+    this.props.onError(e);
+  }
   render() { return this.state.hasError ? null : this.props.children; }
 }
 

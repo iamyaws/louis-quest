@@ -67,11 +67,35 @@ const GoogleGIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   </svg>
 );
 
+// [DRACHENNEST EXPERIMENT BRANCH] When Supabase is not configured (no
+// VITE_SUPABASE_URL env var), provide a stub user so downstream code
+// that reads user.id keeps working without a real login. This lets the
+// prototype boot straight to RoomHub without hitting LoginScreen.
+// Detect via the supabase client's stub flag the lib already exposes
+// (or fall back to checking import.meta.env directly).
+const STUB_USER: User = {
+  id: 'drachennest-local',
+  app_metadata: { provider: 'stub' },
+  user_metadata: { name: 'Louis' },
+  aud: 'stub',
+  created_at: new Date().toISOString(),
+  email: 'louis@drachennest.local',
+} as unknown as User;
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // [DRACHENNEST] Detect stub Supabase (missing env vars) and skip
+    // the network round-trip entirely. Without this we wait the 5s
+    // fallback timer before showing anything.
+    const isStubSupabase = !import.meta.env.VITE_SUPABASE_URL;
+    if (isStubSupabase) {
+      setUser(STUB_USER);
+      setLoading(false);
+      return;  // skip the network getSession dance + listener
+    }
     // Safety net: if the Supabase call hangs (cold start, flaky
     // network, bad token), don't leave the kid on a "Loading" screen
     // forever. After 5s, assume no session and let the app boot.
