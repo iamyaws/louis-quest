@@ -32,15 +32,10 @@ export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 
   const stageIdx = getCatStage(state?.catEvo ?? 0);
   const mood = state?.ronkiMood || 'normal';
 
-  // Blend logic: until the kid has 5+ real plants, we mix demo plants in
-  // so the Hub backdrop never reads as half-empty. Once 5+ real plants
-  // exist the kid's garden carries itself and demos retire. Marc flag
-  // 24 Apr 2026: Hub preview looked empty of trees after planting 1
-  // test seed (because the 'empty state' threshold was 0 not 5, so
-  // demos disappeared too early).
-  const plantsToRender = plants.length >= 5
-    ? plants
-    : [...makeDemoPlants(), ...plants];
+  // Demo atmosphere fills in until the kid has 5+ real plants. Real
+  // and demo render as SEPARATE prop lists so the scene doesn't have
+  // to id-prefix-filter downstream (demo isolation refactor 24 Apr 2026).
+  const demoPlants = plants.length >= 5 ? [] : makeDemoPlants();
 
   return (
     <button
@@ -64,7 +59,8 @@ export default function GardenPreview({ plants = [], decor = [], onOpen, lang = 
       }}
     >
       <GardenScene
-        plants={plantsToRender}
+        plants={plants}
+        demoPlants={demoPlants}
         decor={decor}
         showRonki
         ronkiPosition={{ left: '32%', bottom: '12%', size: 124 }}

@@ -240,8 +240,10 @@ function Fire({ left = '50%', bottom = '12%', scale = 1 }) {
 
 // ── Main component ────────────────────────────────────────────────────
 export default function GardenScene({
-  plants = [],
-  decor = [],
+  plants = [],              // real kid-planted trees (state.garden.plants)
+  decor = [],               // real kid-placed decor (state.garden.decor)
+  demoPlants = [],          // optional atmosphere plants (no interaction)
+  demoDecor = [],           // optional atmosphere decor (no interaction)
   sky,
   season,
   showFire = true,
@@ -255,7 +257,8 @@ export default function GardenScene({
   showSun = true,
   className = '',
   onSceneTap,
-  onDecorClick,          // (id) => void — if set, decor items are tappable (decor mode)
+  onDecorClick,          // (id) => void — if set, REAL decor items are tappable (decor mode).
+                         //                Demo decor stays non-interactive regardless.
   children,
   plantStageFn = defaultStage,
 }) {
@@ -298,9 +301,31 @@ export default function GardenScene({
 
       <div className="g-ground" aria-hidden="true" />
 
-      {/* Plants — rendered in plantedAt order so older plants sit further
-          back in the z-order (they were planted first). Position is % so
-          the garden scales with any scene size. */}
+      {/* Demo atmosphere plants — rendered first, BEHIND real plants in
+          DOM order. Non-interactive (no tap-to-remove even in decor mode).
+          Kid-owned plants visually overlap these. Isolation refactor
+          24 Apr 2026: separate list + non-interactive rendering removes
+          the id-prefix filtering that was scattered in 3 places. */}
+      {demoPlants.map((p) => {
+        const stage = plantStageFn(p);
+        return (
+          <div
+            key={p.id}
+            className="g-plant"
+            style={{ left: `${p.position.x}%`, bottom: `${p.position.y}%` }}
+            data-species={p.species}
+            data-stage={stage}
+            data-demo="true"
+            aria-hidden="true"
+          >
+            <PlantByStage plant={p} stage={stage} />
+            <span className="g-plant-shadow" />
+          </div>
+        );
+      })}
+
+      {/* Real kid-planted trees — rendered AFTER demo plants so they sit
+          in front. Position is % so the garden scales with any scene size. */}
       {plants.map((p) => {
         const stage = plantStageFn(p);
         return (
@@ -317,12 +342,24 @@ export default function GardenScene({
         );
       })}
 
-      {/* Decor — rendered after plants so they overlap them visually if
-          placed in front. Kid chooses the placement order via position.
-          In decor mode (onDecorClick set), each item becomes tappable —
-          tapping removes it from the scene (ownership persists so it
-          flows back to the strip for free re-placement). Marc flag 24
-          Apr 2026: "cannot put the object back into my bag". */}
+      {/* Demo atmosphere decor — rendered BEFORE real decor + always
+          non-interactive (no tappable button, no onDecorClick wiring). */}
+      {demoDecor.map((d) => (
+        <div
+          key={d.id}
+          className="g-decor-item"
+          style={{ left: `${d.position.x}%`, bottom: `${d.position.y}%` }}
+          data-type={d.type}
+          data-demo="true"
+          aria-hidden="true"
+        >
+          <Decor type={d.type} />
+        </div>
+      ))}
+
+      {/* Real kid-placed decor. In decor mode (onDecorClick set), each
+          REAL item becomes tappable (ownership persists, so tap removes
+          from scene but keeps in owned). */}
       {decor.map((d) => {
         const style = { left: `${d.position.x}%`, bottom: `${d.position.y}%` };
         if (onDecorClick) {

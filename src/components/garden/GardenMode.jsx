@@ -106,19 +106,20 @@ export default function GardenMode({ onClose }) {
   const stageIdx = getCatStage(state?.catEvo ?? 0);
   const mood = state?.ronkiMood || 'normal';
 
-  // Blend logic: demo plants/decor fill in alongside real items until
-  // the kid has built up their own garden. Threshold 5 for both so the
-  // Hub preview + full-screen view carry enough visual weight through
-  // the early weeks. Once 5+ real plants/decor exist, demos retire.
-  // Memoized so GardenScene doesn't re-render the full plant+decor tree
-  // on every state tick (UI/UX Pro Max perf finding 24 Apr 2026).
-  const plants = useMemo(
-    () => realPlants.length >= 5 ? realPlants : [...makeDemoPlants(), ...realPlants],
-    [realPlants]
+  // Demo atmosphere fills in until the kid has 5+ real items of each
+  // kind. Real and demo stay as SEPARATE arrays, passed on separate
+  // props to GardenScene — the scene renders both but the demo set is
+  // non-interactive (no id-prefix filtering needed downstream).
+  // Memoized so GardenScene doesn't re-render the full tree every tick.
+  const plants = realPlants;
+  const decor = realDecor;
+  const demoPlants = useMemo(
+    () => realPlants.length >= 5 ? [] : makeDemoPlants(),
+    [realPlants.length]
   );
-  const decor = useMemo(
-    () => realDecor.length >= 5 ? realDecor : [...makeDemoDecor(), ...realDecor],
-    [realDecor]
+  const demoDecor = useMemo(
+    () => realDecor.length >= 5 ? [] : makeDemoDecor(),
+    [realDecor.length]
   );
 
   // Hint rings — 3 pre-defined spots marking "tap here to add something."
@@ -240,6 +241,8 @@ export default function GardenMode({ onClose }) {
         <GardenScene
           plants={plants}
           decor={decor}
+          demoPlants={demoPlants}
+          demoDecor={demoDecor}
           showRonki
           // Ronki sits ON the bench (DEMO_BENCH_POSITION shared with demo
           // decor so they stay aligned). Left 30% matches bench left, and
@@ -259,15 +262,12 @@ export default function GardenMode({ onClose }) {
           showSun
           hintSpots={hintSpots}
           onSceneTap={handleSceneTap}
-          // In decor mode, tapping a placed REAL item removes it
-          // (ownership persists — it flows back to the strip for free
-          // re-placement). Demo items are filtered out so tapping them
-          // is a no-op with no ghost-removal confusion. Code-review C3
-          // flag 24 Apr 2026: tapping demo-bench fired removeDecor but
-          // state.garden.decor didn't contain it → silent nothing.
-          onDecorClick={mode === 'decor'
-            ? (id) => { if (!id.startsWith('demo-')) actions.removeDecor(id); }
-            : undefined}
+          // In decor mode, tapping a placed item removes it (ownership
+          // persists). Demo atmosphere decor is rendered from a
+          // separate `demoDecor` prop and never gets a button wrapper,
+          // so no id-prefix filter needed here anymore (isolation
+          // refactor 24 Apr 2026).
+          onDecorClick={mode === 'decor' ? actions.removeDecor : undefined}
         >
           {/* Ambient gold orbs floating in the sky — atmospheric depth
               lifted from Claude Design Frame 4. Purely decorative. */}

@@ -460,10 +460,21 @@ export function LoginScreen() {
                 expected BEFORE they see it. Reduces "this feels fishy" bounce
                 until the custom-domain migration lands. */}
             <p
-              className="text-center mt-2 mb-5 font-body"
+              className="text-center mt-2 mb-2 font-body"
               style={{ fontSize: 11, color: 'rgba(18,67,70,0.55)', lineHeight: 1.4 }}
             >
               {t('auth.googleHint')}
+            </p>
+            {/* Multi-identity prevention — if parents log in with Google
+                account A on phone and Google account B on laptop, each
+                sees an empty state row in Supabase (one user_id per
+                Google email). Inline warning pre-empts the confusion.
+                See issue_multi_identity_sync.md in basic-memory. */}
+            <p
+              className="text-center mb-5 font-body"
+              style={{ fontSize: 10, color: 'rgba(180,83,9,0.72)', lineHeight: 1.35, padding: '0 12px' }}
+            >
+              {t('auth.sameAccountHint')}
             </p>
 
             {/* ── Divider ── Polish-v2 pill divider: thin hairlines with

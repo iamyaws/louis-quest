@@ -936,6 +936,7 @@
   "auth.hasAccount": "Ich habe bereits ein Konto",
   "auth.signInWithGoogle": "Mit Google anmelden",
   "auth.googleHint": "Google leitet kurz zu unserem Auth-Partner weiter. Das ist normal.",
+  "auth.sameAccountHint": "Tipp: Melde dich auf allen Geräten mit demselben Konto an, sonst siehst du den Fortschritt nicht.",
   "auth.signInWithEmailLink": "Per E-Mail anmelden",
   "auth.sendMagicLink": "Link senden",
   "auth.magicLinkSent.title": "E-Mail unterwegs",

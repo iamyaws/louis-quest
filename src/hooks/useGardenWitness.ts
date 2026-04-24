@@ -59,8 +59,11 @@ export function useGardenWitness(garden: GardenState | undefined): PendingWitnes
     if (!garden) return null;
     const seen = garden.witnessedStages || {};
 
-    // Only consider real plants, skip the demo atmosphere set.
-    const realPlants = garden.plants.filter(p => !p.id.startsWith('demo-'));
+    // state.garden.plants only ever holds REAL kid-planted trees —
+    // demo atmosphere plants live in a separate render-only list on
+    // GardenScene (isolation refactor 24 Apr 2026), never stored in
+    // state. So we can trust this array directly without filtering.
+    const realPlants = garden.plants;
     if (realPlants.length === 0) return null;
 
     // Find the oldest plant whose current stage exceeds what the kid
