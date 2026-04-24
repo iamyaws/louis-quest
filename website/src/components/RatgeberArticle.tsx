@@ -331,6 +331,8 @@ export function RatgeberArticle({
         .ratgeber-body {
           font-family: 'Be Vietnam Pro', system-ui, sans-serif;
           font-size: 1.1rem;
+          hyphens: manual;
+          -webkit-hyphens: manual;
           line-height: 1.75;
           color: rgb(26 32 34 / 0.82);
         }

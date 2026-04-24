@@ -363,7 +363,7 @@ export default function RatgeberWasKinderAppsMachen() {
       <h2>Was ich selbst gebaut habe</h2>
 
       <p>
-        Ich arbeite seit einem Jahr an einer kleinen Web-App für Kinder
+        Ich arbeite seit einigen Wochen an einer kleinen Web-App für Kinder
         zwischen fünf und neun, bei der wir diese Patterns explizit nicht
         eingebaut haben. Keine Streaks, keine Push, keine Werbung, keine
         Cosmetics, kein App-Store, kein Konto, kein Tracking. Sie heißt Ronki
