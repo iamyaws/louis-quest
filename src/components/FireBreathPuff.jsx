@@ -96,6 +96,11 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
               bottom: 0,
               left: `${(10 + i * 8) * scale}px`,
               fontSize: (18 + (i % 2) * 6) * scale,
+              // Alternating bright gold / cream for a subtle twinkle.
+              // Explicit color — the ✦ glyph otherwise inherits the
+              // parent text color (black in most ritual contexts).
+              // Marc flag 24 Apr 2026.
+              color: i % 2 ? '#fef3c7' : '#fde047',
               opacity: 0,
               animation: `fbpSparkle ${duration}s ease-out ${i * 0.08 * duration / 1.1}s forwards`,
               filter: `drop-shadow(0 0 ${6 * scale}px rgba(252,211,77,0.95))`,
