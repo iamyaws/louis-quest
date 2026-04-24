@@ -366,54 +366,60 @@ export default function GardenMode({ onClose }) {
         </GardenScene>
       </div>
 
-      {/* Top chrome — Zurück pill (left) + "Dein Garten" badge (right) */}
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10"
-           style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-flex items-center gap-1.5 active:scale-95 transition-transform"
-          style={{
-            padding: '12px 18px 12px 14px',
-            minHeight: 48,
-            borderRadius: 999,
-            background: 'rgba(255,248,242,.94)',
-            backdropFilter: 'blur(14px)',
-            border: '1px solid rgba(18,67,70,.12)',
-            boxShadow: '0 4px 14px -4px rgba(18,67,70,.22)',
-            color: '#124346',
-            font: '700 12px/1 "Plus Jakarta Sans", sans-serif',
-            letterSpacing: '.14em',
-            textTransform: 'uppercase',
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>close</span>
-          {t('garden.back')}
-        </button>
+      {/* Top chrome — Zurück pill (left) + "Dein Garten" badge (right).
+          Only in idle mode: sub-modes (plant / decor) bring their own
+          chrome (Fertig pill + Sterne budget) and rendering both stacks
+          would overlap the title with the Sterne pill. Marc flag 24 Apr
+          2026 (screenshot: "DEI..." title leaking out behind Sterne). */}
+      {mode === 'idle' && (
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10"
+             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center gap-1.5 active:scale-95 transition-transform"
+            style={{
+              padding: '12px 18px 12px 14px',
+              minHeight: 48,
+              borderRadius: 999,
+              background: 'rgba(255,248,242,.94)',
+              backdropFilter: 'blur(14px)',
+              border: '1px solid rgba(18,67,70,.12)',
+              boxShadow: '0 4px 14px -4px rgba(18,67,70,.22)',
+              color: '#124346',
+              font: '700 12px/1 "Plus Jakarta Sans", sans-serif',
+              letterSpacing: '.14em',
+              textTransform: 'uppercase',
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>close</span>
+            {t('garden.back')}
+          </button>
 
-        <div
-          role="heading"
-          aria-level={1}
-          aria-label={t('garden.yourGarden')}
-          className="inline-flex items-center"
-          style={{
-            padding: '10px 16px',
-            minHeight: 44,
-            borderRadius: 999,
-            background: 'rgba(18,67,70,.85)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(254,243,199,.24)',
-            color: '#fffbeb',
-            font: '700 12px/1 "Plus Jakarta Sans", sans-serif',
-            letterSpacing: '.2em',
-            textTransform: 'uppercase',
-            boxShadow: '0 4px 10px -4px rgba(0,0,0,.45)',
-            textShadow: '0 1px 2px rgba(0,0,0,.35)',
-          }}
-        >
-          {t('garden.yourGarden')}
+          <div
+            role="heading"
+            aria-level={1}
+            aria-label={t('garden.yourGarden')}
+            className="inline-flex items-center"
+            style={{
+              padding: '10px 16px',
+              minHeight: 44,
+              borderRadius: 999,
+              background: 'rgba(18,67,70,.85)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(254,243,199,.24)',
+              color: '#fffbeb',
+              font: '700 12px/1 "Plus Jakarta Sans", sans-serif',
+              letterSpacing: '.2em',
+              textTransform: 'uppercase',
+              boxShadow: '0 4px 10px -4px rgba(0,0,0,.45)',
+              textShadow: '0 1px 2px rgba(0,0,0,.35)',
+            }}
+          >
+            {t('garden.yourGarden')}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Action chips — idle mode. Pflanzen is Sunday-only (weekly
           ritual per Q6 A); hidden on other days so the kid discovers
