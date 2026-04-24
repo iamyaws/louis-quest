@@ -4,6 +4,7 @@ import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import SFX from '../utils/sfx';
 import { useQuestEater } from './QuestEater';
+import { flavorForQuest } from './FireBreathPuff';
 
 /**
  * DailyHabits — parent-defined daily checkpoints.
@@ -42,13 +43,16 @@ export default function DailyHabits() {
     // Habits get the sparkle flavor — star-drift fire-breath. Teaches
     // the kid that habits (vs routine quests) are something different,
     // and the ambient sparkle feels fitting for growing-over-time.
+    // Gated by flavorForQuest → falls back to 'flame' until the
+    // Funkenstern ritual has unlocked the sparkle breath. See
+    // backlog_fire_breath_progression.md.
     if (eater && evt?.currentTarget) {
       const fromRect = evt.currentTarget.getBoundingClientRect();
       eater.eatQuest({
         fromRect,
         emoji: habit.icon || '✨',
         hp: habit.xp || 5,
-        flavor: 'sparkle',
+        flavor: flavorForQuest({ kind: 'habit' }, state.taughtBreaths),
       });
     }
     actions.completeHabit?.(habit.id);

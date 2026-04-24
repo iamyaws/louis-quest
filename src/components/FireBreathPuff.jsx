@@ -251,16 +251,38 @@ export default function FireBreathPuff({ flavor = 'flame', fireKey, top, left, s
 }
 
 /**
- * Flavor mapper — given a Quest (or habit) object, pick the fire-breath
- * flavor. Falls back to 'flame' for anything unrecognized. Centralized
- * here so every call site stays consistent.
+ * Quest-type → flavor mapping. Stateless, deterministic. This is the
+ * "ideal" flavor for the quest type — whether the kid actually sees it
+ * depends on whether that flavor has been taught yet (see flavorForQuest).
  */
-export function flavorForQuest(q) {
+function idealFlavorForQuest(q) {
   if (!q) return 'flame';
   if (q.sideQuest) return 'ember';
   if (q.kind === 'mint' || /^mint_/.test(q.id || '')) return 'sparkle';
   if (q.kind === 'habit' || /^habit_/.test(q.id || '')) return 'sparkle';
   if (q.kind === 'freund') return 'heart';
   if (q.kind === 'arc' || q.kind === 'streak') return 'rainbow';
+  return 'flame';
+}
+
+/**
+ * Flavor mapper — given a Quest (or habit) object, pick the fire-breath
+ * flavor to actually play. Gates the ideal flavor on `taughtBreaths` so
+ * non-flame animations only fire after their teach ritual has been
+ * completed.
+ *
+ * - `flame` is always available (seeded at onboarding completion).
+ * - Any other ideal flavor falls back to `flame` until taught.
+ *
+ * Call sites that don't have access to state (legacy code paths) can
+ * omit the second arg — the gate defaults to "only flame taught" which
+ * matches the pre-progression behavior before onboarding.
+ *
+ * See backlog_fire_breath_progression.md for the unlock schedule.
+ */
+export function flavorForQuest(q, taughtBreaths) {
+  const ideal = idealFlavorForQuest(q);
+  if (ideal === 'flame') return 'flame';
+  if (taughtBreaths && taughtBreaths[ideal]) return ideal;
   return 'flame';
 }

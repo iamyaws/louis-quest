@@ -114,7 +114,10 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
         fromRect,
         emoji: quest.icon || '⭐',
         hp: quest.xp || 0,
-        flavor: flavorForQuest(quest),
+        // Flavor is gated on taughtBreaths — non-flame animations fall
+        // back to flame until the matching teach ritual has unlocked
+        // them. See backlog_fire_breath_progression.md.
+        flavor: flavorForQuest(quest, state.taughtBreaths),
       });
     }
 

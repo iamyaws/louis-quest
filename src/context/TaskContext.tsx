@@ -15,6 +15,20 @@ import { MINT_SEQUENCE } from '../data/mintGames';
 import storage from '../utils/storage';
 import { useAuth } from './AuthContext';
 
+// ── Fire-breath progression ──
+/**
+ * The five unlockable fire-breath flavors. `smoke` is NOT in this union
+ * because it's the universal failed-attempt state, never something the
+ * kid "owns". Each flavor gets taught via its own 2-round ritual
+ * (TeachFireStep v2 pattern) at a milestone; the ritual stamps an ISO
+ * date into state.taughtBreaths[flavor]. Until taught, flavorForQuest
+ * falls back to 'flame' so non-flame animations never play unlocked.
+ *
+ * See backlog_fire_breath_progression.md for the full design + planned
+ * unlock schedule.
+ */
+export type FireBreathFlavor = 'flame' | 'sparkle' | 'heart' | 'ember' | 'rainbow';
+
 // ── Journal entry for history ──
 export interface JournalEntry {
   date: string;
@@ -220,6 +234,14 @@ export interface TaskState {
   // like "Weißt du noch, wie du mir das beigebracht hast?" months later.
   taughtSignature?: 'fire';
   taughtAt?: string; // ISO date string — when the teach beat was completed
+  /** Which fire-breath flavors the kid has taught Ronki, each keyed by
+   *  the ISO date (YYYY-MM-DD) of the teach ritual. `flame` is
+   *  auto-seeded at onboarding completion (mirroring taughtAt). Other
+   *  flavors unlock via milestone-triggered rituals (sparkle/heart/
+   *  ember/rainbow). Gated by flavorForQuest() — any flavor absent
+   *  from this map falls back to 'flame' when a quest fires. See
+   *  backlog_fire_breath_progression.md. */
+  taughtBreaths?: Partial<Record<FireBreathFlavor, string>>;
   familyConfig: FamilyConfig;
   _v2_economy_reset?: boolean;
   arcEngine?: ArcEngineState;
@@ -346,6 +368,11 @@ interface TaskActions {
   playCompanion: () => void;
   collectLoginBonus: () => void;
   completeOnboarding: (cfg?: { eggType?: string; dragonVariant?: DragonVariant; companionVariant?: string; heroName?: string; heroGender?: string; taughtSignature?: 'fire'; taughtAt?: string }) => void;
+  /** Mark a fire-breath flavor as taught. Idempotent — calling twice
+   *  with the same flavor won't overwrite the original teach date.
+   *  Used by post-onboarding teach rituals (sparkle/heart/ember/
+   *  rainbow) to unlock the flavor for future QuestEater completions. */
+  teachBreath: (flavor: FireBreathFlavor) => void;
   saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
   redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
   dismissCelebration: () => void;
@@ -811,6 +838,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           onboardingDate: (raw as any).onboardingDate,
           taughtSignature: (raw as any).taughtSignature,
           taughtAt: (raw as any).taughtAt,
+          // Fire-breath progression — per-flavor teach dates. Gates
+          // flavorForQuest so non-flame animations only play after their
+          // ritual has been completed. See backlog_fire_breath_progression.md.
+          taughtBreaths: (raw as any).taughtBreaths,
           // Garden (core-gameloop-time-stack Phase 1) — lazy-shape.
           // Undefined on saves predating the garden feature; stays
           // undefined until the kid first interacts (plantSeed/placeDecor
@@ -825,6 +856,18 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           s.hp = Math.min(s.hp, 50); // cap at 50 from pre-rebalance inflation
           s.heroStats = s.heroStats || { mut: 0, fokus: 0, ordnung: 0 };
           s._v2_economy_reset = true;
+        }
+        // Migration (fire-breath progression): kids who completed the
+        // onboarding teach-beat before taughtBreaths existed still have
+        // their taughtAt anchor. Back-fill taughtBreaths.flame from it
+        // so they don't have to re-teach the base flame just to see any
+        // fire animations. If taughtAt is missing too, the next
+        // completeOnboarding / teachBreath call will seed it fresh.
+        if (s.taughtAt && !s.taughtBreaths?.flame) {
+          s.taughtBreaths = {
+            ...(s.taughtBreaths || {}),
+            flame: s.taughtAt,
+          };
         }
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
@@ -1326,6 +1369,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       // on completion. Without this, Hub renders a stage-0 egg right
       // after a dramatic hatch, which reads as broken.
       const babyEvo = Math.max(prev.catEvo || 0, CAT_STAGES[1]?.threshold ?? 3);
+      const taughtAtIso = cfg?.taughtAt || prev.taughtAt || new Date().toISOString().slice(0, 10);
       const updated = {
         ...prev,
         onboardingDone: true,
@@ -1340,7 +1384,15 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         // Falls back to 'fire'/today so re-onboarding flows that don't
         // re-run the teach beat still leave the anchors populated.
         taughtSignature: cfg?.taughtSignature || prev.taughtSignature || 'fire',
-        taughtAt: cfg?.taughtAt || prev.taughtAt || new Date().toISOString().slice(0, 10),
+        taughtAt: taughtAtIso,
+        // Fire-breath progression — flame is the base unlock, granted
+        // by completing the onboarding teach beat. Preserve existing
+        // date if already set (re-onboarding flow); otherwise seed from
+        // the same ISO date as taughtAt so the two anchors agree.
+        taughtBreaths: {
+          ...(prev.taughtBreaths || {}),
+          flame: prev.taughtBreaths?.flame || taughtAtIso,
+        },
       };
       const familyConfigPatch: Partial<FamilyConfig> = {};
       if (cfg?.heroName) familyConfigPatch.childName = cfg.heroName;
@@ -1349,6 +1401,25 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         updated.familyConfig = { ...prev.familyConfig, ...familyConfigPatch };
       }
       return updated;
+    });
+  }, []);
+
+  // ── Teach a new fire-breath flavor (idempotent) ──
+  // Called by post-onboarding teach rituals (sparkle/heart/ember/rainbow)
+  // once the kid completes the 2-round success beat. Stamps today's ISO
+  // date into state.taughtBreaths[flavor]; noop if the flavor is already
+  // taught (protects against double-fire from navigation races).
+  const teachBreath = useCallback((flavor: FireBreathFlavor) => {
+    setState(prev => {
+      if (!prev) return prev;
+      if (prev.taughtBreaths?.[flavor]) return prev;  // already taught — idempotent
+      return {
+        ...prev,
+        taughtBreaths: {
+          ...(prev.taughtBreaths || {}),
+          [flavor]: new Date().toISOString().slice(0, 10),
+        },
+      };
     });
   }, []);
 
@@ -2035,7 +2106,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
