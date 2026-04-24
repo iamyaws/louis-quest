@@ -915,6 +915,24 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
             flame: s.taughtAt,
           };
         }
+        // Catch-up ritual for saves loaded AFTER the feature shipped that
+        // are already past one or more thresholds. Without this, a kid
+        // with totalTasksDone=75 at deploy time has `wasAbove=true` on
+        // every future threshold check for sparkle + heart → those
+        // rituals never queue. Queue the lowest-threshold untaught
+        // flavor here (if any) so they get a chance to earn it on next
+        // Ronki-profile visit. Only runs if no ritual is already pending.
+        // Code-review finding 24 Apr 2026.
+        if (!s.pendingRitual) {
+          const tasks = s.totalTasksDone || 0;
+          const taught = s.taughtBreaths || {};
+          for (const flavor of RITUAL_UNLOCK_ORDER) {
+            if (!taught[flavor] && tasks >= RITUAL_TASK_THRESHOLDS[flavor]) {
+              s.pendingRitual = flavor;
+              break;
+            }
+          }
+        }
         // Day transition: rebuild quests if date changed
         if (s.lastDate !== today()) {
           s = applyDayTransition(s);

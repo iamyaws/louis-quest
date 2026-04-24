@@ -3,7 +3,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
 import SFX from '../utils/sfx';
-import FireBreathPuff from './FireBreathPuff';
+import FireBreathPuff, { flavorForQuest } from './FireBreathPuff';
 import MoodChibi from './MoodChibi';
 
 /**
@@ -138,8 +138,15 @@ export default function KristallKetteGame({ onComplete }) {
 
     const len = chain.length;
     if (len >= 2) {
-      // Determine flavor + reward per length
-      const flavor = len >= 7 ? 'rainbow' : len >= 5 ? 'heart' : len >= 3 ? 'ember' : 'flame';
+      // Determine flavor + reward per length. Gate the ideal flavor on
+      // state.taughtBreaths — until the matching ritual has been taught,
+      // fall back to 'flame' so kids don't see advanced flavors inside
+      // a game before teaching Ronki each one. Code-review flag 24 Apr
+      // 2026 (was bypassing flavorForQuest's unlock gate).
+      const idealFlavor = len >= 7 ? 'rainbow' : len >= 5 ? 'heart' : len >= 3 ? 'ember' : 'flame';
+      const flavor = idealFlavor === 'flame' || state?.taughtBreaths?.[idealFlavor]
+        ? idealFlavor
+        : 'flame';
       const hp = 5 + len * 2; // 5 + 2 per crystal
       setLastReward({ flavor, length: len, hp });
       setFireKey(k => k + 1);

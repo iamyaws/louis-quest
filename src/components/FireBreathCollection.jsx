@@ -229,7 +229,28 @@ export default function FireBreathCollection() {
   // Ritual modal mount state — separate from pendingRitual so the kid
   // has to actively tap the "Jetzt starten" card to open the modal.
   // That's the design choice per Marc (discoverable, not interruptive).
+  //
+  // We also capture the target flavor into local state at open-time so
+  // the modal's props don't depend on the live `pendingRitual` reducer
+  // flag while the modal is mounted. Otherwise teachBreath()'s clearing
+  // of pendingRitual + any future AnimatePresence exit timing could
+  // re-render with `flavor={undefined}` mid-animation. Local capture
+  // decouples the mount lifecycle from the reducer. Code-review flag
+  // 24 Apr 2026.
   const [ritualOpen, setRitualOpen] = useState(false);
+  const [activeFlavor, setActiveFlavor] = useState(null);
+
+  const openRitual = () => {
+    if (!pendingRitual) return;
+    setActiveFlavor(pendingRitual);
+    setRitualOpen(true);
+  };
+  const closeRitual = () => {
+    setRitualOpen(false);
+    // Leave activeFlavor set until modal fully unmounts via AnimatePresence;
+    // clearing it here would blank the modal content mid-exit. The next
+    // openRitual() overwrites it cleanly, and there's no other reader.
+  };
 
   const pendingMeta = pendingRitual ? FLAVOR_META[pendingRitual] : null;
   const pendingLabel = pendingRitual ? t(FLAVOR_META[pendingRitual].labelKey) : '';
@@ -282,7 +303,7 @@ export default function FireBreathCollection() {
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
-                onClick={() => setRitualOpen(true)}
+                onClick={openRitual}
                 className="w-full text-left active:scale-[0.98] transition-transform"
                 style={{
                   display: 'flex',
@@ -348,7 +369,7 @@ export default function FireBreathCollection() {
                 flavor={flavor}
                 taughtAt={taughtBreaths[flavor]}
                 isPending={pendingRitual === flavor}
-                onTap={() => setRitualOpen(true)}
+                onTap={openRitual}
               />
             ))}
           </div>
@@ -369,15 +390,17 @@ export default function FireBreathCollection() {
         </div>
       </section>
 
-      {/* Ritual modal mounts when ritualOpen=true. Dispatches
-          teachBreath() on completion (TeachRitualModal handles this),
-          which clears pendingRitual via the reducer. */}
+      {/* Ritual modal mounts when ritualOpen=true with a locally-
+          captured activeFlavor. Dispatches teachBreath() on completion
+          (TeachRitualModal handles this), which clears pendingRitual
+          via the reducer — but the modal itself stays mounted until
+          ritualOpen flips, protecting against any mid-exit render. */}
       <AnimatePresence>
-        {ritualOpen && pendingRitual && (
+        {ritualOpen && activeFlavor && (
           <TeachRitualModal
-            flavor={pendingRitual}
-            copyKeys={RITUAL_COPY[pendingRitual]}
-            onClose={() => setRitualOpen(false)}
+            flavor={activeFlavor}
+            copyKeys={RITUAL_COPY[activeFlavor]}
+            onClose={closeRitual}
           />
         )}
       </AnimatePresence>
