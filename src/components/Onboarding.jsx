@@ -52,7 +52,10 @@ export default function Onboarding({ onComplete, startStep = 0 }) {
           style={{
             height: 8,
             width: i === step ? 48 : 32,
-            background: i === step ? '#fcd34d' : i < step ? '#124346' : 'rgba(18,67,70,0.15)',
+            /* Future-pill opacity 0.15 → 0.32 for 3:1 contrast on the
+               cream background. UI/UX Pro Max flag: at 15%, unfilled
+               pills looked almost invisible. */
+            background: i === step ? '#fcd34d' : i < step ? '#124346' : 'rgba(18,67,70,0.32)',
             border: 'none',
           }}
         />
