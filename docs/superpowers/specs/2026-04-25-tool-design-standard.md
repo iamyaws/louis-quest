@@ -445,3 +445,122 @@ How the patterns map onto the four shipped tools.
 - `website/src/lib/motion.ts` — easing curves and `fadeUp` helper.
 - `.basic-memory/DESIGN.md` — palette, typography, motion, do's and don'ts.
 - `louis-quest/CLAUDE.md` — brand-voice rules (em-dashes, AI-slop, du-form).
+
+---
+
+# Hub / Index Page Patterns
+
+The §1-§14 rules cover individual tool screens. The next six sections cover the `/tools` hub itself — and any future hub-style listing surface (e.g. a `/ratgeber` redesign, a homepage "featured tools" rail). They were derived from a four-agent audit of `ToolsHub.tsx` on 25 Apr 2026 and codify the carve-outs the standard previously left implicit.
+
+## §15 — Hub / Index Page Variant
+
+A `/tools` index page is its own page type. It sits inside `PainterlyShell`, uses the same hero padding (`pt-32 pb-12 sm:pt-40 sm:pb-16`), and the same `max-w-4xl` exception called out in §1, but it overrides three rules from §2 / §13:
+
+| Rule on tool detail page | On a hub/index page |
+| --- | --- |
+| Back-link target = `/tools`, label = `Werkzeuge` | Target = `/`, label = `Startseite` |
+| Eyebrow = `Werkzeug für Eltern` (singular) | Eyebrow = `Werkzeug für Eltern` (singular, same string) — the H1 plural carries the count |
+| `<ToolDisclaimer />` renders at bottom | No disclaimer (the hub makes no per-app claims; per-tool disclaimers fire on the tool detail pages) |
+
+**Apply once per surface that lists tools rather than runs one.** A future `/vorlagen` or `/ratgeber` redesign that uses card-grid composition inherits this rule.
+
+## §16 — Tool-Card Composition
+
+Every card on the hub follows a strict shape:
+
+```
+eyebrow (tool name, ALL-CAPS, tracking-[0.18em])
+H2 (the tool's own H1 question, abbreviated to ≤ ~12 words, text-2xl)
+description (1-2 sentences in Marc-voice, text-sm)
+meta line (text-xs, tabular-nums, "<duration> · <output artifact>")
+CTA "Werkzeug öffnen" + ArrowRight icon
+```
+
+The whole card is a single `<Link>` (entire surface is the hit target — no separate CTA button). Card container uses `rounded-2xl p-7` plus the tone-driven background classes from §17. The 4mm `mustard → sage → teal` ribbon at the top is on by default; it disappears on the `teal` tone variant where it would clash with the inverted background.
+
+**Apply to every card representing a tool, anywhere on the marketing site** — including future homepage "featured tools" placements. Card titles use the parent's question/scenario, not the tool's marketing name (the eyebrow handles naming).
+
+## §17 — Hub Card Tone Rotation
+
+A 2x2 hub grid where every card is the same shape and color reads as a corporate features grid, not a painterly toolbox. Solve by rotating accent tones across the grid:
+
+| Position | Tone | Background |
+| --- | --- | --- |
+| 1 (top-left) | `cream` | `bg-cream/70 backdrop-blur-sm border border-teal/10` |
+| 2 (top-right) | `sage` | `bg-sage/15 ring-1 ring-inset ring-sage/30 border border-transparent` |
+| 3 (bottom-left) | `mustard` | `bg-mustard-soft/55 ring-1 ring-inset ring-mustard/35 border border-transparent` |
+| 4 (bottom-right) | `teal` | `bg-teal-dark ring-1 ring-inset ring-teal-dark/40 border border-transparent`; eyebrow `text-mustard`, title `text-cream`, description `text-cream/85`, meta `text-cream/55`, CTA `text-mustard` |
+
+Card 4 (`teal`) doubles as the page's required dark-teal anchor (§5) — when the parent's eye lands there last the grid resolves into a real composition. **All four tones are equal in semantic weight** — the rotation is rhythm, not hierarchy. See §20 for the no-featured-card rule.
+
+The tone choice per position is **fixed**: the visual rhythm depends on the same colors landing in the same slots across visits. Don't reassign tones based on tool importance.
+
+## §18 — Tool Meta-Line Format
+
+The `meta` line under each card description is the parent's "what do I get for my time" promise. Format is locked:
+
+```
+<duration> · <output artifact>
+```
+
+- **Duration** is human-rounded (`30 Sek`, `3 Min`, `5 Min`). Never minutes-with-decimals, never ranges. If a tool genuinely takes 4-7 minutes, round up to `5 Min`.
+- **Separator** is the middle dot ` · ` (U+00B7). Never em-dash, never bullet, never hyphen.
+- **Output artifact** is the concrete deliverable, named in plain prose: `vier Uhrzeiten + Share-Bild` / `Score + Erklärungen + teilbarer Permalink` / `Druckbar als PDF + Social-Card` / `Pro/Kontra + Plattform-Checkliste`. Use `+` (not `und`) to keep the parallel between artifact components scannable.
+- **Class:** `text-xs tabular-nums` plus the tone-driven color from §17 (`text-ink/55` on cream, `text-cream/55` on teal-dark, etc.)
+
+**Apply to every tool card and to the H1-adjacent subhead on individual tool landing pages.** The meta line on the hub card and the meta line on the tool's own landing page should match exactly — drift between them is a content bug.
+
+## §19 — Hub "Vermisst du was?" Closing Block
+
+A hub page ends with a single closing block that doubles as the page's dark-teal anchor (the cards themselves are too small to anchor) and a Marc-voice trust signal. Pattern:
+
+```tsx
+<div className="rounded-2xl bg-teal-dark px-7 py-8 sm:px-10 sm:py-9">
+  <p className="text-xs uppercase tracking-[0.2em] text-mustard font-semibold mb-3">
+    Vermisst du was?
+  </p>
+  <p className="font-display font-semibold text-base sm:text-lg text-cream leading-relaxed max-w-prose">
+    {/* 2-3 sentences in Marc voice, parent-to-parent, ends with a real ask */}
+  </p>
+  <a href="mailto:hallo@ronki.de" className="... text-mustard ...">
+    hallo@ronki.de <ArrowRight />
+  </a>
+  <p className="mt-4 text-xs text-cream/55">Marc, Vater von Louis (8)</p>
+</div>
+```
+
+**Apply once per hub.** The "Vater von Louis (8)" credit is the only place on a non-About page where founder-voice is justified — it earns the right to be there because the block is asking parents to co-shape the roadmap. **Do not** use this pattern on tool detail pages (their closing-reframe pattern is different, see §5 Tier-3).
+
+**Resist any "Coming Soon" placeholder cards** in the grid above. The promise of every tile being shippable today is part of the page's trust signal. Roadmap conversation belongs in this block, not in the grid.
+
+## §20 — Equal Tool Treatment (no Featured slot)
+
+On the hub, all tools render with identical structural weight:
+
+- Same card size, same padding, same H2 size
+- No "featured", "new", "popular", "beta" badge variants
+- No "first-class" position that gets a 2x card or a different layout
+- The order of the four cards is intentional but **unsignalled** in the visual treatment
+
+The tone rotation (§17) provides visual rhythm, not hierarchy.
+
+If a featured-tool slot is ever genuinely needed (e.g. a homepage hero that points to one specific tool), it lives on a **different surface** (the homepage), not on the hub. This protects the page's "the parent picks, we don't push" principle — the same principle that earns the right to make anti-engagement claims elsewhere on the site.
+
+**Apply on `/tools` and on any future hub-style listing.** This rule has teeth: any product / marketing pressure to "feature the new tool" gets resolved by adding the featured callout on the homepage, never by deforming the hub grid.
+
+---
+
+## §14 (extended) — Pre-merge consistency checklist for hub pages
+
+In addition to §14 1-10, hub/index pages need:
+
+11. ☐ Back-link target is `/`, label is `Startseite` (per §15).
+12. ☐ Eyebrow is `Werkzeug für Eltern` (singular). H1 plural carries the count.
+13. ☐ Each card uses the locked tone for its position (§17). Tone classes match the table exactly.
+14. ☐ The 4mm gradient ribbon is present on `cream` / `sage` / `mustard` cards, **absent** on the `teal` card.
+15. ☐ Card titles are the parent's question, ≤ ~12 words. Card eyebrows hold the tool name.
+16. ☐ Meta lines follow `<duration> · <output artifact>` exactly. Middle-dot separator (·), not em-dash.
+17. ☐ Each card carries `motion.li` with stagger `delay: 0.08 + index * 0.05`. The grid does not pop in dead.
+18. ☐ The closing `Vermisst du was?` block is present, teal-dark, with mustard eyebrow + `Marc, Vater von Louis (8)` credit.
+19. ☐ No `<ToolDisclaimer />` (per §15 carve-out).
+20. ☐ No "Coming Soon" / placeholder cards in the grid. Roadmap signal belongs in the closing block.
