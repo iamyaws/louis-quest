@@ -603,10 +603,72 @@ export default function RoomHub({ onNavigate }) {
         />
       )}
 
-      {/* Care verbs row */}
+      {/* Care verbs row + Funken counter.
+          Marc 25 Apr 2026 — token economy: care verbs were free
+          taps, the loop wasn't earned. Now each quest grants 1
+          Funke; each verb tap costs 1. The kicker above the row
+          tells the kid how many Funken they have, with copy that
+          flips to "voll" or "Erst eine Aufgabe" depending on the
+          state. The verbs themselves render disabled when there's
+          no fuel. */}
       <section style={{ padding: '20px 18px 0' }}>
+        <FunkenChip
+          tokens={state?.careTokens || 0}
+          allFull={
+            (state?.ronkiVitals?.hunger || 0) >= 100 &&
+            (state?.ronkiVitals?.liebe || 0) >= 100 &&
+            (state?.ronkiVitals?.energie || 0) >= 100
+          }
+        />
         <CareVerbs />
       </section>
+
+      {/* Adventure-ready CTA — shows only when all three vitals are
+          capped at 100. Marc 25 Apr 2026 spec: the kid says the
+          line as if to Ronki, no auto-screen-switch. Tapping fires
+          startExpedition() and opens the Reise surface so the
+          walk-out animation plays + ranger departs flow. */}
+      {state?.ronkiVitals &&
+       (state.ronkiVitals.hunger >= 100) &&
+       (state.ronkiVitals.liebe >= 100) &&
+       (state.ronkiVitals.energie >= 100) &&
+       (state?.expedition?.state === 'home') && (
+        <section style={{ padding: '14px 18px 0' }}>
+          <button
+            type="button"
+            onClick={() => {
+              actions?.startExpedition?.();
+              setShowExpedition(true);
+            }}
+            className="active:scale-[0.99] transition-transform"
+            style={{
+              width: '100%',
+              padding: '16px 18px',
+              borderRadius: 18,
+              background: 'linear-gradient(180deg, #fbbf24 0%, #f97316 100%)',
+              border: '1.5px solid rgba(146, 64, 14, 0.4)',
+              color: '#3a1c05',
+              textAlign: 'left',
+              boxShadow: '0 8px 22px -8px rgba(249, 115, 22, 0.55), inset 0 1px 0 rgba(255,255,255,0.5)',
+              cursor: 'pointer',
+            }}
+          >
+            <div style={{
+              font: '800 10px/1 "Plus Jakarta Sans", sans-serif',
+              letterSpacing: '0.22em', textTransform: 'uppercase',
+              color: '#5c2a08', marginBottom: 5,
+            }}>
+              Ronki ist bereit
+            </div>
+            <div style={{
+              font: '500 16px/1.25 "Fredoka", sans-serif',
+              color: '#3a1c05',
+            }}>
+              "Lass uns auf Abenteuer gehen, ich bringe dir was Schönes mit."
+            </div>
+          </button>
+        </section>
+      )}
 
       {/* Wall scroll: Ronki's asks today.
           Each anchor pill is its own button (Marc 25 Apr 2026 spotted
@@ -952,6 +1014,54 @@ function ShelfDecor({ expeditionLog }) {
           </span>
         );
       })}
+    </div>
+  );
+}
+
+// Funken counter — sits above the care verbs row. Three states:
+//   "all full"     → "Ronki ist satt — bereit fürs Abenteuer"
+//   "tokens > 0"   → "X Funken zum Verteilen"
+//   "tokens === 0" → "Erst eine Aufgabe machen, dann Funken sammeln"
+//
+// Visual: small kicker line + a sparkle ✦ icon row (3 dots reflecting
+// token count, capped at 6 visible). Kid-readable count without a
+// numeric badge.
+function FunkenChip({ tokens, allFull }) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 10,
+      padding: '0 4px 8px',
+    }}>
+      <div style={{
+        font: '800 10px/1 "Plus Jakarta Sans", sans-serif',
+        letterSpacing: '0.22em', textTransform: 'uppercase',
+        color: allFull ? '#92400e' : tokens > 0 ? '#b45309' : 'rgba(18,67,70,0.55)',
+      }}>
+        {allFull ? 'Ronki ist satt' :
+         tokens > 0 ? `${tokens} Funken` :
+         'Erst eine Aufgabe'}
+      </div>
+      {!allFull && (
+        <div style={{ display: 'flex', gap: 3 }}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <span
+              key={i}
+              aria-hidden="true"
+              style={{
+                fontSize: 13,
+                color: i < tokens ? '#f59e0b' : 'rgba(180,83,9,0.18)',
+                lineHeight: 1,
+                textShadow: i < tokens ? '0 0 6px rgba(245,158,11,0.5)' : 'none',
+              }}
+            >
+              ✦
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

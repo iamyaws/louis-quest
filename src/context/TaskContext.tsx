@@ -142,6 +142,13 @@ export interface TaskState {
    *  never decays to "starving"; the floor is whatever happens not to
    *  push it lower. The vitals are HIS signal; stars stay the kid's. */
   ronkiVitals?: { hunger: number; liebe: number; energie: number };
+  /** Drachennest "Funken" token currency (25 Apr 2026 — Marc's
+   *  insight: care verbs were free taps, the loop wasn't earned).
+   *  Each completed quest grants +1 Funken; each tap on a care verb
+   *  costs 1. The kid choses which vital to top up with their
+   *  earned Funken. Capped at 12 so the kid can't hoard between
+   *  days. Resets at midnight via the day-transition logic. */
+  careTokens?: number;
   /** Drachennest expedition state (25 Apr 2026): Ronki goes on a trip
    *  when the morning ritual hits 100%, returns hours later with a
    *  memento for the Naturtagebuch. v1 = one biome (Morgenwald), one
@@ -685,6 +692,7 @@ export function createInitialState(): TaskState {
     catPlayed: false,
     catEvo: 0,
     ronkiVitals: { hunger: 70, liebe: 70, energie: 70 },
+    careTokens: 0,
     expedition: { state: 'home', biome: 'morgenwald' },
     expeditionLog: [],
     loginBonusClaimed: false,
@@ -869,6 +877,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // Drachennest reframe: rehydrate vital meters; default to 70 each
           // for legacy saves that pre-date the field.
           ronkiVitals: (raw as any).ronkiVitals || { hunger: 70, liebe: 70, energie: 70 },
+          // Drachennest Funken — default to 0, capped at 12 in
+          // reducer math so a stale save with a higher value still
+          // collapses cleanly on next earn.
+          careTokens: typeof (raw as any).careTokens === 'number' ? (raw as any).careTokens : 0,
           // Drachennest expedition state: default to home/morgenwald with an
           // empty log for legacy saves that pre-date the field.
           expedition: (raw as any).expedition || { state: 'home', biome: 'morgenwald' },
@@ -1427,30 +1439,29 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         hobby:   { vital: 'liebe',  amt: 10 },
         bedtime: { vital: 'energie', amt: 14 },
       };
-      const bump = q.anchor && VITAL_BUMP_BY_ANCHOR[q.anchor];
-      const ronkiVitals = (() => {
-        const v = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
-        if (!bump) return v;
-        return { ...v, [bump.vital]: Math.min(100, v[bump.vital] + bump.amt) };
-      })();
+      // Funken token earn (25 Apr 2026 — Marc's loop redesign).
+      // Each quest grants +1 careToken. The kid spends these via the
+      // care verbs to top up Ronki's vitals. Cap at 12 so the kid
+      // can't bank infinite spam-fuel between days. Replaces the
+      // earlier auto anchor-bump model where vitals filled passively
+      // on quest tick — kid agency over which vital gets attention
+      // is the whole point of the loop.
+      const careTokens = Math.min(12, (prev.careTokens || 0) + 1);
+      // Vitals stay where they are on quest tick — the kid drives
+      // them via the Funken-spend on care verbs. We keep the
+      // ronkiVitals field to preserve the existing hydration shape.
+      const ronkiVitals = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
 
-      // Drachennest expedition trigger (25 Apr 2026):
-      // When THIS completion was the morning anchor's last open quest
-      // AND Ronki is currently home, kick off the trip. We compute on
-      // the post-completion `quests` list so the just-checked quest
-      // is counted as done. The Reise surface owns the walk-out timing
-      // (state stays 'leaving' for ~2.5s before flipping to 'away'),
-      // and the rangerDeparted action sets departedAt + returnAt +
-      // pendingMemento at that handoff. Guard with the home check so
-      // a flurry of late-morning completions doesn't restart anything.
-      let expedition = prev.expedition || { state: 'home' as const, biome: 'morgenwald' as const };
-      if (expedition.state === 'home' && q.anchor === 'morning') {
-        const morningTotal = quests.filter(qq => qq.anchor === 'morning').length;
-        const morningDone = quests.filter(qq => qq.anchor === 'morning' && qq.done).length;
-        if (morningTotal > 0 && morningDone === morningTotal) {
-          expedition = { ...expedition, state: 'leaving' as const };
-        }
-      }
+      // Expedition state pass-through. The auto "morning ritual at
+      // 100% → leaving" trigger was removed when the Funken loop
+      // landed (Marc 25 Apr — "either auto-switch to campfire or
+      // make it simple and require the kid to say 'let's go on an
+      // adventure'"). The deliberate kid-driven CTA in RoomHub now
+      // owns the transition; that surface calls startExpedition()
+      // when all three vitals hit 100.
+      const expedition = prev.expedition || { state: 'home' as const, biome: 'morgenwald' as const };
+      // Anchor pre-bump kept stubbed out for the comment trail.
+      // const bump = q.anchor && VITAL_BUMP_BY_ANCHOR[q.anchor];
 
       // Stamp the latest completion time so the PWA prompt gate (and
       // any future "settle after task" guard) can hold quiet
@@ -1460,7 +1471,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       // + Ronki burp. The PWA gate now waits 8s after this stamp.
       const lastTaskCompletionAt = new Date().toISOString();
 
-      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions, pendingRitual, ronkiVitals, expedition, lastTaskCompletionAt };
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions, pendingRitual, ronkiVitals, careTokens, expedition, lastTaskCompletionAt };
     });
     setToastTrigger(t => t + 1);
     // Re-evaluate organic mood triggers right after the completion
@@ -1688,9 +1699,19 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     const amounts = { hunger: 20, liebe: 15, energie: 25 } as const;
     setState(prev => {
       if (!prev) return prev;
+      // Funken gate (25 Apr 2026): each tap costs 1 token. If the
+      // pile is empty we no-op — the surface should already render
+      // the verbs disabled so this is a defense-in-depth guard.
+      const tokens = prev.careTokens || 0;
+      if (tokens <= 0) return prev;
       const v = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
+      // Guard: if the vital is already at 100, don't waste a Funken
+      // — the kid gets feedback at the surface that this verb is
+      // capped, and the token stays on the pile for another use.
+      if (v[kind] >= 100) return prev;
       return {
         ...prev,
+        careTokens: tokens - 1,
         ronkiVitals: { ...v, [kind]: Math.min(100, v[kind] + amounts[kind]) },
       };
     });
@@ -1756,15 +1777,26 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => {
       if (!prev) return prev;
       const e = prev.expedition;
+      // Vitals decay back to a baseline 70 each on adventure return
+      // (Marc 25 Apr 2026 — Funken loop redesign). Without this the
+      // kid would only need to fill vitals once forever; the trip
+      // wears Ronki out, the kid earns more Funken via tomorrow's
+      // routines, the loop restarts. 70 (not 0) keeps the read
+      // friendly — Ronki isn't starving, just ready for more care.
+      const tiredVitals = { hunger: 70, liebe: 70, energie: 70 };
       if (!e || !e.pendingMemento) {
-        // Nothing pending — just go home, no log mutation.
-        return { ...prev, expedition: { state: 'home' as const, biome: 'morgenwald' as const } };
+        return {
+          ...prev,
+          expedition: { state: 'home' as const, biome: 'morgenwald' as const },
+          ronkiVitals: tiredVitals,
+        };
       }
       const log = [...(prev.expeditionLog || []), e.pendingMemento].slice(-24);
       return {
         ...prev,
         expedition: { state: 'home' as const, biome: 'morgenwald' as const },
         expeditionLog: log,
+        ronkiVitals: tiredVitals,
       };
     });
   }, []);

@@ -25,10 +25,14 @@ const VERBS = [
 ];
 
 export default function CareVerbs() {
-  const { actions } = useTask();
+  const { state, actions } = useTask();
   const [flashed, setFlashed] = useState(null);  // { kind, amt } | null
+  const tokens = state?.careTokens || 0;
+  const vitals = state?.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
 
   const tap = (verb) => {
+    if (tokens <= 0) return;
+    if ((vitals[verb.kind] || 0) >= 100) return;
     actions.careForRonki(verb.kind);
     setFlashed({ kind: verb.kind, amt: verb.amt });
     setTimeout(() => setFlashed(null), 900);
@@ -45,25 +49,39 @@ export default function CareVerbs() {
     >
       {VERBS.map(v => {
         const flashing = flashed?.kind === v.kind;
+        const vitalFull = (vitals[v.kind] || 0) >= 100;
+        const noFunken = tokens <= 0;
+        // Disabled = either out of Funken OR this vital is already at
+        // the cap. Funken-empty also dims the icon and badge so the
+        // kid reads "do a quest first" at a glance.
+        const disabled = noFunken || vitalFull;
         return (
           <button
             key={v.kind}
             type="button"
             onClick={() => tap(v)}
+            disabled={disabled}
+            aria-label={
+              vitalFull ? `${v.label} — voll` :
+              noFunken ? `${v.label} — erst eine Aufgabe machen` :
+              v.label
+            }
             className="active:scale-[0.96] transition-transform"
             style={{
               padding: '14px 8px 12px',
               borderRadius: 18,
-              background: '#ffffff',
-              border: `1.5px solid ${v.color}40`,
-              boxShadow: `0 4px 12px -4px ${v.color}33`,
+              background: disabled ? 'rgba(255,255,255,0.6)' : '#ffffff',
+              border: `1.5px solid ${disabled ? 'rgba(180,83,9,0.18)' : v.color + '40'}`,
+              boxShadow: disabled ? 'none' : `0 4px 12px -4px ${v.color}33`,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               gap: 6,
-              cursor: 'pointer',
+              cursor: disabled ? 'default' : 'pointer',
               position: 'relative',
               minHeight: 92,
+              opacity: disabled ? 0.55 : 1,
+              transition: 'opacity 0.25s ease, background 0.25s ease',
             }}
           >
             <div
