@@ -10,13 +10,10 @@ import SpendEffect from './components/SpendEffect';
 import { QuestEaterProvider } from './components/QuestEater';
 import TaskList from './components/TaskList';
 import Belohnungsbank from './components/Belohnungsbank';
-import Hub from './components/Hub';
-// Drachennest reframe: RoomHub replaces the legacy Hub on this branch.
-// Existing Hub kept in imports for fallback / comparison via ?legacyHub=1.
+// Cuts #4–#5 (25 Apr 2026 northstar): Hub.jsx + Sanctuary +
+// HeldenKodex deleted. RoomHub is the only primary surface.
 import RoomHub from './components/drachennest/RoomHub';
-import Sanctuary from './components/Sanctuary';
 import Journal from './components/Journal';
-import HeldenKodex from './components/HeldenKodex';
 import Onboarding from './components/Onboarding';
 import TeachFirePreview from './components/TeachFirePreview';
 import TeachRitualPreview from './components/TeachRitualPreview';
@@ -34,7 +31,6 @@ import FreundCallbackCard from './components/FreundCallbackCard';
 import MiniGames from './components/MiniGames';
 import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
-import CloudJumpGame from './components/CloudJumpGame';
 import StarCatcherGame from './components/StarCatcherGame';
 import ToolErrorBoundary from './components/ToolErrorBoundary';
 // ── Lazy-loaded tools + games ──────────────────────────────────────────
@@ -45,10 +41,9 @@ import ToolErrorBoundary from './components/ToolErrorBoundary';
 // so the initial chunk ships only the core Hub/Aufgaben/Care/Journal
 // flow — each tool/game arrives on demand when Louis actually opens it.
 //
-// KristallSortiererGame deprecated Apr 2026 — replaced by Kristall-Kette
-// (drag-a-line tactile loop, backlog_mint_crystal_game_rework pitches).
-// Import kept commented for rollback reference.
-// const KristallSortiererGame = lazy(() => import('./components/KristallSortiererGame'));
+// KristallSortiererGame + StarfighterGame + CloudJumpGame deleted in
+// cut #5 (25 Apr 2026 — wrong-genre minigames don't serve the
+// companion thesis).
 const ZahlenjagdGame = lazy(() => import('./components/ZahlenjagdGame'));
 const MusterMemoryGame = lazy(() => import('./components/MusterMemoryGame'));
 const WurzelLabyrinthGame = lazy(() => import('./components/WurzelLabyrinthGame'));
@@ -62,7 +57,6 @@ const LoewenPoseTool = lazy(() => import('./components/LoewenPoseTool'));
 const SteinUndGummiTool = lazy(() => import('./components/SteinUndGummiTool'));
 const RonkiAusmalbild = lazy(() => import('./components/RonkiAusmalbild'));
 const RonkiCompendium = lazy(() => import('./components/RonkiCompendium'));
-const StarfighterGame = lazy(() => import('./components/StarfighterGame'));
 // ── End lazy tools/games ───────────────────────────────────────────────
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
@@ -73,7 +67,6 @@ import ChibiGallery from './components/ChibiGallery';
 import MemoryWall from './components/MemoryWall';
 import DiscoveryLog from './components/DiscoveryLog';
 import Micropedia from './components/Micropedia';
-import PoemQuest from './components/PoemQuest';
 import QuestLineView from './components/QuestLineView';
 import { useSpecialQuests } from './hooks/useSpecialQuests';
 // Easter-egg system paused Apr 2026 — Marc: "don't feel it anymore".
@@ -416,16 +409,13 @@ function AppContent() {
             }}
           />
         )}
-        {view === 'care' && <Sanctuary onNavigate={setView} />}
         {view === 'journal' && <Journal onNavigate={setView} onOpenParental={() => openPinGate()} />}
-        {view === 'kodex' && <HeldenKodex />}
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
         {view === 'memories' && <MemoryWall />}
         {view === 'buch' && <Buch onNavigate={setView} />}
         {view === 'gallery' && <ChibiGallery onClose={() => setView('hub')} />}
         {view === 'discovery' && <DiscoveryLog onNavigate={setView} />}
         {view === 'micropedia' && <Micropedia onNavigate={setView} />}
-        {view === 'poem' && <PoemQuest onBack={() => setView('quests')} />}
         {view === 'questline' && activeQuestLineId && (
           <QuestLineView
             questLineId={activeQuestLineId}
