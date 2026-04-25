@@ -392,18 +392,18 @@ export default function RoomHub({ onNavigate }) {
               position: 'absolute',
               left: '50%',
               // Stage drops well below the scene's floor edge so the
-              // bottom of the vitals ring tucks behind the cushion
-              // mat (Marc 25 Apr — "let ronki and the ring fly a
-              // little lower and let the vital-ring overlap the
-              // cushion on the floor"). The stage has NO z-index here
-              // on purpose: that lets the chibi button's z (bumped to
-              // 7 below) lift to scene level so Ronki paints above the
-              // cushion (z:5), while the ring wrapper (default z)
-              // stays behind the cushion. Without that flat-context
-              // trick, the cushion would either cover the whole stage
-              // (Ronki and all) or miss the ring entirely.
+              // ring's lower curve crosses over the cushion mat.
+              // Marc 25 Apr 2026 (second pass): "cushion still
+              // overlaps make it a background item." So the stage
+              // itself now lifts to z:6 above the cushion (z:5),
+              // pushing the cushion fully into the background. Inside
+              // the stage's stacking context (created by the transform),
+              // the chibi sits at z:7 in front of the ring wrapper at
+              // z:6. The cushion ends up acting as a painted floor
+              // behind the whole stage instead of competing with it.
               bottom: '-9%',
               transform: 'translateX(-50%)',
+              zIndex: 6,
               // Stage grew from 72% / 280px → 84% / 340px (25 Apr 2026)
               // so the vitals arcs read as a generous halo around
               // Ronki rather than a tight collar. Combined with the
