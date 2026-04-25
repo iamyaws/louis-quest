@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTask } from '../../context/TaskContext';
+import RonkiAwayLoop from './RonkiAwayLoop';
 
 /**
  * Expedition — the Reise surface (Drachennest, 25 Apr 2026).
@@ -175,10 +176,14 @@ export default function Expedition({ onClose }) {
         <div style={{ width: 76 }} aria-hidden="true" />
       </div>
 
-      {/* ── Campfire scene ── */}
+      {/* ── Campfire scene ──
+           When Ronki's away, the scene swaps to the infinite-loop
+           walking shot so the kid sees him on the move through the
+           biome instead of an empty campfire (Marc 25 Apr 2026). */}
       <CampfireScene
         expState={expedition.state}
         biome={expedition.biome}
+        variant={state?.companionVariant}
         onTapDiary={() => { setShowDiary(true); setDiaryFillKey(k => k + 1); }}
         status={status}
       />
@@ -370,13 +375,54 @@ export default function Expedition({ onClose }) {
 
 // ─── Campfire scene ──────────────────────────────────────────────
 
-function CampfireScene({ expState, biome, onTapDiary, status }) {
+function CampfireScene({ expState, biome, variant, onTapDiary, status }) {
   const showRonki = expState === 'home' || expState === 'leaving' || expState === 'waiting';
-  const showPlaceholder = expState === 'away';
-  const showPawTrail = expState === 'away';
   const showDiary = expState === 'waiting';
   const showStatus = expState !== 'home';
   const walking = expState === 'leaving';
+
+  // Away state — swap to the infinite-loop walking shot. Kid sees
+  // Ronki on the move through the biome with parallax + biome
+  // items, plus the status strip pinned on top so they still know
+  // where he is.
+  if (expState === 'away') {
+    return (
+      <div style={{ position: 'relative' }}>
+        <RonkiAwayLoop biome={biome} variant={variant} />
+        {showStatus && (
+          <div style={{
+            position: 'absolute', left: 14, right: 14, top: 14,
+            padding: '10px 14px', borderRadius: 14,
+            background: 'rgba(255,248,242,0.85)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            border: '1px solid rgba(18,67,70,0.1)',
+            display: 'flex', alignItems: 'center', gap: 10,
+            color: '#124346',
+            boxShadow: '0 6px 14px -4px rgba(18,67,70,0.15)',
+            zIndex: 10,
+          }}>
+            <div style={{
+              width: 26, height: 26, borderRadius: '50%',
+              background: 'radial-gradient(circle at 40% 35%, #a3c677, #5a8f4a)',
+              display: 'grid', placeItems: 'center',
+              fontSize: 12,
+              boxShadow: 'inset 0 -2px 0 rgba(0,0,0,0.15)',
+              flexShrink: 0,
+            }}>
+              {status.biome}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <b style={{ display: 'block', font: '700 13px/1.1 "Nunito", sans-serif', marginBottom: 1 }}>{status.title}</b>
+              <span style={{ font: '600 11px/1 "Plus Jakarta Sans", sans-serif', color: 'rgba(18,67,70,0.6)', letterSpacing: '0.04em' }}>
+                {status.sub}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -450,39 +496,9 @@ function CampfireScene({ expState, biome, onTapDiary, status }) {
         <CampRonki walking={walking} />
       )}
 
-      {/* Away placeholder: folded map on log */}
-      {showPlaceholder && (
-        <div style={{
-          position: 'absolute', left: '22%', bottom: '20%',
-          width: 40, height: 28,
-          background: 'linear-gradient(160deg, #f5ecd6, #d9c7a2)',
-          borderRadius: 3,
-          boxShadow: '0 4px 6px rgba(0,0,0,0.25), inset 0 -2px 0 rgba(0,0,0,0.15)',
-          transform: 'rotate(-4deg)',
-        }}>
-          <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 1, background: 'rgba(0,0,0,0.08)' }} />
-          <div style={{ position: 'absolute', left: 0, right: 0, top: '50%', height: 1, background: 'rgba(0,0,0,0.08)' }} />
-        </div>
-      )}
-
-      {/* Paw trail */}
-      {showPawTrail && (
-        <div style={{
-          position: 'absolute', right: '4%', bottom: '20%',
-          display: 'flex', gap: 10, opacity: 0.75,
-        }}>
-          {[0, 4, -2, 5, 0].map((dy, i) => (
-            <div key={i} style={{
-              width: 8, height: 10,
-              background: 'rgba(30,20,10,0.4)',
-              borderRadius: '50%',
-              filter: 'blur(0.5px)',
-              transform: `translateY(${dy}px)`,
-              opacity: i >= 3 ? 0.4 : (i === 2 ? 0.6 : 1),
-            }} />
-          ))}
-        </div>
-      )}
+      {/* Away-state placeholder + paw-trail removed 25 Apr 2026 —
+          the away render now lives in its own RonkiAwayLoop branch
+          at the top of CampfireScene (parallax walking shot). */}
 
       {/* Glowing diary */}
       {showDiary && (
