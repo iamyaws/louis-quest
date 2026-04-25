@@ -165,7 +165,11 @@ export interface TaskState {
   vacMode: boolean;
   dt: number;
   hp: number;
-  drachenEier: number;
+  /** Cut #6 (25 Apr 2026): drachenEier is no longer mutated. Kept on
+   *  the type so persistence migration can read legacy values without
+   *  errors, but no surface reads or writes it anymore. Will be
+   *  removed once all persisted client states have aged out. */
+  drachenEier?: number;
   eggType: string | null;
   heroGender: string | null;
   eggProgress: number;
@@ -442,18 +446,10 @@ export interface TaskState {
   collectedEggs?: CollectedEgg[];
   eggTriggersFired?: Record<string, boolean>;
   gamesPlayedEver?: string[];
-  /** Minutes of Funkelzeit consumed today. Resets at daily transition. */
-  funkelzeitMinutesToday?: number;
-  /** Log of Funkelzeit redemptions (last ~60-90 days kept, capped at 200 entries).
-   *  Used by ParentalDashboard "Funkelzeit-Verlauf" and lets parents see what
-   *  Louis actually redeemed vs. what he used. */
-  funkelzeitLog?: Array<{
-    ts: string;          // ISO timestamp when timer started
-    minutes: number;     // reward.minutes — how many minutes were redeemed
-    cost: number;        // reward.cost — cost in drachenEier/screen-minutes
-    rewardName: string;  // Belohnungsbank reward name (localized string)
-    actualUsed?: number; // minutes actually used (filled in on Store action)
-  }>;
+  /** Cut #6 (25 Apr 2026): funkelzeitMinutesToday + funkelzeitLog
+   *  deleted. Keys retained as optional/never written for one
+   *  release cycle so persistence migrations don't choke on old
+   *  state shape. */
   /** ISO dates when the "zeig mama/papa"-confirmation was shown for each
    *  routine block. One per block per day to prevent re-triggering. */
   zeigMomentShownDates?: { morning?: string; evening?: string; bedtime?: string };
@@ -617,9 +613,8 @@ interface TaskActions {
   abandonMission: (id: string) => void;
   addHP: (amount: number) => void;
   claimGameReward: (gameId: string) => void;
-  addScreenMinutes: (amount: number) => void;
-  addFunkelzeitUsage: (minutes: number) => void;
-  refundFunkelzeitUsage: (minutes: number) => void;
+  // addScreenMinutes / addFunkelzeitUsage / refundFunkelzeitUsage —
+  // deleted in cut #6 (Funkelzeit removal). Callers cleaned up.
   consumeStamina: () => void;
   restoreStamina: () => void;
   equipGear: (gearId: string) => void;
@@ -2080,17 +2075,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  // ── Redeem reward ──
+  // ── Redeem reward (HP-only after cut #6) ──
+  // The 'eggs'/Funkelzeit branch was removed. The signature still
+  // takes currency for backwards compatibility with any caller still
+  // passing it, but a non-'hp' value is now a no-op.
   const redeemReward = useCallback((currency: 'hp' | 'eggs', cost: number) => {
+    if (currency !== 'hp') return;
     setState(prev => {
       if (!prev) return prev;
-      if (currency === 'hp') {
-        if ((prev.hp || 0) < cost) return prev;
-        return { ...prev, hp: prev.hp - cost };
-      } else {
-        if ((prev.drachenEier || 0) < cost) return prev;
-        return { ...prev, drachenEier: prev.drachenEier - cost };
-      }
+      if ((prev.hp || 0) < cost) return prev;
+      return { ...prev, hp: prev.hp - cost };
     });
   }, []);
 
@@ -2122,9 +2116,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setState(prev => prev ? { ...prev, hp: (prev.hp || 0) + amount } : prev);
   }, []);
 
-  // ── Mini-game reward: +1 screen minute per unique game per day (max 4) ──
-  /** Mark a minigame complete: grant daily reward (once/day) AND consume 1 stamina.
-   *  Stamina always drops on completion, even for repeat plays of the same game. */
+  // ── Mini-game reward (cut #6): no more screen-minute reward ──
+  // Used to grant +1 drachenEier (screen minute) per unique game per
+  // day. After Funkelzeit deletion the action just stamps the
+  // played-list and consumes stamina; minigames now cost stamina but
+  // don't earn currency. Spielzeug-bei-Ronki ethos.
   const claimGameReward = useCallback((gameId: string) => {
     setState(prev => {
       if (!prev) return prev;
@@ -2132,41 +2128,18 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const alreadyClaimed = played.includes(gameId);
       return {
         ...prev,
-        // Reward only on first claim of the day
-        drachenEier: alreadyClaimed ? prev.drachenEier : (prev.drachenEier || 0) + 1,
         gamesPlayedToday: alreadyClaimed ? played : [...played, gameId],
         gamesPlayedEver: prev.gamesPlayedEver?.includes(gameId)
           ? prev.gamesPlayedEver
           : [...(prev.gamesPlayedEver || []), gameId],
-        // Stamina always drops — the dopamine cost of playing, not of claiming
         ronkiStamina: Math.max(0, (prev.ronkiStamina ?? 5) - 1),
         ronkiStaminaUpdatedAt: new Date().toISOString(),
       };
     });
   }, []);
 
-  // ── Add screen minutes (refund unused timer time) ──
-  const addScreenMinutes = useCallback((amount: number) => {
-    setState(prev => prev ? { ...prev, drachenEier: (prev.drachenEier || 0) + amount } : prev);
-  }, []);
-
-  // ── Funkelzeit daily usage tracking (for 'strikt' mode cap) ──
-  // Called when a Funkelzeit timer starts: commits the full reward minutes.
-  const addFunkelzeitUsage = useCallback((minutes: number) => {
-    setState(prev => prev ? {
-      ...prev,
-      funkelzeitMinutesToday: Math.max(0, (prev.funkelzeitMinutesToday || 0) + minutes),
-    } : prev);
-  }, []);
-
-  // Called when user stores unused timer: refunds the unused minutes against
-  // the daily usage counter (parallels drachenEier refund).
-  const refundFunkelzeitUsage = useCallback((minutes: number) => {
-    setState(prev => prev ? {
-      ...prev,
-      funkelzeitMinutesToday: Math.max(0, (prev.funkelzeitMinutesToday || 0) - minutes),
-    } : prev);
-  }, []);
+  // addScreenMinutes / addFunkelzeitUsage / refundFunkelzeitUsage —
+  // all deleted in cut #6 (Funkelzeit deletion, 25 Apr 2026).
 
   // ── Stamina actions ──
   const consumeStamina = useCallback(() => {
@@ -2753,7 +2726,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, setEmojiCode, addFriend, markWinkSeen, recordWinkSent, setCaveStyle, setExpedition, startExpedition, rangerDeparted, rangerArrived, receiveMemento, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, setEmojiCode, addFriend, markWinkSeen, recordWinkSent, setCaveStyle, setExpedition, startExpedition, rangerDeparted, rangerArrived, receiveMemento, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

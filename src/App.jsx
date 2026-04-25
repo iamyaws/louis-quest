@@ -60,7 +60,7 @@ const RonkiCompendium = lazy(() => import('./components/RonkiCompendium'));
 // ── End lazy tools/games ───────────────────────────────────────────────
 import CompanionToast from './components/CompanionToast';
 import ParentIntroOverlay from './components/ParentIntroOverlay';
-import ScreenTimer from './components/ScreenTimer';
+// ScreenTimer deleted in cut #6 (25 Apr 2026 — Funkelzeit removal).
 import RonkiProfile from './components/RonkiProfile';
 import Buch from './components/Buch';
 import ChibiGallery from './components/ChibiGallery';
@@ -195,7 +195,7 @@ function AppContent() {
   const [pinGateOpen, setPinGateOpen] = useState(false);
   const [pin, setPin] = useState('');
   const openPinGate = () => { setPin(''); setPinGateOpen(true); };
-  const [screenTimer, setScreenTimer] = useState(null); // { totalSeconds, cost, rewardName }
+  // Cut #6 (25 Apr 2026): screenTimer state removed alongside Funkelzeit.
 
   // Post-engagement PWA install prompt. Replaces the upfront step-7 prompt
   // the old Onboarding.jsx fired. Opens only after kid+parent onboarding
@@ -308,32 +308,6 @@ function AppContent() {
     actions.recordViewVisit(view); // track first-time feature discovery
   }, [view]);
 
-  const startScreenTimer = (reward) => {
-    setScreenTimer({
-      totalSeconds: reward.minutes * 60,
-      cost: reward.cost,
-      rewardName: reward.name,
-      // Preserve the full reward runtime so we can refund Funkelzeit-usage
-      // proportionally when the user stores unused time.
-      totalMinutes: reward.minutes,
-    });
-    // Append a Funkelzeit-Verlauf entry (capped at last 200 for long-term use).
-    // actualUsed is left undefined; it gets filled on Store or stays empty if
-    // the timer runs out / is dismissed.
-    const prior = state?.funkelzeitLog || [];
-    actions.patchState({
-      funkelzeitLog: [
-        ...prior,
-        {
-          ts: new Date().toISOString(),
-          minutes: reward.minutes,
-          cost: reward.cost,
-          rewardName: reward.name,
-        },
-      ].slice(-200),
-    });
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-dvh bg-surface">
@@ -379,7 +353,7 @@ function AppContent() {
             }}
           />
         )}
-        {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} onOpenParental={() => openPinGate()} />}
+        {view === 'shop' && <Belohnungsbank onNavigate={setView} onOpenParental={() => openPinGate()} />}
         {view === 'hub' && (
           // Cut #4 (Marc 25 Apr 2026 — northstar lock-in): RoomHub
           // is the only primary surface. The legacy Hub.jsx
@@ -601,32 +575,7 @@ function AppContent() {
       <Celebration />
       {/* <ArcOfferCard /> — paused, see backlog_arc_offer_rework.md */}
       <FreundCallbackCard />
-      {screenTimer && (
-        <ScreenTimer
-          totalSeconds={screenTimer.totalSeconds}
-          cost={screenTimer.cost}
-          rewardName={screenTimer.rewardName}
-          onFinish={() => {}}
-          onStore={({ refundMinutes, refundTimeMinutes }) => {
-            if (refundMinutes > 0) actions.addScreenMinutes(refundMinutes);
-            // Funkelzeit-usage refund: unused minutes don't count against the daily cap.
-            if (refundTimeMinutes > 0) actions.refundFunkelzeitUsage(refundTimeMinutes);
-            // Patch last log entry with actualUsed = total runtime minus refunded
-            // minutes, so the Verlauf shows what Louis really consumed.
-            const log = state?.funkelzeitLog || [];
-            if (log.length > 0) {
-              const last = log[log.length - 1];
-              const totalMin = screenTimer.totalMinutes ?? (screenTimer.totalSeconds / 60);
-              const actualUsed = Math.max(0, Math.round(totalMin - refundTimeMinutes));
-              actions.patchState({
-                funkelzeitLog: [...log.slice(0, -1), { ...last, actualUsed }],
-              });
-            }
-            setScreenTimer(null);
-          }}
-          onDismiss={() => setScreenTimer(null)}
-        />
-      )}
+      {/* ScreenTimer mount deleted in cut #6 (Funkelzeit removal). */}
       {/* CreatureDiscoveryToast is rendered by CelebrationQueue's
            current-surface slot; it mounts only when the queue pops a
            `discover-*` event. See useMicropediaDiscovery wiring above. */}
