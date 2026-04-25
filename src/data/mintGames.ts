@@ -1,16 +1,12 @@
-/** MINT games — brain-play progression for Louis via Forscher-Ecke.
- *  Kid-facing: "Forscher-Ecke" / "Knobel-Abenteuer". Internal: "MINT".
+/** Spielzeug bei Ronki — small games available in the cave.
+ *  Kid-facing: "Ronkis Spielzeug" / "Spiele in der Höhle".
  *
- *  Unlock model (Apr 2026): SEQUENTIAL, ordered easiest → hardest.
- *    - Game 1 is always available from day one.
- *    - Each subsequent game unlocks when the previous game's badge is earned.
- *    - Unimplemented games (implemented:false) are filtered out of the
- *      sequence by ForscherEcke — they don't block progression. When they
- *      ship, they slot in at their array position and the unlockCheck of the
- *      next implemented game is re-evaluated.
- *    - Once every implemented game's badge is earned, the Hub hides the
- *      Forscher-Ecke card (graduation) and the completed games appear as
- *      stables in the MiniGames section.
+ *  Unlock model (cut #7, 25 Apr 2026): ALL games available from day
+ *  one. The sequential badge-chain was a content cliff masquerading
+ *  as progression — the original "graduate and disappear" behaviour
+ *  meant five games eventually went away forever, which is the
+ *  opposite of what a companion app wants. Now they sit as a stable
+ *  rotating shelf the kid can return to whenever.
  *
  *  Each game is hosted by a Freund or creature that introduces the challenge
  *  via FreundIntroModal on first play.
@@ -47,71 +43,65 @@ export interface MintGame {
   implemented: boolean;
 }
 
-// Sequential unlock: game N requires the badge from the implemented game
-// immediately before it in this array. Unimplemented games are skipped.
-// All 5 games are implemented as of Wave 2.7.
+// All games available from day one (cut #7, 25 Apr 2026). The
+// `unlockCheck` field stays on the type for shape compatibility with
+// any consumer that still calls it; every entry now returns true.
 export const MINT_GAMES: MintGame[] = [
   {
-    // Position 1 — always unlocked from day one. Easiest (counting).
     id: 'zahlenjagd',
     name: { de: 'Zahlenjagd', en: 'Number Hunt' },
     emoji: '🎯',
     badgeId: 'badge_mint_zahlen',
     badgeLabel: { de: 'Zahlenjäger', en: 'Number Hunter' },
-    hostId: 'sky_0', // Sturmflügel
+    hostId: 'sky_0',
     unlockCheck: () => true,
     introLine: 'Ich zähle die Sterne am Himmel. Kannst du mir helfen?',
     implemented: true,
   },
   {
-    // Position 2 — unlocks on Zahlenjagd badge. Pattern recognition.
     id: 'muster-memory',
     name: { de: 'Muster-Memory', en: 'Pattern Memory' },
     emoji: '🔁',
     badgeId: 'badge_mint_muster',
     badgeLabel: { de: 'Muster-Meister', en: 'Pattern Master' },
-    hostId: 'forest_4', // Baumbart
-    unlockCheck: (s) => (s.mintBadgesEarned || []).includes('badge_mint_zahlen'),
+    hostId: 'forest_4',
+    unlockCheck: () => true,
     introLine: 'Die Jahreszeiten folgen einem Muster. Schaust du mit mir?',
     implemented: true,
   },
   {
-    // Position 3 — unlocks on Muster-Memory badge. Spatial / pathfinding.
     id: 'wurzel-labyrinth',
     name: { de: 'Wurzel-Labyrinth', en: 'Root Maze' },
     emoji: '🗺️',
     badgeId: 'badge_mint_labyrinth',
     badgeLabel: { de: 'Labyrinth-Löser', en: 'Maze Solver' },
-    hostId: 'forest_6', // Pilz-Jeti
-    unlockCheck: (s) => (s.mintBadgesEarned || []).includes('badge_mint_muster'),
+    hostId: 'forest_6',
+    unlockCheck: () => true,
     introLine: 'Ich kenne die versteckten Pfade. Willst du sie finden?',
     implemented: true,
   },
   {
-    // Position 4 — unlocks on Wurzel-Labyrinth badge. Logic / balance.
     id: 'pilz-waage',
     name: { de: 'Pilz-Waage', en: 'Mushroom Balance' },
     emoji: '⚖️',
     badgeId: 'badge_mint_waage',
     badgeLabel: { de: 'Waagen-Weise', en: 'Balance Sage' },
-    hostId: 'pilzhueter', // Pilzhüter Freund
-    unlockCheck: (s) => (s.mintBadgesEarned || []).includes('badge_mint_labyrinth'),
+    hostId: 'pilzhueter',
+    unlockCheck: () => true,
     introLine: 'Komm, bring die Pilze ins Gleichgewicht.',
     implemented: true,
   },
   {
-    // Position 5 — Apr 2026 rework. The original Kristall-Sortierer (pure
-    // color-sort) tested boring; replaced with Kristall-Kette (drag-a-line
-    // tactile chain game where Ronki eats your chain and burps a matching
-    // fire-breath flavor). Same id + badge so existing saves stay valid.
-    // Completion closes the Forscher-Ecke sequence → Hub graduates it.
+    // Apr 2026 rework: original Kristall-Sortierer (color-sort) tested
+    // boring; replaced with Kristall-Kette (drag-a-line tactile chain).
+    // Same id + badge so existing saves stay valid.
     id: 'kristall-sortierer',
     name: { de: 'Kristall-Kette', en: 'Crystal Chain' },
     emoji: '💎',
     badgeId: 'badge_mint_kristall',
     badgeLabel: { de: 'Kristall-Kenner', en: 'Crystal Expert' },
-    hostId: 'forest_5', // Mr. Shroom
-    unlockCheck: (s) => (s.mintBadgesEarned || []).includes('badge_mint_waage'),
+    hostId: 'forest_5',
+    unlockCheck: () => true,
     introLine: 'Ich hab funkelnde Kristalle gefunden! Zieh eine Linie durch gleiche Farben.',
     implemented: true,
   },
@@ -122,9 +112,10 @@ export const MINT_GAME_BY_ID: Map<string, MintGame> = new Map(MINT_GAMES.map(g =
 /** Games currently in the sequence — unimplemented ones are skipped. */
 export const MINT_SEQUENCE: MintGame[] = MINT_GAMES.filter(g => g.implemented);
 
-/** True when every implemented game's badge has been earned — Forscher-Ecke
- *  graduates and the Hub hides its card. */
-export function isForscherGraduated(state: Partial<TaskState>): boolean {
-  const earned = state.mintBadgesEarned || [];
-  return MINT_SEQUENCE.length > 0 && MINT_SEQUENCE.every(g => earned.includes(g.badgeId));
+/** Cut #7 (25 Apr 2026): graduation behaviour deleted. The card no
+ *  longer disappears once all five badges are earned — games stay
+ *  available as a stable rotating shelf. The function is kept for
+ *  callers that still ask, but always returns false now. */
+export function isForscherGraduated(_state: Partial<TaskState>): boolean {
+  return false;
 }
