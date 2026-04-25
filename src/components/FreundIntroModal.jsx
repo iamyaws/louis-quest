@@ -3,6 +3,7 @@ import { FREUND_BY_ID, getFreundSpritePath } from '../data/freunde';
 import { SEED_BY_ID, getCreatureSpritePath } from '../data/creatures';
 import { MINT_GAME_BY_ID } from '../data/mintGames';
 import VoiceAudio from '../utils/voiceAudio';
+import ChibiFriend, { hasChibiFriend } from './drachennest/ChibiFriend';
 
 /**
  * FreundIntroModal — reusable overlay for "a Freund hosts a game".
@@ -119,14 +120,17 @@ export default function FreundIntroModal({ gameId, onAccept, onDismiss }) {
             {game.emoji} {game.name.de}
           </p>
 
-          {/* Freund/Creature portrait — transparent sprite on warm gradient */}
+          {/* Freund/Creature portrait — chibi-style if covered, MJ
+              webp fallback otherwise. */}
           <div
             className="relative w-40 h-40 mt-6 rounded-full flex items-center justify-center"
             style={{
               background: 'radial-gradient(circle at 50% 40%, rgba(252,211,77,0.25) 0%, rgba(252,211,77,0) 70%)',
             }}
           >
-            {spritePath ? (
+            {hasChibiFriend(game.hostId) ? (
+              <ChibiFriend id={game.hostId} size={144} withBg={false} />
+            ) : spritePath ? (
               <img
                 src={base + spritePath}
                 alt={hostName}

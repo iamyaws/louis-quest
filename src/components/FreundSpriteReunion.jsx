@@ -4,6 +4,7 @@ import { useArc } from '../arcs/useArc';
 import { FREUND_BY_ID, getFreundSpritePath } from '../data/freunde';
 import { CHAPTERS } from '../data/creatures';
 import SFX from '../utils/sfx';
+import ChibiFriend, { hasChibiFriend } from './drachennest/ChibiFriend';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -243,7 +244,17 @@ export default function FreundSpriteReunion() {
                 : 'freund-sprite-bob 3.5s ease-in-out infinite',
             }}
           >
-            {!spriteFailed ? (
+            {hasChibiFriend(freund.id) ? (
+              <div style={{
+                width: '82%',
+                height: '82%',
+                display: 'grid',
+                placeItems: 'center',
+                filter: `drop-shadow(0 6px 10px ${accent}55)`,
+              }}>
+                <ChibiFriend id={freund.id} size={Math.min(220, 220)} withBg={false} />
+              </div>
+            ) : !spriteFailed ? (
               <img
                 src={BASE + spritePath}
                 alt=""

@@ -149,6 +149,20 @@ export interface TaskState {
    *  earned Funken. Capped at 12 so the kid can't hoard between
    *  days. Resets at midnight via the day-transition logic. */
   careTokens?: number;
+  /** Per-Ronki distinguishing features (25 Apr 2026 — Marc's ask
+   *  "ronkis with variations and unique features that we can
+   *  randomize or let the kids pick when evolution happens"). One
+   *  trait id per slot picked from the variant's traits pool at
+   *  hatch (or rolled at evolution). Persists once set so the
+   *  kid's Ronki keeps the same look across sessions. The actual
+   *  visual rendering of these traits on the chibi is a follow-up
+   *  pass; for v1 the field exists + the Compendium showcases the
+   *  pool so the kid can see what's possible. */
+  hatchTraits?: {
+    hornAccent?: string;
+    cheekMark?: string;
+    tailTuft?: string;
+  };
   /** Drachennest expedition state (25 Apr 2026): Ronki goes on a trip
    *  when the morning ritual hits 100%, returns hours later with a
    *  memento for the Naturtagebuch. v1 = one biome (Morgenwald), one

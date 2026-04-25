@@ -39,6 +39,12 @@ export interface CompanionVariant {
    *  Added Apr 2026 when Marc asked for all egg colorways to render
    *  consistently in the Ronki profile. */
   chibi: ChibiPalette;
+  /** Distinguishing traits per variant. Three small features that
+   *  set this Ronki apart visually (horn accent, cheek mark, tail
+   *  tuft). Added 25 Apr 2026 when Marc asked for "ronkis with
+   *  variations and unique features that we can randomize or let
+   *  the kids pick when evolution happens." */
+  traits: VariantTraits;
 }
 
 export interface ChibiPalette {
@@ -54,6 +60,23 @@ export interface ChibiPalette {
   eyeInk: string;
   /** Cheek blush — rgba() for subtle color bath on the cheeks. */
   cheek: string;
+}
+
+/** Per-variant unique features shown alongside the base chibi.
+ *
+ * Each variant ships with three distinguishing traits drawn from a
+ * shared vocabulary. Used today by the public Compendium to show
+ * "this is what makes a Bernstein-Ronki different from a Türkis-Ronki"
+ * at a glance, and reserved for the evolution-pick UI Marc has in
+ * mind: at hatch + at each evolution stage, the kid sees the variant
+ * traits and either picks one (older kids) or gets a randomized
+ * roll (younger). The state field that persists the picked traits
+ * is `state.hatchTraits` — see TaskContext.
+ */
+export interface VariantTraits {
+  hornAccent: { id: string; label: { de: string; en: string }; emoji: string };
+  cheekMark: { id: string; label: { de: string; en: string }; emoji: string };
+  tailTuft:  { id: string; label: { de: string; en: string }; emoji: string };
 }
 
 export const COMPANION_VARIANTS: CompanionVariant[] = [
@@ -73,6 +96,11 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
       eyeInk: '#1a0e08',
       cheek: 'rgba(255,105,105,0.45)',
     },
+    traits: {
+      hornAccent: { id: 'gold-tip',  label: { de: 'Gold-Spitze',     en: 'Gold tip'      }, emoji: '✨' },
+      cheekMark:  { id: 'sun-freckle', label: { de: 'Sonnen-Sommersprosse', en: 'Sun freckle' }, emoji: '☀️' },
+      tailTuft:   { id: 'ember-puff', label: { de: 'Glut-Quaste',    en: 'Ember tuft'    }, emoji: '🔥' },
+    },
   },
   {
     id: 'teal',
@@ -89,6 +117,11 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
       leg: 'linear-gradient(180deg, #14b8a6, #134e4a)',
       eyeInk: '#0a2025',
       cheek: 'rgba(253,164,175,0.5)',
+    },
+    traits: {
+      hornAccent: { id: 'wave-curve', label: { de: 'Wellen-Schwung', en: 'Wave curve' }, emoji: '🌊' },
+      cheekMark:  { id: 'pearl-dot',  label: { de: 'Perlen-Punkt',   en: 'Pearl dot'  }, emoji: '🫧' },
+      tailTuft:   { id: 'sea-foam',   label: { de: 'Seeschaum',      en: 'Sea foam'   }, emoji: '💧' },
     },
   },
   {
@@ -107,6 +140,11 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
       eyeInk: '#1f0510',
       cheek: 'rgba(244,114,182,0.55)',
     },
+    traits: {
+      hornAccent: { id: 'heart-pair', label: { de: 'Herz-Paar',     en: 'Heart pair' }, emoji: '💕' },
+      cheekMark:  { id: 'blush',      label: { de: 'Erröten',       en: 'Blush'      }, emoji: '🌸' },
+      tailTuft:   { id: 'petal',      label: { de: 'Blüten-Quaste', en: 'Petal tuft' }, emoji: '🌷' },
+    },
   },
   {
     id: 'violet',
@@ -123,6 +161,11 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
       leg: 'linear-gradient(180deg, #8b5cf6, #4c1d95)',
       eyeInk: '#140828',
       cheek: 'rgba(236,72,153,0.42)',
+    },
+    traits: {
+      hornAccent: { id: 'spiral',    label: { de: 'Spiral-Horn', en: 'Spiral horn' }, emoji: '🌀' },
+      cheekMark:  { id: 'star-mark', label: { de: 'Stern-Mal',   en: 'Star mark'   }, emoji: '✦'  },
+      tailTuft:   { id: 'mist',      label: { de: 'Nebel-Hauch', en: 'Mist tuft'   }, emoji: '✧'  },
     },
   },
   {
@@ -141,6 +184,11 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
       eyeInk: '#041a0a',
       cheek: 'rgba(251,146,60,0.45)',
     },
+    traits: {
+      hornAccent: { id: 'leaf-tip',   label: { de: 'Blatt-Spitze',   en: 'Leaf tip'  }, emoji: '🌿' },
+      cheekMark:  { id: 'moss-mark',  label: { de: 'Moos-Punkt',     en: 'Moss dot'  }, emoji: '🍃' },
+      tailTuft:   { id: 'fern-tuft',  label: { de: 'Farn-Quaste',    en: 'Fern tuft' }, emoji: '🌱' },
+    },
   },
   {
     id: 'sunset',
@@ -157,6 +205,11 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
       leg: 'linear-gradient(180deg, #f472b6, #9d174d)',
       eyeInk: '#2a0514',
       cheek: 'rgba(249,168,212,0.55)',
+    },
+    traits: {
+      hornAccent: { id: 'flame-tip',  label: { de: 'Flammen-Spitze', en: 'Flame tip'   }, emoji: '🔥' },
+      cheekMark:  { id: 'sunset',     label: { de: 'Abendrot-Streif', en: 'Sunset stripe' }, emoji: '🌅' },
+      tailTuft:   { id: 'spark',      label: { de: 'Funken-Quaste',   en: 'Spark tuft' }, emoji: '✨' },
     },
   },
 ];

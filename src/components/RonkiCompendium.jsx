@@ -5,6 +5,7 @@ import FireBreathPuff from './FireBreathPuff';
 import { COMPANION_VARIANTS } from '../data/companionVariants';
 import ChibiFriend, { CHIBI_FRIEND_IDS } from './drachennest/ChibiFriend';
 import { SEED_BY_ID } from '../data/creatures';
+import { FREUNDE } from '../data/freunde';
 
 /**
  * RonkiCompendium — public-facing "Sammelbuch" showcase.
@@ -146,7 +147,7 @@ export default function RonkiCompendium() {
                 style={{
                   background: '#fff8f2',
                   borderRadius: 20,
-                  padding: '16px 12px',
+                  padding: '16px 12px 14px',
                   border: isActive ? `2px solid ${v.borderColor}` : '1.5px solid rgba(18,67,70,0.12)',
                   boxShadow: isActive
                     ? `0 12px 28px -10px ${v.glowColor}, 0 0 0 4px ${v.glowColor}`
@@ -174,6 +175,45 @@ export default function RonkiCompendium() {
                 }}>
                   {v.id}
                 </p>
+                {/* Per-variant unique traits — three small chips that
+                    distinguish this Ronki from the others. Marc 25 Apr
+                    2026 ask: "ronkis with variations and unique
+                    features that we can randomize or let the kids
+                    pick when evolution happens." This row is the
+                    showcase; the actual on-chibi rendering is a
+                    follow-up pass. */}
+                {v.traits && (
+                  <div style={{
+                    marginTop: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                    alignItems: 'stretch',
+                  }}>
+                    {[v.traits.hornAccent, v.traits.cheekMark, v.traits.tailTuft].map(t => (
+                      <div key={t.id} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '4px 8px',
+                        borderRadius: 10,
+                        background: `${v.glowColor.replace('0.35', '0.15')}`,
+                        border: `1px solid ${v.borderColor}30`,
+                      }}>
+                        <span style={{ fontSize: 11, lineHeight: 1 }}>{t.emoji}</span>
+                        <span style={{
+                          fontSize: 10,
+                          fontFamily: 'Plus Jakarta Sans, sans-serif',
+                          fontWeight: 700,
+                          color: '#124346',
+                          letterSpacing: '0.02em',
+                        }}>
+                          {t.label.de}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </button>
             );
           })}
@@ -428,7 +468,7 @@ export default function RonkiCompendium() {
            SVG renderer the in-app gallery uses so the compendium stays
            in sync with whatever ships. */}
       <Section
-        kicker="Zwölf Freunde"
+        kicker="Zwanzig Wesen"
         title="Ronkis Freunde"
         subtitle="Auf seinen Streifzügen begegnet Ronki kleinen Wesen aus den fünf Biomen. Tippe eins an, um seinen Namen zu lesen."
       >
@@ -439,7 +479,11 @@ export default function RonkiCompendium() {
           maxWidth: 900,
           margin: '0 auto',
         }}>
-          {CHIBI_FRIEND_IDS.map(id => {
+          {/* Filter to creature IDs only — the arc-initiator friends
+              (pilzhueter, windreiterin, etc.) get their own section
+              below since they're characters Ronki MEETS, not creatures
+              he COLLECTS. */}
+          {CHIBI_FRIEND_IDS.filter(id => SEED_BY_ID.has(id)).map(id => {
             const seed = SEED_BY_ID.get(id);
             return (
               <div key={id} style={{
@@ -472,6 +516,65 @@ export default function RonkiCompendium() {
               </div>
             );
           })}
+        </div>
+      </Section>
+
+      {/* ── Section 7: Arc-initiator friends ──
+           The seven character friends Ronki meets across the five
+           Micropedia chapters. More anthropomorphic than the
+           creature roster — keepers, riders, weavers, builders.
+           Each hosts a reunion arc that surfaces once the kid has
+           discovered enough creatures in their chapter. */}
+      <Section
+        kicker="Sieben Charaktere"
+        title="Charaktere, die Ronki trifft"
+        subtitle="Diese sieben Freundinnen und Freunde tauchen auf, wenn Ronki ihr Biom genug erkundet hat, und laden ihn zu einer Geschichte ein."
+      >
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: 16,
+          maxWidth: 900,
+          margin: '0 auto',
+        }}>
+          {FREUNDE.map(f => (
+            <div key={f.id} style={{
+              background: 'linear-gradient(160deg, #fff8f2 0%, #fef3c7 100%)',
+              borderRadius: 20,
+              padding: '16px 14px 14px',
+              border: '1.5px solid rgba(180,83,9,0.18)',
+              boxShadow: '0 6px 16px -8px rgba(180,83,9,0.22), inset 0 1px 0 rgba(255,255,255,0.5)',
+              textAlign: 'center',
+            }}>
+              <div style={{ width: 110, height: 110, margin: '0 auto' }}>
+                <ChibiFriend id={f.id} size={110} />
+              </div>
+              <p style={{
+                margin: '12px 0 2px',
+                fontFamily: 'Fredoka, sans-serif',
+                fontWeight: 500, fontSize: 16,
+                color: '#124346',
+                letterSpacing: '-0.01em',
+              }}>
+                {f.name.de}
+              </p>
+              <p style={{
+                margin: 0,
+                fontSize: 10, letterSpacing: '0.20em',
+                textTransform: 'uppercase', fontWeight: 800,
+                color: '#A83E2C',
+              }}>
+                {f.chapter}
+              </p>
+              <p style={{
+                margin: '6px 0 0',
+                fontSize: 11, lineHeight: 1.4,
+                color: 'rgba(30,43,46,0.7)',
+              }}>
+                {f.skillName.de}
+              </p>
+            </div>
+          ))}
         </div>
       </Section>
 

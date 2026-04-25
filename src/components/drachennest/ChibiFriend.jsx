@@ -203,6 +203,70 @@ const FRIENDS = {
     accessory: 'goggles',
     bg: '#ede9fe',
   },
+
+  // ── ARC-INITIATOR FRIENDS ───────────────────────────────────
+  // The seven character friends that host reunion arcs (one per
+  // Micropedia chapter, with three at the hearth). More
+  // anthropomorphic than the creature roster — keepers, riders,
+  // weavers, builders. Use the same FREUNDE.id keys so any consumer
+  // that already has a freund object can render <ChibiFriend
+  // id={freund.id} /> and it just works.
+  pilzhueter: {
+    name: 'Der Pilzhüter',
+    body: '#854d0e', bodyDeep: '#422006', belly: '#fde68a', eyeColor: '#1a0e08',
+    shape: 'pear', eyes: 'sleepy', mouth: 'closed',
+    flair: 'freckles',
+    accessory: 'keeperCap',  // tall amber-edged mushroom hat
+    bg: '#fef9d7',
+  },
+  windreiterin: {
+    name: 'Die Windreiterin',
+    body: '#bae6fd', bodyDeep: '#0284c7', belly: '#e0f2fe', eyeColor: '#1e3a8a',
+    shape: 'tall', eyes: 'sparkle', mouth: 'smile',
+    flair: 'cheekDots',
+    accessory: 'flowingScarf',
+    bg: '#e0f2fe',
+  },
+  tiefentaucher: {
+    name: 'Die Tiefentaucherin',
+    body: '#67e8f9', bodyDeep: '#0e7490', belly: '#cffafe', eyeColor: '#0c4a6e',
+    shape: 'round', eyes: 'wide', mouth: 'smile',
+    flair: 'cheekDots',
+    accessory: 'diveGoggles',
+    bg: '#cffafe',
+  },
+  sternenweberin: {
+    name: 'Die Sternenweberin',
+    body: '#a78bfa', bodyDeep: '#6d28d9', belly: '#ede9fe', eyeColor: '#1e1b4b',
+    shape: 'tall', eyes: 'sparkle', mouth: 'closed',
+    flair: 'starSpots',
+    accessory: 'starCrown',
+    bg: '#ede9fe',
+  },
+  lichtbringerin: {
+    name: 'Die Lichtbringerin',
+    body: '#fef3c7', bodyDeep: '#d97706', belly: '#fffdf5', eyeColor: '#3a1f12',
+    shape: 'round', eyes: 'sparkle', mouth: 'smile',
+    flair: 'cheekDots',
+    accessory: 'lantern',
+    bg: '#fff8f2',
+  },
+  flackerfuchs: {
+    name: 'Flackerfuchs',
+    body: '#fb923c', bodyDeep: '#9a3412', belly: '#ffffff', eyeColor: '#1a0e08',
+    shape: 'squat', eyes: 'sparkle', mouth: 'smile',
+    flair: 'cheekDots',
+    accessory: 'foxEars',
+    bg: '#fed7aa',
+  },
+  brueckenbauer: {
+    name: 'Der Brückenbauer',
+    body: '#a8a29e', bodyDeep: '#44403c', belly: '#e7e5e4', eyeColor: '#1c1917',
+    shape: 'pear', eyes: 'default', mouth: 'closed',
+    flair: 'freckles',
+    accessory: 'toolBelt',
+    bg: '#fafaf9',
+  },
 };
 
 export const CHIBI_FRIEND_IDS = Object.keys(FRIENDS);
@@ -278,6 +342,13 @@ export default function ChibiFriend({ id, size = 96, locked = false, withBg = tr
         {cfg.accessory === 'beard' && <Beard />}
         {cfg.accessory === 'pincers' && <Pincers />}
         {cfg.accessory === 'thoughtJar' && <ThoughtJar />}
+        {cfg.accessory === 'keeperCap' && <KeeperCap />}
+        {cfg.accessory === 'flowingScarf' && <FlowingScarf />}
+        {cfg.accessory === 'diveGoggles' && <DiveGoggles />}
+        {cfg.accessory === 'starCrown' && <StarCrown />}
+        {cfg.accessory === 'lantern' && <Lantern />}
+        {cfg.accessory === 'foxEars' && <FoxEars cfg={cfg} />}
+        {cfg.accessory === 'toolBelt' && <ToolBelt />}
 
         {/* Per-creature flair (drawn on body, behind face). */}
         {cfg.flair === 'spot' && <SpotMarking />}
@@ -668,6 +739,120 @@ function Sparkle() {
       <text x={-26} y={-24} fontSize={10} fill="#fde68a">✦</text>
       <text x={18} y={-26} fontSize={9} fill="#fde68a">✦</text>
       <text x={-4} y={-30} fontSize={8} fill="#fed7aa">✧</text>
+    </g>
+  );
+}
+
+// ─── Arc-friend accessories (anthropomorphic kit) ───────────
+
+function KeeperCap() {
+  // Tall amber-edged mushroom hat — the Pilzhüter's signature.
+  return (
+    <g>
+      <ellipse cx={0} cy={-32} rx={28} ry={14} fill="#92400e" />
+      <ellipse cx={0} cy={-36} rx={22} ry={12} fill="#a16207" />
+      <ellipse cx={0} cy={-42} rx={14} ry={9} fill="#854d0e" />
+      <path d="M -28 -28 Q 0 -22 28 -28" stroke="#fbbf24" strokeWidth={1.5} fill="none" />
+      <circle cx={-12} cy={-36} r={2.5} fill="#fef9d7" />
+      <circle cx={4} cy={-40} r={2} fill="#fef9d7" />
+      <circle cx={14} cy={-34} r={2} fill="#fef9d7" />
+    </g>
+  );
+}
+
+function FlowingScarf() {
+  // Wind Rider — long flowing scarf trailing to one side, plus a
+  // soft hair-puff on the head.
+  return (
+    <g>
+      {/* Hair puff on top */}
+      <ellipse cx={0} cy={-26} rx={16} ry={8} fill="#7dd3fc" />
+      <ellipse cx={-10} cy={-26} rx={6} ry={4} fill="#bae6fd" />
+      <ellipse cx={10} cy={-28} rx={5} ry={3} fill="#bae6fd" />
+      {/* Scarf trailing back */}
+      <path d="M -22 4 Q -34 8 -42 4 Q -38 0 -30 0 Q -26 0 -22 0 Z" fill="#0284c7" />
+      <path d="M -42 4 Q -46 8 -42 12" stroke="#0284c7" strokeWidth={3} fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
+function DiveGoggles() {
+  // Deep Diver — round glass goggles strapped over the eyes, with a
+  // single bubble rising. Distinct from the lab Goggles (Doktor
+  // Funkel) — these have aqua tint + a strap.
+  return (
+    <g>
+      <line x1={-26} y1={-4} x2={26} y2={-4} stroke="#0c4a6e" strokeWidth={1.6} />
+      <circle cx={-9} cy={-2} r={7} fill="rgba(6,182,212,0.35)" stroke="#0c4a6e" strokeWidth={1.8} />
+      <circle cx={9} cy={-2} r={7} fill="rgba(6,182,212,0.35)" stroke="#0c4a6e" strokeWidth={1.8} />
+      <circle cx={-7} cy={-4} r={1.6} fill="#ffffff" opacity={0.9} />
+      <circle cx={11} cy={-4} r={1.6} fill="#ffffff" opacity={0.9} />
+      {/* Single rising bubble */}
+      <circle cx={20} cy={-14} r={2} fill="rgba(207,250,254,0.7)" stroke="#0e7490" strokeWidth={0.5} />
+    </g>
+  );
+}
+
+function StarCrown() {
+  // Star Weaver — three bigger stars woven into a crown above the
+  // head, plus tiny dots trailing.
+  return (
+    <g>
+      <ellipse cx={0} cy={-26} rx={28} ry={4} fill="#1e1b4b" opacity={0.25} />
+      <text x={-22} y={-22} fontSize={14} fill="#fde68a">✦</text>
+      <text x={-4} y={-28} fontSize={18} fill="#fef3c7">✦</text>
+      <text x={14} y={-22} fontSize={14} fill="#fde68a">✦</text>
+      <circle cx={-26} cy={-12} r={1} fill="#fde68a" />
+      <circle cx={26} cy={-14} r={1} fill="#fde68a" />
+    </g>
+  );
+}
+
+function Lantern() {
+  // Lightbringer — small lantern held to one side, glowing.
+  return (
+    <g>
+      {/* Lantern body */}
+      <rect x={-32} y={-2} width={12} height={14} rx={2} fill="#fbbf24" stroke="#92400e" strokeWidth={1} />
+      <rect x={-34} y={-2} width={16} height={3} rx={1} fill="#92400e" />
+      {/* Top loop / handle */}
+      <path d="M -30 -4 Q -26 -10 -22 -4" stroke="#92400e" strokeWidth={1.2} fill="none" />
+      {/* Glow inside */}
+      <circle cx={-26} cy={6} r={3} fill="#fef9d7" opacity={0.9} />
+      {/* Halo around lantern */}
+      <circle cx={-26} cy={6} r={10} fill="rgba(252,211,77,0.18)" />
+    </g>
+  );
+}
+
+function FoxEars({ cfg }) {
+  // Flicker Fox — tall pointed fox ears + a fluffy tail behind.
+  return (
+    <g>
+      {/* Tail */}
+      <path d="M -28 14 Q -42 6 -38 22 Q -32 18 -26 18 Z" fill={cfg.body} stroke={cfg.bodyDeep} strokeWidth={0.6} />
+      <ellipse cx={-38} cy={14} rx={4} ry={4} fill="#ffffff" />
+      {/* Ears */}
+      <path d="M -22 -16 L -18 -34 L -10 -16 Z" fill={cfg.body} />
+      <path d="M 22 -16 L 18 -34 L 10 -16 Z" fill={cfg.body} />
+      <path d="M -19 -19 L -18 -30 L -14 -20 Z" fill="#ffffff" />
+      <path d="M 19 -19 L 18 -30 L 14 -20 Z" fill="#ffffff" />
+    </g>
+  );
+}
+
+function ToolBelt() {
+  // Bridge Builder — a small belt across the body with a hammer
+  // pouch + bolt. Earthy, practical.
+  return (
+    <g>
+      <rect x={-26} y={10} width={52} height={6} rx={1.5} fill="#57534e" />
+      <rect x={-2} y={10} width={4} height={6} fill="#1c1917" />
+      {/* Hammer head poking out */}
+      <rect x={-22} y={4} width={6} height={4} rx={0.8} fill="#78716c" />
+      <rect x={-21} y={8} width={1.5} height={6} fill="#3f3f46" />
+      {/* Bolt on opposite side */}
+      <circle cx={20} cy={13} r={2} fill="#fbbf24" stroke="#854d0e" strokeWidth={0.6} />
     </g>
   );
 }

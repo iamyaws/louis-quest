@@ -5,6 +5,7 @@ import { FREUND_BY_ID } from '../data/freunde';
 import { CHAPTERS } from '../data/creatures';
 import VoiceAudio from '../utils/voiceAudio';
 import { useEventSurface } from '../hooks/useEventSurface';
+import ChibiFriend, { hasChibiFriend } from './drachennest/ChibiFriend';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -101,7 +102,11 @@ export default function FreundCallbackCard() {
             className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
             style={{ background: `${accent}20`, border: `2px solid ${accent}40` }}
           >
-            {!portraitFailed ? (
+            {hasChibiFriend(freund.id) ? (
+              <div className="w-full h-full grid place-items-center">
+                <ChibiFriend id={freund.id} size={92} withBg={false} />
+              </div>
+            ) : !portraitFailed ? (
               <img
                 src={BASE + freund.portrait}
                 alt=""
