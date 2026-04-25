@@ -302,7 +302,7 @@ export default function Expedition({ onClose }) {
         </div>
 
         {/* Naturtagebuch — Mementos shelf + recent pages */}
-        <Naturtagebuch log={log} />
+        <Naturtagebuch log={log} expedition={expedition} />
       </section>
 
       {/* Diary modal */}
@@ -751,7 +751,7 @@ function CampSpeech({ text, rightAligned }) {
 
 // ─── Naturtagebuch shelf ────────────────────────────────────────
 
-function Naturtagebuch({ log }) {
+function Naturtagebuch({ log, expedition }) {
   // Show 8 slots; fill with what we have, dash the rest. Recent 3
   // pages go below as the "Seiten" detail strip.
   const SHELF_SLOTS = 8;
@@ -785,8 +785,16 @@ function Naturtagebuch({ log }) {
         </p>
       </div>
 
-      {/* Mini map */}
-      <ScrapMap label={`Morgenwald · ${Math.min(99, Math.round((log.length / 24) * 100))}%`} />
+      {/* Mini map — Uber-style live trail (Marc 25 Apr 2026: "show
+          where ronki is going in the woods and how there might be an
+          expedition line of where he is going and track that trail
+          like the Uber Magic Map"). The trail is computed from the
+          active expedition's departedAt/returnAt; idle/home shows a
+          dimmed preview path so the surface still reads as a map. */}
+      <ExpeditionTrail
+        expedition={expedition}
+        label={`Morgenwald · ${Math.min(99, Math.round((log.length / 24) * 100))}%`}
+      />
 
       {/* Empty state — warm onboarding card instead of an
           all-dashed-boxes shelf when Ronki hasn't collected anything
@@ -898,7 +906,88 @@ function Naturtagebuch({ log }) {
   );
 }
 
-function ScrapMap({ label }) {
+// ─── ExpeditionTrail — Uber-style live route map ─────────────────
+//
+// Marc 25 Apr 2026: "show where ronki is going in the woods and how
+// there might be an expedition line of where he is going and track
+// that trail like the Uber Magic Map."
+//
+// Design:
+//   · Parchment map background with scattered tree blobs as
+//     landmarks (kept from the prior ScrapMap for continuity).
+//   · A bezier path drawn from the cave (left, fixed) to the target
+//     find (right, varies per trip via deterministic seed off
+//     departedAt). Each trip looks like a different route.
+//   · Solid green stroke for the portion Ronki has covered;
+//     dashed amber stroke for the portion still ahead.
+//   · A pulsing Ronki dot at the current progress along the curve.
+//   · Three waypoint dots along the path so the route reads as a
+//     real path through landmarks rather than an abstract line.
+//   · Idle / home state shows a dimmed faint path so the map still
+//     reads as a map without giving away the next route.
+//   · Tick once a minute while Ronki is away so the dot crawls
+//     across the map noticeably between visits.
+//
+// Pure visual; no game logic. Geometry uses a fixed 320×160 SVG
+// viewBox so the bezier coords are scale-independent.
+
+function ExpeditionTrail({ expedition, label }) {
+  const expState = expedition?.state || 'home';
+  const isMoving = expState === 'away' || expState === 'waiting' || expState === 'leaving';
+
+  // Tick once a minute so the dot moves visibly across the trip
+  // even if the kid leaves the surface open. 60s is enough granularity
+  // for a 4-hour trip and is cheap.
+  const [, forceTick] = useState(0);
+  useEffect(() => {
+    if (expState !== 'away') return;
+    const id = setInterval(() => forceTick(n => n + 1), 60_000);
+    return () => clearInterval(id);
+  }, [expState]);
+
+  // Progress 0..1 — driven by the trip's actual timestamps.
+  const progress = (() => {
+    if (expState === 'waiting') return 1;
+    if (expState === 'leaving') return 0.04;
+    if (expState !== 'away') return 0;
+    if (!expedition?.departedAt || !expedition?.returnAt) return 0;
+    const start = new Date(expedition.departedAt).getTime();
+    const end = new Date(expedition.returnAt).getTime();
+    const now = Date.now();
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return 0;
+    return Math.max(0, Math.min(1, (now - start) / (end - start)));
+  })();
+
+  // Deterministic path per trip — same departedAt produces the same
+  // route so the dot doesn't teleport between renders.
+  const seed = expedition?.departedAt
+    ? new Date(expedition.departedAt).getTime()
+    : 12345; // stable idle preview seed
+  const path = useMemo(() => makeTrailPath(seed), [seed]);
+
+  // Compute Ronki's current position via bezier eval.
+  const dot = bezierAt(path, progress);
+  // Three waypoint dots at fixed parametric positions — landmarks
+  // along the way (start = 0, end = 1, three intermediate beats).
+  const waypoints = useMemo(() => (
+    [0.22, 0.5, 0.78].map((t, i) => ({ t, ...bezierAt(path, t), key: i }))
+  ), [path]);
+
+  // Path length for the stroke-dashoffset trick. Read on mount via
+  // ref so the SVG path's actual measured length drives the
+  // traveled-vs-ahead split (more accurate than a chord estimate).
+  const pathRef = useRef(null);
+  const [pathLen, setPathLen] = useState(360);  // sane default until measured
+  useEffect(() => {
+    if (pathRef.current && pathRef.current.getTotalLength) {
+      setPathLen(pathRef.current.getTotalLength());
+    }
+  }, [path]);
+
+  // Faint preview when the kid hasn't departed yet — the map still
+  // shows a route, but it's clearly a "coming next" state.
+  const preview = !isMoving;
+
   return (
     <div style={{
       margin: '10px 0 0',
@@ -913,18 +1002,101 @@ function ScrapMap({ label }) {
       `,
       boxShadow: 'inset 0 0 0 1px rgba(180,120,40,0.15)',
     }}>
-      <div style={{
+      {/* Landmark blobs (forest patches) — purely decorative,
+          unchanged from the prior map so the parchment still
+          reads "Morgenwald." */}
+      <div aria-hidden="true" style={{
         position: 'absolute', inset: 0,
         backgroundImage: `
           radial-gradient(circle at 22% 32%, #7a9a5d 0%, transparent 8%),
-          radial-gradient(circle at 42% 55%, #7a9a5d 0%, transparent 10%),
+          radial-gradient(circle at 42% 70%, #7a9a5d 0%, transparent 10%),
           radial-gradient(circle at 64% 38%, #a3c677 0%, transparent 9%),
-          radial-gradient(circle at 76% 68%, #5a8f4a 0%, transparent 7%),
-          radial-gradient(circle at 30% 80%, #7a9a5d 0%, transparent 6%)
+          radial-gradient(circle at 76% 78%, #5a8f4a 0%, transparent 7%),
+          radial-gradient(circle at 30% 90%, #7a9a5d 0%, transparent 6%),
+          radial-gradient(circle at 88% 22%, #a3c677 0%, transparent 7%)
         `,
-        opacity: 0.5,
+        opacity: 0.45,
       }} />
-      <div style={{
+
+      {/* Trail SVG — the heart of the magic-map effect. */}
+      <svg
+        viewBox="0 0 320 160"
+        preserveAspectRatio="none"
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+      >
+        {/* "Ahead" path — dashed amber, full length, drawn first
+            so the solid traveled portion paints over it. */}
+        <path
+          d={path.d}
+          fill="none"
+          stroke={preview ? 'rgba(120,53,15,0.30)' : 'rgba(180,83,9,0.55)'}
+          strokeWidth={preview ? 1.2 : 2}
+          strokeLinecap="round"
+          strokeDasharray="4 5"
+          opacity={preview ? 0.6 : 0.95}
+        />
+        {/* Traveled portion — solid green, dashoffset reveals only
+            the first `progress` chunk. While idle (preview) this
+            is hidden entirely so the route reads as "not started." */}
+        {!preview && (
+          <path
+            ref={pathRef}
+            d={path.d}
+            fill="none"
+            stroke="#15803d"
+            strokeWidth={2.6}
+            strokeLinecap="round"
+            strokeDasharray={pathLen}
+            strokeDashoffset={pathLen * (1 - progress)}
+            style={{ transition: 'stroke-dashoffset 1.2s ease-out' }}
+          />
+        )}
+        {/* Waypoint markers — three small landmarks along the path.
+            Lit when Ronki has passed them, dim ahead. */}
+        {waypoints.map(wp => {
+          const passed = !preview && progress >= wp.t;
+          return (
+            <circle
+              key={wp.key}
+              cx={wp.x} cy={wp.y} r={2.2}
+              fill={passed ? '#15803d' : 'rgba(120,53,15,0.45)'}
+              stroke="#fff8f2"
+              strokeWidth={1}
+            />
+          );
+        })}
+        {/* Cave (start) marker — small home arch on the left. */}
+        <g transform={`translate(${path.p0.x - 6} ${path.p0.y - 8})`}>
+          <rect x="0" y="6" width="12" height="8" rx="1.5"
+                fill={preview ? 'rgba(120,53,15,0.7)' : '#5c2a08'} />
+          <path d="M 0 6 L 6 0 L 12 6 Z"
+                fill={preview ? 'rgba(120,53,15,0.7)' : '#5c2a08'} />
+          <rect x="4.5" y="9" width="3" height="5" rx="0.5"
+                fill="rgba(254,243,199,0.85)" />
+        </g>
+        {/* Target (end) marker — small star/find. Pulses when
+            Ronki has arrived. */}
+        <g transform={`translate(${path.p3.x} ${path.p3.y})`}>
+          <circle r={6}
+                  fill={expState === 'waiting' ? 'rgba(252,211,77,0.55)' : 'rgba(252,211,77,0.20)'}
+                  style={{ animation: expState === 'waiting' ? 'et-pulse 1.4s ease-in-out infinite' : undefined }} />
+          <circle r={2.6} fill={expState === 'waiting' ? '#f59e0b' : 'rgba(180,83,9,0.7)'} />
+        </g>
+
+        {/* Ronki dot — only while a real trip is running. Pulsing
+            ring + chibi-coloured core. */}
+        {!preview && (
+          <g transform={`translate(${dot.x} ${dot.y})`} style={{ transition: 'transform 1.2s ease-out' }}>
+            <circle r={9} fill="rgba(252,211,77,0.20)"
+                    style={{ animation: 'et-pulse 1.6s ease-in-out infinite' }} />
+            <circle r={5} fill="#fff8f2" stroke="#15803d" strokeWidth={1.6} />
+            <circle r={2} fill="#15803d" />
+          </g>
+        )}
+      </svg>
+
+      {/* Compass rose */}
+      <div aria-hidden="true" style={{
         position: 'absolute', top: 10, left: 12,
         width: 28, height: 28, borderRadius: '50%',
         background: 'rgba(255,248,242,0.85)',
@@ -934,6 +1106,8 @@ function ScrapMap({ label }) {
       }}>
         N
       </div>
+
+      {/* Biome + collection % label */}
       <div style={{
         position: 'absolute', bottom: 10, right: 12,
         padding: '4px 10px', borderRadius: 999,
@@ -944,8 +1118,86 @@ function ScrapMap({ label }) {
       }}>
         {label}
       </div>
+
+      {/* Status pill — only while Ronki is moving. Floats top-right
+          so the kid sees what the dot means without translating
+          coordinates in their head. */}
+      {isMoving && (
+        <div style={{
+          position: 'absolute', top: 10, right: 12,
+          padding: '4px 10px', borderRadius: 999,
+          background: 'rgba(20,83,45,0.92)',
+          color: '#ecfdf5',
+          font: '700 10px/1 "Plus Jakarta Sans", sans-serif',
+          letterSpacing: '0.10em', textTransform: 'uppercase',
+          display: 'flex', alignItems: 'center', gap: 6,
+        }}>
+          <span style={{
+            width: 6, height: 6, borderRadius: '50%',
+            background: expState === 'waiting' ? '#fbbf24' : '#86efac',
+            animation: 'et-pulse 1.4s ease-in-out infinite',
+          }} />
+          {expState === 'waiting'
+            ? 'Zurück'
+            : expState === 'leaving'
+            ? 'Aufbruch'
+            : `Unterwegs · ${Math.round(progress * 100)}%`}
+        </div>
+      )}
+
+      <style>{`
+        @keyframes et-pulse {
+          0%, 100% { opacity: 1;   transform: scale(1); }
+          50%      { opacity: 0.55; transform: scale(1.35); }
+        }
+      `}</style>
     </div>
   );
+}
+
+// ─── Trail-path math (deterministic bezier per trip) ──────────────
+
+// Cubic bezier evaluator — returns {x, y} at parameter t in [0,1].
+function bezierAt({ p0, p1, p2, p3 }, t) {
+  const u = 1 - t;
+  return {
+    x: u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x,
+    y: u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y,
+  };
+}
+
+// Build a curvy path from the cave (fixed left anchor) to the
+// target find (right, varies). Two control points jitter so each
+// trip's route looks unique. Coords are inside the 320×160 viewBox.
+function makeTrailPath(seed) {
+  const rand = mulberry32(seed || 1);
+  const p0 = { x: 32,  y: 124 };  // cave/home anchor
+  const p3 = {
+    x: 286,
+    y: 28 + Math.floor(rand() * 80),  // target varies upper to lower-mid
+  };
+  const p1 = {
+    x: 90  + Math.floor(rand() * 60),
+    y: 30  + Math.floor(rand() * 50),
+  };
+  const p2 = {
+    x: 200 + Math.floor(rand() * 60),
+    y: 80  + Math.floor(rand() * 50),
+  };
+  const d = `M ${p0.x} ${p0.y} C ${p1.x} ${p1.y}, ${p2.x} ${p2.y}, ${p3.x} ${p3.y}`;
+  return { p0, p1, p2, p3, d };
+}
+
+// Tiny seeded PRNG — same seed always returns the same sequence.
+// Lifted from public-domain mulberry32 so we don't pull a dep in for
+// twelve random numbers.
+function mulberry32(a) {
+  return function() {
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 // ─── Diary modal ────────────────────────────────────────────────
