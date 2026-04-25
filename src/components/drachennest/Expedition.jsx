@@ -317,12 +317,15 @@ export default function Expedition({ onClose }) {
         />
       )}
 
-      {/* Dev affordance: when ?expedition is set, expose a small
-          state-cycle bar so QA can hop between states without
-          reloading. Hidden in prod. */}
-      {import.meta.env?.DEV && (
-        <DevStateCycler current={expedition.state} actions={actions} />
-      )}
+      {/* Dev affordance: state-cycle bar for QA. Hidden by default
+          even in dev builds (it was leaking the "in-development"
+          feel into Marc's previews — 25 Apr 2026). Opt in with
+          `?devCycler=1` or `?expedition=…`. Hidden in prod always. */}
+      {import.meta.env?.DEV && typeof window !== 'undefined' && (() => {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.get('devCycler') && !params.get('expedition')) return null;
+        return <DevStateCycler current={expedition.state} actions={actions} />;
+      })()}
 
       <style>{`
         @keyframes exp-walk {
@@ -753,6 +756,7 @@ function Naturtagebuch({ log }) {
   const SHELF_SLOTS = 8;
   const slots = Array.from({ length: SHELF_SLOTS }, (_, i) => log[log.length - 1 - i] || null);
   const recent = log.slice(-3).reverse();
+  const isEmpty = log.length === 0;
 
   return (
     <>
@@ -783,33 +787,74 @@ function Naturtagebuch({ log }) {
       {/* Mini map */}
       <ScrapMap label={`Morgenwald · ${Math.min(99, Math.round((log.length / 24) * 100))}%`} />
 
-      {/* Mementos shelf */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '14px 0 4px' }}>
-        <h4 style={{ margin: 0, font: '600 15px/1 "Fredoka", sans-serif', color: '#124346' }}>Mementos</h4>
-        <small style={{ font: '700 10px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(18,67,70,0.55)' }}>
-          {log.length} von 24
-        </small>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-        {slots.map((m, i) => m ? (
-          <div key={m.id} style={{
-            aspectRatio: 1, borderRadius: 12,
-            background: `radial-gradient(ellipse at 40% 30%, rgba(252,211,77,0.3), transparent 40%), linear-gradient(135deg, #fff8f2, #fef3c7)`,
-            border: '1px solid rgba(180,120,40,0.15)',
+      {/* Empty state — warm onboarding card instead of an
+          all-dashed-boxes shelf when Ronki hasn't collected anything
+          yet (Marc 25 Apr 2026 polish: bottom felt dev-in-progress). */}
+      {isEmpty ? (
+        <div style={{
+          marginTop: 16,
+          padding: '20px 18px',
+          borderRadius: 18,
+          background: `
+            radial-gradient(ellipse at 80% 0%, rgba(252,211,77,0.25), transparent 50%),
+            linear-gradient(180deg, #fff8f2 0%, #fef3c7 100%)
+          `,
+          border: '1px solid rgba(180,120,40,0.18)',
+          boxShadow: '0 6px 14px -10px rgba(180,90,30,0.30), inset 0 1px 0 rgba(255,255,255,0.7)',
+          display: 'grid',
+          gridTemplateColumns: '54px 1fr',
+          gap: 14,
+          alignItems: 'center',
+        }}>
+          <div style={{
+            width: 54, height: 54, borderRadius: 14,
+            background: 'linear-gradient(160deg, #fef3c7, #fcd34d)',
             display: 'grid', placeItems: 'center',
-            fontSize: 26,
-            filter: 'drop-shadow(0 2px 3px rgba(180,90,30,0.15))',
+            fontSize: 28,
+            boxShadow: 'inset 0 -2px 0 rgba(180,90,30,0.18)',
           }}>
-            {m.emoji}
+            📔
           </div>
-        ) : (
-          <div key={`empty-${i}`} style={{
-            aspectRatio: 1, borderRadius: 12,
-            background: 'rgba(18,67,70,0.04)',
-            border: '1px dashed rgba(18,67,70,0.15)',
-          }} />
-        ))}
-      </div>
+          <div>
+            <b style={{ display: 'block', font: '600 14px/1.25 "Fredoka", sans-serif', color: '#124346' }}>
+              Noch leer.
+            </b>
+            <span style={{ display: 'block', marginTop: 4, font: '500 12px/1.45 "Nunito", sans-serif', color: 'rgba(18,67,70,0.7)' }}>
+              Wenn Ronki vom Morgenwald zurückkommt, landen seine Funde hier auf der Seite.
+            </span>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Mementos shelf */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '14px 0 4px' }}>
+            <h4 style={{ margin: 0, font: '600 15px/1 "Fredoka", sans-serif', color: '#124346' }}>Mementos</h4>
+            <small style={{ font: '700 10px/1 "Plus Jakarta Sans", sans-serif', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(18,67,70,0.55)' }}>
+              {log.length} von 24
+            </small>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+            {slots.map((m, i) => m ? (
+              <div key={m.id} style={{
+                aspectRatio: 1, borderRadius: 12,
+                background: `radial-gradient(ellipse at 40% 30%, rgba(252,211,77,0.3), transparent 40%), linear-gradient(135deg, #fff8f2, #fef3c7)`,
+                border: '1px solid rgba(180,120,40,0.15)',
+                display: 'grid', placeItems: 'center',
+                fontSize: 26,
+                filter: 'drop-shadow(0 2px 3px rgba(180,90,30,0.15))',
+              }}>
+                {m.emoji}
+              </div>
+            ) : (
+              <div key={`empty-${i}`} style={{
+                aspectRatio: 1, borderRadius: 12,
+                background: 'rgba(18,67,70,0.04)',
+                border: '1px dashed rgba(18,67,70,0.15)',
+              }} />
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Recent pages */}
       {recent.length > 0 && (

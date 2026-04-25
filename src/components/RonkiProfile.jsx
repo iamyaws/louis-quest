@@ -1998,8 +1998,8 @@ function EvolutionTree({ state, lang }) {
         fontStyle: 'italic',
       }}>
         {lang === 'de'
-          ? 'Bei jeder Stufe bringt Ronki eine kleine Spur mit.'
-          : 'At each stage Ronki brings home a little trait.'}
+          ? 'Mit jeder Entwicklung bekommt Ronki ein neues Merkmal.'
+          : 'With every evolution Ronki gains a new trait.'}
       </p>
     </div>
   );

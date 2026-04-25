@@ -44,11 +44,26 @@ export default function EmojiCodePicker({ mode = 'self', initial = [], onConfirm
         background: 'linear-gradient(180deg, #fff8f2 0%, #fef3c7 100%)',
         display: 'flex',
         flexDirection: 'column',
-        padding: '24px 20px 32px',
+        alignItems: 'center',
         overflowY: 'auto',
         WebkitOverflowScrolling: 'touch',
       }}
     >
+      {/* Inner column — phone-shaped on any viewport. Without the
+          max-width clamp the 5-col grid expanded edge-to-edge on
+          tablet/desktop windows and the rightmost tiles got clipped
+          off-screen (Marc QA 25 Apr 2026: "either not responsive or
+          not fit the screen estate"). 460px is a comfortable phone-
+          frame width that still accommodates 5 tiles + gaps. */}
+      <div style={{
+        width: '100%',
+        maxWidth: 460,
+        margin: '0 auto',
+        padding: '24px 20px 32px',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+      }}>
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
         <div style={{
@@ -231,6 +246,7 @@ export default function EmojiCodePicker({ mode = 'self', initial = [], onConfirm
             Abbrechen
           </button>
         )}
+      </div>
       </div>
     </div>
   );
