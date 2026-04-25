@@ -86,7 +86,7 @@ export const QUESTIONS: QuestionDef[] = [
       { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
-      'Sichtbare kostenpflichtige Cosmetics in Kinder-Apps erzeugen für viele Kinder Frust. Wer mit diesem Frust umgeht, der Anbieter durch ein Kaufangebot oder die Eltern durch eine klare Hausregel, entscheidet sich oft am Punkt-of-Sale.',
+      'Sichtbare kostenpflichtige Cosmetics in Kinder-Apps erzeugen für viele Kinder Frust. Wer mit diesem Frust umgeht, der Anbieter über ein Kaufangebot oder die Eltern über eine klare Hausregel, entscheidet sich meist genau in dem Moment, in dem das Kind den Kauf-Knopf sieht.',
     teaches:
       'Lehrt dein Kind: Coole Sachen kommen mit Geld. Wer nicht zahlt, ist sichtbar nicht-cool.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),

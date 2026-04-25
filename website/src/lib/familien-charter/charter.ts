@@ -32,6 +32,13 @@ export type PauseChoice =
 export interface CharterAnswers {
   familyName: string;
   childCount: number;
+  /**
+   * Optional comma-separated first names of family members who sign the
+   * charter. We render one signature line per parsed name in both the
+   * on-screen preview and the printable PDF. Empty string falls back to
+   * generic "Erwachsene / Kinder" labels so we don't break older drafts.
+   */
+  signatures: string;
   wann: WannChoice[];
   wo: WoChoice;
   inhalte: InhaltChoice[];
@@ -44,6 +51,7 @@ export interface CharterAnswers {
 export const EMPTY_ANSWERS: CharterAnswers = {
   familyName: '',
   childCount: 1,
+  signatures: '',
   wann: [],
   wo: 'wohnzimmer',
   inhalte: [],
@@ -53,49 +61,62 @@ export const EMPTY_ANSWERS: CharterAnswers = {
   versprechen: '',
 };
 
+/**
+ * Parses the freeform comma-separated signatures string into a clean
+ * list of trimmed names, capped at 6 to keep the printed signature
+ * block tidy on A4.
+ */
+export function parseSignatures(input: string): string[] {
+  return input
+    .split(/[,\n]/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .slice(0, 6);
+}
+
 export const WANN_LABELS: Record<WannChoice, string> = {
-  'morgens-vor-schule': 'Morgens vor der Schule',
-  'nach-schule': 'Nach der Schule',
-  wochenende: 'Am Wochenende',
-  'abends-nach-hausaufgaben': 'Abends nach den Hausaufgaben',
-  'als-belohnung': 'Als Belohnung für besondere Anlässe',
+  'morgens-vor-schule': 'Morgens, bevor die Schule losgeht.',
+  'nach-schule': 'Nach der Schule, wenn die Hausaufgaben durch sind.',
+  wochenende: 'Am Wochenende, mit etwas Luft im Tag.',
+  'abends-nach-hausaufgaben': 'Abends, nach Hausaufgaben und Bewegung.',
+  'als-belohnung': 'Bei besonderen Anlässen, nicht als Tagesgeschäft.',
 };
 
 export const WO_LABELS: Record<WoChoice, string> = {
-  wohnzimmer: 'Im gemeinsamen Wohnzimmer, sichtbar für alle',
-  kinderzimmer: 'Im Kinderzimmer, mit unseren Hausregeln',
-  beides: 'Beides, je nach Aktivität und Inhalt',
+  wohnzimmer: 'Im Wohnzimmer, dort wo auch wir Erwachsenen sitzen.',
+  kinderzimmer: 'Im Kinderzimmer, mit offener Tür und unseren Hausregeln.',
+  beides: 'Beides, je nachdem was gespielt oder geschaut wird.',
 };
 
 export const INHALT_LABELS: Record<InhaltChoice, string> = {
-  lernen: 'Lern-Apps und Schul-Inhalte',
-  spielen: 'Spiele, vorab gemeinsam ausgewählt',
-  video: 'Videos und Filme, vorab gemeinsam ausgewählt',
-  sozial: 'Soziale Apps (Klassenchat, Familienkontakt)',
+  lernen: 'Lern-Apps und Schul-Sachen.',
+  spielen: 'Spiele, die wir vorher gemeinsam ausgesucht haben.',
+  video: 'Videos und Filme, ebenfalls gemeinsam ausgewählt.',
+  sozial: 'Familien- und Klassen-Chat. Kein Open-World-Social.',
 };
 
 export const GELD_LABELS: Record<GeldChoice, string> = {
-  nie: 'Wir geben kein Echtgeld in Apps aus.',
+  nie: 'Wir geben kein Echtgeld in Apps aus. Punkt.',
   'nur-mit-eltern':
-    'Käufe in Apps nur mit ausdrücklicher Zustimmung eines Elternteils.',
+    'Käufe nur, wenn ein Elternteil daneben sitzt und ja sagt.',
   'monatliches-budget':
-    'Wir vereinbaren ein monatliches Budget für In-App-Käufe und besprechen jeden Kauf.',
+    'Monatliches Budget, das wir gemeinsam besprechen, bevor etwas geklickt wird.',
 };
 
 export const PUSH_LABELS: Record<PushChoice, string> = {
-  'alle-aus': 'Push-Benachrichtigungen sind in allen Apps aus.',
+  'alle-aus': 'Push aus. Auf jeder App, auf jedem Gerät.',
   'einige-erlauben':
-    'Push nur für Apps die wir ausdrücklich freigegeben haben (zum Beispiel Klassenchat).',
+    'Push nur für die paar Apps, die wir bewusst freigegeben haben (zum Beispiel den Klassen-Chat).',
   'je-app':
-    'Wir entscheiden für jede App neu, ob Push erlaubt ist, und prüfen das alle paar Wochen nach.',
+    'Wir entscheiden pro App neu und schauen alle paar Wochen, ob die Entscheidung noch passt.',
 };
 
 export const PAUSE_LABELS: Record<PauseChoice, string> = {
-  'wochentag-pause': 'Mindestens ein Wochentag ohne Bildschirm.',
-  'wochenend-pause': 'Ein Wochenend-Tag im Monat komplett offline.',
+  'wochentag-pause': 'Mindestens ein Wochentag bleibt komplett ohne Bildschirm.',
+  'wochenend-pause': 'Einen Wochenend-Tag im Monat sind alle Geräte aus.',
   urlaubspause: 'Im Urlaub bleiben die Geräte zuhause oder im Koffer.',
   'familien-zeit':
-    'Bei gemeinsamen Mahlzeiten und Familien-Zeit liegen alle Geräte weg.',
+    'Bei gemeinsamen Mahlzeiten liegen alle Geräte weg, auch unsere.',
 };
 
 export interface StepDef {

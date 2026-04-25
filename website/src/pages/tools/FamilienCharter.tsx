@@ -84,15 +84,32 @@ export default function FamilienCharter() {
           </Link>
 
           <motion.div {...fadeUp(0, reduced)} className="space-y-8">
-            <header className="space-y-4">
+            {/*
+              Header: H1 + lead + (on the input steps only) a tilted
+              miniature preview-poster that previews the output shape.
+              The poster hides during step 6 (the real preview) because
+              the actual rendered charter takes over visually.
+            */}
+            <header className="space-y-5">
               <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
                 Werkzeug für Eltern
               </p>
-              <h1 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
-                Eure{' '}
-                <em className="italic text-sage">Familien-Medien-Charter</em>.
-              </h1>
-              <p className="text-sm text-ink/70">
+              <div className="grid sm:grid-cols-[1fr_auto] gap-6 items-start">
+                <div className="space-y-4">
+                  <h1 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
+                    Eure{' '}
+                    <em className="italic text-sage">Familien-Medien-Charter</em>.
+                  </h1>
+                  <p className="text-base text-ink/75 leading-relaxed max-w-prose">
+                    Sechs kurze Schritte, dann steht eure eigene Charter da.
+                    Druckbar als PDF für den Kühlschrank, teilbar als Bild
+                    für andere Eltern. Wir geben den Rahmen, ihr füllt ihn.
+                  </p>
+                </div>
+                {!isPreview && <CharterMiniPoster reduced={reduced} />}
+              </div>
+
+              <p className="text-sm text-ink/70 pt-2">
                 Schritt {Math.min(step + 1, STEPS.length)} von {STEPS.length} ·{' '}
                 {STEPS[step].title}
               </p>
@@ -220,9 +237,10 @@ function FamilyStep({
 }) {
   return (
     <div className="space-y-6">
-      <p className="text-base text-ink/75">
-        Optional ein Familienname für die Charter (wird oben drauf gedruckt),
-        und wie viele Kinder zwischen 5 und 9 ihr aktuell habt.
+      <p className="text-base text-ink/75 max-w-prose leading-relaxed">
+        Zwei kurze Sachen für die Kopfzeile: Wie soll die Charter heißen, und
+        wie viele Kinder im Grundschulalter sitzen bei euch am Tisch. Beides
+        kannst du auch leer lassen.
       </p>
       <label className="block max-w-md">
         <span className="text-sm text-ink/70 mb-2 block">
@@ -258,6 +276,24 @@ function FamilyStep({
           ))}
         </div>
       </div>
+      <label className="block max-w-md">
+        <span className="text-sm text-ink/70 mb-2 block">
+          Wer unterschreibt? (optional, Komma-getrennt)
+        </span>
+        <input
+          type="text"
+          value={answers.signatures}
+          onChange={(e) => onUpdate('signatures', e.target.value)}
+          placeholder="z.B. Anna, Lukas, Mama, Papa"
+          maxLength={120}
+          className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:border-transparent"
+        />
+        <span className="text-xs text-ink/55 mt-1.5 block">
+          Wir drucken pro Name eine echte Signaturzeile unten auf die Charter.
+          Wenn ihr's leer lasst, kommen die Standard-Felder „Erwachsene"
+          und „Kinder".
+        </span>
+      </label>
     </div>
   );
 }
@@ -274,14 +310,14 @@ function WannWoStep({
   return (
     <div className="space-y-8">
       <ChoiceGroup
-        legend="Wann ist Bildschirmzeit erlaubt? (mehrere möglich)"
+        legend="Wann ist die Bildschirm-Zeit bei euch offen? (mehrere möglich)"
         options={Object.entries(WANN_LABELS) as [WannChoice, string][]}
         selected={answers.wann}
         onToggle={onToggleWann}
         multi
       />
       <ChoiceGroup
-        legend="Wo wird gespielt?"
+        legend="Und wo wird gespielt oder geschaut?"
         options={Object.entries(WO_LABELS) as [WoChoice, string][]}
         selected={[answers.wo]}
         onToggle={(v) => onSetWo(v)}
@@ -299,7 +335,7 @@ function InhalteStep({
 }) {
   return (
     <ChoiceGroup
-      legend="Welche Inhalte sind ok? (mehrere möglich)"
+      legend="Welche Arten von Inhalten sind bei euch okay? (mehrere möglich)"
       options={Object.entries(INHALT_LABELS) as [InhaltChoice, string][]}
       selected={answers.inhalte}
       onToggle={onToggle}
@@ -320,13 +356,13 @@ function GeldPushStep({
   return (
     <div className="space-y-8">
       <ChoiceGroup
-        legend="Echtgeld in Apps?"
+        legend="Wie haltet ihr es mit Echtgeld in Apps?"
         options={Object.entries(GELD_LABELS) as [GeldChoice, string][]}
         selected={[answers.geld]}
         onToggle={(v) => onSetGeld(v)}
       />
       <ChoiceGroup
-        legend="Push-Benachrichtigungen?"
+        legend="Und mit Push-Benachrichtigungen?"
         options={Object.entries(PUSH_LABELS) as [PushChoice, string][]}
         selected={[answers.push]}
         onToggle={(v) => onSetPush(v)}
@@ -345,14 +381,14 @@ function PausenStep({
   return (
     <div className="space-y-4">
       <ChoiceGroup
-        legend="Welche Pausen vereinbart ihr? (mehrere möglich, optional)"
+        legend="Welche Pausen wollt ihr fest verabreden? (mehrere möglich, optional)"
         options={Object.entries(PAUSE_LABELS) as [PauseChoice, string][]}
         selected={answers.pausen}
         onToggle={onToggle}
         multi
       />
       <p className="text-xs text-ink/55">
-        Du kannst diesen Schritt auch leer lassen.
+        Du kannst diesen Schritt auch leer lassen, falls bei euch nichts davon passt.
       </p>
     </div>
   );
@@ -367,10 +403,11 @@ function VersprechenStep({
 }) {
   return (
     <div className="space-y-4">
-      <p className="text-base text-ink/75 max-w-prose">
-        Optional ein oder zwei Sätze von euch als Eltern, die in der Charter
-        landen. Beispiel: „Wir lesen am Abend selbst auch nicht das Handy" oder
-        „Wir entscheiden Streitfälle gemeinsam, nicht spontan."
+      <p className="text-base text-ink/75 max-w-prose leading-relaxed">
+        Ein oder zwei Sätze von euch Erwachsenen, die unten auf der Charter
+        landen. Zum Beispiel: „Wir lesen am Abend selbst auch nicht das Handy"
+        oder „Wir entscheiden Streitfälle gemeinsam, nicht spontan." Solche
+        Sätze wirken mit Kindern oft stärker als sechs vorgegebene Regeln.
       </p>
       <label className="block">
         <span className="text-sm text-ink/70 mb-2 block">
@@ -381,7 +418,7 @@ function VersprechenStep({
           onChange={(e) => onChange(e.target.value)}
           maxLength={400}
           rows={4}
-          placeholder="Optional, aber wirkt mit Kindern oft stärker als sechs vorgegebene Regeln."
+          placeholder="Schreib einfach das hin, was ihr euch heute Abend nochmal selbst sagen würdet."
           className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:border-transparent leading-relaxed"
         />
         <span className="text-xs text-ink/55 mt-1 block tabular-nums">
@@ -457,5 +494,61 @@ function ChoiceGroup<T extends string>({
         })}
       </div>
     </fieldset>
+  );
+}
+
+/**
+ * Tilted miniature poster that previews the shape of the final
+ * charter. Pure decoration — small enough not to distract on mobile,
+ * tall enough on desktop to read as "this is what you're building".
+ *
+ * The poster mirrors the gradient stripe + mustard date sticker +
+ * inner double-frame motifs from the real preview, so when the parent
+ * lands on the preview step the visual language is already familiar.
+ */
+function CharterMiniPoster({ reduced }: { reduced: boolean | null }) {
+  return (
+    <motion.div
+      aria-hidden
+      initial={reduced ? false : { opacity: 0, scale: 0.92, rotate: -2 }}
+      animate={{ opacity: 1, scale: 1, rotate: -3 }}
+      transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.1 }}
+      className="hidden sm:block relative w-[180px] h-[230px] -mr-2 -mt-1"
+    >
+      <div className="absolute inset-0 rounded-lg bg-cream/95 ring-1 ring-teal/20 shadow-md overflow-hidden">
+        {/* Gradient stripe */}
+        <span className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-mustard via-sage to-teal" />
+        {/* Mustard sticker */}
+        <span className="absolute right-2 top-3 -rotate-6 rounded-sm bg-mustard/90 ring-1 ring-mustard/60 px-1.5 py-0.5 text-[7px] font-display font-bold text-teal-dark tabular-nums shadow-sm">
+          STAND
+        </span>
+        {/* Inner double-frame */}
+        <div className="absolute inset-1.5 rounded-md border border-teal/15 px-3 pt-4">
+          <p className="text-[7px] uppercase tracking-[0.18em] text-teal font-semibold">
+            Familien-Charter
+          </p>
+          <p className="text-[11px] font-display font-bold text-teal-dark mt-1 leading-tight">
+            Familie Beispiel
+          </p>
+          <div className="mt-2 space-y-1.5">
+            <span className="block h-[3px] w-full rounded bg-teal/15" />
+            <span className="block h-[3px] w-[80%] rounded bg-teal/15" />
+            <span className="block h-[3px] w-full rounded bg-teal/15" />
+            <span className="block h-[3px] w-[65%] rounded bg-teal/15" />
+            <span className="block h-[3px] w-full rounded bg-teal/15" />
+            <span className="block h-[3px] w-[75%] rounded bg-teal/15" />
+            <span className="block h-[3px] w-[90%] rounded bg-teal/15" />
+            <span className="block h-[3px] w-[55%] rounded bg-teal/15" />
+          </div>
+          {/* Signature line */}
+          <div className="absolute bottom-3 left-3 right-3 space-y-1">
+            <span className="block h-px w-[60%] bg-teal/30" />
+            <span className="block text-[6px] uppercase tracking-[0.18em] text-teal-dark/60 font-semibold">
+              Unterschrieben
+            </span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 }

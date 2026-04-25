@@ -226,7 +226,7 @@ export function computeResult(answers: KonsolenAnswers): KonsolenResult {
 
   if (answers.review === 'drei-monate' || answers.review === 'sechs-monate') {
     pros.push({
-      text: 'Geplanter Review-Termin vermeidet, dass alte Regeln einrosten obwohl euer Kind älter geworden ist.',
+      text: 'Ein fester Termin zum Drüberschauen verhindert, dass alte Regeln einrosten, obwohl euer Kind älter geworden ist.',
     });
   }
 

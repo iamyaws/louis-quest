@@ -184,7 +184,7 @@ export function AppEntry({ onContinue }: Props) {
         }
         className="group inline-flex items-center gap-2 rounded-full bg-teal-dark px-6 py-3 text-cream font-display font-semibold text-sm shadow-sm hover:bg-teal hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
-        Fragebogen starten
+        Mit den zehn Fragen loslegen
         <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
       </button>
     </div>

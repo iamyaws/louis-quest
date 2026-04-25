@@ -84,7 +84,7 @@ export default function KonsolenCheck() {
           </Link>
 
           <motion.div {...fadeUp(0, reduced)} className="space-y-8">
-            <header className="space-y-4">
+            <header className="space-y-5">
               <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
                 Werkzeug für Eltern
               </p>
@@ -92,7 +92,13 @@ export default function KonsolenCheck() {
                 Konsole, Tablet oder Phone? Vorher{' '}
                 <em className="italic text-sage">denken</em>.
               </h1>
-              <p className="text-sm text-ink/70">
+              <p className="text-base text-ink/75 max-w-2xl leading-relaxed">
+                Bevor das Gerät im Karton bei euch zuhause steht: zehn Fragen
+                zu Konto, Ort, Käufen, Zeit. Am Ende eine Konfigurations-Liste
+                für genau eure Plattform, kein Kaufversprechen.
+              </p>
+              <PlatformStrip />
+              <p className="text-sm text-ink/70 pt-1">
                 Schritt {Math.min(step + 1, STEPS.length)} von {STEPS.length} ·{' '}
                 {STEPS[step].title}
               </p>
@@ -196,7 +202,7 @@ export default function KonsolenCheck() {
                     onSelect={(v) => update('conflict', v)}
                   />
                   <ChoiceGroup<Review>
-                    legend="Wann reviewt ihr die Regeln?"
+                    legend="Wann schaut ihr die Regeln nochmal an?"
                     options={Object.entries(REVIEW_LABELS) as [Review, string][]}
                     selected={[a.review]}
                     onSelect={(v) => update('review', v)}
@@ -341,6 +347,38 @@ export default function KonsolenCheck() {
 
       <Footer />
     </PainterlyShell>
+  );
+}
+
+/**
+ * Tiny horizontal strip of the platforms the tool covers. Sits below
+ * the lead paragraph as a visual anchor — tells the parent at a glance
+ * "your system is in here" without making them read another paragraph.
+ *
+ * Pure decoration, no interaction. The actual platform pick happens in
+ * step 1 of the form below.
+ */
+function PlatformStrip() {
+  const platforms = [
+    'PS5',
+    'Xbox',
+    'Switch',
+    'iPad',
+    'iPhone',
+    'Android-Tablet',
+    'Gaming-PC',
+  ];
+  return (
+    <div className="flex flex-wrap gap-1.5 pt-1">
+      {platforms.map((p) => (
+        <span
+          key={p}
+          className="inline-flex items-center rounded-full bg-cream/70 ring-1 ring-inset ring-teal/20 px-3 py-1 text-xs font-display font-semibold text-teal-dark"
+        >
+          {p}
+        </span>
+      ))}
+    </div>
   );
 }
 

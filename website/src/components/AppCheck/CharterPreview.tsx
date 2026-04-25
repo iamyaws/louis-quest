@@ -13,6 +13,7 @@ import {
   PUSH_LABELS,
   WANN_LABELS,
   WO_LABELS,
+  parseSignatures,
   type CharterAnswers,
 } from '../../lib/familien-charter/charter';
 import { ArrowRight } from './Icons';
@@ -102,7 +103,7 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
   const ctx: CanvasRenderingContext2D = ctxRaw;
   ctx.scale(dpr, dpr);
 
-  // Background
+  // ────────────── Background layer ──────────────
   ctx.fillStyle = COLORS.cream;
   ctx.fillRect(0, 0, W, H);
 
@@ -120,28 +121,88 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
   ctx.fillStyle = brGlow;
   ctx.fillRect(0, 0, W, H);
 
-  // Eyebrow
+  // ────────────── Top gradient stripe (4px) ──────────────
+  // House ribbon: mustard → sage → teal across the full width, mirrors the
+  // tool-card stripe so the page reads as part of the same family.
+  const stripeH = 6;
+  const stripe = ctx.createLinearGradient(0, 0, W, 0);
+  stripe.addColorStop(0, COLORS.mustard);
+  stripe.addColorStop(0.5, COLORS.sage);
+  stripe.addColorStop(1, COLORS.teal);
+  ctx.fillStyle = stripe;
+  ctx.fillRect(0, 0, W, stripeH);
+
+  // ────────────── Inner double-frame ──────────────
+  // 1px hairline rectangle inset 60px from each edge — gives the page
+  // the "printed certificate" feel.
+  const frameInset = 60;
+  ctx.strokeStyle = COLORS.hairline;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(
+    frameInset,
+    frameInset,
+    W - frameInset * 2,
+    H - frameInset * 2 - 70, // leave room for the bottom strip
+  );
+
+  // ────────────── Header ──────────────
   ctx.fillStyle = COLORS.teal;
   ctx.font = '600 22px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.textBaseline = 'top';
   ctx.fillText('FAMILIEN-MEDIEN-CHARTER', 100, 100);
 
-  // Family heading
   ctx.fillStyle = COLORS.tealDark;
   ctx.font = 'bold 64px "Plus Jakarta Sans", system-ui, sans-serif';
   const fh = familyHeading(answers);
   ctx.fillText(fh, 100, 140);
 
-  // Date + child count
   ctx.fillStyle = COLORS.inkSoft;
   ctx.font = '500 22px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.fillText(
-    `Stand: ${todayISODate()} · ${answers.childCount} ${answers.childCount === 1 ? 'Kind' : 'Kinder'}`,
+    `${answers.childCount} ${answers.childCount === 1 ? 'Kind' : 'Kinder'} · auf eine Seite gebracht`,
     100,
     220,
   );
 
-  // Hairline divider
+  // ────────────── Tilted mustard date sticker, top-right ──────────────
+  // Drawn in its own save/restore block so the rotation doesn't bleed
+  // into the rest of the page.
+  ctx.save();
+  const stickerCX = W - 180;
+  const stickerCY = 150;
+  const stickerW = 200;
+  const stickerH = 84;
+  ctx.translate(stickerCX, stickerCY);
+  ctx.rotate(-3 * (Math.PI / 180));
+  // Subtle drop shadow
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 2;
+  ctx.fillStyle = 'rgba(252, 211, 77, 0.92)';
+  roundRect(ctx, -stickerW / 2, -stickerH / 2, stickerW, stickerH, 8);
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  // Hairline stroke
+  ctx.strokeStyle = 'rgba(176, 138, 0, 0.4)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, -stickerW / 2, -stickerH / 2, stickerW, stickerH, 8);
+  ctx.stroke();
+  // "STAND" eyebrow
+  ctx.fillStyle = COLORS.tealDark;
+  ctx.font = '600 13px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('STAND', 0, -stickerH / 2 + 14);
+  // Date
+  ctx.font = 'bold 26px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.fillText(todayISODate(), 0, -stickerH / 2 + 36);
+  ctx.restore();
+  ctx.textAlign = 'start';
+  ctx.textBaseline = 'top';
+
+  // Hairline divider below header
   ctx.fillStyle = COLORS.hairline;
   ctx.fillRect(100, 270, W - 200, 1);
 
@@ -187,10 +248,10 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
     }
   }
 
-  section('Wann ist Bildschirmzeit ok?', () => bulletList(bulletsFor(answers, 'wann')));
-  section('Wo wird gespielt?', () => paragraph(WO_LABELS[answers.wo]));
-  section('Welche Inhalte?', () => bulletList(bulletsFor(answers, 'inhalte')));
-  section('Geld in Apps?', () => paragraph(GELD_LABELS[answers.geld]));
+  section('Wann ist Bildschirm-Zeit ok?', () => bulletList(bulletsFor(answers, 'wann')));
+  section('Wo wird gespielt oder geschaut?', () => paragraph(WO_LABELS[answers.wo]));
+  section('Welche Inhalte sind ok?', () => bulletList(bulletsFor(answers, 'inhalte')));
+  section('Echtgeld in Apps?', () => paragraph(GELD_LABELS[answers.geld]));
   section('Push-Benachrichtigungen?', () => paragraph(PUSH_LABELS[answers.push]));
   if (answers.pausen.length > 0) {
     section('Unsere Pausen', () => bulletList(bulletsFor(answers, 'pausen')));
@@ -199,35 +260,68 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
     section('Unser Eltern-Versprechen', () => paragraph(answers.versprechen.trim()));
   }
 
-  // Signature lines, lower portion
-  const sigY = H - 240;
-  ctx.fillStyle = COLORS.hairline;
-  ctx.fillRect(100, sigY - 30, W - 200, 1);
+  // ────────────── Dedication + signature block ──────────────
+  // Anchored to the bottom of the page so it always reads as the closing
+  // gesture, regardless of how much content sat above it.
+  const namesParsed = parseSignatures(answers.signatures);
+  const sigBlockTop = H - 280;
 
+  // Dedication line, italic
+  ctx.fillStyle = 'rgba(14, 42, 44, 0.78)';
+  ctx.font = 'italic 600 22px "Plus Jakarta Sans", system-ui, sans-serif';
+  const ded = `Geschrieben für ${familyHeading(answers).toLowerCase()}, am ${todayISODate()}.`;
+  ctx.fillText(ded, 100, sigBlockTop);
+
+  // Eyebrow + signature lines
   ctx.fillStyle = COLORS.teal;
   ctx.font = '600 18px "Plus Jakarta Sans", system-ui, sans-serif';
-  ctx.fillText('UNTERSCHRIEBEN VON', 100, sigY);
+  ctx.fillText('UNTERSCHRIEBEN VON', 100, sigBlockTop + 50);
 
   ctx.strokeStyle = COLORS.hairline;
   ctx.lineWidth = 1;
-  const sigCols = 2;
-  const sigRowY = sigY + 60;
-  const sigW = (W - 240) / sigCols;
-  for (let col = 0; col < sigCols; col++) {
-    ctx.beginPath();
-    ctx.moveTo(100 + col * (sigW + 40), sigRowY);
-    ctx.lineTo(100 + col * (sigW + 40) + sigW, sigRowY);
-    ctx.stroke();
-    ctx.fillStyle = COLORS.inkSoft;
-    ctx.font = '400 16px "Plus Jakarta Sans", system-ui, sans-serif';
-    ctx.fillText(
-      col === 0 ? 'Erwachsene' : 'Kinder',
-      100 + col * (sigW + 40),
-      sigRowY + 12,
-    );
+  const sigRowY = sigBlockTop + 110;
+  if (namesParsed.length > 0) {
+    // Lay out 2-per-row, max 6 names total (parseSignatures cap).
+    const cols = Math.min(2, namesParsed.length);
+    const rows = Math.ceil(namesParsed.length / cols);
+    const sigW = (W - 200 - 40 * (cols - 1)) / cols;
+    const rowGap = 60;
+    for (let i = 0; i < namesParsed.length; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = 100 + col * (sigW + 40);
+      const yLine = sigRowY + row * rowGap;
+      ctx.beginPath();
+      ctx.moveTo(x, yLine);
+      ctx.lineTo(x + sigW, yLine);
+      ctx.stroke();
+      ctx.fillStyle = COLORS.tealDark;
+      ctx.font = '500 16px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.fillText(namesParsed[i], x, yLine + 12);
+    }
+    // Re-anchor bottom strip below the longest column if many names
+    // (no-op visually because bottom strip is always drawn at H-70).
+    void rows;
+  } else {
+    // Fallback: generic two-column lines
+    const cols = 2;
+    const sigW = (W - 240) / cols;
+    for (let col = 0; col < cols; col++) {
+      ctx.beginPath();
+      ctx.moveTo(100 + col * (sigW + 40), sigRowY);
+      ctx.lineTo(100 + col * (sigW + 40) + sigW, sigRowY);
+      ctx.stroke();
+      ctx.fillStyle = COLORS.inkSoft;
+      ctx.font = '400 16px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.fillText(
+        col === 0 ? 'Erwachsene' : 'Kinder',
+        100 + col * (sigW + 40),
+        sigRowY + 12,
+      );
+    }
   }
 
-  // Bottom strip
+  // ────────────── Bottom strip ──────────────
   ctx.fillStyle = COLORS.tealDark;
   ctx.fillRect(0, H - 70, W, 70);
   ctx.fillStyle = COLORS.cream;
@@ -242,6 +336,32 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
       0.95,
     );
   });
+}
+
+/**
+ * Tiny rounded-rect helper used by the date sticker. Same shape as the
+ * one in CharterShareCard, kept local so the file has no cross-file
+ * dependency for canvas geometry.
+ */
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
 export function CharterPreview({ answers }: Props) {
@@ -277,66 +397,135 @@ export function CharterPreview({ answers }: Props) {
   const wann = bulletsFor(answers, 'wann');
   const inhalte = bulletsFor(answers, 'inhalte');
   const pausen = bulletsFor(answers, 'pausen');
+  const signatureNames = parseSignatures(answers.signatures);
+
+  /**
+   * Sections rendered into the two-column grid. We keep the order
+   * stable so reading flow on the printed sheet stays predictable.
+   */
+  const sections: Array<{
+    title: string;
+    body?: string;
+    items?: string[];
+  }> = [
+    { title: 'Wann ist Bildschirm-Zeit ok?', items: wann },
+    { title: 'Wo wird gespielt oder geschaut?', body: WO_LABELS[answers.wo] },
+    { title: 'Welche Inhalte sind ok?', items: inhalte },
+    { title: 'Echtgeld in Apps?', body: GELD_LABELS[answers.geld] },
+    { title: 'Push-Benachrichtigungen?', body: PUSH_LABELS[answers.push] },
+  ];
+  if (pausen.length > 0) {
+    sections.push({ title: 'Unsere Pausen', items: pausen });
+  }
+  if (answers.versprechen.trim()) {
+    sections.push({
+      title: 'Unser Eltern-Versprechen',
+      body: answers.versprechen.trim(),
+    });
+  }
 
   return (
     <div className="space-y-6">
-      {/* On-screen preview, also styled for window.print() */}
-      <div className="charter-preview rounded-2xl bg-cream/90 border border-teal/15 px-7 py-8 sm:px-10 sm:py-10 space-y-7">
-        <header className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
-            Familien-Medien-Charter
-          </p>
-          <h2 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark">
-            {familyHeading(answers)}
-          </h2>
-          <p className="text-sm text-ink/65">
-            Stand: {todayISODate()} ·{' '}
-            {answers.childCount === 1 ? '1 Kind' : `${answers.childCount} Kinder`}
-          </p>
-        </header>
+      {/*
+        On-screen preview. Also drives window.print(): the @media print
+        block at the bottom hides everything outside .charter-preview.
 
-        <hr className="border-teal/15" />
-
-        <CharterSection title="Wann ist Bildschirmzeit ok?" items={wann} />
-        <CharterSection title="Wo wird gespielt?" body={WO_LABELS[answers.wo]} />
-        <CharterSection title="Welche Inhalte?" items={inhalte} />
-        <CharterSection
-          title="Geld in Apps?"
-          body={GELD_LABELS[answers.geld]}
+        Composition (from outside in):
+          1. Outer relative wrapper with painterly accent stripe at top.
+          2. Inner double-frame: outer card + nested inner border, so the
+             page reads as a printed certificate, not a UI card.
+          3. Tilted mustard date sticker, top-right of the header — the
+             single piece of paper-like decoration that makes the result
+             feel hand-pinned to the fridge instead of generated.
+      */}
+      <div className="charter-preview relative rounded-2xl bg-cream/95 border border-teal/15 shadow-sm overflow-hidden">
+        {/* Top accent ribbon — house gradient stripe */}
+        <span
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-mustard via-sage to-teal"
         />
-        <CharterSection
-          title="Push-Benachrichtigungen?"
-          body={PUSH_LABELS[answers.push]}
-        />
-        {pausen.length > 0 && (
-          <CharterSection title="Unsere Pausen" items={pausen} />
-        )}
-        {answers.versprechen.trim() && (
-          <CharterSection
-            title="Unser Eltern-Versprechen"
-            body={answers.versprechen.trim()}
-          />
-        )}
 
-        <hr className="border-teal/15" />
+        {/* Inner double-frame */}
+        <div className="m-2.5 sm:m-3 rounded-xl border border-teal/20 px-6 py-7 sm:px-9 sm:py-9 space-y-7">
+          {/* Header with tilted date sticker */}
+          <header className="relative pr-28 sm:pr-32 space-y-2">
+            <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
+              Familien-Medien-Charter
+            </p>
+            <h2 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
+              {familyHeading(answers)}
+            </h2>
+            <p className="text-sm text-ink/65">
+              {answers.childCount === 1 ? '1 Kind' : `${answers.childCount} Kinder`}{' '}
+              · auf eine Seite gebracht
+            </p>
+            {/* Mustard date sticker */}
+            <div
+              aria-hidden
+              className="charter-date-sticker absolute right-0 top-0 -rotate-3 rounded-md bg-mustard/90 ring-1 ring-mustard/60 shadow-sm px-3 py-1.5 text-center"
+            >
+              <p className="text-[10px] uppercase tracking-[0.18em] text-teal-dark font-semibold leading-tight">
+                Stand
+              </p>
+              <p className="text-sm font-display font-bold text-teal-dark tabular-nums leading-tight">
+                {todayISODate()}
+              </p>
+            </div>
+          </header>
 
-        <div className="space-y-4">
-          <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
-            Unterschrieben von
-          </p>
-          <div className="grid sm:grid-cols-2 gap-6 pt-4">
-            <div className="border-t border-teal/30 pt-2 text-xs text-ink/55">
-              Erwachsene
-            </div>
-            <div className="border-t border-teal/30 pt-2 text-xs text-ink/55">
-              Kinder
-            </div>
+          <hr className="border-teal/15" />
+
+          {/* Two-column section grid — reads like a poster, not an
+              accordion. On mobile collapses cleanly to single column. */}
+          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-7">
+            {sections.map((s) => (
+              <CharterSection
+                key={s.title}
+                title={s.title}
+                body={s.body}
+                items={s.items}
+              />
+            ))}
           </div>
-        </div>
 
-        <p className="text-xs text-ink/45 text-right pt-4">
-          ronki.de · Familien-Medien-Charter
-        </p>
+          <hr className="border-teal/15" />
+
+          {/* Dedication line + signature block */}
+          <div className="space-y-5">
+            <p className="font-display italic text-base text-teal-dark/80 leading-snug max-w-prose">
+              Geschrieben für {familyHeading(answers).toLowerCase()}, am{' '}
+              {todayISODate()}.
+            </p>
+            <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
+              Unterschrieben von
+            </p>
+            {signatureNames.length > 0 ? (
+              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-5 pt-2">
+                {signatureNames.map((name) => (
+                  <div
+                    key={name}
+                    className="border-t border-teal/30 pt-2 text-xs text-ink/65 font-medium"
+                  >
+                    {name}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-5 pt-2">
+                <div className="border-t border-teal/30 pt-2 text-xs text-ink/55">
+                  Erwachsene
+                </div>
+                <div className="border-t border-teal/30 pt-2 text-xs text-ink/55">
+                  Kinder
+                </div>
+              </div>
+            )}
+          </div>
+
+          <p className="text-xs text-ink/45 text-right pt-3">
+            ronki.de · Familien-Medien-Charter
+          </p>
+        </div>
       </div>
 
       {/* Action buttons (hidden in print) */}
@@ -384,9 +573,21 @@ export function CharterPreview({ answers }: Props) {
         <CharterShareCard answers={answers} />
       </div>
 
-      {/* Print-only stylesheet: hide everything except .charter-preview. */}
+      {/* Print-only stylesheet: hide everything except .charter-preview.
+          Force color rendering so the mustard date sticker, gradient
+          ribbon, and signature lines actually print instead of getting
+          flattened to white by browser default print modes. */}
       <style>{`
+        .charter-date-sticker {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
         @media print {
+          html, body {
+            background: #FDF8F0 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
           body * { visibility: hidden; }
           .charter-preview, .charter-preview * { visibility: visible; }
           .charter-preview {
@@ -395,8 +596,9 @@ export function CharterPreview({ answers }: Props) {
             top: 0;
             width: 100%;
             background: #FDF8F0 !important;
-            border: 0 !important;
             box-shadow: none !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
           .no-print { display: none !important; }
           @page { size: A4 portrait; margin: 1.5cm; }

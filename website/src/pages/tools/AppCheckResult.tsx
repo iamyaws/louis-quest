@@ -15,6 +15,7 @@ import { Footer } from '../../components/Footer';
 import { ResultScore } from '../../components/AppCheck/ResultScore';
 import { ShareButtons } from '../../components/AppCheck/ShareButtons';
 import { ToolDisclaimer } from '../../components/AppCheck/ToolDisclaimer';
+import { ArrowRight } from '../../components/AppCheck/Icons';
 import { fetchEval, type FetchedEval } from '../../lib/app-check/storage';
 import { EASE_OUT } from '../../lib/motion';
 
@@ -89,19 +90,24 @@ export default function AppCheckResult() {
               transition={{ duration: 0.4, ease: EASE_OUT }}
               className="space-y-6"
             >
-              <h1 className="font-display font-bold text-3xl text-teal-dark">
-                Diese Bewertung existiert nicht oder wurde entfernt.
-              </h1>
-              <p className="text-ink/70">
-                Wenn du deinen eigenen App-Check starten willst, geht das hier:{' '}
-                <Link
-                  to="/tools/app-check"
-                  className="text-teal underline underline-offset-2 focus:outline-none focus-visible:text-teal-dark focus-visible:decoration-2"
-                >
-                  App prüfen
-                </Link>
-                .
+              <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
+                Hier war mal eine Bewertung
               </p>
+              <h1 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
+                Den Link <em className="italic text-sage">finden wir nicht</em>.
+              </h1>
+              <p className="text-base text-ink/75 max-w-prose leading-relaxed">
+                Vielleicht hat ihn jemand verkürzt oder abgeschnitten. Vielleicht
+                wurde die Bewertung auf Wunsch entfernt. So oder so: dein eigener
+                App-Check ist drei Minuten weit weg.
+              </p>
+              <Link
+                to="/tools/app-check"
+                className="group inline-flex items-center gap-2 rounded-full bg-teal-dark px-6 py-3 text-cream font-display font-semibold text-sm shadow-sm hover:bg-teal hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-all"
+              >
+                Eigenen App-Check starten
+                <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
             </motion.div>
           )}
 

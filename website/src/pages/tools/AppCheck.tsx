@@ -289,6 +289,12 @@ function Landing({
         </p>
       </header>
 
+      {/* Hero anchor: a preview of the three score bands the tool emits.
+          Tells the parent at a glance "I'll come out somewhere on this
+          spectrum." Uses sage / mustard-soft / teal-dark in their semantic
+          places (calm / attention / dense). */}
+      <ScoreBandPreview reduced={reduced} />
+
       <ul className="space-y-3 text-sm text-ink/70">
         <li className="flex gap-3">
           <span aria-hidden className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-sage shrink-0" />
@@ -334,6 +340,75 @@ function Landing({
       </button>
 
       <ToolDisclaimer variant="tool" />
+    </motion.div>
+  );
+}
+
+/**
+ * Three-tile preview of the score bands the tool emits. Sits above the
+ * fold on the landing page so a parent immediately understands the
+ * shape of the answer they'll get back. Each tile uses the same accent
+ * tokens (sage / mustard-soft / teal-dark) the actual ResultScore
+ * component uses, so the visual promise matches the visual delivery.
+ */
+function ScoreBandPreview({ reduced }: { reduced: boolean | null }) {
+  const bands = [
+    {
+      range: '0–2',
+      label: 'Relativ ruhig',
+      hint: 'Wenig Druck-Mechaniken sichtbar.',
+      cardClass: 'bg-sage/15 ring-sage/35',
+      labelClass: 'text-teal-dark',
+      rangeClass: 'text-teal',
+    },
+    {
+      range: '3–5',
+      label: 'Hingucken und begleiten',
+      hint: 'Einige Pattern sind da, lassen sich bändigen.',
+      cardClass: 'bg-mustard-soft/55 ring-mustard/40',
+      labelClass: 'text-teal-dark',
+      rangeClass: 'text-teal',
+    },
+    {
+      range: '6–10',
+      label: 'Hier ist viel los',
+      hint: 'Viele Druck-Mechaniken parallel.',
+      cardClass: 'bg-teal-dark ring-teal-dark/40',
+      labelClass: 'text-cream',
+      rangeClass: 'text-cream/70',
+    },
+  ];
+
+  return (
+    <motion.div
+      initial={reduced ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: EASE_OUT, delay: 0.1 }}
+      className="space-y-3"
+    >
+      <p className="text-xs uppercase tracking-[0.18em] text-teal font-semibold">
+        Was am Ende rauskommt
+      </p>
+      <ol className="grid sm:grid-cols-3 gap-3 list-none p-0">
+        {bands.map((b) => (
+          <li
+            key={b.label}
+            className={`rounded-2xl ring-1 ring-inset ${b.cardClass} px-5 py-4`}
+          >
+            <p
+              className={`text-xs font-display font-bold tabular-nums ${b.rangeClass}`}
+            >
+              {b.range}
+            </p>
+            <p className={`text-base font-display font-semibold mt-1 ${b.labelClass}`}>
+              {b.label}
+            </p>
+            <p className={`text-xs mt-1.5 leading-snug ${b.labelClass} opacity-85`}>
+              {b.hint}
+            </p>
+          </li>
+        ))}
+      </ol>
     </motion.div>
   );
 }

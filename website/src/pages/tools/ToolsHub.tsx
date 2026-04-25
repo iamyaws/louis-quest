@@ -54,26 +54,30 @@ export default function ToolsHub() {
             <ToolCard
               eyebrow="App-Check"
               to="/tools/app-check"
-              title="Welche App will dein Kind?"
-              description="Beantworte zehn Fragen aus deiner eigenen Beobachtung. Du bekommst eine Einschätzung, was die App-Mechaniken über sie verraten."
+              title="Was steckt eigentlich in der App, die dein Kind so will?"
+              description="Zehn Beobachtungs-Fragen, die du selbst beantwortest. Am Ende ein Score und eine Liste der Pattern, die du gerade gesehen hast."
+              meta="3 Min · Score + Erklärungen + teilbarer Permalink"
             />
             <ToolCard
               eyebrow="Schlafens-Rechner"
               to="/tools/schlafens-rechner"
-              title="Wann muss dein Kind ins Bett?"
-              description="Sag uns das Alter und die Aufstehzeit, wir rechnen rückwärts: wann sollte der Bildschirm aus sein, wann ist Bettzeit, wann ist Vorlesen."
+              title="19:30 oder doch 20:15?"
+              description="Alter und Aufstehzeit rein, vier Uhrzeiten raus. Bildschirm aus, Bett vorbereiten, Vorlesen, Bettzeit. Kein Urteil, nur die Mathematik des Konsens."
+              meta="30 Sek · vier Uhrzeiten + Share-Bild"
             />
             <ToolCard
               eyebrow="Familien-Medien-Charter"
               to="/tools/familien-charter"
-              title="Eure eigenen Bildschirm-Regeln, auf eine Seite."
-              description="Sechs Schritte zur Familien-Charter zum Aufhängen. Druckbar als PDF, teilbar als Bild. Kein Ratgeber-Dogma, nur eure eigenen Werte."
+              title="Eure Regeln. Eine Seite. An den Kühlschrank."
+              description="Sechs kurze Schritte, dann steht eure eigene Charter da. Nicht von uns vorgegeben, sondern aus dem zusammengesetzt, was ihr in der Familie eh schon entschieden habt."
+              meta="5 Min · Druckbar als PDF + Social-Card"
             />
             <ToolCard
               eyebrow="Konsolen-Check"
               to="/tools/konsolen-check"
-              title="Konsole, Tablet oder Phone? Vorher denken."
-              description="Zehn Fragen, die euch durch Setup, Hausregeln und Konfigurations-Schritte führen. Plattform-spezifische Checkliste am Ende."
+              title="Bevor der Karton aufgemacht wird."
+              description="Zehn Fragen zu Konto, Ort, Käufen und Zeit. Am Ende ein Profil-Urteil, eine Pro/Kontra-Liste und die Konfigurations-Checkliste für genau eure Plattform."
+              meta="5 Min · Pro/Kontra + Plattform-Checkliste"
             />
           </ul>
           <p className="mt-10 text-sm text-ink/55 leading-relaxed text-center">
@@ -98,27 +102,35 @@ function ToolCard({
   to,
   title,
   description,
+  meta,
 }: {
   eyebrow: string;
   to: string;
   title: string;
   description: string;
+  meta: string;
 }) {
   return (
     <li>
       <Link
         to={to}
-        className="group block h-full rounded-2xl bg-cream/70 backdrop-blur-sm border border-teal/10 p-7 hover:shadow-lg hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-all duration-300"
+        className="group relative block h-full rounded-2xl bg-cream/70 backdrop-blur-sm border border-teal/10 p-7 hover:shadow-lg hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-all duration-300 overflow-hidden"
       >
+        {/* 4mm gradient stripe at the top of the card — house ribbon. */}
+        <span
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-mustard via-sage to-teal"
+        />
         <p className="text-xs uppercase tracking-[0.18em] text-teal font-semibold mb-3">
           {eyebrow}
         </p>
         <h2 className="font-display font-bold text-2xl text-teal-dark leading-snug mb-3">
           {title}
         </h2>
-        <p className="text-sm text-ink/70 leading-relaxed mb-5">
+        <p className="text-sm text-ink/70 leading-relaxed mb-4">
           {description}
         </p>
+        <p className="text-xs text-ink/55 mb-5 tabular-nums">{meta}</p>
         <span className="inline-flex items-center gap-1.5 text-sm text-teal font-semibold group-hover:gap-2 transition-all">
           Tool öffnen
           <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
