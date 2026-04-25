@@ -72,6 +72,12 @@ const BIOME_CONFIG = {
 // repetitive"). The trees alternate through cfg.treeKinds so neighbors
 // never match.
 const TREE_COUNT = 28;
+// Far-background silhouette trees — small, dark, dense, slow scroll.
+// Adds visual depth so the forest reads as receding into the distance
+// rather than a single midground line against open sky.
+const FAR_TREE_COUNT = 56;
+// How many discovered creatures peek from behind midground trees.
+const SHY_CAMEO_COUNT = 2;
 
 export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest', discovered = [] }) {
   const cfg = BIOME_CONFIG[biome] || BIOME_CONFIG.morgenwald;
@@ -102,6 +108,18 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
     }));
   }, [cfg.treeKinds]);
 
+  // Far-background silhouettes — small, dense, slowest scroll.
+  // Stable across renders so the silhouette line doesn't shimmer.
+  const farTreeRow = useMemo(() => {
+    return Array.from({ length: FAR_TREE_COUNT }).map((_, i) => ({
+      key: i,
+      left: `${(i / FAR_TREE_COUNT) * 300 + ((i * 17) % 13) * 0.3}%`,
+      height: 24 + ((i * 13) % 16),  // 24-40px
+      kindIdx: i % 3,                 // tiny shape variety
+      tint:    i % 5 === 0 ? 0.55 : 0.42, // a few standouts feel pop-forward
+    }));
+  }, []);
+
   // Friend cameos (Marc 25 Apr 2026: "maybe also see some of the
   // friends we already have discovered when we do a expedition like
   // this"). Pick up to 3 discovered creatures that have a chibi
@@ -123,6 +141,39 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
       bob: i * 0.3,
     }));
   }, [discovered]);
+
+  // Shy cameos (Marc 25 Apr 2026 polish: "rare-creature 'shy' cameos
+  // that hide behind trees"). Picks a couple of OTHER discovered
+  // creatures (not already in `cameos`) and pairs each with a tree
+  // index in the midground. The tree's canopy naturally obscures
+  // the cameo's body — only the head pokes out beside the trunk.
+  const shyCameos = useMemo(() => {
+    const allIds = (discovered || [])
+      .map(d => (typeof d === 'string' ? d : d?.id))
+      .filter(id => id && hasChibiFriend(id));
+    const usedInCameos = new Set(cameos.map(c => c.id));
+    const remaining = allIds.filter(id => !usedInCameos.has(id));
+    const pick = remaining.slice(0, SHY_CAMEO_COUNT);
+    return pick.map((id, i) => ({
+      key: `shy-${id}-${i}`,
+      id,
+      // Anchor each shy cameo to a specific tree in the trees layer
+      // so it scrolls in lockstep with that tree (looks like it's
+      // standing behind it, not floating in space).
+      treeIdx: Math.floor(((i + 1) * TREE_COUNT) / (SHY_CAMEO_COUNT + 1)) + (i * 3) % 5,
+      // Tilt direction — alternate so they don't all lean the same way.
+      side: i % 2 === 0 ? 1 : -1,
+    }));
+  }, [discovered, cameos]);
+
+  // Butterflies (Marc 25 Apr 2026 polish: "butterfly that flits
+  // through the trees"). Two with offset paths so they don't track
+  // together. Pure decoration; no scroll layer — they wander on
+  // their own animation paths within the upper canopy band.
+  const butterflies = useMemo(() => ([
+    { key: 'b1', leftStart: '12%', topBand: '32%', delay: 0,   palette: ['#f472b6', '#be185d'] },
+    { key: 'b2', leftStart: '70%', topBand: '40%', delay: 4.2, palette: ['#facc15', '#a16207'] },
+  ]), []);
 
   return (
     <div
@@ -194,22 +245,99 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
         ))}
       </div>
 
+      {/* Layer 1.7: Far-background tree silhouettes — small, dark,
+          dense. Slower scroll than the main treeline so the kid's
+          eye reads receding depth. Pure flat shapes, no detail,
+          shadow tone derived from cfg.mountainShadow. */}
+      <div aria-hidden="true" style={{
+        position: 'absolute',
+        bottom: '34%',
+        left: 0,
+        width: '300%',
+        height: '12%',
+        animation: 'rwl-scroll-far 22s linear infinite',
+        pointerEvents: 'none',
+      }}>
+        {farTreeRow.map(t => (
+          <FarTree key={t.key} left={t.left} height={t.height} kindIdx={t.kindIdx} tint={t.tint} />
+        ))}
+      </div>
+
+      {/* Bird — single SVG silhouette crossing the sky right→left
+          on its own slow timeline, slightly above the cloud band. */}
+      <div aria-hidden="true" style={{
+        position: 'absolute',
+        top: '14%',
+        left: 0,
+        width: 24, height: 14,
+        animation: 'rwl-bird 26s linear infinite',
+        pointerEvents: 'none',
+        zIndex: 1,
+      }}>
+        <Bird />
+      </div>
+
       {/* Layer 2: Midground treeline — medium parallax. Mixed
           species (oak / pine / birch / maple) at varying scale
-          + horizontal flip so neighbouring trees don't twin. */}
+          + horizontal flip so neighbouring trees don't twin.
+          Shy cameos render BEFORE their paired tree so the tree's
+          canopy naturally covers the body — only the head peeks
+          out from behind the trunk. */}
       <div style={{
         position: 'absolute',
         bottom: '24%',
         left: 0,
         width: '300%',
-        height: '24%',
+        height: '26%',
         animation: 'rwl-scroll-med 16s linear infinite',
         pointerEvents: 'none',
       }}>
-        {treeRow.map(t => (
-          <Tree key={t.key} species={t.species} left={t.left} scale={t.scale} flip={t.flip} />
-        ))}
+        {treeRow.map(t => {
+          const shy = shyCameos.find(s => s.treeIdx === t.key);
+          return (
+            <React.Fragment key={t.key}>
+              {/* Shy cameo first → tree second → tree visually
+                  obscures most of the cameo body. */}
+              {shy && (
+                <div style={{
+                  position: 'absolute',
+                  left: t.left,
+                  bottom: 0,
+                  width: 36,
+                  height: 36,
+                  // Nudge slightly so the head pokes from one side.
+                  transform: `translateX(${shy.side * 12}px)`,
+                  animation: `rwl-shy-peek 3.4s ease-in-out infinite ${(shy.treeIdx % 4) * 0.4}s`,
+                  filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.30))',
+                }}>
+                  <ChibiFriend id={shy.id} size={36} withBg={false} />
+                </div>
+              )}
+              <Tree species={t.species} left={t.left} scale={t.scale} flip={t.flip} />
+            </React.Fragment>
+          );
+        })}
       </div>
+
+      {/* Butterflies — wandering loops near the canopy. Decorative
+          only, no scroll layer; their own keyframes drive the path. */}
+      {butterflies.map(b => (
+        <div
+          key={b.key}
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: b.leftStart,
+            top: b.topBand,
+            width: 12, height: 10,
+            animation: `rwl-butterfly-${b.key} 9s ease-in-out infinite ${b.delay}s`,
+            zIndex: 4,
+            filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.18))',
+          }}
+        >
+          <Butterfly palette={b.palette} />
+        </div>
+      ))}
 
       {/* Layer 2.5: Friend cameos — discovered creatures peek up
           from the ground line as Ronki glides over. Same scroll
@@ -242,14 +370,53 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
         </div>
       )}
 
-      {/* Layer 3: Ground band — flat, no scroll. */}
+      {/* Layer 3: Ground band — earth + moss mix (Marc 25 Apr 2026
+          polish: "ground should be a mix of green and maybe some
+          earth tones with moos"). Layered backgrounds: warm earth
+          base, a green moss wash on the upper edge where the canopy
+          shadow falls, and clusters of darker moss patches scattered
+          through the ground. Topped with a soft top-grass band that
+          reads as the seam between leaf-mulch and bare dirt. */}
       <div style={{
         position: 'absolute',
         left: 0, right: 0, bottom: 0,
         height: '24%',
-        background: cfg.ground,
+        background: `
+          radial-gradient(ellipse 18% 60% at 8% 35%,  rgba(54,83,20,0.55), transparent 70%),
+          radial-gradient(ellipse 14% 50% at 26% 60%, rgba(74,107,28,0.45), transparent 70%),
+          radial-gradient(ellipse 16% 55% at 46% 30%, rgba(54,83,20,0.50), transparent 70%),
+          radial-gradient(ellipse 20% 60% at 68% 65%, rgba(74,107,28,0.50), transparent 70%),
+          radial-gradient(ellipse 14% 50% at 86% 35%, rgba(54,83,20,0.55), transparent 70%),
+          radial-gradient(ellipse 80% 35% at 50% 0%,  rgba(101,163,13,0.45), transparent 75%),
+          linear-gradient(180deg, #6b5a3a 0%, #3a2f1a 100%)
+        `,
         boxShadow: 'inset 0 6px 12px rgba(0,0,0,0.25)',
-      }} />
+      }}>
+        {/* Top-edge grass tufts — soft green sawtooth stripe at the
+            seam where the trees meet the dirt. Pure decoration; no
+            scroll because it's flush with the static ground band. */}
+        <div aria-hidden="true" style={{
+          position: 'absolute',
+          left: 0, right: 0, top: 0,
+          height: 6,
+          background: `
+            radial-gradient(circle 4px at 4% 100%, #4d7c0f 100%, transparent 100%),
+            radial-gradient(circle 3px at 11% 100%, #3f6212 100%, transparent 100%),
+            radial-gradient(circle 4px at 19% 100%, #65a30d 100%, transparent 100%),
+            radial-gradient(circle 3px at 27% 100%, #4d7c0f 100%, transparent 100%),
+            radial-gradient(circle 4px at 35% 100%, #3f6212 100%, transparent 100%),
+            radial-gradient(circle 3px at 43% 100%, #65a30d 100%, transparent 100%),
+            radial-gradient(circle 4px at 51% 100%, #4d7c0f 100%, transparent 100%),
+            radial-gradient(circle 3px at 59% 100%, #3f6212 100%, transparent 100%),
+            radial-gradient(circle 4px at 67% 100%, #65a30d 100%, transparent 100%),
+            radial-gradient(circle 3px at 75% 100%, #4d7c0f 100%, transparent 100%),
+            radial-gradient(circle 4px at 83% 100%, #3f6212 100%, transparent 100%),
+            radial-gradient(circle 3px at 91% 100%, #65a30d 100%, transparent 100%),
+            radial-gradient(circle 4px at 97% 100%, #4d7c0f 100%, transparent 100%)
+          `,
+          opacity: 0.85,
+        }} />
+      </div>
 
       {/* Layer 4: Foreground items scrolling fast across the ground. */}
       <div style={{
@@ -336,6 +503,7 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
 
       <style>{`
         @keyframes rwl-scroll-slow  { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
+        @keyframes rwl-scroll-far   { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
         @keyframes rwl-scroll-med   { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
         @keyframes rwl-scroll-fast  { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
         @keyframes rwl-scroll-cloud { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
@@ -344,6 +512,53 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
              than floating stickers as the parallax glides past. */
           0%, 100% { transform: translateY(0) rotate(-1.5deg); }
           50%      { transform: translateY(-3px) rotate(1.5deg); }
+        }
+        @keyframes rwl-shy-peek {
+          /* Shy cameo lean — small head poke from one side then back.
+             The horizontal nudge is layered ON TOP of the parent's
+             translateX(±12px), so the cameo bobs around its hiding
+             spot without floating away from the tree. */
+          0%, 100% { transform: translateX(0) rotate(-2deg);  opacity: 0.95; }
+          45%      { transform: translateX(4px) rotate(2deg); opacity: 1; }
+          70%      { transform: translateX(2px) rotate(0deg); opacity: 0.9; }
+        }
+        @keyframes rwl-bird {
+          /* Single bird drift right→left over ~26s, with a tiny
+             altitude wobble so it doesn't read as a sticker. */
+          0%   { transform: translateX(120vw) translateY(0)   scale(0.9); opacity: 0; }
+          5%   { opacity: 0.85; }
+          50%  { transform: translateX(40vw)  translateY(-12px) scale(1); }
+          95%  { opacity: 0.85; }
+          100% { transform: translateX(-30vw) translateY(0)   scale(0.9); opacity: 0; }
+        }
+        @keyframes rwl-wings {
+          0%, 100% { transform: scaleY(1); }
+          50%      { transform: scaleY(0.55); }
+        }
+        @keyframes rwl-butterfly-b1 {
+          /* Wandering loop near the canopy. Both axes move so the
+             butterfly traces a soft figure-eight rather than a
+             linear glide. */
+          0%   { transform: translate(0,    0)    rotate(-4deg); }
+          20%  { transform: translate(40px, -20px) rotate(8deg); }
+          40%  { transform: translate(80px, 6px)   rotate(-6deg); }
+          60%  { transform: translate(120px,-18px) rotate(10deg); }
+          80%  { transform: translate(60px, 10px)  rotate(-8deg); }
+          100% { transform: translate(0,    0)    rotate(-4deg); }
+        }
+        @keyframes rwl-butterfly-b2 {
+          /* Mirrored wander so the second butterfly doesn't track
+             with the first. */
+          0%   { transform: translate(0,    0)    rotate(6deg); }
+          25%  { transform: translate(-50px,-14px) rotate(-10deg); }
+          50%  { transform: translate(-100px, 8px) rotate(8deg); }
+          75%  { transform: translate(-40px, -6px) rotate(-4deg); }
+          100% { transform: translate(0,    0)    rotate(6deg); }
+        }
+        @keyframes rwl-flap {
+          /* Butterfly wings — fast flutter. */
+          0%, 100% { transform: scaleX(1); }
+          50%      { transform: scaleX(0.4); }
         }
         @keyframes rwl-fly {
           /* Subtle vertical bob + slight tilt — selling the glide
@@ -453,6 +668,98 @@ function Tree({ species, left, scale, flip = false }) {
         boxShadow: 'inset 0 -4px 6px rgba(0,0,0,0.18)',
       }} />
     </div>
+  );
+}
+
+// ─── FarTree (far-background silhouette) ────────────────────
+// Tiny, dark, flat shape rendered as a single CSS clip-path. Three
+// rough silhouettes (rounded broadleaf / spire pine / cluster) keep
+// the receding line varied without adding rendering cost. Color is
+// a single dark green at lowered opacity so the kid's eye reads
+// "depth, not detail."
+
+function FarTree({ left, height, kindIdx, tint }) {
+  const baseStyle = {
+    position: 'absolute',
+    left,
+    bottom: 0,
+    width: Math.round(height * 0.65),
+    height,
+    background: '#365314',
+    opacity: tint,
+  };
+  if (kindIdx === 0) {
+    return (
+      <div aria-hidden="true" style={{
+        ...baseStyle,
+        clipPath: 'polygon(50% 0%, 75% 18%, 92% 50%, 78% 80%, 60% 100%, 40% 100%, 22% 80%, 8% 50%, 25% 18%)',
+      }} />
+    );
+  }
+  if (kindIdx === 1) {
+    return (
+      <div aria-hidden="true" style={{
+        ...baseStyle,
+        clipPath: 'polygon(50% 0%, 70% 30%, 60% 32%, 80% 60%, 65% 62%, 90% 100%, 10% 100%, 35% 62%, 20% 60%, 40% 32%, 30% 30%)',
+      }} />
+    );
+  }
+  // Cluster — small twin canopy
+  return (
+    <div aria-hidden="true" style={{
+      ...baseStyle,
+      width: Math.round(height * 0.95),
+      clipPath: 'polygon(0% 60%, 12% 25%, 32% 22%, 45% 55%, 55% 50%, 68% 18%, 88% 28%, 100% 60%, 88% 100%, 12% 100%)',
+    }} />
+  );
+}
+
+// ─── Bird (single sky flyer) ────────────────────────────────
+// Two-stroke "M" shape SVG with the wings as <path> elements that
+// flap via rwl-wings. Sized small — meant to read as a passing
+// silhouette far above the canopy.
+
+function Bird() {
+  return (
+    <svg viewBox="0 0 24 14" width="100%" height="100%" style={{ display: 'block', overflow: 'visible' }}>
+      <g style={{ transformOrigin: '12px 7px', animation: 'rwl-wings 0.45s ease-in-out infinite alternate' }}>
+        <path
+          d="M 1 9 Q 6 1 12 7 Q 18 1 23 9"
+          fill="none"
+          stroke="#1f2937"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
+// ─── Butterfly ──────────────────────────────────────────────
+// Four wings made from SVG ellipses, body a thin stroke between.
+// Wings flap via rwl-flap (scaleX), the parent path animation
+// drives translation across the canopy band.
+
+function Butterfly({ palette }) {
+  const [light, dark] = palette;
+  return (
+    <svg viewBox="-10 -8 20 16" width="100%" height="100%" style={{ display: 'block', overflow: 'visible' }}>
+      <g style={{ transformOrigin: '0 0', animation: 'rwl-flap 0.16s ease-in-out infinite alternate' }}>
+        {/* Left upper wing */}
+        <ellipse cx={-4} cy={-3} rx={4.5} ry={3.2} fill={light} />
+        <ellipse cx={-4} cy={-3} rx={2}   ry={1.5} fill={dark} opacity={0.55} />
+        {/* Right upper wing */}
+        <ellipse cx={4}  cy={-3} rx={4.5} ry={3.2} fill={light} />
+        <ellipse cx={4}  cy={-3} rx={2}   ry={1.5} fill={dark} opacity={0.55} />
+        {/* Left lower wing */}
+        <ellipse cx={-3} cy={3}  rx={3.2} ry={2.4} fill={dark} opacity={0.85} />
+        {/* Right lower wing */}
+        <ellipse cx={3}  cy={3}  rx={3.2} ry={2.4} fill={dark} opacity={0.85} />
+      </g>
+      {/* Body — thin segmented line down the middle. */}
+      <ellipse cx={0} cy={0} rx={0.7} ry={4} fill="#1f2937" />
+    </svg>
   );
 }
 
