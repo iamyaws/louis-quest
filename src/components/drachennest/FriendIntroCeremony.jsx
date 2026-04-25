@@ -84,18 +84,38 @@ export default function FriendIntroCeremony({ creatureId, onClose }) {
       role="dialog"
       aria-modal="true"
       aria-label={`Neuer Freund: ${seed.name?.de || creatureId}`}
+      onClick={(e) => e.stopPropagation()}
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 95,
-        background: `radial-gradient(ellipse at 50% 30%, ${accent}40 0%, #1e1b3a 65%, #0e0c20 100%)`,
+        zIndex: 950,
+        // Layered backdrop: opaque dark base FIRST so Hub content
+        // never bleeds through, with the chapter-tinted glow painted
+        // on top as an atmospheric layer (multi-bg, leftmost is on
+        // top so the glow sits over the dark base). The previous
+        // single radial used `${accent}40` (25% alpha) at 0% which
+        // left the center of the screen 75% transparent and let the
+        // Hub leak through.
+        background: `
+          radial-gradient(ellipse at 50% 30%, ${accent}55 0%, transparent 55%),
+          linear-gradient(180deg, #1e1b3a 0%, #0e0c20 100%)
+        `,
+        backgroundColor: '#0e0c20',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         padding: '40px 28px',
-        animation: 'fic-enter 0.6s ease-out',
+        // The previous outer-div fade-in (`fic-enter` opacity 0→1)
+        // also faded the backdrop, leaving the Hub visible for the
+        // first 600ms. Drop the whole-div animation — the staged
+        // inner reveals (name/chibi/story/lesson/cta) already
+        // provide the entrance choreography, and the backdrop
+        // appears instantly so nothing leaks through.
         overflow: 'hidden',
+        // Belt-and-braces: own all input + scrolling while open.
+        pointerEvents: 'auto',
+        touchAction: 'none',
       }}
     >
       {/* Sparkles drifting up across the backdrop — discovery moment
