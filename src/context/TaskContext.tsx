@@ -149,20 +149,19 @@ export interface TaskState {
    *  earned Funken. Capped at 12 so the kid can't hoard between
    *  days. Resets at midnight via the day-transition logic. */
   careTokens?: number;
-  /** Per-Ronki distinguishing features (25 Apr 2026 — Marc's ask
-   *  "ronkis with variations and unique features that we can
-   *  randomize or let the kids pick when evolution happens"). One
-   *  trait id per slot picked from the variant's traits pool at
-   *  hatch (or rolled at evolution). Persists once set so the
-   *  kid's Ronki keeps the same look across sessions. The actual
-   *  visual rendering of these traits on the chibi is a follow-up
-   *  pass; for v1 the field exists + the Compendium showcases the
-   *  pool so the kid can see what's possible. */
-  hatchTraits?: {
-    hornAccent?: string;
-    cheekMark?: string;
-    tailTuft?: string;
-  };
+  /** Per-Ronki distinguishing features (25 Apr 2026 — Marc's
+   *  clarified model: "when an evolution happens a ronki gets one
+   *  unique trait out of the potential 6, added to the evolution
+   *  stage, keep it simple"). Flat array of trait IDs accumulated
+   *  across evolution stage transitions. One trait gets rolled per
+   *  stage advance from a pool of 18 (3 slots × 6 variants worth
+   *  of options), excluding traits the kid already has. With 5
+   *  evolution stages past the egg, a fully-evolved Ronki lands
+   *  with 5 traits — variant × C(18,5) = 6 × 8568 = 51,408 unique
+   *  Ronkis at most. Visual on-chibi rendering of these traits is
+   *  a follow-up pass; for v1 the array is collected + shown in
+   *  the Compendium / future RonkiProfile chip strip. */
+  hatchTraits?: string[];
   /** Drachennest expedition state (25 Apr 2026): Ronki goes on a trip
    *  when the morning ritual hits 100%, returns hours later with a
    *  memento for the Naturtagebuch. v1 = one biome (Morgenwald), one
@@ -707,6 +706,7 @@ export function createInitialState(): TaskState {
     catEvo: 0,
     ronkiVitals: { hunger: 70, liebe: 70, energie: 70 },
     careTokens: 0,
+    hatchTraits: [],
     expedition: { state: 'home', biome: 'morgenwald' },
     expeditionLog: [],
     loginBonusClaimed: false,
@@ -895,6 +895,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // reducer math so a stale save with a higher value still
           // collapses cleanly on next earn.
           careTokens: typeof (raw as any).careTokens === 'number' ? (raw as any).careTokens : 0,
+          // hatchTraits: array of trait IDs accumulated across
+          // evolution rolls. Default empty array for legacy saves
+          // that pre-date the field.
+          hatchTraits: Array.isArray((raw as any).hatchTraits) ? (raw as any).hatchTraits : [],
           // Drachennest expedition state: default to home/morgenwald with an
           // empty log for legacy saves that pre-date the field.
           expedition: (raw as any).expedition || { state: 'home', biome: 'morgenwald' },
