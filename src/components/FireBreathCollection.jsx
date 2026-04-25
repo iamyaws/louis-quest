@@ -140,11 +140,16 @@ function FlavorTile({ flavor, taughtAt, isPending, onTap }) {
         )}
       </div>
 
-      {/* Label — allowed to wrap to 2 lines on narrow viewports so
-          long words like FUNKENSTERN / REGENBOGEN don't push the
-          tile past its column. font tightened from 10px → 9px and
-          letter-spacing eased from .08em → .04em to give the words
-          a fighting chance on a single line on most phones. */}
+      {/* Label — German compound words (Funken­stern, Herz­feuer,
+          Regen­bogen) carry soft-hyphens (U+00AD) at their natural
+          word boundaries in i18n/de.json, so when a tile is too
+          narrow the browser breaks ONLY at the linguistic boundary:
+          "FUNKEN-/STERN" not "FUNKENS-/TERN" (Marc 25 Apr 2026 QA:
+          "now they break funny that's not proper german
+          understanding of the language to do it that way").
+          `hyphens: manual` + `overflowWrap: normal` + `wordBreak:
+          normal` together mean the browser respects only the
+          authored soft-hyphens and never invents its own breaks. */}
       <div
         style={{
           font: '700 9px/1.1 "Plus Jakarta Sans", sans-serif',
@@ -154,9 +159,11 @@ function FlavorTile({ flavor, taughtAt, isPending, onTap }) {
           textAlign: 'center',
           minHeight: 22,
           maxWidth: '100%',
-          overflowWrap: 'break-word',
-          wordBreak: 'break-word',
-          hyphens: 'auto',
+          whiteSpace: 'normal',
+          overflowWrap: 'normal',
+          wordBreak: 'normal',
+          hyphens: 'manual',
+          WebkitHyphens: 'manual',
         }}
       >
         {t(meta.labelKey)}
