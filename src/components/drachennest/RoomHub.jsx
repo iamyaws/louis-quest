@@ -839,13 +839,20 @@ export default function RoomHub({ onNavigate }) {
         </div>
       </section>
 
-      {/* Object row: Truhe / Buch / Spielzeug / Karte */}
+      {/* Object row — deduped against the bottom nav (Marc 25 Apr
+          2026: 'we have a dual nav at the moment, I tend to keep the
+          bottom nav, what do you think about it?'). Removed Truhe
+          (= Laden in bottom nav) and Buch (= Tagebuch in bottom nav)
+          to avoid offering the same destinations twice. Kept
+          Spielzeug (Spiele isn't a top-level nav target) and Karte
+          (Reise/Expedition is the Drachennest's unique portal —
+          also reachable via the painted window in the back of the
+          cave). Two tiles instead of four also frees vertical space
+          on the room surface. */}
       <section style={{
         padding: '18px 18px 0',
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10,
+        display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12,
       }}>
-        <ObjectTile icon="redeem"         label="Truhe"     onClick={() => onNavigate?.('belohnungen')} />
-        <ObjectTile icon="menu_book"      label="Buch"      onClick={() => onNavigate?.('buch')} />
         <ObjectTile icon="sports_esports" label="Spielzeug" onClick={() => onNavigate?.('spiele')} />
         <ObjectTile icon="explore"        label={expeditionUnlocked ? 'Karte ✦' : 'Karte'} highlight={expeditionUnlocked} onClick={() => setShowExpedition(true)} />
       </section>

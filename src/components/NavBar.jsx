@@ -18,7 +18,11 @@ import { isTabUnlocked, getTabUnlock } from '../data/tabUnlocks';
 // Dev override: ?reveal=all or ?reveal=N still forces unlock state so
 // Marc can preview any stage without touching Louis's real save.
 const TAB_KEYS = [
-  { id: 'hub',     key: 'nav.hub',     icon: 'local_fire_department' },
+  // 'cottage' — small house-with-chimney glyph that reads as
+  // "Ronki's cozy place" without committing to a single visual
+  // metaphor (cave / nest / camp). Pairs with the 'Nest' label
+  // Marc landed on (Lager → Nest, 25 Apr 2026).
+  { id: 'hub',     key: 'nav.hub',     icon: 'cottage' },
   { id: 'quests',  key: 'nav.quests',  icon: 'sunny' },
   { id: 'ronki',   key: 'nav.ronki',   icon: 'pets' },
   { id: 'journal', key: 'nav.journal', icon: 'auto_stories' },
