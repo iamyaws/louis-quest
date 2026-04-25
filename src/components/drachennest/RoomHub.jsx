@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useTask } from '../../context/TaskContext';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { getCatStage } from '../../utils/helpers';
+import { resolveWallpaper, resolveFloor } from '../../data/caveStyles';
 import MoodChibi from '../MoodChibi';
 import RonkiVitalsRing from './RonkiVitalsRing';
 import CareVerbs from './CareVerbs';
 import RonkiSpeechBubble from './RonkiSpeechBubble';
 import Expedition from './Expedition';
 import BeiRonkiSein from './BeiRonkiSein';
+import CaveStyleSheet from './CaveStyleSheet';
 
 /**
  * RoomHub — the Drachennest reframe of the Hub. v2 polish 24 Apr 2026.
@@ -54,7 +56,15 @@ export default function RoomHub({ onNavigate }) {
   // gone now that the real expedition state machine is wired up.
   const [showExpedition, setShowExpedition] = useState(false);
   const [showPresence, setShowPresence] = useState(false);
+  const [showStyleSheet, setShowStyleSheet] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState([]);
+
+  // Cave style — kid-pickable wallpaper + floor (Marc 25 Apr 2026
+  // approach A, free). Resolved with safe fallbacks so a missing or
+  // outdated id from persisted state still renders the warm-amber
+  // default rather than a blank cave.
+  const wallpaper = resolveWallpaper(state?.caveStyle?.wallpaper);
+  const floor = resolveFloor(state?.caveStyle?.floor);
 
   const variant = state?.companionVariant || 'forest';
   const stageIdx = getCatStage(state?.catEvo ?? 0);
@@ -272,16 +282,14 @@ export default function RoomHub({ onNavigate }) {
             aspectRatio: '1 / 1',
             borderRadius: 26,
             overflow: 'hidden',
-            // Warm sandstone interior — radial gradient so the top
-            // catches the most light (lantern + window) and the
-            // edges deepen into rock.
-            background:
-              'radial-gradient(ellipse 110% 80% at 50% -10%, #fef3c7 0%, #fde68a 30%, #fbbf24 65%, #b45309 100%)',
-            boxShadow:
-              '0 18px 36px -14px rgba(40, 20, 8, 0.40), ' +
-              'inset 0 4px 0 rgba(255,255,255,0.35), ' +
-              'inset 0 -10px 28px rgba(78, 42, 20, 0.45), ' +
-              'inset 0 0 0 4px rgba(180,83,9,0.18)',
+            // Cave wallpaper — kid-pickable (Marc 25 Apr 2026
+            // approach A, free). Variant resolves from
+            // state.caveStyle.wallpaper via resolveWallpaper(), with
+            // a safe fallback to warm-amber sandstone so any missing
+            // id still renders the original look.
+            background: wallpaper.bg,
+            boxShadow: wallpaper.inset,
+            transition: 'background 0.4s ease-out, box-shadow 0.4s ease-out',
           }}
         >
           {/* Cave-mouth shadow at the top — pulls the eye toward the
@@ -289,9 +297,10 @@ export default function RoomHub({ onNavigate }) {
               hollow rather than at a flat wall. */}
           <div aria-hidden="true" style={{
             position: 'absolute', top: 0, left: 0, right: 0, height: '24%',
-            background: 'radial-gradient(ellipse at 50% 0%, transparent 0%, transparent 38%, rgba(78,42,20,0.30) 100%)',
+            background: wallpaper.mouthShadow,
             pointerEvents: 'none',
             zIndex: 1,
+            transition: 'background 0.4s ease-out',
           }} />
 
           {/* Hanging string lights — five warm cream beads on a thin
@@ -426,21 +435,62 @@ export default function RoomHub({ onNavigate }) {
               the vital-ring overlap the cushion on the floor"). */}
           <div aria-hidden="true" style={{
             position: 'absolute', left: '-4%', right: '-4%', bottom: '-2%', height: '14%',
-            background: 'radial-gradient(ellipse at 50% 0%, #fef3c7 0%, #fde68a 50%, #d97706 100%)',
+            background: floor.outer,
             borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
-            boxShadow: 'inset 0 -6px 14px rgba(120,53,15,0.35), inset 0 3px 0 rgba(255,255,255,0.40)',
+            boxShadow: floor.outerInset,
             zIndex: 5,
+            transition: 'background 0.4s ease-out, box-shadow 0.4s ease-out',
           }} />
           <div aria-hidden="true" style={{
             position: 'absolute', left: '14%', right: '14%', bottom: '0%', height: '7%',
-            background: 'radial-gradient(ellipse at 50% 0%, #fdba74 0%, #c2410c 100%)',
+            background: floor.inner,
             borderRadius: '50% 50% 0 0 / 90% 90% 0 0',
-            boxShadow: 'inset 0 -4px 10px rgba(67,20,7,0.40), inset 0 2px 0 rgba(255,255,255,0.25)',
+            boxShadow: floor.innerInset,
             zIndex: 5,
+            transition: 'background 0.4s ease-out, box-shadow 0.4s ease-out',
           }} />
           {/* Scattered leaves on the floor mat */}
           <span aria-hidden="true" style={{ position: 'absolute', bottom: '2%', left: '12%', fontSize: 14, transform: 'rotate(-18deg)', zIndex: 6 }}>🍂</span>
           <span aria-hidden="true" style={{ position: 'absolute', bottom: '1.5%', right: '14%', fontSize: 13, transform: 'rotate(24deg)', zIndex: 6 }}>🍁</span>
+
+          {/* "Einrichten" button — top-right corner of the cave.
+              Tapping opens the CaveStyleSheet so the kid can swap
+              wallpapers + floor. Sized small + soft so it doesn't
+              compete with Ronki for attention; readable to a 6yo
+              via the paint-roller icon + label combo. (Marc 25 Apr
+              2026 approach A, free.) */}
+          <button
+            type="button"
+            onClick={() => setShowStyleSheet(true)}
+            aria-label="Ronkis Zimmer einrichten"
+            className="active:scale-[0.94] transition-transform"
+            style={{
+              position: 'absolute',
+              top: 10, right: 10,
+              zIndex: 12,
+              display: 'flex', alignItems: 'center', gap: 4,
+              padding: '6px 10px 6px 8px',
+              borderRadius: 999,
+              background: 'rgba(255,248,242,0.92)',
+              border: '1.5px solid rgba(180,83,9,0.22)',
+              boxShadow: '0 4px 10px -4px rgba(40,20,8,0.30)',
+              cursor: 'pointer',
+            }}
+          >
+            <span className="material-symbols-outlined" style={{
+              fontSize: 16,
+              color: '#A83E2C',
+              fontVariationSettings: "'FILL' 1",
+            }}>format_paint</span>
+            <span style={{
+              font: '700 10px/1 "Plus Jakarta Sans", sans-serif',
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              color: '#5c2a08',
+            }}>
+              Einrichten
+            </span>
+          </button>
 
           {/* Ronki + vitals stage — ring wraps chibi at matched size so
               the arcs clearly belong to him (v2 had them floating too far).
@@ -959,6 +1009,13 @@ export default function RoomHub({ onNavigate }) {
           story line. Free interaction, no Funken, no vital change.
           ESC + tap-anywhere both dismiss. */}
       {showPresence && <BeiRonkiSein onClose={() => setShowPresence(false)} />}
+
+      {/* Cave personalisation sheet — kid-pickable wallpaper + floor.
+          Mounted at the same level as the other modals so its
+          fixed-position bottom sheet stacks above the cave. The cave
+          stays visible above the sheet (¾-height) so kids see swatch
+          taps take effect on the actual room behind. */}
+      {showStyleSheet && <CaveStyleSheet onClose={() => setShowStyleSheet(false)} />}
     </div>
   );
 }

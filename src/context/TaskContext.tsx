@@ -228,6 +228,16 @@ export interface TaskState {
    *  a follow-up pass; for v1 the array is collected + shown in
    *  the Compendium / future RonkiProfile chip strip. */
   hatchTraits?: string[];
+  /** Cave personalisation (Marc 25 Apr 2026 — "louis really liked the
+   *  garden and to give it his personal touch I would like to allow
+   *  him the same for ronki's room. it's not about the mementos its
+   *  about the colors of the room, the furniture, etc."). Free, no
+   *  HP economy: kid taps a swatch and the cave wallpaper + floor
+   *  apply instantly. Each id is looked up in
+   *  `src/data/caveStyles.ts`; a missing id falls back to the
+   *  default (warm-amber sandstone), so removing a variant in a
+   *  future build is safe. */
+  caveStyle?: { wallpaper: string; floor: string };
   /** Drachennest expedition state (25 Apr 2026): Ronki goes on a trip
    *  when the morning ritual hits 100%, returns hours later with a
    *  memento for the Naturtagebuch. v1 = one biome (Morgenwald), one
@@ -565,6 +575,11 @@ interface TaskActions {
   addFriend: (snap: FriendSnapshot) => void;
   /** Mark a wink as seen so the inbox indicator clears. */
   markWinkSeen: (receivedAt: string) => void;
+  /** Cave personalisation — kid picks a wallpaper or floor swatch
+   *  in the "Einrichten" sheet. Partial so the picker can update
+   *  one axis at a time without clobbering the other. Free, no
+   *  HP/Funkelzeit cost. */
+  setCaveStyle: (partial: Partial<{ wallpaper: string; floor: string }>) => void;
   /** Record a wink the kid just sent to a friend. Enforces the
    *  3/day-per-friend cap (Marc Q3). Returns true if the wink
    *  was accepted, false if the cap was already reached today.
@@ -793,6 +808,7 @@ export function createInitialState(): TaskState {
     friends: [],
     winksReceived: [],
     winksSent: [],
+    caveStyle: { wallpaper: 'warm-amber', floor: 'amber' },
     expedition: { state: 'home', biome: 'morgenwald' },
     expeditionLog: [],
     loginBonusClaimed: false,
@@ -996,6 +1012,12 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           friends: Array.isArray((raw as any).friends) ? (raw as any).friends : [],
           winksReceived: Array.isArray((raw as any).winksReceived) ? (raw as any).winksReceived : [],
           winksSent: Array.isArray((raw as any).winksSent) ? (raw as any).winksSent : [],
+          caveStyle: (raw as any).caveStyle && typeof (raw as any).caveStyle === 'object'
+            ? {
+                wallpaper: (raw as any).caveStyle.wallpaper || 'warm-amber',
+                floor:     (raw as any).caveStyle.floor     || 'amber',
+              }
+            : { wallpaper: 'warm-amber', floor: 'amber' },
           // Drachennest expedition state: default to home/morgenwald with an
           // empty log for legacy saves that pre-date the field.
           expedition: (raw as any).expedition || { state: 'home', biome: 'morgenwald' },
@@ -1871,6 +1893,23 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // setCaveStyle — partial update so a swatch tap on wallpaper
+  // doesn't reset the floor (and vice versa). Falls back to the
+  // current value, then the default, if either axis is missing.
+  const setCaveStyle = useCallback((partial: Partial<{ wallpaper: string; floor: string }>) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const current = prev.caveStyle || { wallpaper: 'warm-amber', floor: 'amber' };
+      return {
+        ...prev,
+        caveStyle: {
+          wallpaper: partial.wallpaper ?? current.wallpaper,
+          floor:     partial.floor     ?? current.floor,
+        },
+      };
+    });
+  }, []);
+
   // recordWinkSent — caps at 3 per local day per friend (Marc Q3).
   // We close over the cap check + the append in a single setState
   // pass so two rapid taps can't both squeeze through. The boolean
@@ -2692,7 +2731,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, setEmojiCode, addFriend, markWinkSeen, recordWinkSent, setExpedition, startExpedition, rangerDeparted, rangerArrived, receiveMemento, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, setEmojiCode, addFriend, markWinkSeen, recordWinkSent, setCaveStyle, setExpedition, startExpedition, rangerDeparted, rangerArrived, receiveMemento, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
