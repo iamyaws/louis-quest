@@ -11,14 +11,17 @@
  */
 
 import { useEffect, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { CATEGORY_LABELS, CURATED_APPS, type CuratedApp } from '../../lib/app-check/curated-apps';
 import { fetchEvalCount } from '../../lib/app-check/storage';
+import { EASE_OUT } from '../../lib/motion';
 
 interface Props {
   onContinue: (selection: { name: string; curatedId: string | null }) => void;
 }
 
 export function AppEntry({ onContinue }: Props) {
+  const reduced = useReducedMotion();
   const [mode, setMode] = useState<'curated' | 'free'>('curated');
   const [curatedId, setCuratedId] = useState<string>('');
   const [freeText, setFreeText] = useState<string>('');
@@ -55,11 +58,17 @@ export function AppEntry({ onContinue }: Props) {
   return (
     <div className="space-y-8 max-w-xl">
       {/* Mode toggle */}
-      <div className="inline-flex rounded-full bg-cream/70 border border-teal/15 p-1">
+      <div
+        className="inline-flex rounded-full bg-cream/70 border border-teal/15 p-1"
+        role="tablist"
+        aria-label="App-Auswahl-Modus"
+      >
         <button
           type="button"
+          role="tab"
+          aria-pressed={mode === 'curated'}
           onClick={() => setMode('curated')}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+          className={`px-4 py-1.5 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-colors ${
             mode === 'curated'
               ? 'bg-teal text-cream'
               : 'text-teal-dark hover:text-teal'
@@ -69,8 +78,10 @@ export function AppEntry({ onContinue }: Props) {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-pressed={mode === 'free'}
           onClick={() => setMode('free')}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+          className={`px-4 py-1.5 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-colors ${
             mode === 'free'
               ? 'bg-teal text-cream'
               : 'text-teal-dark hover:text-teal'
@@ -87,7 +98,7 @@ export function AppEntry({ onContinue }: Props) {
           <select
             value={curatedId}
             onChange={(e) => setCuratedId(e.target.value)}
-            className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus:ring-2 focus:ring-sage focus:border-transparent"
+            className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:border-transparent"
           >
             <option value="">Bitte wählen…</option>
             {Object.entries(grouped).map(([cat, apps]) => (
@@ -113,28 +124,37 @@ export function AppEntry({ onContinue }: Props) {
             onChange={(e) => setFreeText(e.target.value)}
             placeholder="z.B. Anton, Duolingo ABC, Pokémon Go"
             maxLength={80}
-            className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus:ring-2 focus:ring-sage focus:border-transparent"
+            className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:border-transparent"
           />
         </label>
       )}
 
       {/* Counter */}
-      {effectiveName && (
-        <div className="text-sm text-ink/65 min-h-[1.25rem]">
-          {count === null && <span>Schau nach…</span>}
-          {count === 0 && (
-            <span>
-              <strong>{effectiveName}</strong> wurde hier noch nicht bewertet.
-            </span>
-          )}
-          {count !== null && count > 0 && (
-            <span>
-              {count === 1 ? 'Eine andere Person hat' : `${count} andere Personen haben`}{' '}
-              <strong>{effectiveName}</strong> bisher geprüft.
-            </span>
-          )}
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {effectiveName && (
+          <motion.div
+            key={effectiveName + (count ?? 'loading')}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -4 }}
+            transition={{ duration: 0.25, ease: EASE_OUT }}
+            className="text-sm text-ink/65 min-h-[1.25rem]"
+          >
+            {count === null && <span>Schau nach…</span>}
+            {count === 0 && (
+              <span>
+                <strong>{effectiveName}</strong> wurde hier noch nicht bewertet.
+              </span>
+            )}
+            {count !== null && count > 0 && (
+              <span>
+                {count === 1 ? 'Eine andere Person hat' : `${count} andere Personen haben`}{' '}
+                <strong>{effectiveName}</strong> bisher geprüft.
+              </span>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* CTA */}
       <button
@@ -146,10 +166,12 @@ export function AppEntry({ onContinue }: Props) {
             curatedId: mode === 'curated' && curatedId ? curatedId : null,
           })
         }
-        className="inline-flex items-center gap-2 rounded-full bg-teal-dark px-6 py-3 text-cream font-display font-semibold text-sm shadow-sm hover:bg-teal hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        className="group inline-flex items-center gap-2 rounded-full bg-teal-dark px-6 py-3 text-cream font-display font-semibold text-sm shadow-sm hover:bg-teal hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
         Fragebogen starten
-        <span aria-hidden>→</span>
+        <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+          →
+        </span>
       </button>
     </div>
   );

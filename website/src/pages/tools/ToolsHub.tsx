@@ -7,12 +7,14 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { PageMeta } from '../../components/PageMeta';
 import { PainterlyShell } from '../../components/PainterlyShell';
 import { Footer } from '../../components/Footer';
+import { fadeUp } from '../../lib/motion';
 
 export default function ToolsHub() {
+  const reduced = useReducedMotion();
   return (
     <PainterlyShell>
       <PageMeta
@@ -23,18 +25,14 @@ export default function ToolsHub() {
 
       <section className="px-6 pt-32 pb-12 sm:pt-40 sm:pb-16">
         <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-          >
+          <motion.div {...fadeUp(0, reduced)}>
             <Link
               to="/"
-              className="inline-flex items-center gap-2 text-sm text-teal-dark/60 hover:text-teal-dark transition-colors mb-8"
+              className="inline-flex items-center gap-2 text-sm text-teal-dark/60 hover:text-teal-dark focus:outline-none focus-visible:text-teal-dark focus-visible:underline underline-offset-4 transition-colors mb-8"
             >
               <span aria-hidden>←</span> Zurück
             </Link>
-            <p className="text-xs uppercase tracking-[0.2em] text-teal font-medium mb-6">
+            <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold mb-6">
               Werkzeuge
             </p>
             <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-6xl leading-[1.04] tracking-tight text-teal-dark">
@@ -49,15 +47,15 @@ export default function ToolsHub() {
         </div>
       </section>
 
-      <section className="px-6 pb-24">
+      <section className="px-6 pb-28 sm:pb-32">
         <div className="max-w-4xl mx-auto">
           <ul className="grid sm:grid-cols-2 gap-6">
             <li>
               <Link
                 to="/tools/app-check"
-                className="block rounded-2xl bg-cream/70 backdrop-blur-sm border border-teal/10 p-7 hover:shadow-lg hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-all duration-300"
+                className="group block rounded-2xl bg-cream/70 backdrop-blur-sm border border-teal/10 p-7 hover:shadow-lg hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-all duration-300"
               >
-                <p className="text-xs uppercase tracking-[0.18em] text-teal font-bold mb-3">
+                <p className="text-xs uppercase tracking-[0.18em] text-teal font-semibold mb-3">
                   App-Check
                 </p>
                 <h2 className="font-display font-bold text-2xl text-teal-dark leading-snug mb-3">
@@ -68,20 +66,20 @@ export default function ToolsHub() {
                   bekommst eine Einschätzung, was die App-Mechaniken über sie
                   verraten.
                 </p>
-                <span className="inline-flex items-center gap-1 text-sm text-teal font-semibold">
+                <span className="inline-flex items-center gap-1 text-sm text-teal font-semibold group-hover:gap-2 transition-all">
                   Tool öffnen <span aria-hidden>→</span>
                 </span>
               </Link>
             </li>
             <li className="rounded-2xl bg-cream/40 border border-dashed border-teal/15 p-7 flex flex-col justify-center text-center">
-              <p className="text-xs uppercase tracking-[0.18em] text-ink/50 font-bold mb-3">
+              <p className="text-xs uppercase tracking-[0.18em] text-ink/50 font-semibold mb-3">
                 Bald
               </p>
               <p className="text-sm text-ink/55 leading-relaxed">
                 Weitere Werkzeuge folgen. Schreib uns woran ihr hängt:{' '}
                 <a
                   href="mailto:hallo@ronki.de"
-                  className="text-teal underline underline-offset-2"
+                  className="text-teal underline underline-offset-2 focus:outline-none focus-visible:text-teal-dark focus-visible:decoration-2"
                 >
                   hallo@ronki.de
                 </a>

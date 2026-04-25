@@ -8,7 +8,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { PageMeta } from '../../components/PageMeta';
 import { PainterlyShell } from '../../components/PainterlyShell';
 import { Footer } from '../../components/Footer';
@@ -16,8 +16,10 @@ import { ResultScore } from '../../components/AppCheck/ResultScore';
 import { ShareButtons } from '../../components/AppCheck/ShareButtons';
 import { ToolDisclaimer } from '../../components/AppCheck/ToolDisclaimer';
 import { fetchEval, type FetchedEval } from '../../lib/app-check/storage';
+import { EASE_OUT } from '../../lib/motion';
 
 export default function AppCheckResult() {
+  const reduced = useReducedMotion();
   const { id } = useParams<{ id: string }>();
   const [state, setState] = useState<
     | { phase: 'loading' }
@@ -56,19 +58,35 @@ export default function AppCheckResult() {
         <div className="max-w-3xl mx-auto">
           <Link
             to="/tools/app-check"
-            className="inline-flex items-center gap-2 text-sm text-teal-dark/60 hover:text-teal-dark transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-sm text-teal-dark/60 hover:text-teal-dark focus:outline-none focus-visible:text-teal-dark focus-visible:underline underline-offset-4 transition-colors mb-8"
           >
             <span aria-hidden>←</span> Eigenen App-Check starten
           </Link>
 
           {state.phase === 'loading' && (
-            <div className="text-ink/60">Lade Bewertung…</div>
+            <motion.div
+              initial={reduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, ease: EASE_OUT }}
+              className="space-y-3"
+            >
+              <div
+                aria-hidden
+                className="h-8 w-44 rounded-md bg-cream/70 animate-pulse"
+              />
+              <div
+                aria-hidden
+                className="h-4 w-72 rounded-md bg-cream/60 animate-pulse"
+              />
+              <span className="sr-only">Lade Bewertung…</span>
+            </motion.div>
           )}
 
           {state.phase === 'not-found' && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={reduced ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: EASE_OUT }}
               className="space-y-6"
             >
               <h1 className="font-display font-bold text-3xl text-teal-dark">
@@ -78,7 +96,7 @@ export default function AppCheckResult() {
                 Wenn du deinen eigenen App-Check starten willst, geht das hier:{' '}
                 <Link
                   to="/tools/app-check"
-                  className="text-teal underline underline-offset-2"
+                  className="text-teal underline underline-offset-2 focus:outline-none focus-visible:text-teal-dark focus-visible:decoration-2"
                 >
                   App prüfen
                 </Link>
@@ -89,13 +107,13 @@ export default function AppCheckResult() {
 
           {state.phase === 'found' && (
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={reduced ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.5, ease: EASE_OUT }}
               className="space-y-10"
             >
               <header>
-                <p className="text-xs uppercase tracking-[0.2em] text-teal font-medium mb-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold mb-4">
                   Gespeicherte Bewertung
                 </p>
                 <h1 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">

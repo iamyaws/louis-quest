@@ -8,8 +8,10 @@
  * substantive without manufacturing fear.
  */
 
+import { motion, useReducedMotion } from 'motion/react';
 import { BAND_ACTIONS, type ScoreBandDef } from '../../lib/app-check/score';
 import { QUESTIONS, type AnswersMap } from '../../lib/app-check/questions';
+import { EASE_OUT } from '../../lib/motion';
 
 interface Props {
   band: ScoreBandDef;
@@ -17,6 +19,7 @@ interface Props {
 }
 
 export function BandActions({ band, answers }: Props) {
+  const reduced = useReducedMotion();
   const config = BAND_ACTIONS[band.key];
 
   // Show items that have no `onlyIfFlagged` constraint, plus items whose
@@ -44,8 +47,16 @@ export function BandActions({ band, answers }: Props) {
       </div>
       <ol className="space-y-4 list-none pl-0">
         {visible.map((item, i) => (
-          <li
+          <motion.li
             key={item.title}
+            initial={reduced ? false : { opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={
+              reduced
+                ? { duration: 0 }
+                : { duration: 0.4, delay: i * 0.05, ease: EASE_OUT }
+            }
             className="rounded-xl bg-cream/70 border border-teal/10 p-5 sm:p-6 flex gap-4"
           >
             <span
@@ -55,14 +66,14 @@ export function BandActions({ band, answers }: Props) {
               {i + 1}
             </span>
             <div className="space-y-1.5 flex-1">
-              <p className="font-display font-bold text-teal-dark text-base">
+              <p className="font-display font-bold text-teal-dark text-base max-w-prose">
                 {item.title}
               </p>
-              <p className="text-sm text-ink/75 leading-relaxed">
+              <p className="text-sm text-ink/75 leading-relaxed max-w-prose">
                 {item.detail}
               </p>
             </div>
-          </li>
+          </motion.li>
         ))}
       </ol>
     </div>

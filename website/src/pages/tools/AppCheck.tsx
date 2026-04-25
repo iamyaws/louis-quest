@@ -17,7 +17,7 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { PageMeta } from '../../components/PageMeta';
 import { PainterlyShell } from '../../components/PainterlyShell';
 import { Footer } from '../../components/Footer';
@@ -32,30 +32,52 @@ import {
   type AnswersMap,
 } from '../../lib/app-check/questions';
 import { saveEval } from '../../lib/app-check/storage';
+import { EASE_OUT, fadeUp } from '../../lib/motion';
 
 type Phase = 'landing' | 'entry' | 'quiz' | 'result' | 'saving';
 
+/**
+ * Forward = +1 (next question), back = -1. Drives the directional slide
+ * on the question screen so going back doesn't feel like another forward.
+ */
+type Direction = 1 | -1;
+
 export default function AppCheck() {
   const navigate = useNavigate();
+  const reduced = useReducedMotion();
   const [phase, setPhase] = useState<Phase>('landing');
   const [appName, setAppName] = useState<string>('');
   const [curatedId, setCuratedId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<AnswersMap>({});
   const [questionIdx, setQuestionIdx] = useState(0);
+  const [direction, setDirection] = useState<Direction>(1);
   const [error, setError] = useState<string | null>(null);
+  // Briefly disable answer buttons after a click so a double-tap can't
+  // skip two questions in one motion frame.
+  const [advancing, setAdvancing] = useState(false);
 
   const score = calculateScore(answers);
   const complete = isComplete(answers);
 
   function handleAnswer(value: string) {
+    if (advancing) return;
+    setAdvancing(true);
     const q = QUESTIONS[questionIdx];
     const next = { ...answers, [q.id]: value };
     setAnswers(next);
+    setDirection(1);
     if (questionIdx < QUESTIONS.length - 1) {
       setQuestionIdx(questionIdx + 1);
     } else {
       setPhase('result');
     }
+    // Re-enable shortly after the slide settles.
+    setTimeout(() => setAdvancing(false), reduced ? 0 : 280);
+  }
+
+  function handleBack() {
+    setDirection(-1);
+    setQuestionIdx(Math.max(0, questionIdx - 1));
   }
 
   async function handleSave() {
@@ -75,8 +97,8 @@ export default function AppCheck() {
       setPhase('result');
       setError(
         result.reason === 'no-supabase'
-          ? 'Speichern aktuell nicht möglich, die Verbindung zur Datenbank fehlt.'
-          : 'Speichern hat nicht geklappt. Versuch es bitte gleich noch mal.',
+          ? 'Speichern aktuell nicht möglich, die Verbindung zur Datenbank fehlt. Du kannst die Bewertung trotzdem als Screenshot teilen.'
+          : 'Speichern hat nicht geklappt. Versuch es bitte gleich noch mal. Falls es weiter hakt, schreib uns an hallo@ronki.de.',
       );
     }
   }
@@ -85,10 +107,14 @@ export default function AppCheck() {
     setPhase('entry');
     setAnswers({});
     setQuestionIdx(0);
+    setDirection(1);
     setAppName('');
     setCuratedId(null);
     setError(null);
   }
+
+  // Question slide direction. Reduced motion → no slide, just opacity.
+  const slideX = reduced ? 0 : direction * 12;
 
   return (
     <PainterlyShell>
@@ -102,26 +128,28 @@ export default function AppCheck() {
         <div className="max-w-3xl mx-auto">
           <Link
             to="/tools"
-            className="inline-flex items-center gap-2 text-sm text-teal-dark/60 hover:text-teal-dark transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-sm text-teal-dark/60 hover:text-teal-dark focus:outline-none focus-visible:text-teal-dark focus-visible:underline underline-offset-4 transition-colors mb-8"
           >
             <span aria-hidden>←</span> Werkzeuge
           </Link>
 
-          {phase === 'landing' && <Landing onStart={() => setPhase('entry')} />}
+          {phase === 'landing' && (
+            <Landing onStart={() => setPhase('entry')} reduced={reduced} />
+          )}
 
           {phase === 'entry' && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={reduced ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.4, ease: EASE_OUT }}
               className="space-y-10"
             >
               <header>
-                <p className="text-xs uppercase tracking-[0.2em] text-teal font-medium mb-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold mb-4">
                   Schritt 1 von 3
                 </p>
                 <h1 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
-                  Welche App willst du prüfen?
+                  Welche App willst du <em className="italic text-sage">prüfen</em>?
                 </h1>
               </header>
               <AppEntry
@@ -130,6 +158,7 @@ export default function AppCheck() {
                   setCuratedId(curatedId);
                   setPhase('quiz');
                   setQuestionIdx(0);
+                  setDirection(1);
                 }}
               />
               <ToolDisclaimer variant="tool" />
@@ -137,39 +166,45 @@ export default function AppCheck() {
           )}
 
           {phase === 'quiz' && (
-            <motion.div
-              key={questionIdx}
-              initial={{ opacity: 0, x: 12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-10"
-            >
+            <div className="space-y-10">
               <header>
-                <p className="text-xs uppercase tracking-[0.2em] text-teal font-medium mb-2">
+                <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold mb-2">
                   Schritt 2 von 3 · {appName}
                 </p>
               </header>
-              <QuestionScreen
-                question={QUESTIONS[questionIdx]}
-                index={questionIdx}
-                total={QUESTIONS.length}
-                current={answers[QUESTIONS[questionIdx].id]}
-                onAnswer={handleAnswer}
-                onBack={() => setQuestionIdx(Math.max(0, questionIdx - 1))}
-              />
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={questionIdx}
+                  initial={reduced ? { opacity: 0 } : { opacity: 0, x: slideX }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={reduced ? { opacity: 0 } : { opacity: 0, x: -slideX }}
+                  transition={{ duration: 0.28, ease: EASE_OUT }}
+                  className="space-y-10"
+                >
+                  <QuestionScreen
+                    question={QUESTIONS[questionIdx]}
+                    index={questionIdx}
+                    total={QUESTIONS.length}
+                    current={answers[QUESTIONS[questionIdx].id]}
+                    disabled={advancing}
+                    onAnswer={handleAnswer}
+                    onBack={handleBack}
+                  />
+                </motion.div>
+              </AnimatePresence>
               <ToolDisclaimer variant="tool" />
-            </motion.div>
+            </div>
           )}
 
           {(phase === 'result' || phase === 'saving') && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={reduced ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.5, ease: EASE_OUT }}
               className="space-y-10"
             >
               <header>
-                <p className="text-xs uppercase tracking-[0.2em] text-teal font-medium mb-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold mb-4">
                   Schritt 3 von 3 · Ergebnis
                 </p>
                 <h1 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
@@ -180,7 +215,10 @@ export default function AppCheck() {
               <ResultScore appName={appName} answers={answers} score={score} />
 
               {error && (
-                <div className="rounded-xl bg-clay/10 border border-clay/30 p-4 text-sm text-clay">
+                <div
+                  role="alert"
+                  className="rounded-xl bg-cream/80 border border-teal/30 p-4 text-sm text-teal-dark"
+                >
                   {error}
                 </div>
               )}
@@ -190,14 +228,32 @@ export default function AppCheck() {
                   type="button"
                   disabled={phase === 'saving'}
                   onClick={handleSave}
-                  className="inline-flex items-center gap-2 rounded-full bg-teal-dark px-6 py-3 text-cream font-display font-semibold text-sm shadow-sm hover:bg-teal hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="group inline-flex items-center gap-2 rounded-full bg-teal-dark px-6 py-3 text-cream font-display font-semibold text-sm shadow-sm hover:bg-teal hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  {phase === 'saving' ? 'Speichere…' : 'Bewertung speichern und teilen'}
+                  {phase === 'saving' ? (
+                    <>
+                      <span
+                        aria-hidden
+                        className="inline-block w-4 h-4 rounded-full border-2 border-cream/30 border-t-cream animate-spin"
+                      />
+                      Speichere…
+                    </>
+                  ) : (
+                    <>
+                      Bewertung speichern und teilen
+                      <span
+                        aria-hidden
+                        className="transition-transform group-hover:translate-x-0.5"
+                      >
+                        →
+                      </span>
+                    </>
+                  )}
                 </button>
                 <button
                   type="button"
                   onClick={handleRestart}
-                  className="inline-flex items-center gap-2 rounded-full border border-teal/30 px-6 py-3 text-sm text-teal-dark font-display font-medium hover:bg-teal-dark hover:text-cream transition-colors"
+                  className="inline-flex items-center gap-2 rounded-full border border-teal/30 px-6 py-3 text-sm text-teal-dark font-display font-medium hover:bg-teal-dark hover:text-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-colors"
                 >
                   Andere App prüfen
                 </button>
@@ -214,16 +270,17 @@ export default function AppCheck() {
   );
 }
 
-function Landing({ onStart }: { onStart: () => void }) {
+function Landing({
+  onStart,
+  reduced,
+}: {
+  onStart: () => void;
+  reduced: boolean | null;
+}) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7 }}
-      className="space-y-10"
-    >
+    <motion.div {...fadeUp(0, reduced)} className="space-y-10">
       <header className="space-y-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-teal font-medium">
+        <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
           Werkzeug für Eltern
         </p>
         <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-6xl leading-[1.04] tracking-tight text-teal-dark">
@@ -262,7 +319,7 @@ function Landing({ onStart }: { onStart: () => void }) {
             Datenbank.{' '}
             <a
               href="/datenschutz"
-              className="text-teal underline underline-offset-2 hover:text-teal-dark"
+              className="text-teal underline underline-offset-2 hover:text-teal-dark focus:outline-none focus-visible:text-teal-dark focus-visible:decoration-2"
             >
               Was wir genau speichern
             </a>
@@ -274,10 +331,12 @@ function Landing({ onStart }: { onStart: () => void }) {
       <button
         type="button"
         onClick={onStart}
-        className="inline-flex items-center gap-2 rounded-full bg-teal-dark px-8 py-4 text-cream font-display font-bold text-base shadow-sm hover:bg-teal hover:shadow-md transition-all"
+        className="group inline-flex items-center gap-2 rounded-full bg-teal-dark px-8 py-4 text-cream font-display font-bold text-base shadow-sm hover:bg-teal hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-all"
       >
         App prüfen
-        <span aria-hidden>→</span>
+        <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+          →
+        </span>
       </button>
 
       <ToolDisclaimer variant="tool" />

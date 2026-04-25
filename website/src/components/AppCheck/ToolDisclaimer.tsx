@@ -19,7 +19,7 @@ const COPY: Record<NonNullable<Props['variant']>, string> = {
 
 export function ToolDisclaimer({ variant = 'tool' }: Props) {
   return (
-    <p className="mt-12 text-xs text-ink/55 italic max-w-prose">
+    <p className="mt-12 text-sm text-ink/55 italic max-w-prose leading-relaxed">
       {COPY[variant]}
     </p>
   );

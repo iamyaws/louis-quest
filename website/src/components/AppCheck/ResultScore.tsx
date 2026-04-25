@@ -3,8 +3,23 @@
  * each "problematic" answer the parent gave.
  *
  * The framing is always "Aus deiner Sicht" — never "this app is X".
+ *
+ * Motion: each section fades up on scroll-in (whileInView once=true) so
+ * the long result body has rhythm instead of dumping all at once. The
+ * score number quietly counts up from 0 to N — intentional, not
+ * celebratory; it reads "this number was calculated from your answers"
+ * rather than "ta-da". Reduced-motion users skip all of this and see
+ * the final state immediately.
  */
 
+import { useEffect, useState } from 'react';
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+} from 'motion/react';
 import {
   QUESTIONS,
   summariseAnswers,
@@ -12,6 +27,7 @@ import {
 } from '../../lib/app-check/questions';
 import { bandForScore, type ScoreBandDef } from '../../lib/app-check/score';
 import { BandActions } from './BandActions';
+import { EASE_OUT } from '../../lib/motion';
 
 interface Props {
   appName: string;
@@ -41,42 +57,73 @@ const TONE_CLASSES: Record<ScoreBandDef['tone'], { bg: string; ring: string; acc
 };
 
 export function ResultScore({ appName, answers, score }: Props) {
+  const reduced = useReducedMotion();
   const band = bandForScore(score);
   const tone = TONE_CLASSES[band.tone];
   const stats = summariseAnswers(answers);
 
-  // Identify which questions contributed problematic answers, for the
-  // educational explanation list. Q10 is special: "Nein" is the
-  // problematic answer.
+  // Identify which questions contributed problematic answers.
   const flaggedQuestions = QUESTIONS.filter((q) => {
     const v = answers[q.id];
-    return v && v !== 'unklar' && q.scoreContribution(v) === 1;
+    if (!v || v === 'unklar') return false;
+    return q.scoreContribution(v) === 1;
   });
 
-  // Pull the questions the parent flagged as "weiß ich nicht" so we can
-  // surface them as a separate "you might want to look this up" section.
+  // Surface the questions the parent flagged as "weiß ich nicht" as a
+  // separate "you might want to look this up" section.
   const unclearQuestions = QUESTIONS.filter(
     (q) => answers[q.id] === 'unklar',
   );
 
-  // If too much was unclear, the score itself is conservative — show a
-  // soft warning so parents understand "low score with many unknowns"
-  // is not the same as "low score with mostly Nein". When most answers
-  // are unclear we hide the band card entirely because it would be
-  // misleading; we just show the warning + a nudge to gather more.
+  // Sparse-data handling: at 5+ unclear show a soft caveat; at 7+ the
+  // band card itself is too misleading to render.
   const sparseData = stats.unclear >= 5;
   const tooSparseForBand = stats.unclear >= 7;
+
+  // Quiet count-up on the score number. ~700ms, eased. Skipped for
+  // reduced-motion users who see the final value right away.
+  const scoreMotion = useMotionValue(reduced ? score : 0);
+  const scoreDisplay = useTransform(scoreMotion, (v) => Math.round(v));
+  const [scoreRendered, setScoreRendered] = useState(reduced ? score : 0);
+  useEffect(() => {
+    if (reduced) {
+      setScoreRendered(score);
+      return;
+    }
+    const controls = animate(scoreMotion, score, {
+      duration: 0.7,
+      ease: EASE_OUT,
+    });
+    const unsub = scoreDisplay.on('change', (v) => setScoreRendered(v));
+    return () => {
+      controls.stop();
+      unsub();
+    };
+  }, [score, reduced, scoreMotion, scoreDisplay]);
+
+  // Standard scroll-in fade-up for body sections. Each section fades on
+  // its first time entering the viewport, then stays put.
+  const sectionMotion = (delay = 0) =>
+    reduced
+      ? {}
+      : ({
+          initial: { opacity: 0, y: 16 },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: { once: true, margin: '-10%' },
+          transition: { duration: 0.5, delay, ease: EASE_OUT },
+        } as const);
 
   return (
     <div className="space-y-10 max-w-3xl">
       {/* Band card — hidden if data too sparse to be meaningful */}
       {!tooSparseForBand && (
-        <div
+        <motion.div
+          {...sectionMotion(0)}
           className={`rounded-2xl ${tone.bg} ring-1 ring-inset ${tone.ring} px-7 py-8 sm:px-10 sm:py-10`}
         >
           <div className="flex items-baseline gap-4 mb-4">
             <span className="text-6xl font-display font-bold tabular-nums text-teal-dark">
-              {score}
+              {scoreRendered}
             </span>
             <span className="text-lg text-ink/55">/ 10 Pattern beobachtet</span>
           </div>
@@ -85,49 +132,63 @@ export function ResultScore({ appName, answers, score }: Props) {
           >
             {band.label}
           </h2>
-          <p className="text-ink/75 leading-relaxed">{band.summary}</p>
-        </div>
+          <p className="text-ink/75 leading-relaxed max-w-prose">
+            {band.summary}
+          </p>
+        </motion.div>
       )}
 
       {tooSparseForBand && (
-        <div className="rounded-2xl bg-cream/80 ring-1 ring-inset ring-teal/15 px-7 py-8 sm:px-10 sm:py-10 space-y-3">
+        <motion.div
+          {...sectionMotion(0)}
+          className="rounded-2xl bg-cream/80 ring-1 ring-inset ring-teal/15 px-7 py-8 sm:px-10 sm:py-10 space-y-3"
+        >
           <h2 className="font-display font-bold text-2xl text-teal-dark">
             Noch zu wenig zum Einordnen
           </h2>
-          <p className="text-ink/75 leading-relaxed">
+          <p className="text-ink/75 leading-relaxed max-w-prose">
             Du hast bei den meisten Fragen "Weiß ich nicht" gewählt. Das ist
             ehrlich, aber wir können daraus noch nichts ableiten. Schau die App
             einmal kurz mit deinem Kind an, achte auf Push, Werbung und
             Cosmetics, und komm dann zurück.
           </p>
-        </div>
+        </motion.div>
       )}
 
       {/* App being assessed + answer breakdown */}
-      <div className="space-y-2 text-sm text-ink/65">
+      <motion.div
+        {...sectionMotion(0.05)}
+        className="space-y-2 text-sm text-ink/65"
+      >
         <p>
           Bewertete App: <strong className="text-teal-dark">{appName}</strong>
         </p>
-        <p>
-          Aus deinen Antworten: <strong className="text-teal-dark">{stats.flagged}</strong> Pattern beobachtet,{' '}
+        <p className="max-w-prose">
+          Aus deinen Antworten:{' '}
+          <strong className="text-teal-dark">{stats.flagged}</strong> Pattern
+          beobachtet,{' '}
           <strong className="text-teal-dark">{stats.cleared}</strong> verneint,{' '}
-          <strong className="text-teal-dark">{stats.unclear}</strong> offen gelassen.
+          <strong className="text-teal-dark">{stats.unclear}</strong> offen
+          gelassen.
         </p>
-      </div>
+      </motion.div>
 
       {sparseData && !tooSparseForBand && (
-        <div className="rounded-xl bg-cream/80 border border-teal/15 p-5 text-sm text-ink/75 leading-relaxed">
+        <motion.div
+          {...sectionMotion(0.1)}
+          className="rounded-xl bg-cream/80 border border-teal/15 p-5 text-sm text-ink/75 leading-relaxed max-w-prose"
+        >
           Du hast bei vielen Fragen "Weiß ich nicht" gewählt. Der Score zählt
           nur was du selbst beobachten konntest und ist deshalb im Zweifel
           niedriger als die App tatsächlich ist. Wenn du mehr Klarheit willst,
           schau ins App-Menü, in die Datenschutzerklärung der App, oder spiel
           mal eine Session zusammen mit deinem Kind.
-        </div>
+        </motion.div>
       )}
 
       {/* Explanations of flagged answers */}
       {flaggedQuestions.length > 0 && (
-        <div className="space-y-5">
+        <motion.div {...sectionMotion(0.1)} className="space-y-5">
           <h3 className="font-display font-bold text-xl text-teal-dark">
             Was deine Antworten zu den einzelnen Pattern bedeuten
           </h3>
@@ -137,33 +198,40 @@ export function ResultScore({ appName, answers, score }: Props) {
                 key={q.id}
                 className="rounded-xl bg-cream/70 border border-teal/10 p-5"
               >
-                <p className="font-display font-semibold text-teal-dark mb-2">
+                <p className="font-display font-semibold text-teal-dark mb-2 max-w-prose">
                   {q.prompt}
                 </p>
-                <p className="text-sm text-ink/75 leading-relaxed">
+                <p className="text-sm text-ink/75 leading-relaxed max-w-prose">
                   {q.explainer}
                 </p>
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
       )}
 
       {flaggedQuestions.length === 0 && stats.cleared > 0 && !tooSparseForBand && (
-        <div className="rounded-xl bg-sage/12 border border-sage/25 p-5 text-sm text-ink/75 leading-relaxed">
+        <motion.div
+          {...sectionMotion(0.1)}
+          className="rounded-xl bg-sage/12 border border-sage/25 p-5 text-sm text-ink/75 leading-relaxed max-w-prose"
+        >
           Aus deinen Antworten ergaben sich keine problematischen Pattern.
           Trotzdem gilt: schau die ersten Sessions zusammen mit deinem Kind,
           setz einen Zeitrahmen, und beobachte ob die App Stress oder Ruhe
           erzeugt.
-        </div>
+        </motion.div>
       )}
 
       {/* Band-specific actionable next steps */}
-      {!tooSparseForBand && <BandActions band={band} answers={answers} />}
+      {!tooSparseForBand && (
+        <motion.div {...sectionMotion(0.15)}>
+          <BandActions band={band} answers={answers} />
+        </motion.div>
+      )}
 
       {/* Surface unclear questions as a "things you could look into" list. */}
       {unclearQuestions.length > 0 && (
-        <div className="space-y-4">
+        <motion.div {...sectionMotion(0.2)} className="space-y-4">
           <h3 className="font-display font-bold text-lg text-teal-dark">
             Diese Fragen waren für dich unklar
           </h3>
@@ -173,14 +241,16 @@ export function ResultScore({ appName, answers, score }: Props) {
                 key={q.id}
                 className="rounded-xl bg-cream/50 border border-teal/10 p-4"
               >
-                <p className="text-sm text-teal-dark mb-1">{q.prompt}</p>
-                <p className="text-xs text-ink/60 leading-relaxed">
+                <p className="text-sm text-teal-dark mb-1 max-w-prose">
+                  {q.prompt}
+                </p>
+                <p className="text-xs text-ink/60 leading-relaxed max-w-prose">
                   {q.explainer}
                 </p>
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
       )}
     </div>
   );
