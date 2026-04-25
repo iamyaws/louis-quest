@@ -1,12 +1,12 @@
 // Ronki service worker.
 //
-// CACHE_NAME carries a build-time version token ("moex7ws8llpj8p") that the Vite
+// CACHE_NAME carries a build-time version token ("moexa9rn0878u2") that the Vite
 // build replaces with a content hash on every `vite build`. In dev, the literal
 // token is left in place — that's fine because we only register the SW in
 // production builds. Bumping the token happens automatically, so we no longer
 // need to manually edit a `ronki-vN` string to invalidate stale caches (that
 // manual step bit us twice this sprint with users stuck on old versions).
-const CACHE_NAME = "ronki-moex7ws8llpj8p";
+const CACHE_NAME = "ronki-moexa9rn0878u2";
 const PRECACHE_URLS = [
   "/",
   "/index.html",
