@@ -1062,7 +1062,7 @@ function DiaryModal({ memento, totalCollected, onClose }) {
             cursor: 'pointer',
           }}
         >
-          Ins Buch legen
+          Aufs Regal stellen
         </button>
       </div>
     </div>

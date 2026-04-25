@@ -371,21 +371,18 @@ export default function RoomHub({ onNavigate }) {
             )}
           </button>
 
-          {/* Stone shelf with a few collected curiosities — tiny
-              callout to the Naturtagebuch. Hand-placed left of the
-              window, on the back wall. */}
-          <div aria-hidden="true" style={{
-            position: 'absolute', top: '38%', left: '10%',
-            width: 64, height: 8,
-            background: 'linear-gradient(180deg, #92400e 0%, #5c2a08 100%)',
-            borderRadius: '3px 3px 6px 6px',
-            boxShadow: '0 3px 6px rgba(40,20,5,0.35), inset 0 1px 0 rgba(254,243,199,0.25)',
-            zIndex: 2,
-          }}>
-            <span style={{ position: 'absolute', left: 4, top: -16, fontSize: 14 }}>🍂</span>
-            <span style={{ position: 'absolute', left: 22, top: -14, fontSize: 12 }}>🪶</span>
-            <span style={{ position: 'absolute', left: 40, top: -12, fontSize: 10 }}>🪨</span>
-          </div>
+          {/* Stone shelf — the Laden-into-Drachennest merge v1.
+              Marc 25 Apr 2026: chosen path is "mementos auto-place"
+              (option 3.B of the planning questions). The three shelf
+              spots now read from state.expeditionLog so each return
+              from the Reise drops a memento onto the back wall —
+              Naturtagebuch and the cave are the same surface from the
+              kid's POV. When the log is empty we still show the
+              starter trio (🍂🪶🪨, dimmed) so the shelf doesn't read
+              as broken on day one. As new mementos roll in, the most
+              recent three rotate to the front; older entries stay in
+              the Naturtagebuch list inside the Reise surface. */}
+          <ShelfDecor expeditionLog={state?.expeditionLog || []} />
 
           {/* Floor mat / nest bedding — Marc 25 Apr flagged the previous
               "puffy cushion" version was too tall and ate into Ronki +
@@ -905,6 +902,57 @@ function RonkiMoodPrompt({ heroName, variant, stageIdx, onPick }) {
         }
       `}</style>
     </section>
+  );
+}
+
+// Cave back-wall shelf decor — three slots reading from
+// state.expeditionLog. New mementos rotate to the front (most-recent
+// = leftmost on the shelf). Empty log falls back to the muted starter
+// trio so the shelf never looks broken on day one. The slot pixel
+// positions match the painted shelf board's geometry (left:10%,
+// width:64px, top:38%) — touching the visual frame from the room.
+function ShelfDecor({ expeditionLog }) {
+  const recent = (expeditionLog || []).slice(-3).reverse();
+  const STARTER = [
+    { emoji: '🍂', size: 14, top: -16 },
+    { emoji: '🪶', size: 12, top: -14 },
+    { emoji: '🪨', size: 10, top: -12 },
+  ];
+  // Slot positions on the shelf — left edge of each slot, in px from
+  // the shelf's left.
+  const SLOT_LEFTS = [4, 22, 40];
+
+  return (
+    <div aria-hidden="true" style={{
+      position: 'absolute', top: '38%', left: '10%',
+      width: 64, height: 8,
+      background: 'linear-gradient(180deg, #92400e 0%, #5c2a08 100%)',
+      borderRadius: '3px 3px 6px 6px',
+      boxShadow: '0 3px 6px rgba(40,20,5,0.35), inset 0 1px 0 rgba(254,243,199,0.25)',
+      zIndex: 2,
+    }}>
+      {SLOT_LEFTS.map((slotLeft, i) => {
+        const real = recent[i];
+        const fallback = STARTER[i];
+        const item = real ? { emoji: real.emoji, size: 14, top: -16 } : fallback;
+        return (
+          <span
+            key={i}
+            style={{
+              position: 'absolute',
+              left: slotLeft,
+              top: item.top,
+              fontSize: item.size,
+              opacity: real ? 1 : 0.55,
+              filter: real ? 'none' : 'saturate(0.6)',
+              transition: 'opacity 0.6s ease, filter 0.6s ease',
+            }}
+          >
+            {item.emoji}
+          </span>
+        );
+      })}
+    </div>
   );
 }
 
