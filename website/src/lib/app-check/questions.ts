@@ -22,6 +22,13 @@ export interface QuestionDef {
   options: { value: string; label: string }[];
   /** Two-sentence "why this matters" explainer, shown on toggle. */
   explainer: string;
+  /**
+   * One-line "what this app is teaching your child" framing, shown
+   * alongside the explainer on the result page when the question is
+   * flagged. Talks about the pattern's pedagogical effect, not about
+   * any specific app's intent.
+   */
+  teaches: string;
   /** How this question contributes to the score given the chosen value. */
   scoreContribution: (value: string) => 0 | 1;
 }
@@ -37,6 +44,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Streaks sind Zähler die fallen wenn dein Kind einen Tag aussetzt. Bei Erwachsenen ist das eine Motivationshilfe. Bei Kindern unter neun, die einen drohenden Verlust noch schwer einordnen können, fühlt sich der Streak-Druck schnell an wie Bestrafung. Die App wird zur Instanz, die täglich Forderungen stellt.',
+    teaches:
+      'Lehrt dein Kind: Ein verpasster Tag ist Strafe. Üben ist Pflicht, nicht Wahl.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -49,6 +58,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Push-Benachrichtigungen für Kinder wirken oft nicht wie eine neutrale Erinnerung, sondern wie ein sozialer Anruf, vor allem wenn sie eine Maskottchen-Figur zitieren. Das Kind fühlt sich aufgefordert zurückzukommen.',
+    teaches:
+      'Lehrt dein Kind: Eine Figur in einer App kann von dir verlangen, zurückzukommen.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -62,6 +73,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Belohnungen für etwas, das ein Kind aus Eigenmotivation getan hätte, senken die Eigenmotivation. Verhaltensforschung beschreibt das seit den 1970ern. Auf Dauer lernt dein Kind, dass es Punkte braucht um etwas tun zu wollen.',
+    teaches:
+      'Lehrt dein Kind: Ohne Punkte ist Lernen kein Lernen, ohne Belohnung kein Wert.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -74,6 +87,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Sichtbare kostenpflichtige Cosmetics in Kinder-Apps erzeugen für viele Kinder Frust. Wer mit diesem Frust umgeht, der Anbieter durch ein Kaufangebot oder die Eltern durch eine klare Hausregel, entscheidet sich oft am Punkt-of-Sale.',
+    teaches:
+      'Lehrt dein Kind: Coole Sachen kommen mit Geld. Wer nicht zahlt, ist sichtbar nicht-cool.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -86,6 +101,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Werbung in Kinder-Apps ist oft nicht als solche erkennbar für ein Kind. Selbst klassische Video-Werbung lenkt Aufmerksamkeit aus dem eigentlichen Inhalt heraus.',
+    teaches:
+      'Lehrt dein Kind: Werbung ist Teil der Erfahrung, nicht ein Bruch in ihr.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -98,6 +115,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Spielbare Werbung ist besonders schwer zu durchschauen: das Kind spielt eine bis zwei Minuten ein anderes Spiel als Anzeige, mit kleinen Schließen-Buttons und einem Countdown. Die Wirkung ist, dass Aufmerksamkeit von einer App zur nächsten weiterläuft, oft ohne dass das Kind bewusst entscheidet.',
+    teaches:
+      'Lehrt dein Kind: Werbung sieht aus wie Spiel. Wo das eine aufhört und das andere anfängt, ist nicht meine Aufgabe zu unterscheiden.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -110,6 +129,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Soziale Druckmechaniken wie Ranglisten oder "Ligen" erzeugen FOMO und Wettbewerbsdruck bei Kindern die das kognitiv noch nicht einordnen können. Diese Ranglisten existieren nur in der App.',
+    teaches:
+      'Lehrt dein Kind: Mein Wert misst sich am Vergleich mit anderen. Auch in einer App.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -122,6 +143,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Wenn dein Kind die Mechanik vermisst (Streaks halten, Punkte sammeln) und nicht den eigentlichen Inhalt, ist die Bindung an die App künstlich erzeugt. Inhalt vermissen ist normal. Mechanik vermissen ist ein Hinweis dass du genauer hinschauen solltest.',
+    teaches:
+      'Lehrt dein Kind: Die Mechanik ist wichtiger als der Inhalt. Was zählt ist, dass ich dabei bin.',
     scoreContribution: (v) => (v === 'mechanik' ? 1 : 0),
   },
   {
@@ -135,6 +158,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Übermäßige Datensammlung füttert Werbe-Profile oder ML-Modelle, oft ohne klaren Mehrwert für dein Kind. Lies die Datenschutzerklärung oder beobachte ob die App nach Standort, Kontakten oder anderen unnötigen Berechtigungen fragt.',
+    teaches:
+      'Lehrt dein Kind: Meine Aufmerksamkeit hat einen Preis, den jemand anders bezahlt bekommt.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -147,6 +172,8 @@ export const QUESTIONS: QuestionDef[] = [
     ],
     explainer:
       'Eine App die nie ein Ende-Signal gibt, optimiert auf Dauer-Engagement statt auf Lernen oder Spielen mit Abschluss. Das natürliche Stop-Signal muss dann das Kind selber setzen, was bei Sechs- bis Neunjährigen schwer ist.',
+    teaches:
+      'Lehrt dein Kind: Aufhören muss ich selbst entscheiden, wenn niemand mir sagt wann fertig ist. Bei sechs Jahren ist das eine große Aufgabe.',
     scoreContribution: (v) => (v === 'nein' ? 1 : 0),
   },
 ];

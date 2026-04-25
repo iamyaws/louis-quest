@@ -62,6 +62,29 @@ export function bandForScore(score: number): ScoreBandDef {
 }
 
 /**
+ * Personal vignettes from Marc's manifesto, one per band, shown at the
+ * top of the result so the abstract score lands in a real moment.
+ * These are Marc-as-parent narratives, not Ronki-as-platform claims.
+ */
+export const BAND_VIGNETTES: Record<ScoreBand, { quote: string; attribution: string }> = {
+  ruhig: {
+    quote:
+      'Bei uns ist die Anton-App so eine Insel. Louis macht zehn Minuten Mathe, klappt das Tablet zu, geht raus. Das funktioniert.',
+    attribution: 'Marc, Vater eines Erstklässlers',
+  },
+  hingucken: {
+    quote:
+      'Bei uns hat Louis irgendwann gefragt: "Wann ist das eigentlich fertig?". Das war der Moment wo wir gemerkt haben: er konnte selbst nicht mehr aufhören.',
+    attribution: 'Marc, Vater eines Erstklässlers',
+  },
+  'viel-los': {
+    quote:
+      'Mein Sohn war sechs als wir Pokémon Go angefangen haben. Zwei Wochen später stand er im Wald und starrte aufs Handy. Er war draußen, aber nicht draußen.',
+    attribution: 'Marc, Vater eines Erstklässlers',
+  },
+};
+
+/**
  * Action lists per band. Each entry is a concrete thing a parent can do
  * tonight. Voice is parent-empowering, not app-condemning. Severity is
  * encoded in the list's length and specificity, not in alarm copy.

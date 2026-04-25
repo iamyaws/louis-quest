@@ -25,8 +25,14 @@ import {
   summariseAnswers,
   type AnswersMap,
 } from '../../lib/app-check/questions';
-import { bandForScore, type ScoreBandDef } from '../../lib/app-check/score';
+import {
+  BAND_VIGNETTES,
+  bandForScore,
+  type ScoreBandDef,
+} from '../../lib/app-check/score';
 import { BandActions } from './BandActions';
+import { TimeCostProjection } from './TimeCostProjection';
+import { ShareCard } from './ShareCard';
 import { EASE_OUT } from '../../lib/motion';
 
 interface Props {
@@ -113,6 +119,8 @@ export function ResultScore({ appName, answers, score }: Props) {
           transition: { duration: 0.5, delay, ease: EASE_OUT },
         } as const);
 
+  const vignette = !tooSparseForBand ? BAND_VIGNETTES[band.key] : null;
+
   return (
     <div className="space-y-10 max-w-3xl">
       {/* Band card — hidden if data too sparse to be meaningful */}
@@ -136,6 +144,22 @@ export function ResultScore({ appName, answers, score }: Props) {
             {band.summary}
           </p>
         </motion.div>
+      )}
+
+      {/* Personal vignette — Marc's lived moment matched to the band so
+          the score lands in a real story instead of just a number. */}
+      {vignette && (
+        <motion.figure
+          {...sectionMotion(0.05)}
+          className="border-l-4 border-mustard pl-6 py-2 italic"
+        >
+          <blockquote className="text-lg sm:text-xl text-teal-dark leading-snug max-w-prose">
+            „{vignette.quote}"
+          </blockquote>
+          <figcaption className="mt-3 text-sm text-ink/60 not-italic">
+            — {vignette.attribution}
+          </figcaption>
+        </motion.figure>
       )}
 
       {tooSparseForBand && (
@@ -186,7 +210,8 @@ export function ResultScore({ appName, answers, score }: Props) {
         </motion.div>
       )}
 
-      {/* Explanations of flagged answers */}
+      {/* Explanations of flagged answers, plus a "what this teaches your
+          child" framing that puts the pattern in pedagogical terms. */}
       {flaggedQuestions.length > 0 && (
         <motion.div {...sectionMotion(0.1)} className="space-y-5">
           <h3 className="font-display font-bold text-xl text-teal-dark">
@@ -196,10 +221,13 @@ export function ResultScore({ appName, answers, score }: Props) {
             {flaggedQuestions.map((q) => (
               <li
                 key={q.id}
-                className="rounded-xl bg-cream/70 border border-teal/10 p-5"
+                className="rounded-xl bg-cream/70 border border-teal/10 p-5 space-y-3"
               >
-                <p className="font-display font-semibold text-teal-dark mb-2 max-w-prose">
+                <p className="font-display font-semibold text-teal-dark max-w-prose">
                   {q.prompt}
+                </p>
+                <p className="text-sm font-display font-semibold italic text-teal max-w-prose">
+                  {q.teaches}
                 </p>
                 <p className="text-sm text-ink/75 leading-relaxed max-w-prose">
                   {q.explainer}
@@ -250,6 +278,43 @@ export function ResultScore({ appName, answers, score }: Props) {
               </li>
             ))}
           </ul>
+        </motion.div>
+      )}
+
+      {/* Optional time-cost projection — parent enters daily usage, we
+          do the math. Brand-safe because every number is from their
+          input, not a Ronki claim. */}
+      {!tooSparseForBand && (
+        <motion.div {...sectionMotion(0.25)}>
+          <TimeCostProjection />
+        </motion.div>
+      )}
+
+      {/* Closing reframe — the gut-line that makes the score feel less
+          like an isolated finding and more like one parent noticing a
+          standard industry pattern. */}
+      {!tooSparseForBand && (
+        <motion.div
+          {...sectionMotion(0.3)}
+          className="rounded-2xl bg-teal-dark/8 border border-teal-dark/15 px-7 py-7 sm:px-10 sm:py-9"
+        >
+          <p className="font-display font-semibold text-lg text-teal-dark leading-relaxed max-w-prose">
+            Was du gerade beobachtet hast, ist nicht die Ausnahme. Es ist
+            Standard-Praxis in der Branche, weil diese Pattern messbar
+            Sessions verlängern. Du bist nicht paranoid wenn dir das
+            auffällt. Du hast jetzt eine Sprache dafür.
+          </p>
+        </motion.div>
+      )}
+
+      {/* Shareable PNG card — auto-generates a 1200x675 quote card with
+          score + band + key learning. Parent downloads, posts wherever. */}
+      {!tooSparseForBand && (
+        <motion.div {...sectionMotion(0.35)} className="space-y-3">
+          <h3 className="font-display font-bold text-lg text-teal-dark">
+            Karte für andere Eltern
+          </h3>
+          <ShareCard appName={appName} answers={answers} score={score} />
         </motion.div>
       )}
     </div>
