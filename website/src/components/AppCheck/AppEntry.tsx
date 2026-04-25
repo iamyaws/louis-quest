@@ -111,7 +111,7 @@ export function AppEntry({ onContinue }: Props) {
             type="text"
             value={freeText}
             onChange={(e) => setFreeText(e.target.value)}
-            placeholder="z.B. Roblox, TikTok, Anton"
+            placeholder="z.B. Anton, Duolingo ABC, Pokémon Go"
             maxLength={80}
             className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus:ring-2 focus:ring-sage focus:border-transparent"
           />
@@ -121,10 +121,10 @@ export function AppEntry({ onContinue }: Props) {
       {/* Counter */}
       {effectiveName && (
         <div className="text-sm text-ink/65 min-h-[1.25rem]">
-          {count === null && <span>Schaue nach…</span>}
+          {count === null && <span>Schau nach…</span>}
           {count === 0 && (
             <span>
-              Sei die erste Person, die <strong>{effectiveName}</strong> hier prüft.
+              <strong>{effectiveName}</strong> wurde hier noch nicht bewertet.
             </span>
           )}
           {count !== null && count > 0 && (

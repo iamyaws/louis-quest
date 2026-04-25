@@ -173,7 +173,7 @@ export default function AppCheck() {
                   Schritt 3 von 3 · Ergebnis
                 </p>
                 <h1 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
-                  Aus deiner Sicht.
+                  Deine <em className="italic text-sage">Bewertung</em>.
                 </h1>
               </header>
 
@@ -227,7 +227,7 @@ function Landing({ onStart }: { onStart: () => void }) {
           Werkzeug für Eltern
         </p>
         <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-6xl leading-[1.04] tracking-tight text-teal-dark">
-          Welche App will dein Kind?
+          Welche App will <em className="italic text-sage">dein Kind</em>?
         </h1>
         <p className="text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
           Beantworte zehn Fragen aus deiner eigenen Beobachtung. Du bekommst eine
@@ -238,18 +238,35 @@ function Landing({ onStart }: { onStart: () => void }) {
 
       <ul className="space-y-3 text-sm text-ink/70">
         <li className="flex gap-3">
-          <span className="text-sage mt-0.5">●</span>
+          <span aria-hidden className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-sage shrink-0" />
           <span>Etwa drei Minuten, zehn Yes/No-Fragen.</span>
         </li>
         <li className="flex gap-3">
-          <span className="text-sage mt-0.5">●</span>
-          <span>Kein Account, keine Anmeldung, kein Tracking.</span>
+          <span aria-hidden className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-sage shrink-0" />
+          <span>
+            Ohne Anmeldung und ohne Tracking. Du bleibst anonym, auch wenn du
+            speicherst.
+          </span>
         </li>
         <li className="flex gap-3">
-          <span className="text-sage mt-0.5">●</span>
+          <span aria-hidden className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-sage shrink-0" />
           <span>
             Du bewertest, wir geben dir den Rahmen. Wir machen keine Aussagen
             über einzelne Apps.
+          </span>
+        </li>
+        <li className="flex gap-3">
+          <span aria-hidden className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-sage shrink-0" />
+          <span>
+            Wenn du speicherst, landet die Bewertung anonym in unserer
+            Datenbank.{' '}
+            <a
+              href="/datenschutz"
+              className="text-teal underline underline-offset-2 hover:text-teal-dark"
+            >
+              Was wir genau speichern
+            </a>
+            .
           </span>
         </li>
       </ul>

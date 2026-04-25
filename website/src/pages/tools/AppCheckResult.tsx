@@ -99,7 +99,7 @@ export default function AppCheckResult() {
                   Gespeicherte Bewertung
                 </p>
                 <h1 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
-                  Aus Sicht eines Elternteils.
+                  Eine <em className="italic text-sage">Eltern-Bewertung</em>.
                 </h1>
               </header>
 

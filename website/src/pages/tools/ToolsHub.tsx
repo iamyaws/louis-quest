@@ -38,12 +38,12 @@ export default function ToolsHub() {
               Werkzeuge
             </p>
             <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-6xl leading-[1.04] tracking-tight text-teal-dark">
-              Werkzeuge für Eltern.
+              Werkzeuge für <em className="italic text-sage">Eltern</em>.
             </h1>
             <p className="mt-6 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
               Kleine Tools die dir helfen, digitale Entscheidungen für dein
               Kind selbst zu treffen. Du bewertest, wir geben dir den Rahmen.
-              Kostenlos, kein Account, keine Cookies.
+              Kostenlos und ohne Anmeldung, wir setzen auch keine Cookies.
             </p>
           </motion.div>
         </div>
@@ -78,7 +78,7 @@ export default function ToolsHub() {
                 Bald
               </p>
               <p className="text-sm text-ink/55 leading-relaxed">
-                Weitere Werkzeuge folgen. Sag uns gerne, was bei euch hängt:{' '}
+                Weitere Werkzeuge folgen. Schreib uns woran ihr hängt:{' '}
                 <a
                   href="mailto:hallo@ronki.de"
                   className="text-teal underline underline-offset-2"

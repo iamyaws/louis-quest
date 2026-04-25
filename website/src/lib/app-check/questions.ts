@@ -61,7 +61,7 @@ export const QUESTIONS: QuestionDef[] = [
       { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
-      'Belohnungen für Aktivitäten die ein Kind aus Eigenmotivation getan hätte senken die Eigenmotivation. Deci und Ryan beschreiben das seit den 1970ern. Wir erziehen Kinder zu Konsumenten von Belohnungen.',
+      'Belohnungen für etwas, das ein Kind aus Eigenmotivation getan hätte, senken die Eigenmotivation. Verhaltensforschung beschreibt das seit den 1970ern. Auf Dauer lernt dein Kind, dass es Punkte braucht um etwas tun zu wollen.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -97,7 +97,7 @@ export const QUESTIONS: QuestionDef[] = [
       { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
-      'Spielbare Werbung ist die heimtückischste Form: das Kind spielt 1-2 Minuten ein anderes Spiel als Anzeige, mit hidden Close-Buttons und Timer. Funnel-Design um Kinder von App zu App zu schicken.',
+      'Spielbare Werbung ist die heimtückischste Form: das Kind spielt eine bis zwei Minuten ein anderes Spiel als Anzeige, mit kaum sichtbaren Schließen-Buttons und einem Countdown. Konstruiert, um Kinder von App zu App zu schicken bevor das Interesse weg ist.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -121,7 +121,7 @@ export const QUESTIONS: QuestionDef[] = [
       { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
-      'Wenn dein Kind die Mechanik vermisst (Streaks halten, Punkte sammeln) und nicht den eigentlichen Inhalt, ist die App-Bindung künstlich erzeugt. Inhalt-Vermissen ist normal, Mechanik-Vermissen ist Sucht.',
+      'Wenn dein Kind die Mechanik vermisst (Streaks halten, Punkte sammeln) und nicht den eigentlichen Inhalt, ist die Bindung an die App künstlich erzeugt. Inhalt vermissen ist normal. Mechanik vermissen ist ein Hinweis dass du genauer hinschauen solltest.',
     scoreContribution: (v) => (v === 'mechanik' ? 1 : 0),
   },
   {

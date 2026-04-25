@@ -11,6 +11,7 @@ import {
   type AnswersMap,
 } from '../../lib/app-check/questions';
 import { bandForScore, type ScoreBandDef } from '../../lib/app-check/score';
+import { BandActions } from './BandActions';
 
 interface Props {
   appName: string;
@@ -18,30 +19,30 @@ interface Props {
   score: number;
 }
 
-const COLOR_CLASSES: Record<ScoreBandDef['colorToken'], { bg: string; ring: string; text: string; pill: string }> = {
+// Band tones use only defined Tailwind tokens (cream, teal, sage,
+// mustard family). No "danger" colors — the tool is not a verdict.
+// Severity is communicated via the actions list density, not via alarm.
+const TONE_CLASSES: Record<ScoreBandDef['tone'], { bg: string; ring: string; accent: string }> = {
   sage: {
-    bg: 'bg-sage/15',
-    ring: 'ring-sage/30',
-    text: 'text-sage-dark',
-    pill: 'bg-sage text-cream',
+    bg: 'bg-sage/12',
+    ring: 'ring-sage/25',
+    accent: 'text-teal-dark',
   },
   mustard: {
-    bg: 'bg-mustard/20',
-    ring: 'ring-mustard/40',
-    text: 'text-teal-dark',
-    pill: 'bg-mustard text-teal-dark',
+    bg: 'bg-mustard-soft/40',
+    ring: 'ring-mustard/30',
+    accent: 'text-teal-dark',
   },
-  clay: {
-    bg: 'bg-clay/15',
-    ring: 'ring-clay/30',
-    text: 'text-clay',
-    pill: 'bg-clay text-cream',
+  serious: {
+    bg: 'bg-teal-dark/8',
+    ring: 'ring-teal-dark/25',
+    accent: 'text-teal-dark',
   },
 };
 
 export function ResultScore({ appName, answers, score }: Props) {
   const band = bandForScore(score);
-  const colors = COLOR_CLASSES[band.colorToken];
+  const tone = TONE_CLASSES[band.tone];
   const stats = summariseAnswers(answers);
 
   // Identify which questions contributed problematic answers, for the
@@ -60,28 +61,47 @@ export function ResultScore({ appName, answers, score }: Props) {
 
   // If too much was unclear, the score itself is conservative — show a
   // soft warning so parents understand "low score with many unknowns"
-  // is not the same as "low score with mostly Nein".
+  // is not the same as "low score with mostly Nein". When most answers
+  // are unclear we hide the band card entirely because it would be
+  // misleading; we just show the warning + a nudge to gather more.
   const sparseData = stats.unclear >= 5;
+  const tooSparseForBand = stats.unclear >= 7;
 
   return (
     <div className="space-y-10 max-w-3xl">
-      {/* Band card */}
-      <div
-        className={`rounded-2xl ${colors.bg} ring-1 ring-inset ${colors.ring} px-7 py-8 sm:px-10 sm:py-10`}
-      >
-        <div className="flex items-baseline gap-4 mb-4">
-          <span className="text-6xl font-display font-bold tabular-nums text-teal-dark">
-            {score}
-          </span>
-          <span className="text-lg text-ink/55">/ 10 Pattern beobachtet</span>
-        </div>
-        <h2
-          className={`font-display font-bold text-2xl sm:text-3xl leading-tight ${colors.text} mb-3`}
+      {/* Band card — hidden if data too sparse to be meaningful */}
+      {!tooSparseForBand && (
+        <div
+          className={`rounded-2xl ${tone.bg} ring-1 ring-inset ${tone.ring} px-7 py-8 sm:px-10 sm:py-10`}
         >
-          {band.label}
-        </h2>
-        <p className="text-ink/75 leading-relaxed">{band.summary}</p>
-      </div>
+          <div className="flex items-baseline gap-4 mb-4">
+            <span className="text-6xl font-display font-bold tabular-nums text-teal-dark">
+              {score}
+            </span>
+            <span className="text-lg text-ink/55">/ 10 Pattern beobachtet</span>
+          </div>
+          <h2
+            className={`font-display font-bold text-2xl sm:text-3xl leading-tight ${tone.accent} mb-3`}
+          >
+            {band.label}
+          </h2>
+          <p className="text-ink/75 leading-relaxed">{band.summary}</p>
+        </div>
+      )}
+
+      {tooSparseForBand && (
+        <div className="rounded-2xl bg-cream/80 ring-1 ring-inset ring-teal/15 px-7 py-8 sm:px-10 sm:py-10 space-y-3">
+          <h2 className="font-display font-bold text-2xl text-teal-dark">
+            Noch zu wenig zum Einordnen
+          </h2>
+          <p className="text-ink/75 leading-relaxed">
+            Du hast bei den meisten Fragen "Weiß ich nicht" gewählt. Das ist
+            ehrlich, aber wir können daraus noch nichts ableiten. Schau die App
+            einmal kurz mit deinem Kind an, achte auf Push, Werbung und
+            Cosmetics, und komm dann zurück.
+          </p>
+        </div>
+      )}
 
       {/* App being assessed + answer breakdown */}
       <div className="space-y-2 text-sm text-ink/65">
@@ -95,13 +115,13 @@ export function ResultScore({ appName, answers, score }: Props) {
         </p>
       </div>
 
-      {sparseData && (
-        <div className="rounded-xl bg-mustard/10 border border-mustard/30 p-5 text-sm text-ink/75 leading-relaxed">
-          Du hast bei vielen Fragen "Weiß ich nicht" gewählt. Der Score ist
-          deshalb konservativ: er zählt nur, was du selbst beobachten konntest.
-          Wenn du mehr Klarheit willst, schau ins App-Menü, in die
-          Datenschutzerklärung der App, oder spiel mal eine Session zusammen
-          mit deinem Kind.
+      {sparseData && !tooSparseForBand && (
+        <div className="rounded-xl bg-cream/80 border border-teal/15 p-5 text-sm text-ink/75 leading-relaxed">
+          Du hast bei vielen Fragen "Weiß ich nicht" gewählt. Der Score zählt
+          nur was du selbst beobachten konntest und ist deshalb im Zweifel
+          niedriger als die App tatsächlich ist. Wenn du mehr Klarheit willst,
+          schau ins App-Menü, in die Datenschutzerklärung der App, oder spiel
+          mal eine Session zusammen mit deinem Kind.
         </div>
       )}
 
@@ -129,14 +149,17 @@ export function ResultScore({ appName, answers, score }: Props) {
         </div>
       )}
 
-      {flaggedQuestions.length === 0 && stats.cleared > 0 && (
-        <div className="rounded-xl bg-sage/10 border border-sage/20 p-5 text-sm text-ink/75 leading-relaxed">
+      {flaggedQuestions.length === 0 && stats.cleared > 0 && !tooSparseForBand && (
+        <div className="rounded-xl bg-sage/12 border border-sage/25 p-5 text-sm text-ink/75 leading-relaxed">
           Aus deinen Antworten ergaben sich keine problematischen Pattern.
           Trotzdem gilt: schau die ersten Sessions zusammen mit deinem Kind,
-          setze einen Zeitrahmen, und beobachte ob die App Stress oder Ruhe
+          setz einen Zeitrahmen, und beobachte ob die App Stress oder Ruhe
           erzeugt.
         </div>
       )}
+
+      {/* Band-specific actionable next steps */}
+      {!tooSparseForBand && <BandActions band={band} answers={answers} />}
 
       {/* Surface unclear questions as a "things you could look into" list. */}
       {unclearQuestions.length > 0 && (
