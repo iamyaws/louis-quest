@@ -99,7 +99,7 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     traits: {
       hornAccent: { id: 'gold-tip',  label: { de: 'Gold-Spitze',     en: 'Gold tip'      }, emoji: '✨' },
       cheekMark:  { id: 'sun-freckle', label: { de: 'Sonnen-Sommersprosse', en: 'Sun freckle' }, emoji: '☀️' },
-      tailTuft:   { id: 'ember-puff', label: { de: 'Glut-Quaste',    en: 'Ember tuft'    }, emoji: '🔥' },
+      tailTuft:   { id: 'ember-puff', label: { de: 'Glut-Schweif',   en: 'Ember tail'    }, emoji: '🔥' },
     },
   },
   {
@@ -143,7 +143,7 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     traits: {
       hornAccent: { id: 'heart-pair', label: { de: 'Herz-Paar',     en: 'Heart pair' }, emoji: '💕' },
       cheekMark:  { id: 'blush',      label: { de: 'Erröten',       en: 'Blush'      }, emoji: '🌸' },
-      tailTuft:   { id: 'petal',      label: { de: 'Blüten-Quaste', en: 'Petal tuft' }, emoji: '🌷' },
+      tailTuft:   { id: 'petal',      label: { de: 'Blüten-Schweif', en: 'Petal tail' }, emoji: '🌷' },
     },
   },
   {
@@ -187,7 +187,7 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     traits: {
       hornAccent: { id: 'leaf-tip',   label: { de: 'Blatt-Spitze',   en: 'Leaf tip'  }, emoji: '🌿' },
       cheekMark:  { id: 'moss-mark',  label: { de: 'Moos-Punkt',     en: 'Moss dot'  }, emoji: '🍃' },
-      tailTuft:   { id: 'fern-tuft',  label: { de: 'Farn-Quaste',    en: 'Fern tuft' }, emoji: '🌱' },
+      tailTuft:   { id: 'fern-tuft',  label: { de: 'Farn-Schweif',   en: 'Fern tail' }, emoji: '🌱' },
     },
   },
   {
@@ -209,7 +209,7 @@ export const COMPANION_VARIANTS: CompanionVariant[] = [
     traits: {
       hornAccent: { id: 'flame-tip',  label: { de: 'Flammen-Spitze', en: 'Flame tip'   }, emoji: '🔥' },
       cheekMark:  { id: 'sunset',     label: { de: 'Abendrot-Streif', en: 'Sunset stripe' }, emoji: '🌅' },
-      tailTuft:   { id: 'spark',      label: { de: 'Funken-Quaste',   en: 'Spark tuft' }, emoji: '✨' },
+      tailTuft:   { id: 'spark',      label: { de: 'Funken-Schweif',  en: 'Spark tail' }, emoji: '✨' },
     },
   },
 ];
