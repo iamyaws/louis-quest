@@ -98,6 +98,22 @@ export interface QuestLineDay {
   isMilestone?: boolean;
 }
 
+// ── Expedition memento (Drachennest reframe, 25 Apr 2026) ──
+// One per return trip. Renders both as a shelf tile in the
+// Naturtagebuch and as the hero artifact inside the diary modal that
+// pops on Ronki's return. Quote is the kid-facing line; location
+// names a sub-area inside the biome to make each find feel like a
+// real little place rather than "from the woods, again."
+export interface ExpeditionMemento {
+  id: string;            // unique-per-collection (timestamp + emoji)
+  emoji: string;         // 🍁 / 🪶 / 🪨 / 🍂 / 🌰 / 🍄 / 🐌 / 🌿
+  name: string;          // "Ahornblatt"
+  biome: 'morgenwald';
+  location: string;      // "Ein kleiner Pfad hinter den Birken"
+  quote: string;         // "Im Morgenwald hat es nach nassem Moos gerochen…"
+  ts: string;            // ISO collected-at
+}
+
 // ── Minimal state shape for the task list ──
 export interface TaskState {
   quests: Quest[];
@@ -126,6 +142,24 @@ export interface TaskState {
    *  never decays to "starving"; the floor is whatever happens not to
    *  push it lower. The vitals are HIS signal; stars stay the kid's. */
   ronkiVitals?: { hunger: number; liebe: number; energie: number };
+  /** Drachennest expedition state (25 Apr 2026): Ronki goes on a trip
+   *  when the morning ritual hits 100%, returns hours later with a
+   *  memento for the Naturtagebuch. v1 = one biome (Morgenwald), one
+   *  memento per return. State machine: home → leaving → away →
+   *  waiting → home (waiting transitions back when the kid taps the
+   *  diary). The departedAt + returnAt timestamps drive the transition
+   *  from away → waiting via a polling effect at the surface. */
+  expedition?: {
+    state: 'home' | 'leaving' | 'away' | 'waiting' | 'night-away';
+    biome: 'morgenwald';
+    departedAt?: string;
+    returnAt?: string;
+    pendingMemento?: ExpeditionMemento;
+  };
+  /** Past expedition mementos. Renders as the Naturtagebuch shelf
+   *  inside the expedition surface. Capped at 24 to keep storage
+   *  bounded (one daily memento → roughly a month of trips). */
+  expeditionLog?: ExpeditionMemento[];
   loginBonusClaimed: boolean;
   onboardingDone: boolean;
   /** Kid saw the Phase-1 forest intro ("Hallo! Bevor wir uns kennenlernen …")
@@ -428,6 +462,29 @@ interface TaskActions {
    *  meters when the kid taps Füttern / Streicheln / Spielen. Caps at
    *  100 per vital. The amounts mirror the Begleiter Polish design. */
   careForRonki: (kind: 'hunger' | 'liebe' | 'energie') => void;
+  /** Drachennest expedition: explicit state setter so the prototype's
+   *  dev URL params (?expedition=away|waiting|home) and the Reise
+   *  surface's polling effect can drive transitions without each
+   *  caller having to reason about the rest of the state shape. */
+  setExpedition: (next: NonNullable<TaskState['expedition']>) => void;
+  /** Move expedition.state to 'leaving' if it's currently 'home'. The
+   *  walk-out animation runs ~2.5s in the surface, then the surface
+   *  flips state to 'away' with departedAt + returnAt set. Reducer
+   *  guards against double-departures so a flurry of morning quest
+   *  completions doesn't restart the trip mid-flight. */
+  startExpedition: () => void;
+  /** Move expedition.state to 'away' with departedAt = now and
+   *  returnAt = now + 4h (capped to 14:00 same day, matching the spec's
+   *  "Zurück gegen 14:00" copy). Generates the pendingMemento now so
+   *  the kid never sees an empty diary slot during the wait. */
+  rangerDeparted: () => void;
+  /** Move expedition.state to 'waiting'. Fires when the polling effect
+   *  detects now > returnAt; pendingMemento is already set from
+   *  rangerDeparted. */
+  rangerArrived: () => void;
+  /** Pop the pendingMemento into expeditionLog and reset state to
+   *  'home'. Called when the kid closes the diary modal. */
+  receiveMemento: () => void;
   saveJournal: (data: { memory: string, gratitude: string[], dayEmoji: number | null, achievements: string[] }) => void;
   redeemReward: (currency: 'hp' | 'eggs', cost: number) => void;
   dismissCelebration: () => void;
@@ -556,6 +613,36 @@ function pickBadRonkiMood(): 'sad' | 'tired' {
   return Math.random() < 0.5 ? 'sad' : 'tired';
 }
 
+// ── Morgenwald memento pool (Drachennest expedition v1) ──
+// Eight finds Ronki can bring back. We try not to repeat the most
+// recent two so the kid sees variety even on a short test session.
+// Quotes follow Marc's voice rules: longer slightly-stumbly lines, no
+// em-dashes, no tidy three-beat fragments. Each entry pairs an emoji
+// with a short location and a quote that reads like a child's
+// observation rather than copy-deck description.
+const MORGENWALD_MEMENTOS: Array<Omit<ExpeditionMemento, 'id' | 'ts'>> = [
+  { emoji: '🍁', name: 'Ahornblatt',     biome: 'morgenwald', location: 'Ein kleiner Pfad hinter den Birken', quote: 'Im Morgenwald hat es nach nassem Moos gerochen, und ich habe ein rotes Blatt mitgebracht weil es leuchtet wenn die Sonne drauf scheint.' },
+  { emoji: '🪶', name: 'Feder',          biome: 'morgenwald', location: 'Stille Lichtung am Baumwipfel',     quote: 'Auf der Lichtung ist eine Feder runtergesegelt während ich gewartet habe, ich glaube ein Vogel hat sie nicht mehr gebraucht.' },
+  { emoji: '🪨', name: 'Bachstein',       biome: 'morgenwald', location: 'Am kleinen Bach',                    quote: 'Der Stein war ganz glatt vom Wasser und kühl in der Hand, ein bisschen wie ein kleines Geheimnis vom Bach.' },
+  { emoji: '🍂', name: 'Eichenblatt',     biome: 'morgenwald', location: 'Am Wegesrand vor der Eiche',         quote: 'Es hat geknistert als ich draufgetreten bin, und das Goldene drin sieht aus als hätte jemand mit Sonne gemalt.' },
+  { emoji: '🌰', name: 'Eichel',          biome: 'morgenwald', location: 'Unter der dicken Eiche',             quote: 'Die hatte sogar noch ihr kleines Hütchen drauf, ich finde das sieht aus wie eine winzige Mütze für einen Wichtel.' },
+  { emoji: '🍄', name: 'Roter Pilz',      biome: 'morgenwald', location: 'Im schattigen Tannenkreis',          quote: 'Den durfte ich nur anschauen, nicht mitnehmen, aber er war wirklich hübsch mit den weißen Punkten oben drauf.' },
+  { emoji: '🐌', name: 'Schneckenhaus',   biome: 'morgenwald', location: 'Auf einem Stein in der Sonne',       quote: 'Es war ganz leer und sauber drin und gespiralt, fast als ob jemand ganz vorsichtig damit gespielt hätte.' },
+  { emoji: '🌿', name: 'Moosbüschel',     biome: 'morgenwald', location: 'Vom alten Wurzelhang',               quote: 'Das Moos ist so weich und feucht, riecht nach Erde nach Regen, und du musst es vorsichtig anfassen damit es nicht plattgedrückt wird.' },
+];
+
+function pickMorgenwaldMemento(log: ExpeditionMemento[]): ExpeditionMemento {
+  const recentNames = new Set(log.slice(-2).map(m => m.name));
+  const pool = MORGENWALD_MEMENTOS.filter(m => !recentNames.has(m.name));
+  const choice = pool[Math.floor(Math.random() * pool.length)] || MORGENWALD_MEMENTOS[0];
+  const ts = new Date().toISOString();
+  return {
+    id: `${ts}-${choice.emoji}`,
+    ts,
+    ...choice,
+  };
+}
+
 const TaskContext = createContext<TaskContextValue | null>(null);
 
 export function useTask() {
@@ -591,6 +678,8 @@ export function createInitialState(): TaskState {
     catPlayed: false,
     catEvo: 0,
     ronkiVitals: { hunger: 70, liebe: 70, energie: 70 },
+    expedition: { state: 'home', biome: 'morgenwald' },
+    expeditionLog: [],
     loginBonusClaimed: false,
     onboardingDone: false,
     // Onboarding-parent-first rework (23 Apr 2026): three new gates drive
@@ -773,6 +862,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // Drachennest reframe: rehydrate vital meters; default to 70 each
           // for legacy saves that pre-date the field.
           ronkiVitals: (raw as any).ronkiVitals || { hunger: 70, liebe: 70, energie: 70 },
+          // Drachennest expedition state: default to home/morgenwald with an
+          // empty log for legacy saves that pre-date the field.
+          expedition: (raw as any).expedition || { state: 'home', biome: 'morgenwald' },
+          expeditionLog: (raw as any).expeditionLog || [],
           loginBonusClaimed: raw.loginBonusClaimed || false,
           onboardingDone: raw.onboardingDone || false,
           // Onboarding-parent-first rework (23 Apr 2026) — migration:
@@ -1333,7 +1426,25 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         return { ...v, [bump.vital]: Math.min(100, v[bump.vital] + bump.amt) };
       })();
 
-      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions, pendingRitual, ronkiVitals };
+      // Drachennest expedition trigger (25 Apr 2026):
+      // When THIS completion was the morning anchor's last open quest
+      // AND Ronki is currently home, kick off the trip. We compute on
+      // the post-completion `quests` list so the just-checked quest
+      // is counted as done. The Reise surface owns the walk-out timing
+      // (state stays 'leaving' for ~2.5s before flipping to 'away'),
+      // and the rangerDeparted action sets departedAt + returnAt +
+      // pendingMemento at that handoff. Guard with the home check so
+      // a flurry of late-morning completions doesn't restart anything.
+      let expedition = prev.expedition || { state: 'home' as const, biome: 'morgenwald' as const };
+      if (expedition.state === 'home' && q.anchor === 'morning') {
+        const morningTotal = quests.filter(qq => qq.anchor === 'morning').length;
+        const morningDone = quests.filter(qq => qq.anchor === 'morning' && qq.done).length;
+        if (morningTotal > 0 && morningDone === morningTotal) {
+          expedition = { ...expedition, state: 'leaving' as const };
+        }
+      }
+
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions, pendingRitual, ronkiVitals, expedition };
     });
     setToastTrigger(t => t + 1);
     // Re-evaluate organic mood triggers right after the completion
@@ -1565,6 +1676,79 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       return {
         ...prev,
         ronkiVitals: { ...v, [kind]: Math.min(100, v[kind] + amounts[kind]) },
+      };
+    });
+  }, []);
+
+  // ── Expedition state machine (Drachennest, 25 Apr 2026) ──
+  // Pure state transitions for the Reise surface. Memento generation
+  // happens in rangerDeparted so the kid never sees an empty diary
+  // slot during the wait. The Reise component owns animation timing
+  // (walk-out -> away) + the polling effect that flips away -> waiting
+  // when now > returnAt.
+  const setExpedition = useCallback((next: NonNullable<TaskState['expedition']>) => {
+    setState(prev => prev ? { ...prev, expedition: next } : prev);
+  }, []);
+
+  const startExpedition = useCallback(() => {
+    setState(prev => {
+      if (!prev) return prev;
+      const e = prev.expedition || { state: 'home' as const, biome: 'morgenwald' as const };
+      // Guard against double-departures: if Ronki is mid-trip, skip.
+      if (e.state !== 'home') return prev;
+      return { ...prev, expedition: { ...e, state: 'leaving' as const } };
+    });
+  }, []);
+
+  const rangerDeparted = useCallback(() => {
+    setState(prev => {
+      if (!prev) return prev;
+      const e = prev.expedition || { state: 'home' as const, biome: 'morgenwald' as const };
+      if (e.state !== 'leaving' && e.state !== 'home') return prev;
+      const now = new Date();
+      // Return at min(now + 4h, today 14:00). Mirrors the spec copy
+      // "Zurück gegen 14:00" so the kid's expectation aligns with the
+      // status strip. If it's already past 14:00, return 4h from now.
+      const fourLater = new Date(now.getTime() + 4 * 3600 * 1000);
+      const today14 = new Date(now);
+      today14.setHours(14, 0, 0, 0);
+      const returnDate = today14 > now && today14 < fourLater ? today14 : fourLater;
+      const memento = pickMorgenwaldMemento(prev.expeditionLog || []);
+      return {
+        ...prev,
+        expedition: {
+          state: 'away' as const,
+          biome: 'morgenwald' as const,
+          departedAt: now.toISOString(),
+          returnAt: returnDate.toISOString(),
+          pendingMemento: memento,
+        },
+      };
+    });
+  }, []);
+
+  const rangerArrived = useCallback(() => {
+    setState(prev => {
+      if (!prev) return prev;
+      const e = prev.expedition;
+      if (!e || e.state !== 'away') return prev;
+      return { ...prev, expedition: { ...e, state: 'waiting' as const } };
+    });
+  }, []);
+
+  const receiveMemento = useCallback(() => {
+    setState(prev => {
+      if (!prev) return prev;
+      const e = prev.expedition;
+      if (!e || !e.pendingMemento) {
+        // Nothing pending — just go home, no log mutation.
+        return { ...prev, expedition: { state: 'home' as const, biome: 'morgenwald' as const } };
+      }
+      const log = [...(prev.expeditionLog || []), e.pendingMemento].slice(-24);
+      return {
+        ...prev,
+        expedition: { state: 'home' as const, biome: 'morgenwald' as const },
+        expeditionLog: log,
       };
     });
   }, []);
@@ -2252,7 +2436,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, setExpedition, startExpedition, rangerDeparted, rangerArrived, receiveMemento, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );

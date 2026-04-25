@@ -45,6 +45,8 @@ first open that he doesn't need a tour.
 | Auth + onboarding bypass for local preview | ✅ shipped | Stub user in `AuthContext` when `VITE_SUPABASE_URL` is unset; `ExperimentAutoPrime` primes `kidIntroSeen` / `parentOnboardingDone` / `onboardingDone` so the app boots straight to RoomHub. |
 | Ronki ask-voice on quests | ✅ shipped | `ronkiAsk` field added to `SCHOOL_QUESTS` (13 lines, Marc's voice rules). Not surfaced in TaskList yet — see Next. |
 | ROADMAP.md as recurring artifact | ✅ shipped | This file. |
+| Marc QA pass (vitals icons clipped, low Ronki, dead pills, window portal) | ✅ shipped | All four flagged in the first hands-on look got fixed in one drop. Full notes in the commit. |
+| **Reise / Expedition surface (DN-02 v1)** | ✅ shipped | Full state machine (home / leaving / away / waiting), painterly campfire scene, glowing diary, modal with memento + Morgenwald banner + progress bar, Naturtagebuch shelf with 8-slot memento grid + Seiten list. One biome (Morgenwald), eight memento types, one per return. Trigger wired: morning ritual at 100% sets expedition.state to 'leaving'. The Karte tile + the painted window in RoomHub both open the surface. `?expedition=home\|leaving\|away\|waiting` forces a state for QA, and a DEV state-cycler bar floats over the surface so any state is one tap away. |
 
 ### Blocking for Louis's test
 
@@ -65,7 +67,7 @@ priority order.
 | ID | Card | Est. | Dependency |
 |---|---|---|---|
 | DN-01 | **Surface `ronkiAsk` in TaskList** | ~1h | RoomHub live. Ronki's voice carries through the whole loop rather than stopping at the room door. Show the ask line beneath each quest tile; fade on complete. |
-| DN-02 | **Garden → real Reise map (stub → content)** | ~6h | Replace the placeholder `GardenMode` overlay with a 5-biome expedition map. First biome = Wald (unlocks Day 1). Tied to `expeditionUnlocked` flag. |
+| DN-02b | **Reise polish + multi-biome unlock** | ~4h | The v1 surface ships with one biome (Morgenwald). Next pass adds the night-streifzug state, a second biome unlock when the kid hits 12 mementos in Morgenwald, the actual scrap-page mosaic that grows in the diary banner over time, and a notification dot on the RoomHub Karte tile when expedition.state is 'waiting'. |
 | DN-03 | **Progressive Hub disclosure** | ~90m | Gate the object row + expedition hint by `totalTasksDone` (0/3/5/10). Hector + Louis both flagged the dense Hub on first entry. See backlog note. |
 | DN-04 | **Ronki status chip (TopBar)** | ~45m | Wrap PinnedRonki in a progress ring driven by today's pct + thread ronkiMood so face/particles match. Ships without event pulses in v1. |
 | DN-05 | **Kinder-Yoga pose as first emotional tool** | ~4h | Start with Löwen-Pose for "besorgt." One pose in the existing tool slot; full Yoga-Reise surface deferred until we've watched Louis engage. |

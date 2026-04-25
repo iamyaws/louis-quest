@@ -3,10 +3,10 @@ import { useTask } from '../../context/TaskContext';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { getCatStage } from '../../utils/helpers';
 import MoodChibi from '../MoodChibi';
-import GardenMode from '../garden/GardenMode';
 import RonkiVitalsRing from './RonkiVitalsRing';
 import CareVerbs from './CareVerbs';
 import RonkiSpeechBubble from './RonkiSpeechBubble';
+import Expedition from './Expedition';
 
 /**
  * RoomHub — the Drachennest reframe of the Hub. v2 polish 24 Apr 2026.
@@ -41,7 +41,11 @@ const ANCHOR_TO_VITAL = {
 export default function RoomHub({ onNavigate }) {
   const { state } = useTask();
   const { t, lang } = useTranslation();
-  const [showGarden, setShowGarden] = useState(false);
+  // Drachennest reframe: the "Karte" tile + window in the back of the
+  // room both open the Expedition surface (Reise / Naturtagebuch).
+  // Earlier prototypes routed to GardenMode as a placeholder; that's
+  // gone now that the real expedition state machine is wired up.
+  const [showExpedition, setShowExpedition] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState([]);
 
   const variant = state?.companionVariant || 'forest';
@@ -197,7 +201,7 @@ export default function RoomHub({ onNavigate }) {
               that reads as "look out at the world." */}
           <button
             type="button"
-            onClick={() => setShowGarden(true)}
+            onClick={() => setShowExpedition(true)}
             aria-label="Aus dem Fenster schauen"
             className="active:scale-[0.96] transition-transform"
             style={{
@@ -443,7 +447,7 @@ export default function RoomHub({ onNavigate }) {
         <ObjectTile icon="redeem"         label="Truhe"     onClick={() => onNavigate?.('belohnungen')} />
         <ObjectTile icon="menu_book"      label="Buch"      onClick={() => onNavigate?.('buch')} />
         <ObjectTile icon="sports_esports" label="Spielzeug" onClick={() => onNavigate?.('spiele')} />
-        <ObjectTile icon="explore"        label={expeditionUnlocked ? 'Karte ✦' : 'Karte'} highlight={expeditionUnlocked} onClick={() => setShowGarden(true)} />
+        <ObjectTile icon="explore"        label={expeditionUnlocked ? 'Karte ✦' : 'Karte'} highlight={expeditionUnlocked} onClick={() => setShowExpedition(true)} />
       </section>
 
       {/* Expedition hint when unlocked */}
@@ -478,8 +482,10 @@ export default function RoomHub({ onNavigate }) {
         @keyframes rh-spark3 { 0%,100% { opacity: 0.5; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-8px); } }
       `}</style>
 
-      {/* Karte → Garden (Reise stub for v1) */}
-      {showGarden && <GardenMode onClose={() => setShowGarden(false)} />}
+      {/* Karte + window → Expedition (Reise / Naturtagebuch surface).
+          The state machine (home / leaving / away / waiting) lives in
+          TaskContext; this surface mostly observes + transitions. */}
+      {showExpedition && <Expedition onClose={() => setShowExpedition(false)} />}
     </div>
   );
 }
