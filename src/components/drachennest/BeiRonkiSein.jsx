@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTask } from '../../context/TaskContext';
+import { getCatStage } from '../../utils/helpers';
 import MoodChibi from '../MoodChibi';
 
 /**
@@ -43,7 +44,14 @@ const STORIES = [
 export default function BeiRonkiSein({ onClose }) {
   const { state } = useTask();
   const variant = state?.companionVariant || 'forest';
-  const stageIdx = state?.catEvo ? Math.min(5, Math.floor(state.catEvo / 9)) : 1;
+  // Match RoomHub's canonical mapping (getCatStage uses CAT_STAGES
+  // thresholds [0, 3, 9, 18, 30, 45]). The previous Math.floor(catEvo/9)
+  // produced stage 0 (egg) for any catEvo in 1-8, so a freshly-hatched
+  // kid sat down at the campfire and saw the egg again. The `|| 1`
+  // fallback mirrors RoomHub: by the time the kid is at the campfire
+  // they've already hatched, so we never render the egg here even if
+  // catEvo somehow lands at 0.
+  const stageIdx = getCatStage(state?.catEvo ?? 0) || 1;
 
   // Track recently-shown line indexes per session so the rotation
   // doesn't repeat itself in quick succession. Lives in a ref so
