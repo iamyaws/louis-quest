@@ -679,7 +679,7 @@ export default function Hub({ onNavigate, onPlayMint, onOpenParental }) {
           <div className="flex justify-between items-center gap-4">
             <div className="flex-1 min-w-0">
               <p className="font-bold text-[11px] font-label uppercase tracking-[0.22em] text-secondary mb-1.5">
-                {lang === 'de' ? 'HEUTE' : 'TODAY'}
+                {t('hub.eyebrow')}
               </p>
               <h3 className="font-headline text-2xl text-primary-container leading-[1.1]"
                   style={{ fontWeight: 500, letterSpacing: '-0.015em', textWrap: 'balance' }}>
