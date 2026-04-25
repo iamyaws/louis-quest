@@ -31,11 +31,17 @@ import Expedition from './Expedition';
  * reducer's anchor-routed vital top-up. Existing NavBar stays visible.
  */
 
+// Anchor pill colors mirror the vitals palette so each routine block
+// reads as "this fills X meter." Bedtime flipped from emerald to
+// sky-blue (Marc 25 Apr 2026) so the Abends pill no longer clashes
+// with a green Ronki variant. The success-fertig state keeps a
+// separate success-green so finished anchors still read as
+// completed without loss-aversion ambiguity.
 const ANCHOR_TO_VITAL = {
   morning: { vital: 'hunger',  color: '#f59e0b', label: 'Morgens' },
   evening: { vital: 'liebe',   color: '#ec4899', label: 'Nachmittag' },
   hobby:   { vital: 'liebe',   color: '#ec4899', label: 'Hobby' },
-  bedtime: { vital: 'energie', color: '#10b981', label: 'Abends' },
+  bedtime: { vital: 'energie', color: '#3b82f6', label: 'Abends' },
 };
 
 export default function RoomHub({ onNavigate }) {
@@ -71,9 +77,13 @@ export default function RoomHub({ onNavigate }) {
     ro.observe(stageRef.current);
     return () => ro.disconnect();
   }, []);
-  // 82% of the stage leaves room for the vitals arcs (drawn at ~90% of
-  // stage) to visibly wrap Ronki without clipping through him.
-  const ronkiPx = Math.floor(stagePx * 0.82);
+  // 68% of the stage leaves a generous gap between Ronki and the arcs
+  // (Marc 25 Apr 2026 — "more room to breathe"). Earlier 82% had the
+  // arcs hugging the chibi too tight, especially with mood particles
+  // or the speech bubble's tail running near them. Pulling the chibi
+  // inward + growing the stage container gives the ring room to
+  // visibly *frame* Ronki rather than crowding him.
+  const ronkiPx = Math.floor(stagePx * 0.68);
 
   const quests = state?.quests || [];
   const undoneByAnchor = ['morning', 'evening', 'bedtime'].map(anchor => {
@@ -114,14 +124,19 @@ export default function RoomHub({ onNavigate }) {
         fontFamily: '"Nunito", sans-serif',
       }}
     >
-      {/* Painted-paper hatching as base texture */}
+      {/* Soft warm wash — earlier passes used a 135° hatching pattern
+          that read as harsh diagonal lines on every card behind. Marc
+          flagged it 25 Apr 2026 ("the vertical small lines as a
+          pattern across all cards etc. needs fixing"). Replaced with
+          two big radial sun-spills only — keeps the warmth without
+          the line texture. */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute', inset: 0,
           background:
-            'repeating-linear-gradient(135deg, transparent 0 8px, rgba(40,36,28,0.04) 8px 9px), ' +
-            'radial-gradient(900px 500px at 30% -20%, rgba(252,211,77,0.18) 0%, transparent 60%)',
+            'radial-gradient(900px 500px at 30% -10%, rgba(252,211,77,0.22) 0%, transparent 60%), ' +
+            'radial-gradient(700px 600px at 100% 110%, rgba(180,83,9,0.08) 0%, transparent 65%)',
           pointerEvents: 'none',
         }}
       />
@@ -163,7 +178,16 @@ export default function RoomHub({ onNavigate }) {
         </div>
       </header>
 
-      {/* The painterly square scene with Ronki + ring + window */}
+      {/* The cozy Drachennest interior (25 Apr 2026 redesign).
+          Earlier passes treated this as an outdoor meadow — green hills,
+          green Ronki, green energie meter, the whole frame collapsed
+          into one biome of green. Marc flagged it: "it's supposed to
+          be a Drachennest." So the scene is now a warm cave hollow
+          with a pebble-and-moss nest where Ronki sits, a small back
+          window (the *only* element that still shows the time of day),
+          and a string of warm lights overhead. The cave itself stays
+          a constant amber/sandstone regardless of the clock — the
+          interior is the home, not the weather. */}
       <section style={{ padding: '14px 18px 0', position: 'relative', zIndex: 3 }}>
         <div
           style={{
@@ -172,72 +196,156 @@ export default function RoomHub({ onNavigate }) {
             aspectRatio: '1 / 1',
             borderRadius: 26,
             overflow: 'hidden',
-            background: sceneTone.bg,
+            // Warm sandstone interior — radial gradient so the top
+            // catches the most light (lantern + window) and the
+            // edges deepen into rock.
+            background:
+              'radial-gradient(ellipse 110% 80% at 50% -10%, #fef3c7 0%, #fde68a 30%, #fbbf24 65%, #b45309 100%)',
             boxShadow:
               '0 18px 36px -14px rgba(40, 20, 8, 0.40), ' +
-              'inset 0 2px 0 rgba(255,255,255,0.30), ' +
-              'inset 0 -6px 18px rgba(78, 42, 20, 0.25)',
+              'inset 0 4px 0 rgba(255,255,255,0.35), ' +
+              'inset 0 -10px 28px rgba(78, 42, 20, 0.45), ' +
+              'inset 0 0 0 4px rgba(180,83,9,0.18)',
           }}
         >
-          {/* Painted hills */}
-          <div style={{
-            position: 'absolute', left: -20, right: -20, bottom: -10, height: '38%',
-            background: sceneTone.hills,
-            borderRadius: '50% 50% 0 0 / 80% 80% 0 0',
-            opacity: 0.85,
-          }} />
-          <div style={{
-            position: 'absolute', left: -40, right: -40, bottom: -20, height: '28%',
-            background: sceneTone.hillsBack,
-            borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
-            opacity: 0.65,
+          {/* Cave-mouth shadow at the top — pulls the eye toward the
+              centre and gives the impression we're peering INTO a
+              hollow rather than at a flat wall. */}
+          <div aria-hidden="true" style={{
+            position: 'absolute', top: 0, left: 0, right: 0, height: '24%',
+            background: 'radial-gradient(ellipse at 50% 0%, transparent 0%, transparent 38%, rgba(78,42,20,0.30) 100%)',
+            pointerEvents: 'none',
+            zIndex: 1,
           }} />
 
-          {/* Window — a narrow tall opening showing time-of-day sky.
-              Doubles as a second portal to the Reise / Garden surface
-              (Marc 25 Apr 2026 — "by clicking on the window in the back
-              of Ronki you get to the garden"). The Karte tile keeps the
-              explicit text affordance; the window adds a spatial one
-              that reads as "look out at the world." */}
+          {/* Hanging string lights — five warm cream beads on a thin
+              cord, gently sagging. Reads as "kid put fairy lights up
+              in the nest." */}
+          <div aria-hidden="true" style={{
+            position: 'absolute', top: '8%', left: '8%', right: '8%', height: 26,
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}>
+            <svg width="100%" height="100%" viewBox="0 0 100 22" preserveAspectRatio="none">
+              <path d="M 0 4 Q 50 22 100 4" fill="none" stroke="rgba(78,42,20,0.45)" strokeWidth="0.6" />
+            </svg>
+            {[10, 30, 50, 70, 90].map((x, i) => {
+              // Beads sag along the cord roughly with sin curvature.
+              const y = 4 + Math.sin((x / 100) * Math.PI) * 18;
+              return (
+                <span key={i} style={{
+                  position: 'absolute',
+                  left: `calc(${x}% - 5px)`,
+                  top: `calc(${(y / 22) * 100}% - 5px)`,
+                  width: 10, height: 10, borderRadius: '50%',
+                  background: 'radial-gradient(circle at 35% 30%, #fef9d7, #fbbf24)',
+                  boxShadow: '0 0 12px 2px rgba(252,211,77,0.55), 0 0 22px 6px rgba(252,165,73,0.25)',
+                  animation: `rh-bead ${3 + i * 0.4}s ease-in-out infinite ${i * 0.2}s`,
+                }} />
+              );
+            })}
+          </div>
+
+          {/* Back window — the cave's view to the outside world. Small,
+              centred behind Ronki on the back wall. The sky behind the
+              glass is the *only* element that still tracks time of
+              day; the cave itself stays warm. Doubles as the second
+              portal to the Reise surface (Marc 25 Apr — "by clicking
+              on the window in the back you get to the garden"). */}
           <button
             type="button"
             onClick={() => setShowExpedition(true)}
             aria-label="Aus dem Fenster schauen"
             className="active:scale-[0.96] transition-transform"
             style={{
-              position: 'absolute', top: 14, right: 14,
-              width: 72, height: 92,
+              position: 'absolute',
+              top: '17%',
+              right: '8%',
+              // Window grew from 64×76 → 100×120 (Marc 25 Apr — felt
+              // too small to read as "look out at the world"). At this
+              // size the sash cross + celestial body have room to
+              // breathe and the kid registers it as a real frame on
+              // the back wall, not a porthole.
+              width: 100, height: 120,
               background: sceneTone.sky,
-              border: `3px solid ${sceneTone.frame}`,
-              borderRadius: 6,
+              // Wood-look frame to match the nest interior — deep brown
+              // with a soft inner highlight.
+              border: '5px solid #5c2a08',
+              borderRadius: 12,
               overflow: 'hidden',
-              boxShadow: '0 4px 12px -4px rgba(40,20,5,0.35), inset 0 1px 0 rgba(255,255,255,0.4)',
+              boxShadow:
+                '0 6px 16px -4px rgba(40,20,5,0.50), ' +
+                'inset 0 0 0 1px rgba(254,243,199,0.5), ' +
+                'inset 0 0 22px rgba(252,211,77,0.30)',
               padding: 0,
               cursor: 'pointer',
-              zIndex: 4,
+              zIndex: 3,
             }}
           >
             {/* Sash cross */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-              <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 3, background: sceneTone.frame, transform: 'translateX(-50%)' }} />
-              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 3, background: sceneTone.frame, transform: 'translateY(-50%)' }} />
+              <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 3, background: '#5c2a08', transform: 'translateX(-50%)' }} />
+              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 3, background: '#5c2a08', transform: 'translateY(-50%)' }} />
             </div>
-            {/* Sun or moon */}
+            {/* Sun or moon — sized up + nudged to the upper-left
+                quadrant so it reads as "the sun's still up out there"
+                instead of "small dot in the corner." */}
             <div style={{
-              position: 'absolute', top: 12, right: 12,
-              width: 20, height: 20, borderRadius: '50%',
+              position: 'absolute', top: 14, left: 14,
+              width: 22, height: 22, borderRadius: '50%',
               background: sceneTone.celestial,
-              boxShadow: `0 0 16px ${sceneTone.celestial}`,
+              boxShadow: `0 0 18px ${sceneTone.celestial}`,
               pointerEvents: 'none',
             }} />
             {time === 'night' && (
               <>
-                <div style={{ position: 'absolute', top: 28, left: 14, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', top: 50, left: 28, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', top: 70, left: 12, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: 36, right: 18, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: 60, right: 30, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: 86, right: 14, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7', pointerEvents: 'none' }} />
               </>
             )}
           </button>
+
+          {/* Stone shelf with a few collected curiosities — tiny
+              callout to the Naturtagebuch. Hand-placed left of the
+              window, on the back wall. */}
+          <div aria-hidden="true" style={{
+            position: 'absolute', top: '38%', left: '10%',
+            width: 64, height: 8,
+            background: 'linear-gradient(180deg, #92400e 0%, #5c2a08 100%)',
+            borderRadius: '3px 3px 6px 6px',
+            boxShadow: '0 3px 6px rgba(40,20,5,0.35), inset 0 1px 0 rgba(254,243,199,0.25)',
+            zIndex: 2,
+          }}>
+            <span style={{ position: 'absolute', left: 4, top: -16, fontSize: 14 }}>🍂</span>
+            <span style={{ position: 'absolute', left: 22, top: -14, fontSize: 12 }}>🪶</span>
+            <span style={{ position: 'absolute', left: 40, top: -12, fontSize: 10 }}>🪨</span>
+          </div>
+
+          {/* Floor mat / nest bedding — Marc 25 Apr flagged the previous
+              "puffy cushion" version was too tall and ate into Ronki +
+              the bottom energie arc. Pulled to a thin cream rim along
+              the floor with a slim terracotta runner on top, so the
+              kid reads it as "Ronki sits on a soft mat" rather than
+              "Ronki sits on a giant pillow." Leaves are tucked along
+              the very bottom edge so they don't compete with the ring. */}
+          <div aria-hidden="true" style={{
+            position: 'absolute', left: '-4%', right: '-4%', bottom: '-2%', height: '14%',
+            background: 'radial-gradient(ellipse at 50% 0%, #fef3c7 0%, #fde68a 50%, #d97706 100%)',
+            borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
+            boxShadow: 'inset 0 -6px 14px rgba(120,53,15,0.35), inset 0 3px 0 rgba(255,255,255,0.40)',
+            zIndex: 2,
+          }} />
+          <div aria-hidden="true" style={{
+            position: 'absolute', left: '14%', right: '14%', bottom: '0%', height: '7%',
+            background: 'radial-gradient(ellipse at 50% 0%, #fdba74 0%, #c2410c 100%)',
+            borderRadius: '50% 50% 0 0 / 90% 90% 0 0',
+            boxShadow: 'inset 0 -4px 10px rgba(67,20,7,0.40), inset 0 2px 0 rgba(255,255,255,0.25)',
+            zIndex: 2,
+          }} />
+          {/* Scattered leaves on the floor mat */}
+          <span aria-hidden="true" style={{ position: 'absolute', bottom: '2%', left: '12%', fontSize: 14, transform: 'rotate(-18deg)', zIndex: 2 }}>🍂</span>
+          <span aria-hidden="true" style={{ position: 'absolute', bottom: '1.5%', right: '14%', fontSize: 13, transform: 'rotate(24deg)', zIndex: 2 }}>🍁</span>
 
           {/* Ronki + vitals stage — ring wraps chibi at matched size so
               the arcs clearly belong to him (v2 had them floating too far).
@@ -248,18 +356,21 @@ export default function RoomHub({ onNavigate }) {
             style={{
               position: 'absolute',
               left: '50%',
-              bottom: '12%',
+              bottom: '10%',
               transform: 'translateX(-50%)',
-              width: '72%',
-              maxWidth: 280,
+              // Stage grew from 72% / 280px → 84% / 340px (25 Apr 2026)
+              // so the vitals arcs read as a generous halo around
+              // Ronki rather than a tight collar. Combined with the
+              // chibi pulling in to 68% (was 82%) below, this gives a
+              // visible ~16% breathing band between body and arc.
+              width: '84%',
+              maxWidth: 340,
               aspectRatio: '1 / 1',
               animation: 'rh-sit 5s ease-in-out infinite',
             }}
           >
-            {/* Vitals ring fills the stage — arcs render at ~90% of stage width */}
+            {/* Vitals ring fills the stage — arcs render near its edge */}
             <RonkiVitalsRing needs={vitals} size={stagePx} />
-            {/* Speech bubble sits above stage */}
-            <RonkiSpeechBubble />
             {/* Ronki centered inside the ring — sized to ~82% of stage so
                 the arcs form a visible halo around him rather than a
                 distant frame. */}
@@ -332,6 +443,13 @@ export default function RoomHub({ onNavigate }) {
               zIndex: 1,
             }} />
           </div>
+
+          {/* Speech bubble lives as a sibling of rh-ronki-stage so it
+              sits in the empty band above the ring rather than
+              overlapping the top arc icon (Marc 25 Apr 2026). It also
+              stays still while the stage's sit-bob animation plays.
+              Tap to dismiss is wired inside the component itself. */}
+          <RonkiSpeechBubble />
 
           {/* Floating sparkles for atmosphere */}
           <span aria-hidden="true" style={{ position: 'absolute', top: '18%', left: '14%', fontSize: 14, color: 'rgba(254,243,199,0.7)', animation: 'rh-spark1 6s ease-in-out infinite' }}>✦</span>
@@ -480,6 +598,10 @@ export default function RoomHub({ onNavigate }) {
         @keyframes rh-spark1 { 0%,100% { opacity: 0.4; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-6px); } }
         @keyframes rh-spark2 { 0%,100% { opacity: 0.3; transform: translateY(0); } 50% { opacity: 0.9; transform: translateY(-4px); } }
         @keyframes rh-spark3 { 0%,100% { opacity: 0.5; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-8px); } }
+        @keyframes rh-bead {
+          0%, 100% { filter: brightness(1); box-shadow: 0 0 12px 2px rgba(252,211,77,0.55), 0 0 22px 6px rgba(252,165,73,0.25); }
+          50%      { filter: brightness(1.15); box-shadow: 0 0 16px 3px rgba(252,211,77,0.75), 0 0 30px 8px rgba(252,165,73,0.40); }
+        }
       `}</style>
 
       {/* Karte + window → Expedition (Reise / Naturtagebuch surface).
@@ -545,40 +667,27 @@ function pickTimeOfDay() {
   return 'night';
 }
 
+// Drachennest reframe (25 Apr 2026): time-of-day now only affects the
+// view *through* the back window. The cave itself stays warm
+// sandstone all day. The window-sky palette here is what the kid
+// peeks at when they tap the window to open the Reise / Naturtagebuch
+// surface, and what shifts the celestial body from sun → orange disc
+// → moon as the day rolls on.
 const SCENE_TONES = {
   dawn: {
-    // Morning warmth: soft apricot sky transitioning to mint hills. Keeps
-    // the hero feeling like fresh morning rather than the brown autumn
-    // palette the first pass landed on.
-    bg: 'linear-gradient(180deg, #fde68a 0%, #fbcfe8 55%, #bbf7d0 100%)',
-    hills: 'linear-gradient(180deg, #34d399, #047857)',
-    hillsBack: 'linear-gradient(180deg, #6ee7b7, #059669)',
-    sky: 'linear-gradient(180deg, #fecaca, #fde68a)',
-    frame: '#5c2a08',
+    sky: 'linear-gradient(180deg, #fecaca 0%, #fde68a 100%)',
     celestial: '#fbbf24',
   },
   day: {
-    bg: 'linear-gradient(180deg, #fde68a 0%, #fef3c7 50%, #fffbeb 100%)',
-    hills: 'linear-gradient(180deg, #15803d, #14532d)',
-    hillsBack: 'linear-gradient(180deg, #22c55e, #15803d)',
-    sky: 'linear-gradient(180deg, #bae6fd, #a7f3d0)',
-    frame: '#5c4508',
+    sky: 'linear-gradient(180deg, #bae6fd 0%, #a7f3d0 100%)',
     celestial: '#fbbf24',
   },
   dusk: {
-    bg: 'linear-gradient(180deg, #fed7aa 0%, #fbcfe8 50%, #c4b5fd 100%)',
-    hills: 'linear-gradient(180deg, #9a3412, #4a1d96)',
-    hillsBack: 'linear-gradient(180deg, #c2410c, #6b21a8)',
-    sky: 'linear-gradient(180deg, #c4b5fd, #fdba74)',
-    frame: '#5c2a08',
+    sky: 'linear-gradient(180deg, #c4b5fd 0%, #fdba74 100%)',
     celestial: '#f97316',
   },
   night: {
-    bg: 'linear-gradient(180deg, #1e1b4b 0%, #3730a3 50%, #1e3a8a 100%)',
-    hills: 'linear-gradient(180deg, #1e293b, #0f172a)',
-    hillsBack: 'linear-gradient(180deg, #334155, #1e293b)',
-    sky: 'linear-gradient(180deg, #1e1b4b, #3730a3)',
-    frame: '#1e1b4b',
+    sky: 'linear-gradient(180deg, #1e1b4b 0%, #3730a3 100%)',
     celestial: '#fef3c7',
   },
 };

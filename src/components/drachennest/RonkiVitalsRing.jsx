@@ -18,10 +18,17 @@ import React from 'react';
  * the chibi inside an absolute container so the ring wraps the chibi.
  */
 
+// Color de-collision (Marc 25 Apr 2026): the ring used emerald for
+// energie which fought every greenish Ronki variant + the green
+// hills. Switched to a confident sky-blue that doesn't appear in any
+// of the six chibi variants (amber / teal / rose / violet / forest /
+// sunset) and reads as "energy / spark" naturally. Hunger amber and
+// liebe pink stay as before — they map to food + heart and don't
+// collide with the chibi palette.
 const ARCS = [
   { key: 'hunger',  start: -150, color: '#f59e0b', icon: 'restaurant' },  // amber, top-left
   { key: 'liebe',   start: -30,  color: '#ec4899', icon: 'favorite'   },  // pink, top-right
-  { key: 'energie', start: 90,   color: '#10b981', icon: 'bolt'       },  // emerald, bottom
+  { key: 'energie', start: 90,   color: '#3b82f6', icon: 'bolt'       },  // sky blue, bottom
 ];
 const ARC_LEN = 100; // degrees per arc
 

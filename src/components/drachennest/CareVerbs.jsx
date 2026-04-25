@@ -13,10 +13,15 @@ import { useTask } from '../../context/TaskContext';
  * a small "+N" pill flashes briefly above the button to confirm.
  */
 
+// Spielen flipped from emerald to sky-blue (Marc 25 Apr 2026) so the
+// verb + the matching vital arc don't collide with a green Ronki
+// variant or the room's interior. Hunger amber + liebe pink stay
+// because they map to food + heart and don't conflict with the chibi
+// palette.
 const VERBS = [
   { kind: 'hunger',  label: 'Füttern',     icon: 'restaurant', color: '#f59e0b', amt: 20 },
   { kind: 'liebe',   label: 'Streicheln',  icon: 'favorite',   color: '#ec4899', amt: 15 },
-  { kind: 'energie', label: 'Spielen',     icon: 'bolt',       color: '#10b981', amt: 25 },
+  { kind: 'energie', label: 'Spielen',     icon: 'bolt',       color: '#3b82f6', amt: 25 },
 ];
 
 export default function CareVerbs() {
