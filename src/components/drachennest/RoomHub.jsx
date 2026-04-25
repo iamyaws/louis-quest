@@ -45,7 +45,7 @@ const ANCHOR_TO_VITAL = {
 };
 
 export default function RoomHub({ onNavigate }) {
-  const { state } = useTask();
+  const { state, actions } = useTask();
   const { t, lang } = useTranslation();
   // Drachennest reframe: the "Karte" tile + window in the back of the
   // room both open the Expedition surface (Reise / Naturtagebuch).
@@ -59,6 +59,15 @@ export default function RoomHub({ onNavigate }) {
   const mood = state?.ronkiMood || 'normal';
   const vitals = state?.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
   const wellbeing = Math.round((vitals.hunger + vitals.liebe + vitals.energie) / 3);
+  // Kid-readable status (Marc 25 Apr — "kids don't get percentage").
+  // Three filled hearts visible at a glance, plus a single short
+  // word so the kid who can already read gets the same signal in
+  // language. Bands stay generous so a little dip doesn't drop
+  // Ronki into "needs you" territory.
+  const heartsFilled = wellbeing >= 80 ? 3 : wellbeing >= 50 ? 2 : 1;
+  const wellLabel = wellbeing >= 80 ? 'Glücklich'
+                  : wellbeing >= 50 ? 'Okay'
+                  : 'Braucht dich';
   const heroName = state?.familyConfig?.childName || state?.heroName || 'du';
 
   // Ronki is sized off the stage's measured width so the chibi + vitals
@@ -164,17 +173,37 @@ export default function RoomHub({ onNavigate }) {
             Hallo {heroName}!
           </div>
         </div>
-        <div style={{
-          padding: '7px 12px',
-          borderRadius: 999,
-          background: 'rgba(18,67,70,0.08)',
-          font: '700 10px/1 "Plus Jakarta Sans", sans-serif',
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-          color: '#124346',
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-        }}>
-          {wellbeing}% glücklich
+        {/* Kid-readable wellbeing chip (Marc 25 Apr — "kids don't get
+            percentage"). Three hearts you can count at a glance, plus
+            a single word for kids who can already read. */}
+        <div
+          aria-label={`Ronki ist ${wellLabel.toLowerCase()}`}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '7px 12px 7px 10px',
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.7)',
+            border: '1px solid rgba(180,83,9,0.18)',
+            color: '#124346',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5)',
+          }}
+        >
+          <span style={{ display: 'flex', gap: 2, fontSize: 14, lineHeight: 1 }}>
+            {[0, 1, 2].map(i => (
+              <span key={i} aria-hidden="true" style={{
+                color: i < heartsFilled ? '#ec4899' : 'rgba(18,67,70,0.20)',
+                textShadow: i < heartsFilled ? '0 1px 2px rgba(236,72,153,0.30)' : 'none',
+              }}>♥</span>
+            ))}
+          </span>
+          <span style={{
+            font: '700 11px/1 "Plus Jakarta Sans", sans-serif',
+            letterSpacing: '0.04em',
+          }}>
+            {wellLabel}
+          </span>
         </div>
       </header>
 
@@ -328,24 +357,30 @@ export default function RoomHub({ onNavigate }) {
               the floor with a slim terracotta runner on top, so the
               kid reads it as "Ronki sits on a soft mat" rather than
               "Ronki sits on a giant pillow." Leaves are tucked along
-              the very bottom edge so they don't compete with the ring. */}
+              the very bottom edge.
+
+              The mat sits at z-index 5 — between the stage (z:3) and
+              the chibi button (which gets bumped to z:7 below). That
+              ordering hides the ring's bottom curve behind the mat
+              while keeping Ronki himself fully visible (Marc's "let
+              the vital-ring overlap the cushion on the floor"). */}
           <div aria-hidden="true" style={{
             position: 'absolute', left: '-4%', right: '-4%', bottom: '-2%', height: '14%',
             background: 'radial-gradient(ellipse at 50% 0%, #fef3c7 0%, #fde68a 50%, #d97706 100%)',
             borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
             boxShadow: 'inset 0 -6px 14px rgba(120,53,15,0.35), inset 0 3px 0 rgba(255,255,255,0.40)',
-            zIndex: 2,
+            zIndex: 5,
           }} />
           <div aria-hidden="true" style={{
             position: 'absolute', left: '14%', right: '14%', bottom: '0%', height: '7%',
             background: 'radial-gradient(ellipse at 50% 0%, #fdba74 0%, #c2410c 100%)',
             borderRadius: '50% 50% 0 0 / 90% 90% 0 0',
             boxShadow: 'inset 0 -4px 10px rgba(67,20,7,0.40), inset 0 2px 0 rgba(255,255,255,0.25)',
-            zIndex: 2,
+            zIndex: 5,
           }} />
           {/* Scattered leaves on the floor mat */}
-          <span aria-hidden="true" style={{ position: 'absolute', bottom: '2%', left: '12%', fontSize: 14, transform: 'rotate(-18deg)', zIndex: 2 }}>🍂</span>
-          <span aria-hidden="true" style={{ position: 'absolute', bottom: '1.5%', right: '14%', fontSize: 13, transform: 'rotate(24deg)', zIndex: 2 }}>🍁</span>
+          <span aria-hidden="true" style={{ position: 'absolute', bottom: '2%', left: '12%', fontSize: 14, transform: 'rotate(-18deg)', zIndex: 6 }}>🍂</span>
+          <span aria-hidden="true" style={{ position: 'absolute', bottom: '1.5%', right: '14%', fontSize: 13, transform: 'rotate(24deg)', zIndex: 6 }}>🍁</span>
 
           {/* Ronki + vitals stage — ring wraps chibi at matched size so
               the arcs clearly belong to him (v2 had them floating too far).
@@ -356,7 +391,18 @@ export default function RoomHub({ onNavigate }) {
             style={{
               position: 'absolute',
               left: '50%',
-              bottom: '10%',
+              // Stage drops well below the scene's floor edge so the
+              // bottom of the vitals ring tucks behind the cushion
+              // mat (Marc 25 Apr — "let ronki and the ring fly a
+              // little lower and let the vital-ring overlap the
+              // cushion on the floor"). The stage has NO z-index here
+              // on purpose: that lets the chibi button's z (bumped to
+              // 7 below) lift to scene level so Ronki paints above the
+              // cushion (z:5), while the ring wrapper (default z)
+              // stays behind the cushion. Without that flat-context
+              // trick, the cushion would either cover the whole stage
+              // (Ronki and all) or miss the ring entirely.
+              bottom: '-9%',
               transform: 'translateX(-50%)',
               // Stage grew from 72% / 280px → 84% / 340px (25 Apr 2026)
               // so the vitals arcs read as a generous halo around
@@ -369,8 +415,23 @@ export default function RoomHub({ onNavigate }) {
               animation: 'rh-sit 5s ease-in-out infinite',
             }}
           >
-            {/* Vitals ring fills the stage — arcs render near its edge */}
-            <RonkiVitalsRing needs={vitals} size={stagePx} />
+            {/* Vitals ring sits in its own slightly-shrunk + lowered
+                wrapper (Marc 25 Apr — "metrics circle just a tiny bit
+                smaller and lower, ronki stays in position"). Wrapper
+                is 92% of stage width and centred ~6% below the
+                stage's geometric centre so the ring frames Ronki's
+                lower body / nest area instead of his head halo. */}
+            <div style={{
+              position: 'absolute',
+              left: '50%',
+              top: '56%',
+              transform: 'translate(-50%, -50%)',
+              width: Math.floor(stagePx * 0.92),
+              height: Math.floor(stagePx * 0.92),
+              pointerEvents: 'none',
+            }}>
+              <RonkiVitalsRing needs={vitals} size={Math.floor(stagePx * 0.92)} />
+            </div>
             {/* Ronki centered inside the ring — sized to ~82% of stage so
                 the arcs form a visible halo around him rather than a
                 distant frame. */}
@@ -385,7 +446,12 @@ export default function RoomHub({ onNavigate }) {
                 border: 'none',
                 cursor: 'pointer',
                 padding: 0,
-                zIndex: 3,
+                // Lifted from 3 → 7 so the chibi paints above the
+                // cushion mat (z:5) even when the stage drops low
+                // enough that Ronki's feet enter the mat's bounds.
+                // The ring wrapper next door keeps its default z so
+                // the lower arc disappears behind the cushion edge.
+                zIndex: 7,
                 display: 'grid',
                 placeItems: 'center',
               }}
@@ -457,6 +523,75 @@ export default function RoomHub({ onNavigate }) {
           <span aria-hidden="true" style={{ position: 'absolute', top: '22%', right: '24%', fontSize: 12, color: 'rgba(254,243,199,0.6)', animation: 'rh-spark3 8s ease-in-out infinite' }}>✧</span>
         </div>
       </section>
+
+      {/* Stimmungs-Check — kid-facing mood logger.
+          Marc 25 Apr 2026: "there's no way to log the mood to unlock
+          the journal right now if the bottom nav is still supposed to
+          be part of the product." Renders only when state.moodAM is
+          unset, so it appears each new day, gets tapped, then quietly
+          disappears for the rest of the day. Once tapped, the kid's
+          mood is set and the Tagebuch tab unlocks via the existing
+          gate logic. The kid can change their mood from the Ronki
+          profile (long-standing flow); we don't expose a re-edit here
+          to avoid the "did I tap the wrong one?" tap-spam. */}
+      {state?.moodAM === null && (
+        <section style={{ padding: '20px 18px 0' }}>
+          <div style={{
+            borderRadius: 18,
+            background: 'linear-gradient(180deg, #fffdf5 0%, #fef3c7 100%)',
+            border: '1.5px solid rgba(180,83,9,0.20)',
+            padding: '14px 14px 16px',
+            boxShadow: '0 6px 16px -8px rgba(180,83,9,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
+          }}>
+            <div style={{
+              font: '800 10px/1 "Plus Jakarta Sans", sans-serif',
+              letterSpacing: '0.22em', textTransform: 'uppercase',
+              color: '#b45309', marginBottom: 4,
+            }}>
+              Stimmungs-Check
+            </div>
+            <div style={{
+              font: '500 16px/1.2 "Fredoka", sans-serif',
+              color: '#124346', marginBottom: 12,
+            }}>
+              Wie geht's dir gerade, {heroName}?
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(6, 1fr)',
+              gap: 6,
+            }}>
+              {[
+                { idx: 3, emoji: '😊', label: 'Gut' },
+                { idx: 4, emoji: '🤩', label: 'Magisch' },
+                { idx: 2, emoji: '😐', label: 'Okay' },
+                { idx: 0, emoji: '😢', label: 'Traurig' },
+                { idx: 1, emoji: '😨', label: 'Besorgt' },
+                { idx: 5, emoji: '😴', label: 'Müde' },
+              ].map(m => (
+                <button
+                  key={m.idx}
+                  type="button"
+                  onClick={() => actions?.setMood?.('moodAM', m.idx)}
+                  aria-label={m.label}
+                  className="active:scale-90 transition-transform"
+                  style={{
+                    aspectRatio: '1',
+                    borderRadius: 14,
+                    background: 'rgba(252,211,77,0.10)',
+                    border: '1.5px solid rgba(180,83,9,0.18)',
+                    fontSize: 24,
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                >
+                  {m.emoji}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Care verbs row */}
       <section style={{ padding: '20px 18px 0' }}>
