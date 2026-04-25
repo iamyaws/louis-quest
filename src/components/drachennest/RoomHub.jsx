@@ -6,7 +6,6 @@ import { resolveWallpaper, resolveFloor } from '../../data/caveStyles';
 import { track } from '../../lib/analytics';
 import MoodChibi from '../MoodChibi';
 import RonkiVitalsRing from './RonkiVitalsRing';
-import CareVerbs from './CareVerbs';
 import RonkiSpeechBubble from './RonkiSpeechBubble';
 import Expedition from './Expedition';
 import BeiRonkiSein from './BeiRonkiSein';
@@ -697,35 +696,18 @@ export default function RoomHub({ onNavigate }) {
         />
       )}
 
-      {/* Care verbs row + Sterne counter.
-          Marc 25 Apr 2026 — currency consolidation: dropped Funken
-          as a separate currency, care now spends Sterne (state.hp)
-          directly. Funkelzeit (drachenEier) stays separate so a
-          kid can't pull all their Sterne into screentime at the
-          cost of caring for Ronki. The kicker shows their Sterne
-          balance with copy that flips to "voll" / "Erst eine
-          Aufgabe" depending on state. */}
+      {/* Presence beat (Cut #3 — Marc 25 Apr 2026 option C: demote
+          care verbs to presence beats). The Füttern/Streicheln/
+          Spielen tile-row was deleted in this commit because it
+          implied a Tamagotchi mechanic the app doesn't actually
+          run — vitals are routine-driven, not verb-driven. The
+          single "Bei Ronki sitzen" button below is the only
+          companion-tap surface in this section now: free, no Sterne
+          cost, no vital change, opens BeiRonkiSein for a presence
+          moment at the campfire. The FunkenChip went with the verbs
+          because its only job was explaining the now-deleted spend
+          mechanic. */}
       <section style={{ padding: '20px 18px 0' }}>
-        <FunkenChip
-          tokens={state?.hp || 0}
-          allFull={
-            (state?.ronkiVitals?.hunger || 0) >= 100 &&
-            (state?.ronkiVitals?.liebe || 0) >= 100 &&
-            (state?.ronkiVitals?.energie || 0) >= 100
-          }
-        />
-        <CareVerbs />
-        {/* "Bei Ronki sein" — fourth interaction, deliberately set
-            apart from the three care verbs. No Funken cost, no vital
-            change. Tapping opens a full-screen presence moment at
-            the campfire where Ronki tells the kid one short line
-            and they sit together (Marc 25 Apr 2026 — "could be a
-            chance for ronki to tell the kid a story or just sit
-            with each other to be present, a cutscene of sorts
-            sitting at the fire and having a friendship/bonding
-            moment"). Always available; the rotation avoids
-            repeating recent lines so it stays a small fresh
-            beat. */}
         <button
           type="button"
           onClick={() => setShowPresence(true)}
@@ -1309,58 +1291,6 @@ function ShelfDecor({ expeditionLog }) {
           </span>
         );
       })}
-    </div>
-  );
-}
-
-// Sterne counter — sits above the care verbs row. Three states:
-//   "all full"   → "Ronki geht's gut" (Marc 25 Apr 2026 — 'satt'
-//                  read too literally about food when the state
-//                  is all-three-vitals-full; flipped to the
-//                  more general 'feeling good')
-//   "tokens > 0" → "X Sterne zum Verteilen"
-//   "tokens===0" → "Erst eine Aufgabe machen, dann Sterne sammeln"
-//
-// Visual: small kicker line + a star ★ icon row (6 pips reflecting
-// available Sterne, capped at 6 visible). Kid-readable count
-// without a numeric badge. Renamed from FunkenChip when we
-// consolidated to Sterne-as-care-currency 25 Apr 2026.
-function FunkenChip({ tokens, allFull }) {
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: 10,
-      padding: '0 4px 8px',
-    }}>
-      <div style={{
-        font: '800 10px/1 "Plus Jakarta Sans", sans-serif',
-        letterSpacing: '0.22em', textTransform: 'uppercase',
-        color: allFull ? '#92400e' : tokens > 0 ? '#b45309' : 'rgba(18,67,70,0.55)',
-      }}>
-        {allFull ? "Ronki geht's gut" :
-         tokens > 0 ? `${tokens} Sterne` :
-         'Erst eine Aufgabe'}
-      </div>
-      {!allFull && (
-        <div style={{ display: 'flex', gap: 3 }}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <span
-              key={i}
-              aria-hidden="true"
-              style={{
-                fontSize: 13,
-                color: i < tokens ? '#f59e0b' : 'rgba(180,83,9,0.18)',
-                lineHeight: 1,
-                textShadow: i < tokens ? '0 0 6px rgba(245,158,11,0.5)' : 'none',
-              }}
-            >
-              ✦
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
