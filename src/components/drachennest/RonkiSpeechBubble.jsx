@@ -82,17 +82,15 @@ export default function RonkiSpeechBubble({ idx: idxProp }) {
       aria-label="Nachricht von Ronki — antippen zum Schließen"
       style={{
         position: 'absolute',
-        // Re-anchored back near Ronki (Marc 25 Apr 2026 second pass
-        // — "let's rather add that slightly to the right above
-        // ronki again even if it risks overlapping on the metrics
-        // but the kid will tap it and it will be gone, so that
-        // might be enough of controls for kids to skip that and see
-        // what ronki needs"). Slight right-of-centre offset
-        // (~58%) so the tail lands above-right of his head rather
-        // than directly on the top hunger badge. Tap-to-dismiss is
-        // the overlap mitigation.
-        top: 18,
-        left: '52%',
+        // Re-anchored even closer to Ronki (Marc 25 Apr 2026 third
+        // pass — "speech bubble needs to be very close to ronki
+        // again as in the start I feel before we started tweaking
+        // it"). Pushed top down to ~25% of the scene so the bubble
+        // sits right above Ronki's head rather than floating up
+        // near the cave-mouth. Tap-to-dismiss is the overlap
+        // mitigation per the earlier QA.
+        top: '25%',
+        left: '50%',
         right: 'auto',
         transform: 'translateX(-50%)',
         background: '#ffffff',

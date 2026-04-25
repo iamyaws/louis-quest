@@ -7,6 +7,7 @@ import RonkiVitalsRing from './RonkiVitalsRing';
 import CareVerbs from './CareVerbs';
 import RonkiSpeechBubble from './RonkiSpeechBubble';
 import Expedition from './Expedition';
+import BeiRonkiSein from './BeiRonkiSein';
 
 /**
  * RoomHub — the Drachennest reframe of the Hub. v2 polish 24 Apr 2026.
@@ -52,6 +53,7 @@ export default function RoomHub({ onNavigate }) {
   // Earlier prototypes routed to GardenMode as a placeholder; that's
   // gone now that the real expedition state machine is wired up.
   const [showExpedition, setShowExpedition] = useState(false);
+  const [showPresence, setShowPresence] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState([]);
 
   const variant = state?.companionVariant || 'forest';
@@ -353,7 +355,14 @@ export default function RoomHub({ onNavigate }) {
                 'inset 0 0 22px rgba(252,211,77,0.30)',
               padding: 0,
               cursor: 'pointer',
-              zIndex: 3,
+              // Window z bumped above the stage (z:6) so the click
+              // target is reachable. Marc 25 Apr 2026 — "the
+              // clickzone of the window is gone." The stage's
+              // raised z to overlap the cushion was eating taps on
+              // the window because the stage extends across most of
+              // the scene. z:8 keeps the window in front of stage +
+              // chibi without pulling it visually awkward.
+              zIndex: 8,
             }}
           >
             {/* Sash cross */}
@@ -641,6 +650,52 @@ export default function RoomHub({ onNavigate }) {
           }
         />
         <CareVerbs />
+        {/* "Bei Ronki sein" — fourth interaction, deliberately set
+            apart from the three care verbs. No Funken cost, no vital
+            change. Tapping opens a full-screen presence moment at
+            the campfire where Ronki tells the kid one short line
+            and they sit together (Marc 25 Apr 2026 — "could be a
+            chance for ronki to tell the kid a story or just sit
+            with each other to be present, a cutscene of sorts
+            sitting at the fire and having a friendship/bonding
+            moment"). Always available; the rotation avoids
+            repeating recent lines so it stays a small fresh
+            beat. */}
+        <button
+          type="button"
+          onClick={() => setShowPresence(true)}
+          aria-label="Bei Ronki sein"
+          className="active:scale-[0.98] transition-transform"
+          style={{
+            marginTop: 12,
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: 14,
+            background: 'rgba(255,255,255,0.7)',
+            border: '1.5px dashed rgba(180,83,9,0.32)',
+            color: '#5c2a08',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            font: '600 13px/1 "Nunito", sans-serif',
+            cursor: 'pointer',
+          }}
+        >
+          <span aria-hidden="true" style={{ fontSize: 16 }}>🔥</span>
+          <span>Bei Ronki sitzen</span>
+          <span
+            aria-hidden="true"
+            style={{
+              font: '700 9px/1 "Plus Jakarta Sans", sans-serif',
+              letterSpacing: '0.18em', textTransform: 'uppercase',
+              color: 'rgba(120,53,15,0.55)',
+              marginLeft: 4,
+            }}
+          >
+            ohne Funken
+          </span>
+        </button>
       </section>
 
       {/* Adventure-ready CTA — shows only when all three vitals are
@@ -882,6 +937,11 @@ export default function RoomHub({ onNavigate }) {
           The state machine (home / leaving / away / waiting) lives in
           TaskContext; this surface mostly observes + transitions. */}
       {showExpedition && <Expedition onClose={() => setShowExpedition(false)} />}
+
+      {/* Presence moment — full-screen campfire scene with a Ronki
+          story line. Free interaction, no Funken, no vital change.
+          ESC + tap-anywhere both dismiss. */}
+      {showPresence && <BeiRonkiSein onClose={() => setShowPresence(false)} />}
     </div>
   );
 }
