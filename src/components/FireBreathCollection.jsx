@@ -140,15 +140,23 @@ function FlavorTile({ flavor, taughtAt, isPending, onTap }) {
         )}
       </div>
 
-      {/* Label */}
+      {/* Label — allowed to wrap to 2 lines on narrow viewports so
+          long words like FUNKENSTERN / REGENBOGEN don't push the
+          tile past its column. font tightened from 10px → 9px and
+          letter-spacing eased from .08em → .04em to give the words
+          a fighting chance on a single line on most phones. */}
       <div
         style={{
-          font: '700 10px/1.15 "Plus Jakarta Sans", sans-serif',
-          letterSpacing: '.08em',
+          font: '700 9px/1.1 "Plus Jakarta Sans", sans-serif',
+          letterSpacing: '.04em',
           textTransform: 'uppercase',
           color: taught ? '#124346' : '#64748b',
           textAlign: 'center',
           minHeight: 22,
+          maxWidth: '100%',
+          overflowWrap: 'break-word',
+          wordBreak: 'break-word',
+          hyphens: 'auto',
         }}
       >
         {t(meta.labelKey)}
@@ -360,9 +368,19 @@ export default function FireBreathCollection() {
             )}
           </AnimatePresence>
 
-          {/* Five flavor tiles in a row. On narrow viewports they squash
-              to fit — flex: 1 per tile keeps them equal-width. */}
-          <div style={{ display: 'flex', gap: 6 }}>
+          {/* Five flavor tiles in a row. Marc 25 Apr 2026 QA: long
+              uppercase labels (FUNKENSTERN / REGENBOGEN) with the
+              .08em letter-spacing pushed the rightmost tile off the
+              container on narrow viewports. Switched to grid with
+              `minmax(0, 1fr)` columns — that's the canonical way to
+              let flex/grid items shrink below their content's
+              intrinsic min-width, paired with the label-side fixes
+              below (wrap allowed, slightly tighter font). */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+            gap: 6,
+          }}>
             {ORDER.map(flavor => (
               <FlavorTile
                 key={flavor}
