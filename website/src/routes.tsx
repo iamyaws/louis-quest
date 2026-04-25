@@ -18,6 +18,9 @@ const VorlageKleineGeschwister = lazy(() => import('./pages/VorlageKleineGeschwi
 const HomeEN = lazy(() => import('./pages/HomeEN'));
 const Installieren = lazy(() => import('./pages/Installieren'));
 const Ratgeber = lazy(() => import('./pages/Ratgeber'));
+const ToolsHub = lazy(() => import('./pages/tools/ToolsHub'));
+const AppCheck = lazy(() => import('./pages/tools/AppCheck'));
+const AppCheckResult = lazy(() => import('./pages/tools/AppCheckResult'));
 // Private print-only utility pages; not in footer, not in sitemap, not in robots.
 const PrintA6Flyer = lazy(() => import('./pages/PrintA6Flyer'));
 const PrintA6FlyerKids = lazy(() => import('./pages/PrintA6FlyerKids'));
@@ -98,6 +101,9 @@ export function AppRoutes() {
         <Route path="/print/a4-poster-kinderarzt" element={<PrintA4PosterKinderarzt />} />
         <Route path="/print/a4-poster-zaehne" element={<PrintA4PosterZaehne />} />
         <Route path="/print/a4-poster-anti-engagement" element={<PrintA4PosterAntiEngagement />} />
+        <Route path="/tools" element={<ToolsHub />} />
+        <Route path="/tools/app-check" element={<AppCheck />} />
+        <Route path="/tools/app-check/r/:id" element={<AppCheckResult />} />
         <Route path="/ratgeber" element={<Ratgeber />} />
         <Route path="/ratgeber/was-kinder-apps-machen" element={<RatgeberWasKinderAppsMachen />} />
         <Route path="/ratgeber/morgen-troedeln" element={<RatgeberMorgenTroedeln />} />

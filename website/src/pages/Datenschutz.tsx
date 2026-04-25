@@ -102,6 +102,33 @@ export default function Datenschutz() {
               </p>
             </Section>
 
+            <Section heading="4a. App-Check Werkzeug (Bewertungs-Speicherung)">
+              <p>
+                Wenn du unter <a href="/tools/app-check" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">ronki.de/tools/app-check</a> eine App bewertest und deine Bewertung speicherst, verarbeiten wir folgende Daten, damit ein dauerhafter Permalink für deine Bewertung entstehen kann:
+              </p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>Den App-Namen, den du eingegeben oder ausgewählt hast</li>
+                <li>Deine zehn Yes/No-Antworten zum Fragebogen</li>
+                <li>Den daraus berechneten Score</li>
+                <li>Den Zeitpunkt der Speicherung und die verwendete Sprache (derzeit „de")</li>
+              </ul>
+              <p>
+                <strong className="text-teal-dark">Was wir nicht speichern:</strong> keine IP-Adresse dauerhaft, keine E-Mail, keinen Account, keinen Geräte-Fingerprint und keinen Hinweis darauf, wer den Permalink später öffnet. Eine Verknüpfung mit anderen Daten findet nicht statt.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Zweck:</strong> Damit du deine Bewertung über einen kurzen Permalink (zum Beispiel <code>/tools/app-check/r/x7k2pq3m</code>) erneut aufrufen oder mit anderen teilen kannst.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO, d. h. deine Einwilligung, die du mit dem Klick auf „Bewertung speichern und teilen" erteilst.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Speicherdauer:</strong> Bis du eine Löschung anforderst. Sende uns dafür einfach den Permalink oder die Eval-ID per E-Mail an <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a>; wir entfernen den Eintrag dann zeitnah.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Wichtig zum Verständnis:</strong> Die gespeicherten Bewertungen geben deine eigenen Beobachtungen wieder. Sie sind weder eine Aussage von Ronki über die jeweilige App noch ein verifizierter Test.
+              </p>
+            </Section>
+
             <Section heading="5. Cookies und vergleichbare Technologien">
               <p>
                 Diese Website setzt <strong className="text-teal-dark">keine Cookies</strong> zur Analyse, Wiedererkennung oder Werbung. Auch kein Local Storage oder Session Storage wird für Tracking-Zwecke genutzt.
