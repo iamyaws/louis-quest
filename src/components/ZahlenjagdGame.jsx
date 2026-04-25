@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
-import { getCreatureSpritePath } from '../data/creatures';
+import ChibiFriend from './drachennest/ChibiFriend';
 
 /**
  * ZahlenjagdGame — falling-numbers MINT game hosted by Sturmflügel (sky_0).
@@ -25,9 +25,10 @@ import { getCreatureSpritePath } from '../data/creatures';
  * Reward: on full run (or first level-1 win) → +50 HP via onComplete({ hp: 50 }).
  */
 
-const STURMFLUEGEL_SPRITE = getCreatureSpritePath({
-  art: 'art/micropedia/creatures/creature-8.webp',
-});
+// Sturmflügel rendered via the chibi system (Marc 25 Apr 2026 QA:
+// minigames were still featuring the old SVG art instead of the new
+// chibi system). Chibi id is `sky_0`.
+const STURMFLUEGEL_CHIBI_ID = 'sky_0';
 const base =
   typeof import.meta !== 'undefined' ? import.meta.env.BASE_URL : '/';
 
@@ -494,14 +495,14 @@ export default function ZahlenjagdGame({ onComplete }) {
           height: 104,
         }}
       >
-        <img
+        <div
           key={wingFlap}
-          src={base + STURMFLUEGEL_SPRITE}
-          alt="Sturmflügel"
-          className="w-full h-full object-contain drop-shadow-lg select-none"
+          aria-label="Sturmflügel"
+          className="w-full h-full select-none drop-shadow-lg"
           style={{ animation: 'zjFlap 0.5s ease-out' }}
-          draggable={false}
-        />
+        >
+          <ChibiFriend id={STURMFLUEGEL_CHIBI_ID} size={104} withBg={false} />
+        </div>
       </div>
 
       {/* Catch/miss effects */}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
-import { getFreundSpritePath } from '../data/freunde';
+import ChibiFriend from './drachennest/ChibiFriend';
 
 /**
  * PilzWaageGame — balance-scale puzzle MINT game hosted by Pilzhüter.
@@ -22,9 +22,9 @@ import { getFreundSpritePath } from '../data/freunde';
  * Reward: +50 HP on Level 5 completion → onComplete({ hp: 50 }).
  */
 
-const PILZHUETER_SPRITE = getFreundSpritePath({
-  portrait: 'art/freunde/pilzhueter.webp',
-});
+// Pilzhüter rendered via the chibi system (Marc 25 Apr 2026 QA).
+// The arc-initiator freunde share their id key with ChibiFriend.
+const PILZHUETER_CHIBI_ID = 'pilzhueter';
 const base =
   typeof import.meta !== 'undefined' ? import.meta.env.BASE_URL : '/';
 
@@ -674,14 +674,14 @@ export default function PilzWaageGame({ onComplete }) {
           height: 96,
         }}
       >
-        <img
+        <div
           key={wobble}
-          src={base + PILZHUETER_SPRITE}
-          alt="Pilzhüter"
-          className="w-full h-full object-contain drop-shadow-lg select-none"
+          aria-label="Pilzhüter"
+          className="w-full h-full select-none drop-shadow-lg"
           style={{ animation: 'pwNudge 0.5s ease-out' }}
-          draggable={false}
-        />
+        >
+          <ChibiFriend id={PILZHUETER_CHIBI_ID} size={96} withBg={false} />
+        </div>
       </div>
 
       {/* Level-done overlay */}

@@ -4,6 +4,7 @@ import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import useWeather, { getWeatherInfo, getClothingRecs } from '../hooks/useWeather';
+import { getCatStage } from '../utils/helpers';
 import SFX from '../utils/sfx';
 import { useSpecialQuests } from '../hooks/useSpecialQuests';
 import ToothbrushTimer from './ToothbrushTimer';
@@ -12,6 +13,7 @@ import ClothingSheet from './ClothingSheet';
 import QuestLineCard from './QuestLineCard';
 import TopBar from './TopBar';
 import DailyHabits from './DailyHabits';
+import MoodChibi from './MoodChibi';
 import VoiceAudio from '../utils/voiceAudio';
 import { biomeBackground } from '../utils/biomeBackgrounds';
 import { useQuestEater } from './QuestEater';
@@ -329,12 +331,22 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
                 <div className="relative z-10 flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     {secDone ? (
-                      /* Companion approval avatar when routine is complete */
+                      // Companion approval avatar when routine is complete.
+                      // Replaced the legacy amber-only dragon-baby.webp with
+                      // the kid's actual variant-coloured chibi (Marc 25 Apr
+                      // 2026 QA: "old art for completed quests"). Mirrors
+                      // the canonical pattern from RoomHub: getCatStage()||1
+                      // fallback so we never render the egg here.
                       <div className="relative w-14 h-14">
-                        <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-emerald/30"
+                        <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-emerald/30 grid place-items-center"
                              style={{ background: 'rgba(52,211,153,0.1)' }}>
-                          <img src={import.meta.env.BASE_URL + 'art/dragon-baby.webp'} alt=""
-                               className="w-full h-full object-cover" />
+                          <MoodChibi
+                            size={52}
+                            variant={state?.companionVariant || 'forest'}
+                            stage={getCatStage(state?.catEvo ?? 0) || 1}
+                            mood="happy"
+                            bare
+                          />
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs"
                              style={{ background: '#34d399', border: '2px solid #ecfdf5', lineHeight: 1 }}>

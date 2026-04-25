@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
-import { getCreatureSpritePath } from '../data/creatures';
+import ChibiFriend from './drachennest/ChibiFriend';
 
 /**
  * KristallSortiererGame — color-sorting MINT game hosted by Mr. Shroom (forest_5).
@@ -21,9 +21,10 @@ import { getCreatureSpritePath } from '../data/creatures';
  * Host: Mr. Shroom's hat is "voll Kristalle" — story premise from introLine.
  */
 
-const MR_SHROOM_SPRITE = getCreatureSpritePath({
-  art: 'art/micropedia/creatures/mr-shroom.webp',
-});
+// Mr. Shroom is rendered via the chibi system now (Marc 25 Apr 2026
+// QA: minigames were still featuring the old SVG art instead of the
+// new chibi system). His chibi id is `forest_5`.
+const MR_SHROOM_CHIBI_ID = 'forest_5';
 const base =
   typeof import.meta !== 'undefined' ? import.meta.env.BASE_URL : '/';
 
@@ -511,14 +512,14 @@ export default function KristallSortiererGame({ onComplete }) {
           height: 96,
         }}
       >
-        <img
+        <div
           key={shroomNudge}
-          src={base + MR_SHROOM_SPRITE}
-          alt="Mr. Shroom"
-          className="w-full h-full object-contain drop-shadow-lg select-none"
+          aria-label="Mr. Shroom"
+          className="w-full h-full select-none drop-shadow-lg"
           style={{ animation: 'ksShroomNudge 0.5s ease-out' }}
-          draggable={false}
-        />
+        >
+          <ChibiFriend id={MR_SHROOM_CHIBI_ID} size={96} withBg={false} />
+        </div>
       </div>
 
       {/* Level-done overlay */}

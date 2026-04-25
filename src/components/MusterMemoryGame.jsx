@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
-import { getCreatureSpritePath } from '../data/creatures';
+import ChibiFriend from './drachennest/ChibiFriend';
 
 /**
  * MusterMemoryGame — Simon-Says sequence repeat MINT game hosted by Baumbart.
@@ -17,9 +17,9 @@ import { getCreatureSpritePath } from '../data/creatures';
  * Reward: +50 HP on Level 3 completion → onComplete({ hp: 50 }).
  */
 
-const BAUMBART_SPRITE = getCreatureSpritePath({
-  art: 'art/micropedia/creatures/baumbart.webp',
-});
+// Baumbart rendered via the chibi system (Marc 25 Apr 2026 QA).
+// Chibi id is `forest_4`.
+const BAUMBART_CHIBI_ID = 'forest_4';
 const base =
   typeof import.meta !== 'undefined' ? import.meta.env.BASE_URL : '/';
 
@@ -250,12 +250,12 @@ export default function MusterMemoryGame({ onComplete }) {
               'radial-gradient(circle at 50% 40%, rgba(252,211,77,0.28) 0%, rgba(252,211,77,0) 70%)',
           }}
         >
-          <img
-            src={base + BAUMBART_SPRITE}
-            alt="Baumbart"
-            className="w-full h-full object-contain drop-shadow-lg select-none"
-            draggable={false}
-          />
+          <div
+            aria-label="Baumbart"
+            className="w-full h-full select-none drop-shadow-lg grid place-items-center"
+          >
+            <ChibiFriend id={BAUMBART_CHIBI_ID} size={120} withBg={false} />
+          </div>
         </div>
 
         {/* Level label */}

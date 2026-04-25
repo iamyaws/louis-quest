@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import SFX from '../utils/sfx';
 import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
-import { getCreatureSpritePath } from '../data/creatures';
+import ChibiFriend from './drachennest/ChibiFriend';
 
 /**
  * WurzelLabyrinthGame — tile-maze navigation MINT game hosted by Pilz-Jeti (forest_6).
@@ -18,9 +18,9 @@ import { getCreatureSpritePath } from '../data/creatures';
  * Reward: +50 HP on Level 5 completion → onComplete({ hp: 50 }).
  */
 
-const PILZ_JETI_SPRITE = getCreatureSpritePath({
-  art: 'art/micropedia/creatures/pilz-jeti.webp',
-});
+// Pilz-Jeti rendered via the chibi system (Marc 25 Apr 2026 QA).
+// Chibi id is `forest_6`.
+const PILZ_JETI_CHIBI_ID = 'forest_6';
 const base =
   typeof import.meta !== 'undefined' ? import.meta.env.BASE_URL : '/';
 
@@ -464,14 +464,14 @@ export default function WurzelLabyrinthGame({ onComplete }) {
           height: 104,
         }}
       >
-        <img
+        <div
           key={jetiWatch}
-          src={base + PILZ_JETI_SPRITE}
-          alt="Pilz-Jeti"
-          className="w-full h-full object-contain drop-shadow-lg select-none"
+          aria-label="Pilz-Jeti"
+          className="w-full h-full select-none drop-shadow-lg"
           style={{ animation: 'wlJetiNudge 0.5s ease-out' }}
-          draggable={false}
-        />
+        >
+          <ChibiFriend id={PILZ_JETI_CHIBI_ID} size={104} withBg={false} />
+        </div>
       </div>
 
       {/* Level-done overlay */}

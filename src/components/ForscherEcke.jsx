@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTask } from '../context/TaskContext';
 import { MINT_SEQUENCE } from '../data/mintGames';
 import FreundIntroModal from './FreundIntroModal';
+import ChibiFriend from './drachennest/ChibiFriend';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
 
@@ -113,21 +114,20 @@ export default function ForscherEcke({ onPlayGame }) {
             {t('forscher.count', { done: playedCount, total: MINT_SEQUENCE.length })}
           </p>
         </div>
-        {/* Dr. Funkel — 112px, leans slightly out of the card top-right.
-             mix-blend-mode:multiply drops the image's cream bg into the
-             card's cream; no hard edge visible. drop-shadow keeps him
-             readable; slight rotate for a "stepping in" feel. */}
-        <div className="shrink-0 relative"
-             style={{ width: 112, height: 112, marginTop: -18, marginRight: -8 }}>
-          <img src={`${import.meta.env.BASE_URL}art/characters/doktor-funkel.png`}
-               alt={t('forscher.drFunkelAlt')}
-               className="w-full h-full object-contain select-none"
-               draggable={false}
-               style={{
-                 mixBlendMode: 'multiply',
-                 filter: 'drop-shadow(0 4px 10px rgba(180,83,9,0.3)) contrast(1.05)',
-                 transform: 'rotate(-3deg)',
-               }} />
+        {/* Dr. Funkel — 112px chibi (hearth_2), leans slightly out of
+             the card top-right. Migrated from the legacy
+             doktor-funkel.png to the chibi system (Marc 25 Apr 2026 QA:
+             "in the forscherecke and the minigames we are still
+             featuring the old svg art vs. the new chibi art"). */}
+        <div className="shrink-0 relative grid place-items-center"
+             style={{
+               width: 112, height: 112,
+               marginTop: -18, marginRight: -8,
+               filter: 'drop-shadow(0 4px 10px rgba(180,83,9,0.3))',
+               transform: 'rotate(-3deg)',
+             }}
+             aria-label={t('forscher.drFunkelAlt')}>
+          <ChibiFriend id="hearth_2" size={112} withBg={false} />
         </div>
       </div>
 
