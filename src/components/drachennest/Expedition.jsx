@@ -184,6 +184,7 @@ export default function Expedition({ onClose }) {
         expState={expedition.state}
         biome={expedition.biome}
         variant={state?.companionVariant}
+        discovered={state?.micropediaDiscovered || []}
         onTapDiary={() => { setShowDiary(true); setDiaryFillKey(k => k + 1); }}
         status={status}
       />
@@ -378,7 +379,7 @@ export default function Expedition({ onClose }) {
 
 // ─── Campfire scene ──────────────────────────────────────────────
 
-function CampfireScene({ expState, biome, variant, onTapDiary, status }) {
+function CampfireScene({ expState, biome, variant, discovered, onTapDiary, status }) {
   const showRonki = expState === 'home' || expState === 'leaving' || expState === 'waiting';
   const showDiary = expState === 'waiting';
   const showStatus = expState !== 'home';
@@ -391,7 +392,7 @@ function CampfireScene({ expState, biome, variant, onTapDiary, status }) {
   if (expState === 'away') {
     return (
       <div style={{ position: 'relative' }}>
-        <RonkiAwayLoop biome={biome} variant={variant} />
+        <RonkiAwayLoop biome={biome} variant={variant} discovered={discovered} />
         {showStatus && (
           <div style={{
             position: 'absolute', left: 14, right: 14, top: 14,

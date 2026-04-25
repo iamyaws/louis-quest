@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { getVariant } from '../../data/companionVariants';
+import ChibiFriend, { hasChibiFriend } from './ChibiFriend';
 
 /**
  * RonkiAwayLoop — infinite parallax walk through the current biome.
@@ -29,8 +30,20 @@ const BIOME_CONFIG = {
     sky: 'linear-gradient(180deg, #fef3c7 0%, #fde68a 35%, #d4a373 70%, #6b8e23 100%)',
     mountainColor: '#5a8f4a',
     mountainShadow: '#365314',
-    treeColor: '#15803d',
-    treeShadow: '#14532d',
+    // Per-species tree palettes — kid reads a "real" forest with mixed
+    // canopies (oak / pine / birch / maple) instead of one repeating
+    // shape. Each entry feeds into <Tree kind=… /> below.
+    treeKinds: [
+      // Broadleaf oak — full canopy, default Wald look.
+      { kind: 'oak',    canopy: '#15803d', shadow: '#14532d', trunk: '#5a3a22' },
+      // Pine — taller, slimmer, slightly cooler green.
+      { kind: 'pine',   canopy: '#166534', shadow: '#0f3a1f', trunk: '#3f2818' },
+      // Birch — pale white-grey trunk + light green canopy.
+      { kind: 'birch',  canopy: '#65a30d', shadow: '#365314', trunk: '#e7e5e4' },
+      // Autumn maple — warm orange-tinted canopy, scattered amongst
+      // the greens for visual variety.
+      { kind: 'maple',  canopy: '#ea7c1a', shadow: '#9a3412', trunk: '#5a3a22' },
+    ],
     ground: 'linear-gradient(180deg, #6b5a3a 0%, #3a2f1a 100%)',
     items: [
       { glyph: '🍄', size: 22, y: 0 },
@@ -39,20 +52,35 @@ const BIOME_CONFIG = {
       { glyph: '🪨', size: 18, y: 2 },
       { glyph: '🍁', size: 18, y: -1 },
       { glyph: '🌱', size: 16, y: 3 },
+      // 25 Apr 2026 polish (Marc): Morgenwald felt sparse + repetitive
+      // — added 6 more glyphs so the foreground row reads as a real
+      // forest floor rather than a 6-icon loop.
+      { glyph: '🌾', size: 18, y: 0 },
+      { glyph: '🌻', size: 18, y: -1 },
+      { glyph: '🪵', size: 18, y: 3 },
+      { glyph: '🐌', size: 16, y: 2 },
+      { glyph: '🪺', size: 18, y: 1 },
+      { glyph: '🌸', size: 16, y: -2 },
     ],
   },
   // Reserved for future biomes — Sandküste, Hochmoor, Sterntal etc.
   // get their own item set + palette when those biomes unlock.
 };
 
-export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest' }) {
+// Density of the midground treeline. Bumped from 18 → 28 (Marc 25 Apr
+// 2026: "for a biom called morgenwald this is very few trees and very
+// repetitive"). The trees alternate through cfg.treeKinds so neighbors
+// never match.
+const TREE_COUNT = 28;
+
+export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest', discovered = [] }) {
   const cfg = BIOME_CONFIG[biome] || BIOME_CONFIG.morgenwald;
   const variantPalette = getVariant(variant)?.chibi || {};
   // Two repeats of each item set so the scroll loops seamlessly. A
   // useMemo so the random-x offsets don't shuffle on every render
   // (would jitter visibly during the parallax animation).
   const itemRow = useMemo(() => {
-    const row = [...cfg.items, ...cfg.items, ...cfg.items];
+    const row = [...cfg.items, ...cfg.items];
     return row.map((item, i) => ({
       ...item,
       key: i,
@@ -61,6 +89,40 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
       left: `${(i / row.length) * 300 + (i * 1.7) % 5}%`,
     }));
   }, [cfg.items]);
+
+  // Tree row — alternate through species + vary scale, keeping the
+  // assignment stable across renders so the line doesn't shimmer.
+  const treeRow = useMemo(() => {
+    return Array.from({ length: TREE_COUNT }).map((_, i) => ({
+      key: i,
+      species: cfg.treeKinds[i % cfg.treeKinds.length],
+      left: `${(i / TREE_COUNT) * 300 + ((i * 13) % 7) * 0.3}%`,
+      scale: 0.6 + ((i * 11) % 6) / 12,
+      flip:  ((i * 7) % 2) === 0,
+    }));
+  }, [cfg.treeKinds]);
+
+  // Friend cameos (Marc 25 Apr 2026: "maybe also see some of the
+  // friends we already have discovered when we do a expedition like
+  // this"). Pick up to 3 discovered creatures that have a chibi
+  // renderer + spread them across the scroll. Stable across renders
+  // so they don't pop in/out as the parallax runs.
+  const cameos = useMemo(() => {
+    const ids = (discovered || [])
+      .map(d => (typeof d === 'string' ? d : d?.id))
+      .filter(id => id && hasChibiFriend(id));
+    if (ids.length === 0) return [];
+    const pick = ids.slice(0, 3);
+    return pick.map((id, i) => ({
+      key: `${id}-${i}`,
+      id,
+      // Place at evenly-spaced positions across the 300% scroll
+      // width with a small offset per index so they don't all line
+      // up vertically.
+      left: `${20 + i * 90 + (i * 7) % 11}%`,
+      bob: i * 0.3,
+    }));
+  }, [discovered]);
 
   return (
     <div
@@ -98,20 +160,87 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
         </svg>
       </div>
 
-      {/* Layer 2: Midground treeline — medium parallax. */}
+      {/* Layer 1.5: Drifting clouds — even slower than mountains.
+          Two wispy shapes at slightly different y positions help
+          fill the upper sky band so the scene reads "alive" even
+          before the foreground items pass. */}
+      <div aria-hidden="true" style={{
+        position: 'absolute',
+        top: '6%',
+        left: 0,
+        width: '300%',
+        height: '14%',
+        animation: 'rwl-scroll-cloud 50s linear infinite',
+        pointerEvents: 'none',
+      }}>
+        {[
+          { left: '8%',  top: 4,  scale: 1.0 },
+          { left: '38%', top: 16, scale: 0.7 },
+          { left: '64%', top: 0,  scale: 1.1 },
+          { left: '82%', top: 12, scale: 0.85 },
+        ].map((c, i) => (
+          <div key={i} style={{
+            position: 'absolute', left: c.left, top: c.top,
+            transform: `scale(${c.scale})`, transformOrigin: 'left top',
+            opacity: 0.78,
+          }}>
+            <div style={{
+              width: 64, height: 18, borderRadius: 999,
+              background: 'rgba(255,255,255,0.85)',
+              boxShadow: '14px -8px 0 -2px rgba(255,255,255,0.85), 28px 0 0 -4px rgba(255,255,255,0.85)',
+              filter: 'blur(0.4px)',
+            }} />
+          </div>
+        ))}
+      </div>
+
+      {/* Layer 2: Midground treeline — medium parallax. Mixed
+          species (oak / pine / birch / maple) at varying scale
+          + horizontal flip so neighbouring trees don't twin. */}
       <div style={{
         position: 'absolute',
         bottom: '24%',
         left: 0,
         width: '300%',
-        height: '22%',
+        height: '24%',
         animation: 'rwl-scroll-med 16s linear infinite',
         pointerEvents: 'none',
       }}>
-        {Array.from({ length: 18 }).map((_, i) => (
-          <Tree key={i} cfg={cfg} left={`${(i / 18) * 300}%`} scale={0.7 + ((i * 11) % 6) / 12} />
+        {treeRow.map(t => (
+          <Tree key={t.key} species={t.species} left={t.left} scale={t.scale} flip={t.flip} />
         ))}
       </div>
+
+      {/* Layer 2.5: Friend cameos — discovered creatures peek up
+          from the ground line as Ronki glides over. Same scroll
+          speed as the foreground items so they feel earth-bound
+          rather than floating. Hidden when nothing's discovered. */}
+      {cameos.length > 0 && (
+        <div aria-hidden="true" style={{
+          position: 'absolute',
+          bottom: '22%',
+          left: 0,
+          width: '300%',
+          height: 64,
+          animation: 'rwl-scroll-fast 10s linear infinite',
+          pointerEvents: 'none',
+          zIndex: 3,
+        }}>
+          {cameos.map(c => (
+            <div key={c.key} style={{
+              position: 'absolute',
+              left: c.left,
+              bottom: 0,
+              width: 56,
+              height: 56,
+              animation: `rwl-cameo-bob 1.8s ease-in-out infinite ${c.bob}s`,
+              filter: 'drop-shadow(0 4px 4px rgba(0,0,0,0.35))',
+            }}>
+              <ChibiFriend id={c.id} size={56} withBg={false} />
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Layer 3: Ground band — flat, no scroll. */}
       <div style={{
@@ -206,9 +335,16 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
       ))}
 
       <style>{`
-        @keyframes rwl-scroll-slow { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
-        @keyframes rwl-scroll-med  { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
-        @keyframes rwl-scroll-fast { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
+        @keyframes rwl-scroll-slow  { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
+        @keyframes rwl-scroll-med   { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
+        @keyframes rwl-scroll-fast  { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
+        @keyframes rwl-scroll-cloud { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
+        @keyframes rwl-cameo-bob {
+          /* Tiny up-down + sway — cameo creatures look "alive" rather
+             than floating stickers as the parallax glides past. */
+          0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+          50%      { transform: translateY(-3px) rotate(1.5deg); }
+        }
         @keyframes rwl-fly {
           /* Subtle vertical bob + slight tilt — selling the glide
              without being jittery. */
@@ -232,31 +368,89 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
 }
 
 // ─── Tree (midground parallax) ──────────────────────────────
+// `species.kind` selects the silhouette: oak (default broad),
+// pine (tall triangle stack), birch (slim canopy + pale trunk),
+// maple (oak shape but warm autumn palette). `flip` mirrors the
+// canopy horizontally so neighbouring trees don't twin.
 
-function Tree({ cfg, left, scale }) {
+function Tree({ species, left, scale, flip = false }) {
+  const { kind, canopy, shadow, trunk } = species;
+  const palette = { canopy, shadow, trunk };
+
+  if (kind === 'pine') {
+    return (
+      <div style={{
+        position: 'absolute', left, bottom: 0,
+        width: 32, height: 64,
+        transform: `scale(${scale}) ${flip ? 'scaleX(-1)' : ''}`.trim(),
+        transformOrigin: 'bottom center',
+      }}>
+        {/* Trunk */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: '46%',
+          width: '8%', height: '22%',
+          background: palette.trunk,
+          transform: 'translateX(-50%)',
+        }} />
+        {/* Three-tier triangle stack */}
+        {[0, 1, 2].map(i => (
+          <div key={i} style={{
+            position: 'absolute',
+            left: '50%',
+            bottom: `${20 + i * 18}%`,
+            transform: 'translateX(-50%)',
+            width: 0, height: 0,
+            borderLeft: `${14 - i * 3}px solid transparent`,
+            borderRight: `${14 - i * 3}px solid transparent`,
+            borderBottom: `${22 - i * 3}px solid ${i === 2 ? palette.canopy : palette.shadow}`,
+            filter: `drop-shadow(0 1px 0 ${palette.shadow})`,
+          }} />
+        ))}
+      </div>
+    );
+  }
+
+  // oak / maple / birch share the broadleaf shape but with their
+  // own palette. Birch trunk is pale (white-grey).
   return (
     <div style={{
-      position: 'absolute',
-      left,
-      bottom: 0,
-      width: 36, height: 56,
-      transform: `scale(${scale})`,
+      position: 'absolute', left, bottom: 0,
+      width: 38, height: 58,
+      transform: `scale(${scale}) ${flip ? 'scaleX(-1)' : ''}`.trim(),
       transformOrigin: 'bottom center',
     }}>
       {/* Trunk */}
       <div style={{
         position: 'absolute', bottom: 0,
-        left: '46%', width: '8%', height: '38%',
-        background: '#5a3a22',
+        left: '46%', width: kind === 'birch' ? '7%' : '8%', height: '38%',
+        background: kind === 'birch'
+          ? `linear-gradient(180deg, ${palette.trunk} 0%, #c7c4be 100%)`
+          : palette.trunk,
         transform: 'translateX(-50%)',
+        boxShadow: kind === 'birch' ? 'inset -1px 0 0 rgba(0,0,0,0.15)' : undefined,
       }} />
+      {/* Birch's signature dark dashes */}
+      {kind === 'birch' && (
+        <>
+          {[0.18, 0.28, 0.36, 0.48, 0.58].map((t, i) => (
+            <div key={i} style={{
+              position: 'absolute', bottom: `${t * 38}%`,
+              left: i % 2 === 0 ? '46%' : '50%',
+              width: 3, height: 1,
+              background: 'rgba(60,40,28,0.65)',
+              transform: 'translateX(-50%)',
+            }} />
+          ))}
+        </>
+      )}
       {/* Canopy */}
       <div style={{
         position: 'absolute', left: '50%', bottom: '28%',
         transform: 'translateX(-50%)',
-        width: 32, height: 44,
-        background: `radial-gradient(ellipse at 40% 30%, ${cfg.treeColor}, ${cfg.treeShadow} 75%)`,
+        width: 34, height: 46,
+        background: `radial-gradient(ellipse at 40% 30%, ${palette.canopy}, ${palette.shadow} 78%)`,
         borderRadius: '50% 60% 55% 45% / 40% 50% 55% 45%',
+        boxShadow: 'inset 0 -4px 6px rgba(0,0,0,0.18)',
       }} />
     </div>
   );
