@@ -14,6 +14,7 @@ import { SPECIAL_QUESTS } from '../data/specialQuests';
 import { MINT_SEQUENCE } from '../data/mintGames';
 import storage from '../utils/storage';
 import { useAuth } from './AuthContext';
+import { track } from '../lib/analytics';
 
 // ── Fire-breath progression ──
 /**
@@ -1967,6 +1968,12 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const rangerDeparted = useCallback(() => {
+    // Track only on real state transitions (not no-op guards). Closure
+    // flag is set inside the updater because setState is synchronous;
+    // by the time setState returns, the flag reflects whether the
+    // transition actually fired.
+    let didDepart = false;
+    let biome: 'morgenwald' = 'morgenwald';
     setState(prev => {
       if (!prev) return prev;
       const e = prev.expedition || { state: 'home' as const, biome: 'morgenwald' as const };
@@ -1980,6 +1987,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       today14.setHours(14, 0, 0, 0);
       const returnDate = today14 > now && today14 < fourLater ? today14 : fourLater;
       const memento = pickMorgenwaldMemento(prev.expeditionLog || []);
+      didDepart = true;
+      biome = e.biome || 'morgenwald';
       return {
         ...prev,
         expedition: {
@@ -1991,21 +2000,33 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         },
       };
     });
+    if (didDepart) track('expedition.start', { biome });
   }, []);
 
   const rangerArrived = useCallback(() => {
+    let didArrive = false;
+    let biome: 'morgenwald' = 'morgenwald';
     setState(prev => {
       if (!prev) return prev;
       const e = prev.expedition;
       if (!e || e.state !== 'away') return prev;
+      didArrive = true;
+      biome = e.biome || 'morgenwald';
       return { ...prev, expedition: { ...e, state: 'waiting' as const } };
     });
+    if (didArrive) track('expedition.return', { biome });
   }, []);
 
   const receiveMemento = useCallback(() => {
+    let didReceive = false;
+    let biome: 'morgenwald' = 'morgenwald';
     setState(prev => {
       if (!prev) return prev;
       const e = prev.expedition;
+      if (e?.pendingMemento) {
+        didReceive = true;
+        biome = e.biome || 'morgenwald';
+      }
       // Vitals decay back to a baseline 70 each on adventure return
       // (Marc 25 Apr 2026 — Funken loop redesign). Without this the
       // kid would only need to fill vitals once forever; the trip
@@ -2028,6 +2049,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         ronkiVitals: tiredVitals,
       };
     });
+    if (didReceive) track('memento.received', { biome });
   }, []);
 
   // ── Save journal (also archives to history) ──

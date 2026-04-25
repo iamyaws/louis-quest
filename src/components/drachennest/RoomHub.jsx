@@ -3,6 +3,7 @@ import { useTask } from '../../context/TaskContext';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { getCatStage } from '../../utils/helpers';
 import { resolveWallpaper, resolveFloor } from '../../data/caveStyles';
+import { track } from '../../lib/analytics';
 import MoodChibi from '../MoodChibi';
 import RonkiVitalsRing from './RonkiVitalsRing';
 import CareVerbs from './CareVerbs';
@@ -140,6 +141,11 @@ export default function RoomHub({ onNavigate }) {
     const glyph = variants[Math.floor(Math.random() * variants.length)];
     setFloatingHearts(prev => [...prev, { id, x, y, kind: glyph }]);
     setTimeout(() => setFloatingHearts(prev => prev.filter(h => h.id !== id)), 950);
+
+    // Telemetry — count companion-touch moments. Fires on every tap so
+    // a single "kid played with Ronki for 30s" session shows up as
+    // multiple events (intentional — frequency matters for this loop).
+    track('companion.tap');
 
     // Body-reaction escalation every 3rd tap. Cycle through the pool
     // round-robin (with a small randomization shuffle) so the kid

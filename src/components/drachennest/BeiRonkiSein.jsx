@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTask } from '../../context/TaskContext';
 import { getCatStage } from '../../utils/helpers';
+import { track } from '../../lib/analytics';
 import MoodChibi from '../MoodChibi';
 
 /**
@@ -74,6 +75,10 @@ export default function BeiRonkiSein({ onClose }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
+
+  // Telemetry — fire once per mount so we count "kid sat with Ronki"
+  // moments. This is a high-signal event for the companion thesis.
+  useEffect(() => { track('companion.sit'); }, []);
 
   // Reveal the story line ~700ms after the scene fades in so the kid
   // has a beat to register the change of place before Ronki speaks.

@@ -38,7 +38,15 @@ export type EventName =
   | 'ausmalbild.redeem'
   | 'parent.pin.enter'
   | 'parent.dashboard.open'
-  | 'parent.setting.change';
+  | 'parent.setting.change'
+  // Drachennest companion-pillar events (cut #2 — Marc 25 Apr 2026):
+  // the most expensive shipped feature was invisible to telemetry.
+  // Each event is enum-bound or numeric; no free-form user content.
+  | 'expedition.start'
+  | 'expedition.return'
+  | 'memento.received'
+  | 'companion.sit'
+  | 'companion.tap';
 
 export type EventProps = Record<string, string | number | boolean>;
 
@@ -62,6 +70,15 @@ const ALLOWED_PROP_KEYS: Record<EventName, readonly string[]> = {
   'parent.pin.enter': ['success'],
   'parent.dashboard.open': [],
   'parent.setting.change': ['key'],
+  // Drachennest events. `biome` is the kid-facing biome id ('morgenwald'
+  // today, more later) — enum-bounded, never user content. No memento
+  // name on `memento.received` so the event can't leak a memento title
+  // that might in some future build include kid-readable copy.
+  'expedition.start': ['biome'],
+  'expedition.return': ['biome'],
+  'memento.received': ['biome'],
+  'companion.sit': [],
+  'companion.tap': [],
 };
 
 // ── Storage keys ─────────────────────────────────────────────────────
