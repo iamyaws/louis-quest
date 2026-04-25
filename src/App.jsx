@@ -52,7 +52,10 @@ const KristallKetteGame = lazy(() => import('./components/KristallKetteGame'));
 const KristallHoehleGame = lazy(() => import('./components/KristallHoehleGame'));
 const CampfireVisitorsGame = lazy(() => import('./components/CampfireVisitorsGame'));
 const DreiDankeTool = lazy(() => import('./components/DreiDankeTool'));
-const KraftwortTool = lazy(() => import('./components/KraftwortTool'));
+// KraftwortTool deleted in cut #8 (UX audit flagged it as
+// sticker-of-the-day with heavy state plumbing — worst friction-to-
+// emotional-payoff ratio in the tool library). Replacement to come
+// when we have a tactile-companion-beat design ready.
 const LoewenPoseTool = lazy(() => import('./components/LoewenPoseTool'));
 const SteinUndGummiTool = lazy(() => import('./components/SteinUndGummiTool'));
 const RonkiAusmalbild = lazy(() => import('./components/RonkiAusmalbild'));
@@ -492,13 +495,7 @@ function AppContent() {
           </Suspense>
         </ToolErrorBoundary>
       )}
-      {view === 'kraftwort' && (
-        <ToolErrorBoundary toolName="KraftwortTool" onBack={() => setView('hub')}>
-          <Suspense fallback={<ToolLoadingFallback />}>
-            <KraftwortTool onComplete={() => setView('ronki')} />
-          </Suspense>
-        </ToolErrorBoundary>
-      )}
+      {/* kraftwort view route deleted in cut #8 (KraftwortTool removed). */}
       {view === 'loewe' && (
         <ToolErrorBoundary toolName="LoewenPoseTool" onBack={() => setView('hub')}>
           <Suspense fallback={<ToolLoadingFallback />}>
