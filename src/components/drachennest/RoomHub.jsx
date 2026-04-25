@@ -632,17 +632,17 @@ export default function RoomHub({ onNavigate }) {
         />
       )}
 
-      {/* Care verbs row + Funken counter.
-          Marc 25 Apr 2026 — token economy: care verbs were free
-          taps, the loop wasn't earned. Now each quest grants 1
-          Funke; each verb tap costs 1. The kicker above the row
-          tells the kid how many Funken they have, with copy that
-          flips to "voll" or "Erst eine Aufgabe" depending on the
-          state. The verbs themselves render disabled when there's
-          no fuel. */}
+      {/* Care verbs row + Sterne counter.
+          Marc 25 Apr 2026 — currency consolidation: dropped Funken
+          as a separate currency, care now spends Sterne (state.hp)
+          directly. Funkelzeit (drachenEier) stays separate so a
+          kid can't pull all their Sterne into screentime at the
+          cost of caring for Ronki. The kicker shows their Sterne
+          balance with copy that flips to "voll" / "Erst eine
+          Aufgabe" depending on state. */}
       <section style={{ padding: '20px 18px 0' }}>
         <FunkenChip
-          tokens={state?.careTokens || 0}
+          tokens={state?.hp || 0}
           allFull={
             (state?.ronkiVitals?.hunger || 0) >= 100 &&
             (state?.ronkiVitals?.liebe || 0) >= 100 &&
@@ -1141,14 +1141,18 @@ function ShelfDecor({ expeditionLog }) {
   );
 }
 
-// Funken counter — sits above the care verbs row. Three states:
-//   "all full"     → "Ronki ist satt — bereit fürs Abenteuer"
-//   "tokens > 0"   → "X Funken zum Verteilen"
-//   "tokens === 0" → "Erst eine Aufgabe machen, dann Funken sammeln"
+// Sterne counter — sits above the care verbs row. Three states:
+//   "all full"   → "Ronki geht's gut" (Marc 25 Apr 2026 — 'satt'
+//                  read too literally about food when the state
+//                  is all-three-vitals-full; flipped to the
+//                  more general 'feeling good')
+//   "tokens > 0" → "X Sterne zum Verteilen"
+//   "tokens===0" → "Erst eine Aufgabe machen, dann Sterne sammeln"
 //
-// Visual: small kicker line + a sparkle ✦ icon row (3 dots reflecting
-// token count, capped at 6 visible). Kid-readable count without a
-// numeric badge.
+// Visual: small kicker line + a star ★ icon row (6 pips reflecting
+// available Sterne, capped at 6 visible). Kid-readable count
+// without a numeric badge. Renamed from FunkenChip when we
+// consolidated to Sterne-as-care-currency 25 Apr 2026.
 function FunkenChip({ tokens, allFull }) {
   return (
     <div style={{
@@ -1163,8 +1167,8 @@ function FunkenChip({ tokens, allFull }) {
         letterSpacing: '0.22em', textTransform: 'uppercase',
         color: allFull ? '#92400e' : tokens > 0 ? '#b45309' : 'rgba(18,67,70,0.55)',
       }}>
-        {allFull ? 'Ronki ist satt' :
-         tokens > 0 ? `${tokens} Funken` :
+        {allFull ? "Ronki geht's gut" :
+         tokens > 0 ? `${tokens} Sterne` :
          'Erst eine Aufgabe'}
       </div>
       {!allFull && (

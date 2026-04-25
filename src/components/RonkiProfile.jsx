@@ -221,7 +221,9 @@ export default function RonkiProfile({ onNavigate }) {
   // Spiele / Erinnerungen are first-class siblings instead of drill-ins.
   // Bottom app-nav stays the single "home" — switching segments doesn't
   // replace the main tab bar (Marc: "kids get confused by two nav bars").
-  const [segment, setSegment] = useState('pflege');
+  // Default segment 'freunde' since the 'pflege' tab moved to the
+  // Drachennest care row 25 Apr 2026.
+  const [segment, setSegment] = useState('freunde');
   const [thankYou, setThankYou] = useState(null); // thank-you bubble after a reaction choice
   const dev = isDevMode();
 
@@ -1000,7 +1002,15 @@ export default function RonkiProfile({ onNavigate }) {
                  boxShadow: 'inset 0 1px 2px rgba(18,67,70,0.1)',
                }}>
             {[
-              { id: 'pflege',       label: lang === 'de' ? 'Pflege'       : 'Care',     icon: 'favorite' },
+              // 'pflege' segment removed 25 Apr 2026 (Marc — "we have
+              // a duplicate, the one appears in the Nest the other at
+              // the Ronki view, I'd probably get rid of it"). The
+              // Drachennest's care row is now the single home for
+              // Füttern / Streicheln / Spielen so the kid only ever
+              // sees that interaction in one place. The Pflege block
+              // below stays in source for now (keeps its bad-day
+              // sad-hero gentle-reaction code paths reachable from
+              // future surfaces) but no segment tab routes here.
               { id: 'freunde',      label: lang === 'de' ? 'Freunde'      : 'Friends',  icon: 'groups' },
               // Feuer replaced Spiele 24 Apr 2026 (Marc) — the mini-games
               // pass-through moved to the main NavBar, and this slot now

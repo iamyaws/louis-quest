@@ -1457,17 +1457,17 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         hobby:   { vital: 'liebe',  amt: 10 },
         bedtime: { vital: 'energie', amt: 14 },
       };
-      // Funken token earn (25 Apr 2026 — Marc's loop redesign).
-      // Each quest grants +1 careToken. The kid spends these via the
-      // care verbs to top up Ronki's vitals. Cap at 12 so the kid
-      // can't bank infinite spam-fuel between days. Replaces the
-      // earlier auto anchor-bump model where vitals filled passively
-      // on quest tick — kid agency over which vital gets attention
-      // is the whole point of the loop.
-      const careTokens = Math.min(12, (prev.careTokens || 0) + 1);
+      // Currency consolidation (Marc 25 Apr 2026): the dedicated
+      // careTokens field is retired — care now spends Sterne (hp)
+      // directly. The hp earn happens elsewhere in this reducer,
+      // so a quest tick automatically gives the kid a Stern they
+      // can spend on care OR on the reward shop. Funkelzeit stays
+      // separate (drachenEier) so a kid can't divert all Sterne
+      // into screentime. careTokens stays on the type for legacy
+      // saves but is no longer mutated.
+      const careTokens = prev.careTokens || 0;
       // Vitals stay where they are on quest tick — the kid drives
-      // them via the Funken-spend on care verbs. We keep the
-      // ronkiVitals field to preserve the existing hydration shape.
+      // them via the Stern-spend on care verbs.
       const ronkiVitals = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
 
       // Expedition state pass-through. The auto "morning ritual at
@@ -1717,19 +1717,23 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     const amounts = { hunger: 20, liebe: 15, energie: 25 } as const;
     setState(prev => {
       if (!prev) return prev;
-      // Funken gate (25 Apr 2026): each tap costs 1 token. If the
-      // pile is empty we no-op — the surface should already render
-      // the verbs disabled so this is a defense-in-depth guard.
-      const tokens = prev.careTokens || 0;
-      if (tokens <= 0) return prev;
+      // Currency consolidation (Marc 25 Apr 2026): care now spends
+      // Sterne (state.hp) directly. Funkelzeit (drachenEier) stays
+      // separate so a kid can't divert all their Sterne into
+      // screentime at the cost of caring for Ronki. Each tap is 1
+      // Stern. If the pile is empty we no-op — the surface should
+      // already render the verbs disabled so this is a defense-in-
+      // depth guard.
+      const sterne = prev.hp || 0;
+      if (sterne <= 0) return prev;
       const v = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
-      // Guard: if the vital is already at 100, don't waste a Funken
+      // Guard: if the vital is already at 100, don't waste a Stern
       // — the kid gets feedback at the surface that this verb is
-      // capped, and the token stays on the pile for another use.
+      // capped, and the Stern stays on the pile for another use.
       if (v[kind] >= 100) return prev;
       return {
         ...prev,
-        careTokens: tokens - 1,
+        hp: sterne - 1,
         ronkiVitals: { ...v, [kind]: Math.min(100, v[kind] + amounts[kind]) },
       };
     });

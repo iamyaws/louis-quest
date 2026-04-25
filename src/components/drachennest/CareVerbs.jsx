@@ -27,7 +27,15 @@ const VERBS = [
 export default function CareVerbs() {
   const { state, actions } = useTask();
   const [flashed, setFlashed] = useState(null);  // { kind, amt } | null
-  const tokens = state?.careTokens || 0;
+  // Currency consolidation (Marc 25 Apr 2026 — "I do think it
+  // needs to option to have funkelzeit and sterne, otherwise there
+  // will be kids that tend to reward themselves only with screentime
+  // and save their stars for that"). Care now spends Sterne (state.hp)
+  // instead of the dedicated careTokens. Funkelzeit (drachenEier)
+  // stays a separate spend lane for screentime, so a kid can't
+  // collapse their whole reward budget into screen time at the cost
+  // of caring for Ronki. Two currencies total.
+  const tokens = state?.hp || 0;
   const vitals = state?.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
 
   const tap = (verb) => {
