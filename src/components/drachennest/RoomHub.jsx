@@ -103,17 +103,18 @@ export default function RoomHub({ onNavigate }) {
   const bedtimeDone = quests.filter(q => q.anchor === 'bedtime').every(q => q.done) && quests.some(q => q.anchor === 'bedtime');
   const expeditionUnlocked = morningDone && bedtimeDone;
 
-  // Tap-Ronki random reaction (Marc 25 Apr 2026 — "by tapping ronki you
-  // trigger these heart emojis, he should be doing a random set of
-  // animations after certain clicks and maybe even trigger voicelines
-  // (giggling or a looping animation)"). Each tap picks one of four
-  // reactions: heart float (default), sparkle burst, giggle bounce, or
-  // spin. The reaction animates the chibi wrapper via a CSS class on
-  // the same element, and the floating-hearts list now stores the
-  // reaction kind so the spawner can render the right glyph.
+  // Tap-Ronki reaction rotation (Marc 25 Apr 2026 second pass — "i
+  // like the looping animation. do we have others? like burping a
+  // flame or winking, etc. to have a few in rotation"). Reaction
+  // pool grew from 2 → 6: bounce, spin, wink, flameBurp, shake,
+  // wiggle. Every third tap escalates into a body reaction; non-
+  // escalating taps still spawn a glyph (heart / sparkle / giggle).
+  // Voiceline stubs are commented out per-reaction so the audio
+  // wiring lands cleanly when samples are recorded.
   const reactionTimerRef = useRef(null);
-  const [reaction, setReaction] = useState(null); // 'bounce' | 'spin' | null
+  const [reaction, setReaction] = useState(null);
   const tapCountRef = useRef(0);
+  const reactionIdxRef = useRef(0);
 
   const tapRonki = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -122,25 +123,33 @@ export default function RoomHub({ onNavigate }) {
     const y = e.clientY - rect.top;
     tapCountRef.current += 1;
 
-    // Reaction picker — every third tap escalates into a body
-    // animation (bounce or spin), every other tap stays as a glyph
-    // burst. Keeps the loop varied without making every tap a big
-    // production. Glyph variants: heart, sparkle, giggle (hihi text).
+    // Glyph burst on every tap.
     const variants = ['heart', 'sparkle', 'giggle'];
     const glyph = variants[Math.floor(Math.random() * variants.length)];
     setFloatingHearts(prev => [...prev, { id, x, y, kind: glyph }]);
     setTimeout(() => setFloatingHearts(prev => prev.filter(h => h.id !== id)), 950);
 
+    // Body-reaction escalation every 3rd tap. Cycle through the pool
+    // round-robin (with a small randomization shuffle) so the kid
+    // sees variety rather than the same trick twice in a row.
     if (tapCountRef.current % 3 === 0) {
-      const moves = ['bounce', 'spin'];
-      const move = moves[Math.floor(Math.random() * moves.length)];
+      const moves = ['bounce', 'spin', 'wink', 'flameBurp', 'shake', 'wiggle'];
+      // Round-robin + small jitter so the same move doesn't repeat back-to-back.
+      reactionIdxRef.current = (reactionIdxRef.current + 1 + Math.floor(Math.random() * 2)) % moves.length;
+      const move = moves[reactionIdxRef.current];
       setReaction(move);
-      // TODO(voiceline): play a Ronki giggle/coo sample matched to
-      // the reaction kind. VoiceAudio.playLocalized('ronki_giggle_01')
-      // once a few takes are recorded. See voice-casting reference
-      // in basic-memory.
+      // TODO(voiceline): per-reaction Ronki samples. Mapping:
+      //   bounce    → ronki_giggle_*
+      //   spin      → ronki_dizzy_*
+      //   wink      → ronki_coo_*
+      //   flameBurp → ronki_burp_* (existing flame-puff SFX)
+      //   shake     → ronki_huff_*
+      //   wiggle    → ronki_wiggle_*
+      // Sample sets get recorded as part of the voice-redesign
+      // backlog — see reference_voice_casting.md.
+      const dur = move === 'flameBurp' ? 1100 : move === 'spin' ? 950 : 900;
       if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current);
-      reactionTimerRef.current = setTimeout(() => setReaction(null), 900);
+      reactionTimerRef.current = setTimeout(() => setReaction(null), dur);
     }
   };
 
@@ -515,12 +524,23 @@ export default function RoomHub({ onNavigate }) {
                   width: ronkiPx,
                   height: ronkiPx,
                   transform: 'translateY(-9%)',
-                  // Reaction class drives a one-shot bounce or spin on
-                  // tap. The class clears after the animation in
+                  // Reaction class drives a one-shot animation on tap.
+                  // The class clears after a per-move duration in
                   // tapRonki's setTimeout so a subsequent tap can
-                  // re-trigger.
-                  animation: reaction === 'bounce' ? 'rh-rk-bounce 0.85s ease-out'
-                           : reaction === 'spin'   ? 'rh-rk-spin 0.95s ease-in-out'
+                  // re-trigger. Six moves in rotation:
+                  //   bounce    — vertical squash
+                  //   spin      — full 360° turn
+                  //   wink      — quick subtle scale on the body
+                  //   flameBurp — small forward lean (sample for
+                  //                 the future flame-puff overlay)
+                  //   shake     — fast side-to-side wiggle
+                  //   wiggle    — slow squash + stretch + tilt
+                  animation: reaction === 'bounce'    ? 'rh-rk-bounce 0.85s ease-out'
+                           : reaction === 'spin'      ? 'rh-rk-spin 0.95s ease-in-out'
+                           : reaction === 'wink'      ? 'rh-rk-wink 0.8s ease-out'
+                           : reaction === 'flameBurp' ? 'rh-rk-burp 1.05s ease-out'
+                           : reaction === 'shake'     ? 'rh-rk-shake 0.85s ease-in-out'
+                           : reaction === 'wiggle'    ? 'rh-rk-wiggle 0.85s ease-in-out'
                            : undefined,
                 }}
               >
@@ -819,6 +839,42 @@ export default function RoomHub({ onNavigate }) {
         @keyframes rh-rk-spin {
           0%   { transform: translateY(-9%) rotate(0deg); }
           100% { transform: translateY(-9%) rotate(360deg); }
+        }
+        @keyframes rh-rk-wink {
+          /* Subtle scale-down + back, with a tiny tilt — reads as a
+             playful blink/wink on the body level. */
+          0%   { transform: translateY(-9%) scale(1) rotate(0deg); }
+          25%  { transform: translateY(-9%) scale(0.96, 1.02) rotate(-1deg); }
+          55%  { transform: translateY(-9%) scale(1.02, 0.98) rotate(1deg); }
+          100% { transform: translateY(-9%) scale(1) rotate(0deg); }
+        }
+        @keyframes rh-rk-burp {
+          /* Quick forward lean + bounce-back — the body cue that
+             pairs with the future flame-puff overlay. */
+          0%   { transform: translateY(-9%) scale(1) rotate(0deg); }
+          15%  { transform: translateY(-7%) scale(0.94, 1.06) rotate(0deg); }
+          35%  { transform: translateY(-12%) scale(1.08, 0.94) rotate(0deg); }
+          60%  { transform: translateY(-9%) scale(1) rotate(0deg); }
+          100% { transform: translateY(-9%) scale(1) rotate(0deg); }
+        }
+        @keyframes rh-rk-shake {
+          /* Fast side-to-side wiggle — Ronki shaking himself off,
+             excited or refusing nicely. */
+          0%, 100% { transform: translateY(-9%) translateX(0); }
+          15%      { transform: translateY(-9%) translateX(-3%); }
+          30%      { transform: translateY(-9%) translateX(3%); }
+          45%      { transform: translateY(-9%) translateX(-3%); }
+          60%      { transform: translateY(-9%) translateX(3%); }
+          75%      { transform: translateY(-9%) translateX(-2%); }
+        }
+        @keyframes rh-rk-wiggle {
+          /* Slower squash-and-stretch with a gentle tilt — giggle
+             wiggle. */
+          0%   { transform: translateY(-9%) scale(1) rotate(0deg); }
+          25%  { transform: translateY(-7%) scale(1.05, 0.95) rotate(-3deg); }
+          50%  { transform: translateY(-11%) scale(0.95, 1.05) rotate(0deg); }
+          75%  { transform: translateY(-7%) scale(1.05, 0.95) rotate(3deg); }
+          100% { transform: translateY(-9%) scale(1) rotate(0deg); }
         }
       `}</style>
 
