@@ -83,6 +83,7 @@ import { useMicropediaDiscovery } from './hooks/useMicropediaDiscovery';
 import { useQuietAttention } from './hooks/useQuietAttention';
 // import EggOverlay from './components/EggOverlay'; // paused Apr 2026 (see useEggSystem note)
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
+import FriendIntroCeremony from './components/drachennest/FriendIntroCeremony';
 import AlphaBanner from './components/AlphaBanner';
 import SWUpdateBanner from './components/SWUpdateBanner';
 import { useAnalytics } from './hooks/useAnalytics';
@@ -215,21 +216,31 @@ function AppContent() {
   // useEggSystem(); // paused Apr 2026 — spawner disabled, no more egg triggers
   useQuietAttention(view); // gentle voice brake when Louis zooms through screens
 
-  // Creature discovery runs through CelebrationQueue so it can't stack on
-  // top of other celebration surfaces (Marc 25 Apr 2026: "no fireworks
-  // in the kid's brain"). CreatureDiscoveryToast stays the presenter;
-  // the queue owns timing, dedupe, quiet-hours + SFX throttling.
+  // Creature discovery — Drachennest reframe (Marc 25 Apr 2026):
+  // first-time encounters fire the FriendIntroCeremony full-screen
+  // takeover; small in-app toasts only fire on celebrations the
+  // kid has already seen the ceremony for. Routed through the
+  // CelebrationQueue's modal slot so the ceremony serializes with
+  // any other celebration in flight (no two takeovers at once).
   const { enqueue: enqueueCelebration } = useCelebrationQueue();
+  const [introCreatureId, setIntroCreatureId] = useState(null);
   useMicropediaDiscovery((id) => {
+    // useMicropediaDiscovery only fires on creatures NOT in
+    // state.micropediaDiscovered, so every fire is a first-ever
+    // encounter — perfect entry point for the ceremony. Queued as
+    // a modal so it owns the screen until the kid taps through.
     enqueueCelebration({
       id: `discover-${id}`,
-      kind: 'toast',
-      ttl: 8000,
+      kind: 'modal',
       sfx: 'coin',
       render: ({ dismiss }) => (
-        <CreatureDiscoveryToast creatureId={id} onDismiss={dismiss} />
+        <FriendIntroCeremony
+          creatureId={id}
+          onClose={() => { setIntroCreatureId(null); dismiss(); }}
+        />
       ),
     });
+    setIntroCreatureId(id);
   });
 
   useEffect(() => {

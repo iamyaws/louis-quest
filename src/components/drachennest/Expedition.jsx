@@ -652,24 +652,36 @@ function CampRonki({ walking }) {
         background: '#fde0a8',
         borderRadius: '50% 40% 50% 50%',
       }} />
-      {/* Horns */}
+      {/* Face cluster — Marc 25 Apr 2026 audit: features were
+          scattered (horns at 26-38%, eye at 46%, mouth at 52%)
+          while the walking animation slides Ronki RIGHT. The
+          dragon was visually facing left while moving right.
+          Now the face is a tight cluster on the front-right of
+          the body, all features clustering between 52-68% of
+          the wrapper, so the head reads as a snout pointing in
+          the walk direction.
+
+          Horns — back horn slightly left of front, both
+          sitting at the top of the head. */}
       <div style={{
-        position: 'absolute', top: '18%', left: '26%',
+        position: 'absolute', top: '14%', left: '52%',
         width: 8, height: 14,
         background: 'linear-gradient(180deg, #fde68a, #f59e0b)',
         borderRadius: '50% 50% 10% 10%',
         transform: 'rotate(-8deg)',
       }} />
       <div style={{
-        position: 'absolute', top: '18%', left: '38%',
+        position: 'absolute', top: '14%', left: '64%',
         width: 8, height: 12,
         background: 'linear-gradient(180deg, #fde68a, #f59e0b)',
         borderRadius: '50% 50% 10% 10%',
         transform: 'rotate(6deg)',
       }} />
-      {/* Eye */}
+      {/* Eye — sits on the front-half of the head, looking
+          forward (rightward). Highlight at top-right keeps the
+          look-direction consistent. */}
       <div style={{
-        position: 'absolute', top: '34%', left: '46%',
+        position: 'absolute', top: '32%', left: '60%',
         width: 6, height: 8,
         background: '#1a0e08',
         borderRadius: '50%',
@@ -679,9 +691,10 @@ function CampRonki({ walking }) {
           width: 2, height: 2, background: '#fff', borderRadius: '50%',
         }} />
       </div>
-      {/* Mouth */}
+      {/* Mouth — front of the snout, just below + to the right
+          of the eye. */}
       <div style={{
-        position: 'absolute', top: '50%', left: '52%',
+        position: 'absolute', top: '48%', left: '68%',
         width: 8, height: 3,
         borderBottom: '1.5px solid #3a1f12',
         borderRadius: '0 0 4px 4px',
