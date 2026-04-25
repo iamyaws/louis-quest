@@ -19,9 +19,9 @@ import { PainterlyShell } from '../../components/PainterlyShell';
 import { Footer } from '../../components/Footer';
 import { ToolDisclaimer } from '../../components/AppCheck/ToolDisclaimer';
 import { ArrowRight } from '../../components/AppCheck/Icons';
+import { SchlafensShareCard } from '../../components/AppCheck/SchlafensShareCard';
 import {
   calculateSchedule,
-  RECOMMENDATIONS,
   type ChildAge,
 } from '../../lib/schlafens-rechner/calculator';
 import { EASE_OUT, fadeUp } from '../../lib/motion';
@@ -203,6 +203,17 @@ export default function SchlafensRechner() {
                   </p>
                 </div>
 
+                <div className="space-y-3">
+                  <h3 className="font-display font-bold text-lg text-teal-dark">
+                    Karte für andere Eltern
+                  </h3>
+                  <SchlafensShareCard
+                    age={age}
+                    wakeUp={wakeUp}
+                    schedule={schedule}
+                  />
+                </div>
+
                 <ToolDisclaimer variant="tool" />
               </motion.div>
             )}
@@ -222,30 +233,60 @@ interface StepProps {
   accent: 'sage' | 'mustard' | 'teal';
 }
 
-const ACCENT_CLASSES: Record<StepProps['accent'], { ring: string; chip: string }> = {
-  sage: { ring: 'ring-sage/30', chip: 'bg-sage/15 text-teal-dark' },
-  mustard: {
-    ring: 'ring-mustard/40',
-    chip: 'bg-mustard-soft/40 text-teal-dark',
+/**
+ * The accent-color now drives the card BACKGROUND, not just a small
+ * pill at the top, so each step is instantly distinguishable. The
+ * Bettzeit card goes full teal-dark to read as the destination of
+ * the evening; the lead-up cards stay in lighter sage/mustard tints.
+ */
+const ACCENT_CLASSES: Record<
+  StepProps['accent'],
+  {
+    card: string;
+    chip: string;
+    timeText: string;
+    detailText: string;
+  }
+> = {
+  sage: {
+    card: 'bg-sage/20 ring-sage/35',
+    chip: 'bg-cream/70 text-teal-dark',
+    timeText: 'text-teal-dark',
+    detailText: 'text-ink/75',
   },
-  teal: { ring: 'ring-teal-dark/25', chip: 'bg-teal-dark text-cream' },
+  mustard: {
+    card: 'bg-mustard-soft/55 ring-mustard/40',
+    chip: 'bg-cream/80 text-teal-dark',
+    timeText: 'text-teal-dark',
+    detailText: 'text-ink/80',
+  },
+  teal: {
+    card: 'bg-teal-dark ring-teal-dark/40',
+    chip: 'bg-cream/15 text-cream',
+    timeText: 'text-cream',
+    detailText: 'text-cream/80',
+  },
 };
 
 function ScheduleStep({ label, time, detail, accent }: StepProps) {
   const c = ACCENT_CLASSES[accent];
   return (
     <li
-      className={`rounded-2xl bg-cream/80 ring-1 ring-inset ${c.ring} px-6 py-5 sm:px-7 sm:py-6 flex flex-col gap-3`}
+      className={`rounded-2xl ${c.card} ring-1 ring-inset px-6 py-5 sm:px-7 sm:py-6 flex flex-col gap-3 transition-colors`}
     >
       <span
         className={`inline-flex items-center self-start text-xs uppercase tracking-[0.18em] font-semibold rounded-full px-3 py-1 ${c.chip}`}
       >
         {label}
       </span>
-      <span className="text-4xl sm:text-5xl font-display font-bold tabular-nums text-teal-dark">
+      <span
+        className={`text-4xl sm:text-5xl font-display font-bold tabular-nums ${c.timeText}`}
+      >
         {time}
       </span>
-      <span className="text-sm text-ink/70 leading-relaxed">{detail}</span>
+      <span className={`text-sm leading-relaxed ${c.detailText}`}>
+        {detail}
+      </span>
     </li>
   );
 }

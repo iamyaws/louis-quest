@@ -16,6 +16,7 @@ import {
   type CharterAnswers,
 } from '../../lib/familien-charter/charter';
 import { ArrowRight } from './Icons';
+import { CharterShareCard } from './CharterShareCard';
 
 interface Props {
   answers: CharterAnswers;
@@ -376,6 +377,12 @@ export function CharterPreview({ answers }: Props) {
           mal.
         </p>
       )}
+
+      {/* Second download path: 1200x675 LinkedIn social card. The full
+          A4 charter goes on the fridge; the social card goes in feeds. */}
+      <div className="pt-2 border-t border-teal/10">
+        <CharterShareCard answers={answers} />
+      </div>
 
       {/* Print-only stylesheet: hide everything except .charter-preview. */}
       <style>{`
