@@ -388,41 +388,33 @@ function AppContent() {
         )}
         {view === 'shop' && <Belohnungsbank onNavigate={setView} onStartTimer={startScreenTimer} timerActive={!!screenTimer} onOpenParental={() => openPinGate()} />}
         {view === 'hub' && (
-          // Drachennest reframe — RoomHub is the new primary surface.
-          // Add ?legacyHub=1 to the URL to fall back to the original Hub
-          // for side-by-side comparison without leaving the branch.
-          (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('legacyHub') === '1') ? (
-            <Hub
-              onNavigate={setView}
-              onOpenParental={() => openPinGate()}
-              onPlayMint={(gameId) => {
-                setActiveMintGame(gameId);
-                setView('mint-game');
-              }}
-            />
-          ) : (
-            <RoomHub
-              onNavigate={(target, opts) => {
-                // 'aufgaben' is the user-facing label — TaskList renders
-                // on view==='quests'. The earlier 'list' mapping was a
-                // dead route (Marc 25 Apr 2026: every pill on the
-                // Schriftrolle card felt unresponsive). The anchor
-                // hint is set on the location hash so a future TaskList
-                // pass can scroll to that section without us threading
-                // it through every navigate call site.
-                if (target === 'aufgaben') {
-                  if (opts?.anchor && typeof window !== 'undefined') {
-                    history.replaceState(null, '', `#anchor=${opts.anchor}`);
-                  }
-                  setView('quests');
+          // Cut #4 (Marc 25 Apr 2026 — northstar lock-in): RoomHub
+          // is the only primary surface. The legacy Hub.jsx
+          // chore-tracker is no longer reachable; the `?legacyHub=1`
+          // dev fallback was removed when the northstar locked the
+          // companion direction. Hub.jsx + its mission/boss/gear
+          // surfaces get deleted entirely in cut #5.
+          <RoomHub
+            onNavigate={(target, opts) => {
+              // 'aufgaben' is the user-facing label — TaskList renders
+              // on view==='quests'. The earlier 'list' mapping was a
+              // dead route (Marc 25 Apr 2026: every pill on the
+              // Schriftrolle card felt unresponsive). The anchor
+              // hint is set on the location hash so a future TaskList
+              // pass can scroll to that section without us threading
+              // it through every navigate call site.
+              if (target === 'aufgaben') {
+                if (opts?.anchor && typeof window !== 'undefined') {
+                  history.replaceState(null, '', `#anchor=${opts.anchor}`);
                 }
-                else if (target === 'belohnungen') setView('shop');
-                else if (target === 'buch') setView('buch');
-                else if (target === 'spiele') setView('games');
-                else setView(target);
-              }}
-            />
-          )
+                setView('quests');
+              }
+              else if (target === 'belohnungen') setView('shop');
+              else if (target === 'buch') setView('buch');
+              else if (target === 'spiele') setView('games');
+              else setView(target);
+            }}
+          />
         )}
         {view === 'care' && <Sanctuary onNavigate={setView} />}
         {view === 'journal' && <Journal onNavigate={setView} onOpenParental={() => openPinGate()} />}
