@@ -103,14 +103,50 @@ export default function RoomHub({ onNavigate }) {
   const bedtimeDone = quests.filter(q => q.anchor === 'bedtime').every(q => q.done) && quests.some(q => q.anchor === 'bedtime');
   const expeditionUnlocked = morningDone && bedtimeDone;
 
+  // Tap-Ronki random reaction (Marc 25 Apr 2026 — "by tapping ronki you
+  // trigger these heart emojis, he should be doing a random set of
+  // animations after certain clicks and maybe even trigger voicelines
+  // (giggling or a looping animation)"). Each tap picks one of four
+  // reactions: heart float (default), sparkle burst, giggle bounce, or
+  // spin. The reaction animates the chibi wrapper via a CSS class on
+  // the same element, and the floating-hearts list now stores the
+  // reaction kind so the spawner can render the right glyph.
+  const reactionTimerRef = useRef(null);
+  const [reaction, setReaction] = useState(null); // 'bounce' | 'spin' | null
+  const tapCountRef = useRef(0);
+
   const tapRonki = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const id = Date.now() + Math.random();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    setFloatingHearts(prev => [...prev, { id, x, y }]);
+    tapCountRef.current += 1;
+
+    // Reaction picker — every third tap escalates into a body
+    // animation (bounce or spin), every other tap stays as a glyph
+    // burst. Keeps the loop varied without making every tap a big
+    // production. Glyph variants: heart, sparkle, giggle (hihi text).
+    const variants = ['heart', 'sparkle', 'giggle'];
+    const glyph = variants[Math.floor(Math.random() * variants.length)];
+    setFloatingHearts(prev => [...prev, { id, x, y, kind: glyph }]);
     setTimeout(() => setFloatingHearts(prev => prev.filter(h => h.id !== id)), 950);
+
+    if (tapCountRef.current % 3 === 0) {
+      const moves = ['bounce', 'spin'];
+      const move = moves[Math.floor(Math.random() * moves.length)];
+      setReaction(move);
+      // TODO(voiceline): play a Ronki giggle/coo sample matched to
+      // the reaction kind. VoiceAudio.playLocalized('ronki_giggle_01')
+      // once a few takes are recorded. See voice-casting reference
+      // in basic-memory.
+      if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current);
+      reactionTimerRef.current = setTimeout(() => setReaction(null), 900);
+    }
   };
+
+  useEffect(() => () => {
+    if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current);
+  }, []);
 
   // ?time=dawn|day|dusk|night forces the scene tone for QA preview; otherwise
   // the clock decides. DEV-gated so prod builds ignore the override.
@@ -401,7 +437,13 @@ export default function RoomHub({ onNavigate }) {
               // the chibi sits at z:7 in front of the ring wrapper at
               // z:6. The cushion ends up acting as a painted floor
               // behind the whole stage instead of competing with it.
-              bottom: '-9%',
+              // Lifted from -9% → -4% (Marc 25 Apr — "ring and ronki
+              // a tiny tiny bit higher so that the blue metric bar
+              // doesn't collapse with the end of the box"). The
+              // bottom energie arc now reads cleanly inside the
+              // scene rather than clipping against the rounded
+              // corner.
+              bottom: '-4%',
               transform: 'translateX(-50%)',
               zIndex: 6,
               // Stage grew from 72% / 280px → 84% / 340px (25 Apr 2026)
@@ -470,12 +512,21 @@ export default function RoomHub({ onNavigate }) {
                   the stage centroid, where the three vital meters average
                   out — closer to the ring's middle so all three badges
                   read as orbiting him rather than floating above. */}
-              <div style={{
-                position: 'relative',
-                width: ronkiPx,
-                height: ronkiPx,
-                transform: 'translateY(-9%)',
-              }}>
+              <div
+                style={{
+                  position: 'relative',
+                  width: ronkiPx,
+                  height: ronkiPx,
+                  transform: 'translateY(-9%)',
+                  // Reaction class drives a one-shot bounce or spin on
+                  // tap. The class clears after the animation in
+                  // tapRonki's setTimeout so a subsequent tap can
+                  // re-trigger.
+                  animation: reaction === 'bounce' ? 'rh-rk-bounce 0.85s ease-out'
+                           : reaction === 'spin'   ? 'rh-rk-spin 0.95s ease-in-out'
+                           : undefined,
+                }}
+              >
                 <MoodChibi
                   size={ronkiPx}
                   variant={variant}
@@ -492,12 +543,17 @@ export default function RoomHub({ onNavigate }) {
                       left: h.x,
                       top: h.y,
                       pointerEvents: 'none',
-                      font: '600 32px/1 sans-serif',
+                      font: h.kind === 'giggle'
+                        ? '700 18px/1 "Fredoka", sans-serif'
+                        : '600 32px/1 sans-serif',
+                      color: h.kind === 'giggle' ? '#b45309' : undefined,
                       animation: 'rh-heart 0.95s ease-out forwards',
                       zIndex: 12,
                     }}
                   >
-                    💚
+                    {h.kind === 'sparkle' ? '✦'
+                      : h.kind === 'giggle' ? 'hihi'
+                      : '💚'}
                   </span>
                 ))}
               </div>
@@ -693,6 +749,17 @@ export default function RoomHub({ onNavigate }) {
         @keyframes rh-bead {
           0%, 100% { filter: brightness(1); box-shadow: 0 0 12px 2px rgba(252,211,77,0.55), 0 0 22px 6px rgba(252,165,73,0.25); }
           50%      { filter: brightness(1.15); box-shadow: 0 0 16px 3px rgba(252,211,77,0.75), 0 0 30px 8px rgba(252,165,73,0.40); }
+        }
+        @keyframes rh-rk-bounce {
+          0%   { transform: translateY(-9%) scale(1); }
+          25%  { transform: translateY(-15%) scale(1.04); }
+          55%  { transform: translateY(-5%) scale(0.98); }
+          80%  { transform: translateY(-12%) scale(1.02); }
+          100% { transform: translateY(-9%) scale(1); }
+        }
+        @keyframes rh-rk-spin {
+          0%   { transform: translateY(-9%) rotate(0deg); }
+          100% { transform: translateY(-9%) rotate(360deg); }
         }
       `}</style>
 

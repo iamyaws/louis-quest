@@ -3,6 +3,7 @@ import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { CREATURE_CONTENT, SEED_BY_ID, CHAPTERS } from '../data/creatures';
 import ChapterAmbient from './ChapterAmbient';
+import ChibiFriend, { hasChibiFriend } from './drachennest/ChibiFriend';
 
 /** Format an ISO discovery timestamp in the app's language. */
 function formatDiscoveredDate(iso, lang) {
@@ -167,7 +168,16 @@ export default function Micropedia({ onNavigate }) {
                                 border: found?.art ? `2px solid ${chapter.color}30` : found ? `1.5px solid ${chapter.color}30` : `1.5px dashed ${chapter.color}12`,
                                 boxShadow: found?.art ? `0 4px 12px ${chapter.color}15` : 'none',
                               }}>
-                              {found?.art ? (
+                              {found && hasChibiFriend(found.id) ? (
+                                /* Drachennest: chibi-style portrait
+                                   in the grid (Marc 25 Apr 2026 — go
+                                   all-in on chibi). The grid tile is
+                                   square so we render without the
+                                   round bg ring; the tile itself
+                                   provides the frame + chapter color
+                                   border. */
+                                <ChibiFriend id={found.id} size={88} withBg={false} />
+                              ) : found?.art ? (
                                 <img src={base + found.art} alt={found.name?.[lang] || ''} className="w-full h-full object-cover" />
                               ) : found ? (
                                 <span className="material-symbols-outlined text-xl"
@@ -238,12 +248,22 @@ export default function Micropedia({ onNavigate }) {
                    style={{ background: ch?.bgGradient || '#fff8f2' }}>
                 {/* Ambient overlay */}
                 <ChapterAmbient chapter={selectedCreature.chapter} color={chapterColor} />
-                {/* Breathing portrait */}
-                {selectedCreature.art && (
+                {/* Breathing portrait — chibi-style if covered by the
+                    Drachennest roster, MJ webp otherwise. */}
+                {hasChibiFriend(selectedCreature.id) ? (
+                  <div
+                    className="relative w-full h-full flex items-center justify-center"
+                    style={{ animation: 'breathe 3s ease-in-out infinite' }}
+                  >
+                    <div style={{ width: '60%', maxWidth: 280 }}>
+                      <ChibiFriend id={selectedCreature.id} size={280} withBg={false} />
+                    </div>
+                  </div>
+                ) : selectedCreature.art ? (
                   <img src={base + selectedCreature.art} alt=""
                        className="relative w-full h-full object-cover"
                        style={{ animation: 'breathe 3s ease-in-out infinite' }} />
-                )}
+                ) : null}
                 {/* Gradient overlay at bottom */}
                 <div className="absolute bottom-0 left-0 w-full h-1/3 pointer-events-none"
                      style={{ background: 'linear-gradient(to top, #fff8f2, transparent)' }} />

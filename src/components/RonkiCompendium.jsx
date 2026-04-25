@@ -3,6 +3,8 @@ import MoodChibi from './MoodChibi';
 import CampfireScene from './CampfireScene';
 import FireBreathPuff from './FireBreathPuff';
 import { COMPANION_VARIANTS } from '../data/companionVariants';
+import ChibiFriend, { CHIBI_FRIEND_IDS } from './drachennest/ChibiFriend';
+import { SEED_BY_ID } from '../data/creatures';
 
 /**
  * RonkiCompendium — public-facing "Sammelbuch" showcase.
@@ -414,6 +416,60 @@ export default function RonkiCompendium() {
                 }}>
                 {w.name}
               </button>
+            );
+          })}
+        </div>
+      </Section>
+
+      {/* ── Section 6: Ronkis Freunde ──
+           Marc 25 Apr 2026: "update the compendium with the friends to
+           show our universe in one glimpse." Twelve chibi-style
+           friends across five biomes, all rendered live from the same
+           SVG renderer the in-app gallery uses so the compendium stays
+           in sync with whatever ships. */}
+      <Section
+        kicker="Zwölf Freunde"
+        title="Ronkis Freunde"
+        subtitle="Auf seinen Streifzügen begegnet Ronki kleinen Wesen aus den fünf Biomen. Tippe eins an, um seinen Namen zu lesen."
+      >
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+          gap: 14,
+          maxWidth: 900,
+          margin: '0 auto',
+        }}>
+          {CHIBI_FRIEND_IDS.map(id => {
+            const seed = SEED_BY_ID.get(id);
+            return (
+              <div key={id} style={{
+                background: '#fff8f2',
+                borderRadius: 18,
+                padding: '14px 10px 12px',
+                border: '1.5px solid rgba(18,67,70,0.10)',
+                boxShadow: '0 4px 12px -6px rgba(18,67,70,0.14)',
+                textAlign: 'center',
+              }}>
+                <div style={{ width: 84, height: 84, margin: '0 auto' }}>
+                  <ChibiFriend id={id} size={84} />
+                </div>
+                <p style={{
+                  margin: '10px 0 2px',
+                  fontFamily: 'Fredoka, sans-serif',
+                  fontWeight: 500, fontSize: 15,
+                  color: '#124346',
+                }}>
+                  {seed?.name?.de || id}
+                </p>
+                <p style={{
+                  margin: 0,
+                  fontSize: 9, letterSpacing: '0.22em',
+                  textTransform: 'uppercase', fontWeight: 800,
+                  color: 'rgba(120,53,15,0.6)',
+                }}>
+                  {seed?.chapter || ''}
+                </p>
+              </div>
             );
           })}
         </div>

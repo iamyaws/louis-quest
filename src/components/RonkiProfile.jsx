@@ -12,6 +12,7 @@ import SFX from '../utils/sfx';
 import { useGameAccess } from '../hooks/useGameAccess';
 import { biomeBackground } from '../utils/biomeBackgrounds';
 import MoodChibi from './MoodChibi';
+import ChibiFriend, { hasChibiFriend } from './drachennest/ChibiFriend';
 import FireBreathCollection from './FireBreathCollection';
 
 /**
@@ -1425,36 +1426,36 @@ export default function RonkiProfile({ onNavigate }) {
                 {/* Compact strip of 6 circle avatars — discovered first,
                      dashed locked circles filling the rest. Scrolls
                      horizontally if Louis has met more than 6 creatures. */}
+                {/* Drachennest swap (Marc 25 Apr 2026): the discovered
+                    avatars now render as ChibiFriend SVGs instead of
+                    MJ portraits. Falls back to the old <img> for
+                    creatures whose IDs aren't covered by the chibi
+                    roster yet — so the gallery never breaks while the
+                    art system migrates over. */}
                 <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
                   {recentFreunde.slice(0, 6).map(f => (
-                    <div key={f.id}
-                         className="w-14 h-14 rounded-full overflow-hidden shrink-0"
-                         style={{ border: '2px solid #fff', boxShadow: '0 2px 6px rgba(120,53,15,0.15)' }}>
-                      {f.art ? (
-                        <img src={base + f.art} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center"
-                             style={{ background: 'rgba(252,211,77,0.18)' }}>
-                          <span className="material-symbols-outlined text-base"
-                                style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>pets</span>
-                        </div>
-                      )}
-                    </div>
+                    hasChibiFriend(f.id) ? (
+                      <ChibiFriend key={f.id} id={f.id} size={56} />
+                    ) : (
+                      <div key={f.id}
+                           className="w-14 h-14 rounded-full overflow-hidden shrink-0"
+                           style={{ border: '2px solid #fff', boxShadow: '0 2px 6px rgba(120,53,15,0.15)' }}>
+                        {f.art ? (
+                          <img src={base + f.art} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center"
+                               style={{ background: 'rgba(252,211,77,0.18)' }}>
+                            <span className="material-symbols-outlined text-base"
+                                  style={{ color: '#92400e', fontVariationSettings: "'FILL' 1" }}>pets</span>
+                          </div>
+                        )}
+                      </div>
+                    )
                   ))}
                   {/* Locked slots — fill out to 6 with dashed circles
                        so the row always reads "part of a bigger set". */}
                   {Array.from({ length: Math.max(0, 6 - recentFreunde.length) }).map((_, i) => (
-                    <div key={`locked-${i}`}
-                         className="w-14 h-14 rounded-full shrink-0 flex items-center justify-center"
-                         style={{
-                           border: '2px dashed rgba(120,53,15,0.25)',
-                           background: 'rgba(255,255,255,0.35)',
-                         }}>
-                      <span className="material-symbols-outlined"
-                            style={{ fontSize: 18, color: 'rgba(120,53,15,0.4)', fontVariationSettings: "'FILL' 1" }}>
-                        lock
-                      </span>
-                    </div>
+                    <ChibiFriend key={`locked-${i}`} id="__locked__" size={56} locked />
                   ))}
                 </div>
               </button>

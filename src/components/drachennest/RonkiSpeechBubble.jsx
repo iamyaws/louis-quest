@@ -82,19 +82,26 @@ export default function RonkiSpeechBubble({ idx: idxProp }) {
       aria-label="Nachricht von Ronki — antippen zum Schließen"
       style={{
         position: 'absolute',
-        top: 14,
-        left: '50%',
-        transform: 'translateX(-50%)',
+        // Left-anchored side speech bubble (Marc 25 Apr 2026 —
+        // "speech box not on top but to the left or right, without
+        // folding or overlapping the metrics"). The bubble lives in
+        // the upper-left corner of the scene; the tail points
+        // down-right toward Ronki so the kid still reads it as him
+        // talking. Capping the width at 168px keeps it clear of
+        // both the right-side window and the centre vitals arcs.
+        top: 16,
+        left: 14,
+        right: 'auto',
         background: '#ffffff',
         border: '2px solid #124346',
         borderRadius: '18px 18px 18px 4px',
-        padding: '10px 16px 11px',
-        font: '600 14px/1.3 "Nunito", sans-serif',
+        padding: '9px 14px 10px',
+        font: '600 13px/1.3 "Nunito", sans-serif',
         color: '#1e1b17',
-        maxWidth: 260,
-        textAlign: 'center',
+        maxWidth: 168,
+        textAlign: 'left',
         boxShadow: '0 6px 14px -4px rgba(18,67,70,0.20)',
-        zIndex: 6,
+        zIndex: 8,
         cursor: 'pointer',
         animation: phase === 'dismissing'
           ? 'rsb-out 0.28s ease-in forwards'
@@ -102,15 +109,17 @@ export default function RonkiSpeechBubble({ idx: idxProp }) {
       }}
     >
       {MOOD_LINES[showIdx]}
-      {/* Small tail pointing down toward Ronki — drawn as two stacked
-          triangles so the dark border shows through. */}
+      {/* Tail at the bottom-right of the bubble pointing down-right
+          toward Ronki — left-anchored bubble means the tail leans
+          INTO the scene rather than dropping straight onto the top
+          arc icon. Two stacked triangles so the dark border shows
+          through. */}
       <span
         aria-hidden="true"
         style={{
           position: 'absolute',
           bottom: -10,
-          left: '50%',
-          transform: 'translateX(-50%)',
+          right: 14,
           width: 0,
           height: 0,
           borderLeft: '8px solid transparent',
@@ -123,8 +132,7 @@ export default function RonkiSpeechBubble({ idx: idxProp }) {
         style={{
           position: 'absolute',
           bottom: -7,
-          left: '50%',
-          transform: 'translateX(-50%)',
+          right: 15,
           width: 0,
           height: 0,
           borderLeft: '7px solid transparent',
@@ -134,12 +142,12 @@ export default function RonkiSpeechBubble({ idx: idxProp }) {
       />
       <style>{`
         @keyframes rsb-in {
-          0%   { opacity: 0; transform: translateX(-50%) translateY(-4px) scale(0.95); }
-          100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+          0%   { opacity: 0; transform: translateY(-4px) scale(0.95); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes rsb-out {
-          0%   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-          100% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.95); }
+          0%   { opacity: 1; transform: translateY(0) scale(1); }
+          100% { opacity: 0; transform: translateY(-10px) scale(0.95); }
         }
       `}</style>
     </button>
