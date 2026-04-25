@@ -77,7 +77,7 @@ const GAMES = [
 
 export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
   const { t, lang } = useTranslation();
-  const { state } = useTask();
+  const { state, actions } = useTask();
   const { track } = useAnalytics();
   const access = useGameAccess();
   const { unlocked, reason, withinTimeWindow, windowStartHour, windowEndHour } = access;
@@ -126,11 +126,12 @@ export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
       setShowExhausted(true);
       return;
     }
-    // Analytics: game.start. Fires only on the successful handoff to the
-    // game view — gated tiles (locked / exhausted) don't pollute the
-    // funnel. game.end is handled by the game components themselves if
-    // we ever want duration/completion data; for now start-rate is the
-    // signal we actually want.
+    // Stamina consume on game start (Marc 25 Apr 2026: "let's also
+    // reactivate the stamina bar"). Each successful game start
+    // costs 1 stamina; the consumption is no-op when the access
+    // mode is 'frei' so nothing changes for parents who keep
+    // unlimited play in the dashboard.
+    actions?.consumeStamina?.();
     track('game.start', { gameId: game.id });
     onPlay(game.id);
   };
@@ -321,6 +322,7 @@ export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
                 }}
                 onClick={() => {
                   if (stamina.exhausted) { setShowExhausted(true); return; }
+                  actions?.consumeStamina?.();
                   track('game.start', { gameId: game.id });
                   onPlayMint?.(game.id);
                 }}

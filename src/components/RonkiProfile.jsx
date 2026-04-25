@@ -3,6 +3,7 @@ import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';
 import { getCatStage, getDragonArt } from '../utils/helpers';
+import { CAT_STAGES } from '../constants';
 import { ARCS, findArc } from '../arcs/arcs';
 import { Pearl } from './CurrencyIcons';
 import { SEED_BY_ID, SEED_CREATURES } from '../data/creatures';
@@ -957,30 +958,14 @@ export default function RonkiProfile({ onNavigate }) {
                     : 'Ronki grows stronger with every adventure.'}
                 </p>
               </div>
-              <div className="rounded-2xl p-5"
-                   style={{ background: 'rgba(18,67,70,0.03)', border: '1.5px dashed rgba(18,67,70,0.12)' }}>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="material-symbols-outlined text-on-surface-variant">lock</span>
-                  <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">
-                    {lang === 'de' ? 'Noch zu entdecken' : 'Yet to discover'}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {TRAIT_POOL.filter(tr => !tr.when(state)).map(tr => (
-                    <div key={tr.id}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-full"
-                      style={{ background: 'rgba(0,0,0,0.03)', border: '1.5px solid rgba(0,0,0,0.06)' }}>
-                      <span className="material-symbols-outlined text-base text-on-surface-variant/40">help</span>
-                      <span className="font-label font-bold text-sm text-on-surface-variant/40">???</span>
-                    </div>
-                  ))}
-                  {TRAIT_POOL.filter(tr => !tr.when(state)).length === 0 && (
-                    <p className="font-body text-sm text-on-surface-variant italic">
-                      {lang === 'de' ? 'Alle Stärken entdeckt!' : 'All strengths discovered!'}
-                    </p>
-                  )}
-                </div>
-              </div>
+              {/* Evolution tree (Marc 25 Apr 2026 — replaces the
+                  old 'noch zu entdecken' placeholder block).
+                  Vertical timeline with the kid's actual Ronki at
+                  the current stage + a kid silhouette beside him,
+                  past stages faded showing the rolled trait, future
+                  stages greyed with the unlock hint pulled from
+                  CAT_STAGES thresholds. */}
+              <EvolutionTree state={state} lang={lang} />
             </div>
           )}
 
@@ -1883,4 +1868,157 @@ function ErinnerungenList({ state, lang, t, onNavigate }) {
       )}
     </section>
   );
+}
+
+// ─── Evolution tree ─────────────────────────────────────────
+// Vertical timeline of the 6 CAT_STAGES (Ei → Legendär).
+//   · Stages BELOW current → faded chip with the trait that was
+//     rolled at that stage (from state.hatchTraits if present).
+//   · CURRENT stage → highlighted card with the kid's actual
+//     Ronki rendered via MoodChibi + a small kid silhouette next
+//     to him (Marc 25 Apr 2026 — "shows the chibi-egg of the
+//     ronki, why that and not the actual ronki state maybe with
+//     a kids silhouette next to it").
+//   · Stages ABOVE current → greyed silhouettes with the
+//     'X mehr Aufgaben für die nächste Stufe' hint pulled from
+//     the CAT_STAGES thresholds + state.catEvo delta.
+function EvolutionTree({ state, lang }) {
+  const evo = state?.catEvo || 0;
+  const currentStage = getCatStage(evo);
+  const variant = state?.companionVariant || 'forest';
+  const traits = Array.isArray(state?.hatchTraits) ? state.hatchTraits : [];
+
+  return (
+    <div
+      className="rounded-2xl p-4"
+      style={{
+        background: 'linear-gradient(180deg, #fff8f2 0%, rgba(252,211,77,0.06) 100%)',
+        border: '1.5px solid rgba(180,83,9,0.16)',
+        boxShadow: '0 2px 10px rgba(217,119,6,0.05)',
+      }}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
+        <span className="font-label font-bold text-xs text-on-surface-variant uppercase tracking-widest">
+          {lang === 'de' ? 'Wie Ronki wächst' : "How Ronki grows"}
+        </span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {CAT_STAGES.map((stg, idx) => {
+          const past    = idx < currentStage;
+          const current = idx === currentStage;
+          const future  = idx > currentStage;
+          const traitId = past ? traits[idx - 1] : null;  // trait rolled at THIS stage advance
+          const nextThreshold = future ? stg.threshold : null;
+          const remaining = nextThreshold ? Math.max(0, nextThreshold - evo) : 0;
+          return (
+            <div
+              key={stg.id ?? idx}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '36px 1fr',
+                gap: 12,
+                alignItems: 'center',
+                padding: '10px 12px',
+                borderRadius: 14,
+                background: current ? 'rgba(252,211,77,0.18)' : 'transparent',
+                border: current ? '1.5px solid #fbbf24' : '1.5px solid rgba(0,0,0,0.06)',
+                opacity: future ? 0.55 : 1,
+              }}
+            >
+              {/* Left rail — stage marker. Current stage shows the
+                  actual Ronki + kid silhouette; past stages show
+                  the stage emoji; future stages show a soft dot. */}
+              <div style={{ width: 36, height: 36, display: 'grid', placeItems: 'center', position: 'relative' }}>
+                {current ? (
+                  <div style={{ position: 'relative', width: 36, height: 36 }}>
+                    <MoodChibi size={32} variant={variant} stage={Math.max(1, idx)} mood="normal" bare />
+                    {/* Kid silhouette tucked next to Ronki */}
+                    <span aria-hidden="true" style={{
+                      position: 'absolute',
+                      right: -6, bottom: -3,
+                      fontSize: 13,
+                      filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.15))',
+                    }}>🧒</span>
+                  </div>
+                ) : past ? (
+                  <span aria-hidden="true" style={{ fontSize: 22 }}>{stg.emoji}</span>
+                ) : (
+                  <span aria-hidden="true" style={{
+                    width: 12, height: 12, borderRadius: '50%',
+                    background: 'rgba(120,53,15,0.22)',
+                    display: 'inline-block',
+                  }} />
+                )}
+              </div>
+
+              {/* Right column — stage name + state-aware sub-line */}
+              <div style={{ minWidth: 0 }}>
+                <div style={{
+                  font: '700 13px/1.2 "Fredoka", sans-serif',
+                  color: '#124346',
+                }}>
+                  {stg.name || stg.label?.de || stg.id}
+                </div>
+                <div style={{
+                  font: '500 11px/1.4 "Nunito", sans-serif',
+                  color: 'rgba(18,67,70,0.7)',
+                  marginTop: 2,
+                }}>
+                  {current
+                    ? (lang === 'de' ? 'Hier seid ihr gerade.' : "You're here.")
+                    : past
+                    ? (traitId
+                        ? (lang === 'de' ? `Mitgebracht: ${formatTraitId(traitId)}` : `Earned: ${formatTraitId(traitId)}`)
+                        : (lang === 'de' ? 'Schon erlebt.' : 'Past stage.'))
+                    : (remaining > 0
+                        ? (lang === 'de'
+                            ? `Noch ${remaining} ${remaining === 1 ? 'Aufgabe' : 'Aufgaben'} bis hier.`
+                            : `${remaining} more ${remaining === 1 ? 'task' : 'tasks'} until here.`)
+                        : (lang === 'de' ? 'Bald.' : 'Soon.'))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <p style={{
+        margin: '14px 4px 0',
+        font: '500 11px/1.45 "Nunito", sans-serif',
+        color: 'rgba(18,67,70,0.6)',
+        fontStyle: 'italic',
+      }}>
+        {lang === 'de'
+          ? 'Bei jeder Stufe bringt Ronki eine kleine Spur mit.'
+          : 'At each stage Ronki brings home a little trait.'}
+      </p>
+    </div>
+  );
+}
+
+// Tiny helper — turn a trait ID like 'gold-tip' into the display
+// label used by the Compendium chip. Kept inline so we don't import
+// the variant data here. Falls back to the raw id if unknown.
+function formatTraitId(id) {
+  const map = {
+    'gold-tip': 'Gold-Spitze ✨',
+    'sun-freckle': 'Sonnen-Sommersprosse ☀️',
+    'ember-puff': 'Glut-Schweif 🔥',
+    'wave-curve': 'Wellen-Schwung 🌊',
+    'pearl-dot': 'Perlen-Punkt 🫧',
+    'sea-foam': 'Seeschaum 💧',
+    'heart-pair': 'Herz-Paar 💕',
+    'blush': 'Erröten 🌸',
+    'petal': 'Blüten-Schweif 🌷',
+    'spiral': 'Spiral-Horn 🌀',
+    'star-mark': 'Stern-Mal ✦',
+    'mist': 'Nebel-Hauch ✧',
+    'leaf-tip': 'Blatt-Spitze 🌿',
+    'moss-mark': 'Moos-Punkt 🍃',
+    'fern-tuft': 'Farn-Schweif 🌱',
+    'flame-tip': 'Flammen-Spitze 🔥',
+    'sunset': 'Abendrot-Streif 🌅',
+    'spark': 'Funken-Schweif ✨',
+  };
+  return map[id] || id;
 }

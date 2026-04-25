@@ -740,7 +740,11 @@ export function createInitialState(): TaskState {
     eveningRitualCompletedAt: undefined,
     ronkiStamina: 10,
     ronkiStaminaUpdatedAt: new Date().toISOString(),
-    minigameAccessMode: 'frei',
+    // Drachennest default flipped 'frei' → 'routine' (Marc 25 Apr
+    // 2026 — "let's also reactivate the stamina bar"). Stamina now
+    // ticks down each game start. Parents can switch back via the
+    // dashboard if they want unlimited play.
+    minigameAccessMode: 'routine',
     minigameStaminaMax: 10,
     minigameTimeWindow: { startHour: 16, endHour: 18 },
     // Parent account + onboarding defaults — Track A will set parentPin

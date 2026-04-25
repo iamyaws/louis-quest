@@ -402,6 +402,15 @@ export default function RoomHub({ onNavigate }) {
               the Naturtagebuch list inside the Reise surface. */}
           <ShelfDecor expeditionLog={state?.expeditionLog || []} />
 
+          {/* v1.5 cave decor (Marc 25 Apr 2026 — three more slot
+              positions in the cave that auto-fill from the
+              expeditionLog). Hanging slot dangles from the string
+              lights overhead, wall-art slot hangs above the shelf,
+              floor-corner slot tucks a memento beside the cushion.
+              Each one fills only when the kid earns enough mementos
+              so the room reads as growing over time. */}
+          <CaveDecorSlots expeditionLog={state?.expeditionLog || []} />
+
           {/* Floor mat / nest bedding — Marc 25 Apr flagged the previous
               "puffy cushion" version was too tall and ate into Ronki +
               the bottom energie arc. Pulled to a thin cream rim along
@@ -1096,6 +1105,107 @@ function RonkiMoodPrompt({ heroName, variant, stageIdx, onPick }) {
 // trio so the shelf never looks broken on day one. The slot pixel
 // positions match the painted shelf board's geometry (left:10%,
 // width:64px, top:38%) — touching the visual frame from the room.
+// v1.5 cave decor — three additional auto-fill slots that reveal
+// as the kid accumulates mementos. Each slot only renders if the
+// expeditionLog has at least N entries. Kid sees the cave fill in
+// over time without any drag-and-drop UI.
+//
+//   slot 1 (hanging) — dangles from the string lights, fills at 4 mementos
+//   slot 2 (wall art) — frames a memento above the shelf, fills at 7
+//   slot 3 (corner)  — tucks a memento beside the cushion, fills at 10
+function CaveDecorSlots({ expeditionLog }) {
+  const log = expeditionLog || [];
+  // Pick deterministic slot fillers from the log so the same
+  // memento doesn't bounce slots on every render. Index by
+  // log-position so the slot keeps its memento.
+  const hangingItem  = log.length >= 4  ? log[3]  : null;
+  const wallItem     = log.length >= 7  ? log[6]  : null;
+  const cornerItem   = log.length >= 10 ? log[9]  : null;
+
+  return (
+    <>
+      {/* Hanging mobile — dangles from the string-light cord on the
+          left side, away from the speech bubble + window. */}
+      {hangingItem && (
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '14%', left: '24%',
+          width: 28, height: 44,
+          zIndex: 2,
+          animation: 'rh-hang 4s ease-in-out infinite',
+          transformOrigin: 'top center',
+        }}>
+          <div style={{
+            position: 'absolute', top: 0, left: '50%',
+            width: 1, height: 18,
+            background: 'rgba(78,42,20,0.55)',
+            transform: 'translateX(-50%)',
+          }} />
+          <div style={{
+            position: 'absolute', top: 16, left: '50%',
+            width: 26, height: 26, borderRadius: '50%',
+            background: 'radial-gradient(ellipse at 40% 30%, rgba(252,211,77,0.3), transparent 60%), linear-gradient(135deg, #fff8f2, #fef3c7)',
+            border: '1px solid rgba(180,120,40,0.30)',
+            display: 'grid', placeItems: 'center',
+            transform: 'translateX(-50%)',
+            fontSize: 14,
+            boxShadow: '0 2px 4px rgba(40,20,5,0.30)',
+          }}>
+            {hangingItem.emoji}
+          </div>
+        </div>
+      )}
+
+      {/* Wall art frame — sits above the stone shelf, on the back
+          wall. Wooden frame around a single memento. */}
+      {wallItem && (
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '24%', left: '12%',
+          width: 36, height: 32,
+          zIndex: 2,
+          padding: 3,
+          background: 'linear-gradient(180deg, #92400e 0%, #5c2a08 100%)',
+          borderRadius: 4,
+          boxShadow: '0 3px 6px rgba(40,20,5,0.40), inset 0 1px 0 rgba(254,243,199,0.25)',
+        }}>
+          <div style={{
+            width: '100%', height: '100%',
+            background: 'linear-gradient(135deg, #fff8f2, #fef3c7)',
+            borderRadius: 2,
+            display: 'grid', placeItems: 'center',
+            fontSize: 16,
+          }}>
+            {wallItem.emoji}
+          </div>
+        </div>
+      )}
+
+      {/* Floor-corner memento — tucked beside the cushion on the
+          right, opposite the leaves we already scatter. Renders
+          inside the floor-mat z-band so it sits on the cushion. */}
+      {cornerItem && (
+        <span aria-hidden="true" style={{
+          position: 'absolute',
+          bottom: '4%',
+          right: '8%',
+          fontSize: 18,
+          transform: 'rotate(12deg)',
+          zIndex: 6,  // above the cushion (z:5), behind the chibi (z:7)
+          filter: 'drop-shadow(0 2px 3px rgba(40,20,5,0.30))',
+        }}>
+          {cornerItem.emoji}
+        </span>
+      )}
+
+      <style>{`
+        @keyframes rh-hang {
+          0%, 100% { transform: rotate(-3deg); }
+          50%      { transform: rotate(3deg); }
+        }
+      `}</style>
+    </>
+  );
+}
+
 function ShelfDecor({ expeditionLog }) {
   const recent = (expeditionLog || []).slice(-3).reverse();
   const STARTER = [
