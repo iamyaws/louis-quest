@@ -11,6 +11,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { PageMeta } from '../../components/PageMeta';
 import { PainterlyShell } from '../../components/PainterlyShell';
 import { Footer } from '../../components/Footer';
+import { ArrowRight } from '../../components/AppCheck/Icons';
 import { fadeUp } from '../../lib/motion';
 
 export default function ToolsHub() {
@@ -66,8 +67,9 @@ export default function ToolsHub() {
                   bekommst eine Einschätzung, was die App-Mechaniken über sie
                   verraten.
                 </p>
-                <span className="inline-flex items-center gap-1 text-sm text-teal font-semibold group-hover:gap-2 transition-all">
-                  Tool öffnen <span aria-hidden>→</span>
+                <span className="inline-flex items-center gap-1.5 text-sm text-teal font-semibold group-hover:gap-2 transition-all">
+                  Tool öffnen
+                  <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
                 </span>
               </Link>
             </li>

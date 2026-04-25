@@ -10,10 +10,11 @@
  * aggregated info exposed publicly; individual scores stay per-permalink.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { CATEGORY_LABELS, CURATED_APPS, type CuratedApp } from '../../lib/app-check/curated-apps';
 import { fetchEvalCount } from '../../lib/app-check/storage';
+import { ArrowRight } from './Icons';
 import { EASE_OUT } from '../../lib/motion';
 
 interface Props {
@@ -22,6 +23,7 @@ interface Props {
 
 export function AppEntry({ onContinue }: Props) {
   const reduced = useReducedMotion();
+  const togglePillId = useId();
   const [mode, setMode] = useState<'curated' | 'free'>('curated');
   const [curatedId, setCuratedId] = useState<string>('');
   const [freeText, setFreeText] = useState<string>('');
@@ -57,38 +59,52 @@ export function AppEntry({ onContinue }: Props) {
 
   return (
     <div className="space-y-8 max-w-xl">
-      {/* Mode toggle */}
+      {/* Mode toggle. The active background pill slides between the two
+          buttons via shared layoutId, so swapping modes feels physical
+          rather than a hard color flip. Buttons stay accessible and use
+          aria-pressed for screen readers. */}
       <div
         className="inline-flex rounded-full bg-cream/70 border border-teal/15 p-1"
         role="tablist"
         aria-label="App-Auswahl-Modus"
       >
-        <button
-          type="button"
-          role="tab"
-          aria-pressed={mode === 'curated'}
-          onClick={() => setMode('curated')}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-colors ${
-            mode === 'curated'
-              ? 'bg-teal text-cream'
-              : 'text-teal-dark hover:text-teal'
-          }`}
-        >
-          Aus Liste wählen
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-pressed={mode === 'free'}
-          onClick={() => setMode('free')}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-colors ${
-            mode === 'free'
-              ? 'bg-teal text-cream'
-              : 'text-teal-dark hover:text-teal'
-          }`}
-        >
-          Andere App eingeben
-        </button>
+        {([
+          { key: 'curated', label: 'Aus Liste wählen' },
+          { key: 'free', label: 'Andere App eingeben' },
+        ] as const).map(({ key, label }) => {
+          const active = mode === key;
+          return (
+            <motion.button
+              key={key}
+              type="button"
+              role="tab"
+              aria-pressed={active}
+              onClick={() => setMode(key)}
+              whileTap={reduced ? undefined : { scale: 0.97 }}
+              className="relative px-4 py-1.5 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-colors"
+            >
+              {active && (
+                <motion.span
+                  layoutId={togglePillId}
+                  aria-hidden
+                  className="absolute inset-0 rounded-full bg-teal"
+                  transition={
+                    reduced
+                      ? { duration: 0 }
+                      : { type: 'spring', stiffness: 360, damping: 32 }
+                  }
+                />
+              )}
+              <span
+                className={`relative z-10 ${
+                  active ? 'text-cream' : 'text-teal-dark hover:text-teal'
+                }`}
+              >
+                {label}
+              </span>
+            </motion.button>
+          );
+        })}
       </div>
 
       {/* Input */}
@@ -169,9 +185,7 @@ export function AppEntry({ onContinue }: Props) {
         className="group inline-flex items-center gap-2 rounded-full bg-teal-dark px-6 py-3 text-cream font-display font-semibold text-sm shadow-sm hover:bg-teal hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
         Fragebogen starten
-        <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
-          →
-        </span>
+        <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
       </button>
     </div>
   );

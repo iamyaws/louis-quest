@@ -32,6 +32,7 @@ import {
   type AnswersMap,
 } from '../../lib/app-check/questions';
 import { saveEval } from '../../lib/app-check/storage';
+import { ArrowRight } from '../../components/AppCheck/Icons';
 import { EASE_OUT, fadeUp } from '../../lib/motion';
 
 type Phase = 'landing' | 'entry' | 'quiz' | 'result' | 'saving';
@@ -241,12 +242,7 @@ export default function AppCheck() {
                   ) : (
                     <>
                       Bewertung speichern und teilen
-                      <span
-                        aria-hidden
-                        className="transition-transform group-hover:translate-x-0.5"
-                      >
-                        →
-                      </span>
+                      <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
                     </>
                   )}
                 </button>
@@ -334,9 +330,7 @@ function Landing({
         className="group inline-flex items-center gap-2 rounded-full bg-teal-dark px-8 py-4 text-cream font-display font-bold text-base shadow-sm hover:bg-teal hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 focus-visible:ring-offset-cream transition-all"
       >
         App prüfen
-        <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
-          →
-        </span>
+        <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
       </button>
 
       <ToolDisclaimer variant="tool" />
