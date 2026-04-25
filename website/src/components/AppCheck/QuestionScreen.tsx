@@ -63,26 +63,51 @@ export function QuestionScreen({
         </div>
       )}
 
-      {/* Answer buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-2">
-        {question.options.map((opt) => {
-          const selected = current === opt.value;
-          return (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => onAnswer(opt.value)}
-              className={`flex-1 rounded-xl border-2 px-6 py-4 text-base font-display font-semibold transition-all ${
-                selected
-                  ? 'border-teal bg-teal text-cream shadow-md'
-                  : 'border-teal/20 bg-cream text-teal-dark hover:border-teal hover:shadow-sm'
-              }`}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
-      </div>
+      {/* Answer buttons. The first two are the primary yes/no (or
+          content/mechanic) split with equal visual weight. The third
+          option is always "Weiß ich nicht" and is rendered softer
+          underneath, so parents naturally lean toward an actual
+          answer when they have one. */}
+      {(() => {
+        const primary = question.options.filter((o) => o.value !== 'unklar');
+        const unclear = question.options.find((o) => o.value === 'unklar');
+        return (
+          <div className="space-y-3 pt-2">
+            <div className="flex flex-col sm:flex-row gap-3">
+              {primary.map((opt) => {
+                const selected = current === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => onAnswer(opt.value)}
+                    className={`flex-1 rounded-xl border-2 px-6 py-4 text-base font-display font-semibold transition-all ${
+                      selected
+                        ? 'border-teal bg-teal text-cream shadow-md'
+                        : 'border-teal/20 bg-cream text-teal-dark hover:border-teal hover:shadow-sm'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+            {unclear && (
+              <button
+                type="button"
+                onClick={() => onAnswer(unclear.value)}
+                className={`w-full rounded-xl border px-6 py-3 text-sm font-medium transition-all ${
+                  current === unclear.value
+                    ? 'border-teal-dark/40 bg-teal-dark/10 text-teal-dark'
+                    : 'border-teal/15 bg-cream/50 text-ink/65 hover:border-teal/30 hover:text-teal-dark'
+                }`}
+              >
+                {unclear.label}
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Back nav */}
       {index > 0 && (

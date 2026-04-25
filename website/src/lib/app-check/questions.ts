@@ -33,6 +33,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'ja', label: 'Ja' },
       { value: 'nein', label: 'Nein' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Streaks sind Zähler die fallen wenn dein Kind einen Tag aussetzt. Bei Erwachsenen Motivationshilfe, bei Kindern unter neun emotionale Erpressung weil sie Verlustaversion noch nicht filtern können.',
@@ -44,6 +45,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'ja', label: 'Ja' },
       { value: 'nein', label: 'Nein' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Push-Benachrichtigungen für Kinder sind keine Erinnerung sondern ein sozialer Anruf, besonders wenn sie eine Maskottchen-Figur zitieren. Sie produzieren Schuldgefühle damit dein Kind zurückkommt.',
@@ -56,6 +58,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'ja', label: 'Ja' },
       { value: 'nein', label: 'Nein' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Belohnungen für Aktivitäten die ein Kind aus Eigenmotivation getan hätte senken die Eigenmotivation. Deci und Ryan beschreiben das seit den 1970ern. Wir erziehen Kinder zu Konsumenten von Belohnungen.',
@@ -67,6 +70,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'ja', label: 'Ja' },
       { value: 'nein', label: 'Nein' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Sichtbare kostenpflichtige Cosmetics in Kinder-Apps erzeugen gezielten Frust, der Eltern dazu bringen soll die Geldbörse zu öffnen. Der Frust ist das Design-Ziel.',
@@ -78,6 +82,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'ja', label: 'Ja' },
       { value: 'nein', label: 'Nein' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Werbung in Kinder-Apps ist oft nicht als solche erkennbar für ein Kind. Selbst klassische Video-Werbung lenkt Aufmerksamkeit aus dem eigentlichen Inhalt heraus.',
@@ -89,6 +94,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'ja', label: 'Ja' },
       { value: 'nein', label: 'Nein' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Spielbare Werbung ist die heimtückischste Form: das Kind spielt 1-2 Minuten ein anderes Spiel als Anzeige, mit hidden Close-Buttons und Timer. Funnel-Design um Kinder von App zu App zu schicken.',
@@ -100,6 +106,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'ja', label: 'Ja' },
       { value: 'nein', label: 'Nein' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Soziale Druckmechaniken wie Ranglisten oder "Ligen" erzeugen FOMO und Wettbewerbsdruck bei Kindern die das kognitiv noch nicht einordnen können. Diese Ranglisten existieren nur in der App.',
@@ -111,6 +118,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'inhalt', label: 'Den Inhalt' },
       { value: 'mechanik', label: 'Die Mechanik' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Wenn dein Kind die Mechanik vermisst (Streaks halten, Punkte sammeln) und nicht den eigentlichen Inhalt, ist die App-Bindung künstlich erzeugt. Inhalt-Vermissen ist normal, Mechanik-Vermissen ist Sucht.',
@@ -123,6 +131,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'ja', label: 'Ja' },
       { value: 'nein', label: 'Nein' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Übermäßige Datensammlung füttert Werbe-Profile oder ML-Modelle, oft ohne klaren Mehrwert für dein Kind. Lies die Datenschutzerklärung oder beobachte ob die App nach Standort, Kontakten oder anderen unnötigen Berechtigungen fragt.',
@@ -134,6 +143,7 @@ export const QUESTIONS: QuestionDef[] = [
     options: [
       { value: 'ja', label: 'Ja' },
       { value: 'nein', label: 'Nein' },
+      { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
       'Eine App die nie ein Ende-Signal gibt, optimiert auf Dauer-Engagement statt auf Lernen oder Spielen mit Abschluss. Das natürliche Stop-Signal muss dann das Kind selber setzen, was bei Sechs- bis Neunjährigen schwer ist.',
@@ -153,4 +163,31 @@ export function calculateScore(answers: AnswersMap): number {
 
 export function isComplete(answers: AnswersMap): boolean {
   return QUESTIONS.every((q) => Boolean(answers[q.id]));
+}
+
+export interface AnswerStats {
+  /** Number of questions answered with the dark-pattern-positive value (Ja or Mechanik). */
+  flagged: number;
+  /** Number of questions answered with the safe value (Nein or Inhalt). */
+  cleared: number;
+  /** Number of questions where the parent picked "Weiß ich nicht". */
+  unclear: number;
+}
+
+export function summariseAnswers(answers: AnswersMap): AnswerStats {
+  let flagged = 0;
+  let cleared = 0;
+  let unclear = 0;
+  for (const q of QUESTIONS) {
+    const v = answers[q.id];
+    if (!v) continue;
+    if (v === 'unklar') {
+      unclear += 1;
+    } else if (q.scoreContribution(v) === 1) {
+      flagged += 1;
+    } else {
+      cleared += 1;
+    }
+  }
+  return { flagged, cleared, unclear };
 }

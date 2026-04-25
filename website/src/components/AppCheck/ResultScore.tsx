@@ -5,7 +5,11 @@
  * The framing is always "Aus deiner Sicht" — never "this app is X".
  */
 
-import { QUESTIONS, type AnswersMap } from '../../lib/app-check/questions';
+import {
+  QUESTIONS,
+  summariseAnswers,
+  type AnswersMap,
+} from '../../lib/app-check/questions';
 import { bandForScore, type ScoreBandDef } from '../../lib/app-check/score';
 
 interface Props {
@@ -38,14 +42,26 @@ const COLOR_CLASSES: Record<ScoreBandDef['colorToken'], { bg: string; ring: stri
 export function ResultScore({ appName, answers, score }: Props) {
   const band = bandForScore(score);
   const colors = COLOR_CLASSES[band.colorToken];
+  const stats = summariseAnswers(answers);
 
   // Identify which questions contributed problematic answers, for the
   // educational explanation list. Q10 is special: "Nein" is the
   // problematic answer.
   const flaggedQuestions = QUESTIONS.filter((q) => {
     const v = answers[q.id];
-    return v && q.scoreContribution(v) === 1;
+    return v && v !== 'unklar' && q.scoreContribution(v) === 1;
   });
+
+  // Pull the questions the parent flagged as "weiß ich nicht" so we can
+  // surface them as a separate "you might want to look this up" section.
+  const unclearQuestions = QUESTIONS.filter(
+    (q) => answers[q.id] === 'unklar',
+  );
+
+  // If too much was unclear, the score itself is conservative — show a
+  // soft warning so parents understand "low score with many unknowns"
+  // is not the same as "low score with mostly Nein".
+  const sparseData = stats.unclear >= 5;
 
   return (
     <div className="space-y-10 max-w-3xl">
@@ -67,10 +83,27 @@ export function ResultScore({ appName, answers, score }: Props) {
         <p className="text-ink/75 leading-relaxed">{band.summary}</p>
       </div>
 
-      {/* App being assessed */}
-      <p className="text-sm text-ink/65">
-        Bewertete App: <strong className="text-teal-dark">{appName}</strong>
-      </p>
+      {/* App being assessed + answer breakdown */}
+      <div className="space-y-2 text-sm text-ink/65">
+        <p>
+          Bewertete App: <strong className="text-teal-dark">{appName}</strong>
+        </p>
+        <p>
+          Aus deinen Antworten: <strong className="text-teal-dark">{stats.flagged}</strong> Pattern beobachtet,{' '}
+          <strong className="text-teal-dark">{stats.cleared}</strong> verneint,{' '}
+          <strong className="text-teal-dark">{stats.unclear}</strong> offen gelassen.
+        </p>
+      </div>
+
+      {sparseData && (
+        <div className="rounded-xl bg-mustard/10 border border-mustard/30 p-5 text-sm text-ink/75 leading-relaxed">
+          Du hast bei vielen Fragen "Weiß ich nicht" gewählt. Der Score ist
+          deshalb konservativ: er zählt nur, was du selbst beobachten konntest.
+          Wenn du mehr Klarheit willst, schau ins App-Menü, in die
+          Datenschutzerklärung der App, oder spiel mal eine Session zusammen
+          mit deinem Kind.
+        </div>
+      )}
 
       {/* Explanations of flagged answers */}
       {flaggedQuestions.length > 0 && (
@@ -96,12 +129,34 @@ export function ResultScore({ appName, answers, score }: Props) {
         </div>
       )}
 
-      {flaggedQuestions.length === 0 && (
+      {flaggedQuestions.length === 0 && stats.cleared > 0 && (
         <div className="rounded-xl bg-sage/10 border border-sage/20 p-5 text-sm text-ink/75 leading-relaxed">
           Aus deinen Antworten ergaben sich keine problematischen Pattern.
           Trotzdem gilt: schau die ersten Sessions zusammen mit deinem Kind,
           setze einen Zeitrahmen, und beobachte ob die App Stress oder Ruhe
           erzeugt.
+        </div>
+      )}
+
+      {/* Surface unclear questions as a "things you could look into" list. */}
+      {unclearQuestions.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="font-display font-bold text-lg text-teal-dark">
+            Diese Fragen waren für dich unklar
+          </h3>
+          <ul className="space-y-3">
+            {unclearQuestions.map((q) => (
+              <li
+                key={q.id}
+                className="rounded-xl bg-cream/50 border border-teal/10 p-4"
+              >
+                <p className="text-sm text-teal-dark mb-1">{q.prompt}</p>
+                <p className="text-xs text-ink/60 leading-relaxed">
+                  {q.explainer}
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
