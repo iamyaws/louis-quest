@@ -429,6 +429,13 @@ export default function RoomHub({ onNavigate }) {
               width: Math.floor(stagePx * 0.92),
               height: Math.floor(stagePx * 0.92),
               pointerEvents: 'none',
+              // Ring sits ABOVE the cushion (z:5) so the lower arc
+              // visibly overlaps the mat instead of disappearing
+              // behind it (Marc 25 Apr 2026: "vital-metric ring needs
+              // to overlap cushion on the floor to be seen clearly").
+              // Ronki himself stays at z:7 above the ring so the
+              // chibi paints in front of all of it.
+              zIndex: 6,
             }}>
               <RonkiVitalsRing needs={vitals} size={Math.floor(stagePx * 0.92)} />
             </div>
@@ -524,73 +531,23 @@ export default function RoomHub({ onNavigate }) {
         </div>
       </section>
 
-      {/* Stimmungs-Check — kid-facing mood logger.
-          Marc 25 Apr 2026: "there's no way to log the mood to unlock
-          the journal right now if the bottom nav is still supposed to
-          be part of the product." Renders only when state.moodAM is
-          unset, so it appears each new day, gets tapped, then quietly
-          disappears for the rest of the day. Once tapped, the kid's
-          mood is set and the Tagebuch tab unlocks via the existing
-          gate logic. The kid can change their mood from the Ronki
-          profile (long-standing flow); we don't expose a re-edit here
-          to avoid the "did I tap the wrong one?" tap-spam. */}
+      {/* Stimmungs-Check — Ronki-driven prompt (Marc 25 Apr 2026:
+          "could also be a tapable question from ronki to louis with a
+          voiceline later — wie geht's dir heute? ronki möchte wissen
+          wie es dir heute geht"). The card always reads as Ronki
+          asking, not a system form: a chibi avatar on the left, a
+          warm question to the right. Tap the card once and the
+          emoji picker slides in from below; pick a mood and the
+          whole section disappears for the day. The voice play button
+          is a stub for now — we'll wire it to a Ronki voiceline
+          ("Sag mir doch wie's dir heute geht") in a follow-up. */}
       {state?.moodAM === null && (
-        <section style={{ padding: '20px 18px 0' }}>
-          <div style={{
-            borderRadius: 18,
-            background: 'linear-gradient(180deg, #fffdf5 0%, #fef3c7 100%)',
-            border: '1.5px solid rgba(180,83,9,0.20)',
-            padding: '14px 14px 16px',
-            boxShadow: '0 6px 16px -8px rgba(180,83,9,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
-          }}>
-            <div style={{
-              font: '800 10px/1 "Plus Jakarta Sans", sans-serif',
-              letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: '#b45309', marginBottom: 4,
-            }}>
-              Stimmungs-Check
-            </div>
-            <div style={{
-              font: '500 16px/1.2 "Fredoka", sans-serif',
-              color: '#124346', marginBottom: 12,
-            }}>
-              Wie geht's dir gerade, {heroName}?
-            </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(6, 1fr)',
-              gap: 6,
-            }}>
-              {[
-                { idx: 3, emoji: '😊', label: 'Gut' },
-                { idx: 4, emoji: '🤩', label: 'Magisch' },
-                { idx: 2, emoji: '😐', label: 'Okay' },
-                { idx: 0, emoji: '😢', label: 'Traurig' },
-                { idx: 1, emoji: '😨', label: 'Besorgt' },
-                { idx: 5, emoji: '😴', label: 'Müde' },
-              ].map(m => (
-                <button
-                  key={m.idx}
-                  type="button"
-                  onClick={() => actions?.setMood?.('moodAM', m.idx)}
-                  aria-label={m.label}
-                  className="active:scale-90 transition-transform"
-                  style={{
-                    aspectRatio: '1',
-                    borderRadius: 14,
-                    background: 'rgba(252,211,77,0.10)',
-                    border: '1.5px solid rgba(180,83,9,0.18)',
-                    fontSize: 24,
-                    cursor: 'pointer',
-                    padding: 0,
-                  }}
-                >
-                  {m.emoji}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
+        <RonkiMoodPrompt
+          heroName={heroName}
+          variant={variant}
+          stageIdx={stageIdx}
+          onPick={(idx) => actions?.setMood?.('moodAM', idx)}
+        />
       )}
 
       {/* Care verbs row */}
@@ -748,6 +705,141 @@ export default function RoomHub({ onNavigate }) {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────
+
+// Ronki-driven mood prompt — a tappable question card that opens a
+// 6-emoji picker once Louis acknowledges Ronki's ask. Reframes the
+// "Stimmungs-Check" beat as roleplay (Ronki asks, kid responds)
+// instead of a system form. Voice playback is stubbed for now;
+// wiring will read a Ronki voiceline like "Sag mir doch wie's dir
+// heute geht."
+function RonkiMoodPrompt({ heroName, variant, stageIdx, onPick }) {
+  const [open, setOpen] = React.useState(false);
+  const moods = [
+    { idx: 3, emoji: '😊', label: 'Gut' },
+    { idx: 4, emoji: '🤩', label: 'Magisch' },
+    { idx: 2, emoji: '😐', label: 'Okay' },
+    { idx: 0, emoji: '😢', label: 'Traurig' },
+    { idx: 1, emoji: '😨', label: 'Besorgt' },
+    { idx: 5, emoji: '😴', label: 'Müde' },
+  ];
+
+  return (
+    <section style={{ padding: '20px 18px 0' }}>
+      <div style={{
+        borderRadius: 18,
+        background: 'linear-gradient(180deg, #fffdf5 0%, #fef3c7 100%)',
+        border: '1.5px solid rgba(180,83,9,0.22)',
+        boxShadow: '0 6px 16px -8px rgba(180,83,9,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
+        overflow: 'hidden',
+      }}>
+        {/* Tappable header — the "Ronki asks" row. */}
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-label="Ronkis Frage beantworten"
+          aria-expanded={open}
+          className="active:scale-[0.99] transition-transform"
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            padding: '12px 14px',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+        >
+          {/* Mini Ronki avatar */}
+          <div style={{
+            width: 52, height: 52, borderRadius: '50%',
+            background: 'rgba(252,211,77,0.18)',
+            border: '1.5px solid rgba(180,83,9,0.20)',
+            overflow: 'hidden',
+            display: 'grid', placeItems: 'center',
+            flexShrink: 0,
+          }}>
+            <MoodChibi size={48} variant={variant} stage={stageIdx || 1} mood="normal" bare />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{
+              font: '800 9px/1 "Plus Jakarta Sans", sans-serif',
+              letterSpacing: '0.22em', textTransform: 'uppercase',
+              color: '#b45309', marginBottom: 4,
+            }}>
+              Ronki fragt
+            </div>
+            <div style={{
+              font: '500 15px/1.2 "Fredoka", sans-serif',
+              color: '#124346',
+            }}>
+              Wie geht's dir heute, {heroName}?
+            </div>
+          </div>
+          {/* Voice-line stub — visual only for now (Marc 25 Apr —
+              "with a voiceline later"). Tap is captured by the parent
+              button so this icon doesn't re-fire; that's intentional
+              because the same tap should both open the picker AND
+              trigger the voiceline once it's wired. */}
+          <span
+            aria-hidden="true"
+            style={{
+              width: 32, height: 32, borderRadius: '50%',
+              display: 'grid', placeItems: 'center',
+              background: 'rgba(252,211,77,0.20)',
+              flexShrink: 0,
+            }}
+          >
+            <span className="material-symbols-outlined" style={{
+              fontSize: 18,
+              color: '#b45309',
+              fontVariationSettings: "'FILL' 1",
+            }}>
+              {open ? 'expand_less' : 'volume_up'}
+            </span>
+          </span>
+        </button>
+        {open && (
+          <div style={{
+            padding: '4px 14px 14px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gap: 6,
+            animation: 'rmp-pickin 0.32s cubic-bezier(0.34, 1.2, 0.64, 1)',
+          }}>
+            {moods.map(m => (
+              <button
+                key={m.idx}
+                type="button"
+                onClick={() => onPick(m.idx)}
+                aria-label={m.label}
+                className="active:scale-90 transition-transform"
+                style={{
+                  aspectRatio: '1',
+                  borderRadius: 14,
+                  background: 'rgba(252,211,77,0.12)',
+                  border: '1.5px solid rgba(180,83,9,0.18)',
+                  fontSize: 24,
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              >
+                {m.emoji}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <style>{`
+        @keyframes rmp-pickin {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </section>
+  );
+}
 
 function ObjectTile({ icon, label, highlight, onClick }) {
   return (
