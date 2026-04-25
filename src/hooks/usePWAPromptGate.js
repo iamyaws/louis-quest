@@ -101,14 +101,43 @@ export function usePWAPromptGate() {
     // still ran once on day 1).
   }, [state, actions, standalone]);
 
+  // Settle window after a task completion. Marc 25 Apr 2026 flagged
+  // that on first-task completion three things fired at once: the
+  // PWA prompt, the first-task achievement, and the QuestEater
+  // ronki-burp+bubble. Now we hold the PWA prompt back until at
+  // least 8 seconds have passed since the most recent quest tick,
+  // letting the inline QuestEater beat finish + any toast clear
+  // before the bottom sheet pops.
+  const SETTLE_AFTER_TASK_MS = 8_000;
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    // Re-evaluate on a 1s tick while we're inside the settle window.
+    // Stops once we're past it so we're not holding a permanent timer.
+    if (!state?.lastTaskCompletionAt) return;
+    const ts = new Date(state.lastTaskCompletionAt).getTime();
+    if (Date.now() - ts >= SETTLE_AFTER_TASK_MS) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [state?.lastTaskCompletionAt]);
+
   const shouldPrompt = useMemo(() => {
     if (!state) return false;
     if (standalone) return false;
     if (!state.onboardingDone) return false;
     if (state.pwaPromptShown) return false;
-    if ((state.totalTasksDone || 0) < 1) return false;
+    // Bumped from 1 → 2 (Marc 25 Apr 2026). The first quest is the
+    // moment the kid is most likely to bounce — better to fire the
+    // install ask after a second tick of engagement when the
+    // experience has actually shown a couple of beats. Keeps the
+    // first-quest screen un-stacked.
+    if ((state.totalTasksDone || 0) < 2) return false;
+    // Settle window guard — no firing while a quest just closed.
+    if (state.lastTaskCompletionAt) {
+      const since = now - new Date(state.lastTaskCompletionAt).getTime();
+      if (since < SETTLE_AFTER_TASK_MS) return false;
+    }
     return true;
-  }, [state, standalone]);
+  }, [state, standalone, now]);
 
   const markShown = () => {
     if (!actions?.patchState) return;

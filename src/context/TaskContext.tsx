@@ -160,6 +160,13 @@ export interface TaskState {
    *  inside the expedition surface. Capped at 24 to keep storage
    *  bounded (one daily memento → roughly a month of trips). */
   expeditionLog?: ExpeditionMemento[];
+  /** ISO timestamp of the most recent quest completion. Used by the
+   *  PWA prompt gate (and any future "quiet after task" guard) to
+   *  hold modal-class notifications back during the inline beat that
+   *  fires on a tick (QuestEater puff + Ronki burp + bubble). 25 Apr
+   *  2026 — Marc QA flag: three notifications were stacking when the
+   *  first quest closed. */
+  lastTaskCompletionAt?: string;
   loginBonusClaimed: boolean;
   onboardingDone: boolean;
   /** Kid saw the Phase-1 forest intro ("Hallo! Bevor wir uns kennenlernen …")
@@ -866,6 +873,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // empty log for legacy saves that pre-date the field.
           expedition: (raw as any).expedition || { state: 'home', biome: 'morgenwald' },
           expeditionLog: (raw as any).expeditionLog || [],
+          lastTaskCompletionAt: (raw as any).lastTaskCompletionAt,
           loginBonusClaimed: raw.loginBonusClaimed || false,
           onboardingDone: raw.onboardingDone || false,
           // Onboarding-parent-first rework (23 Apr 2026) — migration:
@@ -1444,7 +1452,15 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions, pendingRitual, ronkiVitals, expedition };
+      // Stamp the latest completion time so the PWA prompt gate (and
+      // any future "settle after task" guard) can hold quiet
+      // notifications back during the inline QuestEater beat. Marc
+      // 25 Apr 2026 flagged that three notifications fired at once
+      // when the first quest closed — install prompt + achievement
+      // + Ronki burp. The PWA gate now waits 8s after this stamp.
+      const lastTaskCompletionAt = new Date().toISOString();
+
+      return { ...prev, quests, dt, hp, drachenEier: screenMin, xp: newXp, boss, bossTrophies, bossDmgToday, orbs, heroStats, totalTasksDone, unlockedBadges, arcEngine, bossKilledToday, arcBeatAdvancedToday, totalQuestCompletions, pendingRitual, ronkiVitals, expedition, lastTaskCompletionAt };
     });
     setToastTrigger(t => t + 1);
     // Re-evaluate organic mood triggers right after the completion
