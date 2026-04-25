@@ -14,6 +14,7 @@ import { useGameAccess } from '../hooks/useGameAccess';
 import { biomeBackground } from '../utils/biomeBackgrounds';
 import MoodChibi from './MoodChibi';
 import ChibiFriend, { hasChibiFriend } from './drachennest/ChibiFriend';
+import RealFriends from './drachennest/RealFriends';
 import FireBreathCollection from './FireBreathCollection';
 
 /**
@@ -1393,6 +1394,13 @@ export default function RonkiProfile({ onNavigate }) {
                navigates to the full Micropedia, so no separate CTA
                button (fewer tap targets = less visual noise). */}
           {segment === 'freunde' && (
+            <>
+              {/* Echte Freunde — real-kid friendship layer (Marc Q4 = B,
+                  25 Apr 2026: 'new section inside the Ronki profile,
+                  groups social with the friend-creature gallery the
+                  kid already knows'). Sits ABOVE the chibi-creature
+                  gallery so the kid sees their human friends first. */}
+              <RealFriends lang={lang} />
             <section style={{ marginBottom: 14 }}>
               <Kicker>{lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}</Kicker>
               <button
@@ -1455,6 +1463,7 @@ export default function RonkiProfile({ onNavigate }) {
                 </div>
               </button>
             </section>
+            </>
           )}
 
           {/* ═══ FEUER SEGMENT ═══

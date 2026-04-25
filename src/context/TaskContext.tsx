@@ -98,6 +98,48 @@ export interface QuestLineDay {
   isMilestone?: boolean;
 }
 
+// ── Friend snapshot + wink event (Drachennest social, 25 Apr 2026) ──
+// Cached view of another kid's nest. We persist a flat snapshot
+// rather than a live pointer so the visit surface can render
+// offline + privacy-cleanly (no vitals, no live mood). The
+// snapshot gets refreshed on a re-add (kid types the same code
+// again). Decor is the kid's last 10 expeditionLog entries
+// summarised by emoji + name; the visit surface uses the same
+// 4-slot mapping the home cave uses.
+export interface FriendSnapshot {
+  emojiCode: string[];
+  firstName: string;
+  variant: string;
+  stage: number;
+  hatchTraits: string[];
+  decor: {
+    shelf: Array<{ emoji: string; name: string }>;
+    hanging?: { emoji: string; name: string };
+    wallArt?: { emoji: string; name: string };
+    cornerItem?: { emoji: string; name: string };
+  };
+  addedAt: string;
+}
+
+export interface WinkEvent {
+  fromCode: string[];
+  fromName: string;
+  receivedAt: string;
+  seen?: boolean;
+}
+
+// Local record of a wink sent BY this kid TO a friend. Used to
+// enforce Q3's 3/day-per-friend cap (Marc 25 Apr 2026: "single
+// button, capped at 3/day"). We don't need to persist who
+// received the wink elsewhere — the friend will see it when
+// their app reads back their own winksReceived feed (real
+// backend wiring is the follow-up). For the prototype, this
+// array is local-only and only feeds the cap calculation.
+export interface WinkSentRecord {
+  toCode: string[];
+  sentAt: string;
+}
+
 // ── Expedition memento (Drachennest reframe, 25 Apr 2026) ──
 // One per return trip. Renders both as a shelf tile in the
 // Naturtagebuch and as the hero artifact inside the diary modal that
@@ -149,6 +191,30 @@ export interface TaskState {
    *  earned Funken. Capped at 12 so the kid can't hoard between
    *  days. Resets at midnight via the day-transition logic. */
   careTokens?: number;
+  /** Friends + sign-up unique code (Marc 25 Apr 2026).
+   *  Kid picks 3 emojis from EMOJI_VOCABULARY during onboarding;
+   *  becomes their shareable code. Friends added by typing each
+   *  other's 3-emoji codes get cached as snapshots in the friends
+   *  array. Visit surface renders the snapshot read-only — no
+   *  vitals, no live state, just chibi + decor + first name. */
+  emojiCode?: string[];
+  /** Cached friend snapshots — added when the kid types another
+   *  kid's emoji code. Each entry is a frozen view of that
+   *  friend's nest (variant / stage / hatchTraits + decor) at
+   *  add-time. Re-syncs are a follow-up — for prototype the
+   *  snapshot is static after add. */
+  friends?: FriendSnapshot[];
+  /** Winks received from friends (Marc Q3 = A: single-button
+   *  wink, capped at 3/day per friend). For the prototype these
+   *  are seeded locally so the kid sees the indicator without a
+   *  real backend round-trip. */
+  winksReceived?: WinkEvent[];
+  /** Winks sent by this kid. Drives the 3/day-per-friend cap
+   *  (Marc Q3) — the action counts entries with sentAt in
+   *  today's local date matching the target's emojiCode and
+   *  refuses the wink once the count hits 3. Local-only; the
+   *  real social layer ships later. */
+  winksSent?: WinkSentRecord[];
   /** Per-Ronki distinguishing features (25 Apr 2026 — Marc's
    *  clarified model: "when an evolution happens a ronki gets one
    *  unique trait out of the potential 6, added to the evolution
@@ -489,6 +555,22 @@ interface TaskActions {
    *  meters when the kid taps Füttern / Streicheln / Spielen. Caps at
    *  100 per vital. The amounts mirror the Begleiter Polish design. */
   careForRonki: (kind: 'hunger' | 'liebe' | 'energie') => void;
+  /** Friends + sign-up — emoji code picker writes the kid's three
+   *  emojis here. Idempotent. Validates length === 3 + each entry
+   *  exists in EMOJI_VOCABULARY; bad input is ignored. */
+  setEmojiCode: (code: string[]) => void;
+  /** Cache a friend's snapshot (kid types their code, we add them
+   *  to the friends list). De-dupes by emojiCode so the same kid
+   *  gets refreshed rather than duplicated on re-add. */
+  addFriend: (snap: FriendSnapshot) => void;
+  /** Mark a wink as seen so the inbox indicator clears. */
+  markWinkSeen: (receivedAt: string) => void;
+  /** Record a wink the kid just sent to a friend. Enforces the
+   *  3/day-per-friend cap (Marc Q3). Returns true if the wink
+   *  was accepted, false if the cap was already reached today.
+   *  The UI uses the boolean to either flip into the success
+   *  state or show the "morgen wieder" copy. */
+  recordWinkSent: (friend: FriendSnapshot) => boolean;
   /** Drachennest expedition: explicit state setter so the prototype's
    *  dev URL params (?expedition=away|waiting|home) and the Reise
    *  surface's polling effect can drive transitions without each
@@ -707,6 +789,10 @@ export function createInitialState(): TaskState {
     ronkiVitals: { hunger: 70, liebe: 70, energie: 70 },
     careTokens: 0,
     hatchTraits: [],
+    emojiCode: undefined,  // picked during onboarding via EmojiCodePicker
+    friends: [],
+    winksReceived: [],
+    winksSent: [],
     expedition: { state: 'home', biome: 'morgenwald' },
     expeditionLog: [],
     loginBonusClaimed: false,
@@ -903,6 +989,13 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           // evolution rolls. Default empty array for legacy saves
           // that pre-date the field.
           hatchTraits: Array.isArray((raw as any).hatchTraits) ? (raw as any).hatchTraits : [],
+          // Friends + sign-up — emojiCode is undefined until the
+          // kid picks 3 emojis; friends + winksReceived default
+          // to empty arrays so the visit surface always renders.
+          emojiCode: Array.isArray((raw as any).emojiCode) ? (raw as any).emojiCode : undefined,
+          friends: Array.isArray((raw as any).friends) ? (raw as any).friends : [],
+          winksReceived: Array.isArray((raw as any).winksReceived) ? (raw as any).winksReceived : [],
+          winksSent: Array.isArray((raw as any).winksSent) ? (raw as any).winksSent : [],
           // Drachennest expedition state: default to home/morgenwald with an
           // empty log for legacy saves that pre-date the field.
           expedition: (raw as any).expedition || { state: 'home', biome: 'morgenwald' },
@@ -1741,6 +1834,79 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Friends + sign-up (Drachennest social, 25 Apr 2026) ──
+  const setEmojiCode = useCallback((code: string[]) => {
+    if (!Array.isArray(code) || code.length !== 3) return;
+    setState(prev => prev ? { ...prev, emojiCode: code } : prev);
+  }, []);
+
+  const addFriend = useCallback((snap: FriendSnapshot) => {
+    if (!snap?.emojiCode || snap.emojiCode.length !== 3) return;
+    setState(prev => {
+      if (!prev) return prev;
+      const list = prev.friends || [];
+      const matchIdx = list.findIndex(f =>
+        f.emojiCode?.[0] === snap.emojiCode[0] &&
+        f.emojiCode?.[1] === snap.emojiCode[1] &&
+        f.emojiCode?.[2] === snap.emojiCode[2]
+      );
+      // De-dupe — refresh the existing entry rather than appending.
+      const next = matchIdx >= 0
+        ? list.map((f, i) => i === matchIdx ? snap : f)
+        : [...list, snap];
+      return { ...prev, friends: next };
+    });
+  }, []);
+
+  const markWinkSeen = useCallback((receivedAt: string) => {
+    setState(prev => {
+      if (!prev) return prev;
+      const list = prev.winksReceived || [];
+      return {
+        ...prev,
+        winksReceived: list.map(w =>
+          w.receivedAt === receivedAt ? { ...w, seen: true } : w
+        ),
+      };
+    });
+  }, []);
+
+  // recordWinkSent — caps at 3 per local day per friend (Marc Q3).
+  // We close over the cap check + the append in a single setState
+  // pass so two rapid taps can't both squeeze through. The boolean
+  // return mirrors the in-state check: if the resulting list is the
+  // same reference, the cap was hit; otherwise the wink got through.
+  const recordWinkSent = useCallback((friend: FriendSnapshot): boolean => {
+    if (!friend?.emojiCode || friend.emojiCode.length !== 3) return false;
+    const today = new Date().toISOString().slice(0, 10);
+    let accepted = false;
+    setState(prev => {
+      if (!prev) return prev;
+      const list = prev.winksSent || [];
+      const sentTodayToFriend = list.filter(w =>
+        typeof w.sentAt === 'string' &&
+        w.sentAt.slice(0, 10) === today &&
+        w.toCode?.[0] === friend.emojiCode[0] &&
+        w.toCode?.[1] === friend.emojiCode[1] &&
+        w.toCode?.[2] === friend.emojiCode[2]
+      ).length;
+      if (sentTodayToFriend >= 3) {
+        // Cap reached — leave state untouched, return false.
+        accepted = false;
+        return prev;
+      }
+      accepted = true;
+      return {
+        ...prev,
+        winksSent: [
+          ...list,
+          { toCode: friend.emojiCode.slice(), sentAt: new Date().toISOString() },
+        ],
+      };
+    });
+    return accepted;
+  }, []);
+
   // ── Expedition state machine (Drachennest, 25 Apr 2026) ──
   // Pure state transitions for the Reise surface. Memento generation
   // happens in rangerDeparted so the kid never sees an empty diary
@@ -2526,7 +2692,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, setExpedition, startExpedition, rangerDeparted, rangerArrived, receiveMemento, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, setEmojiCode, addFriend, markWinkSeen, recordWinkSent, setExpedition, startExpedition, rangerDeparted, rangerArrived, receiveMemento, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, addScreenMinutes, addFunkelzeitUsage, refundFunkelzeitUsage, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
