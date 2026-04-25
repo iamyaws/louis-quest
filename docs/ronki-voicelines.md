@@ -94,6 +94,21 @@ app announcing.
 | ronki_system_adventure_cta | RoomHub adventure CTA | Lass uns auf Abenteuer gehen, ich bringe dir was Schönes mit. | tbd |
 | ronki_system_speech_dismiss | RonkiSpeechBubble aria | (no spoken line — visual interaction only) | n/a |
 
+## 4b. Stamina-out full-screen takeover
+
+Surface: TBD `RonkiTooTired.jsx` — when the kid runs out of stamina
+playing minigames, Ronki appears full-screen and asks for a break.
+Three lines so the kid doesn't hear the same thing every time. Marc
+25 Apr 2026 — "stating that he has played enough games for now and
+wants to do something else plus we will be back again and having
+some fun playing again."
+
+| ID | DE | Status |
+|---|---|---|
+| ronki_stamina_out_01 | Puh, jetzt brauch ich mal eine kleine Pause vom Spielen. Magst du was anderes mit mir machen? Wir spielen später wieder, versprochen. | tbd |
+| ronki_stamina_out_02 | Mein Kopf ist ein bisschen müde von den ganzen Spielen. Wir kommen gleich wieder, und dann hab ich wieder mehr Lust. | tbd |
+| ronki_stamina_out_03 | Komm wir machen jetzt was anderes zusammen. Spielen ist toll, aber zu viel auf einmal macht mich ganz wuselig im Bauch. | tbd |
+
 ## 5. Memento return quotes (Reise diary modal)
 
 Source: `src/context/TaskContext.tsx` MORGENWALD_MEMENTOS. Ronki

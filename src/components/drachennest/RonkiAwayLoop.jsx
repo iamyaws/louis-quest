@@ -149,8 +149,29 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
         ))}
       </div>
 
-      {/* Ronki, back-view, anchored centre-bottom. Bobs in place
-          while the world scrolls past. */}
+      {/* Ronki, flying — top-down/aerial view (Marc 25 Apr 2026:
+          'his tummy should face the ground'). Anchored mid-scene
+          and gently bobbing in place while the biome scrolls past
+          below him. Wings spread, backpack visible on his back,
+          tail trailing behind. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '36%',
+          transform: 'translateX(-50%)',
+          width: 140, height: 100,
+          animation: 'rwl-fly 1.6s ease-in-out infinite',
+          zIndex: 5,
+          filter: 'drop-shadow(0 12px 8px rgba(0,0,0,0.20))',
+        }}
+      >
+        <RonkiFlying palette={variantPalette} />
+      </div>
+
+      {/* Soft moving shadow on the ground beneath Ronki — sells
+          the height of the flight. */}
       <div
         aria-hidden="true"
         style={{
@@ -158,13 +179,13 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
           left: '50%',
           bottom: '18%',
           transform: 'translateX(-50%)',
-          width: 90, height: 110,
-          animation: 'rwl-walk 0.85s ease-in-out infinite',
-          zIndex: 5,
+          width: 80, height: 16,
+          borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(0,0,0,0.35), transparent 75%)',
+          animation: 'rwl-shadow 1.6s ease-in-out infinite',
+          pointerEvents: 'none',
         }}
-      >
-        <RonkiBack palette={variantPalette} />
-      </div>
+      />
 
       {/* Soft heat shimmer over the ground — small upward drifting
           dots that suggest air over warm earth. */}
@@ -188,9 +209,17 @@ export default function RonkiAwayLoop({ biome = 'morgenwald', variant = 'forest'
         @keyframes rwl-scroll-slow { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
         @keyframes rwl-scroll-med  { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
         @keyframes rwl-scroll-fast { from { transform: translateX(0); } to { transform: translateX(-66.67%); } }
-        @keyframes rwl-walk {
-          0%, 100% { transform: translateX(-50%) translateY(0) rotate(-1deg); }
-          50%      { transform: translateX(-50%) translateY(-3px) rotate(1deg); }
+        @keyframes rwl-fly {
+          /* Subtle vertical bob + slight tilt — selling the glide
+             without being jittery. */
+          0%, 100% { transform: translateX(-50%) translateY(0) rotate(-2deg); }
+          50%      { transform: translateX(-50%) translateY(-8px) rotate(2deg); }
+        }
+        @keyframes rwl-shadow {
+          /* Shadow slightly shrinks + grows in sync with Ronki's
+             altitude bob. */
+          0%, 100% { transform: translateX(-50%) scale(1, 1); opacity: 0.35; }
+          50%      { transform: translateX(-50%) scale(0.8, 0.7); opacity: 0.18; }
         }
         @keyframes rwl-shimmer {
           0%   { opacity: 0; transform: translateY(0) scale(0.6); }
@@ -233,74 +262,95 @@ function Tree({ cfg, left, scale }) {
   );
 }
 
-// ─── Ronki, back view ──────────────────────────────────────
+// ─── Ronki, flying (top-down / aerial view) ──────────────────
 //
-// Simple silhouette: round body in variant colour, two horns
-// peeking up, small triangle wing nubs at the shoulders, a tail
-// curling out one side, two tiny legs at the base. Drawn in SVG
-// so it scales cleanly + variant palette pipes through.
+// Marc 25 Apr 2026: 'tummy should face the ground.' So the camera
+// is above Ronki, looking down on his back as he glides forward.
+// Body is laid out along the X axis (head right, tail left), wings
+// spread out either side of the spine, backpack centered on his
+// back, four legs tucked under, head-crown nose-cone visible at
+// the front. Variant palette pipes through via SVG gradients.
 
-function RonkiBack({ palette }) {
+function RonkiFlying({ palette }) {
   const body = palette.body || 'linear-gradient(180deg, #86efac, #15803d)';
   const horn = palette.horn || 'linear-gradient(180deg, #fde68a, #f59e0b)';
-  const leg  = palette.leg  || 'linear-gradient(180deg, #15803d, #14532d)';
   return (
-    <svg viewBox="-50 -55 100 110" width="100%" height="100%" style={{ display: 'block' }}>
+    <svg viewBox="-70 -50 140 100" width="100%" height="100%" style={{ display: 'block' }}>
       <defs>
-        {/* Use the variant gradients via a foreignObject-free trick:
-            extract the deepest stop-color and render solid for
-            simplicity. The chibi palette stores CSS-gradient strings
-            we can't pipe directly to SVG, so we build SVG-native
-            gradients here from the same colour family. */}
         <linearGradient id="rwl-body" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={parseGradient(body, 0)} />
           <stop offset="60%" stopColor={parseGradient(body, 1)} />
           <stop offset="100%" stopColor={parseGradient(body, 2)} />
         </linearGradient>
-        <linearGradient id="rwl-leg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={parseGradient(leg, 0)} />
-          <stop offset="100%" stopColor={parseGradient(leg, 1)} />
-        </linearGradient>
         <linearGradient id="rwl-horn" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={parseGradient(horn, 0)} />
           <stop offset="100%" stopColor={parseGradient(horn, 1)} />
         </linearGradient>
+        <radialGradient id="rwl-wing" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stopColor={parseGradient(body, 0)} />
+          <stop offset="100%" stopColor={parseGradient(body, 2)} />
+        </radialGradient>
       </defs>
 
-      {/* Tail — curls out the right side. */}
+      {/* Tail — trails behind to the LEFT, since Ronki flies right.
+          Drawn first so the body covers its base. */}
       <path
-        d="M 16 14 Q 28 18 32 8 Q 26 12 20 10 Z"
+        d="M -28 0 Q -52 -4 -60 4 Q -52 8 -28 6 Z"
         fill="url(#rwl-body)"
       />
-      {/* Tail tip — gold tuft. */}
-      <circle cx={32} cy={8} r={4} fill="url(#rwl-horn)" />
+      <ellipse cx={-58} cy={4} rx={6} ry={5} fill="url(#rwl-horn)" />
 
-      {/* Body — back of Ronki, oval. */}
-      <ellipse cx={0} cy={0} rx={28} ry={26} fill="url(#rwl-body)" />
-      {/* Body shading — back midline. */}
-      <ellipse cx={0} cy={2} rx={16} ry={20} fill="rgba(0,0,0,0.10)" />
+      {/* Wings — spread either side of the spine, flapping. The
+          'rwl-wing-flap' anim oscillates rotation around the wing
+          base near the body. */}
+      <g style={{ transformOrigin: '0px -2px', animation: 'rwl-wing-flap 0.5s ease-in-out infinite alternate' }}>
+        <path
+          d="M -8 -4 Q -12 -34 14 -28 Q 6 -16 6 -6 Z"
+          fill="url(#rwl-wing)"
+          stroke="rgba(0,0,0,0.18)"
+          strokeWidth={0.6}
+        />
+        <path
+          d="M -8 4 Q -12 34 14 28 Q 6 16 6 6 Z"
+          fill="url(#rwl-wing)"
+          stroke="rgba(0,0,0,0.18)"
+          strokeWidth={0.6}
+        />
+      </g>
 
-      {/* Wing nubs — small triangles either side of the spine. */}
-      <path d="M -20 -6 L -28 -16 L -14 -12 Z" fill="url(#rwl-body)" stroke="rgba(0,0,0,0.18)" strokeWidth={0.6} />
-      <path d="M 20 -6 L 28 -16 L 14 -12 Z" fill="url(#rwl-body)" stroke="rgba(0,0,0,0.18)" strokeWidth={0.6} />
+      {/* Body — long oval along the X axis, head end (right) tapers
+          toward a snout. */}
+      <ellipse cx={0} cy={0} rx={32} ry={18} fill="url(#rwl-body)" />
+      {/* Spine shading — darker stripe down the middle so the kid
+          reads the up-down depth. */}
+      <ellipse cx={0} cy={0} rx={26} ry={5} fill="rgba(0,0,0,0.18)" />
 
-      {/* Horns — two peeking up from the head/back-of-skull area. */}
-      <path d="M -10 -22 L -6 -34 L -2 -22 Z" fill="url(#rwl-horn)" />
-      <path d="M 2 -22 L 6 -34 L 10 -22 Z" fill="url(#rwl-horn)" />
+      {/* Snout / head — slightly tapered front of the body. */}
+      <ellipse cx={26} cy={0} rx={12} ry={10} fill="url(#rwl-body)" />
+      {/* Horns — two small bumps on the head, viewed from above
+          they read as ears. */}
+      <ellipse cx={20} cy={-9} rx={3} ry={4} fill="url(#rwl-horn)" />
+      <ellipse cx={20} cy={9}  rx={3} ry={4} fill="url(#rwl-horn)" />
 
-      {/* Head crown — soft dome on top of body. */}
-      <ellipse cx={0} cy={-22} rx={12} ry={6} fill="url(#rwl-body)" />
+      {/* Eye dot — single eye visible from this angle, on the side
+          of the head facing the camera (top of head from this POV). */}
+      <circle cx={30} cy={-3} r={1.5} fill="#1a0e08" />
+      <circle cx={30.4} cy={-3.4} r={0.5} fill="#ffffff" />
 
-      {/* Legs — two stubs at the base, alternating step via parent
-          walk animation (legs rendered statically here). */}
-      <ellipse cx={-10} cy={26} rx={5} ry={4} fill="url(#rwl-leg)" />
-      <ellipse cx={10} cy={26} rx={5} ry={4} fill="url(#rwl-leg)" />
+      {/* Four legs tucked under — small ellipses peeking out from
+          the body silhouette. */}
+      <ellipse cx={-14} cy={-14} rx={3} ry={5} fill="url(#rwl-body)" opacity={0.85} />
+      <ellipse cx={14}  cy={-14} rx={3} ry={5} fill="url(#rwl-body)" opacity={0.85} />
+      <ellipse cx={-14} cy={14}  rx={3} ry={5} fill="url(#rwl-body)" opacity={0.85} />
+      <ellipse cx={14}  cy={14}  rx={3} ry={5} fill="url(#rwl-body)" opacity={0.85} />
 
-      {/* Backpack — small rounded square between the wings, telling
-          the kid Ronki's on a trip. */}
-      <rect x={-9} y={-8} width={18} height={18} rx={3} fill="#5c3e1f" />
-      <rect x={-11} y={-10} width={22} height={3} rx={1} fill="#3a2212" />
-      <circle cx={0} cy={1} r={2} fill="#d4a373" />
+      {/* Backpack — strapped to his back, centered on the spine,
+         visible from this aerial POV. The kid reads "he's on a
+         trip" from this single detail. */}
+      <rect x={-10} y={-10} width={20} height={20} rx={4} fill="#5c3e1f" />
+      <rect x={-12} y={-12} width={24} height={3} rx={1} fill="#3a2212" />
+      <circle cx={0} cy={0} r={2.5} fill="#d4a373" />
+      <circle cx={0} cy={0} r={1} fill="#5c3e1f" />
     </svg>
   );
 }

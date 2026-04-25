@@ -37,6 +37,7 @@ const FRIENDS = {
     shape: 'round', eyes: 'sparkle', mouth: 'smile',
     flair: 'cheekDots',
     accessory: 'ember',
+    move: 'flicker',  // gentle brightness pulse, like an ember
     bg: '#fef3c7',
   },
   forest_1: {
@@ -45,6 +46,7 @@ const FRIENDS = {
     shape: 'blob', eyes: 'default', mouth: 'smile',
     flair: 'spot',
     accessory: 'leafCrown',
+    move: 'sway',
     bg: '#ecfccb',
   },
   forest_2: {
@@ -53,6 +55,7 @@ const FRIENDS = {
     shape: 'tall', eyes: 'sleepy', mouth: 'closed',
     flair: 'stripe',
     accessory: 'leafCrown',
+    move: 'breathe-slow',
     bg: '#fef9d7',
   },
   forest_3: {
@@ -61,8 +64,9 @@ const FRIENDS = {
     shape: 'squat', eyes: 'lash', mouth: 'smallO',
     flair: 'cheekDots',
     accessory: 'mushroomCap',
+    move: 'peek',  // quick duck-and-back, the shy hider
     bg: '#fef2f2',
-    capColor: '#fbbf24',  // yellow cap to differentiate from Mr. Shroom
+    capColor: '#fbbf24',
   },
   forest_4: {
     name: 'Baumbart',
@@ -70,6 +74,7 @@ const FRIENDS = {
     shape: 'tall', eyes: 'sleepy', mouth: 'closed',
     flair: 'freckles',
     accessory: 'beard',
+    move: 'breathe-slow',
     bg: '#fef9d7',
   },
   forest_5: {
@@ -78,6 +83,7 @@ const FRIENDS = {
     shape: 'pear', eyes: 'default', mouth: 'smile',
     flair: 'cheekDots',
     accessory: 'mushroomCap',
+    move: 'tip-hat',
     bg: '#fef3c7',
   },
   forest_6: {
@@ -86,6 +92,7 @@ const FRIENDS = {
     shape: 'squat', eyes: 'wide', mouth: 'smile',
     flair: 'fluff',
     accessory: 'mushroomCap',
+    move: 'lumber',  // slow shoulder-rock of a big shy creature
     bg: '#fef9d7',
     capColor: '#a16207',
   },
@@ -97,6 +104,7 @@ const FRIENDS = {
     shape: 'round', eyes: 'wide', mouth: 'smallO',
     flair: 'spot',
     accessory: 'cloudPuff',
+    move: 'hover',
     bg: '#e0f2fe',
   },
   sky_1: {
@@ -105,6 +113,7 @@ const FRIENDS = {
     shape: 'pear', eyes: 'sparkle', mouth: 'beak',
     flair: 'cheekDots',
     accessory: 'beak',
+    move: 'hop',
     bg: '#fff8f2',
   },
 
@@ -115,6 +124,7 @@ const FRIENDS = {
     shape: 'round', eyes: 'sparkle', mouth: 'smallO',
     flair: 'spot',
     accessory: 'finTail',
+    move: 'bob',
     bg: '#cffafe',
   },
   water_1: {
@@ -123,6 +133,7 @@ const FRIENDS = {
     shape: 'squat', eyes: 'wide', mouth: 'frog',
     flair: 'cheekDots',
     accessory: 'frogMouth',
+    move: 'jump',
     bg: '#dcfce7',
   },
   water_2: {
@@ -131,6 +142,7 @@ const FRIENDS = {
     shape: 'round', eyes: 'sparkle', mouth: 'smile',
     flair: 'cheekDots',
     accessory: 'shellBack',
+    move: 'shimmy',
     bg: '#fce7f3',
   },
   water_3: {
@@ -139,6 +151,7 @@ const FRIENDS = {
     shape: 'squat', eyes: 'dots', mouth: 'closed',
     flair: 'stripe',
     accessory: 'pincers',
+    move: 'sidestep',
     bg: '#f1f5f9',
   },
 
@@ -149,6 +162,7 @@ const FRIENDS = {
     shape: 'round', eyes: 'sparkle', mouth: 'smile',
     flair: 'freckles',
     accessory: 'starHalo',
+    move: 'shimmer',
     bg: '#ede9fe',
   },
   dream_1: {
@@ -157,6 +171,7 @@ const FRIENDS = {
     shape: 'round', eyes: 'lash', mouth: 'smile',
     flair: 'spot',
     accessory: 'batWings',
+    move: 'flap',
     bg: '#1e1b4b',
     onDark: true,
   },
@@ -166,6 +181,7 @@ const FRIENDS = {
     shape: 'tall', eyes: 'lash', mouth: 'closed',
     flair: 'starSpots',
     accessory: 'starHalo',
+    move: 'shimmer',
     bg: '#1e1b4b',
     onDark: true,
   },
@@ -175,6 +191,7 @@ const FRIENDS = {
     shape: 'blob', eyes: 'sleepy', mouth: 'smallO',
     flair: 'freckles',
     accessory: 'thoughtJar',
+    move: 'breathe-slow',
     bg: '#fef3c7',
   },
 
@@ -185,6 +202,7 @@ const FRIENDS = {
     shape: 'squat', eyes: 'sleepy', mouth: 'smile',
     flair: 'stripe',
     accessory: 'catEars',
+    move: 'tail-flick',
     bg: '#fef3c7',
   },
   hearth_1: {
@@ -193,6 +211,7 @@ const FRIENDS = {
     shape: 'round', eyes: 'wide', mouth: 'smallO',
     flair: 'cheekDots',
     accessory: 'sparkle',
+    move: 'pop',
     bg: '#fed7aa',
   },
   hearth_2: {
@@ -201,6 +220,7 @@ const FRIENDS = {
     shape: 'tall', eyes: 'wide', mouth: 'smile',
     flair: 'freckles',
     accessory: 'goggles',
+    move: 'study-tilt',
     bg: '#ede9fe',
   },
 
@@ -216,7 +236,8 @@ const FRIENDS = {
     body: '#854d0e', bodyDeep: '#422006', belly: '#fde68a', eyeColor: '#1a0e08',
     shape: 'pear', eyes: 'sleepy', mouth: 'closed',
     flair: 'freckles',
-    accessory: 'keeperCap',  // tall amber-edged mushroom hat
+    accessory: 'keeperCap',
+    move: 'tip-hat',
     bg: '#fef9d7',
   },
   windreiterin: {
@@ -225,6 +246,7 @@ const FRIENDS = {
     shape: 'tall', eyes: 'sparkle', mouth: 'smile',
     flair: 'cheekDots',
     accessory: 'flowingScarf',
+    move: 'wind-sway',
     bg: '#e0f2fe',
   },
   tiefentaucher: {
@@ -233,6 +255,7 @@ const FRIENDS = {
     shape: 'round', eyes: 'wide', mouth: 'smile',
     flair: 'cheekDots',
     accessory: 'diveGoggles',
+    move: 'bob',
     bg: '#cffafe',
   },
   sternenweberin: {
@@ -241,6 +264,7 @@ const FRIENDS = {
     shape: 'tall', eyes: 'sparkle', mouth: 'closed',
     flair: 'starSpots',
     accessory: 'starCrown',
+    move: 'shimmer',
     bg: '#ede9fe',
   },
   lichtbringerin: {
@@ -249,6 +273,7 @@ const FRIENDS = {
     shape: 'round', eyes: 'sparkle', mouth: 'smile',
     flair: 'cheekDots',
     accessory: 'lantern',
+    move: 'glow-pulse',
     bg: '#fff8f2',
   },
   flackerfuchs: {
@@ -257,6 +282,7 @@ const FRIENDS = {
     shape: 'squat', eyes: 'sparkle', mouth: 'smile',
     flair: 'cheekDots',
     accessory: 'foxEars',
+    move: 'tail-flick',
     bg: '#fed7aa',
   },
   brueckenbauer: {
@@ -265,6 +291,7 @@ const FRIENDS = {
     shape: 'pear', eyes: 'default', mouth: 'closed',
     flair: 'freckles',
     accessory: 'toolBelt',
+    move: 'hammer-tap',
     bg: '#fafaf9',
   },
 };
@@ -309,6 +336,14 @@ export default function ChibiFriend({ id, size = 96, locked = false, withBg = tr
     width: size, height: size, display: 'block',
   };
 
+  // Per-friend signature move (Marc 25 Apr 2026 — "give them a
+  // little more character by giving them a unique animation if you
+  // go on the detailed view"). The move is rendered as a CSS
+  // animation on the SVG wrapper; keyframes are emitted inline at
+  // the bottom of the file so any consumer (gallery / Compendium /
+  // Micropedia detail) gets the right idle automatically.
+  const moveAnim = MOVE_KEYFRAMES[cfg.move];
+
   return (
     <div style={wrapStyle}>
       <svg
@@ -317,7 +352,11 @@ export default function ChibiFriend({ id, size = 96, locked = false, withBg = tr
         viewBox="-50 -50 100 100"
         aria-label={cfg.name}
         role="img"
-        style={{ display: 'block' }}
+        style={{
+          display: 'block',
+          animation: moveAnim ? `${moveAnim} infinite` : undefined,
+          transformOrigin: 'center center',
+        }}
       >
         {withBg && (
           <ellipse cx={0} cy={36} rx={26} ry={4} fill="rgba(40,20,5,0.18)" />
@@ -855,4 +894,65 @@ function ToolBelt() {
       <circle cx={20} cy={13} r={2} fill="#fbbf24" stroke="#854d0e" strokeWidth={0.6} />
     </g>
   );
+}
+
+// ─── Per-friend signature moves ─────────────────────────────
+//
+// Each FRIENDS entry has a `move` id pointing into this map. The
+// id resolves to a CSS animation shorthand ("name duration timing
+// fillmode"); the wrapper SVG runs it on infinite loop. New moves
+// can be added here without touching the consumer surfaces.
+
+const MOVE_KEYFRAMES = {
+  'flicker':       'cf-flicker 2.4s ease-in-out',
+  'sway':          'cf-sway 3.4s ease-in-out',
+  'breathe-slow':  'cf-breathe-slow 4.6s ease-in-out',
+  'peek':          'cf-peek 4s ease-in-out',
+  'tip-hat':       'cf-tip-hat 5s ease-in-out',
+  'lumber':        'cf-lumber 4s ease-in-out',
+  'hover':         'cf-hover 3s ease-in-out',
+  'hop':           'cf-hop 2s ease-out',
+  'bob':           'cf-bob 2.6s ease-in-out',
+  'jump':          'cf-jump 2.4s ease-out',
+  'shimmy':        'cf-shimmy 2.8s ease-in-out',
+  'sidestep':      'cf-sidestep 3.4s ease-in-out',
+  'shimmer':       'cf-shimmer 2.8s ease-in-out',
+  'flap':          'cf-flap 1.6s ease-in-out',
+  'tail-flick':    'cf-tail-flick 3.6s ease-in-out',
+  'pop':           'cf-pop 2.4s ease-out',
+  'study-tilt':    'cf-study-tilt 3.6s ease-in-out',
+  'wind-sway':     'cf-wind-sway 3s ease-in-out',
+  'glow-pulse':    'cf-glow-pulse 2.8s ease-in-out',
+  'hammer-tap':    'cf-hammer-tap 2.4s ease-in-out',
+};
+
+// Inject the keyframes into the document once, at module load.
+// All ChibiFriend renders share these — no per-instance inline
+// <style> spam.
+if (typeof document !== 'undefined' && !document.getElementById('chibi-friend-moves')) {
+  const style = document.createElement('style');
+  style.id = 'chibi-friend-moves';
+  style.textContent = `
+    @keyframes cf-flicker      { 0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)} }
+    @keyframes cf-sway         { 0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)} }
+    @keyframes cf-breathe-slow { 0%,100%{transform:scale(1)}50%{transform:scale(1.04)} }
+    @keyframes cf-peek         { 0%,90%,100%{transform:translateY(0) scale(1)}45%{transform:translateY(4px) scale(0.95,1.05)} }
+    @keyframes cf-tip-hat      { 0%,90%,100%{transform:rotate(0)}45%{transform:rotate(-6deg) translateY(-2px)} }
+    @keyframes cf-lumber       { 0%,100%{transform:translateX(-2px) rotate(-1deg)}50%{transform:translateX(2px) rotate(1deg)} }
+    @keyframes cf-hover        { 0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)} }
+    @keyframes cf-hop          { 0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)} }
+    @keyframes cf-bob          { 0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(2px) rotate(1deg)} }
+    @keyframes cf-jump         { 0%,55%,100%{transform:translateY(0) scale(1)}25%{transform:translateY(-8px) scale(1.04,0.96)}60%{transform:translateY(0) scale(0.96,1.04)} }
+    @keyframes cf-shimmy       { 0%,100%{transform:translateX(-2px) rotate(-2deg)}50%{transform:translateX(2px) rotate(2deg)} }
+    @keyframes cf-sidestep     { 0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)} }
+    @keyframes cf-shimmer      { 0%,100%{filter:brightness(1) drop-shadow(0 0 0 transparent)}50%{filter:brightness(1.12) drop-shadow(0 0 8px rgba(254,243,199,0.6))} }
+    @keyframes cf-flap         { 0%,100%{transform:translateY(0) scaleX(1)}50%{transform:translateY(-4px) scaleX(1.05)} }
+    @keyframes cf-tail-flick   { 0%,80%,100%{transform:rotate(0)}40%{transform:rotate(2deg)} }
+    @keyframes cf-pop          { 0%,55%,100%{transform:scale(1)}30%{transform:scale(1.08)} }
+    @keyframes cf-study-tilt   { 0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)} }
+    @keyframes cf-wind-sway    { 0%,100%{transform:rotate(-4deg) translateX(-1px)}50%{transform:rotate(4deg) translateX(1px)} }
+    @keyframes cf-glow-pulse   { 0%,100%{filter:brightness(1) drop-shadow(0 0 0 transparent)}50%{filter:brightness(1.18) drop-shadow(0 0 12px rgba(252,211,77,0.7))} }
+    @keyframes cf-hammer-tap   { 0%,55%,100%{transform:translateY(0)}30%{transform:translateY(2px) rotate(-1deg)} }
+  `;
+  document.head.appendChild(style);
 }
