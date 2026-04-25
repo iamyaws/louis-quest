@@ -36,7 +36,7 @@ export const QUESTIONS: QuestionDef[] = [
       { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
-      'Streaks sind Zähler die fallen wenn dein Kind einen Tag aussetzt. Bei Erwachsenen Motivationshilfe, bei Kindern unter neun emotionale Erpressung weil sie Verlustaversion noch nicht filtern können.',
+      'Streaks sind Zähler die fallen wenn dein Kind einen Tag aussetzt. Bei Erwachsenen ist das eine Motivationshilfe. Bei Kindern unter neun, die einen drohenden Verlust noch schwer einordnen können, fühlt sich der Streak-Druck schnell an wie Bestrafung. Die App wird zur Instanz, die täglich Forderungen stellt.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -48,7 +48,7 @@ export const QUESTIONS: QuestionDef[] = [
       { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
-      'Push-Benachrichtigungen für Kinder sind keine Erinnerung sondern ein sozialer Anruf, besonders wenn sie eine Maskottchen-Figur zitieren. Sie produzieren Schuldgefühle damit dein Kind zurückkommt.',
+      'Push-Benachrichtigungen für Kinder wirken oft nicht wie eine neutrale Erinnerung, sondern wie ein sozialer Anruf, vor allem wenn sie eine Maskottchen-Figur zitieren. Das Kind fühlt sich aufgefordert zurückzukommen.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -73,7 +73,7 @@ export const QUESTIONS: QuestionDef[] = [
       { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
-      'Sichtbare kostenpflichtige Cosmetics in Kinder-Apps erzeugen gezielten Frust, der Eltern dazu bringen soll die Geldbörse zu öffnen. Der Frust ist das Design-Ziel.',
+      'Sichtbare kostenpflichtige Cosmetics in Kinder-Apps erzeugen für viele Kinder Frust. Wer mit diesem Frust umgeht, der Anbieter durch ein Kaufangebot oder die Eltern durch eine klare Hausregel, entscheidet sich oft am Punkt-of-Sale.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {
@@ -97,7 +97,7 @@ export const QUESTIONS: QuestionDef[] = [
       { value: 'unklar', label: 'Weiß ich nicht' },
     ],
     explainer:
-      'Spielbare Werbung ist die heimtückischste Form: das Kind spielt eine bis zwei Minuten ein anderes Spiel als Anzeige, mit kaum sichtbaren Schließen-Buttons und einem Countdown. Konstruiert, um Kinder von App zu App zu schicken bevor das Interesse weg ist.',
+      'Spielbare Werbung ist besonders schwer zu durchschauen: das Kind spielt eine bis zwei Minuten ein anderes Spiel als Anzeige, mit kleinen Schließen-Buttons und einem Countdown. Die Wirkung ist, dass Aufmerksamkeit von einer App zur nächsten weiterläuft, oft ohne dass das Kind bewusst entscheidet.',
     scoreContribution: (v) => (v === 'ja' ? 1 : 0),
   },
   {

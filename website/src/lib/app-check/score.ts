@@ -161,7 +161,7 @@ export const BAND_ACTIONS: Record<ScoreBand, { intro: string; items: BandAction[
       {
         title: 'Konversation über App-Design',
         detail:
-          'Erklärung in einfachen Worten: diese App ist so gebaut, dass du gar nicht aufhören willst. Das sind Erwachsene die das absichtlich machen, weil sie damit Geld verdienen. Das ist nicht deine Schuld wenn du nicht aufhören kannst.',
+          'Erklärung in einfachen Worten: viele Apps sind so gebaut, dass du nicht von selbst aufhörst. Erwachsene haben das so entworfen, weil viele dieser Apps Geld verdienen, je länger du dabei bleibst. Das ist nicht deine Schuld wenn du nicht aufhören kannst.',
         onlyIfFlagged: 'q8',
       },
       {

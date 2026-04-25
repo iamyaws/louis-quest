@@ -297,8 +297,8 @@ function Landing({
         <li className="flex gap-3">
           <span aria-hidden className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-sage shrink-0" />
           <span>
-            Ohne Anmeldung und ohne Tracking. Du bleibst anonym, auch wenn du
-            speicherst.
+            Ohne Anmeldung und ohne Tracking. Wir speichern weder deinen
+            Namen noch deine E-Mail.
           </span>
         </li>
         <li className="flex gap-3">
@@ -311,8 +311,8 @@ function Landing({
         <li className="flex gap-3">
           <span aria-hidden className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-sage shrink-0" />
           <span>
-            Wenn du speicherst, landet die Bewertung anonym in unserer
-            Datenbank.{' '}
+            Wenn du speicherst, landet die Bewertung ohne Bezug zu deiner
+            Person in unserer Datenbank.{' '}
             <a
               href="/datenschutz"
               className="text-teal underline underline-offset-2 hover:text-teal-dark focus:outline-none focus-visible:text-teal-dark focus-visible:decoration-2"

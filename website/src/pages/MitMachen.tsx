@@ -261,7 +261,7 @@ export default function MitMachen() {
             {[
               {
                 q: 'Kostet das etwas?',
-                a: 'Nein. Ronki ist kostenlos in der Public\u2011Alpha. Und wird auch in der nächsten Phase nicht plötzlich kostenpflichtig. Falls sich daran etwas ändert, kommunizieren wir es transparent, bevor irgendetwas passiert.',
+                a: 'Nein. Ronki ist kostenlos in der Public\u2011Alpha. Falls sich daran in einer späteren Phase etwas ändert, kommunizieren wir es transparent und mit Vorlauf, bevor irgendetwas passiert.',
               },
               {
                 q: 'Muss ich ständig aktiv sein?',

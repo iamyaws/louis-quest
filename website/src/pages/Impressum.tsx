@@ -29,6 +29,7 @@ export default function Impressum() {
           <p className="mt-5 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
             Anbieterkennzeichnung gemäß § 5 Digitale-Dienste-Gesetz (DDG) und § 18 Abs. 2 Medienstaatsvertrag (MStV).
           </p>
+          <p className="mt-3 text-sm text-ink/60">Stand: 25. April 2026</p>
 
           <div className="mt-14 flex flex-col gap-12 text-[0.98rem] leading-[1.75] text-ink/85">
 
@@ -45,9 +46,6 @@ export default function Impressum() {
               <p>
                 E-Mail: <a href="mailto:hallo@ronki.de" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">hallo@ronki.de</a><br />
                 Telefon: <a href="tel:+4917657904421" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">+49 176 57904421</a>
-              </p>
-              <p className="text-sm text-ink/65">
-                Nach § 5 Abs. 1 Nr. 2 DDG ist neben der E-Mail-Adresse ein weiterer Kommunikationsweg anzugeben, der eine schnelle elektronische Kontaktaufnahme ermöglicht. Alternativ zur Telefonnummer kann hier ein elektronisches Kontaktformular angegeben werden.
               </p>
             </Section>
 

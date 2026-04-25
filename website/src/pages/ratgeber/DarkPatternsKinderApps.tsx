@@ -156,10 +156,11 @@ export default function RatgeberDarkPatternsKinderApps() {
           <p>
             Dein Kind öffnet eine Kiste. Manchmal ist ein kleines Ding drin,
             manchmal ein großes, manchmal ein sehr großes. Du weißt nie genau, was
-            kommt. Das ist eine variable Belohnung, und sie aktiviert dasselbe
-            System im Gehirn wie ein Spielautomat in Las Vegas. Das ist keine
-            Metapher, das ist dokumentiert in der Verhaltensforschung seit B.F.
-            Skinner in den 1950ern.
+            kommt. Das ist eine variable Belohnung. Skinners Forschung in den
+            1950ern hat gezeigt, wie stark Variabilität im Belohnungs-Schema
+            Verhalten verstärkt. Heutige Neurowissenschaft beschreibt, dass
+            das Dopamin-System auf unvorhersehbare Belohnungen besonders
+            reagiert, bei Kindern wie bei Erwachsenen, oft sogar stärker.
           </p>
           <p>
             Bei Erwachsenen funktioniert das auch, aber Erwachsene haben eine
@@ -248,8 +249,9 @@ export default function RatgeberDarkPatternsKinderApps() {
 
         <StepCard n={8} title="Endless Scroll und Autoplay">
           <p>
-            TikTok ist das reinste Beispiel, aber Endless-Scroll-Mechaniken sind
-            inzwischen überall, auch in Apps für Vorschul- und Grundschulkinder.
+            TikTok ist das Beispiel, das die meisten Eltern sofort kennen, aber
+            Endless-Scroll-Mechaniken sind inzwischen überall, auch in Apps
+            für Vorschul- und Grundschulkinder.
             Das Muster: kein Ende, kein Abschluss, immer rutscht ein nächstes
             Video, eine nächste Geschichte, eine nächste Minispielzeug rein.
             Autoplay-Startbildschirme, die direkt das nächste Element laden, ohne
@@ -260,8 +262,9 @@ export default function RatgeberDarkPatternsKinderApps() {
             aufhört, ist eine exekutive Entscheidung. Die fällt bei jedem Menschen
             schwerer als die Entscheidung, einfach weiterzumachen. Und bei
             Grundschulkindern, deren Exekutivfunktion noch im Aufbau ist, fällt sie
-            deutlich schwerer. Eine App, die das Aufhören aktiv einspart, bekommt
-            dafür Stunden an Lebenszeit geschenkt.
+            deutlich schwerer. Wenn das aktive Aufhören-Müssen aus dem Interface
+            verschwindet, verlängern sich Sessions. Das ist nicht App-spezifisch,
+            das ist beobachtbar wo immer Endless-Scroll-Mechaniken eingebaut sind.
           </p>
           <p>
             Als Faustregel: Apps mit Autoplay-on-default für Kinder unter zehn
@@ -290,8 +293,9 @@ export default function RatgeberDarkPatternsKinderApps() {
         Systeme. Das Dopamin-System ist bei Kindern und Jugendlichen
         empfindlicher. Ein zufälliger kleiner Gewinn in einer App löst bei
         einem Siebenjährigen stärkere Aktivität aus als bei einem
-        Vierzigjährigen. Das ist neurowissenschaftlich mehrfach gezeigt, unter
-        anderem in Meta-Analysen zu adoleszenter Risikoaffinität.
+        Vierzigjährigen. Die Forschung zur Reifung des Belohnungssystems im
+        Kindes- und Jugendalter beschreibt das breit, etwa in Übersichten
+        wie Steinberg (2008) zur adoleszenten Risikoaffinität.
       </p>
 
       <p>
@@ -386,8 +390,11 @@ export default function RatgeberDarkPatternsKinderApps() {
           </li>
           <li>
             <strong>Gibt es Streaks oder ähnliche Loss-Aversion-
-            Mechanismen?</strong> Bestraft die App verpasste Tage? Wenn ja, ist
-            sie auf Compliance optimiert, nicht auf Lernen.
+            Mechanismen?</strong> Setzt die App das Kind unter Druck verpasste
+            Tage „wieder gutzumachen"? Wenn ja, schau ob die App eher daran
+            interessiert ist, dein Kind täglich wieder zu sehen, oder daran,
+            dass es etwas lernt. Aus meiner Sicht sind das oft zwei
+            verschiedene Dinge.
           </li>
           <li>
             <strong>Wie ist die In-App-Käufe-Struktur?</strong> Kann mein Kind

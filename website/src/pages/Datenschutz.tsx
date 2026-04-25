@@ -87,6 +87,7 @@ export default function Datenschutz() {
                 <li>E-Mail-Adresse (von dir eingegeben)</li>
                 <li>Sprache (derzeit automatisch „de")</li>
                 <li>Zeitpunkt der Anmeldung (technisch notwendig)</li>
+                <li>Optional: falls du nach der Anmeldung den kurzen Eltern-Fragebogen ausfüllst, zusätzlich Altersgruppe deines Kindes (zum Beispiel „5–6"), thematischer Schwerpunkt (zum Beispiel „Morgen") und deine Bereitschaft, eine frühe Version mitzutesten. Diese Angaben sind freiwillig und helfen uns, Ronki am Bedarf entlang zu bauen.</li>
               </ul>
               <p>
                 <strong className="text-teal-dark">Zweck:</strong> Eine einzige Benachrichtigung, wenn Ronki verfügbar ist. Kein Newsletter, keine Werbemails, keine Weitergabe an Dritte.
@@ -99,6 +100,21 @@ export default function Datenschutz() {
               </p>
               <p>
                 <strong className="text-teal-dark">Auftragsverarbeitung:</strong> Die Daten werden über einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO bei Supabase Inc. in der EU-Region gespeichert (siehe Abschnitt 7).
+              </p>
+            </Section>
+
+            <Section heading="4b. Feedback-Formular und Themenwünsche">
+              <p>
+                Wenn du uns über ein Formular auf der Website (zum Beispiel im Ratgeber oder eine Feedback-Box) eine Nachricht schickst, verarbeiten wir den von dir geschriebenen Text, optional deine E-Mail-Adresse, die Quelle des Formulars (zum Beispiel „/ratgeber") sowie den Zeitpunkt der Übermittlung.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Zweck:</strong> Inhaltliche Auswertung deiner Rückmeldung und gegebenenfalls Antwort per E-Mail.
+              </p>
+              <p>
+                <strong className="text-teal-dark">Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung mit dem Absenden des Formulars). Bei Beantwortung zusätzlich Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Pflege des Nutzungsverhältnisses).
+              </p>
+              <p>
+                <strong className="text-teal-dark">Speicherdauer:</strong> Bis zur abschließenden Bearbeitung deiner Rückmeldung, längstens 12 Monate. Danach werden personenbezogene Bestandteile gelöscht oder anonymisiert.
               </p>
             </Section>
 
@@ -131,10 +147,7 @@ export default function Datenschutz() {
 
             <Section heading="5. Cookies und vergleichbare Technologien">
               <p>
-                Diese Website setzt <strong className="text-teal-dark">keine Cookies</strong> zur Analyse, Wiedererkennung oder Werbung. Auch kein Local Storage oder Session Storage wird für Tracking-Zwecke genutzt.
-              </p>
-              <p>
-                Technisch notwendige Mechanismen, etwa ein kurzfristiger Eintrag im Browser-Speicher, der beim Absenden des Warteliste-Formulars verhindert, dass du versehentlich doppelt klickst, gelten nach § 25 Abs. 2 TTDSG als unbedingt erforderlich und benötigen keine Einwilligung.
+                Diese Website setzt <strong className="text-teal-dark">keine Cookies</strong> zur Analyse, Wiedererkennung oder Werbung. Auch kein Local Storage oder Session Storage wird zu Tracking-Zwecken genutzt. Schutzmechanismen gegen versehentliches mehrfaches Absenden eines Formulars laufen rein im Arbeitsspeicher der jeweiligen Seite und hinterlassen keine Spur im Browser.
               </p>
               <p>
                 Auch die von uns genutzte Reichweitenanalyse (Plausible Analytics) setzt bewusst keine Cookies und keinen Local Storage. Details siehe Abschnitt 7.
@@ -174,11 +187,11 @@ export default function Datenschutz() {
                   <span className="text-sm text-ink/65">Sitz: San Francisco, USA. Übermittlung auf Basis von EU-Standardvertragsklauseln. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">vercel.com/legal/privacy-policy</a></span>
                 </li>
                 <li>
-                  <strong className="text-teal-dark">ImprovMX (Reflectiv SAS):</strong> E-Mail-Weiterleitung für eingehende Nachrichten an hallo@ronki.de. Sitz: Frankreich (EU). Personenbezogene Daten (Absender-E-Mail, Betreff) werden nur zur Weiterleitung verarbeitet und nicht gespeichert.<br />
-                  <span className="text-sm text-ink/65"><a href="https://improvmx.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">improvmx.com/privacy</a></span>
+                  <strong className="text-teal-dark">ImprovMX (Reflectiv SAS):</strong> E-Mail-Weiterleitung für eingehende Nachrichten an hallo@ronki.de. Sitz: Frankreich (EU). Personenbezogene Daten (Absender-E-Mail, Betreff) werden nur zur Weiterleitung verarbeitet und nicht gespeichert. Eingehende E-Mails werden anschließend an unser persönliches Postfach bei Google Workspace (Google Ireland Limited, Sitz Irland) zugestellt, wo sie inhaltlich gelesen und beantwortet werden. Dabei findet ein Drittlandtransfer in die USA auf Basis von EU-Standardvertragsklauseln statt.<br />
+                  <span className="text-sm text-ink/65"><a href="https://improvmx.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">improvmx.com/privacy</a> &middot; <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">policies.google.com/privacy</a></span>
                 </li>
                 <li>
-                  <strong className="text-teal-dark">Plausible Analytics (Plausible Insights OÜ):</strong> Anonyme Reichweitenanalyse unserer Website. Plausible setzt keine Cookies, speichert keine IP-Adressen im Klartext und erstellt keine geräteübergreifenden Profile. Erfasst werden ausschließlich aggregierte Seitenaufrufe, Referrer (z. B. Suchmaschine, Social-Media-Plattform), grobe Geo-Region (Land) und Gerätetyp-Kategorie. Eine Zuordnung zu einzelnen Personen ist ausdrücklich nicht möglich. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Verbesserung unseres Angebots). Sitz: Estland (EU). Datenverarbeitung ausschließlich in der EU.<br />
+                  <strong className="text-teal-dark">Plausible Analytics (Plausible Insights OÜ):</strong> Anonyme Reichweitenanalyse unserer Website. Plausible setzt keine Cookies, speichert keine IP-Adressen im Klartext und erstellt keine geräteübergreifenden Profile. Erfasst werden ausschließlich aggregierte Seitenaufrufe, Referrer (z. B. Suchmaschine, Social-Media-Plattform), grobe Geo-Region (Land) und Gerätetyp-Kategorie. Eine Zuordnung zu einzelnen Personen ist ausdrücklich nicht möglich. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Verbesserung unseres Angebots). Eine Interessenabwägung ergibt: Plausible setzt keine Cookies, speichert keine IP im Klartext, bildet keine geräteübergreifenden Profile und erlaubt keine Identifizierung einzelner Personen. Die Verarbeitung greift damit nur in geringfügigem Maße in deine Rechte ein, während wir ein nachvollziehbares Interesse an aggregierter Reichweitenmessung haben. Sitz: Estland (EU). Datenverarbeitung ausschließlich in der EU.<br />
                   <span className="text-sm text-ink/65"><a href="https://plausible.io/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">plausible.io/privacy</a> &middot; <a href="https://plausible.io/data-policy" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark">plausible.io/data-policy</a></span>
                 </li>
               </ul>
