@@ -391,8 +391,20 @@ function AppContent() {
             />
           ) : (
             <RoomHub
-              onNavigate={(target) => {
-                if (target === 'aufgaben') setView('list');
+              onNavigate={(target, opts) => {
+                // 'aufgaben' is the user-facing label — TaskList renders
+                // on view==='quests'. The earlier 'list' mapping was a
+                // dead route (Marc 25 Apr 2026: every pill on the
+                // Schriftrolle card felt unresponsive). The anchor
+                // hint is set on the location hash so a future TaskList
+                // pass can scroll to that section without us threading
+                // it through every navigate call site.
+                if (target === 'aufgaben') {
+                  if (opts?.anchor && typeof window !== 'undefined') {
+                    history.replaceState(null, '', `#anchor=${opts.anchor}`);
+                  }
+                  setView('quests');
+                }
                 else if (target === 'belohnungen') setView('shop');
                 else if (target === 'buch') setView('buch');
                 else if (target === 'spiele') setView('games');

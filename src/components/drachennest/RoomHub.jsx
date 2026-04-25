@@ -189,18 +189,32 @@ export default function RoomHub({ onNavigate }) {
             opacity: 0.65,
           }} />
 
-          {/* Window — a narrow tall opening showing time-of-day sky */}
-          <div style={{
-            position: 'absolute', top: 14, right: 14,
-            width: 72, height: 92,
-            background: sceneTone.sky,
-            border: `3px solid ${sceneTone.frame}`,
-            borderRadius: 6,
-            overflow: 'hidden',
-            boxShadow: '0 4px 12px -4px rgba(40,20,5,0.35), inset 0 1px 0 rgba(255,255,255,0.4)',
-          }}>
+          {/* Window — a narrow tall opening showing time-of-day sky.
+              Doubles as a second portal to the Reise / Garden surface
+              (Marc 25 Apr 2026 — "by clicking on the window in the back
+              of Ronki you get to the garden"). The Karte tile keeps the
+              explicit text affordance; the window adds a spatial one
+              that reads as "look out at the world." */}
+          <button
+            type="button"
+            onClick={() => setShowGarden(true)}
+            aria-label="Aus dem Fenster schauen"
+            className="active:scale-[0.96] transition-transform"
+            style={{
+              position: 'absolute', top: 14, right: 14,
+              width: 72, height: 92,
+              background: sceneTone.sky,
+              border: `3px solid ${sceneTone.frame}`,
+              borderRadius: 6,
+              overflow: 'hidden',
+              boxShadow: '0 4px 12px -4px rgba(40,20,5,0.35), inset 0 1px 0 rgba(255,255,255,0.4)',
+              padding: 0,
+              cursor: 'pointer',
+              zIndex: 4,
+            }}
+          >
             {/* Sash cross */}
-            <div style={{ position: 'absolute', inset: 0 }}>
+            <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
               <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 3, background: sceneTone.frame, transform: 'translateX(-50%)' }} />
               <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 3, background: sceneTone.frame, transform: 'translateY(-50%)' }} />
             </div>
@@ -210,15 +224,16 @@ export default function RoomHub({ onNavigate }) {
               width: 20, height: 20, borderRadius: '50%',
               background: sceneTone.celestial,
               boxShadow: `0 0 16px ${sceneTone.celestial}`,
+              pointerEvents: 'none',
             }} />
             {time === 'night' && (
               <>
-                <div style={{ position: 'absolute', top: 28, left: 14, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7' }} />
-                <div style={{ position: 'absolute', top: 50, left: 28, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7' }} />
-                <div style={{ position: 'absolute', top: 70, left: 12, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7' }} />
+                <div style={{ position: 'absolute', top: 28, left: 14, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: 50, left: 28, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: 70, left: 12, width: 2, height: 2, borderRadius: '50%', background: '#fef3c7', pointerEvents: 'none' }} />
               </>
             )}
-          </div>
+          </button>
 
           {/* Ronki + vitals stage — ring wraps chibi at matched size so
               the arcs clearly belong to him (v2 had them floating too far).
@@ -260,7 +275,19 @@ export default function RoomHub({ onNavigate }) {
                 placeItems: 'center',
               }}
             >
-              <div style={{ position: 'relative', width: ronkiPx, height: ronkiPx }}>
+              {/* The chibi is bottom-anchored inside MoodChibi (bottom: 5%
+                  in bare mode), so a 1:1 wrapper centred in the stage puts
+                  Ronki at the lower half of the ring. Translating the
+                  whole wrapper up by ~12% pulls his vertical center toward
+                  the stage centroid, where the three vital meters average
+                  out — closer to the ring's middle so all three badges
+                  read as orbiting him rather than floating above. */}
+              <div style={{
+                position: 'relative',
+                width: ronkiPx,
+                height: ronkiPx,
+                transform: 'translateY(-9%)',
+              }}>
                 <MoodChibi
                   size={ronkiPx}
                   variant={variant}
@@ -314,7 +341,12 @@ export default function RoomHub({ onNavigate }) {
         <CareVerbs />
       </section>
 
-      {/* Wall scroll: Ronki's asks today */}
+      {/* Wall scroll: Ronki's asks today.
+          Each anchor pill is its own button (Marc 25 Apr 2026 spotted
+          they were dead taps before), and the card title tap-target sits
+          at the top so the parent surface stays openable as a whole. The
+          pills route to TaskList with a hash so future TaskList work can
+          scroll to that anchor section. */}
       <section style={{ padding: '22px 18px 0' }}>
         <div style={{
           font: '800 10px/1 "Plus Jakarta Sans", sans-serif',
@@ -323,10 +355,7 @@ export default function RoomHub({ onNavigate }) {
         }}>
           Ronki bittet dich heute um Hilfe
         </div>
-        <button
-          type="button"
-          onClick={() => onNavigate?.('aufgaben')}
-          className="active:scale-[0.99] transition-transform"
+        <div
           style={{
             width: '100%',
             background: 'linear-gradient(180deg, #fffdf5 0%, #fef3c7 100%)',
@@ -336,21 +365,40 @@ export default function RoomHub({ onNavigate }) {
             display: 'flex',
             flexDirection: 'column',
             gap: 12,
-            cursor: 'pointer',
             boxShadow: '0 8px 18px -8px rgba(180,83,9,0.30), inset 0 1px 0 rgba(255,255,255,0.6)',
-            textAlign: 'left',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <button
+            type="button"
+            onClick={() => onNavigate?.('aufgaben')}
+            className="active:scale-[0.99] transition-transform"
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              margin: 0,
+              cursor: 'pointer',
+              textAlign: 'left',
+              width: '100%',
+            }}
+            aria-label="Alle Aufgaben anzeigen"
+          >
             <b style={{ font: '500 18px/1.15 "Fredoka", sans-serif', color: '#124346' }}>
               Heute auf der Schriftrolle
             </b>
             <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#b45309' }}>chevron_right</span>
-          </div>
+          </button>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
             {undoneByAnchor.map(a => (
-              <div
+              <button
                 key={a.anchor}
+                type="button"
+                onClick={() => onNavigate?.('aufgaben', { anchor: a.anchor })}
+                className="active:scale-[0.96] transition-transform"
+                aria-label={`${a.label}: ${a.count > 0 ? `${a.count} offen` : 'fertig'}`}
                 style={{
                   borderRadius: 14,
                   background: a.count > 0 ? `${a.color}1a` : 'rgba(34,197,94,0.16)',
@@ -358,6 +406,7 @@ export default function RoomHub({ onNavigate }) {
                   padding: '10px 8px 8px',
                   display: 'flex', flexDirection: 'column', gap: 2,
                   textAlign: 'center',
+                  cursor: 'pointer',
                 }}
               >
                 <span style={{
@@ -380,10 +429,10 @@ export default function RoomHub({ onNavigate }) {
                 }}>
                   {a.count > 0 ? 'offen' : 'fertig'}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
-        </button>
+        </div>
       </section>
 
       {/* Object row: Truhe / Buch / Spielzeug / Karte */}
