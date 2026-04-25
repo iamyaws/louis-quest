@@ -678,20 +678,21 @@ export default function RoomHub({ onNavigate }) {
           style={{
             marginTop: 12,
             width: '100%',
-            padding: '12px 16px',
-            borderRadius: 14,
-            background: 'rgba(255,255,255,0.7)',
-            border: '1.5px dashed rgba(180,83,9,0.32)',
+            padding: '14px 16px',
+            borderRadius: 16,
+            background: 'linear-gradient(180deg, #fff8f2 0%, #fef3c7 100%)',
+            border: '1.5px solid rgba(180,83,9,0.30)',
             color: '#5c2a08',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 8,
-            font: '600 13px/1 "Nunito", sans-serif',
+            gap: 10,
+            font: '700 14px/1 "Nunito", sans-serif',
             cursor: 'pointer',
+            boxShadow: '0 6px 16px -8px rgba(180,83,9,0.30), inset 0 1px 0 rgba(255,255,255,0.6)',
           }}
         >
-          <span aria-hidden="true" style={{ fontSize: 16 }}>🔥</span>
+          <span aria-hidden="true" style={{ fontSize: 18 }}>🔥</span>
           <span>Bei Ronki sitzen</span>
           <span
             aria-hidden="true"
@@ -702,7 +703,7 @@ export default function RoomHub({ onNavigate }) {
               marginLeft: 4,
             }}
           >
-            ohne Funken
+            ohne Sterne
           </span>
         </button>
       </section>
@@ -1035,27 +1036,24 @@ function RonkiMoodPrompt({ heroName, variant, stageIdx, onPick }) {
               Wie geht's dir heute, {heroName}?
             </div>
           </div>
-          {/* Voice-line stub — visual only for now (Marc 25 Apr —
-              "with a voiceline later"). Tap is captured by the parent
-              button so this icon doesn't re-fire; that's intentional
-              because the same tap should both open the picker AND
-              trigger the voiceline once it's wired. */}
+          {/* Tap-to-expand chevron — the voice-line stub used to
+              live here but the audit flagged it as dead-tap-look
+              for kids (looks tappable, isn't, sits at 32×32 below
+              the 44dp guideline). Replaced with a clear chevron
+              hint that mirrors the open/closed state. When the
+              voiceline is actually recorded + wired, it'll fire
+              from the parent button's click handler, no separate
+              icon needed. */}
           <span
             aria-hidden="true"
+            className="material-symbols-outlined"
             style={{
-              width: 32, height: 32, borderRadius: '50%',
-              display: 'grid', placeItems: 'center',
-              background: 'rgba(252,211,77,0.20)',
+              fontSize: 22,
+              color: 'rgba(120,53,15,0.55)',
               flexShrink: 0,
             }}
           >
-            <span className="material-symbols-outlined" style={{
-              fontSize: 18,
-              color: '#b45309',
-              fontVariationSettings: "'FILL' 1",
-            }}>
-              {open ? 'expand_less' : 'volume_up'}
-            </span>
+            {open ? 'expand_less' : 'expand_more'}
           </span>
         </button>
         {open && (
@@ -1179,17 +1177,18 @@ function CaveDecorSlots({ expeditionLog }) {
         </div>
       )}
 
-      {/* Floor-corner memento — tucked beside the cushion on the
-          right, opposite the leaves we already scatter. Renders
-          inside the floor-mat z-band so it sits on the cushion. */}
+      {/* Floor-corner memento — pushed to z:9 above the stage
+          (audit fix 25 Apr 2026 — at z:6 the chibi at right
+          edge of stage was painting over it). Tucked at right:3%
+          so it doesn't compete with the chibi's silhouette. */}
       {cornerItem && (
         <span aria-hidden="true" style={{
           position: 'absolute',
           bottom: '4%',
-          right: '8%',
+          right: '3%',
           fontSize: 18,
           transform: 'rotate(12deg)',
-          zIndex: 6,  // above the cushion (z:5), behind the chibi (z:7)
+          zIndex: 9,
           filter: 'drop-shadow(0 2px 3px rgba(40,20,5,0.30))',
         }}>
           {cornerItem.emoji}

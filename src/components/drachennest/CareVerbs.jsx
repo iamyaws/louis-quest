@@ -36,10 +36,11 @@ export default function CareVerbs() {
   // collapse their whole reward budget into screen time at the cost
   // of caring for Ronki. Two currencies total.
   const tokens = state?.hp || 0;
+  const COST_PER_TAP = 5;  // mirrors careForRonki reducer (rebalanced 25 Apr 2026)
   const vitals = state?.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
 
   const tap = (verb) => {
-    if (tokens <= 0) return;
+    if (tokens < COST_PER_TAP) return;
     if ((vitals[verb.kind] || 0) >= 100) return;
     actions.careForRonki(verb.kind);
     setFlashed({ kind: verb.kind, amt: verb.amt });
@@ -58,7 +59,7 @@ export default function CareVerbs() {
       {VERBS.map(v => {
         const flashing = flashed?.kind === v.kind;
         const vitalFull = (vitals[v.kind] || 0) >= 100;
-        const noFunken = tokens <= 0;
+        const noFunken = tokens < COST_PER_TAP;
         // Disabled = either out of Funken OR this vital is already at
         // the cap. Funken-empty also dims the icon and badge so the
         // kid reads "do a quest first" at a glance.

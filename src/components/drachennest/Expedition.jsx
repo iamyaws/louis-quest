@@ -1134,11 +1134,19 @@ function DevStateCycler({ current, actions }) {
 // ─── Helpers ────────────────────────────────────────────────────
 
 function returnLabel(returnAt) {
+  // Kid-readable return-time copy (Marc 25 Apr 2026 audit fix —
+  // 'Zurück gegen 14:00' was unreadable for a 6yo who hasn't
+  // mastered clocks yet). Map the return time to a daytime anchor
+  // the kid already knows (vor dem Mittag / zum Mittagessen / am
+  // Nachmittag / am Abend / morgen früh) so the wait is concrete.
   if (!returnAt) return '';
   const t = new Date(returnAt);
-  const hh = String(t.getHours()).padStart(2, '0');
-  const mm = String(t.getMinutes()).padStart(2, '0');
-  return `Zurück gegen ${hh}:${mm}`;
+  const hh = t.getHours();
+  if (hh < 11) return 'Kommt vor dem Mittag zurück';
+  if (hh < 14) return 'Kommt zum Mittagessen zurück';
+  if (hh < 17) return 'Kommt am Nachmittag zurück';
+  if (hh < 20) return 'Kommt zum Abendessen zurück';
+  return 'Kommt morgen früh zurück';
 }
 
 function timeOfDay() {

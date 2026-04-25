@@ -1719,25 +1719,23 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   // Capped at 100. Independent of any quest completion path.
   const careForRonki = useCallback((kind: 'hunger' | 'liebe' | 'energie') => {
     const amounts = { hunger: 20, liebe: 15, energie: 25 } as const;
+    // Care cost rebalanced 1 → 5 Sterne after the audit flagged a
+    // 10× Sterne inflation: each quest grants ~10 Sterne but care
+    // was only costing 1, so 6 morning quests gave 60 Sterne while
+    // full care needed 6. Care felt free + the spend beat was
+    // meaningless. With cost=5, full vitals (6 taps) costs 30 of
+    // the morning's ~60, leaving 30 for the reward shop. Real
+    // budget pressure without forcing the kid to choose.
+    const COST_PER_TAP = 5;
     setState(prev => {
       if (!prev) return prev;
-      // Currency consolidation (Marc 25 Apr 2026): care now spends
-      // Sterne (state.hp) directly. Funkelzeit (drachenEier) stays
-      // separate so a kid can't divert all their Sterne into
-      // screentime at the cost of caring for Ronki. Each tap is 1
-      // Stern. If the pile is empty we no-op — the surface should
-      // already render the verbs disabled so this is a defense-in-
-      // depth guard.
       const sterne = prev.hp || 0;
-      if (sterne <= 0) return prev;
+      if (sterne < COST_PER_TAP) return prev;
       const v = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
-      // Guard: if the vital is already at 100, don't waste a Stern
-      // — the kid gets feedback at the surface that this verb is
-      // capped, and the Stern stays on the pile for another use.
       if (v[kind] >= 100) return prev;
       return {
         ...prev,
-        hp: sterne - 1,
+        hp: sterne - COST_PER_TAP,
         ronkiVitals: { ...v, [kind]: Math.min(100, v[kind] + amounts[kind]) },
       };
     });
@@ -1947,9 +1945,27 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const consumeStamina = useCallback(() => {
     setState(prev => {
       if (!prev) return prev;
+      // Materialize the lazy-computed current value FIRST, then
+      // decrement (code-review fix 25 Apr 2026 — without this the
+      // hook reads `base + Math.floor(elapsed/RECHARGE)` for display
+      // but the reducer only sees `base`, so a kid who comes back
+      // after a long break and taps a game would lose hours of
+      // recharge in one tap when we reset ronkiStaminaUpdatedAt
+      // here). Same elapsed math the hook uses, kept inline so the
+      // helper can stay UI-only.
+      const RECHARGE_MIN = 20;
+      const max = prev.minigameStaminaMax ?? 10;
+      const base = prev.ronkiStamina ?? max;
+      const updatedAt = prev.ronkiStaminaUpdatedAt;
+      let current = base;
+      if (updatedAt && base < max) {
+        const elapsedMin = (Date.now() - new Date(updatedAt).getTime()) / 60000;
+        const gained = Math.floor(elapsedMin / RECHARGE_MIN);
+        current = Math.min(max, base + gained);
+      }
       return {
         ...prev,
-        ronkiStamina: Math.max(0, (prev.ronkiStamina ?? 5) - 1),
+        ronkiStamina: Math.max(0, current - 1),
         ronkiStaminaUpdatedAt: new Date().toISOString(),
       };
     });
