@@ -69,98 +69,70 @@ ENV_PATH = r'C:\Users\öööö\louis-quest\.env.local'
 # substituteName helper; audio stays generic).
 
 EN_LINES = {
-    # ── Greetings ──
-    # Audio-generic: bubble prepends "{name}! " dynamically; audio stays neutral.
-    'en_greet_any_01':       'Hey! I was waiting for you!',
-    'en_greet_morning_01':   'Up already? Me too, just now.',
-    'en_greet_afternoon_01': 'Afternoon! How was school?',
-    'en_greet_evening_01':   'Evening. I had so many dreams today.',
-    'en_greet_night_01':     'Bedtime is coming. Stay a bit?',
-    'en_greet_any_02':       'Hi! I saw something today. Ask me.',
+    # Mirrors src/companion/lines/en.ts after the 2026-04-26 northstar pass.
+    # Engine-routed only (direct-play stays in DIRECT_PLAY_EN below).
 
-    # ── Sanctuary open ──
-    'en_sanct_01': 'You\u2019re here! I was running in circles.',
-    'en_sanct_02': 'Do you smell the flowers? I can smell them now.',
-    'en_sanct_03': 'I heard a noise. Was that you?',
-    'en_sanct_04': 'Look over there \u2014 a dragonfly!',
-    'en_sanct_05': 'I missed you. Was it long?',
-    'en_sanct_06': 'Did you laugh today? Me too.',
+    # Greetings
+    'en_greet_01':           'You’re here! Finally!',
+    'en_greet_morning_01':   'Morning! I just yawned too.',
+    'en_greet_afternoon_01': 'How was school? Tell me.',
+    'en_greet_evening_01':   'Evening. It’s about to get cosy.',
+    'en_greet_night_01':     'Dark outside. Warm in here.',
 
-    # ── Weather ──
-    # Audio-generic: bubble prepends name dynamically.
-    'en_weather_rain_01': 'Did you hear the rain?',
-    'en_weather_cold_01': 'It\u2019s cold! Brrr, cuddle up.',
-    'en_weather_hot_01':  'The sun! I keep blinking.',
-    'en_weather_snow_01': 'Snow! I\u2019ve never seen snow\u2026 wait, yes, last year.',
+    # Sanctuary
+    'en_sanct_01': 'You’re here! I was running in circles.',
+    'en_sanct_02': 'Smell that? The meadow smells like adventure.',
+    'en_sanct_03': 'You know what? I tried catching a butterfly today. Didn’t go great.',
 
-    # ── Quest complete ──
-    'en_quest_01':        'What \u2014 you did that? Show me!',
-    'en_quest_02':        'I saw you. You were cool.',
-    'en_quest_03':        'Psst. I\u2019m proud of you.',
-    'en_quest_streak_01': 'Another? Wow, you\u2019re on a roll today.',
+    # Weather
+    'en_w_rain_01': 'It’s raining! Puddles are the best.',
+    'en_w_cold_01': 'Brrr! Bundle up. I’ve got scales, I’m fine.',
+    'en_w_hot_01':  'So warm. I’m lying in the sun all day.',
+    'en_w_snow_01': 'Snow! I’ve never— okay, yes, last year. Still beautiful.',
 
-    # ── Care actions ──
-    'en_care_fed_01':  'Mmm! What was that? I want more!',
-    'en_care_pet_01':  'That tickles. Haha, again!',
-    'en_care_play_01': 'Play! Play! I\u2019m the fastest.',
+    # Idle
+    'en_idle_01': 'Do you think clouds are as soft as they look?',
+    'en_idle_02': 'I tried catching my own tail. Didn’t work.',
+    'en_idle_03': 'What would you be if you weren’t a person? I’d be a… dragon. Oh wait, right.',
 
-    # ── Idle wonder ──
-    'en_idle_01': 'I dreamed I could fly. Can you too?',
-    'en_idle_02': 'What did you learn today? I want to know.',
-    'en_idle_03': 'When I\u2019m big I\u2019ll be\u2026 I don\u2019t know. You?',
-    'en_idle_04': 'Do clouds feel soft, you think?',
-
-    # ── Arc phases ──
-    'en_arc_cooldown_01': 'I am still resting. But your routines keep me warm.',
-    'en_arc_cooldown_02': 'Phew, that was an adventure. I need a little sleep. See you soon!',
-    'en_arc_active_01':   'We are in the middle of an adventure. Check the banner up top!',
-
-    # ── Identity language (parity pass 2026-04-25) ──
-    'en_identity_01': 'I told the fireflies you always brush your teeth. They were so impressed!',
-    'en_identity_02': 'The butterflies say you\u2019re the bravest hero they know.',
-    'en_identity_03': 'You know what? You\u2019re someone who can be counted on. I\u2019ve noticed that.',
-    'en_identity_04': 'The meadow tells stories about you. All good ones!',
-
-    # ── Mood-aware ──
-    'en_mood_sad_01':     'Hey... I\u2019m a bit quiet today too. Want to just sit together?',
-    'en_mood_sad_02':     'Some days are just like this. I\u2019m here.',
-    'en_mood_sad_03':     'I saw you. You\u2019re strong, even when it doesn\u2019t feel that way.',
-    'en_mood_sad_04':     'Know what helps? A hug. I can\u2019t really give one \u2014 but imagine one, okay?',
-    'en_mood_tired_01':   'I\u2019m yawning too. Let\u2019s take it slow today.',
-    'en_mood_tired_02':   'Being tired is okay. Then we rest.',
-    'en_mood_happy_01':   'Wow! You\u2019re glowing today! What happened?',
-    'en_mood_happy_02':   'I can feel your good mood. It\u2019s catching!',
-    'en_mood_happy_03':   'Such a bright day inside you! Take me along?',
+    # Mood
+    'en_mood_sad_01':     'Hey... I’m a bit quiet today too. Want to just sit together?',
+    'en_mood_tired_01':   'I’m yawning too. Let’s take it slow today.',
+    'en_mood_happy_01':   'You’re glowing today. What happened?',
     'en_mood_okay_01':    'Somewhere-in-between is good too. Not every day has to sparkle.',
-    'en_mood_worried_01': 'Did something happen? You can tell me \u2014 or just be here.',
-    'en_mood_worried_02': 'I\u2019ll be quiet. Makes the head clearer.',
+    'en_mood_worried_01': 'Did something happen? You can tell me — or just be here.',
 
-    # ── Trait-gated ──
-    'en_trait_brave_01':    'You\u2019re someone who doesn\u2019t give up. I know that now.',
-    'en_trait_brave_02':    'Brave isn\u2019t being fearless. Brave is doing it anyway. That\u2019s you.',
-    'en_trait_gentle_01':   'Your calm is good for everyone. Me too.',
-    'en_trait_patient_01':  'You wait patiently \u2014 not everyone can. I\u2019m learning from you.',
-    'en_trait_mapmaker_01': 'The Explorer\u2019s back! What will you find today?',
-    'en_trait_curious_01':  'You always ask the best questions. What are you wondering today?',
-    'en_trait_multi_01':    'You have so many strengths already. You\u2019re going to be a great hero.',
+    # Quest complete
+    'en_quest_01':        'Did you just do that? Nice.',
+    'en_quest_02':        'I was watching. That was really really good.',
+    'en_quest_streak_01': 'Three already. You’re keeping a steady pace, I like that.',
 
-    # ── All-done celebration ──
-    'en_alldone_01': 'Everything! You did EVERYTHING! I might actually burst with pride!',
-    'en_alldone_02': 'Woohoo! Today was your day! Every single task \u2014 done!',
-    'en_alldone_03': 'Look! My scales are glittering. That only happens when you finish it all.',
-    'en_alldone_04': 'I\u2019m dancing! Look, I\u2019m dancing! We did it!',
-    'en_alldone_05': 'Today was such a good day. I was with you for every bit of it.',
-    'en_alldone_06': 'The fireflies are going to be so excited \u2014 I\u2019ve got to tell them everything!',
-    'en_alldone_07': 'You\u2019re my favourite person today. Okay, always. But especially today.',
-    'en_alldone_08': 'Done! Now we\u2019re both allowed to be tired. Tired together is the best kind.',
+    # All done — calm celebration
+    'en_alldone_recognition_01': 'All done today. I see it, I see it.',
+    'en_alldone_recognition_02': 'Today was a good day with you. Let’s sit a moment.',
 
-    # ── Freund-met ──
-    'en_freund_met_01': 'A new friend! Look, look! They look so interesting!',
-    'en_freund_met_02': 'Oh! I\u2019ve met them before, I think. Or maybe not. Either way!',
-    'en_freund_met_03': 'Hi, new friend! We\u2019re glad to meet you.',
-    'en_freund_met_04': 'My heart is going thumpthumpthump. That happens with new friends.',
-    'en_freund_met_05': 'Come here. We have so much to tell.',
-    'en_freund_met_06': 'Phew! So many new names. Good thing you help me remember them.',
+    # Care
+    'en_care_fed_01':  'Mmmm! Yum! Did you eat too?',
+    'en_care_pet_01':  'Hihihi! That tickles! Again.',
+    'en_care_play_01': 'Play! Come, catch me!',
+
+    # Freund met
+    'en_freund_met_01': 'Look who’s here.',
+    'en_freund_met_02': 'My heart goes thumpthumpthump. That happens with new friends.',
+
+    # Identity
+    'en_identity_01': 'I told the fireflies you always brush your teeth. They were really impressed.',
+    'en_identity_03': 'You know what? You’re someone who can be counted on. I’ve noticed that.',
+
+    # Trait-gated
+    'en_trait_brave_01':  'You’re someone who doesn’t give up. I know that now.',
+    'en_trait_gentle_01': 'Your calm is good for everyone. Me too.',
+
+    # Arc context (paused, harmless to keep)
+    'en_arc_cooldown_01': 'I’m still resting from the last adventure. But you keep going!',
+    'en_arc_cooldown_02': 'Phew, that was something. I need a little nap.',
+    'en_arc_active_01':   'We’re in the middle of an adventure! Look up top.',
+    'en_arc_active_02':   'Our adventure is waiting! I’m so excited.',
 }
 
 # Direct-play lines — played from feature code by ID, not via engine pick.

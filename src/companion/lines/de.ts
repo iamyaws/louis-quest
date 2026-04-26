@@ -1,190 +1,130 @@
 import type { VoiceLine } from '../types';
 
 /**
- * Ronki's voice — Baby-Drache, frisch geschlüpft.
+ * Ronki's voice — engine-routed line bank, German.
  *
- * Character: Ronki is Louis's age in dragon years. Curious, easily amazed,
- * a little clumsy, full of wonder. Speaks in short sentences. Has strong
- * opinions about small things (puddles are great, socks are confusing).
- * Never lectures. Celebrates alongside Louis, never above him.
+ * Source of truth for content + tone: docs/ronki-voicelines.md (the northstar
+ * voice rewrite, 2026-04-26). This file is the React-engine-readable version
+ * of the engine-routed subset of that doc — direct-play lines (stamina,
+ * teeth, screen, journal, garden, witness, elder, onboarding, narrator) live
+ * in feature code via VoiceAudio.playLocalized(...) and are NOT registered
+ * here. Direct-play registration would let the random picker surface them
+ * out of context (e.g. "Sonntag. Was pflanzt du?" on a Tuesday hub_open).
  *
- * From day 14+, identity-language lines unlock:
- * "Ronki hat den Glühwürmchen erzählt, dass du immer deine Zähne putzt!"
- * These shift motivation from external reward to self-concept (Atomic Habits).
+ * Character: Ronki = Louis's age in dragon years. Curious, easily amazed,
+ * a little clumsy, full of wonder. Short sentences. Strong opinions about
+ * small things (puddles are great). Never lectures. Celebrates alongside
+ * Louis, never above him. Quiet in mood-sad / evening / night moments.
  *
- * TODO — audio to generate (ElevenLabs; quota-gated). Lines intentionally NOT
- * registered in the bank because they're played directly by useQuietAttention
- * (not trigger-matched). Once MP3s land in /public/audio/ronki/, they play
- * automatically — no code change needed here.
- *   - de_slowdown_01: "Wow, du bist aber schnell! Schau nochmal."
- *   - de_slowdown_02: "Langsam, kleiner Flitzer. Es gibt viel zu entdecken."
- *   - de_slowdown_03: "Pssst. Nicht alles rennt davon."
- * MVP wires only de_slowdown_01. Rotation added later when audio exists.
+ * Identity-language lines ("Ich hab den Glühwürmchen erzählt…") shift
+ * motivation from external reward to self-concept (Atomic Habits).
  *
- * AttentionGlow announcement lines (fired once per seen-key via AttentionGlow prop):
- *   - de_forscher_new_01: "Hey, ich hab was Neues entdeckt! Komm mal hin, guck dir das an."
- * Ships silent (VoiceAudio.play fails gracefully); Marc generates MP3 later.
+ * Direct-play audio IDs (NOT registered here, played by feature code):
+ *   stamina_low_01 / stamina_exhausted_01
+ *   teeth_start / teeth_topright / teeth_bottomleft / teeth_bottomright
+ *     / teeth_halfway / teeth_done / teeth_done_02 / teeth_done_03
+ *     / teeth_mid_01..04 / teeth_ronki_01..03
+ *   screen_start / screen_half / screen_5min / screen_2min / screen_1min
+ *     / screen_done / screen_eyes / screen_eyes2 / screen_eyes3
+ *     / screentime_50_01 / screentime_20_01 / screentime_10_01 / screentime_done_01
+ *   journal_done_01 / journal_done_02 / journal_done_03
+ *   discover_creature
+ *   parent_zone_intro / ritual_start / ritual_ask / ritual_goodnight
+ *     / onboarding_welcome (Drachenmutter narrator — public/audio/narrator/)
+ *   onboarding_kid_intro_01 / lagerfeuer_arrival_01 (Ronki onboarding,
+ *     fired by App.jsx onboarding orchestrator)
+ *   garden_plant_offer_01 / garden_planted_01 / garden_quiet_week_01
+ *     / garden_decor_placed_01 / garden_visit_back_01
+ *   witness_invite_monthly_01 / witness_reveal_tree_01
+ *     / witness_invite_season_01 / journey_reflection_01
  */
 
 export const linesDe: VoiceLine[] = [
   // ═══════════════════════════════════════
   // GREETINGS — Hub open
   // ═══════════════════════════════════════
-  { id: 'de_greet_01', text: 'Hey! Du bist da! Endlich!', triggers: ['hub_open'] },
-  { id: 'de_greet_02', text: 'Hey! Ich hab gerade an dich gedacht!', triggers: ['hub_open'] },
-  { id: 'de_greet_03', text: 'Oh! Da bist du ja! Ich hab was entdeckt…', triggers: ['hub_open'] },
-  { id: 'de_greet_m01', text: 'Guten Morgen! Ich hab schon gegähnt.', triggers: ['hub_open'], timeOfDay: ['morning'] },
-  { id: 'de_greet_m02', text: 'Morgens bin ich immer ein bisschen verschlafen. Du auch?', triggers: ['hub_open'], timeOfDay: ['morning'] },
-  // Cut 2026-04-19 (audit): 'Die Sonne ist aufgegangen! Lass uns loslegen!' — generic motivational filler
-  { id: 'de_greet_a01', text: 'Wie war die Schule? Erzähl mir alles!', triggers: ['hub_open'], timeOfDay: ['afternoon'] },
-  // Cut 2026-04-19 (audit): 'Nachmittag! Ich hab den ganzen Tag auf dich gewartet.' — reads as needy
-  { id: 'de_greet_e01', text: 'Abend! Bald wird es gemütlich.', triggers: ['hub_open'], timeOfDay: ['evening'] },
-  { id: 'de_greet_e02', text: 'Hast du heute was Cooles erlebt? Ich will alles wissen.', triggers: ['hub_open'], timeOfDay: ['evening'] },
-  { id: 'de_greet_n01', text: 'Gute Nacht bald! Noch ein bisschen zusammen?', triggers: ['hub_open'], timeOfDay: ['night'] },
-  { id: 'de_greet_n02', text: 'Draußen ist es dunkel. Hier drin ist es warm.', triggers: ['hub_open'], timeOfDay: ['night'] },
+  { id: 'de_greet_01', text: 'Du bist da! Endlich!', triggers: ['hub_open'] },
+  { id: 'de_greet_morning_01', text: 'Morgen! Ich hab schon gegähnt.', triggers: ['hub_open'], timeOfDay: ['morning'] },
+  { id: 'de_greet_afternoon_01', text: 'Wie war Schule? Komm, erzähl.', triggers: ['hub_open'], timeOfDay: ['afternoon'] },
+  { id: 'de_greet_evening_01', text: 'Abend. Bald wird\'s gemütlich.', triggers: ['hub_open'], timeOfDay: ['evening'] },
+  { id: 'de_greet_night_01', text: 'Draußen dunkel. Hier ist\'s warm.', triggers: ['hub_open'], timeOfDay: ['night'] },
 
   // ═══════════════════════════════════════
   // SANCTUARY — Ronki's home
   // ═══════════════════════════════════════
-  { id: 'de_sanct_01', text: 'Du bist da! Ich bin im Kreis gelaufen vor Freude!', triggers: ['sanctuary_open'] },
-  { id: 'de_sanct_02', text: 'Riechst du das? Die Wiese riecht nach Abenteuer!', triggers: ['sanctuary_open'] },
-  { id: 'de_sanct_03', text: 'Psst — hör mal! Da raschelt was im Gras!', triggers: ['sanctuary_open'] },
-  { id: 'de_sanct_04', text: 'Schau mal! Eine Libelle! Die ist schneller als ich!', triggers: ['sanctuary_open'] },
-  // Cut 2026-04-19 (audit): 'Ich hab dich vermisst…' — redundant with de_greet_02
-  { id: 'de_sanct_06', text: 'Weißt du was? Ich hab heute versucht, einen Schmetterling zu fangen. Hat nicht geklappt.', triggers: ['sanctuary_open'] },
-  { id: 'de_sanct_07', text: 'Mein Lieblingsplatz ist genau hier. Wo ist deiner?', triggers: ['sanctuary_open'] },
+  { id: 'de_sanct_01', text: 'Du bist da! Ich bin im Kreis gelaufen vor Freude.', triggers: ['sanctuary_open'] },
+  { id: 'de_sanct_02', text: 'Riech mal! Die Wiese riecht nach Abenteuer.', triggers: ['sanctuary_open'] },
+  { id: 'de_sanct_03', text: 'Weißt du was? Ich hab heut versucht, einen Schmetterling zu fangen. Hat nicht geklappt.', triggers: ['sanctuary_open'] },
 
   // ═══════════════════════════════════════
   // WEATHER — context-aware observations
   // ═══════════════════════════════════════
-  { id: 'de_w_rain_01', text: 'Es regnet! Ich mag Regen. Pfützen sind das Beste.', triggers: ['hub_open', 'sanctuary_open'], weather: ['rain'] },
-  { id: 'de_w_rain_02', text: 'Tropf tropf tropf! Hörst du das auch?', triggers: ['hub_open', 'sanctuary_open'], weather: ['rain'] },
-  { id: 'de_w_cold_01', text: 'Brrr! Zieh dich warm an heute! Ich hab ja Schuppen.', triggers: ['hub_open', 'sanctuary_open'], weather: ['cold'] },
-  { id: 'de_w_hot_01', text: 'So warm! Ich könnte den ganzen Tag in der Sonne liegen.', triggers: ['hub_open', 'sanctuary_open'], weather: ['hot', 'clear'] },
-  // Cut 2026-04-19 (audit): 'Sonnenschein! Vergiss die Sonnencreme nicht!' — violates "never lectures" rule
-  { id: 'de_w_snow_01', text: 'SCHNEE! Ich — ich hab noch nie Schnee gesehen! Naja, letztes Mal schon.', triggers: ['hub_open', 'sanctuary_open'], weather: ['snow'] },
-  // Cut 2026-04-19 (audit): 'Blauer Himmel! Der perfekte Tag für ein Abenteuer!' — generic adventure-ad copy
+  { id: 'de_w_rain_01', text: 'Es regnet! Pfützen sind das Beste.', triggers: ['hub_open', 'sanctuary_open'], weather: ['rain'] },
+  { id: 'de_w_cold_01', text: 'Brrr! Zieh dich warm an. Ich hab ja Schuppen, ich pack das.', triggers: ['hub_open', 'sanctuary_open'], weather: ['cold'] },
+  { id: 'de_w_hot_01', text: 'Voll warm. Ich liege heut den ganzen Tag in der Sonne.', triggers: ['hub_open', 'sanctuary_open'], weather: ['hot', 'clear'] },
+  { id: 'de_w_snow_01', text: 'Schnee! Ich hab noch nie— okay, doch, letztes Mal schon. Trotzdem schön.', triggers: ['hub_open', 'sanctuary_open'], weather: ['snow'] },
 
   // ═══════════════════════════════════════
-  // QUEST COMPLETE — celebrating together
+  // IDLE — wonder
   // ═══════════════════════════════════════
-  { id: 'de_quest_01', text: 'Hast du das gerade geschafft? Wow!', triggers: ['quest_complete'] },
-  // Cut 2026-04-19 (audit): 'Ja! So macht man das! 💪' — emoji in TTS + generic
-  { id: 'de_quest_03', text: 'Ich hab zugeguckt. Das war richtig gut.', triggers: ['quest_complete'] },
-  // Cut 2026-04-19 (audit): 'Weiter so! Ronki glaubt an dich!' — third-person coach-talk
-  // Cut 2026-04-19 (audit): 'Eins weniger! Du rockst das!' — aging slang
-  { id: 'de_quest_streak_01', text: 'Drei schon? Du bist heute nicht zu stoppen!', triggers: ['quest_complete'], minQuestsToday: 3 },
-  // Cut 2026-04-19 (audit): 'Nochmal? Du machst gar keine Pause!' — ambiguous tone, could read critical
+  { id: 'de_idle_01', text: 'Glaubst du, Wolken sind so weich, wie sie aussehen?', triggers: ['idle'] },
+  { id: 'de_idle_02', text: 'Ich hab versucht, meinen eigenen Schwanz zu fangen. Hat nicht geklappt.', triggers: ['idle'] },
+  { id: 'de_idle_03', text: 'Was wärst du, wenn du kein Mensch wärst? Ich wär ein… Drache. Ach, stimmt ja.', triggers: ['idle'] },
+
+  // ═══════════════════════════════════════
+  // MOOD-AWARE — soft when down, upbeat when happy
+  // ═══════════════════════════════════════
+  { id: 'de_mood_sad_01',     text: 'Hey... ich bin heut auch leise. Sollen wir einfach zusammen sein?', triggers: ['hub_open'], mood: ['traurig', 'besorgt'] },
+  { id: 'de_mood_tired_01',   text: 'Ich gähne auch. Lass uns heut langsam machen.', triggers: ['hub_open'], mood: ['müde'] },
+  { id: 'de_mood_happy_01',   text: 'Du strahlst heut. Was ist passiert?', triggers: ['hub_open'], mood: ['magisch', 'gut'] },
+  { id: 'de_mood_okay_01',    text: 'Mittendrin ist auch gut. Nicht jeder Tag muss funkeln.', triggers: ['hub_open'], mood: ['okay'] },
+  { id: 'de_mood_worried_01', text: 'Ist was passiert? Du kannst\'s mir erzählen — oder einfach da sein.', triggers: ['hub_open'], mood: ['besorgt'] },
+
+  // ═══════════════════════════════════════
+  // QUEST COMPLETE — recognition, not hype
+  // ═══════════════════════════════════════
+  { id: 'de_quest_01', text: 'Hast du das grad geschafft? Schön.', triggers: ['quest_complete'] },
+  { id: 'de_quest_02', text: 'Ich hab zugeguckt. Das war richtig richtig gut.', triggers: ['quest_complete'] },
+  { id: 'de_quest_streak_01', text: 'Drei schon. Du machst das ruhig weiter, das gefällt mir.', triggers: ['quest_complete'], minQuestsToday: 3 },
+
+  // ═══════════════════════════════════════
+  // ALL DONE — calm celebration on final-tap
+  // ═══════════════════════════════════════
+  { id: 'de_alldone_recognition_01', text: 'Alles geschafft heute. Ich seh\'s, ich seh\'s.', triggers: ['all_done'] },
+  { id: 'de_alldone_recognition_02', text: 'Heute war ein guter Tag mit dir. Lass uns kurz sitzen.', triggers: ['all_done'] },
 
   // ═══════════════════════════════════════
   // CARE ACTIONS — companion interactions
   // ═══════════════════════════════════════
-  { id: 'de_care_fed_01', text: 'Mmmmm! Das war lecker! Hast du auch was gegessen?', triggers: ['care_action'], careAction: ['fed'] },
-  { id: 'de_care_fed_02', text: 'Danke! Mein Bauch ist jetzt warm und voll.', triggers: ['care_action'], careAction: ['fed'] },
-  { id: 'de_care_pet_01', text: 'Hihihi! Das kitzelt! Nochmal, nochmal!', triggers: ['care_action'], careAction: ['petted'] },
-  { id: 'de_care_pet_02', text: 'Ahhh… das ist schön. Du hast warme Hände.', triggers: ['care_action'], careAction: ['petted'] },
-  { id: 'de_care_play_01', text: 'Spielen! Ja! Ich bin bereit! Fang mich!', triggers: ['care_action'], careAction: ['played'] },
-  { id: 'de_care_play_02', text: 'Haha! Ich bin schneller als du! …oder?', triggers: ['care_action'], careAction: ['played'] },
+  { id: 'de_care_fed_01',  text: 'Mmmmm! Lecker! Hast du auch was gegessen?', triggers: ['care_action'], careAction: ['fed'] },
+  { id: 'de_care_pet_01',  text: 'Hihihi! Das kitzelt! Nochmal.', triggers: ['care_action'], careAction: ['petted'] },
+  { id: 'de_care_play_01', text: 'Spielen! Komm, fang mich!', triggers: ['care_action'], careAction: ['played'] },
 
   // ═══════════════════════════════════════
-  // IDLE — wondering and wondering
+  // FREUND MET — quiet recognition, not hype
   // ═══════════════════════════════════════
-  { id: 'de_idle_01', text: 'Ob Wolken wirklich so weich sind, wie sie aussehen?', triggers: ['idle'] },
-  { id: 'de_idle_02', text: 'Ich hab geträumt, ich kann fliegen. Bald kann ich das wirklich!', triggers: ['idle'] },
-  { id: 'de_idle_03', text: 'Was wärst du, wenn du kein Mensch wärst? Ich wäre ein… Drache. Ach, stimmt ja.', triggers: ['idle'] },
-  { id: 'de_idle_04', text: 'Weißt du, was ich heute gelernt habe? Dass Ameisen richtig stark sind!', triggers: ['idle'] },
-  { id: 'de_idle_05', text: 'Ich hab versucht, meinen eigenen Schwanz zu fangen. Hat nicht geklappt.', triggers: ['idle'] },
-  { id: 'de_idle_06', text: 'Meinst du, Fische können träumen?', triggers: ['idle'] },
+  { id: 'de_freund_met_01', text: 'Schau mal, wer da ist.', triggers: ['freund_met'] },
+  { id: 'de_freund_met_02', text: 'Mein Herz macht pongpongpong. Das passiert bei neuen Freunden.', triggers: ['freund_met'] },
 
   // ═══════════════════════════════════════
-  // ARCS — adventure context
+  // IDENTITY — magical witness + Atomic Habits framing
   // ═══════════════════════════════════════
-  { id: 'de_arc_cool_01', text: 'Ich ruh mich noch aus vom letzten Abenteuer. Aber mach ruhig weiter!', triggers: ['hub_open'], arcPhase: 'cooldown' },
-  { id: 'de_arc_cool_02', text: 'Puh! Das war aufregend. Ich brauch ein Schläfchen.', triggers: ['hub_open'], arcPhase: 'cooldown' },
+  { id: 'de_identity_01', text: 'Ich hab den Glühwürmchen erzählt, dass du immer deine Zähne putzt. Die waren echt beeindruckt.', triggers: ['quest_complete'], minQuestsToday: 1 },
+  { id: 'de_identity_03', text: 'Weißt du was? Du bist jemand, auf den man sich verlassen kann. Hab ich gemerkt.', triggers: ['hub_open'] },
+
+  // ═══════════════════════════════════════
+  // TRAIT-GATED — unlocks after earning the named trait
+  // ═══════════════════════════════════════
+  { id: 'de_trait_brave_01',  text: 'Du bist jemand, der nicht aufgibt. Das weiß ich jetzt.', triggers: ['hub_open', 'quest_complete'], requiredTraits: ['brave'] },
+  { id: 'de_trait_gentle_01', text: 'Deine Ruhe tut allen gut. Auch mir.', triggers: ['hub_open', 'sanctuary_open'], requiredTraits: ['gentle'] },
+
+  // ═══════════════════════════════════════
+  // ARCS — paused per backlog_arc_offer_rework, but harmless to keep.
+  // arcPhase is hardcoded to 'idle' in Hub.jsx today, so these never fire.
+  // When Arcs reactivate, no audio gen needed — files already exist.
+  // ═══════════════════════════════════════
+  { id: 'de_arc_cool_01',   text: 'Ich ruh mich noch aus vom letzten Abenteuer. Aber mach ruhig weiter!', triggers: ['hub_open'], arcPhase: 'cooldown' },
+  { id: 'de_arc_cool_02',   text: 'Puh! Das war aufregend. Ich brauch ein Schläfchen.', triggers: ['hub_open'], arcPhase: 'cooldown' },
   { id: 'de_arc_active_01', text: 'Wir haben ein Abenteuer! Schau mal oben!', triggers: ['hub_open'], arcPhase: 'active' },
   { id: 'de_arc_active_02', text: 'Unser Abenteuer wartet! Ich bin so gespannt!', triggers: ['hub_open'], arcPhase: 'active' },
-
-  // ═══════════════════════════════════════
-  // IDENTITY LANGUAGE — unlocks after day 14
-  // (From habit research: shift from "I did X" to "I am someone who does X")
-  // ═══════════════════════════════════════
-  { id: 'de_identity_01', text: 'Ich hab den Glühwürmchen erzählt, dass du immer deine Zähne putzt. Die waren beeindruckt!', triggers: ['quest_complete'], minQuestsToday: 1 },
-  { id: 'de_identity_02', text: 'Die Schmetterlinge sagen, du bist der mutigste Held, den sie kennen.', triggers: ['quest_complete'], minQuestsToday: 2 },
-  { id: 'de_identity_03', text: 'Weißt du was? Du bist jemand, auf den man sich verlassen kann. Das hab ich gemerkt.', triggers: ['hub_open'] },
-  { id: 'de_identity_04', text: 'Die Wiese erzählt Geschichten über dich. Lauter gute!', triggers: ['sanctuary_open'] },
-
-  // ═══════════════════════════════════════
-  // MOOD-AWARE — soft responses when Louis is down, upbeat when happy
-  // ═══════════════════════════════════════
-  { id: 'de_mood_sad_01',   text: 'Hey... ich bin heute auch ein bisschen leise. Sollen wir zusammen sein?', triggers: ['hub_open'], mood: ['traurig', 'besorgt'] },
-  { id: 'de_mood_sad_02',   text: 'Manchmal sind Tage einfach so. Ich bin da.', triggers: ['hub_open'], mood: ['traurig'] },
-  { id: 'de_mood_sad_03',   text: 'Ich hab dich gesehen. Du bist stark, auch wenn es sich nicht so anfühlt.', triggers: ['hub_open'], mood: ['traurig', 'besorgt'] },
-  { id: 'de_mood_sad_04',   text: 'Weißt du was hilft? Eine Umarmung. Ich kann leider keine geben — aber stell dir eine vor.', triggers: ['hub_open', 'sanctuary_open'], mood: ['traurig'] },
-  { id: 'de_mood_tired_01', text: 'Ich gähne auch. Lass uns heute langsam machen.', triggers: ['hub_open'], mood: ['müde'] },
-  { id: 'de_mood_tired_02', text: 'Müde sein ist okay. Dann ruhen wir uns aus.', triggers: ['hub_open'], mood: ['müde'] },
-  { id: 'de_mood_happy_01', text: 'Wow! Du strahlst heute! Was ist passiert?', triggers: ['hub_open'], mood: ['magisch', 'gut'] },
-  { id: 'de_mood_happy_02', text: 'Ich spüre deine gute Laune. Bin mit angesteckt!', triggers: ['hub_open'], mood: ['magisch'] },
-  { id: 'de_mood_happy_03', text: 'So ein schöner Tag in dir! Nimmst du mich mit?', triggers: ['hub_open', 'sanctuary_open'], mood: ['magisch', 'gut'] },
-  { id: 'de_mood_okay_01',  text: 'Mittendrin ist auch gut. Nicht jeder Tag muss funkeln.', triggers: ['hub_open'], mood: ['okay'] },
-  { id: 'de_mood_worried_01', text: 'Ist was passiert? Du kannst mir erzählen — oder einfach da sein.', triggers: ['hub_open'], mood: ['besorgt'] },
-  { id: 'de_mood_worried_02', text: 'Ich bin leise. Dann ist der Kopf freier.', triggers: ['hub_open'], mood: ['besorgt'] },
-
-  // ═══════════════════════════════════════
-  // TRAIT-GATED — identity language (Atomic Habits)
-  // Unlock after earning the named trait from an arc completion
-  // ═══════════════════════════════════════
-  { id: 'de_trait_brave_01',     text: 'Du bist jemand, der nicht aufgibt. Das weiß ich jetzt.', triggers: ['hub_open', 'quest_complete'], requiredTraits: ['brave'] },
-  // Rewritten 2026-04-19 (audit): was 'Mutig sein heißt nicht, keine Angst zu haben. Du weißt das.' (too adult-philosophical)
-  { id: 'de_trait_brave_02',     text: 'Mutig ist nicht, keine Angst zu haben. Mutig ist trotzdem machen. Das bist du.', triggers: ['hub_open'], requiredTraits: ['brave'] },
-  { id: 'de_trait_gentle_01',    text: 'Deine Ruhe tut allen gut. Auch mir.', triggers: ['hub_open', 'sanctuary_open'], requiredTraits: ['gentle'] },
-  { id: 'de_trait_patient_01',   text: 'Du wartest geduldig — das können nicht alle. Ich lerne von dir.', triggers: ['hub_open'], requiredTraits: ['patient'] },
-  { id: 'de_trait_mapmaker_01',  text: 'Der Entdecker ist zurück! Was findest du heute?', triggers: ['hub_open'], requiredTraits: ['mapmaker'] },
-  { id: 'de_trait_curious_01',   text: 'Du stellst immer die besten Fragen. Was fragst du dich heute?', triggers: ['idle'], requiredTraits: ['curious'] },
-  { id: 'de_trait_multi_01',     text: 'Du hast schon so viele Stärken. Du wirst ein großer Held.', triggers: ['hub_open'], requireAllTraits: ['brave', 'gentle', 'patient', 'mapmaker'] },
-
-  // ═══════════════════════════════════════
-  // ALL DONE — the big moment when Louis finishes every main quest today.
-  // Fires via voice.say('all_done') from TaskList when a tap flips allDone
-  // from false → true. Distinct from quest_complete (which fires on every
-  // individual tap). These are Ronki celebrating WITH the kid — peak warmth,
-  // dragon-y flourishes, never preachy.
-  // ═══════════════════════════════════════
-  { id: 'de_alldone_01', text: 'Alles! Du hast ALLES geschafft! Ich glaub, ich könnte platzen vor Stolz!', triggers: ['all_done'] },
-  { id: 'de_alldone_02', text: 'Wuuuhuu! Heute war dein Tag! Jede einzelne Aufgabe — fertig!', triggers: ['all_done'] },
-  { id: 'de_alldone_03', text: 'Schau mal! Meine Schuppen glitzern. Das passiert nur, wenn du alles schaffst.', triggers: ['all_done'] },
-  { id: 'de_alldone_04', text: 'Ich tanze! Guck, ich tanze! Wir haben\'s geschafft!', triggers: ['all_done'] },
-  { id: 'de_alldone_05', text: 'Heute war so ein guter Tag. Ich hab jeden Moment mit dir erlebt.', triggers: ['all_done'] },
-  { id: 'de_alldone_06', text: 'Die Glühwürmchen werden ganz aufgeregt — ich muss denen alles erzählen!', triggers: ['all_done'] },
-  { id: 'de_alldone_07', text: 'Du bist heute mein Lieblingsmensch. Okay, immer. Aber heute besonders.', triggers: ['all_done'] },
-  { id: 'de_alldone_08', text: 'Fertig! Jetzt dürfen wir beide müde sein. Gemeinsam müde ist am schönsten.', triggers: ['all_done'] },
-
-  // ═══════════════════════════════════════
-  // FREUND MET — Ronki reacting to a new friend appearing (Freund unlock,
-  // Micropedia first-discovery, Arc reunion beat). Wire via
-  // voice.say('freund_met') at the fire site when one lands.
-  // ═══════════════════════════════════════
-  { id: 'de_freund_met_01', text: 'Ein neuer Freund! Schau mal, schau mal! Der sieht so interessant aus!', triggers: ['freund_met'] },
-  { id: 'de_freund_met_02', text: 'Oh! Den hab ich schon mal gesehen, glaub ich. Oder vielleicht auch nicht. Trotzdem!', triggers: ['freund_met'] },
-  { id: 'de_freund_met_03', text: 'Hallo, neuer Freund! Wir freuen uns, dich zu treffen.', triggers: ['freund_met'] },
-  { id: 'de_freund_met_04', text: 'Mein Herz macht pongpongpong. Das passiert bei neuen Freunden.', triggers: ['freund_met'] },
-  { id: 'de_freund_met_05', text: 'Komm her. Wir haben viel zu erzählen.', triggers: ['freund_met'] },
-  { id: 'de_freund_met_06', text: 'Uff! So viele neue Namen. Gut, dass du mir hilfst, die zu merken.', triggers: ['freund_met'] },
-
-  // NOTE: de_stamina_* and de_screentime_* audio files exist in public/audio/ronki/
-  // and are played directly via VoiceAudio.play(id) from MiniGames.jsx and ScreenTimer.jsx.
-  // They are NOT registered here because that would make the VoiceEngine pick them
-  // randomly on hub_open/idle triggers — Ronki would say "Ich bin ganz platt" even
-  // when fully rested. Direct play bypasses the line bank by design.
-  //
-  // TODO — Ab-in-die-Tasche tooth-brush audio to generate (ElevenLabs; quota-gated).
-  // Played directly from ToothBrushGuide.jsx on each 30s zone transition — also
-  // NOT registered here for the same reason as stamina/screentime. Until these
-  // audio files exist, the component falls back to a short SFX 'pop' beep.
-  //   - de_brush_zone_1: "Jetzt oben rechts außen."
-  //   - de_brush_zone_2: "Oben links außen."
-  //   - de_brush_zone_3: "Oben hinten — rauf und runter."
-  //   - de_brush_zone_4: "Unten rechts außen."
-  //   - de_brush_zone_5: "Unten links außen."
-  //   - de_brush_zone_6: "Zunge. Sanft."
-  //   - de_brush_done_01: "Fertig! Super gemacht."
 ];

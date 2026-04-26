@@ -51,8 +51,8 @@ Single source of truth for Ronki's voice across all surfaces, restructured aroun
     }
   },
   "drachenmutter": {
-    "voice_id": "hpp4J3VqNfWAUOO0d1Us",
-    "voice_name": "Bella (placeholder — pick from voice-samples/drachenmutter/)",
+    "voice_id": "XB0fDUnXU5powFXDhCwa",
+    "voice_name": "Charlotte (locked 2026-04-26 — mature gentle narrator, storytelling cadence)",
     "output_dir": "public/audio/narrator",
     "settings": {
       "stability": 0.70,
