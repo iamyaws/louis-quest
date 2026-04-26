@@ -10,7 +10,7 @@ import { useSpecialQuests } from '../hooks/useSpecialQuests';
 import ToothbrushTimer from './ToothbrushTimer';
 import ToothBrushGuide from './ToothBrushGuide';
 import ClothingSheet from './ClothingSheet';
-import QuestLineCard from './QuestLineCard';
+// QuestLineCard deleted Apr 2026 (cut #10f). NORTHSTAR: "not a skill tree".
 import TopBar from './TopBar';
 import DailyHabits from './DailyHabits';
 import MoodChibi from './MoodChibi';
@@ -49,7 +49,7 @@ const ANCHOR_META_BASE = {
 // Vacation quests share the same hints as their school counterparts
 const HINT_ALIAS = { v1: 's1', v3: 's3', v4: 's4', v2: 's2', v5b: 's6b', v6: 's8', v7: 'sq_zimmer', v10: 's12', v11: 's13', v12: 's14', v13: 's15' };
 
-export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }) {
+export default function TaskList({ onNavigate, onOpenParental }) {
   const { state, computed, actions } = useTask();
   const haptic = useHaptic();
   const { track } = useAnalytics();
@@ -241,28 +241,12 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
            checkpoints like Vitamin D or Zeit-mit-Liam belong as add-ons,
            not as prelude. See new mount point further down. */}
 
-      {/* ── Parent-created quest-lines (top of list, show up to 3) ── */}
-      {(() => {
-        const allActive = (state?.parentQuestLines || [])
-          .filter(q => !q.completed && !q.archived);
-        if (!allActive.length) return null;
-        const shown = allActive.slice(0, 3);
-        const remainder = allActive.length - shown.length;
-        return (
-          <div className="mb-5">
-            {shown.map(ql => (
-              <QuestLineCard key={ql.id} questLine={ql} onOpen={onOpenQuestLine} />
-            ))}
-            {remainder > 0 && (
-              <p className="font-label text-xs text-on-surface-variant/70 text-center italic mt-2">
-                {remainder === 1
-                  ? 'Noch eine Quest-Linie wartet. Frag Mama oder Papa.'
-                  : `Noch ${remainder} Quest-Linien warten. Frag Mama oder Papa.`}
-              </p>
-            )}
-          </div>
-        );
-      })()}
+      {/* Parent-created quest-lines deleted Apr 2026 (cut #10f).
+          NORTHSTAR: "we are not a skill tree." Parent-created
+          learning sequences (poems, Einmaleins, Referate) belonged
+          to the productivity-tracker era. The data shape
+          (state.parentQuestLines) stays in the reducer to avoid
+          stomping persisted state, but the surface is gone. */}
 
       {/* ── Active Poem Quest Banner ──
        *   Legacy surface from before quest-line templates existed. The 'NEU! Gedicht lernen'

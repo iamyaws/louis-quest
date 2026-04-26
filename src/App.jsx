@@ -70,7 +70,7 @@ import ChibiGallery from './components/ChibiGallery';
 import MemoryWall from './components/MemoryWall';
 import DiscoveryLog from './components/DiscoveryLog';
 import Micropedia from './components/Micropedia';
-import QuestLineView from './components/QuestLineView';
+// QuestLineView deleted Apr 2026 (cut #10f). NORTHSTAR: "not a skill tree".
 import { useSpecialQuests } from './hooks/useSpecialQuests';
 // Easter-egg system paused Apr 2026 — Marc: "don't feel it anymore".
 // Hook + component files kept so we can re-enable by restoring these imports.
@@ -197,7 +197,7 @@ function AppContent() {
       actions.patchState(patch);
     }
   }, [state, actions]);
-  const [activeQuestLineId, setActiveQuestLineId] = useState(null);
+  // activeQuestLineId state removed Apr 2026 (cut #10f, QuestLine deletion).
   const [activeMintGame, setActiveMintGame] = useState(null); // MINT game id when view==='mint-game'
   const [showParental, setShowParental] = useState(false);
   // PIN gate — intercepts every parental-dashboard entry (lock tap, long
@@ -357,10 +357,6 @@ function AppContent() {
           <TaskList
             onNavigate={setView}
             onOpenParental={() => openPinGate()}
-            onOpenQuestLine={(id) => {
-              setActiveQuestLineId(id);
-              setView('questline');
-            }}
           />
         )}
         {view === 'shop' && <Belohnungsbank onNavigate={setView} onOpenParental={() => openPinGate()} />}
@@ -418,12 +414,7 @@ function AppContent() {
         {view === 'gallery' && <ChibiGallery onClose={() => setView('hub')} />}
         {view === 'discovery' && <DiscoveryLog onNavigate={setView} />}
         {view === 'micropedia' && <Micropedia onNavigate={setView} />}
-        {view === 'questline' && activeQuestLineId && (
-          <QuestLineView
-            questLineId={activeQuestLineId}
-            onBack={() => { setActiveQuestLineId(null); setView('quests'); }}
-          />
-        )}
+        {/* view==='questline' route removed Apr 2026 (cut #10f). */}
         {view === 'games' && (
           <MiniGames
             onPlay={(id) => setView(id)}

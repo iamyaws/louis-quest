@@ -5,7 +5,7 @@ import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
 import { getCatStage } from '../utils/helpers';
 import { useRonkiStamina } from '../hooks/useRonkiStamina';
 import FeedbackModal from './FeedbackModal';
-import QuestLineEditor from './QuestLineEditor';
+// QuestLineEditor deleted Apr 2026 (cut #10f). NORTHSTAR: "not a skill tree".
 import VoiceAudio from '../utils/voiceAudio';
 import { useAnalytics } from '../hooks/useAnalytics';
 
@@ -203,7 +203,7 @@ export default function ParentalDashboard({ onClose, currentView, preauthorized 
         {[
           { id: 'overview', label: t('parent.tab.overview'), icon: 'dashboard' },
           { id: 'family', label: t('parent.tab.family'), icon: 'family_restroom' },
-          { id: 'questlines', label: t('parent.tab.questlines'), icon: 'flag' },
+          // 'questlines' tab removed Apr 2026 (cut #10f, QuestLine deletion).
           { id: 'settings', label: t('parent.tab.settings'), icon: 'settings' },
         ].map(tb => (
           <button key={tb.id}
@@ -229,7 +229,7 @@ export default function ParentalDashboard({ onClose, currentView, preauthorized 
       <main className="relative z-10 px-6 pb-12 max-w-lg mx-auto flex flex-col gap-5">
         {tab === 'overview' && <OverviewTab state={state} lang={lang} t={t} />}
         {tab === 'family' && <FamilyTab state={state} actions={actions} lang={lang} />}
-        {tab === 'questlines' && <QuestLineEditor />}
+        {/* tab==='questlines' removed Apr 2026 (cut #10f). */}
         {tab === 'settings' && <SettingsTab lang={lang} setLang={setLang} t={t} actions={actions} state={state} onOpenFeedback={() => setShowFeedback(true)} />}
         <BodhiLeaf />
       </main>
