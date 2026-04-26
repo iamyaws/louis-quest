@@ -14,7 +14,10 @@ import { useGameAccess } from '../hooks/useGameAccess';
 import { biomeBackground } from '../utils/biomeBackgrounds';
 import MoodChibi from './MoodChibi';
 import ChibiFriend, { hasChibiFriend } from './drachennest/ChibiFriend';
-import RealFriends from './drachennest/RealFriends';
+// RealFriends deleted Apr 2026 (cut #10c). Three-emoji-code social
+// layer was unreachable for a 6yo; the Pilzhüter / 7-friends arc
+// (creatures Ronki meets on adventures) survives in ForscherEcke
+// and is the canonical "friends" surface now.
 import FireBreathCollection from './FireBreathCollection';
 
 /**
@@ -1395,12 +1398,12 @@ export default function RonkiProfile({ onNavigate }) {
                button (fewer tap targets = less visual noise). */}
           {segment === 'freunde' && (
             <>
-              {/* Echte Freunde — real-kid friendship layer (Marc Q4 = B,
-                  25 Apr 2026: 'new section inside the Ronki profile,
-                  groups social with the friend-creature gallery the
-                  kid already knows'). Sits ABOVE the chibi-creature
-                  gallery so the kid sees their human friends first. */}
-              <RealFriends lang={lang} />
+              {/* Real-kid friendship layer (RealFriends) deleted Apr 2026
+                  (cut #10c). The 3-emoji-code mechanic was unreachable
+                  for a 6yo; child-UX audit flagged it as "almost all
+                  broken for the audience." The chibi-creature gallery
+                  below now stands as the canonical "Ronkis Freunde"
+                  surface — friends Ronki meets on expeditions. */}
             <section style={{ marginBottom: 14 }}>
               <Kicker>{lang === 'de' ? 'Ronkis Freunde' : "Ronki's Friends"}</Kicker>
               <button
