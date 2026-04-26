@@ -744,6 +744,47 @@ export default function RoomHub({ onNavigate }) {
             ohne Sterne
           </span>
         </button>
+
+        {/* Heute Abend — Tonight bedtime ritual. Companion to "Bei
+            Ronki sitzen". Shows always for now (Marc 26 Apr 2026 —
+            Louis testing); a later pass will gate it to evening
+            hours so it surfaces when the kid would actually use it. */}
+        <button
+          type="button"
+          onClick={() => onNavigate?.('tonight')}
+          aria-label="Heute Abend mit Ronki"
+          className="active:scale-[0.98] transition-transform"
+          style={{
+            marginTop: 10,
+            width: '100%',
+            padding: '14px 16px',
+            borderRadius: 16,
+            background: 'linear-gradient(180deg, #2a1a3e 0%, #1a0f3a 100%)',
+            border: '1.5px solid rgba(252,211,77,0.30)',
+            color: '#fef3c7',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+            font: '700 14px/1 "Nunito", sans-serif',
+            cursor: 'pointer',
+            boxShadow: '0 6px 16px -8px rgba(30,18,56,0.55), inset 0 1px 0 rgba(252,211,77,0.10)',
+          }}
+        >
+          <span aria-hidden="true" style={{ fontSize: 16 }}>✦</span>
+          <span>Heute Abend</span>
+          <span
+            aria-hidden="true"
+            style={{
+              font: '700 9px/1 "Plus Jakarta Sans", sans-serif',
+              letterSpacing: '0.18em', textTransform: 'uppercase',
+              color: 'rgba(252,211,77,0.55)',
+              marginLeft: 4,
+            }}
+          >
+            mit Ronki
+          </span>
+        </button>
       </section>
 
       {/* Adventure-ready CTA — shows only when all three vitals are

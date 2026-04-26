@@ -80,6 +80,8 @@ import { useQuietAttention } from './hooks/useQuietAttention';
 // import EggOverlay from './components/EggOverlay'; // paused Apr 2026 (see useEggSystem note)
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import FriendIntroCeremony from './components/drachennest/FriendIntroCeremony';
+import MeetRonki from './components/drachennest/MeetRonki';
+import TonightRitual from './components/drachennest/TonightRitual';
 import AlphaBanner from './components/AlphaBanner';
 import SWUpdateBanner from './components/SWUpdateBanner';
 import { useAnalytics } from './hooks/useAnalytics';
@@ -135,6 +137,9 @@ function AppContent() {
       if (p.get('loewe') === '1') return 'loewe';
       if (p.get('steinGummi') === '1') return 'stein-gummi';
       if (p.get('ausmalbild') === '1') return 'ausmalbild';
+      // Claude Design hi-fi previews (26 Apr 2026 handoff)
+      if (p.get('meet') === '1') return 'meet';
+      if (p.get('tonight') === '1') return 'tonight';
     }
     return 'hub';
   })();
@@ -387,6 +392,12 @@ function AppContent() {
           />
         )}
         {view === 'journal' && <Journal onNavigate={setView} onOpenParental={() => openPinGate()} />}
+        {view === 'meet' && (
+          <MeetRonki onComplete={() => setView('hub')} />
+        )}
+        {view === 'tonight' && (
+          <TonightRitual onClose={() => setView('hub')} />
+        )}
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
         {view === 'memories' && <MemoryWall />}
         {view === 'buch' && <Buch onNavigate={setView} />}

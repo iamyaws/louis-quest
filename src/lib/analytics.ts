@@ -46,7 +46,13 @@ export type EventName =
   | 'expedition.return'
   | 'memento.received'
   | 'companion.sit'
-  | 'companion.tap';
+  | 'companion.tap'
+  // Meet onboarding + Tonight ritual (26 Apr 2026 design landing).
+  // No props — these are pure ritual moments. The hatch fires
+  // as part of meet completion and is already covered by
+  // 'ronki.hatch'; that's why meet.complete is omitted.
+  | 'tonight.start'
+  | 'tonight.complete';
 
 export type EventProps = Record<string, string | number | boolean>;
 
@@ -79,6 +85,8 @@ const ALLOWED_PROP_KEYS: Record<EventName, readonly string[]> = {
   'memento.received': ['biome'],
   'companion.sit': [],
   'companion.tap': [],
+  'tonight.start': [],
+  'tonight.complete': [],
 };
 
 // ── Storage keys ─────────────────────────────────────────────────────
