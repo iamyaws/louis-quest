@@ -89,18 +89,19 @@ That's the entire mechanical system. Care for the creature, share the morning, s
 
 ## Cuts (in priority order)
 
-These are the structural cuts. Sized + sequenced below.
+These are the structural cuts. All shipped on `experiment/drachennest`.
 
-| # | Cut | Why | Size |
+| # | Cut | Why | Status |
 |---|---|---|---|
-| 1 | **Funkelzeit + screen-time currency, entirely** | Contradicts marketing, zero usage, PO already wavering. ~8 components, ~3 reducer paths, 1 state field. | L |
-| 2 | **Hub.jsx legacy chore-tracker route** | Two primary surfaces. RoomHub wins. Hard-route `view==='hub'` to RoomHub. | M |
-| 3 | **Mission / boss / gear surfaces** | Game-mechanics layer that survives in the legacy Hub. None of these serve the companion thesis. | L |
-| 4 | **Forscher-Ecke linear chain** | "Graduates and disappears" = content cliff. Replace with stable rotating shelf, no gating. | M |
-| 5 | **Care verbs (Streicheln/Füttern/Spielen)** | Cosmetic dissonance — vitals are routine-driven, not verb-driven. Kids will smell it. Either commit to a verb-driven Tamagotchi loop OR delete. | S |
-| 6 | **8 rotating praise strings** (`task.status.complete.0–7`) | Slot-machine pattern our own marketing condemns. Replace with quiet acknowledgement. | S |
-| 7 | **KraftwortTool** | "Sticker-of-the-day" with heavy state plumbing. Replace with a tactile companion beat. | M |
-| 8 | **Voice-rule violations** (`journal.affirmation.*`, `mission.em*.story`, `ronki.stubNote`) | Internal contradiction with stated principles. | S |
+| 1 | **Funkelzeit + screen-time currency, entirely** | Contradicts marketing, zero usage. ~8 components, ~3 reducer paths, 1 state field. | ✅ `5478394` |
+| 2 | **Hub.jsx legacy chore-tracker route** | Two primary surfaces. RoomHub wins. Hard-route `view==='hub'` to RoomHub. | ✅ `f39d774` |
+| 3 | **Mission / boss / gear surfaces** | Game-mechanics layer in the legacy Hub. None serve the companion thesis. | ✅ `d6858a6` |
+| 4 | **Forscher-Ecke linear chain** | "Graduates and disappears" = content cliff. Replace with stable rotating shelf. | ✅ `3d36b61` |
+| 5 | **Care verbs (Streicheln/Füttern/Spielen)** | Cosmetic dissonance — vitals weren't verb-driven. Demoted to presence beat. | ✅ `e496c0b` |
+| 6 | **8 rotating praise strings** (`task.status.complete.0–7`) | Slot-machine pattern our own marketing condemns. Replaced with quiet acknowledgement. | ✅ `f7c80f2` |
+| 7 | **KraftwortTool** | "Sticker-of-the-day" with heavy state plumbing. Deleted; replacement deferred. | ✅ `e578470` |
+| 8 | **Voice-rule violations** (`journal.affirmation.*`, `mission.em*.story`, `ronki.stubNote`) | Internal contradiction with stated principles. | ✅ `f7c80f2` |
+| 9 | **Vitals ring + dead vitals system** | Three-agent audit found the ring was a metric on a relationship surface AND the underlying system was inert (anchor-routed top-up commented out, careForRonki dead, expedition CTA unreachable). Replaced expedition gate with morning-routine-complete. | ✅ `bde6a4e` |
 
 ## What gets doubled down on
 
@@ -145,4 +146,4 @@ This document is the call. Everything that follows refers back to it.
 
 ---
 
-_Last revised: 25 April 2026._
+_Last revised: 26 April 2026 (Cut #9 — vitals system removal)._

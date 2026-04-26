@@ -53,7 +53,12 @@ Bar 2 is where most kid-app product plans collapse. We're going to refuse to.
 
 ## Brutal cuts (deeper than the audit)
 
-The audit said 8 cuts. The bar says more. In addition to the NORTHSTAR.md list:
+The audit said 8 cuts. After landing them, a follow-on three-agent
+audit on 26 April found the vitals system was already broken under the
+hood — ring rendering metrics that didn't move, expedition CTA gated
+on numbers that couldn't reach 100. That became Cut #9. Both NORTHSTAR
++ PATH show the consolidated 9-cut sequence; everything below is the
+extended list (#10+) the bar still demands beyond the audit.
 
 | # | Cut | Reason |
 |---|---|---|
@@ -264,4 +269,4 @@ Ship less. Make what ships precious.
 
 ---
 
-_Last revised: 25 April 2026._
+_Last revised: 26 April 2026 (Cut #9 — vitals system removal)._
