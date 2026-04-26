@@ -53,12 +53,13 @@ const KristallKetteGame = lazy(() => import('./components/KristallKetteGame'));
 const KristallHoehleGame = lazy(() => import('./components/KristallHoehleGame'));
 const CampfireVisitorsGame = lazy(() => import('./components/CampfireVisitorsGame'));
 const DreiDankeTool = lazy(() => import('./components/DreiDankeTool'));
-// KraftwortTool deleted in cut #8 (UX audit flagged it as
-// sticker-of-the-day with heavy state plumbing — worst friction-to-
-// emotional-payoff ratio in the tool library). Replacement to come
-// when we have a tactile-companion-beat design ready.
+// KraftwortTool re-shipped Apr 2026 as the BeiRonkiSein-tier replacement
+// for the sticker-of-the-day version deleted in cut #8.
+const KraftwortTool = lazy(() => import('./components/KraftwortTool'));
 const LoewenPoseTool = lazy(() => import('./components/LoewenPoseTool'));
 const SteinUndGummiTool = lazy(() => import('./components/SteinUndGummiTool'));
+const GedankenWolkenTool = lazy(() => import('./components/GedankenWolkenTool'));
+const HoermomentTool = lazy(() => import('./components/HoermomentTool'));
 const RonkiAusmalbild = lazy(() => import('./components/RonkiAusmalbild'));
 const RonkiCompendium = lazy(() => import('./components/RonkiCompendium'));
 // ── End lazy tools/games ───────────────────────────────────────────────
@@ -109,6 +110,8 @@ const TOOL_VIEW_IDS = {
   kraftwort: 'kraftwort',
   loewe: 'loewe',
   'stein-gummi': 'stein_gummi',
+  'gedanken-wolken': 'gedanken_wolken',
+  hoermoment: 'hoermoment',
   ausmalbild: 'ausmalbild',
 };
 
@@ -139,6 +142,8 @@ function AppContent() {
       if (p.get('kraftwort') === '1') return 'kraftwort';
       if (p.get('loewe') === '1') return 'loewe';
       if (p.get('steinGummi') === '1') return 'stein-gummi';
+      if (p.get('gedankenWolken') === '1') return 'gedanken-wolken';
+      if (p.get('hoermoment') === '1') return 'hoermoment';
       if (p.get('ausmalbild') === '1') return 'ausmalbild';
       // Claude Design hi-fi previews (26 Apr 2026 handoff)
       if (p.get('meet') === '1') return 'meet';
@@ -513,7 +518,13 @@ function AppContent() {
           </Suspense>
         </ToolErrorBoundary>
       )}
-      {/* kraftwort view route deleted in cut #8 (KraftwortTool removed). */}
+      {view === 'kraftwort' && (
+        <ToolErrorBoundary toolName="KraftwortTool" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <KraftwortTool onComplete={() => setView('ronki')} />
+          </Suspense>
+        </ToolErrorBoundary>
+      )}
       {view === 'loewe' && (
         <ToolErrorBoundary toolName="LoewenPoseTool" onBack={() => setView('hub')}>
           <Suspense fallback={<ToolLoadingFallback />}>
@@ -525,6 +536,20 @@ function AppContent() {
         <ToolErrorBoundary toolName="SteinUndGummiTool" onBack={() => setView('hub')}>
           <Suspense fallback={<ToolLoadingFallback />}>
             <SteinUndGummiTool onComplete={() => setView('ronki')} />
+          </Suspense>
+        </ToolErrorBoundary>
+      )}
+      {view === 'gedanken-wolken' && (
+        <ToolErrorBoundary toolName="GedankenWolkenTool" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <GedankenWolkenTool onComplete={() => setView('ronki')} />
+          </Suspense>
+        </ToolErrorBoundary>
+      )}
+      {view === 'hoermoment' && (
+        <ToolErrorBoundary toolName="HoermomentTool" onBack={() => setView('hub')}>
+          <Suspense fallback={<ToolLoadingFallback />}>
+            <HoermomentTool onComplete={() => setView('ronki')} />
           </Suspense>
         </ToolErrorBoundary>
       )}
