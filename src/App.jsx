@@ -82,6 +82,7 @@ import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import FriendIntroCeremony from './components/drachennest/FriendIntroCeremony';
 import MeetRonki from './components/drachennest/MeetRonki';
 import TonightRitual from './components/drachennest/TonightRitual';
+import RonkisTag from './components/drachennest/RonkisTag';
 import AlphaBanner from './components/AlphaBanner';
 import SWUpdateBanner from './components/SWUpdateBanner';
 import { useAnalytics } from './hooks/useAnalytics';
@@ -140,6 +141,7 @@ function AppContent() {
       // Claude Design hi-fi previews (26 Apr 2026 handoff)
       if (p.get('meet') === '1') return 'meet';
       if (p.get('tonight') === '1') return 'tonight';
+      if (p.get('streifen') === '1') return 'streifen';
     }
     return 'hub';
   })();
@@ -371,18 +373,20 @@ function AppContent() {
           // surfaces get deleted entirely in cut #5.
           <RoomHub
             onNavigate={(target, opts) => {
-              // 'aufgaben' is the user-facing label — TaskList renders
-              // on view==='quests'. The earlier 'list' mapping was a
-              // dead route (Marc 25 Apr 2026: every pill on the
-              // Schriftrolle card felt unresponsive). The anchor
-              // hint is set on the location hash so a future TaskList
-              // pass can scroll to that section without us threading
-              // it through every navigate call site.
+              // 'aufgaben' from the cave routes to RonkisTag
+              // (Streifen, hi-fi Direction A from the 26 Apr 2026
+              // brief) — the daily surface as a story-of-the-day
+              // strip rather than a checklist. The legacy TaskList
+              // still mounts on view==='quests' for questline
+              // back-buttons and any direct setView('quests') call,
+              // but the cave's primary entry now lands on Streifen.
+              // The anchor hint is preserved on the URL hash for a
+              // future scroll-to-anchor pass.
               if (target === 'aufgaben') {
                 if (opts?.anchor && typeof window !== 'undefined') {
                   history.replaceState(null, '', `#anchor=${opts.anchor}`);
                 }
-                setView('quests');
+                setView('streifen');
               }
               else if (target === 'belohnungen') setView('shop');
               else if (target === 'buch') setView('buch');
@@ -397,6 +401,16 @@ function AppContent() {
         )}
         {view === 'tonight' && (
           <TonightRitual onClose={() => setView('hub')} />
+        )}
+        {view === 'streifen' && (
+          <RonkisTag
+            onClose={() => setView('hub')}
+            onOpenExpedition={() => {
+              actions?.startExpedition?.();
+              setView('hub');
+            }}
+            onOpenTonight={() => setView('tonight')}
+          />
         )}
         {view === 'ronki' && <RonkiProfile onNavigate={setView} />}
         {view === 'memories' && <MemoryWall />}
