@@ -73,9 +73,8 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
 
   const base = import.meta.env.BASE_URL;
 
-  // Remap old stored quests that still have anchor:"evening" but belong to bedtime or hobby
+  // Remap old stored quests that still have anchor:"evening" but belong to bedtime
   const BEDTIME_IDS = new Set(['s8', 's12', 's13', 's14', 's15', 'v10', 'v11', 'v12', 'v13']);
-  const HOBBY_IDS = new Set(['ft']);
   const groups = { ...byGroup };
   if (groups.evening) {
     const fromEvening = groups.evening.filter(q => BEDTIME_IDS.has(q.id));
@@ -83,11 +82,15 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
       groups.evening = groups.evening.filter(q => !BEDTIME_IDS.has(q.id));
       groups.bedtime = [...(groups.bedtime || []), ...fromEvening].sort((a, b) => (a.order || 0) - (b.order || 0));
     }
-    const fromHobby = groups.evening.filter(q => HOBBY_IDS.has(q.id));
-    if (fromHobby.length) {
-      groups.evening = groups.evening.filter(q => !HOBBY_IDS.has(q.id));
-      groups.hobby = [...(groups.hobby || []), ...fromHobby].sort((a, b) => (a.order || 0) - (b.order || 0));
-    }
+  }
+  // Streifen-aligned section model (Apr 2026): fold hobby into the afternoon
+  // section so the kid sees Morgen / Nachmittag / Abend, not four sections.
+  // RonkisTag.jsx uses the same blockFor() collapse — keeping HEUTE in sync
+  // means a kid who switches between surfaces sees one consistent day shape.
+  if (groups.hobby?.length) {
+    groups.evening = [...(groups.evening || []), ...groups.hobby]
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+    groups.hobby = [];
   }
 
   // Weather data for clothing hints
@@ -288,7 +291,10 @@ export default function TaskList({ onNavigate, onOpenQuestLine, onOpenParental }
       {/* ── Epic Quest Groups ── */}
       <div className="flex flex-col gap-5">
 
-        {['morning', 'evening', 'hobby', 'bedtime'].map(anchor => {
+        {/* 3-section streifen-aligned day: Morgen / Nachmittag / Abend.
+            Hobby quests are folded into evening above; iterating over
+            'hobby' here is unreachable but harmless. */}
+        {['morning', 'evening', 'bedtime'].map(anchor => {
           const meta = ANCHOR_META_I18N[anchor];
           const quests = (groups[anchor] || []).filter(q => !q.sideQuest);
           if (!quests.length) return null;
