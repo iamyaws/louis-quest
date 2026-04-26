@@ -486,9 +486,10 @@ function OverviewTab({ state, lang, t }) {
           <div>
             <p className="font-label font-bold text-sm text-primary">Eltern-Guide</p>
             <p className="font-body text-xs text-on-surface-variant mt-1 leading-relaxed">
-              Ronki motiviert durch die tägliche Routine, Begleiter-Pflege
-              und kleine Abenteuer. Sterne können im Laden gegen echte
-              Belohnungen eingetauscht werden, Funkelzeit gegen Bildschirm-Zeit.
+              Ronki begleitet dein Kind durch den Tag — beim Aufstehen, bei den
+              Hausaufgaben, beim Schlafengehen. Keine Punktekonten, keine
+              Bildschirmzeit-Tausche. Sterne sammeln sich für kleine echte
+              Belohnungen, die ihr gemeinsam vereinbart.
             </p>
           </div>
         </div>

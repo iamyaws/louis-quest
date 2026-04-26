@@ -86,7 +86,7 @@ export default function Datenschutz() {
             <ul className="list-disc pl-5 space-y-1.5">
               <li>Abgeschlossene Routinen und Quests</li>
               <li>Stimmungs-Einträge (Mood-Check-ins)</li>
-              <li>HP, Funkelzeit-Kontostand, Companion-Entwicklung, Ei-Fortschritt</li>
+              <li>Sterne-Stand und Companion-Entwicklung</li>
               <li>Zeitstempel der Interaktionen</li>
               <li>Journal- und Erinnerungs-Einträge</li>
             </ul>

@@ -38,7 +38,7 @@ const STAGES = [
 const MOODS = [
   { id: 'normal',  name: 'Okay',     when: 'Der Alltag. Ronki atmet ruhig, zufrieden.' },
   { id: 'gut',     name: 'Gut',      when: 'Wenn du alle Aufgaben geschafft hast. Ronki hüpft vor Freude.' },
-  { id: 'magisch', name: 'Magisch',  when: 'Bei besonderen Tagen — Streak-Feiern, Funkelzeit, Geburtstag. Ronki leuchtet.' },
+  { id: 'magisch', name: 'Magisch',  when: 'Bei besonderen Tagen — Geburtstag, Abenteuer-Rückkehr, neue Freunde. Ronki leuchtet.' },
   { id: 'besorgt', name: 'Besorgt',  when: 'Wenn Ronki auf etwas wartet. Kleine Gedanken-Punkte schweben über ihm.' },
   { id: 'tired',   name: 'Müde',     when: 'Am Abend, nach langen Tagen. Ronki döst mit Zs über dem Kopf.' },
   { id: 'sad',     name: 'Traurig',  when: 'Selten, nur an schweren Tagen. Ronki braucht dich dann besonders.' },
