@@ -53,26 +53,9 @@ const GAMES = [
     btnColor: '#7c2d12',
     ready: true,
   },
-  {
-    id: 'clouds',
-    titleKey: 'game.cloudJump',
-    descKey: 'game.cloudJump.desc',
-    emoji: '☁️',
-    bg: 'linear-gradient(160deg, #e0f2fe 0%, #7dd3fc 50%, #38bdf8 100%)',
-    textColor: '#0c4a6e',
-    btnBg: 'rgba(12,74,110,0.1)',
-    btnColor: '#0c4a6e',
-    ready: true,
-  },
-  {
-    id: 'starfighter',
-    titleKey: 'game.starfighter',
-    descKey: 'game.starfighter.desc',
-    emoji: '🐉',
-    bg: 'linear-gradient(160deg, #ecfdf5 0%, #6ee7b7 50%, #059669 100%)',
-    textColor: '#064e3b',
-    ready: true,
-  },
+  // CloudJumpGame + StarfighterGame tiles deleted Apr 2026 (cut #10b).
+  // Components were already gone (cut #5); these tiles still pointed
+  // into the deleted JSX in App.jsx, which would have crashed on click.
 ];
 
 export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {

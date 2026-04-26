@@ -563,25 +563,15 @@ function AppContent() {
         actions.claimGameReward('potion');
         setView('games');
       }} />}
-      {view === 'clouds' && <CloudJumpGame onComplete={() => {
-        actions.claimGameReward('clouds');
-        setView('games');
-      }} />}
+      {/* CloudJumpGame + StarfighterGame JSX deleted (Apr 2026 cut #10b).
+          Imports were already gone (cut #5) but the JSX remained, which
+          would have ReferenceError'd if anyone routed view==='clouds' or
+          'starfighter'. StarCatcherGame still mounts; it's deleted in
+          cut #10g (legacy MINT games). */}
       {view === 'starfall' && <StarCatcherGame onComplete={() => {
         actions.claimGameReward('starfall');
         setView('games');
       }} />}
-      {view === 'starfighter' && (
-        <ToolErrorBoundary toolName="StarfighterGame" onBack={() => setView('games')}>
-          <Suspense fallback={<ToolLoadingFallback />}>
-            <StarfighterGame onComplete={(reward) => {
-              if (reward?.hp > 0) actions.addHP(reward.hp);
-              actions.claimGameReward('starfighter');
-              setView('games');
-            }} />
-          </Suspense>
-        </ToolErrorBoundary>
-      )}
       {/* EggOverlay mount paused Apr 2026. Any lingering state.pendingEgg
           stays in storage but doesn't render. Re-enable by restoring the
           JSX block above with the useEggSystem() hook. */}
