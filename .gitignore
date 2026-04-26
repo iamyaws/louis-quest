@@ -15,3 +15,6 @@ voice-samples/
 
 # Visual brainstorming companion artifacts (ephemeral mockups + server state).
 .superpowers/
+
+# Python bytecode caches from gen scripts
+scripts/__pycache__/
