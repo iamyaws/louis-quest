@@ -5,7 +5,6 @@ import { getCatStage } from '../../utils/helpers';
 import { resolveWallpaper, resolveFloor } from '../../data/caveStyles';
 import { track } from '../../lib/analytics';
 import MoodChibi from '../MoodChibi';
-import RonkiVitalsRing from './RonkiVitalsRing';
 import RonkiSpeechBubble from './RonkiSpeechBubble';
 import Expedition from './Expedition';
 import BeiRonkiSein from './BeiRonkiSein';
@@ -69,17 +68,14 @@ export default function RoomHub({ onNavigate }) {
   const variant = state?.companionVariant || 'forest';
   const stageIdx = getCatStage(state?.catEvo ?? 0);
   const mood = state?.ronkiMood || 'normal';
-  const vitals = state?.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
-  const wellbeing = Math.round((vitals.hunger + vitals.liebe + vitals.energie) / 3);
-  // Kid-readable status (Marc 25 Apr — "kids don't get percentage").
-  // Three filled hearts visible at a glance, plus a single short
-  // word so the kid who can already read gets the same signal in
-  // language. Bands stay generous so a little dip doesn't drop
-  // Ronki into "needs you" territory.
-  const heartsFilled = wellbeing >= 80 ? 3 : wellbeing >= 50 ? 2 : 1;
-  const wellLabel = wellbeing >= 80 ? 'Glücklich'
-                  : wellbeing >= 50 ? 'Okay'
-                  : 'Braucht dich';
+  // Cut #9 (Marc 26 Apr 2026 northstar follow-on): vitals ring +
+  // wellbeing chip removed entirely. The three-agent audit found
+  // the system was already inert — anchor-routed top-up was
+  // commented out, careForRonki was wired but never called, and
+  // the expedition CTA gated on vitals reaching 100 was therefore
+  // unreachable in normal play. Three meters that never moved on a
+  // companion-not-metric surface. Ronki's mood face + cave state
+  // are the wellbeing signal now.
   const heroName = state?.familyConfig?.childName || state?.heroName || 'du';
 
   // Ronki is sized off the stage's measured width so the chibi + vitals
@@ -235,38 +231,8 @@ export default function RoomHub({ onNavigate }) {
             Hallo {heroName}!
           </div>
         </div>
-        {/* Kid-readable wellbeing chip (Marc 25 Apr — "kids don't get
-            percentage"). Three hearts you can count at a glance, plus
-            a single word for kids who can already read. */}
-        <div
-          aria-label={`Ronki ist ${wellLabel.toLowerCase()}`}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '7px 12px 7px 10px',
-            borderRadius: 999,
-            background: 'rgba(255,255,255,0.7)',
-            border: '1px solid rgba(180,83,9,0.18)',
-            color: '#124346',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5)',
-          }}
-        >
-          <span style={{ display: 'flex', gap: 2, fontSize: 14, lineHeight: 1 }}>
-            {[0, 1, 2].map(i => (
-              <span key={i} aria-hidden="true" style={{
-                color: i < heartsFilled ? '#ec4899' : 'rgba(18,67,70,0.20)',
-                textShadow: i < heartsFilled ? '0 1px 2px rgba(236,72,153,0.30)' : 'none',
-              }}>♥</span>
-            ))}
-          </span>
-          <span style={{
-            font: '700 11px/1 "Plus Jakarta Sans", sans-serif',
-            letterSpacing: '0.04em',
-          }}>
-            {wellLabel}
-          </span>
-        </div>
+        {/* Wellbeing chip deleted in Cut #9. Was reading from a
+            frozen vitals system; replaced by Ronki's mood face. */}
       </header>
 
       {/* The cozy Drachennest interior (25 Apr 2026 redesign).
@@ -542,27 +508,15 @@ export default function RoomHub({ onNavigate }) {
                 is 92% of stage width and centred ~6% below the
                 stage's geometric centre so the ring frames Ronki's
                 lower body / nest area instead of his head halo. */}
-            <div style={{
-              position: 'absolute',
-              left: '50%',
-              top: '56%',
-              transform: 'translate(-50%, -50%)',
-              width: Math.floor(stagePx * 0.92),
-              height: Math.floor(stagePx * 0.92),
-              pointerEvents: 'none',
-              // Ring sits ABOVE the cushion (z:5) so the lower arc
-              // visibly overlaps the mat instead of disappearing
-              // behind it (Marc 25 Apr 2026: "vital-metric ring needs
-              // to overlap cushion on the floor to be seen clearly").
-              // Ronki himself stays at z:7 above the ring so the
-              // chibi paints in front of all of it.
-              zIndex: 6,
-            }}>
-              <RonkiVitalsRing needs={vitals} size={Math.floor(stagePx * 0.92)} />
-            </div>
-            {/* Ronki centered inside the ring — sized to ~82% of stage so
-                the arcs form a visible halo around him rather than a
-                distant frame. */}
+            {/* Vitals ring deleted in Cut #9. The arcs were a metric
+                layer on a relationship surface that violated the
+                Northstar's "presence not metric" principle, the
+                underlying vitals system was already inert, and three
+                agents (child UX / companion comparables / code audit)
+                converged on cutting it. Ronki stands free in his cave
+                now — his mood face + cave time-of-day shifts are the
+                wellbeing signal. */}
+            {/* Ronki centered in the stage. */}
             <button
               type="button"
               onClick={tapRonki}
@@ -787,16 +741,14 @@ export default function RoomHub({ onNavigate }) {
         </button>
       </section>
 
-      {/* Adventure-ready CTA — shows only when all three vitals are
-          capped at 100. Marc 25 Apr 2026 spec: the kid says the
-          line as if to Ronki, no auto-screen-switch. Tapping fires
-          startExpedition() and opens the Reise surface so the
-          walk-out animation plays + ranger departs flow. */}
-      {state?.ronkiVitals &&
-       (state.ronkiVitals.hunger >= 100) &&
-       (state.ronkiVitals.liebe >= 100) &&
-       (state.ronkiVitals.energie >= 100) &&
-       (state?.expedition?.state === 'home') && (
+      {/* Adventure-ready CTA — shows once the morning routine is
+          complete (Cut #9, 26 Apr 2026). Was previously gated on
+          all-three-vitals-at-100, but the vitals system was inert
+          (anchor-routed top-up commented out, careForRonki dead),
+          so the CTA was unreachable in normal play. PATH.md:70
+          already committed to "morning anchor triggers the
+          expedition narratively" — this commit lands that. */}
+      {morningDone && (state?.expedition?.state === 'home') && (
         <section style={{ padding: '14px 18px 0' }}>
           <button
             type="button"

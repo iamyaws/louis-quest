@@ -561,7 +561,7 @@ interface TaskActions {
   /** Drachennest reframe: standing care verbs that top up Ronki's vital
    *  meters when the kid taps Füttern / Streicheln / Spielen. Caps at
    *  100 per vital. The amounts mirror the Begleiter Polish design. */
-  careForRonki: (kind: 'hunger' | 'liebe' | 'energie') => void;
+  // careForRonki — deleted in Cut #9 (26 Apr 2026, vitals system removed).
   /** Friends + sign-up — emoji code picker writes the kid's three
    *  emojis here. Idempotent. Validates length === 3 + each entry
    *  exists in EMOJI_VOCABULARY; bad input is ignored. */
@@ -1562,39 +1562,20 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
       // Drachennest reframe: the kid completing a task tops up one of
       // Ronki's vital meters based on the quest's anchor. Morning quests
-      // feed Hunger ("you helped me wake up / eat / drink"); afternoon
-      // and hobby quests feed Liebe ("we connected today"); bedtime
-      // quests feed Energie ("you helped me rest"). Hp/stars stay the
-      // kid's score; vitals are Ronki's parallel signal.
-      const VITAL_BUMP_BY_ANCHOR: Record<string, { vital: 'hunger'|'liebe'|'energie', amt: number }> = {
-        morning: { vital: 'hunger', amt: 12 },
-        evening: { vital: 'liebe',  amt: 10 },
-        hobby:   { vital: 'liebe',  amt: 10 },
-        bedtime: { vital: 'energie', amt: 14 },
-      };
-      // Currency consolidation (Marc 25 Apr 2026): the dedicated
-      // careTokens field is retired — care now spends Sterne (hp)
-      // directly. The hp earn happens elsewhere in this reducer,
-      // so a quest tick automatically gives the kid a Stern they
-      // can spend on care OR on the reward shop. Funkelzeit stays
-      // separate (drachenEier) so a kid can't divert all Sterne
-      // into screentime. careTokens stays on the type for legacy
-      // saves but is no longer mutated.
+      // Cut #9 (Marc 26 Apr 2026): the entire vitals system was
+      // deleted. The anchor-routed top-up had been commented out
+      // already, careForRonki was wired but never called from any
+      // surface, and the expedition CTA gated on "all vitals = 100"
+      // was therefore unreachable in normal play. The three-agent
+      // audit (child UX / companion comparables / code) all
+      // recommended cutting; the Northstar's "presence not metric"
+      // line made it an honesty call. Vitals + careTokens stay on
+      // the type for persistence migration safety but are no
+      // longer mutated. Expedition CTA in RoomHub now triggers off
+      // morning-routine-complete.
       const careTokens = prev.careTokens || 0;
-      // Vitals stay where they are on quest tick — the kid drives
-      // them via the Stern-spend on care verbs.
       const ronkiVitals = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
-
-      // Expedition state pass-through. The auto "morning ritual at
-      // 100% → leaving" trigger was removed when the Funken loop
-      // landed (Marc 25 Apr — "either auto-switch to campfire or
-      // make it simple and require the kid to say 'let's go on an
-      // adventure'"). The deliberate kid-driven CTA in RoomHub now
-      // owns the transition; that surface calls startExpedition()
-      // when all three vitals hit 100.
       const expedition = prev.expedition || { state: 'home' as const, biome: 'morgenwald' as const };
-      // Anchor pre-bump kept stubbed out for the comment trail.
-      // const bump = q.anchor && VITAL_BUMP_BY_ANCHOR[q.anchor];
 
       // Stamp the latest completion time so the PWA prompt gate (and
       // any future "settle after task" guard) can hold quiet
@@ -1824,33 +1805,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  // ── Drachennest reframe: standing care verbs ──
-  // Füttern / Streicheln / Spielen as a direct kid → Ronki action.
-  // Amounts (+20 / +15 / +25) match the Begleiter Polish design.
-  // Capped at 100. Independent of any quest completion path.
-  const careForRonki = useCallback((kind: 'hunger' | 'liebe' | 'energie') => {
-    const amounts = { hunger: 20, liebe: 15, energie: 25 } as const;
-    // Care cost rebalanced 1 → 5 Sterne after the audit flagged a
-    // 10× Sterne inflation: each quest grants ~10 Sterne but care
-    // was only costing 1, so 6 morning quests gave 60 Sterne while
-    // full care needed 6. Care felt free + the spend beat was
-    // meaningless. With cost=5, full vitals (6 taps) costs 30 of
-    // the morning's ~60, leaving 30 for the reward shop. Real
-    // budget pressure without forcing the kid to choose.
-    const COST_PER_TAP = 5;
-    setState(prev => {
-      if (!prev) return prev;
-      const sterne = prev.hp || 0;
-      if (sterne < COST_PER_TAP) return prev;
-      const v = prev.ronkiVitals || { hunger: 70, liebe: 70, energie: 70 };
-      if (v[kind] >= 100) return prev;
-      return {
-        ...prev,
-        hp: sterne - COST_PER_TAP,
-        ronkiVitals: { ...v, [kind]: Math.min(100, v[kind] + amounts[kind]) },
-      };
-    });
-  }, []);
+  // careForRonki — deleted in Cut #9 (Marc 26 Apr 2026). Was wired
+  // into the actions object but never called from any UI surface
+  // after Cut #3 removed the verb tile-row. The action is gone
+  // along with the entire vitals-as-mechanic system.
 
   // ── Friends + sign-up (Drachennest social, 25 Apr 2026) ──
   const setEmojiCode = useCallback((code: string[]) => {
@@ -2726,7 +2684,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   })() : emptyComputed;
 
   return (
-    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, careForRonki, setEmojiCode, addFriend, markWinkSeen, recordWinkSent, setCaveStyle, setExpedition, startExpedition, rangerDeparted, rangerArrived, receiveMemento, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
+    <TaskContext.Provider value={{ state, computed, actions: { complete, setMood, drinkWater, feedCompanion, petCompanion, playCompanion, collectLoginBonus, completeOnboarding, teachBreath, dismissPendingRitual, setEmojiCode, addFriend, markWinkSeen, recordWinkSent, setCaveStyle, setExpedition, startExpedition, rangerDeparted, rangerArrived, receiveMemento, saveJournal, redeemReward, dismissCelebration, startMission, abandonMission, addHP, claimGameReward, consumeStamina, restoreStamina, equipGear, unequipGear, updateBirthdayEpic, updateFamilyConfig, patchState, completeSpecialQuest, recordViewVisit, spawnEgg, collectEgg, fireCelebration, createQuestLine, updateQuestLine, completeQuestLineDay, archiveQuestLine, logFeeling, claimMintBadge, recordMintGamePlay, syncRonkiMood, pickRonkiSadReaction, practiceSkill, markLearnBannerSeen, markTabUnlockSeen, markTabCoachmarkSeen, completeHabit, addCrystals, spendCrystals, giftCrystalToFreund, plantSeed, placeDecor, moveDecor, removeDecor, witnessPlant }, loading, celebration, toastTrigger }}>
       {children}
     </TaskContext.Provider>
   );
