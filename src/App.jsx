@@ -29,8 +29,9 @@ import Celebration from './components/Celebration';
 // import ArcOfferCard from './components/ArcOfferCard';
 import FreundCallbackCard from './components/FreundCallbackCard';
 import MiniGames from './components/MiniGames';
-import MemoryGame from './components/MemoryGame';
-import PotionGame from './components/PotionGame';
+// MemoryGame + PotionGame deleted Apr 2026 (cut #10g). StarCatcher kept
+// per Marc — Louis loves it. MusterMemoryGame is a separate Simon-Says
+// MINT game that stays.
 import StarCatcherGame from './components/StarCatcherGame';
 import ToolErrorBoundary from './components/ToolErrorBoundary';
 // ── Lazy-loaded tools + games ──────────────────────────────────────────
@@ -546,19 +547,9 @@ function AppContent() {
         />
       )}
       {showParental && <ParentalDashboard onClose={() => setShowParental(false)} currentView={view} preauthorized />}
-      {view === 'memory' && <MemoryGame onComplete={() => {
-        actions.claimGameReward('memory');
-        setView('games');
-      }} />}
-      {view === 'potion' && <PotionGame onComplete={() => {
-        actions.claimGameReward('potion');
-        setView('games');
-      }} />}
-      {/* CloudJumpGame + StarfighterGame JSX deleted (Apr 2026 cut #10b).
-          Imports were already gone (cut #5) but the JSX remained, which
-          would have ReferenceError'd if anyone routed view==='clouds' or
-          'starfighter'. StarCatcherGame still mounts; it's deleted in
-          cut #10g (legacy MINT games). */}
+      {/* MemoryGame + PotionGame routes deleted Apr 2026 (cut #10g).
+          CloudJumpGame + StarfighterGame routes deleted earlier in cut
+          #10b. StarCatcherGame kept — Louis loves it (Marc, Apr 2026). */}
       {view === 'starfall' && <StarCatcherGame onComplete={() => {
         actions.claimGameReward('starfall');
         setView('games');

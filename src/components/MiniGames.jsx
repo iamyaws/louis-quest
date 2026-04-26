@@ -22,17 +22,11 @@ let lastStaminaVoiceMs = 0;
 const STAMINA_VOICE_COOLDOWN_MS = 30 * 60 * 1000; // 30 min
 
 const GAMES = [
-  {
-    id: 'memory',
-    titleKey: 'game.magicMemory',
-    descKey: 'game.magicMemory.desc',
-    emoji: '🃏',
-    bg: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)',
-    textColor: '#78350f',
-    btnBg: 'rgba(120,53,15,0.12)',
-    btnColor: '#78350f',
-    ready: true,
-  },
+  // Apr 2026 cut sweep:
+  //  - CloudJumpGame + StarfighterGame tiles removed in cut #10b (broken).
+  //  - MemoryGame + PotionGame tiles removed in cut #10g (legacy MINT).
+  //  - StarCatcher kept per Marc: "starcatcher mini-game alive — Louis
+  //    loves it." It's the only legacy game with a real-user signal.
   {
     id: 'starfall',
     titleKey: 'game.starfall',
@@ -42,20 +36,6 @@ const GAMES = [
     textColor: '#713f12',
     ready: true,
   },
-  {
-    id: 'potion',
-    titleKey: 'game.colorMix',
-    descKey: 'game.colorMix.desc',
-    emoji: '🎨',
-    bg: 'linear-gradient(160deg, #fef3c7 0%, #fdba74 50%, #f97316 100%)',
-    textColor: '#7c2d12',
-    btnBg: 'rgba(124,45,18,0.1)',
-    btnColor: '#7c2d12',
-    ready: true,
-  },
-  // CloudJumpGame + StarfighterGame tiles deleted Apr 2026 (cut #10b).
-  // Components were already gone (cut #5); these tiles still pointed
-  // into the deleted JSX in App.jsx, which would have crashed on click.
 ];
 
 export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
