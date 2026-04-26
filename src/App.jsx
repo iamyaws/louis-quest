@@ -39,7 +39,7 @@ import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
 import CloudJumpGame from './components/CloudJumpGame';
 import StarfighterGame from './components/StarfighterGame';
-import KristallSortiererGame from './components/KristallSortiererGame';
+// KristallSortiererGame deleted again — Louis tested "super boring."
 import ToolErrorBoundary from './components/ToolErrorBoundary';
 // ── Lazy-loaded tools + games ──────────────────────────────────────────
 // These surfaces are mounted conditionally (URL param shortcuts, post-
@@ -603,10 +603,6 @@ function AppContent() {
       {view === 'starfighter' && <StarfighterGame onComplete={(reward) => {
         if (reward?.hp > 0) actions.addHP(reward.hp);
         actions.claimGameReward('starfighter');
-        setView('games');
-      }} />}
-      {view === 'kristallsortier' && <KristallSortiererGame onComplete={() => {
-        actions.claimGameReward('kristallsortier');
         setView('games');
       }} />}
       {/* Egg system deleted Apr 2026 (cut #10h). state.pendingEgg may

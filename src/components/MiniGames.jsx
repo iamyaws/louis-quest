@@ -77,17 +77,7 @@ const GAMES = [
     textColor: '#064e3b',
     ready: true,
   },
-  {
-    id: 'kristallsortier',
-    titleKey: 'game.kristallsortier',
-    descKey: 'game.kristallsortier.desc',
-    emoji: '💎',
-    bg: 'linear-gradient(160deg, #ede9fe 0%, #a78bfa 50%, #7c3aed 100%)',
-    textColor: '#3b0764',
-    btnBg: 'rgba(59,7,100,0.1)',
-    btnColor: '#3b0764',
-    ready: true,
-  },
+  // Kristall-Sortier removed — Louis tested "super boring" (Marc, 26 Apr).
 ];
 
 export default function MiniGames({ onPlay, onPlayMint, onNavigate }) {
