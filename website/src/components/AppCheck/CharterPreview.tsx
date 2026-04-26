@@ -185,13 +185,15 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
   }
 
   // Wofür italic line — the artifact's emotional anchor when filled.
+  // Wraps at full body width since the printed PDF has no sticker on
+  // the right side to dodge.
   let headerCursor = 220;
   const wofuerText = answers.wofuer.trim();
   if (wofuerText) {
     ctx.fillStyle = 'rgba(14, 42, 44, 0.85)';
     ctx.font = 'italic 600 22px "Plus Jakarta Sans", system-ui, sans-serif';
-    const wofLines = wrapText(ctx, wofuerText, W - 380);
-    for (const line of wofLines.slice(0, 2)) {
+    const wofLines = wrapText(ctx, wofuerText, W - 200);
+    for (const line of wofLines.slice(0, 3)) {
       ctx.fillText(line, 100, headerCursor);
       headerCursor += 30;
     }
@@ -207,58 +209,10 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
     headerCursor,
   );
 
-  // ────────────── Two-line tilted mustard date stamp ──────────────
-  // Extends the previous single-line sticker into STAND + WIR PRÜFEN AM,
-  // converting the artifact from "permanent verdict" into "checkpoint."
-  ctx.save();
-  const stampCX = W - 180;
-  const stampCY = 175;
-  const stampW = 220;
-  const stampH = 130;
-  ctx.translate(stampCX, stampCY);
-  ctx.rotate(-3 * (Math.PI / 180));
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
-  ctx.shadowBlur = 8;
-  ctx.shadowOffsetY = 2;
-  ctx.fillStyle = 'rgba(252, 211, 77, 0.92)';
-  roundRect(ctx, -stampW / 2, -stampH / 2, stampW, stampH, 8);
-  ctx.fill();
-  ctx.shadowColor = 'transparent';
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetY = 0;
-  ctx.strokeStyle = 'rgba(176, 138, 0, 0.4)';
-  ctx.lineWidth = 1;
-  roundRect(ctx, -stampW / 2, -stampH / 2, stampW, stampH, 8);
-  ctx.stroke();
-
-  // STAND row
-  ctx.fillStyle = 'rgba(14, 42, 44, 0.8)';
-  ctx.font = '600 12px "Plus Jakarta Sans", system-ui, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.fillText('STAND', 0, -stampH / 2 + 14);
-  ctx.fillStyle = COLORS.tealDark;
-  ctx.font = 'bold 22px "Plus Jakarta Sans", system-ui, sans-serif';
-  ctx.fillText(todayISODate(), 0, -stampH / 2 + 32);
-
-  // Hairline between the two rows
-  ctx.strokeStyle = 'rgba(14, 42, 44, 0.18)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(-stampW / 2 + 16, 4);
-  ctx.lineTo(stampW / 2 - 16, 4);
-  ctx.stroke();
-
-  // WIR PRÜFEN AM row
-  ctx.fillStyle = 'rgba(14, 42, 44, 0.8)';
-  ctx.font = '600 12px "Plus Jakarta Sans", system-ui, sans-serif';
-  ctx.fillText('WIR PRÜFEN AM', 0, 14);
-  ctx.fillStyle = COLORS.tealDark;
-  ctx.font = 'bold 22px "Plus Jakarta Sans", system-ui, sans-serif';
-  ctx.fillText(reviewISODate(), 0, 32);
-  ctx.restore();
-  ctx.textAlign = 'start';
-  ctx.textBaseline = 'top';
+  // (No mustard date sticker on the printed PDF — the dates live in the
+  // dedication line, the review-cadence line, and the bottom strip
+  // already. The sticker is an on-screen reminder for the parent, not
+  // part of the printed Hausverfassung.)
 
   // Hairline divider below header
   ctx.fillStyle = COLORS.hairline;
@@ -290,23 +244,23 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
     y += 26;
   }
 
+  /**
+   * Items render as plain stacked paragraphs (no bullet marks). Each
+   * label is already a full sentence ending in a period, so a list
+   * marker would be redundant — and looked inconsistent when only one
+   * item was selected per article.
+   */
   function bulletList(items: string[]) {
     ctx.fillStyle = COLORS.ink;
     ctx.font = '500 22px "Be Vietnam Pro", system-ui, sans-serif';
     for (const item of items) {
-      const lines = wrapText(ctx, item, W - 260);
-      // Em-dash mark (12×3px sage rectangle) — prints clean at 300dpi
-      // where the previous round dots disappeared as gray dust.
-      ctx.fillStyle = COLORS.sage;
-      ctx.fillRect(108, y + 14, 14, 3);
-      // Text
-      ctx.fillStyle = COLORS.ink;
+      const lines = wrapText(ctx, item, W - 200);
       let lineY = y;
       for (const line of lines) {
-        ctx.fillText(line, 138, lineY);
+        ctx.fillText(line, 100, lineY);
         lineY += 32;
       }
-      y = lineY + 6;
+      y = lineY + 8;
     }
   }
 
@@ -598,8 +552,11 @@ export function CharterPreview({ answers }: Props) {
 
         {/* Inner double-frame */}
         <div className="m-2.5 sm:m-3 rounded-xl border border-teal/20 px-6 py-7 sm:px-9 sm:py-9 space-y-7">
-          {/* Header with two-line tilted date stamp */}
-          <header className="relative pr-32 sm:pr-36 space-y-3">
+          {/* Header with two-line tilted date stamp. The right-side
+              padding makes room for the sticker on screen; in print
+              mode the stylesheet below removes the sticker AND drops
+              this padding so the header text reflows full-width. */}
+          <header className="charter-header relative pr-32 sm:pr-36 space-y-3">
             <p className="text-xs uppercase tracking-[0.22em] text-teal font-semibold">
               Hausverfassung{' '}
               <span className="text-teal/40 mx-1">·</span>{' '}
@@ -629,23 +586,30 @@ export function CharterPreview({ answers }: Props) {
               {answers.childCount === 1 ? '1 Kind' : `${answers.childCount} Kinder`}{' '}
               · auf eine Seite gebracht
             </p>
-            {/* Two-line mustard date stamp */}
+            {/* Two-line mustard date stamp — on-screen reminder only,
+                hidden in print (the dates still appear in the
+                dedication, review-cadence, and bottom-strip lines). */}
             <div
               aria-hidden
-              className="charter-date-sticker absolute right-0 top-0 -rotate-3 rounded-md bg-mustard/90 ring-1 ring-mustard/60 shadow-sm px-3 py-1.5 text-center min-w-[7rem]"
+              className="charter-date-sticker absolute right-0 top-0 -rotate-3 flex flex-col items-center"
             >
-              <p className="text-[9px] uppercase tracking-[0.18em] text-teal-dark/80 font-semibold leading-tight">
-                Stand
-              </p>
-              <p className="text-sm font-display font-bold text-teal-dark tabular-nums leading-tight">
-                {today}
-              </p>
-              <span className="block h-px bg-teal-dark/15 my-1" aria-hidden />
-              <p className="text-[9px] uppercase tracking-[0.18em] text-teal-dark/80 font-semibold leading-tight">
-                Wir prüfen am
-              </p>
-              <p className="text-sm font-display font-bold text-teal-dark tabular-nums leading-tight">
-                {review}
+              <div className="rounded-md bg-mustard/90 ring-1 ring-mustard/60 shadow-sm px-3 py-1.5 text-center min-w-[7rem]">
+                <p className="text-[9px] uppercase tracking-[0.18em] text-teal-dark/80 font-semibold leading-tight">
+                  Stand
+                </p>
+                <p className="text-sm font-display font-bold text-teal-dark tabular-nums leading-tight">
+                  {today}
+                </p>
+                <span className="block h-px bg-teal-dark/15 my-1" aria-hidden />
+                <p className="text-[9px] uppercase tracking-[0.18em] text-teal-dark/80 font-semibold leading-tight">
+                  Wir prüfen am
+                </p>
+                <p className="text-sm font-display font-bold text-teal-dark tabular-nums leading-tight">
+                  {review}
+                </p>
+              </div>
+              <p className="rotate-3 text-[9px] uppercase tracking-[0.16em] text-ink/40 font-medium mt-1.5">
+                Nicht im Druck
               </p>
             </div>
           </header>
@@ -812,12 +776,19 @@ export function CharterPreview({ answers }: Props) {
       </div>
 
       {/* Print-only stylesheet: hide everything except .charter-preview.
-          Force color rendering so the mustard date sticker, gradient
-          ribbon, sage pull-quote, signature lines, and bottom teal
-          strip all actually print instead of getting flattened to
-          white by browser default print modes. */}
+          Force color rendering so the gradient ribbon, sage pull-quote,
+          signature lines, and bottom teal strip all actually print
+          instead of getting flattened to white by browser default
+          print modes.
+
+          The mustard date sticker is INTENTIONALLY hidden in print:
+          it's an on-screen reminder for the parent (when generated +
+          when to revisit), but the printed Hausverfassung shouldn't
+          carry that UI scaffolding. The dates still appear in the
+          dedication line, the review-cadence line, and the bottom
+          strip — printout has the info three times over without the
+          sticker chrome. */}
       <style>{`
-        .charter-date-sticker,
         .charter-bottom-strip {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
@@ -840,6 +811,13 @@ export function CharterPreview({ answers }: Props) {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
+          .charter-date-sticker {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          .charter-header {
+            padding-right: 0 !important;
+          }
           .charter-bottom-strip {
             background: #0E2A2C !important;
             color: #FDF8F0 !important;
@@ -859,10 +837,10 @@ export function CharterPreview({ answers }: Props) {
  * (Article I, Article II, etc.) — gives the page rhythm and makes
  * scanning back to a specific article actually possible.
  *
- * Bullet mark is a 10×2px sage rectangle (em-dash glyph, not a dot)
- * because round dots disappear at 300dpi inkjet print on uncoated
- * paper. This is the Print Typographer's call, validated by the fact
- * that the dot-bullets in v1 already washed out in user screenshots.
+ * Items render as plain stacked paragraphs (no bullet marks). Each
+ * label in charter.ts is already a full sentence ending in a period,
+ * so a list-marker would be redundant — and inconsistent visually
+ * when only a single item is selected for an article.
  */
 function CharterArticle({
   numeral,
@@ -889,20 +867,16 @@ function CharterArticle({
         </p>
       )}
       {items && items.length > 0 && (
-        <ul className="list-none pl-0 space-y-2">
+        <div className="space-y-2">
           {items.map((item) => (
-            <li
+            <p
               key={item}
-              className="flex gap-3 text-base text-ink/85 leading-relaxed max-w-prose"
+              className="text-base text-ink/85 leading-relaxed max-w-prose"
             >
-              <span
-                aria-hidden
-                className="mt-[0.65rem] inline-block w-2.5 h-[2px] rounded-sm bg-sage shrink-0"
-              />
-              <span>{item}</span>
-            </li>
+              {item}
+            </p>
           ))}
-        </ul>
+        </div>
       )}
     </section>
   );
