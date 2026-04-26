@@ -17,7 +17,7 @@ export default function RatgeberElternBereich() {
     <RatgeberArticle
       slug="eltern-bereich"
       title="Der Eltern-Bereich in Ronki: was drin ist und wie du hinkommst"
-      description="Ronki ist für dein Kind gebaut, nicht für dich. Der Eltern-Bereich ist die eine Ausnahme: ein PIN-geschützter Ort für Einstellungen, eigene Quest-Linien und einen ruhigen Blick auf die Woche. Hier ist, was drin ist und wie oft du reinschauen solltest."
+      description="Ronki ist für dein Kind gebaut, nicht für dich. Der Eltern-Bereich ist die eine Ausnahme: ein PIN-geschützter Ort für Einstellungen, eigene Vorhaben für dein Kind und einen ruhigen Blick auf die Woche. Hier ist, was drin ist und wie oft du reinschauen solltest."
       category="Ronki nutzen"
       readMinutes={5}
       publishedAt="2026-04-21"
@@ -30,7 +30,7 @@ export default function RatgeberElternBereich() {
         },
         {
           slug: 'morgenroutine-grundschulkind',
-          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 9-Jährige funktioniert',
+          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 8-Jährige funktioniert',
         },
         {
           slug: 'abendroutine-grundschulkind',
@@ -92,14 +92,16 @@ export default function RatgeberElternBereich() {
           aufräumen, was bei euch halt anfällt. Auch die Familien-Struktur
           (mehrere Kinder, Elternteile) landet hier.
         </StepCard>
-        <StepCard n={3} title="Quest-Linien">
+        <StepCard n={3} title="Eigene Vorhaben">
           Das Stück, das Ronki am meisten von normalen Checklisten-Apps
-          unterscheidet. Du kannst eigene, mehrstufige Quests für dein Kind
-          bauen. Beispiel: ein „Frühlings-Gedicht", das über zwei Wochen in
-          sieben Schritten aufgebaut wird. Oder „Schwimmabzeichen
-          Bronze-Vorbereitung" mit allen Lern-Einheiten. Dein Kind sieht die
-          Quest-Linie wie ein kleines Abenteuer auftauchen, nicht wie eine
-          Aufgabe von Mama oder Papa.
+          unterscheidet. Hier könnt ihr eigene, mehrstufige Vorhaben für
+          euer Kind bauen. Beispiel: ein „Frühlings-Gedicht", das über
+          zwei Wochen in sieben Schritten aufgebaut wird. Oder
+          „Schwimmabzeichen Bronze-Vorbereitung" mit allen Lern-Einheiten.
+          Dein Kind sieht das Vorhaben wie ein kleines eigenes Kapitel
+          auftauchen, nicht wie eine Aufgabe von Mama oder Papa. Hier
+          entfaltet sich die Magie von Ronki: jede Familie schreibt ihre
+          eigenen kleinen Geschichten dazu.
         </StepCard>
         <StepCard n={4} title="Einstellungen">
           Sprache (deutsch oder englisch), PIN ändern, App zurücksetzen, und
@@ -133,7 +135,7 @@ export default function RatgeberElternBereich() {
 
       <p>
         Alles, was du im Eltern-Bereich einstellst, bleibt auf eurem Gerät.
-        Routinen, Quest-Linien, Stimmungs-Historie, Familien-Setup. Wir
+        Routinen, eigene Vorhaben, Stimmungs-Historie, Familien-Setup. Wir
         speichern nichts davon bei uns, es gibt keine Analyse auf Server-Seite
         und keine Weitergabe an Dritte. Wenn du mehr Details willst, steht
         das alles in der <a href="/datenschutz">Datenschutzerklärung</a>.
@@ -154,7 +156,7 @@ export default function RatgeberElternBereich() {
         </li>
         <li>
           <strong>Wenn ihr was Neues reinnehmt</strong>, zum Beispiel eine
-          neue Quest-Linie oder eine zusätzliche Gewohnheit im Familie-Tab.
+          neues Vorhaben oder eine zusätzliche Gewohnheit im Familie-Tab.
         </li>
         <li>
           <strong>Wenn etwas kaputt wirkt</strong>, dann nutze den

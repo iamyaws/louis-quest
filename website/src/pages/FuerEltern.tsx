@@ -56,8 +56,8 @@ const CONCERNS: Concern[] = [
           keine Zahlen, kein Vergleich mit anderen Kindern.
         </p>
         <p>
-          Du bekommst einen Eltern-Bereich (in Vorbereitung): ein ruhiger
-          Überblick über Stimmung und Fortschritt im Verlauf. Keine
+          Du bekommst einen Eltern-Bereich: ein ruhiger Überblick über
+          Stimmung und Fortschritt im Verlauf. Keine
           Minuten-genaue Überwachung, keine Aktivitäts-Heatmap. Genug, um zu
           sehen, wie es deinem Kind geht. Wenig genug, um nicht zum Kontroll-Werkzeug
           zu werden.

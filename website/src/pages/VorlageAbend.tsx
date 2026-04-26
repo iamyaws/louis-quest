@@ -11,7 +11,7 @@ export default function VorlageAbend() {
       steps={[
         { icon: '🪥', label: 'Zähne putzen', hint: 'Auch die hinten im Mund.' },
         { icon: '🧼', label: 'Gesicht waschen', hint: 'Mit Wasser, ganz sanft.' },
-        { icon: '🌙', label: 'Pyjama an', hint: 'Die Zeug von heute in den Korb.' },
+        { icon: '🌙', label: 'Pyjama an', hint: 'Die Sachen von heute in den Korb.' },
         { icon: '📖', label: 'Licht aus', hint: 'Eine Geschichte, dann schlafen.' },
       ]}
     />

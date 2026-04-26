@@ -34,7 +34,7 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: 'Ab welchem Alter ist Ronki geeignet?',
-        a: 'Ronki ist für Kinder zwischen 5 und 9 Jahren gedacht, also Vorschule und Grundschule. In dieser Phase lernen Kinder, eigene Routinen aufzubauen. Genau dort setzt Ronki an.',
+        a: 'Ronki ist für Kinder zwischen 5 und 8 Jahren gedacht, also Vorschule und frühe Grundschule. In dieser Phase fängt ein Kind an, eigene Gefühle zu benennen und mit ihnen umzugehen. Genau dort setzt Ronki an.',
       },
       {
         q: 'Braucht mein Kind ein eigenes Gerät?',

@@ -62,9 +62,12 @@ export default function MitMachen() {
               .
             </h1>
             <p className="mt-6 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
-              Seit einigen Wochen bauen mein Sohn und ich Ronki. Jetzt, in der
-              Public&#8209;Alpha, suchen wir die ersten Familien, die es mit
-              uns formen. Bevor daraus etwas Größeres wird.
+              Ronki ist ein leiser Drache für Kinder zwischen 5 und 8. Er
+              hilft beim Benennen, was ein Kind gerade fühlt. Er atmet mit,
+              wenn ein Tag zu viel war. Am Abend weiß das Kind: jemand hat
+              zugehört. Wir bauen ihn gerade, mein Sohn und ich. Jetzt
+              suchen wir in der Public&#8209;Alpha die ersten Familien, die
+              ihn mit uns formen. Bevor daraus etwas Größeres wird.
             </p>
           </motion.div>
         </div>
@@ -261,7 +264,7 @@ export default function MitMachen() {
             {[
               {
                 q: 'Kostet das etwas?',
-                a: 'Nein. Ronki ist kostenlos in der Public\u2011Alpha. Und wird auch in der nächsten Phase nicht plötzlich kostenpflichtig. Falls sich daran etwas ändert, kommunizieren wir es transparent, bevor irgendetwas passiert.',
+                a: 'Nein. Ronki ist kostenlos in der Public\u2011Alpha. Falls sich daran in einer späteren Phase etwas ändert, kommunizieren wir es transparent und mit Vorlauf, bevor irgendetwas passiert.',
               },
               {
                 q: 'Muss ich ständig aktiv sein?',

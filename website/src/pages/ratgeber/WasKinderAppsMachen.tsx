@@ -70,7 +70,7 @@ export default function RatgeberWasKinderAppsMachen() {
         nicht verarbeiten kann.
       </p>
 
-      <h2>FOMO wird absichtlich konstruiert</h2>
+      <h2>Wie sich FOMO bei uns angefühlt hat</h2>
 
       <p>
         Pokémon Go war unser deutlichstes Beispiel. Events, saisonale Pokémon,
@@ -89,7 +89,7 @@ export default function RatgeberWasKinderAppsMachen() {
       </p>
 
       <PullQuote>
-        Sechs Jahre alt, und der Algorithmus hatte es ihm beigebracht.
+        Sechs Jahre alt, und der App-Rhythmus hatte ihn fest im Griff.
       </PullQuote>
 
       <h2>Streaks, am klarsten bei Duolingo</h2>
@@ -103,18 +103,20 @@ export default function RatgeberWasKinderAppsMachen() {
       </p>
 
       <p>
-        Bei Erwachsenen ist das eine Motivationshilfe. Bei Kindern unter neun
-        funktioniert es anders. Die Verhaltensökonomie-Forschung seit den
-        1970ern beschreibt das Phänomen: Kinder filtern Verlustaversion
-        kognitiv noch nicht, sie erleben den drohenden Streak-Verlust als
-        Bestrafung. Die App wird zur Bestraferin. Das ist kein Designfehler.
-        Das ist das Design.
+        Bei Erwachsenen ist das eine Motivationshilfe. Aus meiner Beobachtung
+        mit Louis und im Austausch mit anderen Eltern erleben Kinder unter
+        neun den drohenden Streak-Verlust öfter als Druck als als Anreiz.
+        Verlustaversion ist seit Kahneman und Tversky breit beschrieben; bei
+        Grundschulkindern bildet sich die kognitive Distanz dazu erst aus.
+        Das ist nicht der Designfehler von einem einzelnen Anbieter, das ist
+        der Stand der Mechanik wie sie heute in vielen Produkten steckt.
       </p>
 
       <p>
         Mein Sohn nutzt Duolingo nicht selbst. Aber ich kenne das Muster von
-        anderen Eltern und aus eigenem Test, und bei Kindern mit geringerer
-        Frust-Toleranz ist es jedes Mal destruktiv.
+        anderen Eltern und aus eigenem Test. Bei Kindern mit geringerer
+        Frust-Toleranz fühlt sich ein gerissener Streak in meiner Beobachtung
+        oft an wie echtes Versagen.
       </p>
 
       <h2>Spiele ohne Ende</h2>
@@ -122,9 +124,11 @@ export default function RatgeberWasKinderAppsMachen() {
       <p>
         Hill Climb Racing 2 ist ein kleines Auto-Bergauf-Spiel, das mein Sohn
         eine Weile gespielt hat. Es hat keine Endbedingung. Du schaltest immer
-        neue Fahrzeuge frei, neue Strecken, neue Tunings. Das Spiel kann nicht
-        durchgespielt werden, und das ist kein technisches Limit, das ist die
-        Architektur.
+        neue Fahrzeuge frei, neue Strecken, neue Tunings. Das Spiel ist nicht
+        zum Durchspielen gedacht. Das ist eine Designentscheidung, die für
+        erwachsene Spieler manchmal Reiz ist und bei Louis eine andere Wirkung
+        entfaltet hat. Ich beschreibe das nicht als Vorwurf an den Hersteller,
+        sondern als das was wir bei uns beobachtet haben.
       </p>
 
       <p>
@@ -160,16 +164,21 @@ export default function RatgeberWasKinderAppsMachen() {
         falschen Bereich, landest du direkt im App Store.
       </p>
 
-      <p>Das ist kein Bug. Das ist ein Funnel.</p>
+      <p>
+        Aus meiner Sicht ist das kein Bug, sondern Funnel-Logik. Wer ein
+        wirtschaftliches Interesse daran hat, Aufmerksamkeit weiterzureichen,
+        baut Interfaces so, dass Aufmerksamkeit weiterläuft. Bei welcher
+        konkreten App das mit welcher Absicht passiert, kann ich von außen
+        nicht beweisen, deshalb beschreibe ich nur was ich gesehen habe.
+      </p>
 
       <p>
-        Mein Sohn ist klug genug, dass er die Patterns inzwischen kennt und
+        Mein Sohn ist klug genug, dass er die Muster inzwischen kennt und
         meistens rauskommt. Aber das ist eine Fertigkeit die er ausbilden
         musste, nicht etwas das ihm erspart blieb. Wenn er in einem Spiel war,
         war er oft fünf Minuten später in einem anderen, ohne das erste aktiv
-        verlassen zu haben. Das ist nicht Aufmerksamkeitsspanne, das ist
-        Funnel-Design, und das Ziel ist: das Kind von einem Anbieter zum
-        nächsten schicken bevor Interesse verloren geht.
+        verlassen zu haben. In meiner Beobachtung ist das nicht
+        Aufmerksamkeitsspanne, das ist die Wirkung der eingebauten Funnels.
       </p>
 
       <h2>Paywalls, die Pay-to-Win verkaufen</h2>
@@ -227,37 +236,38 @@ export default function RatgeberWasKinderAppsMachen() {
         <li>
           <strong>Anton-App</strong> (Lernapp, oft in Grundschulen
           eingesetzt): klarer Bildungsauftrag, in vielen Schulen als
-          Hausaufgabenplattform integriert. Gamification ja, aber funktional
-          eingebunden. Keine wilden Sucht-Mechaniken beobachtet.
+          Hausaufgabenplattform integriert. Gamification ja, aber aus unserer
+          Beobachtung funktional eingebunden, nicht losgelöst.
         </li>
         <li>
           <strong>Antolin</strong> (Leseverständnis, schulnah): fokussiert auf
-          Fragen zu gelesenen Büchern, kein Abo-Modell, kein Druck.
-          Funktioniert als Ergänzung zum realen Buch, nicht als Ersatz.
+          Fragen zu gelesenen Büchern, kein Abo-Modell, kein sichtbarer Druck.
+          Funktioniert bei uns als Ergänzung zum realen Buch, nicht als
+          Ersatz.
         </li>
         <li>
-          <strong>Paper.io 2</strong> und ähnliche einfache Arcade-Spiele: ja,
-          mit Werbung, aber Kernloop ist kurz und abgeschlossen. Zeitlich
-          begrenzt spielen funktioniert hier.
+          <strong>Paper.io 2</strong> und ähnliche einfache Arcade-Spiele:
+          mit Werbung, aber der Kernloop ist kurz und hat ein Ende. Zeitlich
+          begrenzt spielen funktioniert bei uns hier.
         </li>
         <li>
-          <strong>Beyblade-App</strong> (Spielzeug-Begleit-App): nicht
-          perfekt, aber im Vergleich weniger aggressiv. Progression ist
+          <strong>Beyblade-App</strong> (Spielzeug-Begleit-App): aus unserer
+          Beobachtung weniger fordernd als andere Free-Apps. Progression ist
           möglich ohne Zahlung.
         </li>
         <li>
-          <strong>Mario Kart / Mario Run</strong>: nicht dark-pattern-frei,
-          aber die Design-Qualität ist so hoch, dass die gespielte Zeit sich
-          meistens wie Spielen anfühlt und nicht wie Schleife. Zeitlich
-          limitiert und unter elterlicher Beobachtung funktioniert das bei
-          uns.
+          <strong>Mario Kart / Mario Run</strong>: die Design-Qualität ist so
+          hoch, dass die gespielte Zeit sich bei uns meistens wie Spielen
+          anfühlt und nicht wie Schleife. Zeitlich limitiert und unter
+          elterlicher Beobachtung funktioniert das in unserem Alltag.
         </li>
       </ul>
 
       <p>
-        Der Punkt: es gibt Abstufungen. Nicht alles ist gleich manipulativ.
-        Und es gibt Apps, bei denen die Entwicklerinnen und Entwickler
-        offensichtlich überlegt haben was Kindern tatsächlich gut tut.
+        Der Punkt: es gibt Abstufungen. Nicht alles ist gleich auf Retention
+        optimiert. Und es gibt Apps, bei denen die Entwicklerinnen und
+        Entwickler aus unserer Sicht überlegt haben was Kindern tatsächlich
+        gut tut.
       </p>
 
       <h2>Was wir praktisch machen</h2>
@@ -360,11 +370,27 @@ export default function RatgeberWasKinderAppsMachen() {
         einer Exit-Strategie wenn sie kippt.
       </Callout>
 
+      <p>
+        Wenn du die Fragen lieber durch ein Werkzeug gehst statt sie auf
+        Papier abzuarbeiten: ich habe die Checkliste in eine kleine Web-App
+        gepackt. Du beantwortest die zehn Fragen aus deiner Beobachtung, das
+        Ding rechnet einen Score und gibt dir konkrete Vorschläge was du
+        tun kannst, je nach Punktzahl. Kein Account, kein Tracking, du
+        kannst die Bewertung speichern und teilen wenn du willst.{' '}
+        <a
+          href="/tools/app-check"
+          className="font-semibold text-teal-dark underline decoration-mustard underline-offset-4 hover:decoration-teal"
+        >
+          Hier zum App-Check
+        </a>
+        .
+      </p>
+
       <h2>Was ich selbst gebaut habe</h2>
 
       <p>
-        Ich arbeite seit einem Jahr an einer kleinen Web-App für Kinder
-        zwischen fünf und neun, bei der wir diese Patterns explizit nicht
+        Ich arbeite seit einigen Wochen an einer kleinen Web-App für Kinder
+        zwischen fünf und acht, bei der wir diese Patterns explizit nicht
         eingebaut haben. Keine Streaks, keine Push, keine Werbung, keine
         Cosmetics, kein App-Store, kein Konto, kein Tracking. Sie heißt Ronki
         und läuft direkt im Browser unter ronki.de. Sie ist ausdrücklich

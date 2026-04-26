@@ -59,7 +59,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'morgenroutine-grundschulkind',
-    title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 9-Jährige funktioniert',
+    title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 8-Jährige funktioniert',
     description:
       'Eine Morgenroutine, die ein Grundschulkind selbst ausführen kann. Reihenfolge, Zeitplan, typische Stolpersteine und warum deine Routine vielleicht am falschen Ende anfängt.',
     category: 'Morgenroutine',
@@ -70,14 +70,14 @@ export const ARTICLES: Article[] = [
     slug: 'abendroutine-grundschulkind',
     title: 'Die Abendroutine für Grundschulkinder: ruhiger runterkommen, besser schlafen',
     description:
-      'Abendroutine für 6- bis 9-Jährige: Warum 45 Minuten reichen, welche Reihenfolge wirklich Schlaf bringt, und wie du aus dem Zähneputz-Drama rauskommst.',
+      'Abendroutine für 6- bis 8-Jährige: Warum 45 Minuten reichen, welche Reihenfolge wirklich Schlaf bringt, und wie du aus dem Zähneputz-Drama rauskommst.',
     category: 'Abendroutine',
     readMinutes: 9,
     image: '/art/bioms/Sternenmeer_sea-of-stars.webp',
   },
   {
     slug: 'zaehneputzen-ohne-streit',
-    title: 'Zähneputzen ohne Streit: was bei 5- bis 9-Jährigen wirklich hilft',
+    title: 'Zähneputzen ohne Streit: was bei 5- bis 8-Jährigen wirklich hilft',
     description:
       'Kind verweigert Zähneputzen? Warum das meistens kein Erziehungsproblem ist, was Kinderzahnärzt:innen raten, und drei Hebel, die bei Grundschulkindern wirken.',
     category: 'Hygiene & Zähne',
@@ -97,7 +97,7 @@ export const ARTICLES: Article[] = [
     slug: 'eltern-bereich',
     title: 'Der Eltern-Bereich in Ronki: was drin ist und wie du hinkommst',
     description:
-      'Ronki ist für dein Kind gebaut, nicht für dich. Der Eltern-Bereich ist die eine Ausnahme: ein PIN-geschützter Ort für Einstellungen, eigene Quest-Linien und einen ruhigen Blick auf die Woche.',
+      'Ronki ist für dein Kind gebaut, nicht für dich. Der Eltern-Bereich ist die eine Ausnahme: ein PIN-geschützter Ort für Einstellungen, eigene Vorhaben und einen ruhigen Blick auf die Woche.',
     category: 'Ronki nutzen',
     readMinutes: 5,
     image: '/art/bioms/Sonnenglast_sun-highlands.webp',

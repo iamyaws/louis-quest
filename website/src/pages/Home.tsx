@@ -44,7 +44,7 @@ export default function Home() {
           {
             question: 'Ab welchem Alter ist Ronki geeignet?',
             answer:
-              'Ronki ist für Kinder zwischen 5 und 9 Jahren gedacht. In dieser Phase lernen Kinder, eigene Routinen aufzubauen. Ronki begleitet genau diesen Schritt.',
+              'Ronki ist für Kinder zwischen 5 und 8 Jahren gedacht. In dieser Phase lernen Kinder, eigene Gefühle zu benennen und mit ihnen umzugehen. Ronki begleitet genau das.',
           },
           {
             question: 'Was kostet Ronki?',

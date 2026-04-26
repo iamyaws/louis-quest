@@ -29,7 +29,7 @@ export default function AGB() {
           <p className="mt-5 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
             Die Spielregeln für die Nutzung von Ronki, so kurz und klar wie möglich.
           </p>
-          <p className="mt-3 text-sm text-ink/60">Stand: 17. April 2026</p>
+          <p className="mt-3 text-sm text-ink/60">Stand: 25. April 2026</p>
 
           <div className="mt-14 flex flex-col gap-12 text-[0.98rem] leading-[1.75] text-ink/85">
 
@@ -41,7 +41,7 @@ export default function AGB() {
 
             <Section heading="§2 Leistungsbeschreibung">
               <p>
-                Ronki ist eine Web-App, die Kindern hilft, Alltagsroutinen spielerisch aufzubauen. Die App befindet sich aktuell in der Entwicklung. Über die Warteliste können sich Interessierte für den Start registrieren.
+                Ronki ist eine Web-App, die Kindern hilft, Gefühle zu benennen, durchzuatmen und ihren Alltag mit einem digitalen Drachen-Begleiter zu gestalten. Die App befindet sich aktuell in der Public-Alpha. Über die Warteliste können sich Interessierte für den nächsten Schritt registrieren.
               </p>
               <p>
                 Der Funktionsumfang kann sich bis zum Launch ändern. Ein Rechtsanspruch auf bestimmte Funktionen besteht nicht.
@@ -62,7 +62,7 @@ export default function AGB() {
 
             <Section heading="§4 Nutzung durch Kinder">
               <p>
-                Ronki richtet sich an Kinder im Alter von 5–9 Jahren. Die Einrichtung und Verwaltung erfolgt durch einen Erziehungsberechtigten.
+                Ronki richtet sich an Kinder im Alter von 5–8 Jahren. Die Einrichtung und Verwaltung erfolgt durch einen Erziehungsberechtigten.
               </p>
               <p>
                 Kinder nutzen die App unter Aufsicht oder mit Einverständnis der Eltern.
@@ -80,6 +80,9 @@ export default function AGB() {
                 Ronki wird „wie besehen" bereitgestellt. Wir übernehmen keine Garantie für ununterbrochene Verfügbarkeit.
               </p>
               <p>
+                Ronki befindet sich in einer öffentlichen Alpha-Phase. Funktionen, Spielmechaniken und Speicherformate können sich kurzfristig ändern oder entfallen. Inhalte, die du oder dein Kind im Spiel anlegen (zum Beispiel Charakter-Fortschritt, Sammelbuch), können bei Versionswechseln zurückgesetzt werden, wenn dies aus technischen oder gestalterischen Gründen erforderlich ist. Wir empfehlen daher, keine unersetzlichen Inhalte ausschließlich in Ronki zu hinterlegen.
+              </p>
+              <p>
                 Für Schäden durch die Nutzung haften wir nur bei Vorsatz oder grober Fahrlässigkeit. Dies gilt nicht für die Verletzung wesentlicher Vertragspflichten (Kardinalspflichten). In diesem Fall ist die Haftung auf den vertragstypischen, vorhersehbaren Schaden begrenzt.
               </p>
             </Section>
@@ -90,15 +93,18 @@ export default function AGB() {
               </p>
             </Section>
 
-            <Section heading="§8 Schlussbestimmungen">
+            <Section heading="§8 Online-Streitbeilegung">
+              <p>
+                Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit, die du unter <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" className="underline decoration-mustard underline-offset-4 hover:text-teal-dark break-words">ec.europa.eu/consumers/odr</a> erreichst. Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
+              </p>
+            </Section>
+
+            <Section heading="§9 Schlussbestimmungen">
               <p>
                 Es gilt deutsches Recht.
               </p>
               <p>
                 Sollten einzelne Bestimmungen unwirksam sein, bleiben die übrigen Bestimmungen davon unberührt.
-              </p>
-              <p className="text-sm text-ink/60">
-                Stand: 17. April 2026
               </p>
             </Section>
 

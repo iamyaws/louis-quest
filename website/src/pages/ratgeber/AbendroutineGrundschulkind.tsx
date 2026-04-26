@@ -12,7 +12,7 @@ export default function RatgeberAbendroutineGrundschulkind() {
     <RatgeberArticle
       slug="abendroutine-grundschulkind"
       title="Die Abendroutine für Grundschulkinder: ruhiger runterkommen, besser schlafen"
-      description="Abendroutine für 6- bis 9-Jährige: Warum 45 Minuten reichen, welche Reihenfolge wirklich Schlaf bringt, und wie du aus dem Zähneputz-Drama rauskommst."
+      description="Abendroutine für 6- bis 8-Jährige: Warum 45 Minuten reichen, welche Reihenfolge wirklich Schlaf bringt, und wie du aus dem Zähneputz-Drama rauskommst."
       category="Abendroutine"
       readMinutes={9}
       publishedAt="2026-04-19"
@@ -22,11 +22,11 @@ export default function RatgeberAbendroutineGrundschulkind() {
       related={[
         {
           slug: 'morgenroutine-grundschulkind',
-          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 9-Jährige funktioniert',
+          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 8-Jährige funktioniert',
         },
         {
           slug: 'zaehneputzen-ohne-streit',
-          title: 'Zähneputzen ohne Streit: was bei 5- bis 9-Jährigen wirklich hilft',
+          title: 'Zähneputzen ohne Streit: was bei 5- bis 8-Jährigen wirklich hilft',
         },
         {
           slug: 'morgen-troedeln',

@@ -85,7 +85,7 @@ export function HeroVariantF() {
             {...fade(0.4)}
             className="mt-8 text-lg sm:text-xl text-cream/80 leading-relaxed max-w-lg"
           >
-            Zähne putzen, Tasche packen, Schuhe an. Ronki ist der Drachen-Gefährte, der dein Kind daran erinnert. Nicht du. Nicht zum zehnten Mal.
+            Ein kleiner Drache, der morgens an die Zähne erinnert und abends zuhört, wenn der Tag schwer war. Nicht du. Nicht zum zehnten Mal.
           </motion.p>
 
           {/* CTA form */}
