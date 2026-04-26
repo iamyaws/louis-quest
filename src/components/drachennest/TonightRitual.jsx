@@ -75,6 +75,12 @@ export default function TonightRitual({ onClose }) {
   const [phase, setPhase] = useState('enter');
   const [tapped, setTapped] = useState(false);
   const [story] = useState(() => pickStory());
+  // Guards the curtain → black auto-advance. Without it, replay()
+  // mid-curtain (or repeated taps) would leave a dangling 12s timer
+  // that fires `tonight.complete` again + yanks the kid back to
+  // black during the second viewing. Cleared on tap, replay, unmount.
+  const curtainTimerRef = useRef(null);
+  const completeFiredRef = useRef(false);
 
   // Auto-advance into lookup → story.
   useEffect(() => {
@@ -91,6 +97,12 @@ export default function TonightRitual({ onClose }) {
   // Telemetry — fire start once per mount.
   useEffect(() => { track('tonight.start'); }, []);
 
+  // Cleanup any pending curtain timer on unmount so an early dismiss
+  // doesn't fire `tonight.complete` for a moment that didn't finish.
+  useEffect(() => () => {
+    if (curtainTimerRef.current) clearTimeout(curtainTimerRef.current);
+  }, []);
+
   // ESC dismisses.
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
@@ -98,21 +110,39 @@ export default function TonightRitual({ onClose }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
+  const fireComplete = () => {
+    if (completeFiredRef.current) return;
+    completeFiredRef.current = true;
+    track('tonight.complete');
+  };
+
   const handleTap = () => {
     if (phase === 'story' && !tapped) {
       setTapped(true);
       setPhase('curtain');
-      setTimeout(() => {
+      curtainTimerRef.current = setTimeout(() => {
         setPhase('black');
-        track('tonight.complete');
+        fireComplete();
+        curtainTimerRef.current = null;
       }, 12000);
     } else if (phase === 'curtain') {
+      // Kid tapped early to skip the curtain. Cancel pending timer,
+      // jump straight to black, fire complete once.
+      if (curtainTimerRef.current) {
+        clearTimeout(curtainTimerRef.current);
+        curtainTimerRef.current = null;
+      }
       setPhase('black');
-      track('tonight.complete');
+      fireComplete();
     }
   };
 
   const replay = () => {
+    if (curtainTimerRef.current) {
+      clearTimeout(curtainTimerRef.current);
+      curtainTimerRef.current = null;
+    }
+    completeFiredRef.current = false;
     setPhase('enter');
     setTapped(false);
   };

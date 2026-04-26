@@ -39,7 +39,7 @@ import MemoryGame from './components/MemoryGame';
 import PotionGame from './components/PotionGame';
 import CloudJumpGame from './components/CloudJumpGame';
 import StarfighterGame from './components/StarfighterGame';
-// KristallSortiererGame deleted again — Louis tested "super boring."
+// KristallSortiererGame deleted again. Louis tested it "super boring."
 import ToolErrorBoundary from './components/ToolErrorBoundary';
 // ── Lazy-loaded tools + games ──────────────────────────────────────────
 // These surfaces are mounted conditionally (URL param shortcuts, post-

@@ -90,7 +90,10 @@ export default function HoermomentTool({ onComplete }) {
     if (typeof onComplete === 'function') onComplete();
   };
 
-  const pct = Math.min(1, elapsed / ROUND_DURATION_MS);
+  // Clamp elapsed to round duration so the conic-gradient ring doesn't
+  // briefly overshoot 360° between the threshold tick and the round
+  // advance — a visible glitch on slow phones.
+  const pct = Math.min(1, Math.max(0, elapsed) / ROUND_DURATION_MS);
   const ringDegrees = pct * 360;
 
   return (
