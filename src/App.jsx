@@ -75,10 +75,11 @@ import Micropedia from './components/Micropedia';
 import { useSpecialQuests } from './hooks/useSpecialQuests';
 // Easter-egg system paused Apr 2026 — Marc: "don't feel it anymore".
 // Hook + component files kept so we can re-enable by restoring these imports.
-// import { useEggSystem } from './hooks/useEggSystem';
+// useEggSystem deleted Apr 2026 (cut #10h). Egg-spawner mechanic
+// retired entirely.
 import { useMicropediaDiscovery } from './hooks/useMicropediaDiscovery';
 import { useQuietAttention } from './hooks/useQuietAttention';
-// import EggOverlay from './components/EggOverlay'; // paused Apr 2026 (see useEggSystem note)
+// EggOverlay deleted Apr 2026 (cut #10h).
 import CreatureDiscoveryToast from './components/CreatureDiscoveryToast';
 import FriendIntroCeremony from './components/drachennest/FriendIntroCeremony';
 import MeetRonki from './components/drachennest/MeetRonki';
@@ -217,7 +218,7 @@ function AppContent() {
   const { isIOS, androidPrompt, promptInstall } = usePWAInstall();
 
   useSpecialQuests(); // side-effect only — silently completes special quests
-  // useEggSystem(); // paused Apr 2026 — spawner disabled, no more egg triggers
+  // useEggSystem deleted Apr 2026 (cut #10h).
   useQuietAttention(view); // gentle voice brake when Louis zooms through screens
 
   // Creature discovery — Drachennest reframe (Marc 25 Apr 2026):
@@ -554,9 +555,8 @@ function AppContent() {
         actions.claimGameReward('starfall');
         setView('games');
       }} />}
-      {/* EggOverlay mount paused Apr 2026. Any lingering state.pendingEgg
-          stays in storage but doesn't render. Re-enable by restoring the
-          JSX block above with the useEggSystem() hook. */}
+      {/* Egg system deleted Apr 2026 (cut #10h). state.pendingEgg may
+          linger in old saves but is never rendered or mutated. */}
       <CompanionToast trigger={toastTrigger} />
       {/* ParentIntroOverlay retired 25 Apr 2026. The ParentOnboarding
           flow now introduces the parent area up-front (and the Eltern-
