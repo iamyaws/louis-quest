@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import SFX from '../utils/sfx';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useHaptic } from '../hooks/useHaptic';

@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import TeachRitualModal, { RITUAL_COPY } from './TeachRitualModal';
-import { COMPANION_VARIANTS } from '../data/companionVariants';
 import { TaskProvider } from '../context/TaskContext';
 import { CelebrationQueueProvider } from '../context/CelebrationQueue';
 import { QuestEaterProvider } from './QuestEater';

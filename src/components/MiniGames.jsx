@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useTask } from '../context/TaskContext';
 import { useGameAccess } from '../hooks/useGameAccess';

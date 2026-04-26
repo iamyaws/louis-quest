@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import CooldownButton from './CooldownButton';
-import { getCatStage, DRAGON_ART } from '../utils/helpers';
+import { DRAGON_ART } from '../utils/helpers';
 import { isDevMode } from '../utils/mode';
 
 // ── Confetti Canvas ──

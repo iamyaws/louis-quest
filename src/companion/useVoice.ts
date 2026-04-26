@@ -5,7 +5,6 @@ import useWeather from '../hooks/useWeather';
 import { getCatStage } from '../utils/helpers';
 import { pickLine, recordUse, pruneHistory } from './VoiceEngine';
 import { linesFor } from './voiceLines';
-import TTS from '../utils/tts';
 import VoiceAudio from '../utils/voiceAudio';
 import type { ArcLifecyclePhase } from '../arcs/types';
 import type {

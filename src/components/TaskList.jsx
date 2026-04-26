@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { ANCHORS } from '../constants';
 import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
 import { useTranslation } from '../i18n/LanguageContext';

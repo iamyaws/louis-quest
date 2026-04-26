@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuestEater } from './QuestEater';
-import { getVariant } from '../data/companionVariants';
 import { triggerHaptic } from '../lib/haptics';
 import MoodChibi from './MoodChibi';
 import FireBreathPuff from './FireBreathPuff';

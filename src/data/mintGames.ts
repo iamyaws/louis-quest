@@ -17,7 +17,6 @@
  *    Wave 2.7 — kristall-sortierer + Forscher-Funkel creature unlock
  */
 
-import type { ChapterId } from './creatures';
 import type { TaskState } from '../context/TaskContext';
 
 export interface MintGame {

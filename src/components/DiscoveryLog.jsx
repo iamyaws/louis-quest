@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
-import { ARCS, findArc } from '../arcs/arcs';
+import { findArc } from '../arcs/arcs';
 
 /**
  * Discovery Log — chronological timeline of arcs survived.

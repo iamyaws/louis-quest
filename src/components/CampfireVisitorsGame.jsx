@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useTask } from '../context/TaskContext';
 import { useHaptic } from '../hooks/useHaptic';
