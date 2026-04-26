@@ -323,18 +323,20 @@ export default function RatgeberStickerChartAlternative() {
         </StepCard>
       </Steps>
 
-      <h2>Was wir bei Ronki anders machen</h2>
+      <h2>Warum Ronki kein Sticker-Chart in digital ist</h2>
 
       <p>
-        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
-        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
+        Sticker-Charts sind extrinsische Belohnung in Druckform. Eine App,
+        die Sticker durch Sterne ersetzt, ist dasselbe in einem hübscheren
+        Anstrich. Wir wollten was anderes.
       </p>
 
       <p>
-        Kurzer Teil, kein Verkaufsgespräch. Ronki ist eine App, die die
-        Routine des Kindes sichtbar macht. Der Drachen-Begleiter bestätigt
-        (<em>fertig</em>), er belohnt nicht. Keine Punkte, keine Streaks,
-        keine Level, die an Routine-Erfüllung hängen. Bewusst plan.
+        Ronki ist kein Belohnungssystem. Der Drache reicht nichts aus,
+        weder Punkte noch Sterne noch Lob-Sätze, die rotieren. Er ist
+        einfach dabei. Wenn das Kind durch seinen Morgen gegangen ist,
+        fragt Ronki nach dem Gefühl, das gerade da ist. Das ist nicht
+        messbar in Streaks. Es ist auch keins.
       </p>
 
       <PullQuote attribution="Als Gamer-Vater">
@@ -344,17 +346,16 @@ export default function RatgeberStickerChartAlternative() {
       <p>
         Wir haben uns an einer Stelle gefragt, ob wir nicht wenigstens ein
         kleines Punkte-System einbauen. Wäre sehr leicht. Haben wir nicht
-        gemacht. Der gleiche Effekt, den wir in den Apps unserer Kinder nicht
-        sehen wollen, gilt für unsere App auch.
+        gemacht. Der gleiche Effekt, den wir in den Apps unserer Kinder
+        nicht sehen wollen, gilt für unsere App auch.
       </p>
 
       <p>
-        Stattdessen: das Kind sieht die Sequenz, macht die Schritte, der
-        Drache bestätigt. Und je besser die Routine sitzt, desto leiser wird
-        der Drache. Irgendwann braucht das Kind die App nicht mehr. Das ist,
-        als Gamer-Vater mit ein paar Jahren Tech-Erfahrung sage ich das,
-        ein ziemlich schlechtes Engagement-Metric. Aber ein verdammt gutes
-        Erziehungs-Metric.
+        Stattdessen: das Kind macht den Morgen, der Drache nickt, der Tag
+        geht weiter. Je besser das sitzt, desto weniger ist der Drache zu
+        hören. Irgendwann läuft der Morgen ohne ihn. Das ist nicht das,
+        wonach uns der App-Store-Algorithmus belohnt. Aber genau die App
+        wollten wir bauen.
       </p>
 
       <h2>Der Einwand: "bei uns hat's aber funktioniert"</h2>

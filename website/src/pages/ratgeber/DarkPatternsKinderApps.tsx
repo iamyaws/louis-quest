@@ -431,16 +431,9 @@ export default function RatgeberDarkPatternsKinderApps() {
       <h2>Ronki macht diese Entscheidungen so</h2>
 
       <p>
-        Ein Wort zur Sprache vorweg: was andere Apps Routine oder Habit
-        nennen, nennen wir bei Ronki tägliches Ritual. Eine Routine führst
-        du aus. Ein Ritual lebt ihr gemeinsam. Das klingt nach Sprache, ist
-        aber Produktentscheidung.
-      </p>
-
-      <p>
-        Ich bin der Meinung, ich sollte das offen machen, nicht nur, weil es
-        transparent ist, sondern weil du so siehst, was Umsetzung in der
-        Praxis heißt.
+        Ich finde, ich sollte das offen machen. Nicht nur weil es
+        transparent ist, sondern weil du so siehst, was unsere Position in
+        der Praxis bedeutet, nicht nur was wir auf der Website behaupten.
       </p>
 
       <Steps>
@@ -479,18 +472,18 @@ export default function RatgeberDarkPatternsKinderApps() {
         <StepCard n="FADE" title="Fade-by-design">
           <p>
             Das ist die Entscheidung, die uns am meisten von der Industrie
-            trennt. Je besser die Routine sitzt, desto leiser wird der Drache.
-            Wenn dein Kind die Morgenroutine nach drei Monaten draufhat und die
-            App nicht mehr öffnet, haben wir unseren Job gemacht.
+            trennt. Je besser ein Kind weiß, was es gerade fühlt, je
+            leichter ihm das Atmen fällt, desto leiser wird der Drache.
+            Wenn dein Kind irgendwann nicht mehr nach Ronki greift, weil
+            es selbst weiß, was los ist, haben wir unseren Job gemacht.
           </p>
         </StepCard>
       </Steps>
 
       <PullQuote attribution="Als Gamer-Vater">
-        Wenn dein Kind die Morgenroutine nach drei Monaten draufhat und die
-        App nicht mehr öffnet, haben wir unseren Job gemacht. Ein richtig
-        schlechtes Engagement-Metric. Aber ein verdammt gutes Erziehungs-
-        Metric.
+        Wir bauen Ronki gegen den Algorithmus, der entscheidet welche App
+        vorne im App-Store steht. Eine App, die ihre Kinder nicht braucht,
+        gewinnt nicht im Ranking. Aber sie macht ihren Job.
       </PullQuote>
 
       <p>

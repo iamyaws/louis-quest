@@ -242,30 +242,32 @@ export default function RatgeberMorgenTroedeln() {
         </StepCard>
       </Steps>
 
-      <h2>Was wir bei Ronki anders machen</h2>
+      <h2>Wo Ronki im Morgen-Trödeln passt</h2>
 
       <p>
-        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
-        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
+        Trödeln ist oft kein Motivationsproblem. Es ist ein
+        Regulationsproblem. Das Kind ist morgens noch nicht ganz da, der
+        Körper ist wach, das System nicht. Genau in diesen Spalt sitzt
+        Ronki.
       </p>
 
       <p>
-        Kurzer Teil, kein Verkaufsgespräch. Ronki ist eine App, die Kindern ihre
-        eigene Routine sichtbar macht. Drachen-Begleiter, bildbasiert statt
-        textbasiert, designed dafür, dass das Kind ihn nach ein paar Wochen
-        schon fast nicht mehr braucht.
+        Ronki ist ein leiser Drache, der morgens dabei ist. Er fragt einmal
+        kurz nach dem Gefühl, atmet einmal mit, dann geht's los. Keine
+        Push, keine Punkte für Tempo, kein Vergleich mit gestern. Wenn dein
+        Kind drei Wochen später selbst durch die Tür geht, war Ronki im
+        Hintergrund, nicht im Vordergrund. Das ist der Punkt.
       </p>
 
       <PullQuote attribution="Als Gamer-Vater">
-        Wenn dein Kind nach drei Monaten routiniert durch die Tür geht, ohne
-        erst in die App zu schauen, haben wir unseren Job gemacht. Das ist ein
-        richtig schlechtes Engagement-Metric. Aber ein verdammt gutes
-        Erziehungs-Metric.
+        Eine App, die einem Kind hilft, morgens nicht zu trödeln, hat
+        verloren, sobald das Kind sie braucht um nicht zu trödeln. Wir
+        bauen sie so, dass sie sich überflüssig machen will.
       </PullQuote>
 
       <p>
-        Wenn dich das interessiert, trag dich unten ein. Wenn nicht, nimm die
-        vier Prinzipien aus diesem Artikel und bau dir selbst was. Das
+        Wenn dich das interessiert, trag dich unten ein. Wenn nicht, nimm
+        die vier Prinzipien aus diesem Artikel und bau dir selbst was. Das
         funktioniert auch.
       </p>
 
