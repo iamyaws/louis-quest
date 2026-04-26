@@ -21,12 +21,22 @@ import { useAttentionFlag } from '../hooks/useAttentionFlag';
 let lastStaminaVoiceMs = 0;
 const STAMINA_VOICE_COOLDOWN_MS = 30 * 60 * 1000; // 30 min
 
+// Spielzeugkiste — full mini-game library. Restored 26 Apr 2026 per
+// Marc: "please add back all mini games to spielzeugkiste." Each
+// stays code-ready in App.jsx; the Forscher-Ecke MINT chain is
+// separate and surfaces alongside via mintEarned filtering below.
 const GAMES = [
-  // Apr 2026 cut sweep:
-  //  - CloudJumpGame + StarfighterGame tiles removed in cut #10b (broken).
-  //  - MemoryGame + PotionGame tiles removed in cut #10g (legacy MINT).
-  //  - StarCatcher kept per Marc: "starcatcher mini-game alive — Louis
-  //    loves it." It's the only legacy game with a real-user signal.
+  {
+    id: 'memory',
+    titleKey: 'game.magicMemory',
+    descKey: 'game.magicMemory.desc',
+    emoji: '🃏',
+    bg: 'linear-gradient(160deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)',
+    textColor: '#78350f',
+    btnBg: 'rgba(120,53,15,0.12)',
+    btnColor: '#78350f',
+    ready: true,
+  },
   {
     id: 'starfall',
     titleKey: 'game.starfall',
@@ -34,6 +44,48 @@ const GAMES = [
     emoji: '⭐',
     bg: 'linear-gradient(160deg, #fef9c3 0%, #fde047 50%, #eab308 100%)',
     textColor: '#713f12',
+    ready: true,
+  },
+  {
+    id: 'potion',
+    titleKey: 'game.colorMix',
+    descKey: 'game.colorMix.desc',
+    emoji: '🎨',
+    bg: 'linear-gradient(160deg, #fef3c7 0%, #fdba74 50%, #f97316 100%)',
+    textColor: '#7c2d12',
+    btnBg: 'rgba(124,45,18,0.1)',
+    btnColor: '#7c2d12',
+    ready: true,
+  },
+  {
+    id: 'clouds',
+    titleKey: 'game.cloudJump',
+    descKey: 'game.cloudJump.desc',
+    emoji: '☁️',
+    bg: 'linear-gradient(160deg, #e0f2fe 0%, #7dd3fc 50%, #38bdf8 100%)',
+    textColor: '#0c4a6e',
+    btnBg: 'rgba(12,74,110,0.1)',
+    btnColor: '#0c4a6e',
+    ready: true,
+  },
+  {
+    id: 'starfighter',
+    titleKey: 'game.starfighter',
+    descKey: 'game.starfighter.desc',
+    emoji: '🐉',
+    bg: 'linear-gradient(160deg, #ecfdf5 0%, #6ee7b7 50%, #059669 100%)',
+    textColor: '#064e3b',
+    ready: true,
+  },
+  {
+    id: 'kristallsortier',
+    titleKey: 'game.kristallsortier',
+    descKey: 'game.kristallsortier.desc',
+    emoji: '💎',
+    bg: 'linear-gradient(160deg, #ede9fe 0%, #a78bfa 50%, #7c3aed 100%)',
+    textColor: '#3b0764',
+    btnBg: 'rgba(59,7,100,0.1)',
+    btnColor: '#3b0764',
     ready: true,
   },
 ];

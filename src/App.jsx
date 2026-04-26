@@ -29,10 +29,17 @@ import Celebration from './components/Celebration';
 // import ArcOfferCard from './components/ArcOfferCard';
 import FreundCallbackCard from './components/FreundCallbackCard';
 import MiniGames from './components/MiniGames';
-// MemoryGame + PotionGame deleted Apr 2026 (cut #10g). StarCatcher kept
-// per Marc — Louis loves it. MusterMemoryGame is a separate Simon-Says
-// MINT game that stays.
+// Spielzeugkiste — all legacy mini-games kept alongside StarCatcher
+// (Marc 26 Apr 2026: "please add back all mini games to spielzeugkiste").
+// The cuts removed unused tiles to slim the routine surface; on the
+// dedicated games tab the kid actively chooses, so the full library
+// belongs there.
 import StarCatcherGame from './components/StarCatcherGame';
+import MemoryGame from './components/MemoryGame';
+import PotionGame from './components/PotionGame';
+import CloudJumpGame from './components/CloudJumpGame';
+import StarfighterGame from './components/StarfighterGame';
+import KristallSortiererGame from './components/KristallSortiererGame';
 import ToolErrorBoundary from './components/ToolErrorBoundary';
 // ── Lazy-loaded tools + games ──────────────────────────────────────────
 // These surfaces are mounted conditionally (URL param shortcuts, post-
@@ -573,11 +580,33 @@ function AppContent() {
         />
       )}
       {showParental && <ParentalDashboard onClose={() => setShowParental(false)} currentView={view} preauthorized />}
-      {/* MemoryGame + PotionGame routes deleted Apr 2026 (cut #10g).
-          CloudJumpGame + StarfighterGame routes deleted earlier in cut
-          #10b. StarCatcherGame kept — Louis loves it (Marc, Apr 2026). */}
+      {/* Spielzeugkiste — all 6 legacy mini-games (Marc 26 Apr 2026
+          restored after the routine-side cut sweep). They live on the
+          dedicated games tab where the kid actively chooses, separate
+          from the daily routine surface. */}
+      {view === 'memory' && <MemoryGame onComplete={() => {
+        actions.claimGameReward('memory');
+        setView('games');
+      }} />}
       {view === 'starfall' && <StarCatcherGame onComplete={() => {
         actions.claimGameReward('starfall');
+        setView('games');
+      }} />}
+      {view === 'potion' && <PotionGame onComplete={() => {
+        actions.claimGameReward('potion');
+        setView('games');
+      }} />}
+      {view === 'clouds' && <CloudJumpGame onComplete={() => {
+        actions.claimGameReward('clouds');
+        setView('games');
+      }} />}
+      {view === 'starfighter' && <StarfighterGame onComplete={(reward) => {
+        if (reward?.hp > 0) actions.addHP(reward.hp);
+        actions.claimGameReward('starfighter');
+        setView('games');
+      }} />}
+      {view === 'kristallsortier' && <KristallSortiererGame onComplete={() => {
+        actions.claimGameReward('kristallsortier');
         setView('games');
       }} />}
       {/* Egg system deleted Apr 2026 (cut #10h). state.pendingEgg may
