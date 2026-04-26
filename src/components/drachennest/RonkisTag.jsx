@@ -33,6 +33,10 @@ import ToothbrushTimer from '../ToothbrushTimer';
  */
 
 // ── Tokens ────────────────────────────────────────────────────────
+// Type scale (Apr 2026 readability pass — 1st-grader minimums):
+//   Voiced lines = the heart of the surface, must read at arm's length.
+//   German is letter-dense (Hausaufgaben, Schlafanzug) so sizes bias
+//   slightly above WCAG-for-adults floors. Body min = 16px on mobile.
 const T = {
   cream: '#fff8f2',
   ink: '#1e1b17',
@@ -41,13 +45,20 @@ const T = {
   goldSoft: '#fde68a',
   goldDeep: '#b45309',
   warm: '#3a2818',
-  inkScript: '#7a6a4a',
+  inkScript: '#5a4a30',  // deepened from #7a6a4a for 4.5:1 on cream
   inkSoft: '#5a3a20',
   fHead: '"Fredoka", system-ui, sans-serif',
   fBody: '"Nunito", system-ui, sans-serif',
   fLabel: '"Plus Jakarta Sans", system-ui, sans-serif',
   fScript: '"Caveat", "Bradley Hand", cursive',
 };
+
+// Honor reduced-motion at module scope. Used to short-circuit the
+// background-gradient transition and the nightsky twinkle loop.
+const REDUCE_MOTION =
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ── Quest IDs that detour through the toothbrush timer ────────────
 // (mirrors TaskList — kept here as a small const to avoid a circular
@@ -213,7 +224,8 @@ export default function RonkisTag({ onClose, onOpenExpedition, onOpenTonight }) 
       aria-label="Ronkis Tag"
       style={{
         position: 'fixed', inset: 0, zIndex: 90,
-        background: bg, transition: 'background 1200ms ease',
+        background: bg,
+        transition: REDUCE_MOTION ? 'none' : 'background 1200ms ease',
         overflowY: 'auto', WebkitOverflowScrolling: 'touch',
         fontFamily: T.fBody,
       }}
@@ -230,7 +242,7 @@ export default function RonkisTag({ onClose, onOpenExpedition, onOpenTonight }) 
         <>
           <TopBar phase={phase} />
 
-          <div style={{ padding: '94px 14px 16px' }}>
+          <div style={{ padding: '108px 18px 24px' }}>
             {/* Morning */}
             {blocks.morning.length > 0 && (
               <BlockStrip
@@ -324,18 +336,19 @@ function BackChrome({ onClose, dark }) {
         aria-label="Zurück zur Höhle"
         style={{
           pointerEvents: 'auto',
-          display: 'flex', alignItems: 'center', gap: 6,
-          padding: '8px 14px', borderRadius: 999,
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '11px 18px', borderRadius: 999,
           background: dark ? 'rgba(255,248,242,0.92)' : '#ffffff',
           border: dark ? 'none' : '1.5px solid rgba(180,83,9,0.18)',
           color: '#124346',
-          font: `700 12px/1 ${T.fLabel}`,
-          letterSpacing: '0.06em',
+          font: `700 14px/1 ${T.fLabel}`,
+          letterSpacing: '0.04em',
           boxShadow: '0 4px 10px -4px rgba(18,67,70,0.18)',
           cursor: 'pointer',
+          touchAction: 'manipulation',
         }}
       >
-        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>
+        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
         Zurück
       </button>
       <div style={{ width: 76 }} aria-hidden="true" />
@@ -351,28 +364,28 @@ function TopBar({ phase }) {
   const date = dateLabelDe();
   return (
     <div style={{
-      position: 'absolute', top: 50, left: 0, right: 0, padding: '0 18px',
+      position: 'absolute', top: 56, left: 0, right: 0, padding: '0 22px',
       display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
       pointerEvents: 'none',
     }}>
       <div>
         <div style={{
-          font: `700 9px/1 ${T.fLabel}`, letterSpacing: '.32em',
-          textTransform: 'uppercase', color: T.goldDeep, marginBottom: 3,
+          font: `700 11px/1 ${T.fLabel}`, letterSpacing: '.22em',
+          textTransform: 'uppercase', color: T.goldDeep, marginBottom: 5,
         }}>Heute mit Ronki</div>
         <div style={{
-          font: `600 16px/1.05 ${T.fHead}`, color: T.ink, letterSpacing: '-0.01em',
+          font: `700 19px/1.1 ${T.fHead}`, color: T.ink, letterSpacing: '-0.01em',
         }}>{date}, {moment}</div>
       </div>
-      <div style={{ display: 'flex', gap: 3, paddingBottom: 4 }}>
+      <div style={{ display: 'flex', gap: 4, paddingBottom: 5 }}>
         {phases.map((m, i) => {
           const active = m.toLowerCase().startsWith(moment.toLowerCase().slice(0, 3));
           return (
             <div key={i} style={{
-              width: 4, height: active ? 14 : 8,
+              width: 5, height: active ? 18 : 11,
               background: active ? T.goldDeep : 'rgba(180,83,9,.25)',
-              borderRadius: 1,
-              transition: 'height 600ms ease',
+              borderRadius: 2,
+              transition: REDUCE_MOTION ? 'none' : 'height 600ms ease, background 600ms ease',
             }} />
           );
         })}
@@ -399,7 +412,7 @@ function BlockStrip({ title, phase, blockId, quests, isCurrent, allDone, collaps
       {collapse ? (
         <CollapsedGrid quests={quests} blockId={blockId} variant={variant} stageIdx={stageIdx} />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {quests.map((q, i) => {
             const sceneState = q.done ? 'past' : (isCurrent && firstUndone(quests)?.id === q.id ? 'now' : 'future');
             return (
@@ -430,17 +443,17 @@ function firstUndone(list) {
 function StripSection({ children, color, hint, onDark }) {
   return (
     <div style={{
-      display: 'flex', alignItems: 'baseline', gap: 8,
-      margin: `14px 4px 7px`,
+      display: 'flex', alignItems: 'baseline', gap: 10,
+      margin: `24px 4px 12px`,
     }}>
       <div style={{
-        font: `700 9px/1 ${T.fLabel}`, color, letterSpacing: '.22em',
+        font: `800 13px/1.05 ${T.fLabel}`, color, letterSpacing: '.12em',
         textTransform: 'uppercase',
       }}>{children}</div>
       {hint && (
         <div style={{
-          font: `400 12px/1 ${T.fScript}`,
-          color: onDark ? 'rgba(254,243,199,.55)' : T.inkScript,
+          font: `500 17px/1.05 ${T.fScript}`,
+          color: onDark ? 'rgba(254,243,199,.88)' : T.inkScript,
         }}>
           {hint}
         </div>
@@ -458,14 +471,20 @@ function StripSection({ children, color, hint, onDark }) {
 // ── StripScene (one task as a comic panel) ───────────────────────
 
 function StripScene({ quest, state, phase, variant, stageIdx, onDark, onTap }) {
-  const opacity = state === 'past' ? 0.55 : 1;
-  const saturate = state === 'past' ? 0.6 : 1;
+  // Past-state fade is applied to the ART FRAME only — text stays at
+  // full opacity so a 6yo can still read the quest name on review.
+  const artOpacity = state === 'past' ? 0.62 : 1;
+  const artSaturate = state === 'past' ? 0.78 : 1;
   const seed = useMemo(() => {
     let h = 0;
     for (const c of quest.id) h = (h * 31 + c.charCodeAt(0)) | 0;
     return h;
   }, [quest.id]);
   const line = pickMomentLine(phase, state === 'now' ? 'now' : state === 'past' ? 'past' : 'future', seed);
+  const stateAria =
+    state === 'past' ? ', fertig' :
+    state === 'now'  ? ', jetzt dran' :
+                       ', später';
 
   const baseBg =
     onDark
@@ -479,38 +498,40 @@ function StripScene({ quest, state, phase, variant, stageIdx, onDark, onTap }) {
       type="button"
       onClick={(e) => onTap(quest, e)}
       disabled={state === 'past'}
-      aria-label={`${quest.name || quest.id}${state === 'past' ? ' — fertig' : ''}`}
-      className="active:scale-[0.99] transition-transform"
+      aria-label={`${quest.name || quest.id}${stateAria}`}
+      aria-current={state === 'now' ? 'step' : undefined}
+      className="active:scale-[0.96] transition-transform duration-150"
       style={{
         position: 'relative',
         textAlign: 'left',
         padding: 0, margin: 0,
-        borderRadius: 12, overflow: 'hidden',
+        borderRadius: 14, overflow: 'hidden',
         border: state === 'now'
           ? `1.5px solid rgba(252,211,77,.6)`
           : '1px solid rgba(0,0,0,.06)',
         boxShadow: state === 'now'
           ? '0 6px 14px -4px rgba(180,83,9,.4), inset 0 0 0 1.5px rgba(252,211,77,.5)'
           : '0 2px 6px rgba(0,0,0,.10)',
-        opacity, filter: `saturate(${saturate})`,
         cursor: state === 'past' ? 'default' : 'pointer',
         background: 'transparent',
+        touchAction: 'manipulation',
       }}
     >
       <div style={{
         background: baseBg,
-        height: 86,
-        display: 'grid', gridTemplateColumns: '64px 1fr',
-        gap: 10, padding: '10px 12px',
+        minHeight: 100,
+        display: 'grid', gridTemplateColumns: '76px 1fr',
+        gap: 12, padding: '12px 14px',
         position: 'relative',
       }}>
-        {/* Art frame */}
+        {/* Art frame — past-state desaturate happens here only */}
         <div style={{
-          width: 64, height: 66, borderRadius: 8,
+          width: 76, height: 78, borderRadius: 10,
           background: onDark ? 'rgba(50,40,80,.6)' : 'rgba(255,255,255,.35)',
           border: onDark ? '1px solid rgba(252,211,77,.2)' : '1px solid rgba(0,0,0,.08)',
           position: 'relative', overflow: 'hidden',
           display: 'grid', placeItems: 'center',
+          opacity: artOpacity, filter: `saturate(${artSaturate})`,
         }}>
           <SceneArt
             quest={quest}
@@ -527,16 +548,19 @@ function StripScene({ quest, state, phase, variant, stageIdx, onDark, onTap }) {
           minWidth: 0,
         }}>
           <div style={{
-            font: `600 12.5px/1.2 ${T.fHead}`,
+            font: `700 17px/1.25 ${T.fHead}`,
             color: onDark ? '#fef3c7' : T.warm,
-            letterSpacing: '-0.005em', marginBottom: 3,
+            letterSpacing: '-0.005em', marginBottom: 4,
+            textDecoration: state === 'past' ? 'line-through' : 'none',
+            textDecorationColor: state === 'past' ? 'rgba(58,40,24,0.35)' : undefined,
+            textDecorationThickness: state === 'past' ? '1.5px' : undefined,
           }}>
             {quest.name || quest.id}
           </div>
           {line && (
             <div style={{
-              font: `400 10.5px/1.3 ${T.fBody}`,
-              color: onDark ? 'rgba(254,243,199,.7)' : T.inkSoft,
+              font: `500 15px/1.4 ${T.fBody}`,
+              color: onDark ? 'rgba(254,243,199,.92)' : T.inkSoft,
               fontStyle: 'italic',
               overflow: 'hidden', textOverflow: 'ellipsis',
               display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
@@ -555,13 +579,14 @@ function StripScene({ quest, state, phase, variant, stageIdx, onDark, onTap }) {
 function PastCheck() {
   return (
     <div aria-hidden="true" style={{
-      position: 'absolute', top: 6, right: 8,
-      width: 14, height: 14, borderRadius: '50%',
+      position: 'absolute', top: 9, right: 10,
+      width: 18, height: 18, borderRadius: '50%',
       background: '#86c084', display: 'grid', placeItems: 'center',
+      boxShadow: '0 1px 3px rgba(58,90,42,0.3)',
     }}>
       <div style={{
-        width: 5, height: 7, marginTop: -1, marginLeft: -0.5,
-        borderRight: '1.5px solid #fff', borderBottom: '1.5px solid #fff',
+        width: 6, height: 9, marginTop: -1, marginLeft: -0.5,
+        borderRight: '2px solid #fff', borderBottom: '2px solid #fff',
         transform: 'rotate(45deg)',
       }} />
     </div>
@@ -571,11 +596,13 @@ function PastCheck() {
 function JetztPill({ onDark }) {
   return (
     <div style={{
-      position: 'absolute', top: 6, right: 8,
-      font: `700 7px/1 ${T.fLabel}`, letterSpacing: '.18em',
+      position: 'absolute', top: 9, right: 10,
+      font: `800 11px/1 ${T.fLabel}`, letterSpacing: '.14em',
       color: onDark ? '#5a3a18' : T.goldDeep, textTransform: 'uppercase',
-      background: onDark ? T.gold : 'rgba(252,211,77,.3)', padding: '3px 5px',
-      borderRadius: 3,
+      background: onDark ? T.gold : 'rgba(252,211,77,.55)',
+      padding: '5px 9px',
+      borderRadius: 6,
+      boxShadow: '0 1px 3px rgba(180,83,9,0.18)',
     }}>jetzt</div>
   );
 }
@@ -585,38 +612,41 @@ function JetztPill({ onDark }) {
 function CollapsedGrid({ quests, blockId, variant, stageIdx }) {
   const cols = quests.length === 2 ? 2 : 3;
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 5 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
       {quests.map(q => (
         <div key={q.id} style={{
-          borderRadius: 7, padding: '6px 6px 5px',
-          background: blockId === 'morning' ? 'rgba(254,243,199,.85)' : 'rgba(244,226,200,.85)',
+          borderRadius: 9, padding: '8px 8px 7px',
+          background: blockId === 'morning' ? 'rgba(254,243,199,.92)' : 'rgba(244,226,200,.92)',
           border: '1px solid rgba(0,0,0,.06)',
-          opacity: 0.7, filter: 'saturate(0.7)',
+          // Past-state fade kept on the wrapper for hierarchy, but no
+          // longer aggressive enough to make labels unreadable.
+          opacity: 0.92,
           position: 'relative', overflow: 'hidden',
         }}>
           <div style={{
-            width: '100%', height: 28, borderRadius: 4,
+            width: '100%', height: 38, borderRadius: 6,
             background: 'rgba(245,158,11,.18)',
-            marginBottom: 4, display: 'grid', placeItems: 'center',
+            marginBottom: 6, display: 'grid', placeItems: 'center',
             overflow: 'hidden',
+            opacity: 0.78, filter: 'saturate(0.85)',
           }}>
-            <div style={{ transform: 'scale(0.65)' }}>
+            <div style={{ transform: 'scale(0.78)' }}>
               <SceneArt quest={q} phase={blockId} state="past" variant={variant} stageIdx={stageIdx} compact />
             </div>
           </div>
           <div style={{
-            font: `600 8px/1 ${T.fLabel}`, color: '#7a6a4a', letterSpacing: '.04em',
+            font: `700 12px/1.15 ${T.fLabel}`, color: '#5a4a30', letterSpacing: '.02em',
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>{q.name || q.id}</div>
           {q.done && (
             <div style={{
-              position: 'absolute', top: 4, right: 4,
-              width: 10, height: 10, borderRadius: '50%',
+              position: 'absolute', top: 5, right: 5,
+              width: 13, height: 13, borderRadius: '50%',
               background: '#86c084', display: 'grid', placeItems: 'center',
             }}>
               <div style={{
-                width: 3, height: 5, marginTop: -1,
-                borderRight: '1.2px solid #fff', borderBottom: '1.2px solid #fff',
+                width: 4, height: 6, marginTop: -1,
+                borderRight: '1.5px solid #fff', borderBottom: '1.5px solid #fff',
                 transform: 'rotate(45deg)',
               }} />
             </div>
@@ -634,42 +664,44 @@ function AnchorCompleteCard({ onOpenExpedition }) {
     <button
       type="button"
       onClick={onOpenExpedition}
-      className="active:scale-[0.99] transition-transform"
+      aria-label="Reise verfolgen — Morgen ist gemacht"
+      className="active:scale-[0.96] transition-transform duration-150"
       style={{
-        width: '100%', marginTop: 14,
-        padding: 0, border: 'none', borderRadius: 14, overflow: 'hidden',
+        width: '100%', marginTop: 18,
+        padding: 0, border: 'none', borderRadius: 16, overflow: 'hidden',
         cursor: 'pointer',
         boxShadow: '0 8px 22px -8px rgba(180,90,40,.45)',
         textAlign: 'left',
+        touchAction: 'manipulation',
       }}
     >
       <div style={{
         position: 'relative',
         background: 'linear-gradient(180deg, #b8d8c4 0%, #e8e0c4 60%, #fef3c7 100%)',
-        padding: '14px 16px 18px',
-        minHeight: 110,
+        padding: '18px 18px 22px',
+        minHeight: 132,
       }}>
         {/* Tiny forest path silhouette */}
         <ForestPathStrip />
         <div style={{
           position: 'relative', zIndex: 2,
-          font: `700 8px/1 ${T.fLabel}`,
-          letterSpacing: '.32em', textTransform: 'uppercase',
-          color: '#5c2a08', marginBottom: 6,
+          font: `800 12px/1 ${T.fLabel}`,
+          letterSpacing: '.16em', textTransform: 'uppercase',
+          color: '#5c2a08', marginBottom: 8,
         }}>Morgen ist gemacht</div>
         <div style={{
           position: 'relative', zIndex: 2,
-          font: `500 14px/1.4 ${T.fHead}`, color: T.warm, fontStyle: 'italic',
+          font: `600 17px/1.4 ${T.fHead}`, color: T.warm, fontStyle: 'italic',
         }}>"Ich geh mal kurz raus. Bin zum Mittag wieder da."</div>
         <div style={{
           position: 'relative', zIndex: 2,
-          marginTop: 12,
+          marginTop: 14,
           display: 'inline-block',
-          font: `700 10px/1 ${T.fLabel}`,
-          letterSpacing: '.22em', textTransform: 'uppercase',
+          font: `800 13px/1 ${T.fLabel}`,
+          letterSpacing: '.10em', textTransform: 'uppercase',
           color: '#fef3c7',
           background: 'linear-gradient(180deg, #5a3a20 0%, #3a2818 100%)',
-          padding: '8px 14px', borderRadius: 999,
+          padding: '10px 18px', borderRadius: 999,
         }}>Reise verfolgen →</div>
       </div>
     </button>
@@ -727,21 +759,21 @@ function EndOfDayScene({ variant, stageIdx, onOpenTonight }) {
         textAlign: 'center', padding: '0 24px',
       }}>
         <div style={{
-          font: `400 9px/1 ${T.fLabel}`, letterSpacing: '.32em',
-          textTransform: 'uppercase', color: 'rgba(252,211,77,.65)',
-          marginBottom: 8,
+          font: `600 12px/1.1 ${T.fLabel}`, letterSpacing: '.16em',
+          textTransform: 'uppercase', color: 'rgba(254,243,199,.85)',
+          marginBottom: 10,
         }}>{dateLabelDe()} · zu Ende</div>
         <div style={{
-          font: `500 22px/1.2 ${T.fHead}`, color: '#fef3c7', letterSpacing: '-0.01em',
+          font: `600 32px/1.15 ${T.fScript}`, color: '#fef3c7', letterSpacing: '-0.01em',
         }}>Ein guter Tag.</div>
       </div>
 
       <div style={{
         position: 'relative', zIndex: 2,
-        textAlign: 'center', padding: '14px 28px 0',
+        textAlign: 'center', padding: '16px 28px 0',
       }}>
         <div style={{
-          font: `400 13px/1.5 ${T.fBody}`, color: 'rgba(254,243,199,.80)',
+          font: `500 16px/1.45 ${T.fBody}`, color: 'rgba(254,243,199,.92)',
           fontStyle: 'italic',
         }}>"Wir haben heute alles geteilt. Sogar das Brot mit den Krümeln."</div>
       </div>
@@ -764,16 +796,18 @@ function EndOfDayScene({ variant, stageIdx, onOpenTonight }) {
         <button
           type="button"
           onClick={onOpenTonight}
-          className="active:scale-[0.98] transition-transform"
+          aria-label="Ins Lager — Tonight-Ritual öffnen"
+          className="active:scale-[0.96] transition-transform duration-150"
           style={{
             display: 'inline-block',
             borderRadius: 999,
-            background: 'rgba(252,211,77,.18)',
-            border: '1px solid rgba(252,211,77,.42)',
-            padding: '12px 22px',
-            font: `600 11px/1 ${T.fLabel}`, letterSpacing: '.22em',
-            textTransform: 'uppercase', color: '#fde68a',
+            background: 'rgba(252,211,77,.22)',
+            border: '1.5px solid rgba(252,211,77,.65)',
+            padding: '14px 26px',
+            font: `700 14px/1 ${T.fLabel}`, letterSpacing: '.10em',
+            textTransform: 'uppercase', color: '#fef3c7',
             cursor: 'pointer',
+            touchAction: 'manipulation',
           }}
         >
           ins Lager →
@@ -806,7 +840,10 @@ function NightSky() {
           width: s.size, height: s.size, borderRadius: '50%',
           background: 'white',
           boxShadow: `0 0 ${s.size * 2}px rgba(255,255,255,.6)`,
-          animation: `rt-twinkle ${3 + (i % 4)}s ease-in-out infinite ${s.delay}s`,
+          opacity: REDUCE_MOTION ? 0.7 : undefined,
+          animation: REDUCE_MOTION
+            ? 'none'
+            : `rt-twinkle ${3 + (i % 4)}s ease-in-out infinite ${s.delay}s`,
         }} />
       ))}
       <div style={{
