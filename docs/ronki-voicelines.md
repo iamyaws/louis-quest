@@ -1,18 +1,37 @@
-# Ronki Voicelines — Refined Database
+# Ronki Voicelines — Refined Database (Northstar Pass)
 
-Single source of truth for the 50 voice lines covering all surfaces in the app. Kept Dikka-energy where it serves the moment (peak-celebration, quest-complete, freund-met, weather-wow) and quiet warmth where the kid needs that (mood-sad, evening, narrator).
+Single source of truth for Ronki's voice across all surfaces, restructured around the four-tier voice architecture from the 2026-04-23 time-stack discovery and the 2026-04-23 parent-first onboarding discovery.
 
-**Two characters:**
-- `ronki` — Harry voice (creaky young male). Curious, easily amazed, slightly clumsy, never lectures. Outputs to `public/audio/ronki/<id>.mp3`.
-- `drachenmutter` — Bella placeholder until Marc picks from the casting shortlist. Calm authority, intimate register, slow grounded. Outputs to `public/audio/narrator/<id>.mp3`.
+## Northstar — what shapes every line
 
-**Voice rules:**
-- Real UTF-8 umlauts (ä/ö/ü/ß), never `ae`/`oe`/`ue` substitutes — ElevenLabs reads those as English.
-- No emojis in audio text — bubble can render emojis but TTS speaks them literally.
-- Dikka touches that fit a baby dragon: punchy openers (`Boah!`, `Hammer!`, `Krass!`), repetition for bounce (`schau, schau!`), invitation energy (`Komm!`, `Lass uns!`), body-physicality (`Ich tanze!`, `Mein Herz macht pongpongpong`). Pulled back on adult-rapper slang (`Bratan`, `Dikka`, `Yo!` standalone) — too cool for a 6yo dragon.
-- Full Dikka energy reserved for big moments (all_done, freund_met, weather wow). Quiet moments stay quiet — sad/tired/night/narrator are deliberately gentler.
+**Ronki IS the time-stack spine.** The companion carries meaning across week/month/season/journey. Garden replaces the campfire-only Hub backdrop; plants accumulate; Ronki narrates growth.
 
-**TS sync:** `src/companion/lines/de.ts` is the React engine's source. After Marc reviews this doc, sync de.ts (and en.ts translations) to match. Until then this doc is the staging area.
+**Four voice tiers, distinct registers:**
+
+| Tier | Cadence | Register | What it sounds like |
+|---|---|---|---|
+| **Quipper** | daily | ambient, light | "Hey, du bist da!" |
+| **Gardener** | weekly | invitation, patient | "Was pflanzt du diese Woche?" |
+| **Storyteller** | monthly | witness, present | "Komm her, ich zeig dir was." |
+| **Elder** | seasonal / journey | reflective, rare | "Riech mal — die Luft hat sich geändert." |
+
+**Hard rules** (carried from `project_ronki_positioning.md` + the time-stack discovery):
+- Companion that fades by design — no FOMO, no decay, no streaks, no engagement-theater.
+- Patience IS the mechanic. Ronki's invite can sit unanswered for hours or days; the world waits.
+- Cumulative over countable. "The forest grew" beats "this stone is for Tuesday."
+- Time-to-independence > time-on-device.
+- Real UTF-8 umlauts (ä/ö/ü/ß) in source. No emojis in audio text — TTS reads them literally.
+
+**What this rewrite cleaned up vs. the previous draft:**
+1. **Toned down 6 Dikka-amped lines** (`de_alldone_01/02`, `de_freund_met_01`, `de_quest_streak_01`, `de_w_snow_01`, `de_identity_01`) — caps-shouting + "gerockt" / "nicht zu stoppen" / "EIN NEUER FREUND!" tipped into engagement-theater. Same warmth, less performance.
+2. **Cut paused-feature audio** — `de_egg_found` + `de_egg_hatch` (floating egg system paused per `App.jsx`). No regen waste.
+3. **Cut redundant** — `de_greet_02` (overlaps `de_greet_01`), `de_alldone_03/04` (replaced with 2 calmer recognitions), `de_trait_multi_01` (4-trait gate moment is too rare for v1).
+4. **Added Gardener tier** (5 lines) — Sunday plant offer, plant placed, decor placed, quiet-week reassurance, garden-revisit.
+5. **Added Storyteller tier** (2 lines) — monthly witness invite + tree-grew reveal.
+6. **Added Elder tier** (2 lines) — seasonal change invite, journey reflection (sets up Wave-3 fade-out without arriving there yet).
+7. **Added 2 onboarding-first lines** — kid-intro greeting before parent handoff, Lagerfeuer arrival post-hatch.
+
+**TS sync:** `src/companion/lines/de.ts` is still the React engine's source. After Marc signs off this doc, sync de.ts to match (and translate to en.ts in a parity pass). New triggers needed: `garden_plant_offer`, `garden_planted`, `garden_decor_placed`, `garden_quiet_week`, `garden_visit`, `witness_invite_monthly`, `witness_reveal_tree`, `witness_invite_season`, `journey_reflection`, `onboarding_kid_intro`, `lagerfeuer_arrival`. Most new lines are direct-play (component fires by ID); a few benefit from engine routing for variety.
 
 ---
 
@@ -33,7 +52,7 @@ Single source of truth for the 50 voice lines covering all surfaces in the app. 
   },
   "drachenmutter": {
     "voice_id": "hpp4J3VqNfWAUOO0d1Us",
-    "voice_name": "Bella (placeholder — pick from voice-samples/drachenmutter/ casting)",
+    "voice_name": "Bella (placeholder — pick from voice-samples/drachenmutter/)",
     "output_dir": "public/audio/narrator",
     "settings": {
       "stability": 0.70,
@@ -47,193 +66,146 @@ Single source of truth for the 50 voice lines covering all surfaces in the app. 
 
 ---
 
-## Lines (50)
+## Lines (57)
 
 ```json
 [
   {
-    "id": "de_greet_01",
+    "id": "de_onboarding_kid_intro_01",
     "character": "ronki",
-    "text": "Du bist da! Endlich!",
-    "triggers": ["hub_open"],
-    "notes": "Generic greeting, any time of day"
+    "tier": "onboarding",
+    "text": "Hallo! Bevor wir uns kennenlernen, hol bitte Mama oder Papa.",
+    "direct_play": true,
+    "notes": "Phase 1 of parent-first onboarding. Kid's very first Ronki beat before the handoff card. May ship as bubble-only; audio is a stretch goal."
   },
   {
-    "id": "de_greet_02",
+    "id": "de_lagerfeuer_arrival_01",
     "character": "ronki",
-    "text": "Hey! Ich hab grad an dich gedacht!",
+    "tier": "onboarding",
+    "text": "Magst du mir zeigen, was du morgens machst?",
+    "direct_play": true,
+    "notes": "Phase 6 arrival post-hatch. Kid-as-expert framing — Ronki asks the kid to teach him."
+  },
+
+  {
+    "id": "de_greet_01",
+    "character": "ronki",
+    "tier": "quipper",
+    "text": "Du bist da! Endlich!",
     "triggers": ["hub_open"],
-    "notes": "Generic greeting, any time of day"
+    "notes": "Generic warm opener, any time of day"
   },
   {
     "id": "de_greet_morning_01",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Morgen! Ich hab schon gegähnt.",
     "triggers": ["hub_open"],
     "timeOfDay": ["morning"],
-    "notes": "Sleepy morning energy — Ronki yawns too"
+    "notes": "Sleepy morning energy"
   },
   {
     "id": "de_greet_afternoon_01",
     "character": "ronki",
-    "text": "Wie war Schule? Komm, erzähl!",
+    "tier": "quipper",
+    "text": "Wie war Schule? Komm, erzähl.",
     "triggers": ["hub_open"],
     "timeOfDay": ["afternoon"],
-    "notes": "Engaged listener, invites story"
+    "notes": "Engaged listener — invites story"
   },
   {
     "id": "de_greet_evening_01",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Abend. Bald wird's gemütlich.",
     "triggers": ["hub_open"],
     "timeOfDay": ["evening"],
-    "notes": "Soft transition to evening — quiet, not Dikka-energy"
+    "notes": "Soft transition. Deliberately quiet — not Dikka-energy"
   },
   {
     "id": "de_greet_night_01",
     "character": "ronki",
-    "text": "Draußen dunkel. Hier ist's warm. Pass auf, ich pass auf.",
+    "tier": "quipper",
+    "text": "Draußen dunkel. Hier ist's warm.",
     "triggers": ["hub_open"],
     "timeOfDay": ["night"],
-    "notes": "Cozy night reassurance"
+    "notes": "Cozy night — dropped the 'ich pass auf' echo for tightness"
   },
+
   {
     "id": "de_sanct_01",
     "character": "ronki",
-    "text": "Boah, du bist da! Ich bin im Kreis gelaufen vor Freude!",
+    "tier": "quipper",
+    "text": "Du bist da! Ich bin im Kreis gelaufen vor Freude.",
     "triggers": ["sanctuary_open"],
-    "notes": "Dikka opener — peak entry-energy"
+    "notes": "Dropped 'Boah' — the body-physical reaction carries it"
   },
   {
     "id": "de_sanct_02",
     "character": "ronki",
-    "text": "Riech mal! Die Wiese riecht nach Abenteuer!",
+    "tier": "quipper",
+    "text": "Riech mal! Die Wiese riecht nach Abenteuer.",
     "triggers": ["sanctuary_open"],
     "notes": "Sensory invitation"
   },
   {
     "id": "de_sanct_03",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Weißt du was? Ich hab heut versucht, einen Schmetterling zu fangen. Hat nicht geklappt.",
     "triggers": ["sanctuary_open"],
-    "notes": "Signature Ronki clumsiness — keep verbatim"
+    "notes": "Signature Ronki clumsiness — verbatim"
   },
+
   {
     "id": "de_w_rain_01",
     "character": "ronki",
-    "text": "Es regnet! Pfützen sind das BESTE!",
+    "tier": "quipper",
+    "text": "Es regnet! Pfützen sind das Beste.",
     "triggers": ["hub_open", "sanctuary_open"],
     "weather": ["rain"],
-    "notes": "Caps for emphasis on BESTE — voice should land it"
+    "notes": "Dropped caps on BESTE — voice carries the emphasis"
   },
   {
     "id": "de_w_cold_01",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Brrr! Zieh dich warm an. Ich hab ja Schuppen, ich pack das.",
     "triggers": ["hub_open", "sanctuary_open"],
     "weather": ["cold"],
-    "notes": "Dragon detail — gentle ribbing, not lecture"
+    "notes": "Dragon detail, gentle ribbing"
   },
   {
     "id": "de_w_hot_01",
     "character": "ronki",
-    "text": "Voll warm! Ich liege heut den ganzen Tag in der Sonne.",
+    "tier": "quipper",
+    "text": "Voll warm. Ich liege heut den ganzen Tag in der Sonne.",
     "triggers": ["hub_open", "sanctuary_open"],
     "weather": ["hot", "clear"],
-    "notes": "Dragon basking — replaces 'könnte den ganzen Tag' with bolder 'liege'"
+    "notes": "Dragon basking. 'Voll warm' kept — more grounded than 'krass warm'"
   },
   {
     "id": "de_w_snow_01",
     "character": "ronki",
-    "text": "SCHNEE! Ich hab noch nie— okay, doch, letztes Mal schon. Trotzdem KRASS!",
+    "tier": "quipper",
+    "text": "Schnee! Ich hab noch nie— okay, doch, letztes Mal schon. Trotzdem schön.",
     "triggers": ["hub_open", "sanctuary_open"],
     "weather": ["snow"],
-    "notes": "Self-correcting wonder — Dikka punctuation"
+    "notes": "Dropped CAPS + 'KRASS' — the self-correcting wonder is enough"
   },
-  {
-    "id": "de_quest_01",
-    "character": "ronki",
-    "text": "Wow! Hast du das echt grad geschafft? Krass!",
-    "triggers": ["quest_complete"],
-    "notes": "Surprise + direct praise"
-  },
-  {
-    "id": "de_quest_02",
-    "character": "ronki",
-    "text": "Ich hab zugeguckt. Das war richtig richtig gut.",
-    "triggers": ["quest_complete"],
-    "notes": "Quiet intimate praise — repeated 'richtig' for emphasis"
-  },
-  {
-    "id": "de_quest_streak_01",
-    "character": "ronki",
-    "text": "Drei schon? Boah, du bist heut nicht zu stoppen!",
-    "triggers": ["quest_complete"],
-    "minQuestsToday": 3,
-    "notes": "Streak — Dikka 'Boah'"
-  },
-  {
-    "id": "de_alldone_01",
-    "character": "ronki",
-    "text": "ALLES! Du hast ALLES gerockt! Ich platze gleich vor Stolz!",
-    "triggers": ["all_done"],
-    "notes": "Peak celebration — caps + 'gerockt' lean Dikka"
-  },
-  {
-    "id": "de_alldone_02",
-    "character": "ronki",
-    "text": "Wuuuhuu! Heute war DEIN Tag! Jede Aufgabe — fertig!",
-    "triggers": ["all_done"],
-    "notes": "Onomatopoeia opener"
-  },
-  {
-    "id": "de_alldone_03",
-    "character": "ronki",
-    "text": "Schau! Meine Schuppen glitzern! Das passiert nur, wenn du's komplett rockst.",
-    "triggers": ["all_done"],
-    "notes": "Body reaction — keeps Ronki's POV"
-  },
-  {
-    "id": "de_alldone_04",
-    "character": "ronki",
-    "text": "Wir haben's geschafft! Ich tanze, schau, ich tanze!",
-    "triggers": ["all_done"],
-    "notes": "Physical celebration — 'wir' inclusive"
-  },
-  {
-    "id": "de_care_fed_01",
-    "character": "ronki",
-    "text": "Mmmmmm! Lecker! Hast du auch was gegessen?",
-    "triggers": ["care_action"],
-    "careAction": ["fed"],
-    "notes": "Bounces back to kid"
-  },
-  {
-    "id": "de_care_pet_01",
-    "character": "ronki",
-    "text": "Hihihi! Das kitzelt! Nochmal, nochmal!",
-    "triggers": ["care_action"],
-    "careAction": ["petted"],
-    "notes": "Repetition for giggle-rhythm"
-  },
-  {
-    "id": "de_care_play_01",
-    "character": "ronki",
-    "text": "Spielen! Ja! Komm, fang mich!",
-    "triggers": ["care_action"],
-    "careAction": ["played"],
-    "notes": "Play invitation"
-  },
+
   {
     "id": "de_idle_01",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Glaubst du, Wolken sind so weich, wie sie aussehen?",
     "triggers": ["idle"],
-    "notes": "Wonder — kept quiet on purpose"
+    "notes": "Wonder — quietly framed"
   },
   {
     "id": "de_idle_02",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Ich hab versucht, meinen eigenen Schwanz zu fangen. Hat nicht geklappt.",
     "triggers": ["idle"],
     "notes": "Slapstick — signature Ronki"
@@ -241,13 +213,16 @@ Single source of truth for the 50 voice lines covering all surfaces in the app. 
   {
     "id": "de_idle_03",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Was wärst du, wenn du kein Mensch wärst? Ich wär ein... Drache. Ach, stimmt ja.",
     "triggers": ["idle"],
     "notes": "Self-aware joke"
   },
+
   {
     "id": "de_mood_sad_01",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Hey... ich bin heut auch leise. Sollen wir einfach zusammen sein?",
     "triggers": ["hub_open"],
     "mood": ["traurig", "besorgt"],
@@ -256,6 +231,7 @@ Single source of truth for the 50 voice lines covering all surfaces in the app. 
   {
     "id": "de_mood_tired_01",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Ich gähne auch. Lass uns heut langsam machen.",
     "triggers": ["hub_open"],
     "mood": ["müde"],
@@ -264,170 +240,325 @@ Single source of truth for the 50 voice lines covering all surfaces in the app. 
   {
     "id": "de_mood_happy_01",
     "character": "ronki",
-    "text": "Wow! Du strahlst heut! Was ist passiert?",
+    "tier": "quipper",
+    "text": "Du strahlst heut. Was ist passiert?",
     "triggers": ["hub_open"],
     "mood": ["magisch", "gut"],
-    "notes": "Catches the kid's energy"
+    "notes": "Dropped 'Wow!' opener — the question itself is the recognition"
   },
   {
     "id": "de_mood_okay_01",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Mittendrin ist auch gut. Nicht jeder Tag muss funkeln.",
     "triggers": ["hub_open"],
     "mood": ["okay"],
-    "notes": "Validation — keep verbatim"
+    "notes": "Validation — verbatim"
   },
   {
     "id": "de_mood_worried_01",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Ist was passiert? Du kannst's mir erzählen — oder einfach da sein.",
     "triggers": ["hub_open"],
     "mood": ["besorgt"],
     "notes": "Permission-giving"
   },
+
   {
-    "id": "de_trait_brave_01",
+    "id": "de_quest_01",
     "character": "ronki",
-    "text": "Du bist jemand, der nicht aufgibt. Das weiß ich jetzt.",
-    "triggers": ["hub_open", "quest_complete"],
-    "requiredTraits": ["brave"],
-    "notes": "Identity language — kept verbatim"
+    "tier": "quipper",
+    "text": "Hast du das grad geschafft? Schön.",
+    "triggers": ["quest_complete"],
+    "notes": "Quiet recognition — replaces 'Wow! ... Krass!' with a calmer beat"
   },
   {
-    "id": "de_trait_gentle_01",
+    "id": "de_quest_02",
     "character": "ronki",
-    "text": "Deine Ruhe tut allen gut. Auch mir.",
-    "triggers": ["hub_open", "sanctuary_open"],
-    "requiredTraits": ["gentle"],
-    "notes": "Body-sense"
+    "tier": "quipper",
+    "text": "Ich hab zugeguckt. Das war richtig richtig gut.",
+    "triggers": ["quest_complete"],
+    "notes": "Intimate — repeated 'richtig' for emphasis-without-shouting"
   },
   {
-    "id": "de_trait_multi_01",
+    "id": "de_quest_streak_01",
     "character": "ronki",
-    "text": "Boah! Du hast schon SO VIELE Stärken. Du wirst ein großer Held.",
-    "triggers": ["hub_open"],
-    "requireAllTraits": ["brave", "gentle", "patient", "mapmaker"],
-    "notes": "Achievement gate — Dikka 'Boah'"
+    "tier": "quipper",
+    "text": "Drei schon. Du machst das ruhig weiter, das gefällt mir.",
+    "triggers": ["quest_complete"],
+    "minQuestsToday": 3,
+    "notes": "Reframed from 'nicht zu stoppen' (streak-hype) to 'machst das ruhig' (recognition without the loop language)"
   },
+  {
+    "id": "de_alldone_recognition_01",
+    "character": "ronki",
+    "tier": "quipper",
+    "text": "Alles geschafft heute. Ich seh's, ich seh's.",
+    "triggers": ["all_done"],
+    "notes": "Replaces 'ALLES gerockt' — recognition + Ronki repetition for warmth"
+  },
+  {
+    "id": "de_alldone_recognition_02",
+    "character": "ronki",
+    "tier": "quipper",
+    "text": "Heute war ein guter Tag mit dir. Lass uns kurz sitzen.",
+    "triggers": ["all_done"],
+    "notes": "Replaces 'Wuuuhuu DEIN Tag' — invites rest, not high-five"
+  },
+
+  {
+    "id": "de_care_fed_01",
+    "character": "ronki",
+    "tier": "quipper",
+    "text": "Mmmmm! Lecker! Hast du auch was gegessen?",
+    "triggers": ["care_action"],
+    "careAction": ["fed"],
+    "notes": "Bounces back to kid"
+  },
+  {
+    "id": "de_care_pet_01",
+    "character": "ronki",
+    "tier": "quipper",
+    "text": "Hihihi! Das kitzelt! Nochmal.",
+    "triggers": ["care_action"],
+    "careAction": ["petted"],
+    "notes": "Repetition for giggle-rhythm. Trimmed double 'nochmal' to one for tightness"
+  },
+  {
+    "id": "de_care_play_01",
+    "character": "ronki",
+    "tier": "quipper",
+    "text": "Spielen! Komm, fang mich!",
+    "triggers": ["care_action"],
+    "careAction": ["played"],
+    "notes": "Play invitation"
+  },
+
+  {
+    "id": "de_freund_met_01",
+    "character": "ronki",
+    "tier": "quipper",
+    "text": "Schau mal, wer da ist.",
+    "triggers": ["freund_met"],
+    "notes": "Replaces 'EIN NEUER FREUND!' — quiet, present, an invitation to look"
+  },
+  {
+    "id": "de_freund_met_02",
+    "character": "ronki",
+    "tier": "quipper",
+    "text": "Mein Herz macht pongpongpong. Das passiert bei neuen Freunden.",
+    "triggers": ["freund_met"],
+    "notes": "Body onomatopoeia — kept verbatim, it's the warmest of the three"
+  },
+
   {
     "id": "de_identity_01",
     "character": "ronki",
-    "text": "Ich hab den Glühwürmchen erzählt, dass du immer deine Zähne putzt. Die waren BEEINDRUCKT!",
+    "tier": "quipper",
+    "text": "Ich hab den Glühwürmchen erzählt, dass du immer deine Zähne putzt. Die waren echt beeindruckt.",
     "triggers": ["quest_complete"],
     "minQuestsToday": 1,
-    "notes": "Magical-witness pattern — caps for landing"
+    "notes": "Magical-witness pattern. Dropped CAPS on BEEINDRUCKT — voice can land it without shouting"
   },
   {
     "id": "de_identity_03",
     "character": "ronki",
+    "tier": "quipper",
     "text": "Weißt du was? Du bist jemand, auf den man sich verlassen kann. Hab ich gemerkt.",
     "triggers": ["hub_open"],
     "notes": "Atomic-Habits identity"
   },
   {
-    "id": "de_freund_met_01",
+    "id": "de_trait_brave_01",
     "character": "ronki",
-    "text": "EIN NEUER FREUND! Schau, schau! Krass, oder?",
-    "triggers": ["freund_met"],
-    "notes": "Peak Dikka — repetition + caps"
+    "tier": "quipper",
+    "text": "Du bist jemand, der nicht aufgibt. Das weiß ich jetzt.",
+    "triggers": ["hub_open", "quest_complete"],
+    "requiredTraits": ["brave"],
+    "notes": "Identity language — verbatim"
   },
   {
-    "id": "de_freund_met_02",
+    "id": "de_trait_gentle_01",
     "character": "ronki",
-    "text": "Komm her, neuer Freund! Wir freuen uns!",
-    "triggers": ["freund_met"],
-    "notes": "Inclusive 'wir' invitation"
+    "tier": "quipper",
+    "text": "Deine Ruhe tut allen gut. Auch mir.",
+    "triggers": ["hub_open", "sanctuary_open"],
+    "requiredTraits": ["gentle"],
+    "notes": "Body-sense"
+  },
+
+  {
+    "id": "de_garden_plant_offer_01",
+    "character": "ronki",
+    "tier": "gardener",
+    "text": "Sonntag. Was pflanzt du diese Woche?",
+    "direct_play": true,
+    "notes": "Weekly Sunday seed-offer. Kid picks species + spot."
   },
   {
-    "id": "de_freund_met_03",
+    "id": "de_garden_planted_01",
     "character": "ronki",
-    "text": "Mein Herz macht pongpongpong. Das passiert bei neuen Freunden.",
-    "triggers": ["freund_met"],
-    "notes": "Body onomatopoeia"
+    "tier": "gardener",
+    "text": "Schöner Platz. Schauen wir in ein paar Tagen.",
+    "direct_play": true,
+    "notes": "Plant-placed reaction. 'Schauen wir in ein paar Tagen' is the patience-IS-the-mechanic line."
   },
+  {
+    "id": "de_garden_quiet_week_01",
+    "character": "ronki",
+    "tier": "gardener",
+    "text": "Diese Woche war leise. Das Bäumchen wächst trotzdem.",
+    "direct_play": true,
+    "notes": "Soft-fire on quiet-week Sunday — no FOMO, the world waits"
+  },
+  {
+    "id": "de_garden_decor_placed_01",
+    "character": "ronki",
+    "tier": "gardener",
+    "text": "Der Stein gefällt mir genau da.",
+    "direct_play": true,
+    "notes": "Decor-placed notice — the kid decides what's awesome, Ronki notices"
+  },
+  {
+    "id": "de_garden_visit_back_01",
+    "character": "ronki",
+    "tier": "gardener",
+    "text": "Erinnerst du dich? Hier hast du was gepflanzt.",
+    "direct_play": true,
+    "notes": "Garden-revisit beat — Ronki references the kid's history"
+  },
+
+  {
+    "id": "de_witness_invite_monthly_01",
+    "character": "ronki",
+    "tier": "storyteller",
+    "text": "Komm her, kleiner Held. Ich zeig dir was.",
+    "direct_play": true,
+    "notes": "Monthly horizon-crossing invite. Pattern D from time-stack discovery — Ronki invites, kid walks over."
+  },
+  {
+    "id": "de_witness_reveal_tree_01",
+    "character": "ronki",
+    "tier": "storyteller",
+    "text": "Schau. Aus deinem Sapling ist ein Bäumchen geworden.",
+    "direct_play": true,
+    "notes": "Monthly reveal — present + soft. Cumulative-not-countable: 'Aus DEINEM Sapling', not 'das Bäumchen vom 12. Mai'."
+  },
+
+  {
+    "id": "de_witness_invite_season_01",
+    "character": "ronki",
+    "tier": "elder",
+    "text": "Riech mal — die Luft hat sich geändert.",
+    "direct_play": true,
+    "notes": "Seasonal beat — sensory, present, no calendar reference. The world shifted; the kid noticed because Ronki pointed."
+  },
+  {
+    "id": "de_journey_reflection_01",
+    "character": "ronki",
+    "tier": "elder",
+    "text": "Wir haben viel zusammen gepflanzt. Schön, oder?",
+    "direct_play": true,
+    "notes": "Journey-tier soft reflection. Sets up the Wave-3 farewell register without arriving there. Cumulative ('zusammen gepflanzt'), grounded, no metric."
+  },
+
   {
     "id": "de_stamina_low_01",
     "character": "ronki",
-    "direct_play": true,
+    "tier": "direct-play",
     "text": "Puh, ich werd langsam müde vom Fliegen. Aber einmal noch geht.",
-    "notes": "Direct-play — fired by MiniGames when stamina low"
+    "direct_play": true,
+    "notes": "MiniGames — stamina low warning"
   },
   {
     "id": "de_stamina_exhausted_01",
     "character": "ronki",
-    "direct_play": true,
+    "tier": "direct-play",
     "text": "Ich bin platt. Spielst du kurz ohne mich?",
-    "notes": "Direct-play — fired by MiniGames when stamina 0"
+    "direct_play": true,
+    "notes": "MiniGames — stamina exhausted"
   },
   {
     "id": "de_teeth_start",
     "character": "ronki",
+    "tier": "direct-play",
+    "text": "Zähne putzen! Wir starten oben links.",
     "direct_play": true,
-    "text": "Zähne putzen! Wir starten oben links!",
-    "notes": "Direct-play — ToothbrushTimer mount"
+    "notes": "ToothbrushTimer mount"
   },
   {
     "id": "de_teeth_done",
     "character": "ronki",
+    "tier": "direct-play",
+    "text": "Fertig! Voll sauber. Ich seh deine Zähne von hier glitzern.",
     "direct_play": true,
-    "text": "Fertig! Voll sauber! Ich seh deine Zähne von hier glitzern.",
-    "notes": "Direct-play — timer complete (one of three randomized variants)"
+    "notes": "ToothbrushTimer end (one of the variants)"
   },
   {
     "id": "de_screen_done",
     "character": "ronki",
+    "tier": "direct-play",
+    "text": "Zeit ist um. Bis nachher.",
     "direct_play": true,
-    "text": "Zeit ist um. Hammer gemacht — bis nachher!",
-    "notes": "Direct-play — ScreenTimer end. Dikka 'Hammer gemacht'"
+    "notes": "Replaces 'Hammer gemacht — bis nachher!' — quieter close-out, fits ScreenTimer wind-down"
   },
   {
     "id": "de_journal_done_01",
     "character": "ronki",
-    "direct_play": true,
+    "tier": "direct-play",
     "text": "Das hast du schön aufgeschrieben.",
-    "notes": "Direct-play — Journal save"
+    "direct_play": true,
+    "notes": "Journal save"
   },
   {
     "id": "de_discover_creature",
     "character": "ronki",
+    "tier": "direct-play",
+    "text": "Schau mal! Ein neuer Freund. Lass uns ihn kennenlernen.",
     "direct_play": true,
-    "text": "Schau mal! Ein neuer Freund! Lass uns ihn kennenlernen.",
-    "notes": "Direct-play — Micropedia first-discovery toast"
+    "notes": "Micropedia first-discovery toast"
   },
+
   {
     "id": "parent_zone_intro",
     "character": "drachenmutter",
-    "direct_play": true,
+    "tier": "narrator",
     "text": "Ah, hier gibt's was für Mama und Papa. Für euch Kinder leider total langweilig — aber wichtig.",
-    "notes": "Direct-play — ParentalDashboard open. Drachenmutter narrator."
+    "direct_play": true,
+    "notes": "ParentalDashboard open. Re-record with new Drachenmutter voice once Marc picks from casting samples."
   },
   {
     "id": "ritual_start",
     "character": "drachenmutter",
-    "direct_play": true,
+    "tier": "narrator",
     "text": "Komm, kleiner Drache. Setz dich. Wir machen das gleich gemeinsam.",
-    "notes": "Direct-play — emotional-tool opener (Box-Atmung etc.)"
+    "direct_play": true,
+    "notes": "Emotional-tool opener (Box-Atmung etc.)"
   },
   {
     "id": "ritual_ask",
     "character": "drachenmutter",
-    "direct_play": true,
+    "tier": "narrator",
     "text": "Wie geht's dir heute? Hör in dich rein.",
-    "notes": "Direct-play — mood check-in question"
+    "direct_play": true,
+    "notes": "Mood check-in question"
   },
   {
     "id": "ritual_goodnight",
     "character": "drachenmutter",
-    "direct_play": true,
+    "tier": "narrator",
     "text": "Schlaf gut, kleiner Drache. Ich pass auf dich auf.",
-    "notes": "Direct-play — bedtime ritual closer"
+    "direct_play": true,
+    "notes": "Bedtime ritual closer"
   },
   {
     "id": "onboarding_welcome",
     "character": "drachenmutter",
-    "direct_play": true,
+    "tier": "narrator",
     "text": "Willkommen, kleiner Held. Dein Drache wartet auf dich.",
-    "notes": "Direct-play — onboarding step 1"
+    "direct_play": true,
+    "notes": "Onboarding step 1 — adapt or remove depending on parent-first onboarding choreography"
   }
 ]
 ```
@@ -436,22 +567,23 @@ Single source of truth for the 50 voice lines covering all surfaces in the app. 
 
 ## Smoke-test subset (3 lines)
 
-Used by `--smoke` to verify Harry pronounces umlauts cleanly + check that narrator routing to `public/audio/narrator/` works:
+Used by `--smoke` to verify Harry pronounces umlauts cleanly + check that both output dirs route correctly + check the new tiers fire:
 
 ```json
-["de_w_snow_01", "de_alldone_03", "ritual_goodnight"]
+["de_w_snow_01", "de_witness_reveal_tree_01", "ritual_goodnight"]
 ```
 
-`de_w_snow_01` covers ä in `Trotzdem`/`KRASS!` and emphasis caps. `de_alldone_03` covers ü in `Glühwürmchen`-adjacent words (`schön`, `glitzern`, `rockst`). `ritual_goodnight` switches characters and exercises the narrator output dir.
+`de_w_snow_01` covers the self-correcting cadence + ä/ö (`Trotzdem schön`). `de_witness_reveal_tree_01` exercises a new Storyteller-tier line + ä (`Bäumchen`). `ritual_goodnight` switches characters and exercises the narrator output dir.
 
 ---
 
 ## Notes for the gen script
 
-- Reads this file. Extracts the two JSON code blocks (profiles + lines) via fenced-code-block parser.
-- Routes each line to `profiles[character].output_dir` so Ronki lands in `public/audio/ronki/`, Drachenmutter in `public/audio/narrator/`.
-- Per-character `voice_id` + `voice_settings` come from the profiles block — when Marc picks a Drachenmutter casting winner, swap one field in this doc and re-run.
-- `--smoke` regenerates only the smoke subset.
-- `--full` regenerates everything missing (skip-existing).
-- `--full --regen` overwrites everything regardless.
-- Loads the API key from `.env.local` first, falls back to `.env`.
+The `scripts/gen-ronki-voicelines.py` script is unchanged — it reads `id`, `character`, `text` fields and routes by `profiles[character].output_dir`. The `tier`, `direct_play`, `triggers`, etc. fields are documentation/sync metadata; the script doesn't validate them.
+
+After Marc reviews this doc:
+1. Sync `src/companion/lines/de.ts` to match (engine source of truth for React).
+2. Add new triggers to `src/companion/types.ts` (`garden_plant_offer`, `garden_planted`, `garden_decor_placed`, `garden_quiet_week`, `garden_visit`, `witness_invite_monthly`, `witness_reveal_tree`, `witness_invite_season`, `journey_reflection`, `onboarding_kid_intro`, `lagerfeuer_arrival`).
+3. Translate new tiers to `src/companion/lines/en.ts` for parity.
+4. Wire fire sites for new triggers when their UI components ship (Garden mode, witness beats, parent-first onboarding).
+5. Re-record narrator lines once Drachenmutter casting winner is locked.
