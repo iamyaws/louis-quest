@@ -324,34 +324,36 @@ export default function RatgeberAbendroutineGrundschulkind() {
         </p>
       </Callout>
 
-      <h2>Was wir bei Ronki anders machen</h2>
+      <h2>Wo Ronki abends passt</h2>
 
       <p>
-        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
-        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
+        Der Abend ist der Moment, an dem ein Tag verarbeitet wird. Wenn
+        die Schritte durch sind und das Licht noch nicht ganz aus ist, hat
+        ein Kind ein paar Minuten, in denen alles noch da ist: was schwer
+        war, was schön war, was geblieben ist. Genau in diesen Spalt sitzt
+        Ronki.
       </p>
 
       <p>
-        Kurzer Teil, weil die Routine nicht von einer App kommt, sondern
-        von euch. Viele Eltern, die Ronki ausprobieren, fangen beim Abend
-        an, nicht beim Morgen. Der Schmerz ist abends oft greifbarer: am
-        Morgen gibt es wenigstens einen externen Takt (die Schulzeit), am
-        Abend musst du den ganzen Rahmen selbst halten.
+        Viele Eltern, die Ronki ausprobieren, fangen beim Abend an, nicht
+        beim Morgen. Der Schmerz ist abends oft greifbarer: am Morgen gibt
+        es wenigstens einen externen Takt (die Schulzeit), am Abend musst
+        du den ganzen Rahmen selbst halten.
       </p>
 
       <p>
-        Ronki zeigt dem Kind die Reihenfolge visuell. Ein Bild pro Schritt,
-        Kind hakt selbst ab, Drachen-Begleiter macht mit. Keine
-        Push-Benachrichtigungen abends, das wäre das Gegenteil von dem, was
-        jetzt hilft. Die App ist still. Das Kind wird von der Routine
-        geführt, nicht von Dringlichkeit.
+        Ronki zeigt die Schritte. Ohne Push, ohne Drängen, ohne dem Kind
+        zu sagen, wie spät es ist. Was Ronki abends besonders macht, ist
+        der eine ruhige Beat nach den Schritten: ein Drache, der einmal
+        nachfragt, wie der Tag war. Drei Worte reichen. Manchmal nur ein
+        Gesicht. Das Kind weiß: jemand hat zugehört.
       </p>
 
       <blockquote>
-        Wenn dein Kind in drei Monaten abends von selbst Richtung Bad
-        abdreht, ohne in die App zu gucken, haben wir unseren Job gemacht.
-        Das ist ein ziemlich schlechtes Engagement-Metric. Aber ein gutes
-        Erziehungs-Metric.
+        Wir bauen Ronki nicht für Kinder, die jeden Abend in die App
+        müssen. Wir bauen ihn für den einen ruhigen Beat zwischen Zähne
+        und Licht-aus. Wenn der bei euch irgendwann ohne den Drachen
+        funktioniert, war er gut.
       </blockquote>
 
       <p>

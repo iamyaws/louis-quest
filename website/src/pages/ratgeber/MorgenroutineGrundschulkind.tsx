@@ -321,32 +321,33 @@ export default function RatgeberMorgenroutineGrundschulkind() {
         </p>
       </Callout>
 
-      <h2>Was wir bei Ronki machen</h2>
+      <h2>Wo Ronki im Morgen passt</h2>
 
       <p>
-        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
-        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
+        Eine Reihenfolge auf einem Blatt Papier reicht meistens. Wofür
+        ein Drache dazu kommt: für den Beat, in dem das Kind kurz benennt,
+        wie es heute überhaupt aufgewacht ist. Ein Gesicht. Ein Wort.
+        Manchmal ein Atemzug. Dann geht es los.
       </p>
 
       <p>
-        Kurzer Teil. Ronki ist eine App, die diese Reihenfolge für dein
-        Kind sichtbar macht. Bildbasiert, mit einem Drachen-Begleiter.
-        Das Kind hakt die Schritte selbst ab, in seinem Tempo, ohne
-        Eltern-Ansage. Es gibt keine Push-Benachrichtigungen, keine
-        Streaks, keine Punktejagd.
+        Ronki zeigt die Schritte bildbasiert, das Kind hakt selbst ab, in
+        seinem Tempo, ohne Eltern-Ansage. Keine Push, keine Streaks, keine
+        Punktejagd. Was Ronki morgens dazu addiert, ist nicht Effizienz,
+        sondern ein kurzer Moment des Ankommens, bevor der Morgen los geht.
       </p>
 
       <blockquote>
-        Die App ist darauf ausgelegt, zu verschwinden, sobald die
-        Routine sitzt. Wenn dein Kind nach ein paar Monaten morgens
-        routiniert durch die Tür geht, ohne die App zu öffnen, ist unser
-        Job gemacht.
+        Die App ist darauf ausgelegt, zu verschwinden, sobald das Kind
+        seinen eigenen Morgen findet. Wenn dein Kind nach ein paar Monaten
+        ohne den Drachen durch die Tür geht, weil es selbst weiß, wie sein
+        Morgen aussieht, ist unser Job gemacht.
       </blockquote>
 
       <p>
-        Wenn dich das interessiert, trag dich unten ein. Wenn nicht,
-        nimm die Reihenfolge aus diesem Artikel und mal sie auf ein
-        laminiertes Poster. Das funktioniert auch.
+        Wenn dich das interessiert, trag dich unten ein. Wenn nicht, nimm
+        die Reihenfolge aus diesem Artikel und mal sie auf ein laminiertes
+        Poster. Das funktioniert auch.
       </p>
 
       <h2>Was du heute tun kannst</h2>

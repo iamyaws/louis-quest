@@ -263,28 +263,21 @@ export default function RatgeberZaehneputzenOhneStreit() {
         </p>
       </Callout>
 
-      <h2>Was wir bei Ronki anders machen</h2>
+      <h2>Wo Ronki beim Zähneputzen passt</h2>
 
       <p>
-        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
-        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
-      </p>
-
-      <p>
-        Kurzer Teil. Zähneputzen ist einer der Top-drei-Reibungspunkte in
-        Grundschulfamilien, und entsprechend einer der Schritte, für die
-        Ronki von Anfang an eine gute Unterstützung sein sollte. Ronki
-        stellt Zähneputzen als eigenen Schritt dar, mit eingebautem
-        Timer. Das Kind sieht selbst, wann die zwei Minuten um sind. Der
-        Drachen-Begleiter ist dabei und ermutigt: kurz nicken, mit-summen,
-        am Ende einmal aufschauen. Keine Punkte für Vollständigkeit, keine
-        Streaks, wenn es mal nicht klappt.
+        Zähneputzen ist einer der täglichen Knackpunkte. Ronki stellt es
+        als eigenen Schritt dar, mit eingebautem Timer. Das Kind sieht
+        selbst, wann die zwei Minuten um sind. Der Drachen-Begleiter ist
+        dabei und ermutigt: kurz nicken, mit-summen, am Ende einmal
+        aufschauen. Keine Punkte für Vollständigkeit, keine Streaks, wenn
+        es mal nicht klappt.
       </p>
 
       <p>
         Auch hier gilt: Ronki ersetzt nicht das Nachputzen, und Ronki
-        ersetzt nicht dich als Elternteil. Die App kann die Reibung
-        rausnehmen, aber die letzten 30 Sekunden machst immer noch du.
+        ersetzt nicht dich als Elternteil. Die App nimmt einen Teil der
+        Reibung raus, aber die letzten 30 Sekunden machst immer noch du.
         So ist es gedacht.
       </p>
 

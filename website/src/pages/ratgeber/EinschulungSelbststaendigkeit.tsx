@@ -276,10 +276,10 @@ export default function RatgeberEinschulungSelbststaendigkeit() {
       </p>
 
       <p>
-        Ein Wort zur Sprache: was hier Routine heißt, nennen wir bei Ronki
-        tägliches Ritual. Routine führt man aus. Rituale lebt man gemeinsam.
-        Bei Einschulung geht es genau darum: nicht um Tracking, sondern um
-        den Rhythmus, in dem ihr als Familie Alltag baut.
+        Bei Einschulung geht es nicht um Tracking. Es geht um den Rhythmus,
+        in dem ihr als Familie Alltag baut, und um die Frage, wer den Takt
+        angibt. Mit etwas Glück das Kind, in seinem eigenen Tempo, mit
+        euch als Sicherheitsnetz im Hintergrund.
       </p>
 
       <p>

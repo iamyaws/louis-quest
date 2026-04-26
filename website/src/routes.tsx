@@ -52,15 +52,7 @@ const RatgeberElternBereich = lazy(() => import('./pages/ratgeber/ElternBereich'
 const Impressum = lazy(() => import('./pages/Impressum'));
 const Datenschutz = lazy(() => import('./pages/Datenschutz'));
 const AGB = lazy(() => import('./pages/AGB'));
-const HeroCompare = lazy(() => import('./pages/HeroCompare'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-
-// Test variants — only loaded if someone navigates to them
-const HomeModern = lazy(() => import('./pages/HomeModern'));
-const HomeV2 = lazy(() => import('./pages/HomeV2'));
-const HomeV3 = lazy(() => import('./pages/HomeV3'));
-const AltFeatureHighlight = lazy(() => import('./pages/AltFeatureHighlight'));
-const AltRoutineCards = lazy(() => import('./pages/AltRoutineCards'));
 
 function PageLoader() {
   return (
@@ -75,9 +67,6 @@ export function AppRoutes() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/modern" element={<HomeModern />} />
-        <Route path="/v2" element={<HomeV2 />} />
-        <Route path="/v3" element={<HomeV3 />} />
         <Route path="/wie-es-funktioniert" element={<HowItWorks />} />
         <Route path="/wissenschaft" element={<Science />} />
         <Route path="/fuer-eltern" element={<FuerEltern />} />
@@ -124,9 +113,6 @@ export function AppRoutes() {
         <Route path="/impressum" element={<Impressum />} />
         <Route path="/datenschutz" element={<Datenschutz />} />
         <Route path="/agb" element={<AGB />} />
-        <Route path="/hero-compare" element={<HeroCompare />} />
-        <Route path="/alt/highlight" element={<AltFeatureHighlight />} />
-        <Route path="/alt/routines" element={<AltRoutineCards />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
