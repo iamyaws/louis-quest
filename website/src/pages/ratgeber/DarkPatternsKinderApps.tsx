@@ -80,7 +80,7 @@ export default function RatgeberDarkPatternsKinderApps() {
 
       <p>
         Für Kinder gibt es dabei einen wichtigen Zusatzpunkt. Das
-        entwicklungspsychologische Profil von fünf- bis neunjährigen Kindern
+        entwicklungspsychologische Profil von fünf- bis achtjährigen Kindern
         macht sie für genau diese Muster besonders empfänglich. Der
         präfrontale Kortex, also die Gehirnregion, die Impulse abwägt und
         Selbstregulation ermöglicht, ist bei Grundschulkindern noch weit vom
@@ -274,7 +274,7 @@ export default function RatgeberDarkPatternsKinderApps() {
         </StepCard>
       </Steps>
 
-      <h2>Warum das bei 5- bis 9-Jährigen besonders hart einschlägt</h2>
+      <h2>Warum das bei 5- bis 8-Jährigen besonders hart einschlägt</h2>
 
       <p>
         Drei Gründe, die sich in der Entwicklungsliteratur immer wiederfinden.

@@ -30,7 +30,7 @@ export default function RatgeberStickerChartAlternative() {
         },
         {
           slug: 'morgenroutine-grundschulkind',
-          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 9-Jährige funktioniert',
+          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 8-Jährige funktioniert',
         },
       ]}
     >

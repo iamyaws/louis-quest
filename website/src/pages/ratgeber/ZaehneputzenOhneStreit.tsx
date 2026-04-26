@@ -9,7 +9,7 @@ export default function RatgeberZaehneputzenOhneStreit() {
   return (
     <RatgeberArticle
       slug="zaehneputzen-ohne-streit"
-      title="Zähneputzen ohne Streit: was bei 5- bis 9-Jährigen wirklich hilft"
+      title="Zähneputzen ohne Streit: was bei 5- bis 8-Jährigen wirklich hilft"
       description="Kind verweigert Zähneputzen? Warum das meistens kein Erziehungsproblem ist, was Kinderzahnärzt:innen raten, und drei Hebel, die bei Grundschulkindern wirken."
       category="Hygiene & Zähne"
       readMinutes={7}
@@ -274,10 +274,11 @@ export default function RatgeberZaehneputzenOhneStreit() {
         Kurzer Teil. Zähneputzen ist einer der Top-drei-Reibungspunkte in
         Grundschulfamilien, und entsprechend einer der Schritte, für die
         Ronki von Anfang an eine gute Unterstützung sein sollte. Ronki
-        stellt Zähneputzen als eigenen Routine-Schritt dar, mit
-        eingebautem Timer. Das Kind sieht selbst, wann die zwei Minuten
-        um sind. Der Drachen-Begleiter putzt einmal mit. Keine Punkte für
-        Vollständigkeit, keine Streaks, wenn es mal nicht klappt.
+        stellt Zähneputzen als eigenen Schritt dar, mit eingebautem
+        Timer. Das Kind sieht selbst, wann die zwei Minuten um sind. Der
+        Drachen-Begleiter ist dabei und ermutigt: kurz nicken, mit-summen,
+        am Ende einmal aufschauen. Keine Punkte für Vollständigkeit, keine
+        Streaks, wenn es mal nicht klappt.
       </p>
 
       <p>

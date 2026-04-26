@@ -41,7 +41,7 @@ export default function AGB() {
 
             <Section heading="§2 Leistungsbeschreibung">
               <p>
-                Ronki ist eine Web-App, die Kindern hilft, Alltagsroutinen spielerisch aufzubauen. Die App befindet sich aktuell in der Entwicklung. Über die Warteliste können sich Interessierte für den Start registrieren.
+                Ronki ist eine Web-App, die Kindern hilft, Gefühle zu benennen, durchzuatmen und ihren Alltag mit einem digitalen Drachen-Begleiter zu gestalten. Die App befindet sich aktuell in der Public-Alpha. Über die Warteliste können sich Interessierte für den nächsten Schritt registrieren.
               </p>
               <p>
                 Der Funktionsumfang kann sich bis zum Launch ändern. Ein Rechtsanspruch auf bestimmte Funktionen besteht nicht.
@@ -62,7 +62,7 @@ export default function AGB() {
 
             <Section heading="§4 Nutzung durch Kinder">
               <p>
-                Ronki richtet sich an Kinder im Alter von 5–9 Jahren. Die Einrichtung und Verwaltung erfolgt durch einen Erziehungsberechtigten.
+                Ronki richtet sich an Kinder im Alter von 5–8 Jahren. Die Einrichtung und Verwaltung erfolgt durch einen Erziehungsberechtigten.
               </p>
               <p>
                 Kinder nutzen die App unter Aufsicht oder mit Einverständnis der Eltern.

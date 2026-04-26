@@ -14,7 +14,7 @@ export default function Ratgeber() {
     <PainterlyShell>
       <PageMeta
         title="Ratgeber: Ronki"
-        description="Ehrliche Artikel für Eltern von 5- bis 9-Jährigen. Über Morgenroutinen, Abendroutinen, Motivation und was in Kinder-Apps wirklich passiert. Kein Ratgeber-Kitsch, keine Versprechen, nur das, was wir selbst rausgefunden haben."
+        description="Ehrliche Artikel für Eltern von 5- bis 8-Jährigen. Über Morgenroutinen, Abendroutinen, Motivation und was in Kinder-Apps wirklich passiert. Kein Ratgeber-Kitsch, keine Versprechen, nur das, was wir selbst rausgefunden haben."
         canonicalPath="/ratgeber"
         ogImage="/og-ratgeber.jpg"
       />
@@ -40,7 +40,7 @@ export default function Ratgeber() {
               Was wir <em className="italic text-sage">rausgefunden</em> haben.
             </h1>
             <p className="mt-6 text-base sm:text-lg text-ink/75 max-w-2xl leading-relaxed">
-              Ich schreibe hier über die Themen, die uns als Eltern von 5- bis 9-Jährigen wirklich
+              Ich schreibe hier über die Themen, die uns als Eltern von 5- bis 8-Jährigen wirklich
               beschäftigen. Keine Ratgeber-Klischees, keine Versprechen in drei Schritten. Nur das,
               was die Forschung sagt, was bei uns zuhause wirklich was verändert hat und wo ich als
               Gamer-Vater mit Tech-Background nicht hinter dem Berg halte.

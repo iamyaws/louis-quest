@@ -22,7 +22,7 @@ export default function RatgeberEinschulungSelbststaendigkeit() {
       related={[
         {
           slug: 'morgenroutine-grundschulkind',
-          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 9-Jährige funktioniert',
+          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 8-Jährige funktioniert',
         },
         {
           slug: 'morgen-troedeln',
@@ -283,12 +283,13 @@ export default function RatgeberEinschulungSelbststaendigkeit() {
       </p>
 
       <p>
-        Ronki, unsere App, ist kein Schulstoff. Ronki ist ein Werkzeug für
-        den Routine-Muskel, also für das Sequenzieren von
-        Alltagsaufgaben. Genau die Fähigkeit, die Schule in den ersten
-        Wochen einfordert. Wir bauen bewusst keine Buchstaben-Spiele, keine
-        Rechen-Übungen, keinen Vorschul-Lernpfad. Das ist Schulsache, nicht
-        App-Sache.
+        Ronki, unsere App, ist kein Schulstoff. Ronki ist ein leiser
+        Drachen-Begleiter, der dem Kind hilft, sein Gefühl zu benennen,
+        einmal durchzuatmen und am Abend zu wissen: jemand hat zugehört.
+        Das ist genau das, was ein Schulanfänger oft am meisten braucht,
+        wenn der erste Schultag näherrückt. Wir bauen bewusst keine
+        Buchstaben-Spiele, keine Rechen-Übungen, keinen Vorschul-Lernpfad.
+        Das ist Schulsache, nicht App-Sache.
       </p>
 
       <PullQuote>

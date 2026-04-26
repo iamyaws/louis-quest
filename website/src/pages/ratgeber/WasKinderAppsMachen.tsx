@@ -390,7 +390,7 @@ export default function RatgeberWasKinderAppsMachen() {
 
       <p>
         Ich arbeite seit einigen Wochen an einer kleinen Web-App für Kinder
-        zwischen fünf und neun, bei der wir diese Patterns explizit nicht
+        zwischen fünf und acht, bei der wir diese Patterns explizit nicht
         eingebaut haben. Keine Streaks, keine Push, keine Werbung, keine
         Cosmetics, kein App-Store, kein Konto, kein Tracking. Sie heißt Ronki
         und läuft direkt im Browser unter ronki.de. Sie ist ausdrücklich

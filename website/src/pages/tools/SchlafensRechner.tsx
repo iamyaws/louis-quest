@@ -9,6 +9,13 @@
  * range. We don't say "your kid MUST sleep X". We say "for healthy
  * sleep at this age, the consensus range is Y, this schedule lands in
  * the middle of it".
+ *
+ * NORTHSTAR CARVE-OUT (26 Apr 2026): The Ronki app is positioned for
+ * 5-8 year olds, but this parent-tool keeps the broader 5-9 picker.
+ * Reason: sleep schedules genuinely apply across the full primary-school
+ * range, and tightening the picker hurts SEO ("schlafenszeit 9-jährige")
+ * without product justification. Parent-tools serve a wider audience
+ * than the app itself by design.
  */
 
 import { useState } from 'react';

@@ -62,7 +62,7 @@ export function FeaturedRatgeber() {
             Was wir <em className="italic text-sage">rausgefunden</em> haben.
           </h2>
           <p className="mt-6 text-base opacity-75 max-w-2xl leading-relaxed">
-            Ehrliche Artikel für Eltern von 5- bis 9-Jährigen. Keine Ratgeber-Klischees,
+            Ehrliche Artikel für Eltern von 5- bis 8-Jährigen. Keine Ratgeber-Klischees,
             keine Versprechen in drei Schritten. Nur das, was die Forschung sagt und was
             bei uns zuhause wirklich was verändert hat.
           </p>

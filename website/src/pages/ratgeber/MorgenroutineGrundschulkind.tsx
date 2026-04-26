@@ -11,7 +11,7 @@ export default function RatgeberMorgenroutineGrundschulkind() {
   return (
     <RatgeberArticle
       slug="morgenroutine-grundschulkind"
-      title="Die Morgenroutine, die wirklich klappt: was für 6- bis 9-Jährige funktioniert"
+      title="Die Morgenroutine, die wirklich klappt: was für 6- bis 8-Jährige funktioniert"
       description="Eine Morgenroutine, die ein Grundschulkind selbst ausführen kann. Reihenfolge, Zeitplan, typische Stolpersteine und warum deine Routine vielleicht am falschen Ende anfängt."
       category="Morgenroutine"
       readMinutes={8}

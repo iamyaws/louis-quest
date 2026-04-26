@@ -22,7 +22,7 @@ export default function RatgeberMorgenTroedeln() {
       related={[
         {
           slug: 'morgenroutine-grundschulkind',
-          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 9-Jährige funktioniert',
+          title: 'Die Morgenroutine, die wirklich klappt: was für 6- bis 8-Jährige funktioniert',
         },
         {
           slug: 'abendroutine-grundschulkind',
@@ -58,7 +58,7 @@ export default function RatgeberMorgenTroedeln() {
       <h2>Erstmal die unbequeme Wahrheit: Trödeln ist normal</h2>
 
       <p>
-        Kinder zwischen fünf und neun haben noch kein fertiges
+        Kinder zwischen fünf und acht haben noch kein fertiges
         Sequenzierungs-Werkzeug im Kopf. Der präfrontale Kortex, also die
         Gehirnregion, die Pläne Schritt für Schritt ausführt und sich gegen
         Ablenkung wehrt, ist frühestens mit Anfang zwanzig ausgewachsen. Für
@@ -162,7 +162,7 @@ export default function RatgeberMorgenTroedeln() {
 
         <StepCard n={4} title="Autonomie versus Zeitdruck">
           <p>
-            Kinder zwischen fünf und neun haben ein massives,
+            Kinder zwischen fünf und acht haben ein massives,
             entwicklungsgerechtes Autonomie-Bedürfnis. Sie wollen selbst
             bestimmen. Morgens kollidiert das mit der härtesten Zeitbegrenzung
             des Tages.

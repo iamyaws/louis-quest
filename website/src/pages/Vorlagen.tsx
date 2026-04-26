@@ -19,20 +19,20 @@ const VORLAGEN: Vorlage[] = [
   {
     slug: 'morgenroutine',
     title: 'Morgenroutine zum Ausmalen',
-    subtitle: 'Für 5- bis 9-jährige',
+    subtitle: 'Für 5- bis 8-jährige',
     description:
       'Vier Schritte, vier Kreise zum Ausmalen. Hängt neben den Zahnputzbecher und dein Kind folgt der Reihe selbst.',
-    ages: '5–9 Jahre',
+    ages: '5–8 Jahre',
     accent: '#d97706',
     accentLight: 'rgba(217,119,6,0.12)',
   },
   {
     slug: 'abendroutine',
     title: 'Abendroutine zum Ausmalen',
-    subtitle: 'Für 5- bis 9-jährige',
+    subtitle: 'Für 5- bis 8-jährige',
     description:
       'Vier Schritte bis ins Bett. Keine Streit-Gespräche mehr darüber, was noch dran ist. Dein Kind sieht es selbst.',
-    ages: '5–9 Jahre',
+    ages: '5–8 Jahre',
     accent: '#4338ca',
     accentLight: 'rgba(67,56,202,0.12)',
   },

@@ -30,7 +30,7 @@ export default function PrintA4PosterBaeckerei() {
         heroAlt: 'Malerische Morgenszene: Sechsjähriges Kind im Schlafanzug sitzt auf dem Boden und starrt eine Socke an.',
         phoneMockup: {
           variant: 'morgen-anchor',
-          caption: 'Morgen-Quests, eine nach der anderen.',
+          caption: 'Morgen-Schritte, einer nach dem anderen.',
         },
         ctaHeading: 'Heute Abend einrichten, morgen früh testen:',
         steps: [
