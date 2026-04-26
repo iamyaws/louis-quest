@@ -7,12 +7,14 @@
 
 import { useState } from 'react';
 import {
+  ARTICLE_TITLES,
   GELD_LABELS,
   INHALT_LABELS,
   PAUSE_LABELS,
   PUSH_LABELS,
   WANN_LABELS,
   WO_LABELS,
+  computeReviewDate,
   parseSignatures,
   type CharterAnswers,
 } from '../../lib/familien-charter/charter';
@@ -39,6 +41,14 @@ const COLORS = {
 
 function todayISODate(): string {
   return new Date().toLocaleDateString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
+
+function reviewISODate(): string {
+  return computeReviewDate().toLocaleDateString('de-DE', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -149,72 +159,135 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
   ctx.fillStyle = COLORS.teal;
   ctx.font = '600 22px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.textBaseline = 'top';
-  ctx.fillText('FAMILIEN-MEDIEN-CHARTER', 100, 100);
+  ctx.fillText('HAUSVERFASSUNG · FAMILIEN-MEDIEN-CHARTER', 100, 100);
 
+  // Family heading: split into "Familie " + name (sage italic) when name
+  // is provided, so the brand's italic-sage signature device lands on
+  // the part the parent actually owns.
+  const fname = answers.familyName.trim();
   ctx.fillStyle = COLORS.tealDark;
   ctx.font = 'bold 64px "Plus Jakarta Sans", system-ui, sans-serif';
-  const fh = familyHeading(answers);
-  ctx.fillText(fh, 100, 140);
+  if (fname) {
+    const prefix = 'Familie ';
+    ctx.fillText(prefix, 100, 140);
+    const prefixW = ctx.measureText(prefix).width;
+    ctx.fillStyle = COLORS.sage;
+    ctx.font = 'italic bold 64px "Plus Jakarta Sans", system-ui, sans-serif';
+    ctx.fillText(fname, 100 + prefixW, 140);
+  } else {
+    ctx.fillStyle = COLORS.sage;
+    ctx.font = 'italic bold 64px "Plus Jakarta Sans", system-ui, sans-serif';
+    ctx.fillText('Unsere', 100, 140);
+    const unsereW = ctx.measureText('Unsere').width;
+    ctx.fillStyle = COLORS.tealDark;
+    ctx.font = 'bold 64px "Plus Jakarta Sans", system-ui, sans-serif';
+    ctx.fillText(' Familie', 100 + unsereW, 140);
+  }
 
+  // Wofür italic line — the artifact's emotional anchor when filled.
+  let headerCursor = 220;
+  const wofuerText = answers.wofuer.trim();
+  if (wofuerText) {
+    ctx.fillStyle = 'rgba(14, 42, 44, 0.85)';
+    ctx.font = 'italic 600 22px "Plus Jakarta Sans", system-ui, sans-serif';
+    const wofLines = wrapText(ctx, wofuerText, W - 380);
+    for (const line of wofLines.slice(0, 2)) {
+      ctx.fillText(line, 100, headerCursor);
+      headerCursor += 30;
+    }
+    headerCursor += 8;
+  }
+
+  // Child-count subline
   ctx.fillStyle = COLORS.inkSoft;
-  ctx.font = '500 22px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.font = '500 20px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.fillText(
     `${answers.childCount} ${answers.childCount === 1 ? 'Kind' : 'Kinder'} · auf eine Seite gebracht`,
     100,
-    220,
+    headerCursor,
   );
 
-  // ────────────── Tilted mustard date sticker, top-right ──────────────
-  // Drawn in its own save/restore block so the rotation doesn't bleed
-  // into the rest of the page.
+  // ────────────── Two-line tilted mustard date stamp ──────────────
+  // Extends the previous single-line sticker into STAND + WIR PRÜFEN AM,
+  // converting the artifact from "permanent verdict" into "checkpoint."
   ctx.save();
-  const stickerCX = W - 180;
-  const stickerCY = 150;
-  const stickerW = 200;
-  const stickerH = 84;
-  ctx.translate(stickerCX, stickerCY);
+  const stampCX = W - 180;
+  const stampCY = 175;
+  const stampW = 220;
+  const stampH = 130;
+  ctx.translate(stampCX, stampCY);
   ctx.rotate(-3 * (Math.PI / 180));
-  // Subtle drop shadow
   ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
   ctx.shadowBlur = 8;
   ctx.shadowOffsetY = 2;
   ctx.fillStyle = 'rgba(252, 211, 77, 0.92)';
-  roundRect(ctx, -stickerW / 2, -stickerH / 2, stickerW, stickerH, 8);
+  roundRect(ctx, -stampW / 2, -stampH / 2, stampW, stampH, 8);
   ctx.fill();
   ctx.shadowColor = 'transparent';
   ctx.shadowBlur = 0;
   ctx.shadowOffsetY = 0;
-  // Hairline stroke
   ctx.strokeStyle = 'rgba(176, 138, 0, 0.4)';
   ctx.lineWidth = 1;
-  roundRect(ctx, -stickerW / 2, -stickerH / 2, stickerW, stickerH, 8);
+  roundRect(ctx, -stampW / 2, -stampH / 2, stampW, stampH, 8);
   ctx.stroke();
-  // "STAND" eyebrow
-  ctx.fillStyle = COLORS.tealDark;
-  ctx.font = '600 13px "Plus Jakarta Sans", system-ui, sans-serif';
+
+  // STAND row
+  ctx.fillStyle = 'rgba(14, 42, 44, 0.8)';
+  ctx.font = '600 12px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.fillText('STAND', 0, -stickerH / 2 + 14);
-  // Date
-  ctx.font = 'bold 26px "Plus Jakarta Sans", system-ui, sans-serif';
-  ctx.fillText(todayISODate(), 0, -stickerH / 2 + 36);
+  ctx.fillText('STAND', 0, -stampH / 2 + 14);
+  ctx.fillStyle = COLORS.tealDark;
+  ctx.font = 'bold 22px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.fillText(todayISODate(), 0, -stampH / 2 + 32);
+
+  // Hairline between the two rows
+  ctx.strokeStyle = 'rgba(14, 42, 44, 0.18)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(-stampW / 2 + 16, 4);
+  ctx.lineTo(stampW / 2 - 16, 4);
+  ctx.stroke();
+
+  // WIR PRÜFEN AM row
+  ctx.fillStyle = 'rgba(14, 42, 44, 0.8)';
+  ctx.font = '600 12px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.fillText('WIR PRÜFEN AM', 0, 14);
+  ctx.fillStyle = COLORS.tealDark;
+  ctx.font = 'bold 22px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.fillText(reviewISODate(), 0, 32);
   ctx.restore();
   ctx.textAlign = 'start';
   ctx.textBaseline = 'top';
 
   // Hairline divider below header
   ctx.fillStyle = COLORS.hairline;
-  ctx.fillRect(100, 270, W - 200, 1);
+  const dividerY = Math.max(headerCursor + 50, 290);
+  ctx.fillRect(100, dividerY, W - 200, 1);
 
-  let y = 310;
+  let y = dividerY + 40;
 
-  function section(title: string, render: () => void) {
+  /**
+   * Article renderer with Roman-numeral prefix in sage. The numeral
+   * sits in front of the title separated by a small vertical hairline,
+   * giving the page the feel of a real Verfassung document.
+   */
+  function article(numeral: string, title: string, render: () => void) {
+    // Numeral
+    ctx.fillStyle = COLORS.sage;
+    ctx.font = 'bold 20px "Plus Jakarta Sans", system-ui, sans-serif';
+    ctx.fillText(numeral, 100, y);
+    const numW = ctx.measureText(numeral).width;
+    // Hairline separator
+    ctx.fillStyle = COLORS.hairline;
+    ctx.fillRect(100 + numW + 10, y + 2, 1, 16);
+    // Title (oath)
     ctx.fillStyle = COLORS.teal;
-    ctx.font = '600 18px "Plus Jakarta Sans", system-ui, sans-serif';
-    ctx.fillText(title.toUpperCase(), 100, y);
-    y += 36;
+    ctx.font = '600 16px "Plus Jakarta Sans", system-ui, sans-serif';
+    ctx.fillText(title.toUpperCase(), 100 + numW + 22, y + 2);
+    y += 38;
     render();
-    y += 28;
+    y += 26;
   }
 
   function bulletList(items: string[]) {
@@ -222,16 +295,15 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
     ctx.font = '500 22px "Be Vietnam Pro", system-ui, sans-serif';
     for (const item of items) {
       const lines = wrapText(ctx, item, W - 260);
-      // Bullet dot
+      // Em-dash mark (12×3px sage rectangle) — prints clean at 300dpi
+      // where the previous round dots disappeared as gray dust.
       ctx.fillStyle = COLORS.sage;
-      ctx.beginPath();
-      ctx.arc(110, y + 12, 5, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(108, y + 14, 14, 3);
       // Text
       ctx.fillStyle = COLORS.ink;
       let lineY = y;
       for (const line of lines) {
-        ctx.fillText(line, 134, lineY);
+        ctx.fillText(line, 138, lineY);
         lineY += 32;
       }
       y = lineY + 6;
@@ -248,42 +320,91 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
     }
   }
 
-  section('Wann ist Bildschirm-Zeit ok?', () => bulletList(bulletsFor(answers, 'wann')));
-  section('Wo wird gespielt oder geschaut?', () => paragraph(WO_LABELS[answers.wo]));
-  section('Welche Inhalte sind ok?', () => bulletList(bulletsFor(answers, 'inhalte')));
-  section('Echtgeld in Apps?', () => paragraph(GELD_LABELS[answers.geld]));
-  section('Push-Benachrichtigungen?', () => paragraph(PUSH_LABELS[answers.push]));
+  article('I', ARTICLE_TITLES.wann, () => bulletList(bulletsFor(answers, 'wann')));
+  article('II', ARTICLE_TITLES.wo, () => paragraph(WO_LABELS[answers.wo]));
+  article('III', ARTICLE_TITLES.inhalte, () =>
+    bulletList(bulletsFor(answers, 'inhalte')),
+  );
+  article('IV', ARTICLE_TITLES.geld, () => paragraph(GELD_LABELS[answers.geld]));
+  article('V', ARTICLE_TITLES.push, () => paragraph(PUSH_LABELS[answers.push]));
   if (answers.pausen.length > 0) {
-    section('Unsere Pausen', () => bulletList(bulletsFor(answers, 'pausen')));
-  }
-  if (answers.versprechen.trim()) {
-    section('Unser Eltern-Versprechen', () => paragraph(answers.versprechen.trim()));
+    article('VI', ARTICLE_TITLES.pausen, () => bulletList(bulletsFor(answers, 'pausen')));
   }
 
-  // ────────────── Dedication + signature block ──────────────
+  // Versprechen pull-quote — sage-tinted band, matching the on-screen
+  // figure treatment.
+  const versprechen = answers.versprechen.trim();
+  if (versprechen) {
+    y += 6;
+    const pqX = 100;
+    const pqW = W - 200;
+    const pqStartY = y;
+    // Background
+    ctx.fillStyle = 'rgba(80, 160, 130, 0.12)';
+    // We need to know the height before we draw the background, so
+    // measure the wrapped text height first, then draw the box, then
+    // draw the text inside.
+    ctx.font = 'italic 600 24px "Be Vietnam Pro", system-ui, sans-serif';
+    const quotedText = `„${versprechen}"`;
+    const pqLines = wrapText(ctx, quotedText, pqW - 56);
+    const pqContentH = 56 /* eyebrow + gap */ + pqLines.length * 36 + 28;
+    roundRect(ctx, pqX, pqStartY, pqW, pqContentH, 16);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(80, 160, 130, 0.3)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, pqX, pqStartY, pqW, pqContentH, 16);
+    ctx.stroke();
+    // Eyebrow with VII numeral
+    ctx.fillStyle = COLORS.sage;
+    ctx.font = 'bold 14px "Plus Jakarta Sans", system-ui, sans-serif';
+    ctx.fillText(`VII   ${ARTICLE_TITLES.versprechen.toUpperCase()}`, pqX + 28, pqStartY + 22);
+    // Quote body
+    ctx.fillStyle = COLORS.tealDark;
+    ctx.font = 'italic 600 24px "Be Vietnam Pro", system-ui, sans-serif';
+    let pqY = pqStartY + 56;
+    for (const line of pqLines) {
+      ctx.fillText(line, pqX + 28, pqY);
+      pqY += 36;
+    }
+    y = pqStartY + pqContentH + 24;
+  }
+
+  // ────────────── Review-cadence + dedication + signature block ──────────────
   // Anchored to the bottom of the page so it always reads as the closing
   // gesture, regardless of how much content sat above it.
   const namesParsed = parseSignatures(answers.signatures);
-  const sigBlockTop = H - 280;
+  const sigBlockTop = H - 320;
 
-  // Dedication line, italic
+  // Review-cadence line
+  ctx.fillStyle = 'rgba(14, 42, 44, 0.65)';
+  ctx.font = 'italic 500 18px "Be Vietnam Pro", system-ui, sans-serif';
+  ctx.fillText(
+    `Wir lesen das am ${reviewISODate()} nochmal. Vielleicht ändern wir was, vielleicht auch nicht.`,
+    100,
+    sigBlockTop,
+  );
+
+  // Dedication line, italic — drops the .toLowerCase() that was a German
+  // grammar bug ("familie müller" lowercase mid-sentence).
   ctx.fillStyle = 'rgba(14, 42, 44, 0.78)';
   ctx.font = 'italic 600 22px "Plus Jakarta Sans", system-ui, sans-serif';
-  const ded = `Geschrieben für ${familyHeading(answers).toLowerCase()}, am ${todayISODate()}.`;
-  ctx.fillText(ded, 100, sigBlockTop);
+  const ded = `Aufgeschrieben am ${todayISODate()}, von und für ${familyHeading(answers)}.`;
+  ctx.fillText(ded, 100, sigBlockTop + 36);
 
-  // Eyebrow + signature lines
+  // "Wer hier unterschreibt" anchor line + signature lines
   ctx.fillStyle = COLORS.teal;
-  ctx.font = '600 18px "Plus Jakarta Sans", system-ui, sans-serif';
-  ctx.fillText('UNTERSCHRIEBEN VON', 100, sigBlockTop + 50);
+  ctx.font = '600 16px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.fillText(
+    'WER HIER UNTERSCHREIBT, HÄLT SICH DRAN. AUCH DIE ERWACHSENEN.',
+    100,
+    sigBlockTop + 90,
+  );
 
   ctx.strokeStyle = COLORS.hairline;
   ctx.lineWidth = 1;
-  const sigRowY = sigBlockTop + 110;
+  const sigRowY = sigBlockTop + 160;
   if (namesParsed.length > 0) {
-    // Lay out 2-per-row, max 6 names total (parseSignatures cap).
     const cols = Math.min(2, namesParsed.length);
-    const rows = Math.ceil(namesParsed.length / cols);
     const sigW = (W - 200 - 40 * (cols - 1)) / cols;
     const rowGap = 60;
     for (let i = 0; i < namesParsed.length; i++) {
@@ -291,43 +412,47 @@ async function buildCharterPng(answers: CharterAnswers): Promise<Blob> {
       const row = Math.floor(i / cols);
       const x = 100 + col * (sigW + 40);
       const yLine = sigRowY + row * rowGap;
+      // Eyebrow ABOVE the line (name as small label, line stays empty
+      // for the actual signature)
+      ctx.fillStyle = 'rgba(14, 42, 44, 0.7)';
+      ctx.font = '600 12px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.fillText(namesParsed[i].toUpperCase(), x, yLine - 16);
+      // Empty signature line
       ctx.beginPath();
       ctx.moveTo(x, yLine);
       ctx.lineTo(x + sigW, yLine);
       ctx.stroke();
-      ctx.fillStyle = COLORS.tealDark;
-      ctx.font = '500 16px "Plus Jakarta Sans", system-ui, sans-serif';
-      ctx.fillText(namesParsed[i], x, yLine + 12);
     }
-    // Re-anchor bottom strip below the longest column if many names
-    // (no-op visually because bottom strip is always drawn at H-70).
-    void rows;
   } else {
-    // Fallback: generic two-column lines
+    // Fallback: generic two-column eyebrow + line layout
     const cols = 2;
     const sigW = (W - 240) / cols;
     for (let col = 0; col < cols; col++) {
+      const x = 100 + col * (sigW + 40);
+      ctx.fillStyle = 'rgba(14, 42, 44, 0.7)';
+      ctx.font = '600 12px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.fillText(col === 0 ? 'ERWACHSENE' : 'KINDER', x, sigRowY - 16);
       ctx.beginPath();
-      ctx.moveTo(100 + col * (sigW + 40), sigRowY);
-      ctx.lineTo(100 + col * (sigW + 40) + sigW, sigRowY);
+      ctx.moveTo(x, sigRowY);
+      ctx.lineTo(x + sigW, sigRowY);
       ctx.stroke();
-      ctx.fillStyle = COLORS.inkSoft;
-      ctx.font = '400 16px "Plus Jakarta Sans", system-ui, sans-serif';
-      ctx.fillText(
-        col === 0 ? 'Erwachsene' : 'Kinder',
-        100 + col * (sigW + 40),
-        sigRowY + 12,
-      );
     }
   }
 
-  // ────────────── Bottom strip ──────────────
+  // ────────────── Bottom teal strip ──────────────
   ctx.fillStyle = COLORS.tealDark;
   ctx.fillRect(0, H - 70, W, 70);
   ctx.fillStyle = COLORS.cream;
   ctx.font = '600 20px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.textBaseline = 'middle';
-  ctx.fillText('ronki.de · Familien-Medien-Charter', 100, H - 35);
+  ctx.fillText('ronki.de · Hausverfassung', 100, H - 35);
+
+  // Right-aligned page indicator
+  ctx.font = '600 14px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(253, 248, 240, 0.7)';
+  const pageTag = `STAND ${todayISODate()} · SEITE 1 / 1`;
+  const pageTagW = ctx.measureText(pageTag).width;
+  ctx.fillText(pageTag, W - 100 - pageTagW, H - 35);
 
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
@@ -398,31 +523,46 @@ export function CharterPreview({ answers }: Props) {
   const inhalte = bulletsFor(answers, 'inhalte');
   const pausen = bulletsFor(answers, 'pausen');
   const signatureNames = parseSignatures(answers.signatures);
+  const wofuer = answers.wofuer.trim();
+  const versprechen = answers.versprechen.trim();
+  const today = todayISODate();
+  const review = reviewISODate();
 
   /**
-   * Sections rendered into the two-column grid. We keep the order
-   * stable so reading flow on the printed sheet stays predictable.
+   * Articles rendered in the two-column grid. Roman numerals are tied to
+   * each article's NAME, not its grid position — so even when an optional
+   * article (Pausen / Versprechen) is missing, the remaining numerals
+   * stay stable. That's the way a real Verfassung numbers its articles:
+   * Article IV is always Article IV, regardless of whether Article III
+   * was rendered above it.
+   *
+   * Versprechen is intentionally NOT in this list — it gets a full-width
+   * pull-quote treatment below the grid because it's the artifact's
+   * emotional pivot and doesn't deserve to be one cell among six.
    */
-  const sections: Array<{
+  const articles: Array<{
+    numeral: string;
     title: string;
     body?: string;
     items?: string[];
   }> = [
-    { title: 'Wann ist Bildschirm-Zeit ok?', items: wann },
-    { title: 'Wo wird gespielt oder geschaut?', body: WO_LABELS[answers.wo] },
-    { title: 'Welche Inhalte sind ok?', items: inhalte },
-    { title: 'Echtgeld in Apps?', body: GELD_LABELS[answers.geld] },
-    { title: 'Push-Benachrichtigungen?', body: PUSH_LABELS[answers.push] },
+    { numeral: 'I', title: ARTICLE_TITLES.wann, items: wann },
+    { numeral: 'II', title: ARTICLE_TITLES.wo, body: WO_LABELS[answers.wo] },
+    { numeral: 'III', title: ARTICLE_TITLES.inhalte, items: inhalte },
+    { numeral: 'IV', title: ARTICLE_TITLES.geld, body: GELD_LABELS[answers.geld] },
+    { numeral: 'V', title: ARTICLE_TITLES.push, body: PUSH_LABELS[answers.push] },
   ];
   if (pausen.length > 0) {
-    sections.push({ title: 'Unsere Pausen', items: pausen });
+    articles.push({ numeral: 'VI', title: ARTICLE_TITLES.pausen, items: pausen });
   }
-  if (answers.versprechen.trim()) {
-    sections.push({
-      title: 'Unser Eltern-Versprechen',
-      body: answers.versprechen.trim(),
-    });
-  }
+
+  /**
+   * Family heading split: when a name is provided, render the surname
+   * with italic-sage emphasis (the brand's signature device, otherwise
+   * reserved for H1 nouns). Without a name, italic-sage falls on the
+   * "Unsere" word so the heading still carries the painterly flourish.
+   */
+  const fname = answers.familyName.trim();
 
   return (
     <div className="space-y-6">
@@ -431,99 +571,197 @@ export function CharterPreview({ answers }: Props) {
         block at the bottom hides everything outside .charter-preview.
 
         Composition (from outside in):
-          1. Outer relative wrapper with painterly accent stripe at top.
-          2. Inner double-frame: outer card + nested inner border, so the
-             page reads as a printed certificate, not a UI card.
-          3. Tilted mustard date sticker, top-right of the header — the
-             single piece of paper-like decoration that makes the result
-             feel hand-pinned to the fridge instead of generated.
+          1. Outer relative wrapper with painterly accent stripe at top
+             plus mustard TL + sage BR background glows (mirroring the
+             canvas PDF render, so screen and print feel like one
+             artifact).
+          2. Inner double-frame: outer card + nested inner border, so
+             the page reads as a printed certificate, not a UI card.
+          3. Tilted two-line mustard date sticker, top-right of header —
+             "STAND DD.MM" + "WIR PRÜFEN AM DD.MM" (4 months out). The
+             revisit date converts the artifact from "permanent verdict"
+             into "checkpoint," which family-ritual research shows
+             roughly quadruples its functional half-life on the fridge.
       */}
-      <div className="charter-preview relative rounded-2xl bg-cream/95 border border-teal/15 shadow-sm overflow-hidden">
+      <div
+        className="charter-preview relative rounded-2xl bg-cream/95 border border-teal/15 shadow-sm overflow-hidden"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 88% 12%, rgba(252, 211, 77, 0.18) 0%, transparent 55%), radial-gradient(circle at 8% 92%, rgba(80, 160, 130, 0.14) 0%, transparent 60%)',
+        }}
+      >
         {/* Top accent ribbon — house gradient stripe */}
         <span
           aria-hidden
-          className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-mustard via-sage to-teal"
+          className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-mustard via-sage to-teal"
         />
 
         {/* Inner double-frame */}
         <div className="m-2.5 sm:m-3 rounded-xl border border-teal/20 px-6 py-7 sm:px-9 sm:py-9 space-y-7">
-          {/* Header with tilted date sticker */}
-          <header className="relative pr-28 sm:pr-32 space-y-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
-              Familien-Medien-Charter
+          {/* Header with two-line tilted date stamp */}
+          <header className="relative pr-32 sm:pr-36 space-y-3">
+            <p className="text-xs uppercase tracking-[0.22em] text-teal font-semibold">
+              Hausverfassung{' '}
+              <span className="text-teal/40 mx-1">·</span>{' '}
+              <span className="text-teal/70">
+                Familien-Medien-Charter
+              </span>
             </p>
             <h2 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
-              {familyHeading(answers)}
+              {fname ? (
+                <>
+                  Familie{' '}
+                  <em className="italic text-sage not-italic-fix">{fname}</em>
+                </>
+              ) : (
+                <>
+                  <em className="italic text-sage not-italic-fix">Unsere</em>{' '}
+                  Familie
+                </>
+              )}
             </h2>
+            {wofuer ? (
+              <p className="font-display italic text-base sm:text-lg text-teal-dark/85 leading-snug max-w-prose">
+                {wofuer}
+              </p>
+            ) : null}
             <p className="text-sm text-ink/65">
               {answers.childCount === 1 ? '1 Kind' : `${answers.childCount} Kinder`}{' '}
               · auf eine Seite gebracht
             </p>
-            {/* Mustard date sticker */}
+            {/* Two-line mustard date stamp */}
             <div
               aria-hidden
-              className="charter-date-sticker absolute right-0 top-0 -rotate-3 rounded-md bg-mustard/90 ring-1 ring-mustard/60 shadow-sm px-3 py-1.5 text-center"
+              className="charter-date-sticker absolute right-0 top-0 -rotate-3 rounded-md bg-mustard/90 ring-1 ring-mustard/60 shadow-sm px-3 py-1.5 text-center min-w-[7rem]"
             >
-              <p className="text-[10px] uppercase tracking-[0.18em] text-teal-dark font-semibold leading-tight">
+              <p className="text-[9px] uppercase tracking-[0.18em] text-teal-dark/80 font-semibold leading-tight">
                 Stand
               </p>
               <p className="text-sm font-display font-bold text-teal-dark tabular-nums leading-tight">
-                {todayISODate()}
+                {today}
+              </p>
+              <span className="block h-px bg-teal-dark/15 my-1" aria-hidden />
+              <p className="text-[9px] uppercase tracking-[0.18em] text-teal-dark/80 font-semibold leading-tight">
+                Wir prüfen am
+              </p>
+              <p className="text-sm font-display font-bold text-teal-dark tabular-nums leading-tight">
+                {review}
               </p>
             </div>
           </header>
 
           <hr className="border-teal/15" />
 
-          {/* Two-column section grid — reads like a poster, not an
-              accordion. On mobile collapses cleanly to single column. */}
+          {/* Two-column article grid — reads like a magazine spread.
+              Roman numerals on each section eyebrow give the page rhythm
+              and make scanning back to "Article IV" actually possible. */}
           <div className="grid sm:grid-cols-2 gap-x-8 gap-y-7">
-            {sections.map((s) => (
-              <CharterSection
-                key={s.title}
-                title={s.title}
-                body={s.body}
-                items={s.items}
+            {articles.map((a) => (
+              <CharterArticle
+                key={a.numeral}
+                numeral={a.numeral}
+                title={a.title}
+                body={a.body}
+                items={a.items}
               />
             ))}
           </div>
 
+          {/* Versprechen pull-quote — the artifact's emotional pivot. The
+              parent wrote this themselves, so it earns full-width sage
+              band treatment instead of being one cell among six in the
+              grid above. */}
+          {versprechen ? (
+            <figure className="rounded-2xl bg-sage/12 ring-1 ring-inset ring-sage/30 px-6 py-6 sm:px-8 sm:py-7 m-0">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-sage font-bold mb-3">
+                <span className="font-display font-extrabold mr-2">VII</span>
+                {ARTICLE_TITLES.versprechen}
+              </p>
+              <blockquote className="font-display italic font-semibold text-lg sm:text-xl text-teal-dark leading-snug max-w-prose">
+                <span aria-hidden className="text-sage/55 text-2xl leading-none mr-1">
+                  „
+                </span>
+                {versprechen}
+                <span aria-hidden className="text-sage/55 text-2xl leading-none ml-1">
+                  "
+                </span>
+              </blockquote>
+            </figure>
+          ) : null}
+
+          {/* Review-cadence line + dedication */}
+          <div className="space-y-2 pt-2">
+            <p className="text-sm italic text-ink/65 max-w-prose leading-relaxed">
+              Wir lesen das am {review} nochmal. Vielleicht ändern wir was,
+              vielleicht auch nicht.
+            </p>
+            <p className="font-display italic text-base text-teal-dark/80 leading-snug max-w-prose">
+              Aufgeschrieben am {today}, von und für{' '}
+              {fname ? `Familie ${fname}` : 'unsere Familie'}.
+            </p>
+          </div>
+
           <hr className="border-teal/15" />
 
-          {/* Dedication line + signature block */}
-          <div className="space-y-5">
-            <p className="font-display italic text-base text-teal-dark/80 leading-snug max-w-prose">
-              Geschrieben für {familyHeading(answers).toLowerCase()}, am{' '}
-              {todayISODate()}.
-            </p>
-            <p className="text-xs uppercase tracking-[0.2em] text-teal font-semibold">
-              Unterschrieben von
+          {/* Signature block — name as eyebrow above empty line, so the
+              act of signing means physically writing your name onto the
+              line, not signing on top of pre-printed authority. */}
+          <div className="space-y-4">
+            <p className="text-xs uppercase tracking-[0.22em] text-teal font-semibold">
+              Wer hier unterschreibt, hält sich dran. Auch die Erwachsenen.
             </p>
             {signatureNames.length > 0 ? (
-              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-5 pt-2">
+              <div className="grid sm:grid-cols-2 gap-x-10 gap-y-6 pt-3">
                 {signatureNames.map((name) => (
-                  <div
-                    key={name}
-                    className="border-t border-teal/30 pt-2 text-xs text-ink/65 font-medium"
-                  >
-                    {name}
+                  <div key={name} className="space-y-1.5">
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-teal-dark/70 font-semibold">
+                      {name}
+                    </p>
+                    <span className="block border-b border-teal/35 h-7" aria-hidden />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-5 pt-2">
-                <div className="border-t border-teal/30 pt-2 text-xs text-ink/55">
-                  Erwachsene
+              <div className="grid sm:grid-cols-2 gap-x-10 gap-y-6 pt-3">
+                <div className="space-y-1.5">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-teal-dark/70 font-semibold">
+                    Erwachsene
+                  </p>
+                  <span className="block border-b border-teal/35 h-7" aria-hidden />
                 </div>
-                <div className="border-t border-teal/30 pt-2 text-xs text-ink/55">
-                  Kinder
+                <div className="space-y-1.5">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-teal-dark/70 font-semibold">
+                    Kinder
+                  </p>
+                  <span className="block border-b border-teal/35 h-7" aria-hidden />
                 </div>
               </div>
             )}
           </div>
 
-          <p className="text-xs text-ink/45 text-right pt-3">
-            ronki.de · Familien-Medien-Charter
+          {/* Practical footer line — kept inside the cream area, above
+              the dark band, so it reads as advice from the document
+              rather than brand chrome. */}
+          <p className="font-display italic text-sm text-teal-dark/75 leading-snug max-w-prose pt-2">
+            Wenn euch was schwerfällt: gilt nicht als Versagen. Gilt als
+            Punkt zwei der nächsten Verfassung.
+          </p>
+        </div>
+
+        {/* Bottom teal-dark band — full-bleed, mirrors the canvas PDF.
+            Closes the page with weight instead of a tiny right-aligned
+            URL line, so the on-screen and screenshot states match the
+            printed PDF. */}
+        <div className="bg-teal-dark px-6 sm:px-9 py-4 flex items-center justify-between text-cream/90 charter-bottom-strip">
+          <p className="font-display font-bold text-sm tracking-wide">
+            ronki.de
+            <span className="text-cream/40 mx-2">·</span>
+            Hausverfassung
+          </p>
+          <p className="font-display text-[11px] tracking-[0.18em] uppercase text-cream/70 tabular-nums hidden sm:block">
+            Stand {today}
+            <span className="text-cream/30 mx-2">·</span>
+            Seite 1 / 1
           </p>
         </div>
       </div>
@@ -575,10 +813,12 @@ export function CharterPreview({ answers }: Props) {
 
       {/* Print-only stylesheet: hide everything except .charter-preview.
           Force color rendering so the mustard date sticker, gradient
-          ribbon, and signature lines actually print instead of getting
-          flattened to white by browser default print modes. */}
+          ribbon, sage pull-quote, signature lines, and bottom teal
+          strip all actually print instead of getting flattened to
+          white by browser default print modes. */}
       <style>{`
-        .charter-date-sticker {
+        .charter-date-sticker,
+        .charter-bottom-strip {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         }
@@ -600,6 +840,10 @@ export function CharterPreview({ answers }: Props) {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
+          .charter-bottom-strip {
+            background: #0E2A2C !important;
+            color: #FDF8F0 !important;
+          }
           .no-print { display: none !important; }
           @page { size: A4 portrait; margin: 1.5cm; }
         }
@@ -608,19 +852,36 @@ export function CharterPreview({ answers }: Props) {
   );
 }
 
-function CharterSection({
+/**
+ * One article in the Hausverfassung. Roman numeral + oath title +
+ * body/bullets. The numeral sits in front of the title in sage as a
+ * tiny serial number, the way a real Verfassung article reads
+ * (Article I, Article II, etc.) — gives the page rhythm and makes
+ * scanning back to a specific article actually possible.
+ *
+ * Bullet mark is a 10×2px sage rectangle (em-dash glyph, not a dot)
+ * because round dots disappear at 300dpi inkjet print on uncoated
+ * paper. This is the Print Typographer's call, validated by the fact
+ * that the dot-bullets in v1 already washed out in user screenshots.
+ */
+function CharterArticle({
+  numeral,
   title,
   body,
   items,
 }: {
+  numeral: string;
   title: string;
   body?: string;
   items?: string[];
 }) {
   return (
     <section className="space-y-2">
-      <h3 className="text-xs uppercase tracking-[0.18em] text-teal font-semibold">
-        {title}
+      <h3 className="flex items-baseline gap-2.5 text-xs uppercase tracking-[0.18em] text-teal font-semibold">
+        <span className="font-display font-extrabold text-sage text-[15px] tabular-nums leading-none">
+          {numeral}
+        </span>
+        <span className="border-l border-teal/20 pl-2.5">{title}</span>
       </h3>
       {body && (
         <p className="text-base text-ink/85 leading-relaxed max-w-prose">
@@ -636,7 +897,7 @@ function CharterSection({
             >
               <span
                 aria-hidden
-                className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-sage shrink-0"
+                className="mt-[0.65rem] inline-block w-2.5 h-[2px] rounded-sm bg-sage shrink-0"
               />
               <span>{item}</span>
             </li>

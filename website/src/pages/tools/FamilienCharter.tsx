@@ -69,8 +69,8 @@ export default function FamilienCharter() {
   return (
     <PainterlyShell>
       <PageMeta
-        title="Familien-Medien-Charter: erstellt eure eigenen Regeln"
-        description="In sechs Schritten zu einer einseitigen Familien-Medien-Charter zum Aufhängen. Druckbar als PDF, teilbar als Bild. Werkzeug für Eltern, kein Ratgeber-Dogma."
+        title="Hausverfassung erstellen: die Familien-Medien-Charter"
+        description="In sechs Schritten zur eigenen Hausverfassung — eurer einseitigen Familien-Medien-Charter zum Aufhängen. Druckbar als PDF, teilbar als Bild. Werkzeug für Eltern, kein Ratgeber-Dogma."
         canonicalPath="/tools/familien-charter"
       />
 
@@ -98,12 +98,13 @@ export default function FamilienCharter() {
                 <div className="space-y-4">
                   <h1 className="font-display font-bold text-3xl sm:text-4xl text-teal-dark leading-tight">
                     Eure{' '}
-                    <em className="italic text-sage">Familien-Medien-Charter</em>.
+                    <em className="italic text-sage">Hausverfassung</em>.
                   </h1>
                   <p className="text-base text-ink/75 leading-relaxed max-w-prose">
-                    Sechs kurze Schritte, dann steht eure eigene Charter da.
-                    Druckbar als PDF für den Kühlschrank, teilbar als Bild
-                    für andere Eltern. Wir geben den Rahmen, ihr füllt ihn.
+                    Sechs kurze Schritte zur einseitigen Familien-Medien-
+                    Charter. Druckbar als PDF für den Kühlschrank, teilbar
+                    als Bild für andere Eltern. Wir geben den Rahmen, ihr
+                    füllt ihn — die Regeln in eurem Haus schreibt ihr selbst.
                   </p>
                 </div>
                 {!isPreview && <CharterMiniPoster reduced={reduced} />}
@@ -172,8 +173,10 @@ export default function FamilienCharter() {
               )}
               {step === 5 && (
                 <VersprechenStep
-                  value={answers.versprechen}
-                  onChange={(v) => update('versprechen', v)}
+                  versprechen={answers.versprechen}
+                  wofuer={answers.wofuer}
+                  onChangeVersprechen={(v) => update('versprechen', v)}
+                  onChangeWofuer={(v) => update('wofuer', v)}
                 />
               )}
               {isPreview && <CharterPreview answers={answers} />}
@@ -395,36 +398,71 @@ function PausenStep({
 }
 
 function VersprechenStep({
-  value,
-  onChange,
+  versprechen,
+  wofuer,
+  onChangeVersprechen,
+  onChangeWofuer,
 }: {
-  value: string;
-  onChange: (v: string) => void;
+  versprechen: string;
+  wofuer: string;
+  onChangeVersprechen: (v: string) => void;
+  onChangeWofuer: (v: string) => void;
 }) {
   return (
-    <div className="space-y-4">
-      <p className="text-base text-ink/75 max-w-prose leading-relaxed">
-        Ein oder zwei Sätze von euch Erwachsenen, die unten auf der Charter
-        landen. Zum Beispiel: „Wir lesen am Abend selbst auch nicht das Handy"
-        oder „Wir entscheiden Streitfälle gemeinsam, nicht spontan." Solche
-        Sätze wirken mit Kindern oft stärker als sechs vorgegebene Regeln.
-      </p>
-      <label className="block">
-        <span className="text-sm text-ink/70 mb-2 block">
-          Euer Versprechen (optional)
-        </span>
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          maxLength={400}
-          rows={4}
-          placeholder="Schreib einfach das hin, was ihr euch heute Abend nochmal selbst sagen würdet."
-          className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:border-transparent leading-relaxed"
-        />
-        <span className="text-xs text-ink/55 mt-1 block tabular-nums">
-          {value.length} / 400
-        </span>
-      </label>
+    <div className="space-y-8">
+      {/* Wofür field — the positive frame. Renders as an italic line at the
+          top of the printed Hausverfassung when filled, reframing the whole
+          document from "list of nos" to "what we're protecting". */}
+      <div className="space-y-3">
+        <p className="text-base text-ink/75 max-w-prose leading-relaxed">
+          Wofür macht ihr das? Ein einziger Satz, was ihr durch die Regeln
+          schützen wollt. Zum Beispiel: „Damit wir abends noch Zeit zum
+          Vorlesen haben." Wenn ihr's habt, landet der Satz oben auf der
+          Charter und gibt allem darunter einen Sinn.
+        </p>
+        <label className="block">
+          <span className="text-sm text-ink/70 mb-2 block">
+            Wofür macht ihr das? (optional)
+          </span>
+          <textarea
+            value={wofuer}
+            onChange={(e) => onChangeWofuer(e.target.value)}
+            maxLength={180}
+            rows={2}
+            placeholder="z.B. Damit wir abends noch Zeit zum Vorlesen haben."
+            className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:border-transparent leading-relaxed"
+          />
+          <span className="text-xs text-ink/55 mt-1 block tabular-nums">
+            {wofuer.length} / 180
+          </span>
+        </label>
+      </div>
+
+      <div className="space-y-3 pt-2 border-t border-teal/15">
+        <p className="text-base text-ink/75 max-w-prose leading-relaxed">
+          Und ein oder zwei Sätze von euch Erwachsenen, die unten auf der
+          Charter landen. Zum Beispiel: „Wir lesen am Abend selbst auch
+          nicht das Handy" oder „Wir entscheiden Streitfälle gemeinsam,
+          nicht spontan." Solche Sätze wirken mit Kindern oft stärker als
+          sechs vorgegebene Regeln.
+        </p>
+        <label className="block">
+          <span className="text-sm text-ink/70 mb-2 block">
+            Euer Versprechen (optional)
+          </span>
+          <textarea
+            value={versprechen}
+            onChange={(e) => onChangeVersprechen(e.target.value)}
+            maxLength={400}
+            rows={4}
+            placeholder="Schreib einfach das hin, was ihr euch heute Abend nochmal selbst sagen würdet."
+            className="w-full rounded-xl border border-teal/20 bg-cream px-4 py-3 text-base text-teal-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:border-transparent leading-relaxed"
+          />
+          <span className="text-xs text-ink/55 mt-1 block tabular-nums">
+            {versprechen.length} / 400
+          </span>
+        </label>
+      </div>
     </div>
   );
 }
@@ -525,7 +563,7 @@ function CharterMiniPoster({ reduced }: { reduced: boolean | null }) {
         {/* Inner double-frame */}
         <div className="absolute inset-1.5 rounded-md border border-teal/15 px-3 pt-4">
           <p className="text-[7px] uppercase tracking-[0.18em] text-teal font-semibold">
-            Familien-Charter
+            Hausverfassung
           </p>
           <p className="text-[11px] font-display font-bold text-teal-dark mt-1 leading-tight">
             Familie Beispiel

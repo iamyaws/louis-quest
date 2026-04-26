@@ -46,6 +46,13 @@ export interface CharterAnswers {
   push: PushChoice;
   pausen: PauseChoice[];
   versprechen: string;
+  /**
+   * Optional one-sentence answer to "Wofür macht ihr das?" — the family's
+   * positive frame for why the rules exist. Reframes the charter from a
+   * defensive list of "no" rules into a constructive household commitment.
+   * Renders as the italic subhead under the family name when filled.
+   */
+  wofuer: string;
 }
 
 export const EMPTY_ANSWERS: CharterAnswers = {
@@ -59,6 +66,7 @@ export const EMPTY_ANSWERS: CharterAnswers = {
   push: 'alle-aus',
   pausen: [],
   versprechen: '',
+  wofuer: '',
 };
 
 /**
@@ -79,17 +87,18 @@ export const WANN_LABELS: Record<WannChoice, string> = {
   'nach-schule': 'Nach der Schule, wenn die Hausaufgaben durch sind.',
   wochenende: 'Am Wochenende, mit etwas Luft im Tag.',
   'abends-nach-hausaufgaben': 'Abends, nach Hausaufgaben und Bewegung.',
-  'als-belohnung': 'Bei besonderen Anlässen, nicht als Tagesgeschäft.',
+  'als-belohnung': 'Bei besonderen Anlässen, nicht jeden Tag einfach so.',
 };
 
 export const WO_LABELS: Record<WoChoice, string> = {
   wohnzimmer: 'Im Wohnzimmer, dort wo auch wir Erwachsenen sitzen.',
-  kinderzimmer: 'Im Kinderzimmer, mit offener Tür und unseren Hausregeln.',
+  kinderzimmer:
+    'Im Kinderzimmer, mit offener Tür. Wir kommen ab und zu rein.',
   beides: 'Beides, je nachdem was gespielt oder geschaut wird.',
 };
 
 export const INHALT_LABELS: Record<InhaltChoice, string> = {
-  lernen: 'Lern-Apps und Schul-Sachen.',
+  lernen: 'Lern-Apps und alles, was bei der Schule hilft.',
   spielen: 'Spiele, die wir vorher gemeinsam ausgesucht haben.',
   video: 'Videos und Filme, ebenfalls gemeinsam ausgewählt.',
   sozial: 'Familien- und Klassen-Chat. Kein Open-World-Social.',
@@ -108,16 +117,49 @@ export const PUSH_LABELS: Record<PushChoice, string> = {
   'einige-erlauben':
     'Push nur für die paar Apps, die wir bewusst freigegeben haben (zum Beispiel den Klassen-Chat).',
   'je-app':
-    'Wir entscheiden pro App neu und schauen alle paar Wochen, ob die Entscheidung noch passt.',
+    'Pro App entscheiden wir neu. Alle paar Wochen prüfen wir, ob es noch passt.',
 };
 
 export const PAUSE_LABELS: Record<PauseChoice, string> = {
   'wochentag-pause': 'Mindestens ein Wochentag bleibt komplett ohne Bildschirm.',
   'wochenend-pause': 'Einen Wochenend-Tag im Monat sind alle Geräte aus.',
-  urlaubspause: 'Im Urlaub bleiben die Geräte zuhause oder im Koffer.',
+  urlaubspause: 'Im Urlaub bleiben die Geräte im Koffer. Auch unsere.',
   'familien-zeit':
     'Bei gemeinsamen Mahlzeiten liegen alle Geräte weg, auch unsere.',
 };
+
+/**
+ * The seven oath-style article titles that replace the previous question
+ * format on the printed Hausverfassung. Each title declares an action the
+ * family takes ownership of, rather than asking themselves a question.
+ *
+ * Order matches the on-screen and PDF rendering order so the Roman /
+ * Arabic numerals stay consistent with reading flow.
+ */
+export const ARTICLE_TITLES = {
+  wann: 'Wann wir Bildschirm-Zeit zulassen.',
+  wo: 'Wo bei uns gespielt wird.',
+  inhalte: 'Was an Inhalten reinkommt.',
+  geld: 'Wie wir es mit Echtgeld halten.',
+  push: 'Was uns unterbrechen darf.',
+  pausen: 'Pausen, die wir uns nehmen.',
+  versprechen: 'Was wir euch versprechen.',
+} as const;
+
+/**
+ * Computes a "wir prüfen am" review date roughly 4 months out from a base
+ * date. Family-ritual research suggests an explicit revisit date roughly
+ * quadruples the half-life of a pinned household agreement: it gives the
+ * family permission to revise, instead of treating the artifact as
+ * permanent until silently ignored.
+ *
+ * Returns a Date object; callers format with `toLocaleDateString('de-DE')`.
+ */
+export function computeReviewDate(base: Date = new Date()): Date {
+  const d = new Date(base.getTime());
+  d.setMonth(d.getMonth() + 4);
+  return d;
+}
 
 export interface StepDef {
   id: string;
