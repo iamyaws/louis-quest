@@ -1,6 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTask } from '../../context/TaskContext';
 import { track } from '../../lib/analytics';
+
+// Path to the lullaby audio. Royalty-free 4-bar loop, ~30s.
+// File is not committed yet — Marc to drop in once curated. The
+// component plays through best-effort and silently no-ops if the
+// file is missing (fetch fails → audio element stays muted).
+// Spec: gentle major-key acoustic, no vocals, no percussion, soft
+// fade-in/out built into the file. Loops naturally during 'curtain'.
+const LULLABY_SRC = '/audio/lullaby/tonight_lullaby_01.mp3';
 
 /**
  * TonightRitual — the bedtime ritual.
@@ -126,6 +134,9 @@ export default function TonightRitual({ onClose }) {
         position: 'fixed', inset: 0, zIndex: 950, overflow: 'hidden',
         background: bgDim, transition: 'background 3400ms ease',
         cursor: phase === 'story' ? 'pointer' : 'default',
+        // Kills the 300ms tap delay — important for the "tap when
+        // ready" beat, which should feel immediate to a tired kid.
+        touchAction: 'manipulation',
       }}
     >
       <StarField phase={phase} />
@@ -138,7 +149,7 @@ export default function TonightRitual({ onClose }) {
           animation: 'tn-lineIn 1400ms ease',
         }}>
           <div style={{
-            font: '600 32px/1 "Fredoka", sans-serif',
+            font: '600 36px/1 "Fredoka", sans-serif',
             color: 'rgba(255,242,217,.95)',
             letterSpacing: '-0.01em',
             textShadow: '0 2px 16px rgba(0,0,0,.6)',
@@ -147,8 +158,10 @@ export default function TonightRitual({ onClose }) {
           </div>
           <div style={{
             marginTop: 14,
-            font: '400 13px/1.4 "Nunito", sans-serif',
-            color: 'rgba(255,242,217,.55)',
+            // Was 13px italic / .55 alpha — Marc's audit flagged it.
+            // Bumped to 16px / .72 alpha so the kid + parent can both read.
+            font: '500 16px/1.45 "Nunito", sans-serif',
+            color: 'rgba(255,242,217,.72)',
             fontStyle: 'italic',
           }}>
             wir schauen kurz raus, du und ich
@@ -164,9 +177,12 @@ export default function TonightRitual({ onClose }) {
       {phase === 'story' && !tapped && (
         <div style={{
           position: 'absolute', bottom: 36, left: 0, right: 0, textAlign: 'center',
-          font: '600 10px/1 "Plus Jakarta Sans", sans-serif',
-          letterSpacing: '.22em', textTransform: 'uppercase',
-          color: 'rgba(255,242,217,.3)',
+          // Apr 2026 readability pass — was 10px / .22em / .3 alpha,
+          // unreadable for a kid in bed at low brightness. Bumped to
+          // 14px / .12em / .55 alpha. Marc's note from the audit.
+          font: '600 14px/1.2 "Plus Jakarta Sans", sans-serif',
+          letterSpacing: '.12em', textTransform: 'uppercase',
+          color: 'rgba(255,242,217,.55)',
           animation: 'tn-fadeBlink 3000ms ease-in-out infinite 4000ms backwards',
           pointerEvents: 'none',
         }}>
@@ -178,26 +194,31 @@ export default function TonightRitual({ onClose }) {
         <div style={{
           position: 'absolute', inset: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexDirection: 'column', gap: 32,
+          flexDirection: 'column', gap: 36,
           animation: 'tn-lineIn 2400ms ease 800ms backwards',
         }}>
           <div style={{
-            font: '500 12px/1 "Plus Jakarta Sans", sans-serif',
-            letterSpacing: '.32em', textTransform: 'uppercase',
-            color: 'rgba(255,242,217,.16)',
+            // Was 12px / .32em / .16 alpha — invisible. Bumped to
+            // 16px / .14em / .42 alpha. Stays soft (it's bedtime)
+            // but a parent peeking at the screen can read it.
+            font: '500 16px/1.2 "Plus Jakarta Sans", sans-serif',
+            letterSpacing: '.14em', textTransform: 'uppercase',
+            color: 'rgba(255,242,217,.42)',
           }}>
             schlaf gut
           </div>
-          <div style={{ display: 'flex', gap: 14 }}>
+          <div style={{ display: 'flex', gap: 16 }}>
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); replay(); }}
               style={{
-                background: 'transparent', border: '1px solid rgba(255,242,217,.1)',
-                color: 'rgba(255,242,217,.25)',
-                padding: '8px 18px', borderRadius: 999, cursor: 'pointer',
-                font: '600 9px/1 "Plus Jakarta Sans", sans-serif',
-                letterSpacing: '.22em', textTransform: 'uppercase',
+                background: 'transparent', border: '1.5px solid rgba(255,242,217,.22)',
+                color: 'rgba(255,242,217,.55)',
+                padding: '12px 22px', borderRadius: 999, cursor: 'pointer',
+                font: '700 13px/1 "Plus Jakarta Sans", sans-serif',
+                letterSpacing: '.10em', textTransform: 'uppercase',
+                touchAction: 'manipulation',
+                minHeight: 44,
               }}
             >
               nochmal
@@ -206,11 +227,13 @@ export default function TonightRitual({ onClose }) {
               type="button"
               onClick={(e) => { e.stopPropagation(); onClose?.(); }}
               style={{
-                background: 'transparent', border: '1px solid rgba(255,242,217,.1)',
-                color: 'rgba(255,242,217,.25)',
-                padding: '8px 18px', borderRadius: 999, cursor: 'pointer',
-                font: '600 9px/1 "Plus Jakarta Sans", sans-serif',
-                letterSpacing: '.22em', textTransform: 'uppercase',
+                background: 'transparent', border: '1.5px solid rgba(255,242,217,.22)',
+                color: 'rgba(255,242,217,.55)',
+                padding: '12px 22px', borderRadius: 999, cursor: 'pointer',
+                font: '700 13px/1 "Plus Jakarta Sans", sans-serif',
+                letterSpacing: '.10em', textTransform: 'uppercase',
+                touchAction: 'manipulation',
+                minHeight: 44,
               }}
             >
               schließen
@@ -396,18 +419,22 @@ function StoryLine({ text }) {
       textAlign: 'center',
     }}>
       <div style={{
-        font: '700 9px/1 "Plus Jakarta Sans", sans-serif',
-        letterSpacing: '.32em', textTransform: 'uppercase',
-        color: 'rgba(252,211,77,.55)',
-        marginBottom: 14,
+        // Was 9px / .32em — eyebrow was decorative noise to a kid.
+        // Bumped to 12px / .18em so it reads as a label, not a smear.
+        font: '800 12px/1 "Plus Jakarta Sans", sans-serif',
+        letterSpacing: '.18em', textTransform: 'uppercase',
+        color: 'rgba(252,211,77,.75)',
+        marginBottom: 16,
       }}>
         Ronki erzählt
       </div>
       <p style={{
         margin: 0,
-        font: '400 18px/1.5 "Nunito", sans-serif',
+        // Body bumped 18 → 19px and weight 400 → 500 for italic
+        // legibility on a dim screen at night.
+        font: '500 19px/1.5 "Nunito", sans-serif',
         fontStyle: 'italic',
-        color: 'rgba(255,242,217,.92)',
+        color: 'rgba(255,242,217,.94)',
         textShadow: '0 2px 12px rgba(0,0,0,.6)',
       }}>
         {text}
@@ -464,37 +491,65 @@ function StarCurtain({ active }) {
 // ─── Lullaby indicator ──────────────────────────────────────────
 
 function Lullaby({ active }) {
+  // Audio plays best-effort. If the lullaby file isn't yet committed,
+  // play() rejects silently and the visual indicator still renders —
+  // graceful degradation. respects reduced-motion via opacity-only
+  // animation on the wave bars.
+  const audioRef = useRef(null);
+  const [audioReady, setAudioReady] = useState(false);
+
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (active) {
+      a.volume = 0.45;
+      a.loop = true;
+      // play() returns a promise on modern browsers; reject is fine
+      // (file 404 / autoplay policy). We just won't have audio.
+      a.play().then(() => setAudioReady(true)).catch(() => setAudioReady(false));
+    } else {
+      a.pause();
+      a.currentTime = 0;
+    }
+  }, [active]);
+
   return (
-    <div aria-hidden="true" style={{
-      position: 'absolute', top: 60, left: '50%', transform: 'translateX(-50%)',
-      display: 'flex', gap: 4, alignItems: 'center', padding: '8px 16px',
-      borderRadius: 999, background: 'rgba(0,0,0,.4)',
-      backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-      opacity: active ? 1 : 0, transition: 'opacity 800ms ease',
-      border: '1px solid rgba(252,211,77,.18)',
-    }}>
-      <span style={{
-        font: '700 9px/1 "Plus Jakarta Sans", sans-serif',
-        letterSpacing: '.18em', textTransform: 'uppercase',
-        color: 'rgba(252,211,77,.7)',
+    <>
+      <audio ref={audioRef} src={LULLABY_SRC} preload="auto" aria-hidden="true" />
+      <div aria-hidden="true" style={{
+        position: 'absolute', top: 60, left: '50%', transform: 'translateX(-50%)',
+        display: 'flex', gap: 6, alignItems: 'center', padding: '10px 18px',
+        borderRadius: 999, background: 'rgba(0,0,0,.45)',
+        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        opacity: active ? 1 : 0, transition: 'opacity 800ms ease',
+        border: '1px solid rgba(252,211,77,.22)',
       }}>
-        ♪ Schlaflied
-      </span>
-      <div style={{ display: 'flex', gap: 2, alignItems: 'center', marginLeft: 6 }}>
-        {[5, 9, 7, 11, 6].map((h, i) => (
-          <div key={i} style={{
-            width: 2, height: h, borderRadius: 1,
-            background: 'rgba(252,211,77,.6)',
-            animation: active ? `tn-lullawave 1.4s ease-in-out ${i * 0.12}s infinite` : 'none',
-          }} />
-        ))}
+        <span style={{
+          // Was 9px / .18em — sub-readable. Bumped to 12px / .12em
+          // and weight 800 so a parent peeking can confirm the
+          // lullaby is on, even if the audio hasn't loaded.
+          font: '800 12px/1 "Plus Jakarta Sans", sans-serif',
+          letterSpacing: '.12em', textTransform: 'uppercase',
+          color: 'rgba(252,211,77,.85)',
+        }}>
+          ♪ Schlaflied
+        </span>
+        <div style={{ display: 'flex', gap: 2.5, alignItems: 'center', marginLeft: 6 }}>
+          {[5, 9, 7, 11, 6].map((h, i) => (
+            <div key={i} style={{
+              width: 2.5, height: h + 1, borderRadius: 1.5,
+              background: 'rgba(252,211,77,.7)',
+              animation: active ? `tn-lullawave 1.4s ease-in-out ${i * 0.12}s infinite` : 'none',
+            }} />
+          ))}
+        </div>
+        <style>{`
+          @keyframes tn-lullawave {
+            0%, 100% { transform: scaleY(0.4); }
+            50%      { transform: scaleY(1.2); }
+          }
+        `}</style>
       </div>
-      <style>{`
-        @keyframes tn-lullawave {
-          0%, 100% { transform: scaleY(0.4); }
-          50%      { transform: scaleY(1.2); }
-        }
-      `}</style>
-    </div>
+    </>
   );
 }
