@@ -209,11 +209,19 @@ export default function RonkisTag({ onClose, onOpenExpedition, onOpenTonight }) 
 
   // Background gradient — shifts gold-cream → umber → deep violet
   // across the day. End-of-day flips to nightsky.
+  // Bedtime gradient lifted Apr 2026 (Marc: "evening view super dark").
+  // Was #6a5a8a → #4a3a5a → #2a1f3a; the bottom anchor at #2a1f3a was
+  // crushing — the cards visually sank into pitch. Bumped each stop
+  // ~12 lightness points: bedtime sky now reads as deep dusky violet
+  // not midnight. fullDay (when the kid finishes the entire day)
+  // stays its original near-black night palette — that's the
+  // "tonight ritual is now" signal so it should read distinctly
+  // darker than the in-progress bedtime view.
   const bg =
     fullDay                ? 'linear-gradient(180deg, #2d1b4e 0%, #1a0f3a 50%, #0a0a2e 100%)' :
     phase === 'morning'    ? 'linear-gradient(180deg, #fef3c7 0%, #fbe9b6 30%, #f9eed8 100%)' :
     phase === 'afternoon'  ? 'linear-gradient(180deg, #faecc8 0%, #f5e0b8 30%, #f4d8a8 100%)' :
-                              'linear-gradient(180deg, #6a5a8a 0%, #4a3a5a 35%, #2a1f3a 100%)';
+                              'linear-gradient(180deg, #8a7aac 0%, #6a5a82 35%, #4a3d62 100%)';
 
   const inkOnDark = phase === 'bedtime' || fullDay;
 
@@ -282,7 +290,13 @@ export default function RonkisTag({ onClose, onOpenExpedition, onOpenTonight }) 
               />
             )}
 
-            {/* Bedtime */}
+            {/* Bedtime — always rendered with the dark theme regardless
+                of current time-of-day. The card backgrounds are deep-violet
+                gradients constantly (bedtime is bedtime, day or night), so
+                the text + eyebrow + pill colors must always pair with that.
+                Earlier wiring `onDark={phase === 'bedtime'}` only flipped
+                colors when the current hour was past bedtime, which left
+                a dark-on-dark title state during afternoon viewing. */}
             {blocks.bedtime.length > 0 && (
               <BlockStrip
                 title="Abend"
@@ -295,7 +309,7 @@ export default function RonkisTag({ onClose, onOpenExpedition, onOpenTonight }) 
                 variant={variant}
                 stageIdx={stageIdx}
                 onTap={handleTap}
-                onDark={phase === 'bedtime'}
+                onDark={true}
               />
             )}
           </div>
@@ -486,12 +500,16 @@ function StripScene({ quest, state, phase, variant, stageIdx, onDark, onTap }) {
     state === 'now'  ? ', jetzt dran' :
                        ', später';
 
+  // Card gradient lifted Apr 2026 to match the page-bg lift — was
+  // #4a3a6a → #2a1f3a, crushed against the new #4a3d62 bottom of the
+  // page. Lifted to dusky-velvet so the cards read as a soft layer
+  // floating on the bedtime sky, not sinking into pitch.
   const baseBg =
     onDark
-      ? 'linear-gradient(135deg, #4a3a6a 0%, #2a1f3a 100%)'
+      ? 'linear-gradient(135deg, #6a5a82 0%, #4a3a5a 100%)'
       : phase === 'morning'   ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)'
       : phase === 'afternoon' ? 'linear-gradient(135deg, #f4e2c8 0%, #ead09a 100%)'
-                              : 'linear-gradient(135deg, #4a3a6a 0%, #2a1f3a 100%)';
+                              : 'linear-gradient(135deg, #6a5a82 0%, #4a3a5a 100%)';
 
   return (
     <button

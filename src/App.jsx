@@ -370,9 +370,24 @@ function AppContent() {
              paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
            }}>
         {view === 'quests' && (
-          <TaskList
-            onNavigate={setView}
-            onOpenParental={() => openPinGate()}
+          // HEUTE bottom-nav now routes to RonkisTag (Streifen) — the
+          // new comic-strip daily surface, same component the cave's
+          // 'aufgaben' tile mounts. Marc 27 Apr 2026: HEUTE was firing
+          // the old TaskList; the brutal-honesty audit had aligned its
+          // section labels but the kid was still landing on the
+          // checklist surface, not the new strip. Both nav paths now
+          // converge on the same surface. TaskList component is left
+          // in the codebase for the moment (downstream questline
+          // back-buttons may still poke it) but is no longer reachable
+          // through normal user flow — Tier-1 candidate for deletion
+          // in the next trim sweep.
+          <RonkisTag
+            onClose={() => setView('hub')}
+            onOpenExpedition={() => {
+              actions?.startExpedition?.();
+              setView('hub');
+            }}
+            onOpenTonight={() => setView('tonight')}
           />
         )}
         {view === 'shop' && <Belohnungsbank onNavigate={setView} onOpenParental={() => openPinGate()} />}
