@@ -74,7 +74,15 @@ export default function MeetRonki({ onComplete }) {
     }
     if (phase === 'wobble') {
       VoiceAudio.playNarrator('narrator_meet_wobble', 100);
-      const t = setTimeout(() => setPhase('hatch'), 1600);
+      // Phase bumped 1600 → 2200ms (Apr 2026 character-pass): Charlotte's
+      // natural read of "Oh. Das hier hat dich gehört." at her locked
+      // narrator register (stability 0.70, style 0.30) lands at ~2.04s
+      // across 8 takes. The original 1.4s timing-budget guess was over-
+      // optimistic for that voice + copy combination. 2200ms gives the
+      // line ~150ms tail before the hatch flash kicks in. The egg wobble
+      // animation is CSS-driven so it continues to play through the
+      // extended phase without awkward freeze.
+      const t = setTimeout(() => setPhase('hatch'), 2200);
       return () => { clearTimeout(t); VoiceAudio.stop(); };
     }
     if (phase === 'hatch') {
