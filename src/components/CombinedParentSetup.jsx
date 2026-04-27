@@ -113,7 +113,7 @@ export default function CombinedParentSetup({ existingFamilyConfig, onComplete }
             Drei kleine Sachen.
           </h1>
           <p className="font-body text-base text-on-surface-variant mt-3 leading-relaxed">
-            Dann übergibt ihr Ronki an euer Kind.
+            Dann darf mit Ronki gespielt werden.
           </p>
         </div>
 

@@ -94,7 +94,13 @@ export const VACATION_QUESTS: Omit<Quest, 'done' | 'streak'>[] = [
   { id: "v_cuddle",    name: "Kuschelzeit / Vorlesen",                icon: "\u{1F4D6}", anchor: "bedtime", xp: 10, minutes: 10, order: 5 },
 ];
 
-export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Fu\u00DFball Training", icon: "\u26BD", anchor: "hobby", xp: 10, minutes: 10, order: 1, target: 2 };
+// Renamed Apr 2026 from Fussball Training to Bewegung + single-tap.
+// The double-tap (target: 2) was training-session framing leftover.
+// Marc 27 Apr: 'make it universal and just say movement'. Keeps
+// FOOTBALL identifier so helpers.ts buildDay() Mon/Wed gating still
+// hits the right quest object - just no longer football-themed.
+// Icon U+1F3C3 (runner) - universal moving glyph.
+export const FOOTBALL: Omit<Quest, 'done' | 'streak'> = { id: "ft", name: "Bewegung", icon: "\u{1F3C3}", anchor: "hobby", xp: 10, minutes: 10, order: 1 };
 
 export const REWARDS: Reward[] = [
   { id: "r1", name: "H\u00F6rspiel h\u00F6ren", icon: "\u{1F3A7}", minutes: 30 },
