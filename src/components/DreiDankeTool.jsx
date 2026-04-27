@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import SFX from '../utils/sfx';
 import MoodChibi from './MoodChibi';
+import useDialogA11y from '../hooks/useDialogA11y';
 
 /**
  * DreiDankeTool — gratitude mini-ritual for 'gut' mood days.
@@ -109,13 +110,23 @@ export default function DreiDankeTool({ onComplete }) {
 
   const close = () => onComplete?.();
 
+  // A11y: ESC dismiss + initial focus + restore on unmount.
+  const dialogRef = useRef(null);
+  useDialogA11y(close, { containerRef: dialogRef });
+
   return (
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Drei-Danke"
+      tabIndex={-1}
       className="fixed inset-0 z-[300] flex flex-col"
       style={{
         background: 'linear-gradient(180deg, #fef3c7 0%, #fff8f2 55%, #fef3c7 100%)',
         color: '#124346',
         fontFamily: 'Nunito, system-ui, sans-serif',
+        outline: 'none',
       }}
     >
       {/* Header */}

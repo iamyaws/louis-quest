@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import SFX from '../utils/sfx';
 import MoodChibi from './MoodChibi';
+import useDialogA11y from '../hooks/useDialogA11y';
 
 /**
  * SteinUndGummiTool — progressive muscle relaxation for 'tired' mood.
@@ -122,13 +123,23 @@ export default function SteinUndGummiTool({ onComplete }) {
     phase === 'done'    ? 1.08 :
     1.0;
 
+  // A11y: ESC dismiss + initial focus + restore on unmount.
+  const dialogRef = useRef(null);
+  useDialogA11y(onComplete, { containerRef: dialogRef });
+
   return (
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Stein und Gummi"
+      tabIndex={-1}
       className="fixed inset-0 z-[300] flex flex-col"
       style={{
         background: 'linear-gradient(180deg, #cffafe 0%, #fff8f2 50%, #cffafe 100%)',
         color: '#0e7490',
         fontFamily: 'Nunito, system-ui, sans-serif',
+        outline: 'none',
       }}
     >
       {/* Header */}

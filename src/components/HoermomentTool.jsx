@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import SFX from '../utils/sfx';
 import MoodChibi from './MoodChibi';
+import useDialogA11y from '../hooks/useDialogA11y';
 
 /**
  * HoermomentTool — auditory sensory grounding.
@@ -90,6 +91,10 @@ export default function HoermomentTool({ onComplete }) {
     if (typeof onComplete === 'function') onComplete();
   };
 
+  // A11y: ESC dismiss + initial focus + restore on unmount.
+  const dialogRef = useRef(null);
+  useDialogA11y(handleClose, { containerRef: dialogRef });
+
   // Clamp elapsed to round duration so the conic-gradient ring doesn't
   // briefly overshoot 360° between the threshold tick and the round
   // advance — a visible glitch on slow phones.
@@ -98,10 +103,16 @@ export default function HoermomentTool({ onComplete }) {
 
   return (
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Hörmoment"
+      tabIndex={-1}
       className="fixed inset-0 z-[500] flex items-center justify-center px-5 py-8 overflow-y-auto"
       style={{
         background: 'linear-gradient(180deg, #ecfdf5 0%, #f0fdfa 60%, #fff8f1 100%)',
         backdropFilter: 'blur(6px)',
+        outline: 'none',
       }}
     >
       <div

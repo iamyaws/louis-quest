@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import SFX from '../utils/sfx';
 import MoodChibi from './MoodChibi';
+import useDialogA11y from '../hooks/useDialogA11y';
 
 /**
  * KraftwortTool — quiet affirmation moment.
@@ -79,12 +80,22 @@ export default function KraftwortTool({ onComplete }) {
     if (typeof onComplete === 'function') onComplete();
   };
 
+  // A11y: ESC dismiss + initial focus + restore on unmount.
+  const dialogRef = useRef(null);
+  useDialogA11y(handleClose, { containerRef: dialogRef });
+
   return (
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Kraftwort"
+      tabIndex={-1}
       className="fixed inset-0 z-[500] flex items-center justify-center px-5 py-8 overflow-y-auto"
       style={{
         background: 'linear-gradient(180deg, rgba(255,248,242,0.96) 0%, rgba(252,231,243,0.92) 100%)',
         backdropFilter: 'blur(8px)',
+        outline: 'none',
       }}
     >
       <div

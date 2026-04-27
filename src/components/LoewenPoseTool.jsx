@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTask } from '../context/TaskContext';
 import SFX from '../utils/sfx';
 import MoodChibi from './MoodChibi';
+import useDialogA11y from '../hooks/useDialogA11y';
 
 /**
  * LoewenPoseTool — body-based self-regulation for 'besorgt' mood.
@@ -246,8 +247,17 @@ export default function LoewenPoseTool({ onComplete }) {
 
   const progress = (stepIdx + 1) / STEPS.length;
 
+  // A11y: ESC dismiss + initial focus + restore on unmount.
+  const dialogRef = useRef(null);
+  useDialogA11y(onComplete, { containerRef: dialogRef });
+
   return (
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Löwen-Pose"
+      tabIndex={-1}
       className="fixed inset-0 z-[300] flex flex-col"
       style={{
         background:
@@ -257,6 +267,7 @@ export default function LoewenPoseTool({ onComplete }) {
         color: '#124346',
         fontFamily: 'Nunito, system-ui, sans-serif',
         transition: 'background 0.6s ease',
+        outline: 'none',
       }}
     >
       {/* Header */}
