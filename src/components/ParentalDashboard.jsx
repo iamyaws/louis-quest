@@ -1050,11 +1050,20 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     { id: 'schau',  emoji: '🦷', label: 'Schau-Modus',        desc: 'Illustrierter Guide mit Zonen-Bildern.' },
   ];
 
-  // ── Voice-Lines mute toggle ──
+  // ── Voice-Lines mute toggle (Ronki, Harry voice) ──
   const [voiceMuted, setVoiceMutedState] = useState(VoiceAudio.isMuted());
   const toggleVoiceMute = (next) => {
     VoiceAudio.setMuted(next);
     setVoiceMutedState(next);
+  };
+  // ── Narrator mute toggle (Drachenmutter, Charlotte voice) ──
+  // Separate key so a parent can keep one on, the other off. In
+  // practice most parents will toggle both together; the UI groups
+  // them under "Stimmen" so the relationship is visible.
+  const [narratorMuted, setNarratorMutedState] = useState(VoiceAudio.isNarratorMuted());
+  const toggleNarratorMute = (next) => {
+    VoiceAudio.setNarratorMuted(next);
+    setNarratorMutedState(next);
   };
 
   // ── Haptics (three-state: off / gentle / normal) — 'gentle' is the
@@ -1538,32 +1547,36 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
         </div>
       </div>
 
-      {/* Voice-Lines (Ronki spricht) */}
+      {/* Stimmen — Ronki + Drachenmutter audio toggles. Both default to ON
+          since the 2026-04-27 voice ship (Harry as Ronki, Charlotte as
+          Drachenmutter). Parent can mute either independently. */}
       <div className="rounded-2xl p-5"
            style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <div className="flex items-center gap-3 mb-2">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center"
                style={{ background: 'rgba(109,40,217,0.12)' }}>
             <span className="material-symbols-outlined text-lg" style={{ color: '#6d28d9', fontVariationSettings: "'FILL' 1" }}>
-              {voiceMuted ? 'volume_off' : 'volume_up'}
+              {(voiceMuted && narratorMuted) ? 'volume_off' : 'volume_up'}
             </span>
           </div>
-          <p className="font-label font-bold text-sm text-on-surface">Ronkis Stimme</p>
+          <p className="font-label font-bold text-sm text-on-surface">Stimmen</p>
         </div>
         <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
-          Ronki kommentiert spontan Stimmung, Wetter und Aufgaben. Wir optimieren die Sprüche gerade — stumm schalten, bis sie sich richtig anfühlen.
+          Ronki spricht selten und kurz. Drachenmutter erzählt die Rahmen — beim Kennenlernen, vor dem Schlafen, bei Abenteuern. Beide einzeln stumm schaltbar.
         </p>
-        <div className="flex items-center justify-between p-4 rounded-2xl"
+
+        {/* Ronki toggle */}
+        <div className="flex items-center justify-between p-4 rounded-2xl mb-3"
              style={{ background: 'rgba(109,40,217,0.06)', border: '1px solid rgba(109,40,217,0.15)' }}>
-          <div>
-            <p className="font-label font-bold text-sm text-on-surface">{voiceMuted ? 'Stumm' : 'An'}</p>
+          <div className="flex-1">
+            <p className="font-label font-bold text-sm text-on-surface">Ronki</p>
             <p className="font-label text-xs text-on-surface-variant mt-0.5">
-              {voiceMuted ? 'Keine Sprechblasen, kein Audio.' : 'Sprechblasen und Audio aktiv.'}
+              {voiceMuted ? 'Stumm' : 'An — Kommentare zu Stimmung, Wetter, Aufgaben.'}
             </p>
           </div>
           <button
             onClick={() => toggleVoiceMute(!voiceMuted)}
-            className="relative w-14 h-8 rounded-full transition-all active:scale-95"
+            className="relative w-14 h-8 rounded-full transition-all active:scale-95 shrink-0"
             style={{
               background: !voiceMuted ? '#6d28d9' : 'rgba(0,0,0,0.12)',
               boxShadow: !voiceMuted ? '0 2px 8px rgba(109,40,217,0.35)' : 'none',
@@ -1572,6 +1585,29 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
           >
             <span className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
                   style={{ transform: !voiceMuted ? 'translateX(24px)' : 'translateX(0)' }} />
+          </button>
+        </div>
+
+        {/* Drachenmutter toggle */}
+        <div className="flex items-center justify-between p-4 rounded-2xl"
+             style={{ background: 'rgba(180,83,9,0.06)', border: '1px solid rgba(180,83,9,0.18)' }}>
+          <div className="flex-1">
+            <p className="font-label font-bold text-sm text-on-surface">Drachenmutter</p>
+            <p className="font-label text-xs text-on-surface-variant mt-0.5">
+              {narratorMuted ? 'Stumm' : 'An — Erzählerin bei Abenteuern und Übergängen.'}
+            </p>
+          </div>
+          <button
+            onClick={() => toggleNarratorMute(!narratorMuted)}
+            className="relative w-14 h-8 rounded-full transition-all active:scale-95 shrink-0"
+            style={{
+              background: !narratorMuted ? '#b45309' : 'rgba(0,0,0,0.12)',
+              boxShadow: !narratorMuted ? '0 2px 8px rgba(180,83,9,0.35)' : 'none',
+            }}
+            aria-label={narratorMuted ? 'Drachenmutter einschalten' : 'Drachenmutter stumm schalten'}
+          >
+            <span className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
+                  style={{ transform: !narratorMuted ? 'translateX(24px)' : 'translateX(0)' }} />
           </button>
         </div>
       </div>
