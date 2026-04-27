@@ -92,11 +92,17 @@ export default function MeetRonki({ onComplete }) {
   const finish = () => {
     if (!picked || !name.trim()) return;
     track('ronki.hatch');
-    actions?.completeOnboarding?.({
-      heroName: name.trim(),
-      companionVariant: picked,
-      heroGender: null,
-    });
+    // NOTE: completeOnboarding is intentionally NOT called here. The
+    // chained onboarding flow (CombinedParentSetup → HandoffBackCard
+    // → MeetRonki → TeachFireStep → Hub) runs TeachFireStep AFTER this
+    // surface, and TeachFireStep's onComplete is what flips
+    // state.onboardingDone (via completeOnboarding with taughtSignature
+    // = 'fire'). If we flipped onboardingDone here, the gate that
+    // hides onboarding would unmount the chain mid-flight before
+    // TeachFireStep even rendered.
+    //
+    // Standalone usage of MeetRonki (e.g. ?meet=1 preview) doesn't
+    // need onboardingDone flipped — it's already onboarded.
     onComplete?.({ companionVariant: picked, heroName: name.trim() });
   };
 

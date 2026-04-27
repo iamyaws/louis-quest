@@ -14,11 +14,16 @@ import Belohnungsbank from './components/Belohnungsbank';
 // HeldenKodex deleted. RoomHub is the only primary surface.
 import RoomHub from './components/drachennest/RoomHub';
 import Journal from './components/Journal';
-import Onboarding from './components/Onboarding';
+// Onboarding.jsx (8-step kid flow) deleted Apr 26 2026 in the
+// onboarding-trim. Replaced by MeetRonki + TeachFireStep run in
+// sequence after the parent setup. See OnboardingChain below.
+import TeachFireStep from './components/onboarding/TeachFireStep';
+import CombinedParentSetup from './components/CombinedParentSetup';
 import TeachFirePreview from './components/TeachFirePreview';
 import TeachRitualPreview from './components/TeachRitualPreview';
-import ParentOnboarding from './components/ParentOnboarding';
-import KidIntro from './components/KidIntro';
+// ParentOnboarding (5-step) replaced by CombinedParentSetup (1-step).
+// KidIntro (greeting + handoff sub-screens) replaced by MeetRonki's
+// in-cave approach beat. Both deleted Apr 26 2026 in the onboarding-trim.
 import HandoffBackCard from './components/HandoffBackCard';
 import PWAInstallSheet from './components/PWAInstallSheet';
 import { usePWAInstall } from './hooks/usePWAInstall';
@@ -340,13 +345,10 @@ function AppContent() {
     );
   }
 
-  // ── Parent-first onboarding choreography (23 Apr 2026 rework) ──
-  // [DRACHENNEST EXPERIMENT BRANCH] Both onboardings auto-bypassed via
-  // ExperimentAutoPrime mounted further up the provider tree (sibling
-  // to AppContent so the prime hooks don't disturb AppContent's hook
-  // ordering — early attempt put the useEffect inline here and React
-  // caught a hook-count mismatch). When experiment graduates to main,
-  // restore the gated returns from `git log -- src/App.jsx`.
+  // Onboarding (Apr 26 2026 trim): handled upstream by OnboardingGate
+  // → OnboardingChain (4 screens). When AppContent mounts,
+  // state.onboardingDone is already true; AppContent never has to
+  // worry about onboarding gating. ExperimentAutoPrime is dead.
 
   // Long-press backdoor removed — the lock button on Buch + Laden gives a
   // focused, intentional parental entry, and a 1.5s anywhere-hold was
@@ -689,8 +691,20 @@ function AuthGate() {
       );
     }
     if (p.get('onboardingPreview') === '1') {
-      const startStep = parseInt(p.get('step') || '0', 10) || 0;
-      return <Onboarding startStep={startStep} onComplete={() => {}} />;
+      // Public QA route — runs the full lean chain end-to-end without
+      // an auth session. Wrapped in TaskProvider so MeetRonki and
+      // TeachFireStep can patch state via useTask hooks. The chain
+      // loops on completion (sets onboardingDone, then resets it
+      // after a beat) so a designer can keep cycling the flow.
+      return (
+        <TaskProvider>
+          <CelebrationQueueProvider>
+            <QuestEaterProvider>
+              <OnboardingChain onComplete={() => { /* loops via state reset */ }} previewLoop />
+            </QuestEaterProvider>
+          </CelebrationQueueProvider>
+        </TaskProvider>
+      );
     }
     // Dedicated iteration harness for TeachFireStep v2 — replay pill +
     // variant swatches so Marc can loop the fire/smoke sequence without
@@ -706,15 +720,17 @@ function AuthGate() {
     if (p.get('teachRitualPreview') === '1') {
       return <TeachRitualPreview />;
     }
-    // QA route for the parent-first onboarding choreography (23 Apr 2026
-    // rework). Lets Marc smoke-test the full KidIntro → ParentOnboarding →
-    // HandoffBack → Onboarding sequence across viewports without a real
-    // Supabase account. Each phase advances the local pointer on
-    // onComplete; the last phase loops back to phase 0 so a designer can
-    // keep cycling. Use ?parentFirstPreview=1 or add &phase=N to jump.
+    // ?parentFirstPreview=1 was the QA harness for the now-deleted
+    // KidIntro → ParentOnboarding → HandoffBack → Onboarding chain
+    // (23 Apr 2026 rework). The new lean chain is reachable via
+    // ?onboardingPreview=1 above. Old param redirects there for any
+    // bookmarked preview links.
     if (p.get('parentFirstPreview') === '1') {
-      const startPhase = parseInt(p.get('phase') || '0', 10) || 0;
-      return <ParentFirstPreview startPhase={startPhase} />;
+      const url = new URL(window.location.href);
+      url.searchParams.delete('parentFirstPreview');
+      url.searchParams.set('onboardingPreview', '1');
+      window.location.replace(url.toString());
+      return null;
     }
 
     // Dev fast-path — lands straight on the Hub, skipping auth + all
@@ -737,56 +753,147 @@ function AuthGate() {
     }
   }
 
-  // [DRACHENNEST EXPERIMENT BRANCH] LoginScreen bypassed — the
-  // experiment runs locally with the supabase stub (no real auth) so
-  // user is always null. Marc's call 24 Apr 2026: "deactivate both
-  // onboardings" + "preview within Claude Code". Logging in is one
-  // gate too many for prototype iteration. AppContent's auto-prime
-  // useEffect handles the parent-first onboarding bypass downstream.
-  // Restore the `if (!user) return <LoginScreen />;` block when the
-  // experiment graduates to main.
-
+  // LoginScreen still bypassed for the prototype — restore when auth
+  // graduates. Real users land in onboarding-gate; once gates flip,
+  // AppContent renders.
   return (
     <TaskProvider>
       <CelebrationQueueProvider>
         <QuestEaterProvider>
-          {/* [DRACHENNEST] Auto-prime sits as a sibling so its hook
-              stack stays separate from AppContent's. Onboarding gates
-              get bypassed without disturbing AppContent rendering. */}
-          <ExperimentAutoPrime />
-          <AppContent />
+          <OnboardingGate />
         </QuestEaterProvider>
       </CelebrationQueueProvider>
     </TaskProvider>
   );
 }
 
-// [DRACHENNEST EXPERIMENT BRANCH] One-shot auto-prime for the
-// onboarding flags so the prototype always boots straight to RoomHub.
-// Renders nothing; runs an effect that patches state once. Lives as a
-// sibling of AppContent so its hooks don't disturb that component's
-// hook ordering.
-function ExperimentAutoPrime() {
-  const { state, actions } = useTask();
-  React.useEffect(() => {
-    if (!state || !actions) return;
-    if (!state.kidIntroSeen || !state.parentOnboardingDone || !state.parentHandoffBackSeen) {
-      actions.patchState?.({
-        kidIntroSeen: true,
-        parentOnboardingDone: true,
-        parentHandoffBackSeen: true,
-      });
-    }
-    if (!state.onboardingDone) {
-      actions.completeOnboarding?.({
-        companionVariant: 'forest',
-        heroName: 'Louis',
-        heroGender: 'boy',
-      });
-    }
-  }, [state?.kidIntroSeen, state?.parentOnboardingDone, state?.parentHandoffBackSeen, state?.onboardingDone, actions]);
-  return null;
+/**
+ * OnboardingGate — renders OnboardingChain until all onboarding
+ * gates flip, then unmounts itself and renders AppContent. The
+ * 4-flag legacy state (kidIntroSeen, parentOnboardingDone,
+ * parentHandoffBackSeen, onboardingDone) is preserved for save-data
+ * compatibility; the new chain flips them in order.
+ */
+function OnboardingGate() {
+  const { state } = useTask();
+  // Gate considers onboarding complete only when state.onboardingDone.
+  // The other 3 flags are stage markers used by the chain's resume
+  // logic (so a kid who closes the app mid-flow lands back on the
+  // right screen). Pre-rework saves auto-mark these on rehydrate.
+  if (!state) return null;
+  if (!state.onboardingDone) {
+    return <OnboardingChain />;
+  }
+  return <AppContent />;
 }
+
+/**
+ * OnboardingChain — the lean 4-screen onboarding flow.
+ *
+ * Phases:
+ *   0 — CombinedParentSetup        sets parentOnboardingDone, parentPin,
+ *                                  analyticsEnabled, familyConfig
+ *   1 — HandoffBackCard            sets parentHandoffBackSeen
+ *   2 — MeetRonki                  collects {heroName, companionVariant};
+ *                                  sets kidIntroSeen
+ *   3 — TeachFireStep              calls completeOnboarding(...) which
+ *                                  sets onboardingDone + taughtSignature
+ *
+ * Resume logic: phase advances based on which gates are already true,
+ * so a kid who closes the app mid-flow returns to the right screen.
+ *
+ * `previewLoop` (?onboardingPreview=1): after onboardingDone fires,
+ * waits ~2s and resets the gates so designers can cycle the chain.
+ */
+function OnboardingChain({ previewLoop, onComplete }) {
+  const { state, actions } = useTask();
+  const [meetData, setMeetData] = React.useState({ heroName: '', companionVariant: 'forest' });
+
+  // Compute phase from state gates so resume works.
+  const phase =
+    !state?.parentOnboardingDone ? 0 :
+    !state?.parentHandoffBackSeen ? 1 :
+    !state?.kidIntroSeen ? 2 :
+                          3;
+
+  // Preview loop — when onboardingDone flips, wait 2s then reset
+  // the gates so the cycle replays. Real users skip this branch.
+  React.useEffect(() => {
+    if (!previewLoop || !state?.onboardingDone) return;
+    const t = setTimeout(() => {
+      actions.patchState?.({
+        onboardingDone: false,
+        kidIntroSeen: false,
+        parentOnboardingDone: false,
+        parentHandoffBackSeen: false,
+      });
+    }, 2200);
+    return () => clearTimeout(t);
+  }, [previewLoop, state?.onboardingDone, actions]);
+
+  if (phase === 0) {
+    return (
+      <CombinedParentSetup
+        existingFamilyConfig={state?.familyConfig}
+        onComplete={(payload) => {
+          actions.patchState?.(payload);
+          if (payload.familyConfig) actions.updateFamilyConfig?.(payload.familyConfig);
+        }}
+      />
+    );
+  }
+  if (phase === 1) {
+    return (
+      <HandoffBackCard
+        onContinue={() => actions.patchState?.({ parentHandoffBackSeen: true })}
+      />
+    );
+  }
+  if (phase === 2) {
+    return (
+      <MeetRonki
+        onComplete={({ heroName, companionVariant }) => {
+          // Persist what the kid picked + named — TeachFireStep needs
+          // companionVariant for its theming, completeOnboarding needs
+          // heroName when TeachFireStep finishes.
+          setMeetData({ heroName: heroName || '', companionVariant: companionVariant || 'forest' });
+          actions.patchState?.({
+            kidIntroSeen: true,
+            heroName: heroName || state?.heroName,
+            companionVariant: companionVariant || state?.companionVariant,
+          });
+        }}
+      />
+    );
+  }
+  // phase === 3 — TeachFireStep is the finisher. completeOnboarding
+  // flips state.onboardingDone, OnboardingGate unmounts the chain,
+  // AppContent takes over.
+  // TeachFireStep contract: { variant, t, ProgressBar, onComplete }.
+  // ProgressBar is a child component the original Onboarding.jsx
+  // rendered above the beat. We pass a no-op so the beat stays
+  // self-contained without the 8-pip onboarding bar.
+  const NoProgressBar = () => null;
+  return (
+    <TeachFireStep
+      variant={state?.companionVariant || meetData.companionVariant}
+      ProgressBar={NoProgressBar}
+      onComplete={() => {
+        actions.completeOnboarding?.({
+          companionVariant: state?.companionVariant || meetData.companionVariant,
+          heroName: state?.heroName || meetData.heroName,
+          heroGender: null,
+          taughtSignature: 'fire',
+        });
+        if (typeof onComplete === 'function') onComplete();
+      }}
+    />
+  );
+}
+
+// ExperimentAutoPrime deleted Apr 26 2026 in the onboarding-trim.
+// The lean OnboardingChain runs in prod; the auto-bypass it provided
+// is no longer needed.
 
 function ErrorBoundary({ children }) {
   const { t } = useTranslation();
@@ -869,35 +976,9 @@ function DevHubPrime({ variant = 'forest' }) {
   return null;
 }
 
-// ── ParentFirstPreview ────────────────────────────────────────────────
-// QA harness for the 23-Apr-2026 onboarding rework. Walks through the
-// new choreography end-to-end (KidIntro → ParentOnboarding → HandoffBack
-// → Onboarding) using local state, no Supabase account required.
-// Reached via ?parentFirstPreview=1 (optionally &phase=N to jump in).
-// The final phase loops back to phase 0 so designers can cycle. For
-// Phase-6 (Lagerfeuer greeting) QA, open the real flow after signing
-// in — the bubble + visual thread render on Hub.jsx, not here.
-function ParentFirstPreview({ startPhase = 0 }) {
-  const [phase, setPhase] = React.useState(startPhase);
-  const next = () => setPhase((p) => (p >= 3 ? 0 : p + 1));
-
-  if (phase === 0) {
-    return <KidIntro onComplete={next} />;
-  }
-  if (phase === 1) {
-    return (
-      <ParentOnboarding
-        existingFamilyConfig={undefined}
-        onComplete={() => next()}
-      />
-    );
-  }
-  if (phase === 2) {
-    return <HandoffBackCard onContinue={next} />;
-  }
-  // phase 3 — kid Onboarding (existing component). Loops back to 0 on complete.
-  return <Onboarding onComplete={next} />;
-}
+// ParentFirstPreview deleted Apr 26 2026 in the onboarding-trim.
+// The lean chain (OnboardingChain) is reachable via ?onboardingPreview=1
+// and previews itself via the previewLoop branch.
 
 export default function App() {
   return (
