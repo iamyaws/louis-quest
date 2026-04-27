@@ -807,6 +807,11 @@ function OnboardingGate() {
  */
 function OnboardingChain({ previewLoop, onComplete }) {
   const { state, actions } = useTask();
+  // TeachFireStep at phase 3 expects a translation function. Without
+  // it, TeachBreathBeat throws "t is not a function" the moment the
+  // kid finishes naming Ronki — the most embarrassing possible time
+  // to crash. Pulling it once at the chain level so all phases share it.
+  const { t } = useTranslation();
   const [meetData, setMeetData] = React.useState({ heroName: '', companionVariant: 'forest' });
 
   // Compute phase from state gates so resume works.
@@ -877,6 +882,7 @@ function OnboardingChain({ previewLoop, onComplete }) {
   return (
     <TeachFireStep
       variant={state?.companionVariant || meetData.companionVariant}
+      t={t}
       ProgressBar={NoProgressBar}
       onComplete={() => {
         actions.completeOnboarding?.({
