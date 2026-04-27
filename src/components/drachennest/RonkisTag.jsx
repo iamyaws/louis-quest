@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTask } from '../../context/TaskContext';
 import { getCatStage } from '../../utils/helpers';
 import MoodChibi from '../MoodChibi';
 import { useQuestEater } from '../QuestEater';
 import { flavorForQuest } from '../FireBreathPuff';
 import ToothbrushTimer from '../ToothbrushTimer';
+import VoiceAudio from '../../utils/voiceAudio';
 
 /**
  * RonkisTag — daily surface as a vertical comic strip.
@@ -175,6 +176,15 @@ export default function RonkisTag({ onClose, onOpenExpedition, onOpenTonight }) 
 
   // Phase of day = which block is "now."
   const phase = useMemo(() => currentPhaseFromHour(new Date().getHours()), []);
+
+  // Voice on mount — Drachenmutter narrator framing + Ronki warmth.
+  // Once per mount of the strip; gentle 600ms delay so the strip
+  // settles in before audio kicks in. Apr 2026 voice pass.
+  useEffect(() => {
+    VoiceAudio.playNarrator('tag_intro_01', 600);
+    const t = setTimeout(() => VoiceAudio.playLocalized('tag_warmth_01', 0), 4200);
+    return () => clearTimeout(t);
+  }, []);
 
   // Block completion
   const morningAll = blocks.morning.length > 0 && blocks.morning.every(q => q.done);

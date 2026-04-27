@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import MoodChibi from '../MoodChibi';
 import FireBreathPuff from '../FireBreathPuff';
+import VoiceAudio from '../../utils/voiceAudio';
 
 /**
  * TeachBreathBeat — the reusable "teach Ronki a fire-breath flavor" beat.
@@ -154,6 +155,31 @@ export default function TeachBreathBeat({
     const id = setTimeout(() => setPhase('prompt'), INTRO_DURATION_MS);
     return () => clearTimeout(id);
   }, [phase]);
+
+  // ── Voice — phase-keyed playback (Apr 2026 character pass).
+  // Drachenmutter (Eleonore) narrates framing beats; Ronki (Harry)
+  // voices first-person reactions. No cleanup-stop — each new
+  // phase's play() naturally overrides the previous via
+  // VoiceAudio.stop() inside play(), so audio chains cleanly without
+  // gaps. Onboarding-flame only — ritual unlock variants will get
+  // their own audio bank when those modals ship.
+  const isOnboardingFlame = targetFlavor === 'flame';
+  const introPlayedRef = useRef(false);
+  useEffect(() => {
+    if (!isOnboardingFlame) return;
+    if (phase === 'intro' && !introPlayedRef.current) {
+      introPlayedRef.current = true;
+      VoiceAudio.playNarrator('teach_fire_intro_01', 400);
+    } else if (phase === 'smoke') {
+      VoiceAudio.playLocalized('teach_fire_smoke_01', 200);
+    } else if (phase === 'prompt' && attemptNum === 2) {
+      VoiceAudio.playNarrator('teach_fire_tryagain_01', 200);
+    } else if (phase === 'released') {
+      VoiceAudio.playLocalized('teach_fire_celebrate_01', 100);
+    } else if (phase === 'done') {
+      VoiceAudio.playNarrator('teach_fire_done_01', 200);
+    }
+  }, [phase, attemptNum, isOnboardingFlame]);
 
   // Cleanup pending timers on unmount
   useEffect(() => () => {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
+import VoiceAudio from '../utils/voiceAudio';
 
 const IOS_STEPS = [
   {
@@ -36,6 +37,12 @@ export default function PWAInstallSheet({ isIOS, androidPrompt, onInstall, onSki
   useEffect(() => {
     const id = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(id);
+  }, []);
+
+  // Ronki invitation to put him on the homescreen — fires once when
+  // the sheet mounts, after the slide-in begins (Apr 2026 voice pass).
+  useEffect(() => {
+    VoiceAudio.playLocalized('pwa_install_01', 600);
   }, []);
 
   return (

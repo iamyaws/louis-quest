@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ChibiFriend, { hasChibiFriend } from './ChibiFriend';
 import { SEED_BY_ID, CREATURE_CONTENT, CHAPTERS } from '../../data/creatures';
+import VoiceAudio from '../../utils/voiceAudio';
 
 /**
  * FriendIntroCeremony — full-screen first-encounter takeover when a
@@ -64,6 +65,14 @@ export default function FriendIntroCeremony({ creatureId, onClose }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
+
+  // Voice — Ronki tells the howMet story when the story-stage reveals.
+  // 20 stories, one per creature ID. Apr 2026 voice pass; files at
+  // public/audio/ronki/de_creature_lore_<id>.mp3.
+  useEffect(() => {
+    if (!phase.story || !creatureId) return;
+    VoiceAudio.playLocalized(`creature_lore_${creatureId}`, 100);
+  }, [phase.story, creatureId]);
 
   if (!seed) {
     // Shouldn't happen — the discovery hook only fires for known

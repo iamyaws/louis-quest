@@ -92,6 +92,14 @@ export const linesDe: VoiceLine[] = [
   // ═══════════════════════════════════════
   { id: 'de_alldone_recognition_01', text: 'Alles geschafft heute. Ich seh\'s, ich seh\'s.', triggers: ['all_done'] },
   { id: 'de_alldone_recognition_02', text: 'Heute war ein guter Tag mit dir. Lass uns kurz sitzen.', triggers: ['all_done'] },
+  // 5 stronger peak-day lines (Apr 2026 voice pass) — Marc: "all quest
+  // complete needs strong ronki lines." Identity-language, body-physical
+  // Ronki reactions, Dikka-warm peak energy without engagement-theater.
+  { id: 'de_alldone_strong_01', text: 'Du hast wirklich alles geschafft. Alles. Du bist jemand, der das einfach durchzieht.', triggers: ['all_done'] },
+  { id: 'de_alldone_strong_02', text: 'Schau dich an. Heute hast du nichts liegen gelassen.', triggers: ['all_done'] },
+  { id: 'de_alldone_strong_03', text: 'Ich kann gar nicht stillsitzen. Du hast heute wirklich alles gemacht.', triggers: ['all_done'] },
+  { id: 'de_alldone_strong_04', text: 'Mein Bauch kribbelt. Du hast es geschafft. Komplett.', triggers: ['all_done'] },
+  { id: 'de_alldone_strong_05', text: 'Ich erzähl das später den Glühwürmchen. Sie werden mir nicht glauben.', triggers: ['all_done'] },
 
   // ═══════════════════════════════════════
   // CARE ACTIONS — companion interactions

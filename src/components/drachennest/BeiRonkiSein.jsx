@@ -3,6 +3,7 @@ import { useTask } from '../../context/TaskContext';
 import { getCatStage } from '../../utils/helpers';
 import { track } from '../../lib/analytics';
 import MoodChibi from '../MoodChibi';
+import VoiceAudio from '../../utils/voiceAudio';
 
 /**
  * BeiRonkiSein — the presence beat (Marc 25 Apr 2026).
@@ -58,7 +59,11 @@ export default function BeiRonkiSein({ onClose }) {
   // doesn't repeat itself in quick succession. Lives in a ref so
   // it survives the moment closing + re-opening within the session.
   const recentRef = useRef(typeof window !== 'undefined' ? (window.__beiRonkiRecent || []) : []);
-  const story = useMemo(() => {
+  // Pick BOTH the index + text up front so the matching audio file
+  // (de_tonight_story_<idx>) can play in lockstep with the bubble text.
+  // STORIES + tonight_story_* share the same 10-line pool — generated
+  // together in the 27 Apr 2026 voice push.
+  const { story, storyIdx } = useMemo(() => {
     const recent = recentRef.current;
     const fresh = STORIES.map((_, i) => i).filter(i => !recent.includes(i));
     const pool = fresh.length > 0 ? fresh : STORIES.map((_, i) => i);
@@ -66,7 +71,7 @@ export default function BeiRonkiSein({ onClose }) {
     const next = [...recent, pickIdx].slice(-3);
     recentRef.current = next;
     if (typeof window !== 'undefined') window.__beiRonkiRecent = next;
-    return STORIES[pickIdx];
+    return { story: STORIES[pickIdx], storyIdx: pickIdx };
   }, []);
 
   // ESC dismisses.
@@ -87,6 +92,15 @@ export default function BeiRonkiSein({ onClose }) {
     const id = setTimeout(() => setShowStory(true), 700);
     return () => clearTimeout(id);
   }, []);
+
+  // Voice the picked story when it reveals — uses the same 10-file
+  // tonight_story_<i> bank generated for TonightRitual (Apr 2026
+  // voice pass). Audio + bubble line up because both pull from the
+  // same indexed pool.
+  useEffect(() => {
+    if (!showStory) return;
+    VoiceAudio.playLocalized(`tonight_story_${storyIdx}`, 100);
+  }, [showStory, storyIdx]);
 
   return (
     <div

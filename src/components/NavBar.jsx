@@ -4,6 +4,20 @@ import { useTask } from '../context/TaskContext';
 import { isTabUnlocked, getTabUnlock } from '../data/tabUnlocks';
 import SFX from '../utils/sfx';
 import { triggerHaptic } from '../lib/haptics';
+import VoiceAudio from '../utils/voiceAudio';
+
+// Map nav tab IDs to their voice line base IDs (Apr 2026 voice pass).
+// playLocalized resolves to de_/en_ at play time. Cooldown gates this
+// so Ronki only chimes in once in a while, not every tap (Marc:
+// "doesn't have to shoot for every tap").
+const NAV_VOICE_MAP = {
+  hub:     'nav_tap_nest',
+  quests:  'nav_tap_heute',
+  ronki:   'nav_tap_ronki',
+  journal: 'nav_tap_tagebuch',
+  shop:    'nav_tap_laden',
+};
+const NAV_VOICE_COOLDOWN_MS = 12000; // min gap between any two nav-tap voice lines
 
 // Pflege merged into Ronki's page (April 2026) — care actions
 // (Füttern/Streicheln/Spielen) now live at the top of RonkiProfile.
@@ -79,6 +93,12 @@ export default function NavBar({ active = 'quests', onNavigate }) {
     };
   }, [lockedHintFor]);
 
+  // Last-fired timestamp lives on a ref so cooldown survives re-renders
+  // without adding state. Module-scope would also work but a ref keeps
+  // it scoped to this NavBar instance (parent-first onboarding can
+  // remount the bar fresh).
+  const lastNavVoiceRef = useRef(0);
+
   const handleTap = (tab, locked) => {
     if (locked) {
       // Locked tab: gentle bump (warning haptic + soft pop) so the kid
@@ -101,6 +121,20 @@ export default function NavBar({ active = 'quests', onNavigate }) {
     try { triggerHaptic('light'); } catch {}
     SFX.play('tap');
     setLockedHintFor(null);
+    // Ronki nav-tap voice — gated by 12s cooldown across all tabs so it
+    // doesn't fire on rapid switching. Probabilistic (1-in-3) on top so
+    // even within-cooldown taps are sometimes silent. Result: Ronki
+    // chimes in maybe once per minute of normal navigation, never spammy.
+    const voiceBaseId = NAV_VOICE_MAP[tab.id];
+    if (voiceBaseId) {
+      const now = Date.now();
+      const okCooldown = now - lastNavVoiceRef.current >= NAV_VOICE_COOLDOWN_MS;
+      const okChance = Math.random() < 0.34;
+      if (okCooldown && okChance) {
+        VoiceAudio.playLocalized(voiceBaseId, 200);
+        lastNavVoiceRef.current = now;
+      }
+    }
     onNavigate?.(tab.id);
   };
 

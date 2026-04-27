@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTask } from '../../context/TaskContext';
 import { track } from '../../lib/analytics';
+import VoiceAudio from '../../utils/voiceAudio';
 
 // Path to the lullaby audio. Royalty-free 4-bar loop, ~30s.
 // File is not committed yet — Marc to drop in once curated. The
@@ -55,7 +56,8 @@ function pickStory() {
   // Stable for the duration of one Tonight session — uses session
   // storage so a kid who taps "nochmal ansehen" sees a different
   // story instead of the same one twice. Falls back to index 0 if
-  // storage is unavailable.
+  // storage is unavailable. Returns { text, idx } so the matching
+  // audio file (de_tonight_story_<idx>) can play in lockstep.
   try {
     const recent = JSON.parse(window.sessionStorage.getItem('tonight_recent') || '[]');
     const fresh = STORY_LINES.map((_, i) => i).filter(i => !recent.includes(i));
@@ -63,9 +65,9 @@ function pickStory() {
     const idx = pool[Math.floor(Math.random() * pool.length)];
     const next = [...recent, idx].slice(-3);
     window.sessionStorage.setItem('tonight_recent', JSON.stringify(next));
-    return STORY_LINES[idx];
+    return { text: STORY_LINES[idx], idx };
   } catch {
-    return STORY_LINES[0];
+    return { text: STORY_LINES[0], idx: 0 };
   }
 }
 
@@ -74,7 +76,7 @@ export default function TonightRitual({ onClose }) {
   const variant = state?.companionVariant || 'amber';
   const [phase, setPhase] = useState('enter');
   const [tapped, setTapped] = useState(false);
-  const [story] = useState(() => pickStory());
+  const [{ text: story, idx: storyIdx }] = useState(() => pickStory());
   // Guards the curtain → black auto-advance. Without it, replay()
   // mid-curtain (or repeated taps) would leave a dangling 12s timer
   // that fires `tonight.complete` again + yanks the kid back to
@@ -96,6 +98,21 @@ export default function TonightRitual({ onClose }) {
 
   // Telemetry — fire start once per mount.
   useEffect(() => { track('tonight.start'); }, []);
+
+  // Voice — phase-keyed playback (Apr 2026 voice pass).
+  // enter:   Drachenmutter "Heute Abend. Wir schauen kurz raus."
+  // lookup:  Ronki "Komm. Wir setzen uns. Ich will dir was erzählen."
+  // story:   Ronki tells the picked story (matched by index).
+  // curtain: lullaby already wired via the Lullaby component.
+  useEffect(() => {
+    if (phase === 'enter') {
+      VoiceAudio.playNarrator('tonight_intro_01', 600);
+    } else if (phase === 'lookup') {
+      VoiceAudio.playLocalized('tonight_invite_01', 200);
+    } else if (phase === 'story') {
+      VoiceAudio.playLocalized(`tonight_story_${storyIdx}`, 600);
+    }
+  }, [phase, storyIdx]);
 
   // Cleanup any pending curtain timer on unmount so an early dismiss
   // doesn't fire `tonight.complete` for a moment that didn't finish.
