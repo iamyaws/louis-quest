@@ -51,13 +51,13 @@ Single source of truth for Ronki's voice across all surfaces, restructured aroun
     }
   },
   "drachenmutter": {
-    "voice_id": "XB0fDUnXU5powFXDhCwa",
-    "voice_name": "Charlotte (locked 2026-04-26 — mature gentle narrator, storytelling cadence)",
+    "voice_id": "jO00l6thH9mRUIF1vSux",
+    "voice_name": "Eleonore | Reflective & Gentle Guide (locked 2026-04-27 — German-native, tender guide register, replaces Charlotte after recast)",
     "output_dir": "public/audio/narrator",
     "settings": {
-      "stability": 0.70,
-      "similarity_boost": 0.72,
-      "style": 0.30,
+      "stability": 0.75,
+      "similarity_boost": 0.75,
+      "style": 0.20,
       "use_speaker_boost": true
     }
   }
@@ -91,25 +91,25 @@ Single source of truth for Ronki's voice across all surfaces, restructured aroun
     "id": "narrator_meet_approach",
     "character": "drachenmutter",
     "tier": "onboarding",
-    "text": "Schau mal. Da hinten. Komm näher.",
+    "text": "Komm mit. Da hinten ist etwas, das du sehen sollst.",
     "direct_play": true,
-    "notes": "MeetRonki phase 1. Plays as the camera pushes into the cave (auto-advances at 4.4s — leave ≥400ms tail). Soft inviting whisper, not theatrical. 'Schau mal' is warmer kid-German than bare 'Schau'. Three-beat narrative fragment is fine for Drachenmutter's narrator register."
+    "notes": "MeetRonki phase 1. Plays as the camera pushes into the cave (auto-advances at 4.4s). Slower flowing sentence (rewritten 27 Apr 2026 from 'Schau mal. Da hinten. Komm näher.' staccato fragments) so Eleonore's narrator-cadence has natural pacing. Soft inviting tone — invitation + mystery."
   },
   {
     "id": "narrator_meet_shelf",
     "character": "drachenmutter",
     "tier": "onboarding",
-    "text": "Welches fühlt sich richtig an?",
+    "text": "Schau dir die Eier an. Welches davon fühlt sich richtig an?",
     "direct_play": true,
-    "notes": "MeetRonki phase 2. Plays once when 6 eggs appear. Kid is browsing — line is brief, no hurry. Pause naturally on the comma after 'Welches'. Kid is the agent ('fühlt sich'); Drachenmutter is the witness."
+    "notes": "MeetRonki phase 2. Plays once when 6 eggs appear. Kid is browsing — no auto-advance, kid taps when ready. Rewritten 27 Apr 2026 to bridge from 'Welches fühlt sich richtig an?' alone — gives Eleonore a soft pointer-sentence to start before the question. Kid is still the agent; Drachenmutter is still witnessing."
   },
   {
     "id": "narrator_meet_wobble",
     "character": "drachenmutter",
     "tier": "onboarding",
-    "text": "Oh. Das hier hat dich gehört.",
+    "text": "Das hier hat dich gehört.",
     "direct_play": true,
-    "notes": "MeetRonki phase 3. Plays when kid picks an egg. Phase is only 1.6s long — TIGHT, must finish under 1.4s. Two beats: surprise 'Oh.' (small intake), then quiet certainty 'Das hier hat dich gehört.' Stress 'gehört' as ge-HÖRT (heard, not 'belongs to'). Inverts agency — the egg picked the kid."
+    "notes": "MeetRonki phase 3. Plays when kid picks an egg. Phase is 1.6s. Rewritten 27 Apr 2026 to drop the 'Oh.' surprise intake — TTS doesn't hold the period-pause naturally and English-accent voices stumbled on it. Pure quiet certainty now: the egg heard you. Stress 'gehört' as ge-HÖRT (heard, not 'belongs to'). Inverts agency — the egg picked the kid."
   },
   {
     "id": "de_meet_hello_01",
@@ -131,9 +131,9 @@ Single source of truth for Ronki's voice across all surfaces, restructured aroun
     "id": "narrator_meet_close",
     "character": "drachenmutter",
     "tier": "onboarding",
-    "text": "Er bleibt hier. Komm wieder, wann du magst.",
+    "text": "Er bleibt hier und wartet. Komm wieder, wann du magst.",
     "direct_play": true,
-    "notes": "MeetRonki phase 7 — Drachenmutter pulls the camera back out of the cave. Soft sign-off, lower energy than approach. Sets up the 'companion-that-fades' framing per northstar — Ronki stays put, kid leaves on their own clock. 'Wann du magst' deliberately vague (not 'morgen') so we don't habituate daily check-ins."
+    "notes": "MeetRonki phase 7 — Drachenmutter pulls the camera back out of the cave. Soft sign-off, lower energy than approach. Rewritten 27 Apr 2026: 'Er bleibt hier' → 'Er bleibt hier und wartet' adds warmth + flowing cadence for Eleonore. Sets up the 'companion-that-fades' framing per northstar — Ronki stays put, kid leaves on their own clock. 'Wann du magst' deliberately vague (not 'morgen') so we don't habituate daily check-ins."
   },
 
   {

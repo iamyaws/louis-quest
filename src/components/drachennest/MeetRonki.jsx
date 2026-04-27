@@ -24,8 +24,8 @@ import VoiceAudio from '../../utils/voiceAudio';
  *
  * Voice + lines align with the BeiRonkiSein bar (soft, hedge-y,
  * no em-dashes, kid-readable). ElevenLabs audio shipped 2026-04-27
- * (Charlotte for Drachenmutter, Harry for Ronki) — see
- * docs/ronki-voicelines.md narrator_meet_* + de_meet_*.
+ * (Eleonore for Drachenmutter — German-native tender guide; Harry for
+ * Ronki) — see docs/ronki-voicelines.md narrator_meet_* + de_meet_*.
  *
  * Based on: docs/design-incoming/meet-tonight/project/src/hifi-meet.jsx
  */
@@ -40,13 +40,13 @@ const EGG_VARIANTS = [
 ];
 
 const LINES = {
-  approach: { who: 'Drachenmutter', text: 'Schau mal. Da hinten. Komm näher.' },
-  shelf:    { who: 'Drachenmutter', text: 'Welches fühlt sich richtig an?' },
-  wobble:   { who: 'Drachenmutter', text: 'Oh. Das hier hat dich gehört.' },
+  approach: { who: 'Drachenmutter', text: 'Komm mit. Da hinten ist etwas, das du sehen sollst.' },
+  shelf:    { who: 'Drachenmutter', text: 'Schau dir die Eier an. Welches davon fühlt sich richtig an?' },
+  wobble:   { who: 'Drachenmutter', text: 'Das hier hat dich gehört.' },
   hatch:    null,
   meet:     { who: 'Ronki', text: 'Hallo. Ich hab auf dich gewartet. Glaub ich.' },
   name:     { who: 'Ronki', text: 'Hm, wie soll ich heißen?' },
-  close:    { who: 'Drachenmutter', text: 'Er bleibt hier. Komm wieder, wann du magst.' },
+  close:    { who: 'Drachenmutter', text: 'Er bleibt hier und wartet. Komm wieder, wann du magst.' },
 };
 
 export default function MeetRonki({ onComplete }) {
@@ -74,15 +74,14 @@ export default function MeetRonki({ onComplete }) {
     }
     if (phase === 'wobble') {
       VoiceAudio.playNarrator('narrator_meet_wobble', 100);
-      // Phase bumped 1600 → 2200ms (Apr 2026 character-pass): Charlotte's
-      // natural read of "Oh. Das hier hat dich gehört." at her locked
-      // narrator register (stability 0.70, style 0.30) lands at ~2.04s
-      // across 8 takes. The original 1.4s timing-budget guess was over-
-      // optimistic for that voice + copy combination. 2200ms gives the
-      // line ~150ms tail before the hatch flash kicks in. The egg wobble
-      // animation is CSS-driven so it continues to play through the
-      // extended phase without awkward freeze.
-      const t = setTimeout(() => setPhase('hatch'), 2200);
+      // Phase 1800ms (27 Apr 2026 recast): the rewritten line
+      // "Das hier hat dich gehört." (dropped the 'Oh.' surprise intake)
+      // lands at ~1.57s in Eleonore's slow-narrator settings. With the
+      // 100ms playNarrator delay that's 1.67s total — so 1800ms gives
+      // a ~130ms comfortable tail before the hatch flash. (Cleanup
+      // VoiceAudio.stop() fires on phase exit; audio finishes naturally
+      // before then.)
+      const t = setTimeout(() => setPhase('hatch'), 1800);
       return () => { clearTimeout(t); VoiceAudio.stop(); };
     }
     if (phase === 'hatch') {
