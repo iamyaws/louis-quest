@@ -32,9 +32,17 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 # Hardcoded base because Python on Windows mangles __file__ paths that
 # contain umlauts. Same workaround the other gen scripts use.
-_REPO = 'C:\\Users\\öööö\\louis-quest'
+# This is the drachennest worktree's copy — points at drachennest paths
+# so MeetRonki audio lands here, not on main. The .env.local can stay
+# on the main worktree (shared API key); we fall through to main if the
+# drachennest copy is missing.
+_REPO = 'C:\\Users\\öööö\\louis-quest-drachennest'
+_MAIN = 'C:\\Users\\öööö\\louis-quest'
 DOC_PATH = _REPO + '\\docs\\ronki-voicelines.md'
-ENV_CANDIDATES = [_REPO + '\\.env.local', _REPO + '\\.env']
+ENV_CANDIDATES = [
+    _REPO + '\\.env.local', _REPO + '\\.env',
+    _MAIN + '\\.env.local', _MAIN + '\\.env',
+]
 
 MODEL_ID = 'eleven_multilingual_v2'
 

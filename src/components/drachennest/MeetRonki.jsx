@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTask } from '../../context/TaskContext';
 import { track } from '../../lib/analytics';
+import VoiceAudio from '../../utils/voiceAudio';
 
 /**
  * MeetRonki — the 60-second first-encounter beat.
@@ -22,9 +23,9 @@ import { track } from '../../lib/analytics';
  * — the parent flow uses this to seed the kid's onboarding state.
  *
  * Voice + lines align with the BeiRonkiSein bar (soft, hedge-y,
- * no em-dashes, kid-readable). The voiced line bubbles + the
- * waveform indicator stand in for the actual TTS playback that
- * lands when ElevenLabs voices for Drachenmutter + Ronki are cut.
+ * no em-dashes, kid-readable). ElevenLabs audio shipped 2026-04-27
+ * (Charlotte for Drachenmutter, Harry for Ronki) — see
+ * docs/ronki-voicelines.md narrator_meet_* + de_meet_*.
  *
  * Based on: docs/design-incoming/meet-tonight/project/src/hifi-meet.jsx
  */
@@ -39,13 +40,13 @@ const EGG_VARIANTS = [
 ];
 
 const LINES = {
-  approach: { who: 'Drachenmutter', text: 'Schau. Da hinten. Komm näher.' },
+  approach: { who: 'Drachenmutter', text: 'Schau mal. Da hinten. Komm näher.' },
   shelf:    { who: 'Drachenmutter', text: 'Welches fühlt sich richtig an?' },
   wobble:   { who: 'Drachenmutter', text: 'Oh. Das hier hat dich gehört.' },
   hatch:    null,
-  meet:     { who: 'Ronki', text: 'Hallo. Ich hab auf dich gewartet, glaub ich.' },
-  name:     { who: 'Ronki', text: 'Wie soll ich heißen?' },
-  close:    { who: 'Drachenmutter', text: 'Er bleibt hier. Du findest ihn morgen wieder.' },
+  meet:     { who: 'Ronki', text: 'Hallo. Ich hab auf dich gewartet. Glaub ich.' },
+  name:     { who: 'Ronki', text: 'Hm, wie soll ich heißen?' },
+  close:    { who: 'Drachenmutter', text: 'Er bleibt hier. Komm wieder, wann du magst.' },
 };
 
 export default function MeetRonki({ onComplete }) {
@@ -55,23 +56,43 @@ export default function MeetRonki({ onComplete }) {
   const [name, setName] = useState('');
   const [voiceKey, setVoiceKey] = useState(0);
 
-  // Auto-advance through the phases the kid doesn't drive.
+  // Auto-advance through the phases the kid doesn't drive. Each branch
+  // also fires its matching ElevenLabs line + returns a cleanup that
+  // stops the audio if phase shifts mid-playback. Symmetric structure
+  // (every branch returns a cleanup) keeps the contract obvious for
+  // future-you. Audio files: narrator_meet_* (Drachenmutter, Charlotte)
+  // and de_meet_*_01 (Ronki, Harry) — see docs/ronki-voicelines.md.
   useEffect(() => {
     if (phase === 'approach') {
+      VoiceAudio.playNarrator('narrator_meet_approach', 600);
       const t = setTimeout(() => { setPhase('shelf'); setVoiceKey(v => v + 1); }, 4400);
-      return () => clearTimeout(t);
+      return () => { clearTimeout(t); VoiceAudio.stop(); };
+    }
+    if (phase === 'shelf') {
+      VoiceAudio.playNarrator('narrator_meet_shelf', 300);
+      return () => VoiceAudio.stop();
     }
     if (phase === 'wobble') {
+      VoiceAudio.playNarrator('narrator_meet_wobble', 100);
       const t = setTimeout(() => setPhase('hatch'), 1600);
-      return () => clearTimeout(t);
+      return () => { clearTimeout(t); VoiceAudio.stop(); };
     }
     if (phase === 'hatch') {
       const t = setTimeout(() => { setPhase('meet'); setVoiceKey(v => v + 1); }, 1400);
       return () => clearTimeout(t);
     }
     if (phase === 'meet') {
+      VoiceAudio.playLocalized('meet_hello_01', 200);
       const t = setTimeout(() => { setPhase('name'); setVoiceKey(v => v + 1); }, 4500);
-      return () => clearTimeout(t);
+      return () => { clearTimeout(t); VoiceAudio.stop(); };
+    }
+    if (phase === 'name') {
+      VoiceAudio.playLocalized('meet_namequest_01', 400);
+      return () => VoiceAudio.stop();
+    }
+    if (phase === 'close') {
+      VoiceAudio.playNarrator('narrator_meet_close', 600);
+      return () => VoiceAudio.stop();
     }
   }, [phase]);
 

@@ -88,6 +88,55 @@ Single source of truth for Ronki's voice across all surfaces, restructured aroun
   },
 
   {
+    "id": "narrator_meet_approach",
+    "character": "drachenmutter",
+    "tier": "onboarding",
+    "text": "Schau mal. Da hinten. Komm näher.",
+    "direct_play": true,
+    "notes": "MeetRonki phase 1. Plays as the camera pushes into the cave (auto-advances at 4.4s — leave ≥400ms tail). Soft inviting whisper, not theatrical. 'Schau mal' is warmer kid-German than bare 'Schau'. Three-beat narrative fragment is fine for Drachenmutter's narrator register."
+  },
+  {
+    "id": "narrator_meet_shelf",
+    "character": "drachenmutter",
+    "tier": "onboarding",
+    "text": "Welches fühlt sich richtig an?",
+    "direct_play": true,
+    "notes": "MeetRonki phase 2. Plays once when 6 eggs appear. Kid is browsing — line is brief, no hurry. Pause naturally on the comma after 'Welches'. Kid is the agent ('fühlt sich'); Drachenmutter is the witness."
+  },
+  {
+    "id": "narrator_meet_wobble",
+    "character": "drachenmutter",
+    "tier": "onboarding",
+    "text": "Oh. Das hier hat dich gehört.",
+    "direct_play": true,
+    "notes": "MeetRonki phase 3. Plays when kid picks an egg. Phase is only 1.6s long — TIGHT, must finish under 1.4s. Two beats: surprise 'Oh.' (small intake), then quiet certainty 'Das hier hat dich gehört.' Stress 'gehört' as ge-HÖRT (heard, not 'belongs to'). Inverts agency — the egg picked the kid."
+  },
+  {
+    "id": "de_meet_hello_01",
+    "character": "ronki",
+    "tier": "onboarding",
+    "text": "Hallo. Ich hab auf dich gewartet. Glaub ich.",
+    "direct_play": true,
+    "notes": "MeetRonki phase 5 — Ronki's FIRST EVER LINE in the product. Just hatched, eyes still adjusting. Soft, slightly stumbly, hedge on 'Glaub ich.' as its OWN sentence (period not comma — separates the hedge into a distinct stumbly beat, matches BeiRonkiSein voice rule). Small breath before 'Glaub ich.' Auto-advances at 4.5s — leave 500ms tail."
+  },
+  {
+    "id": "de_meet_namequest_01",
+    "character": "ronki",
+    "tier": "onboarding",
+    "text": "Hm, wie soll ich heißen?",
+    "direct_play": true,
+    "notes": "MeetRonki phase 6. Kid is about to type. Open, curious, not pleading. 'Hm,' opener is the thinking-pause that makes it Ronki — without it the question is too tidy (BeiRonkiSein voice rule = no clean fragments, always slightly stumbly). Slight rise on 'heißen?'"
+  },
+  {
+    "id": "narrator_meet_close",
+    "character": "drachenmutter",
+    "tier": "onboarding",
+    "text": "Er bleibt hier. Komm wieder, wann du magst.",
+    "direct_play": true,
+    "notes": "MeetRonki phase 7 — Drachenmutter pulls the camera back out of the cave. Soft sign-off, lower energy than approach. Sets up the 'companion-that-fades' framing per northstar — Ronki stays put, kid leaves on their own clock. 'Wann du magst' deliberately vague (not 'morgen') so we don't habituate daily check-ins."
+  },
+
+  {
     "id": "de_greet_01",
     "character": "ronki",
     "tier": "quipper",
