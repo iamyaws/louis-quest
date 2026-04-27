@@ -18,8 +18,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 VOICE_ID = 'jO00l6thH9mRUIF1vSux'  # Eleonore | Reflective & Gentle Guide (Drachenmutter)
 MODEL_ID = 'eleven_multilingual_v2'
-# Drachennest worktree path — was main repo path when this script lived only on main.
-OUTPUT_DIR = r'C:\Users\öööö\louis-quest-drachennest\public\audio\narrator'
+OUTPUT_DIR = r'C:\Users\öööö\louis-quest\public\audio\narrator'
 ENV_PATH = r'C:\Users\öööö\louis-quest\.env.local'
 
 VOICE_SETTINGS = {
