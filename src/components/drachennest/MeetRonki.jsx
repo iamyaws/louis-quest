@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTask } from '../../context/TaskContext';
 import { track } from '../../lib/analytics';
 import VoiceAudio from '../../utils/voiceAudio';
+import MoodChibi from '../MoodChibi';
 
 /**
  * MeetRonki — the 60-second first-encounter beat.
@@ -181,12 +182,26 @@ export default function MeetRonki({ onComplete }) {
             : 'translate(-50%, -45%)',
           transition: 'transform 1400ms cubic-bezier(.34,1.4,.64,1)',
         }}>
-          <RonkiHatchling
-            variant={picked}
-            size={150}
+          {/* Apr 2026 immersion fix: was a custom CSS-drawn RonkiHatchling
+              that didn't match TeachBreathBeat's MoodChibi → kid saw two
+              different Ronkis between hatching here and learning fire-
+              breath in TeachFireStep. Now both surfaces share MoodChibi
+              with stage=1 (baby) + variant from the egg pick. The wrapper
+              div carries the awakening scale ramp + breathing animation
+              that the old hatchling baked in. */}
+          <RonkiHatchlingWrapper
             awakening={phase === 'meet' || phase === 'name' ? 1 : 0.6}
             breathe={phase !== 'hatch'}
-          />
+            tint={pickedVar?.tint || '#fde68a'}
+          >
+            <MoodChibi
+              variant={picked || 'amber'}
+              stage={1}
+              mood="normal"
+              size={150}
+              bare
+            />
+          </RonkiHatchlingWrapper>
         </div>
       )}
 
@@ -474,63 +489,32 @@ function Egg({ tint, deep, size = 60, picked, dim, onTap, wobble, hatching }) {
   );
 }
 
-// ─── Ronki hatchling — temporary chibi until final art swap ─────
+// ─── RonkiHatchlingWrapper — awakening scale + breathing animation ────
 //
-// The design ships a custom CSS-drawn chibi keyed off the egg
-// variant tint. We're using it as-is here because MoodChibi's
-// shape doesn't fit the "newly hatched, sleepy, looking up"
-// posture this moment needs. When Marc cuts the canonical
-// hatchling pose, swap the SVG body and everything else holds.
-
-function RonkiHatchling({ size = 130, variant, blink = false, awakening = 0, breathe = false }) {
-  const v = EGG_VARIANTS.find(e => e.id === variant) || EGG_VARIANTS[0];
-  const hashKey = v.id;
+// Apr 2026 art-unification (Marc: "Ronki that hatches and Ronki getting
+// taught firebreath aren't the same chibi but have to be"). The body
+// is now MoodChibi (same primitive TeachBreathBeat uses), so the kid
+// sees a continuous Ronki across the meet→teach handoff. This wrapper
+// keeps the choreography that the old custom hatchling baked in:
+//  · awakening: 0..1 — scale ramps from 0.4× to 1.0× over 900ms when
+//    Ronki "wakes up" post-hatch (phase shifts from hatch → meet)
+//  · breathe: gentle 3.4s breathing pulse once the chibi has settled
+//  · drop-shadow with a variant-tinted glow so the egg's color carries
+//    through visually on the hatchling
+//
+// Old custom-SVG hatchling deleted. EGG_VARIANTS still exports tint+deep
+// for the egg artwork itself (the wobbling eggs on the shelf); the
+// chibi colors come from MoodChibi's own palette via variant id.
+function RonkiHatchlingWrapper({ children, awakening = 1, breathe = true, tint = '#fde68a' }) {
   return (
     <div style={{
-      position: 'relative', width: size, height: size,
+      position: 'relative',
       transform: `scale(${0.4 + 0.6 * awakening})`,
       transition: 'transform 900ms cubic-bezier(.34,1.4,.64,1)',
       animation: breathe ? 'mr-ronkiBreathe 3.4s ease-in-out infinite' : 'none',
-      filter: `drop-shadow(0 8px 14px rgba(0,0,0,.5)) drop-shadow(0 0 20px ${v.tint}88)`,
+      filter: `drop-shadow(0 8px 14px rgba(0,0,0,.5)) drop-shadow(0 0 20px ${tint}88)`,
     }}>
-      <svg viewBox="0 0 130 130" width={size} height={size}>
-        <defs>
-          <radialGradient id={`mr-bd-${hashKey}`} cx="40%" cy="35%" r="70%">
-            <stop offset="0%"  stopColor="#ffffff" stopOpacity="0.7"/>
-            <stop offset="20%" stopColor={v.tint}/>
-            <stop offset="70%" stopColor={v.tint}/>
-            <stop offset="100%" stopColor={v.deep}/>
-          </radialGradient>
-          <radialGradient id={`mr-bel-${hashKey}`} cx="50%" cy="60%" r="60%">
-            <stop offset="0%"   stopColor="#fef9e7"/>
-            <stop offset="100%" stopColor={v.tint}/>
-          </radialGradient>
-        </defs>
-        <ellipse cx="48" cy="118" rx="11" ry="6" fill={v.deep} opacity="0.7"/>
-        <ellipse cx="82" cy="118" rx="11" ry="6" fill={v.deep} opacity="0.7"/>
-        <path d="M95 100 Q115 95, 118 80" stroke={v.deep} strokeWidth="9" strokeLinecap="round" fill="none"/>
-        <ellipse cx="65" cy="78" rx="38" ry="42" fill={`url(#mr-bd-${hashKey})`}/>
-        <ellipse cx="65" cy="88" rx="22" ry="26" fill={`url(#mr-bel-${hashKey})`}/>
-        <path d="M48 42 Q42 28, 50 22" stroke={v.deep} strokeWidth="5" strokeLinecap="round" fill="none"/>
-        <path d="M82 42 Q88 28, 80 22" stroke={v.deep} strokeWidth="5" strokeLinecap="round" fill="none"/>
-        <ellipse cx="65" cy="48" rx="32" ry="30" fill={`url(#mr-bd-${hashKey})`}/>
-        <circle cx="48" cy="56" r="5" fill={v.deep} opacity="0.18"/>
-        <circle cx="82" cy="56" r="5" fill={v.deep} opacity="0.18"/>
-        {!blink ? (
-          <>
-            <circle cx="55" cy="48" r="3.5" fill="#1a0f08"/>
-            <circle cx="75" cy="48" r="3.5" fill="#1a0f08"/>
-            <circle cx="56" cy="46.5" r="1.2" fill="white"/>
-            <circle cx="76" cy="46.5" r="1.2" fill="white"/>
-          </>
-        ) : (
-          <>
-            <path d="M51 48 Q55 51, 59 48" stroke="#1a0f08" strokeWidth="2" fill="none" strokeLinecap="round"/>
-            <path d="M71 48 Q75 51, 79 48" stroke="#1a0f08" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          </>
-        )}
-        <path d="M61 60 Q65 64, 69 60" stroke="#1a0f08" strokeWidth="2" strokeLinecap="round" fill="none"/>
-      </svg>
+      {children}
       <style>{`
         @keyframes mr-ronkiBreathe {
           0%, 100% { transform: scale(1); }
