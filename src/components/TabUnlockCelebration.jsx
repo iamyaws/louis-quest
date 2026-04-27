@@ -4,6 +4,7 @@ import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { TAB_UNLOCKS } from '../data/tabUnlocks';
 import { useCelebrationQueue } from '../context/CelebrationQueue';
+import VoiceAudio from '../utils/voiceAudio';
 
 /**
  * TabUnlockCelebration — lightweight onboarding scaffolding for the
@@ -88,6 +89,9 @@ export default function TabUnlockCelebration({ view }) {
           <TabUnlockToast unlock={unlock} t={t} onDismiss={dismiss} />
         ),
       });
+      // Ronki celebrates the unlock — short toast voiceline (Apr 2026
+      // voice pass). Files at de_nav_unlock_{ronki|journal|shop}.
+      VoiceAudio.playLocalized(`nav_unlock_${tabId}`, 200);
       actions.markTabUnlockSeen?.(tabId);
       break; // only one unlock per state tick — others queue naturally on next flip
     }
@@ -112,6 +116,9 @@ export default function TabUnlockCelebration({ view }) {
     const timer = setTimeout(() => {
       if (cancelled) return;
       setCoachFor(view);
+      // Ronki reads the coachmark text aloud as the overlay reveals
+      // (Apr 2026 voice pass). Files at de_nav_coach_{ronki|journal|shop}.
+      VoiceAudio.playLocalized(`nav_coach_${view}`, 100);
     }, 220);
     return () => {
       cancelled = true;
