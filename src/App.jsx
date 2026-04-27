@@ -19,6 +19,7 @@ import Journal from './components/Journal';
 // sequence after the parent setup. See OnboardingChain below.
 import TeachFireStep from './components/onboarding/TeachFireStep';
 import CombinedParentSetup from './components/CombinedParentSetup';
+import BackgroundMusic from './utils/backgroundMusic';
 import TeachFirePreview from './components/TeachFirePreview';
 import TeachRitualPreview from './components/TeachRitualPreview';
 // ParentOnboarding (5-step) replaced by CombinedParentSetup (1-step).
@@ -667,6 +668,13 @@ function AppContent() {
 function AuthGate() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
+
+  // Background music engine — boots once, attaches its own first-
+  // gesture listener so audio respects browser autoplay policy.
+  // Off by default; parental toggle in dashboard turns it on.
+  React.useEffect(() => {
+    BackgroundMusic.init();
+  }, []);
 
   if (loading) {
     return (

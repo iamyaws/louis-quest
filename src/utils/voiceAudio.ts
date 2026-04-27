@@ -12,6 +12,8 @@
  * stall — they just proceed immediately as if the audio had played.
  */
 
+import BackgroundMusic from './backgroundMusic';
+
 const MUTE_KEY = 'ronki_voice_mute';
 const NARRATOR_MUTE_KEY = 'ronki_narrator_mute';
 // Mirrors src/i18n/LanguageContext STORAGE_KEY — duplicated here to avoid
@@ -62,7 +64,13 @@ const VoiceAudio = {
       const src = `${BASE}audio/narrator/${lineId}.mp3`;
       const audio = new Audio(src);
       audio.volume = 0.9;
-      audio.play().catch(() => {});
+      // Duck background music for the duration of this voice line.
+      // Reference-counted by reason — 'narrator' is unique to Drachenmutter.
+      BackgroundMusic.duck('narrator');
+      const undock = () => BackgroundMusic.unduck('narrator');
+      audio.addEventListener('ended', undock);
+      audio.addEventListener('error', undock);
+      audio.play().catch(() => undock());
       currentAudio = audio;
     };
     delayTimer = setTimeout(doPlay, delayMs);
@@ -99,9 +107,11 @@ const VoiceAudio = {
       const src = `${BASE}audio/narrator/${lineId}.mp3`;
       const audio = new Audio(src);
       audio.volume = 0.9;
-      audio.addEventListener('ended', fireOnce);
-      audio.addEventListener('error', fireOnce);
-      audio.play().catch(() => { fireOnce(); });
+      BackgroundMusic.duck('narrator-cb');
+      const wrap = () => { BackgroundMusic.unduck('narrator-cb'); fireOnce(); };
+      audio.addEventListener('ended', wrap);
+      audio.addEventListener('error', wrap);
+      audio.play().catch(() => { wrap(); });
       currentAudio = audio;
     };
     delayTimer = setTimeout(doPlay, delayMs);
@@ -138,8 +148,15 @@ const VoiceAudio = {
       const src = `${BASE}audio/ronki/${lineId}.mp3`;
       const audio = new Audio(src);
       audio.volume = 0.85;
+      // Duck for Ronki — separate reason from narrator so concurrent
+      // voicelines don't unduck prematurely.
+      BackgroundMusic.duck('ronki');
+      const undock = () => BackgroundMusic.unduck('ronki');
+      audio.addEventListener('ended', undock);
+      audio.addEventListener('error', undock);
       audio.play().catch(() => {
         // File doesn't exist or autoplay blocked — fail silently
+        undock();
       });
       currentAudio = audio;
     };

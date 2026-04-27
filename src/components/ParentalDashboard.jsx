@@ -7,6 +7,7 @@ import { useRonkiStamina } from '../hooks/useRonkiStamina';
 import FeedbackModal from './FeedbackModal';
 // QuestLineEditor deleted Apr 2026 (cut #10f). NORTHSTAR: "not a skill tree".
 import VoiceAudio from '../utils/voiceAudio';
+import BackgroundMusic from '../utils/backgroundMusic';
 import { useAnalytics } from '../hooks/useAnalytics';
 
 const PIN_CODE = '1234';
@@ -1065,6 +1066,16 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     VoiceAudio.setNarratorMuted(next);
     setNarratorMutedState(next);
   };
+  // ── Background music toggle ──
+  // Off by default. When on, a soft cave-ambient pad plays under the
+  // app and ducks during voicelines. Currently driven by an in-code
+  // synthesizer placeholder until Marc picks a real mp3 — see
+  // docs/voice-music-engine.md.
+  const [musicOn, setMusicOnState] = useState(BackgroundMusic.isEnabled());
+  const toggleMusic = (next) => {
+    BackgroundMusic.setEnabled(next);
+    setMusicOnState(next);
+  };
 
   // ── Haptics (three-state: off / gentle / normal) — 'gentle' is the
   //    default for age 6 (halved pulse durations, widened pauses).
@@ -1589,7 +1600,7 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
         </div>
 
         {/* Drachenmutter toggle */}
-        <div className="flex items-center justify-between p-4 rounded-2xl"
+        <div className="flex items-center justify-between p-4 rounded-2xl mb-3"
              style={{ background: 'rgba(180,83,9,0.06)', border: '1px solid rgba(180,83,9,0.18)' }}>
           <div className="flex-1">
             <p className="font-label font-bold text-sm text-on-surface">Drachenmutter</p>
@@ -1608,6 +1619,32 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
           >
             <span className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
                   style={{ transform: !narratorMuted ? 'translateX(24px)' : 'translateX(0)' }} />
+          </button>
+        </div>
+
+        {/* Hintergrundmusik toggle — soft cave-ambient pad. Currently
+            an in-code synth placeholder; swaps to a real mp3 once Marc
+            picks one (see docs/voice-music-engine.md). Ducks during
+            any voiceline. */}
+        <div className="flex items-center justify-between p-4 rounded-2xl"
+             style={{ background: 'rgba(14,165,233,0.06)', border: '1px solid rgba(14,165,233,0.20)' }}>
+          <div className="flex-1">
+            <p className="font-label font-bold text-sm text-on-surface">Hintergrundmusik</p>
+            <p className="font-label text-xs text-on-surface-variant mt-0.5">
+              {musicOn ? 'An — leise unter der App, leiser bei Stimmen.' : 'Aus'}
+            </p>
+          </div>
+          <button
+            onClick={() => toggleMusic(!musicOn)}
+            className="relative w-14 h-8 rounded-full transition-all active:scale-95 shrink-0"
+            style={{
+              background: musicOn ? '#0ea5e9' : 'rgba(0,0,0,0.12)',
+              boxShadow: musicOn ? '0 2px 8px rgba(14,165,233,0.35)' : 'none',
+            }}
+            aria-label={musicOn ? 'Hintergrundmusik aus' : 'Hintergrundmusik an'}
+          >
+            <span className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
+                  style={{ transform: musicOn ? 'translateX(24px)' : 'translateX(0)' }} />
           </button>
         </div>
       </div>
