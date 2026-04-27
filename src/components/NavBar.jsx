@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useTask } from '../context/TaskContext';
 import { isTabUnlocked, getTabUnlock } from '../data/tabUnlocks';
+import SFX from '../utils/sfx';
+import { triggerHaptic } from '../lib/haptics';
 
 // Pflege merged into Ronki's page (April 2026) — care actions
 // (Füttern/Streicheln/Spielen) now live at the top of RonkiProfile.
@@ -79,12 +81,25 @@ export default function NavBar({ active = 'quests', onNavigate }) {
 
   const handleTap = (tab, locked) => {
     if (locked) {
+      // Locked tab: gentle bump (warning haptic + soft pop) so the kid
+      // FEELS the tap was registered, even though navigation didn't fire.
+      // Without this the locked-tab tap felt dead — kid would think the
+      // app froze.
+      try { triggerHaptic('warning'); } catch {}
+      SFX.play('pop');
       const el = btnRefsRef.current[tab.id];
       const rect = el?.getBoundingClientRect();
       const anchorX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
       setLockedHintFor({ tabId: tab.id, anchorX });
       return;
     }
+    // Unlocked tap: light haptic + soft pop SFX. Marc 27 Apr 2026:
+    // "there should also either be sounds and/or haptics when i click
+    // buttons like nav" — both, light. Phones without a haptic engine
+    // ignore the call silently; muted devices skip the SFX. Either way,
+    // the device-capable kid gets a confirming tactile beat.
+    try { triggerHaptic('light'); } catch {}
+    SFX.play('tap');
     setLockedHintFor(null);
     onNavigate?.(tab.id);
   };

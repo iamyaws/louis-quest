@@ -19,6 +19,11 @@ function checkTrigger(trigger: string, state: TaskState): boolean {
     case 'memoriesVisit': return (state.viewsVisited || []).includes('memories');
     case 'moodSet':       return state.moodAM !== null;
     case 'waterFull':     return (state.dailyWaterCount || 0) >= 6;
+    // 'firstGlass' fires the moment the morning water routine quest
+    // (s_water / v_water) flips done. Replaces the old 6-glass tracker
+    // that depended on the cut TopBar water pill — see sq_water comment
+    // in data/specialQuests.ts.
+    case 'firstGlass':    return (state.quests || []).some(q => (q.id === 's_water' || q.id === 'v_water') && q.done);
     default: return false;
   }
 }
