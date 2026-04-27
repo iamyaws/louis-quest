@@ -1,6 +1,31 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTask } from '../../context/TaskContext';
 import RonkiAwayLoop from './RonkiAwayLoop';
+import VoiceAudio from '../../utils/voiceAudio';
+
+// ─── Voice (Apr 2026 voice pass) ──────────────────────────────────
+// State-keyed Ronki narration. Each state-entry fires one matching
+// line; refs prevent re-fire on re-render. Pack/depart/browse pull
+// from indexed pools so the kid hears a different take across days.
+const KARTE_POOL_SIZE = 3;       // de_karte_0..2
+const PACK_POOL_SIZE = 2;        // de_expedition_pack_01..02
+const DEPART_POOL_SIZE = 2;      // de_expedition_depart_01..02
+const BROWSE_POOL_SIZE = 5;      // de_expedition_browse_01..05
+const BIOME_TO_VOICE = {
+  morgenwald: 'expedition_arrive_morgenwald',
+  forest:     'expedition_arrive_morgenwald',  // alias for forest chapter
+  water:      'expedition_arrive_water',
+  sky:        'expedition_arrive_sky',
+  dream:      'expedition_arrive_dream',
+  hearth:     'expedition_arrive_hearth',
+};
+
+function randPoolId(prefix, size, suffix1Indexed = false) {
+  const i = Math.floor(Math.random() * size);
+  return suffix1Indexed
+    ? `${prefix}_${String(i + 1).padStart(2, '0')}`  // _01 / _02
+    : `${prefix}_${i}`;                              // _0 / _1 / _2
+}
 
 /**
  * Expedition — the Reise surface (Drachennest, 25 Apr 2026).
@@ -63,6 +88,46 @@ export default function Expedition({ onClose }) {
       setTimeout(() => actions.rangerArrived?.(), 50);
     }
   }, [actions]);
+
+  // ─── Voice — state-keyed Ronki narration ──
+  // home:    Karte voice on first mount (kid is browsing the map)
+  // leaving: pack voice (Ronki narrates packing) +
+  //          depart voice 1.5s later (synced with the walk-out anim)
+  // away:    arrive voice (per biome) on first render of away state
+  // waiting: return voice ("Ich bin wieder da. Schau, was ich gefunden hab.")
+  // Refs gate each so re-renders or rapid state-flip-flops don't
+  // double-fire. Reset only on full unmount.
+  const voiceFiredRef = useRef({ home: false, leaving: false, away: false, waiting: false });
+  useEffect(() => {
+    const s = expedition.state;
+    if (s === 'home' && !voiceFiredRef.current.home) {
+      voiceFiredRef.current.home = true;
+      VoiceAudio.playLocalized(randPoolId('karte', KARTE_POOL_SIZE), 600);
+    } else if (s === 'leaving' && !voiceFiredRef.current.leaving) {
+      voiceFiredRef.current.leaving = true;
+      VoiceAudio.playLocalized(randPoolId('expedition_pack', PACK_POOL_SIZE, true), 200);
+      // Depart line lands as Ronki actually walks off (~1.6s in).
+      const t = setTimeout(() => {
+        VoiceAudio.playLocalized(randPoolId('expedition_depart', DEPART_POOL_SIZE, true), 0);
+      }, 1600);
+      return () => clearTimeout(t);
+    } else if (s === 'away' && !voiceFiredRef.current.away) {
+      voiceFiredRef.current.away = true;
+      const biomeId = expedition.biome || 'morgenwald';
+      const baseId = BIOME_TO_VOICE[biomeId] || 'expedition_arrive_morgenwald';
+      VoiceAudio.playLocalized(baseId, 400);
+      // Browse line plays a few seconds after arrival, then again on
+      // any return-visit (handled by below effect via voiceFiredRef
+      // reset on close — kept simple here).
+      const t = setTimeout(() => {
+        VoiceAudio.playLocalized(randPoolId('expedition_browse', BROWSE_POOL_SIZE, true), 0);
+      }, 5000);
+      return () => clearTimeout(t);
+    } else if (s === 'waiting' && !voiceFiredRef.current.waiting) {
+      voiceFiredRef.current.waiting = true;
+      VoiceAudio.playLocalized('expedition_return_01', 400);
+    }
+  }, [expedition.state, expedition.biome]);
 
   // 'leaving' → 'away' transition: the walk-out animation runs ~2.4s,
   // then we hand off to the reducer (which stamps departedAt +

@@ -5,6 +5,13 @@ import { getCatStage } from '../../utils/helpers';
 import { resolveWallpaper, resolveFloor } from '../../data/caveStyles';
 import { track } from '../../lib/analytics';
 import MoodChibi from '../MoodChibi';
+import VoiceAudio from '../../utils/voiceAudio';
+
+// Ronki-tap voice gate (Apr 2026 voice pass). Marc: "doesn't have to
+// shoot for every tap but once in a while between tapping." Combined
+// cooldown + probabilistic gate keeps Ronki vocal but not chatty.
+const ROOM_TAP_VOICE_COUNT = 10; // de_room_tap_0 through de_room_tap_9
+const ROOM_TAP_COOLDOWN_MS = 7000;
 import RonkiSpeechBubble from './RonkiSpeechBubble';
 import Expedition from './Expedition';
 import BeiRonkiSein from './BeiRonkiSein';
@@ -123,6 +130,12 @@ export default function RoomHub({ onNavigate }) {
   const [reaction, setReaction] = useState(null);
   const tapCountRef = useRef(0);
   const reactionIdxRef = useRef(0);
+  // Voice — round-robin through the 10-line pool with a 7s cooldown +
+  // 1-in-3 chance gate. Round-robin avoids same-line-twice; chance gate
+  // means even within-cooldown extra taps stay silent. Together: kid
+  // hears a fresh Ronki line ~once per 15-20s of active tapping.
+  const voiceLastRef = useRef(0);
+  const voiceIdxRef = useRef(Math.floor(Math.random() * ROOM_TAP_VOICE_COUNT));
 
   const tapRonki = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -141,6 +154,16 @@ export default function RoomHub({ onNavigate }) {
     // a single "kid played with Ronki for 30s" session shows up as
     // multiple events (intentional — frequency matters for this loop).
     track('companion.tap');
+
+    // Voice — gated. Skip when the cooldown hasn't lapsed OR when the
+    // 1-in-3 chance doesn't hit.
+    const now = Date.now();
+    if (now - voiceLastRef.current >= ROOM_TAP_COOLDOWN_MS && Math.random() < 0.34) {
+      const idx = voiceIdxRef.current;
+      voiceIdxRef.current = (idx + 1) % ROOM_TAP_VOICE_COUNT;
+      VoiceAudio.playLocalized(`room_tap_${idx}`, 80);
+      voiceLastRef.current = now;
+    }
 
     // Body-reaction escalation every 3rd tap. Cycle through the pool
     // round-robin (with a small randomization shuffle) so the kid
