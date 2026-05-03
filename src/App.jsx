@@ -20,6 +20,7 @@ import Journal from './components/Journal';
 import TeachFireStep from './components/onboarding/TeachFireStep';
 import CombinedParentSetup from './components/CombinedParentSetup';
 import BackgroundMusic from './utils/backgroundMusic';
+import { getActiveToken, ensureTokenForExistingProfile } from './lib/profileToken';
 import TeachFirePreview from './components/TeachFirePreview';
 import TeachRitualPreview from './components/TeachRitualPreview';
 // ParentOnboarding (5-step) replaced by CombinedParentSetup (1-step).
@@ -674,6 +675,15 @@ function AuthGate() {
   // Off by default; parental toggle in dashboard turns it on.
   React.useEffect(() => {
     BackgroundMusic.init();
+  }, []);
+
+  // QR-auth Phase 1 (Apr 27 2026): consume any ?p=<token> URL param
+  // on first mount so subsequent boots have the token persisted to
+  // localStorage. The full Supabase-keyed cloud-load by token is
+  // Phase 2; for now this just tags the device with whichever
+  // profile the parent shared. See docs/qr-profile-auth.md.
+  React.useEffect(() => {
+    getActiveToken();
   }, []);
 
   if (loading) {

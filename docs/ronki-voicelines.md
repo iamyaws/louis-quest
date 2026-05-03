@@ -128,6 +128,14 @@ Single source of truth for Ronki's voice across all surfaces, restructured aroun
     "notes": "MeetRonki phase 6. Kid is about to type. Open, curious, not pleading. 'Hm,' opener is the thinking-pause that makes it Ronki — without it the question is too tidy (BeiRonkiSein voice rule = no clean fragments, always slightly stumbly). Slight rise on 'heißen?'"
   },
   {
+    "id": "de_meet_close_01",
+    "character": "ronki",
+    "tier": "onboarding",
+    "text": "Bis morgen. Versprochen.",
+    "direct_play": true,
+    "notes": "MeetRonki phase 7 — replaces the deleted Drachenmutter narrator_meet_close (Apr 27 2026: Marc removed the narrator entirely, 'Ronki's voice only'). The cinematic still pulls back, but Ronki himself says goodbye now. Soft, sleepy-warm. 'Bis morgen.' is plain reassurance; 'Versprochen.' is the BeiRonkiSein-style separated stumble (period not comma) — Ronki adding a small extra promise as if catching himself. Plays at phase entry with 600ms delay; phase ends when kid taps to dismiss."
+  },
+  {
     "id": "narrator_meet_close",
     "character": "drachenmutter",
     "tier": "onboarding",

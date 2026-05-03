@@ -8,6 +8,7 @@ import { buildHighlights } from '../dream/dreamHighlights';
 import { advanceBeat, initialArcState } from '../arcs/ArcEngine';
 import { findArc } from '../arcs/arcs';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
+import { ensureTokenForExistingProfile } from '../lib/profileToken';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES, SCHOOL_QUESTS, VACATION_QUESTS, SIDE_QUESTS, FOOTBALL } from '../constants';
 import { SPECIAL_QUESTS } from '../data/specialQuests';
@@ -1205,6 +1206,15 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         // Fresh start
         setState(createInitialState());
       }
+      // QR-auth Phase 1 (Apr 27 2026): tag any already-onboarded
+      // profile with a profile token so the parent can share the URL
+      // with another device and land on the same profile. No-op for
+      // first-time visitors (their token gets assigned at parent-
+      // setup completion in Phase 2). See docs/qr-profile-auth.md.
+      try {
+        const onboarded = !!(raw && (raw as any).onboardingDone);
+        ensureTokenForExistingProfile(onboarded);
+      } catch { /* private mode / quota — non-fatal */ }
       // Always flip loading off, even if rebuild failed halfway — a
       // partially-populated state is better than a stuck Loading screen.
       setLoading(false);

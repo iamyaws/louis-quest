@@ -41,13 +41,20 @@ const EGG_VARIANTS = [
 ];
 
 const LINES = {
-  approach: { who: 'Drachenmutter', text: 'Komm mit. Da hinten ist etwas, das du sehen sollst.' },
-  shelf:    { who: 'Drachenmutter', text: 'Schau dir die Eier an. Welches davon fühlt sich richtig an?' },
-  wobble:   { who: 'Drachenmutter', text: 'Das hier hat dich gehört.' },
+  // Apr 27 2026: Drachenmutter removed (Marc: "Ronki's voice only").
+  // Pre-hatch beats (approach/shelf/wobble) are now silent-with-text —
+  // no speaker attribution, no audio, the German line just fades in
+  // visually like a storybook caption. Ronki can't speak from inside
+  // the egg, but the cinematic still needs framing copy. Post-hatch
+  // (meet/name/close) is Ronki's voice, his text. 'who: null' is the
+  // signal to VoiceLine to render text without the speaker eyebrow.
+  approach: { who: null,    text: 'Da hinten leuchtet etwas.' },
+  shelf:    { who: null,    text: 'Welches Ei fühlt sich richtig an?' },
+  wobble:   { who: null,    text: 'Eines zittert leicht.' },
   hatch:    null,
   meet:     { who: 'Ronki', text: 'Hallo. Ich hab auf dich gewartet. Glaub ich.' },
   name:     { who: 'Ronki', text: 'Hm, wie soll ich heißen?' },
-  close:    { who: 'Drachenmutter', text: 'Er bleibt hier und wartet. Komm wieder, wann du magst.' },
+  close:    { who: 'Ronki', text: 'Bis morgen. Versprochen.' },
 };
 
 export default function MeetRonki({ onComplete }) {
@@ -65,31 +72,28 @@ export default function MeetRonki({ onComplete }) {
   // and de_meet_*_01 (Ronki, Harry) — see docs/ronki-voicelines.md.
   useEffect(() => {
     if (phase === 'approach') {
-      VoiceAudio.playNarrator('narrator_meet_approach', 600);
-      const t = setTimeout(() => { setPhase('shelf'); setVoiceKey(v => v + 1); }, 4400);
-      return () => { clearTimeout(t); VoiceAudio.stop(); };
+      // Pre-hatch: silent, on-screen text only. Ronki can't speak yet.
+      // Phase length tightened from 4400 → 3600ms now that no voice needs
+      // to land — pure visual beat with text fade-in.
+      const t = setTimeout(() => { setPhase('shelf'); setVoiceKey(v => v + 1); }, 3600);
+      return () => clearTimeout(t);
     }
     if (phase === 'shelf') {
-      VoiceAudio.playNarrator('narrator_meet_shelf', 300);
-      return () => VoiceAudio.stop();
+      // Silent — kid is browsing eggs. Tapping advances.
+      return undefined;
     }
     if (phase === 'wobble') {
-      VoiceAudio.playNarrator('narrator_meet_wobble', 100);
-      // Phase 1800ms (27 Apr 2026 recast): the rewritten line
-      // "Das hier hat dich gehört." (dropped the 'Oh.' surprise intake)
-      // lands at ~1.57s in Eleonore's slow-narrator settings. With the
-      // 100ms playNarrator delay that's 1.67s total — so 1800ms gives
-      // a ~130ms comfortable tail before the hatch flash. (Cleanup
-      // VoiceAudio.stop() fires on phase exit; audio finishes naturally
-      // before then.)
-      const t = setTimeout(() => setPhase('hatch'), 1800);
-      return () => { clearTimeout(t); VoiceAudio.stop(); };
+      // Silent. Visual: chosen egg trembles, others dim, music carries.
+      // Phase length 1400ms (faster now that no voice has to fit).
+      const t = setTimeout(() => setPhase('hatch'), 1400);
+      return () => clearTimeout(t);
     }
     if (phase === 'hatch') {
       const t = setTimeout(() => { setPhase('meet'); setVoiceKey(v => v + 1); }, 1400);
       return () => clearTimeout(t);
     }
     if (phase === 'meet') {
+      // Ronki's first voiced line. Already shipped.
       VoiceAudio.playLocalized('meet_hello_01', 200);
       const t = setTimeout(() => { setPhase('name'); setVoiceKey(v => v + 1); }, 4500);
       return () => { clearTimeout(t); VoiceAudio.stop(); };
@@ -99,7 +103,12 @@ export default function MeetRonki({ onComplete }) {
       return () => VoiceAudio.stop();
     }
     if (phase === 'close') {
-      VoiceAudio.playNarrator('narrator_meet_close', 600);
+      // Was Drachenmutter narrator_meet_close ("Er bleibt hier...");
+      // now Ronki saying his own goodbye. Voice file de_meet_close_01
+      // is queued in docs/ronki-voicelines.md for the next gen pass —
+      // until that lands, playLocalized fails silently and the on-
+      // screen "Bis morgen. Versprochen." text carries the moment.
+      VoiceAudio.playLocalized('meet_close_01', 600);
       return () => VoiceAudio.stop();
     }
   }, [phase]);
@@ -207,7 +216,10 @@ export default function MeetRonki({ onComplete }) {
 
       {cur && phase !== 'hatch' && <VoiceLine key={voiceKey} who={cur.who} text={cur.text} />}
 
-      {cur && (phase === 'approach' || phase === 'shelf' || phase === 'meet' || phase === 'close') && (
+      {/* Waveform only on phases where Ronki actually speaks — was previously
+          showing during the silent pre-hatch beats too, which read as a bug
+          (waveform present, no audio). */}
+      {cur && (phase === 'meet' || phase === 'close') && (
         <Waveform active />
       )}
 
@@ -528,23 +540,28 @@ function RonkiHatchlingWrapper({ children, awakening = 1, breathe = true, tint =
 // ─── Voice line + waveform ──────────────────────────────────────
 
 function VoiceLine({ who, text }) {
+  // who: 'Ronki' | null. Drachenmutter removed Apr 27 2026 — pre-hatch
+  // beats now use who=null (storybook caption, no speaker eyebrow).
+  const showSpeaker = who === 'Ronki';
   return (
     <div style={{
       position: 'absolute', bottom: 90, left: 28, right: 28,
       animation: 'mr-lineIn 800ms ease-out',
       pointerEvents: 'none', textAlign: 'center',
     }}>
-      <div style={{
-        font: '700 9px/1 "Plus Jakarta Sans", sans-serif',
-        letterSpacing: '.32em', textTransform: 'uppercase',
-        color: who === 'Ronki' ? 'rgba(252,211,77,.7)' : 'rgba(255,242,217,.45)',
-        marginBottom: 8,
-      }}>
-        {who === 'Ronki' ? 'Ronki' : 'Drachenmutter'}
-      </div>
+      {showSpeaker && (
+        <div style={{
+          font: '700 9px/1 "Plus Jakarta Sans", sans-serif',
+          letterSpacing: '.32em', textTransform: 'uppercase',
+          color: 'rgba(252,211,77,.7)',
+          marginBottom: 8,
+        }}>
+          Ronki
+        </div>
+      )}
       <p style={{
         margin: 0,
-        font: `400 ${who === 'Ronki' ? 17 : 15}px/1.45 "Nunito", sans-serif`,
+        font: `400 ${showSpeaker ? 17 : 16}px/1.45 "Nunito", sans-serif`,
         fontStyle: 'italic',
         color: 'rgba(255,242,217,.92)',
       }}>

@@ -8,6 +8,13 @@ import FeedbackModal from './FeedbackModal';
 // QuestLineEditor deleted Apr 2026 (cut #10f). NORTHSTAR: "not a skill tree".
 import VoiceAudio from '../utils/voiceAudio';
 import BackgroundMusic from '../utils/backgroundMusic';
+import {
+  getActiveToken,
+  buildShareUrl,
+  tokenDisplayFragment,
+  generateToken,
+  setActiveToken,
+} from '../lib/profileToken';
 import { useAnalytics } from '../hooks/useAnalytics';
 
 const PIN_CODE = '1234';
@@ -1061,6 +1068,34 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
   // only"). The toggle + state hook are gone; readNarratorMuted is
   // hard-true at the source. Audio files stay in public/audio/narrator/
   // as historical assets; playNarrator(...) is a no-op everywhere.
+
+  // ── Profil & Geräte (QR auth Phase 1) ──
+  // Apr 27 2026: BeyArena-pattern profile token. Phase 1 = display +
+  // share the URL/code so parent can sync between devices via the
+  // built-in URL. Phase 2 (deferred): Supabase profiles table for
+  // cross-device cloud-load by token, QR rendering, PDF print, camera
+  // scan flow. See docs/qr-profile-auth.md.
+  const [profileToken, setProfileTokenState] = useState(() => getActiveToken());
+  const [shareCopied, setShareCopied] = useState(false);
+  const handleShareLink = async () => {
+    if (!profileToken) return;
+    const url = buildShareUrl(profileToken);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Ronki — euer Profil', url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2400);
+    } catch { /* user cancelled / clipboard blocked — silent */ }
+  };
+  const handleResetToken = () => {
+    if (!confirm('Neues Profil anlegen? Der alte QR-Code funktioniert dann nicht mehr.')) return;
+    const fresh = generateToken();
+    setActiveToken(fresh);
+    setProfileTokenState(fresh);
+  };
   // ── Background music toggle ──
   // Off by default. When on, a soft cave-ambient pad plays under the
   // app and ducks during voicelines. Currently driven by an in-code
@@ -1646,6 +1681,62 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
           ))}
         </div>
       </div>
+
+      {/* Profil & Geräte — QR auth Phase 1 (text + share, no QR yet) */}
+      {profileToken && (
+        <div className="rounded-2xl p-5"
+             style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                 style={{ background: 'rgba(14,165,233,0.12)' }}>
+              <span className="material-symbols-outlined text-lg" style={{ color: '#0369a1', fontVariationSettings: "'FILL' 1" }}>devices</span>
+            </div>
+            <p className="font-label font-bold text-sm text-on-surface">Profil &amp; Geräte</p>
+          </div>
+          <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+            Auf neuem Gerät? Teilt den Link — Ronki begrüßt euch dort wieder mit denselben Sternen. (QR-Code-Druck folgt im nächsten Update.)
+          </p>
+
+          {/* Code preview */}
+          <div className="flex items-center justify-between p-4 rounded-2xl mb-3"
+               style={{ background: 'rgba(14,165,233,0.06)', border: '1px solid rgba(14,165,233,0.18)' }}>
+            <div>
+              <p className="font-label font-bold text-xs uppercase tracking-[0.10em] mb-1" style={{ color: '#0369a1' }}>
+                Profil-Code
+              </p>
+              <p className="font-headline font-bold text-2xl tracking-widest" style={{ color: '#0c4a6e', fontFamily: 'Fredoka, sans-serif' }}>
+                {tokenDisplayFragment(profileToken)}
+              </p>
+            </div>
+            <button
+              onClick={handleShareLink}
+              className="px-5 py-3 rounded-full font-label font-bold text-sm active:scale-95 transition-transform"
+              style={{
+                background: shareCopied ? 'rgba(52,211,153,0.18)' : '#0ea5e9',
+                color: shareCopied ? '#047857' : 'white',
+                border: shareCopied ? '1.5px solid rgba(52,211,153,0.45)' : 'none',
+                boxShadow: shareCopied ? 'none' : '0 4px 12px rgba(14,165,233,0.35)',
+                minHeight: 44,
+              }}
+              aria-label="Profil-Link teilen"
+            >
+              {shareCopied ? 'Kopiert ✓' : 'Teilen'}
+            </button>
+          </div>
+
+          <button
+            onClick={handleResetToken}
+            className="w-full text-left px-4 py-3 rounded-xl font-label text-sm active:scale-[0.99] transition-transform"
+            style={{
+              background: 'transparent',
+              color: '#dc2626',
+              border: '1px solid rgba(220,38,38,0.20)',
+            }}
+          >
+            Neues Profil anlegen (alten Code ungültig machen)
+          </button>
+        </div>
+      )}
 
       {/* PIN Change */}
       <div className="rounded-2xl p-5"
