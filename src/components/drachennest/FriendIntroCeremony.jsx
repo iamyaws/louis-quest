@@ -66,9 +66,15 @@ export default function FriendIntroCeremony({ creatureId, onClose }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  // Voice — Ronki tells the howMet story when the story-stage reveals.
-  // 20 stories, one per creature ID. Apr 2026 voice pass; files at
-  // public/audio/ronki/de_creature_lore_<id>.mp3.
+  // Voice — Ronki announces the creature's NAME when the name-stage
+  // lands ("Das ist Goldauge!"), then narrates the howMet lore when
+  // the story-stage reveals. Two-beat intro per creature: first who,
+  // then how-we-met. 20 name files + 20 lore files.
+  // Files: de_creature_name_<id>.mp3 + de_creature_lore_<id>.mp3
+  useEffect(() => {
+    if (!phase.name || !creatureId) return;
+    VoiceAudio.playLocalized(`creature_name_${creatureId}`, 100);
+  }, [phase.name, creatureId]);
   useEffect(() => {
     if (!phase.story || !creatureId) return;
     VoiceAudio.playLocalized(`creature_lore_${creatureId}`, 100);
