@@ -6,6 +6,11 @@ import { prerenderMeta } from './vite-plugin-prerender-meta';
 
 export default defineConfig({
   root: path.resolve(__dirname),
+  // Read .env files from the repo root, not website/, so both the app
+  // and the website share one source of truth for VITE_SUPABASE_URL +
+  // VITE_SUPABASE_ANON_KEY. Avoids two parallel .env.local files
+  // drifting out of sync.
+  envDir: path.resolve(__dirname, '..'),
   base: '/',
   plugins: [tailwindcss(), react(), prerenderMeta()],
   server: {
