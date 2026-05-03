@@ -12,10 +12,31 @@ it's the right step when going from "Marc's testing" → "5 families
 testing" because each family needs an isolated profile and password
 flows fail at this age.
 
-> **Status update — 3 May 2026:** Phase 1 + Phase 2 shipped.
-> - Phase 1 (token generation, URL detection, dashboard share link, save persistence fix) — landed week of 27 April
-> - Phase 2 (Supabase profiles table + RLS, token-keyed cloud sync, NoProfileLanding screen, dashboard QR canvas, A6 print stylesheet) — landed 3 May
-> - Phase 2.5 (camera scan via jsQR) — deferred. Manual code entry + share-URL paste covers the live use case; camera adds ~30KB and asks for a permission a kid shouldn't be granting.
+> **Status update — 3 May 2026:** Phase 1, Phase 2, Phase 2.5, and the
+> website-driven setup northstar all shipped on the same day.
+> - **Phase 1** (token generation, URL detection, dashboard share link,
+>   save persistence fix) — landed week of 27 April
+> - **Phase 2** (Supabase profiles table + RLS, token-keyed cloud sync,
+>   NoProfileLanding screen, dashboard QR canvas, A6 print stylesheet)
+>   — landed 3 May AM
+> - **Phase 2.5** (camera scan via jsQR, lazy-loaded ~130KB chunk)
+>   — landed 3 May PM after Marc flagged that BeyArena's pattern is
+>   scan-primary, not type-primary
+> - **Setup migration to website** (Marc 3 May 2026): "the one-time
+>   setup could be handled via the website for parents to generate a
+>   code for their kids and print it out." NoProfileLanding became
+>   single-CTA scanner + Eltern-callout to ronki.de. The new
+>   `/profil-erstellen` page on the marketing site:
+>   - one-form parent setup (child name + optional PIN)
+>   - generates token, seeds Supabase profiles row with
+>     `parentOnboardingDone: true` AND `parentHandoffBackSeen: true`
+>     pre-flipped (kid skips both phases on first scan)
+>   - renders printable A6 QR card with the same print stylesheet as
+>     the in-app dashboard QR
+>   - parents land here from `/installieren` or external CTAs
+> - **In-app `CombinedParentSetup` retained** as orphan-token fallback
+>   (rare: token in localStorage but the cloud row was deleted/never
+>   created). Not reachable through the normal flow anymore.
 
 ---
 

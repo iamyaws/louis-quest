@@ -17,6 +17,7 @@ const VorlageAbend = lazy(() => import('./pages/VorlageAbend'));
 const VorlageKleineGeschwister = lazy(() => import('./pages/VorlageKleineGeschwister'));
 const HomeEN = lazy(() => import('./pages/HomeEN'));
 const Installieren = lazy(() => import('./pages/Installieren'));
+const ProfilErstellen = lazy(() => import('./pages/ProfilErstellen'));
 const Ratgeber = lazy(() => import('./pages/Ratgeber'));
 const ToolsHub = lazy(() => import('./pages/tools/ToolsHub'));
 const AppCheck = lazy(() => import('./pages/tools/AppCheck'));
@@ -78,6 +79,7 @@ export function AppRoutes() {
         <Route path="/vorlagen/abendroutine" element={<VorlageAbend />} />
         <Route path="/vorlagen/kleine-geschwister" element={<VorlageKleineGeschwister />} />
         <Route path="/installieren" element={<Installieren />} />
+        <Route path="/profil-erstellen" element={<ProfilErstellen />} />
         <Route path="/print/a6-flyer" element={<PrintA6Flyer />} />
         <Route path="/print/a6-flyer-kids" element={<PrintA6FlyerKids />} />
         <Route path="/print/a6-flyer-kids-hatchling" element={<PrintA6FlyerKidsHatchling />} />
