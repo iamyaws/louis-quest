@@ -20,7 +20,8 @@ import Journal from './components/Journal';
 import TeachFireStep from './components/onboarding/TeachFireStep';
 import CombinedParentSetup from './components/CombinedParentSetup';
 import BackgroundMusic from './utils/backgroundMusic';
-import { getActiveToken, ensureTokenForExistingProfile } from './lib/profileToken';
+import { getActiveToken, ensureTokenForExistingProfile, generateToken, setActiveToken } from './lib/profileToken';
+import NoProfileLanding from './components/NoProfileLanding';
 import TeachFirePreview from './components/TeachFirePreview';
 import TeachRitualPreview from './components/TeachRitualPreview';
 // ParentOnboarding (5-step) replaced by CombinedParentSetup (1-step).
@@ -806,15 +807,46 @@ function AuthGate() {
  * 4-flag legacy state (kidIntroSeen, parentOnboardingDone,
  * parentHandoffBackSeen, onboardingDone) is preserved for save-data
  * compatibility; the new chain flips them in order.
+ *
+ * QR-auth Phase 2 (Apr 27 2026): if there's no active profile token
+ * AND no onboarded state, NoProfileLanding renders FIRST so the
+ * arriving parent can choose between "new profile" (proceed to the
+ * normal onboarding chain) and "enter existing code" (paste a 32-hex
+ * token from another device, then reload to pick up the cloud state).
+ *
+ * Why a local "showLanding" state instead of route-style gating: the
+ * landing screen exits in two ways — "Code eingeben" hard-reloads
+ * (which re-runs AuthGate from scratch and resolves the new token);
+ * "Neues Profil anlegen" just sets showLanding=false so the existing
+ * OnboardingChain renders. Both paths converge cleanly without
+ * needing a separate route.
  */
 function OnboardingGate() {
   const { state } = useTask();
+  // True for genuinely fresh visitors. Captured once at mount — once
+  // the user picks "new profile," we flip it false and the rest of
+  // the chain runs as normal. If the user picks "Code eingeben," the
+  // page hard-reloads, so this initial check re-runs with the token
+  // now resolved (no landing).
+  const [showLanding, setShowLanding] = React.useState(() => {
+    // Don't show landing if state is already onboarded (returning
+    // user with no token gets auto-tagged via ensureTokenForExisting-
+    // Profile inside TaskContext; they shouldn't see the picker).
+    return !getActiveToken();
+  });
   // Gate considers onboarding complete only when state.onboardingDone.
   // The other 3 flags are stage markers used by the chain's resume
   // logic (so a kid who closes the app mid-flow lands back on the
   // right screen). Pre-rework saves auto-mark these on rehydrate.
   if (!state) return null;
   if (!state.onboardingDone) {
+    if (showLanding && !getActiveToken() && !state.parentOnboardingDone) {
+      return (
+        <NoProfileLanding
+          onProceedToSetup={() => setShowLanding(false)}
+        />
+      );
+    }
     return <OnboardingChain />;
   }
   return <AppContent />;
@@ -876,6 +908,21 @@ function OnboardingChain({ previewLoop, onComplete }) {
         onComplete={(payload) => {
           actions.patchState?.(payload);
           if (payload.familyConfig) actions.updateFamilyConfig?.(payload.familyConfig);
+          // QR-auth Phase 2: anchor every fresh profile to a cloud
+          // row from the moment parent setup completes. Subsequent
+          // saves go through cloudSaveByToken (TaskContext) so a
+          // device swap mid-onboarding (parent fills setup on phone,
+          // hands tablet to kid) can resume via the shared link.
+          // Skip if a token already exists — this happens when the
+          // parent pasted a code on NoProfileLanding before opting
+          // into "Neues Profil" anyway, or for ensureTokenForExist-
+          // ingProfile tagging on Phase-1-era saves.
+          try {
+            if (!getActiveToken()) {
+              const fresh = generateToken();
+              setActiveToken(fresh);
+            }
+          } catch { /* private mode / quota — survive silently */ }
         }}
       />
     );

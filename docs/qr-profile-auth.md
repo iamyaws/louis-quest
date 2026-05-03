@@ -12,6 +12,11 @@ it's the right step when going from "Marc's testing" → "5 families
 testing" because each family needs an isolated profile and password
 flows fail at this age.
 
+> **Status update — 3 May 2026:** Phase 1 + Phase 2 shipped.
+> - Phase 1 (token generation, URL detection, dashboard share link, save persistence fix) — landed week of 27 April
+> - Phase 2 (Supabase profiles table + RLS, token-keyed cloud sync, NoProfileLanding screen, dashboard QR canvas, A6 print stylesheet) — landed 3 May
+> - Phase 2.5 (camera scan via jsQR) — deferred. Manual code entry + share-URL paste covers the live use case; camera adds ~30KB and asks for a permission a kid shouldn't be granting.
+
 ---
 
 ## The pattern

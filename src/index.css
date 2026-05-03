@@ -311,3 +311,95 @@
   0%, 100% { box-shadow: 0 12px 36px -8px rgba(252,211,77,0.30), 0 0 0 4px rgba(252,211,77,0.15), inset 0 1px 0 rgba(255,255,255,0.6); }
   50%       { box-shadow: 0 16px 44px -6px rgba(252,211,77,0.45), 0 0 0 10px rgba(252,211,77,0.26), inset 0 1px 0 rgba(255,255,255,0.6); }
 }
+
+/* ── QR auth Phase 2 — printable profile card (Apr 27 2026) ──
+   The dashboard renders #qr-print-card alongside the regular
+   "Profil & Geräte" panel. In normal viewport it's display:none.
+   When the parent taps "Drucken," window.print() fires; this print
+   stylesheet hides everything else and renders only the card on a
+   centred A6 page so it can be folded/cut/taped to a fridge or
+   wallet. The card carries: kid's name big, QR code centered,
+   8-char display fragment, share-URL line, brand mark. */
+#qr-print-card {
+  display: none;
+}
+@media print {
+  /* Hide the entire app shell for print — only the card prints. */
+  body > *:not(#qr-print-card) {
+    display: none !important;
+  }
+  /* When the parent triggers print from inside the dashboard, the
+     card is nested deep in the React tree (under the modal overlay).
+     Promote it to a top-level positioned element so the
+     `body > *:not(...)` rule above doesn't hide it as a descendant
+     of the parental dashboard. */
+  #qr-print-card {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 99999 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .qr-print-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12mm 10mm;
+    text-align: center;
+    font-family: 'Fredoka', system-ui, sans-serif;
+  }
+  .qr-print-eyebrow {
+    font-size: 10pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin: 0 0 4mm 0;
+  }
+  .qr-print-name {
+    font-size: 28pt;
+    font-weight: 700;
+    margin: 0 0 8mm 0;
+    color: #0c4a6e;
+    line-height: 1.1;
+  }
+  .qr-print-canvas {
+    width: 70mm !important;
+    height: 70mm !important;
+    margin: 0 auto 8mm auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 4mm;
+    background: #ffffff;
+  }
+  .qr-print-code {
+    font-size: 22pt;
+    font-weight: 700;
+    letter-spacing: 0.20em;
+    color: #0c4a6e;
+    margin: 0 0 4mm 0;
+  }
+  .qr-print-hint {
+    font-size: 10pt;
+    color: #4b5563;
+    line-height: 1.4;
+    margin: 0 0 8mm 0;
+    max-width: 80mm;
+  }
+  .qr-print-url {
+    font-size: 9pt;
+    color: #9ca3af;
+    margin: 0;
+    letter-spacing: 0.06em;
+  }
+  /* Page setup — A6 portrait, no browser headers/footers (parent can
+     toggle in their print dialog). */
+  @page {
+    size: A6 portrait;
+    margin: 0;
+  }
+}

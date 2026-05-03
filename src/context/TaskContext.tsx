@@ -8,7 +8,7 @@ import { buildHighlights } from '../dream/dreamHighlights';
 import { advanceBeat, initialArcState } from '../arcs/ArcEngine';
 import { findArc } from '../arcs/arcs';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
-import { ensureTokenForExistingProfile } from '../lib/profileToken';
+import { ensureTokenForExistingProfile, getActiveToken } from '../lib/profileToken';
 import { buildDay, getLevel, getLvlProg, getCatStage } from '../utils/helpers';
 import { BOSSES, CAT_STAGES, WEEKLY_MISSIONS, GEAR_ITEMS, BADGES, SCHOOL_QUESTS, VACATION_QUESTS, SIDE_QUESTS, FOOTBALL } from '../constants';
 import { SPECIAL_QUESTS } from '../data/specialQuests';
@@ -944,9 +944,19 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         // forever → app stuck on "Lädt..." pill. Marc flag 24 Apr 2026:
         // phone stuck on Loading. Fallback to a fresh-start initial state
         // so the kid at least sees SOMETHING instead of a dead screen.
-        raw = (user
-          ? await storage.syncLoad(user.id)
-          : await storage.load()
+        //
+        // Load priority (Apr 27 2026, QR auth Phase 2):
+        //   1. Profile token (BeyArena pattern) → cloud-keyed by token,
+        //      merged with local. This is the new default path.
+        //   2. Auth user.id → legacy game_state path (the table never
+        //      existed; kept for any latent caller).
+        //   3. Local-only IndexedDB / localStorage.
+        const activeToken = getActiveToken();
+        raw = (activeToken
+          ? await storage.syncLoadByToken(activeToken)
+          : user
+            ? await storage.syncLoad(user.id)
+            : await storage.load()
         ) as (GameState & TaskState) | null;
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -1237,8 +1247,19 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       await storage.save(merged);
     }, 400);
 
-    // Cloud sync (debounced, slightly longer)
-    if (user) {
+    // Cloud sync (debounced, slightly longer than local). Apr 27 2026
+    // Phase-2: token-keyed save is the primary path. The legacy user-
+    // id path is kept for any latent caller, but the game_state table
+    // never existed so it always no-op'd anyway.
+    const activeToken = getActiveToken();
+    if (activeToken) {
+      clearTimeout(cloudTimer.current);
+      cloudTimer.current = setTimeout(async () => {
+        const raw = await storage.load() as GameState | null;
+        const merged = { ...(raw || {}), ...state } as GameState;
+        await storage.cloudSaveByToken(activeToken, merged);
+      }, 1500);
+    } else if (user) {
       clearTimeout(cloudTimer.current);
       cloudTimer.current = setTimeout(async () => {
         const raw = await storage.load() as GameState | null;

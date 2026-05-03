@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTask } from '../context/TaskContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { DEFAULT_FAMILY_CONFIG } from '../types/familyConfig';
@@ -8,6 +9,7 @@ import FeedbackModal from './FeedbackModal';
 // QuestLineEditor deleted Apr 2026 (cut #10f). NORTHSTAR: "not a skill tree".
 import VoiceAudio from '../utils/voiceAudio';
 import BackgroundMusic from '../utils/backgroundMusic';
+import QRCode from 'qrcode';
 import {
   getActiveToken,
   buildShareUrl,
@@ -1096,6 +1098,42 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     setActiveToken(fresh);
     setProfileTokenState(fresh);
   };
+  // ── QR rendering (Phase 2 Apr 27 2026) ──
+  // Two canvases: one inline (compact, dashboard view) and one
+  // print-only (large, ~50mm box, prints with print stylesheet
+  // below). Both encode the share URL as a Level-M QR with a generous
+  // margin so phone cameras catch it cleanly even at 30mm screen size.
+  const qrCanvasRef = useRef(null);
+  const qrPrintCanvasRef = useRef(null);
+  useEffect(() => {
+    if (!profileToken) return;
+    const url = buildShareUrl(profileToken);
+    // Inline canvas (compact)
+    if (qrCanvasRef.current) {
+      QRCode.toCanvas(qrCanvasRef.current, url, {
+        errorCorrectionLevel: 'M',
+        margin: 2,
+        width: 168,
+        color: { dark: '#0c4a6e', light: '#ffffff' },
+      }).catch(() => { /* canvas not ready yet — next render handles it */ });
+    }
+    // Print-only canvas (large, dark navy on white for print contrast)
+    if (qrPrintCanvasRef.current) {
+      QRCode.toCanvas(qrPrintCanvasRef.current, url, {
+        errorCorrectionLevel: 'M',
+        margin: 2,
+        width: 360,
+        color: { dark: '#000000', light: '#ffffff' },
+      }).catch(() => { /* same — silent */ });
+    }
+  }, [profileToken]);
+  const handlePrintQR = () => {
+    // Trigger native print dialog. Print stylesheet (in index.css)
+    // hides everything except #qr-print-card. The kid + parent end up
+    // with an A6-friendly card with the QR + 8-char code that can be
+    // taped inside a wallet, fridge, school binder.
+    try { window.print(); } catch { /* unsupported — silent */ }
+  };
   // ── Background music toggle ──
   // Off by default. When on, a soft cave-ambient pad plays under the
   // app and ducks during voicelines. Currently driven by an in-code
@@ -1682,7 +1720,7 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
         </div>
       </div>
 
-      {/* Profil & Geräte — QR auth Phase 1 (text + share, no QR yet) */}
+      {/* Profil & Geräte — QR auth Phase 2 (QR canvas + share + print) */}
       {profileToken && (
         <div className="rounded-2xl p-5"
              style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
@@ -1694,23 +1732,31 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
             <p className="font-label font-bold text-sm text-on-surface">Profil &amp; Geräte</p>
           </div>
           <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
-            Auf neuem Gerät? Teilt den Link — Ronki begrüßt euch dort wieder mit denselben Sternen. (QR-Code-Druck folgt im nächsten Update.)
+            Auf neuem Gerät? Scannt den QR-Code, druckt ihn als Karte aus oder teilt den Link — Ronki begrüßt euch dort wieder mit denselben Sternen.
           </p>
 
-          {/* Code preview */}
-          <div className="flex items-center justify-between p-4 rounded-2xl mb-3"
-               style={{ background: 'rgba(14,165,233,0.06)', border: '1px solid rgba(14,165,233,0.18)' }}>
-            <div>
-              <p className="font-label font-bold text-xs uppercase tracking-[0.10em] mb-1" style={{ color: '#0369a1' }}>
-                Profil-Code
-              </p>
-              <p className="font-headline font-bold text-2xl tracking-widest" style={{ color: '#0c4a6e', fontFamily: 'Fredoka, sans-serif' }}>
-                {tokenDisplayFragment(profileToken)}
-              </p>
-            </div>
+          {/* QR canvas — primary affordance */}
+          <div className="flex flex-col items-center p-4 rounded-2xl mb-3"
+               style={{ background: 'rgba(14,165,233,0.04)', border: '1px solid rgba(14,165,233,0.18)' }}>
+            <canvas
+              ref={qrCanvasRef}
+              className="rounded-lg"
+              style={{ width: 168, height: 168, background: '#ffffff' }}
+              aria-label="QR-Code zum Verbinden eines weiteren Geräts"
+            />
+            <p className="font-label font-bold text-xs uppercase tracking-[0.10em] mt-3" style={{ color: '#0369a1' }}>
+              Profil-Code
+            </p>
+            <p className="font-headline font-bold text-2xl tracking-widest mt-0.5" style={{ color: '#0c4a6e', fontFamily: 'Fredoka, sans-serif' }}>
+              {tokenDisplayFragment(profileToken)}
+            </p>
+          </div>
+
+          {/* Share + Print row */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
             <button
               onClick={handleShareLink}
-              className="px-5 py-3 rounded-full font-label font-bold text-sm active:scale-95 transition-transform"
+              className="py-3 rounded-full font-label font-bold text-sm flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
               style={{
                 background: shareCopied ? 'rgba(52,211,153,0.18)' : '#0ea5e9',
                 color: shareCopied ? '#047857' : 'white',
@@ -1720,7 +1766,22 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
               }}
               aria-label="Profil-Link teilen"
             >
-              {shareCopied ? 'Kopiert ✓' : 'Teilen'}
+              <span className="material-symbols-outlined text-base">{shareCopied ? 'check' : 'ios_share'}</span>
+              {shareCopied ? 'Kopiert' : 'Teilen'}
+            </button>
+            <button
+              onClick={handlePrintQR}
+              className="py-3 rounded-full font-label font-bold text-sm flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+              style={{
+                background: 'rgba(14,165,233,0.10)',
+                color: '#0369a1',
+                border: '1.5px solid rgba(14,165,233,0.30)',
+                minHeight: 44,
+              }}
+              aria-label="QR-Code als Karte drucken"
+            >
+              <span className="material-symbols-outlined text-base">print</span>
+              Drucken
             </button>
           </div>
 
@@ -1736,6 +1797,31 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
             Neues Profil anlegen (alten Code ungültig machen)
           </button>
         </div>
+      )}
+
+      {/* Print-only QR card — PORTALED TO body so it sits as a direct
+          child of <body> for the print stylesheet's
+          `body > *:not(#qr-print-card) { display: none }` selector to
+          isolate just this card on the printed page. Without the
+          portal, the card would be a deeply-nested descendant of
+          #root and the body-level rule would hide its ancestors,
+          taking the card with them. Layout fits A6 portrait (folded
+          card, fridge magnet, school binder). */}
+      {profileToken && typeof document !== 'undefined' && createPortal(
+        <div id="qr-print-card" aria-hidden="true">
+          <div className="qr-print-inner">
+            <p className="qr-print-eyebrow">Ronki</p>
+            <h2 className="qr-print-name">{state?.heroName || state?.familyConfig?.childName || 'Mein Profil'}</h2>
+            <canvas
+              ref={qrPrintCanvasRef}
+              className="qr-print-canvas"
+            />
+            <p className="qr-print-code">{tokenDisplayFragment(profileToken)}</p>
+            <p className="qr-print-hint">Scannt den Code, um Ronki auf einem anderen Gerät zu öffnen.</p>
+            <p className="qr-print-url">app.ronki.de</p>
+          </div>
+        </div>,
+        document.body,
       )}
 
       {/* PIN Change */}

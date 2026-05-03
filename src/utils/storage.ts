@@ -112,7 +112,13 @@ const storage = {
     try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
   },
 
-  // ── Cloud (Supabase) ──
+  // ── Cloud (Supabase, legacy game_state path) ──
+  // Apr 27 2026: legacy `game_state` table never actually existed on
+  // the project (verified via Supabase advisor + list_tables). These
+  // calls were silently failing, which is part of the reason Louis
+  // lost state across sessions. Kept here for any latent caller that
+  // still passes a userId; the new BeyArena-pattern token path below
+  // (cloudLoadByToken/cloudSaveByToken) is what actually persists.
   async cloudLoad(userId: string): Promise<GameState | null> {
     try {
       const { data, error } = await supabase
@@ -138,6 +144,46 @@ const storage = {
         }, { onConflict: 'user_id' });
     } catch {
       // Silent fail — local IndexedDB is the fallback
+    }
+  },
+
+  // ── Cloud (Supabase, token-keyed BeyArena pattern) ──
+  // Token-as-credential model. The 32-hex token is both the row key
+  // and the auth credential — anyone with it can read/write that
+  // profile. RLS allows anon SELECT/INSERT/UPDATE filtered by token
+  // shape; security relies on token entropy (128 bits, unguessable).
+  // See migrations create_profiles_table_for_qr_auth +
+  // harden_profiles_function_and_rls + docs/qr-profile-auth.md.
+  async cloudLoadByToken(token: string): Promise<GameState | null> {
+    if (!token || !/^[a-f0-9]{32}$/.test(token)) return null;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('state, updated_at')
+        .eq('token', token)
+        .maybeSingle();
+      if (error || !data) return null;
+      return (data.state as GameState) || null;
+    } catch {
+      return null;
+    }
+  },
+
+  async cloudSaveByToken(token: string, state: GameState): Promise<void> {
+    if (!token || !/^[a-f0-9]{32}$/.test(token)) return;
+    try {
+      // Upsert by primary-key token. Server-side trigger updates
+      // updated_at on any modification; we set last_active_at here
+      // so cleanup heuristics ("inactive 90+ days") can rely on it.
+      await supabase
+        .from('profiles')
+        .upsert({
+          token,
+          state: state as unknown as Record<string, unknown>,
+          last_active_at: new Date().toISOString(),
+        }, { onConflict: 'token' });
+    } catch {
+      // Silent fail — local IndexedDB + localStorage are the fallback
     }
   },
 
@@ -175,6 +221,48 @@ const storage = {
     }
 
     return null; // Fresh user, no data anywhere
+  },
+
+  // ── Sync: token-keyed (BeyArena pattern) ──
+  // Resolve local vs cloud for a given profile token. Same merge
+  // strategy as syncLoad(userId) but keyed by token, not auth user.
+  // Used by TaskContext when a profile token is present.
+  async syncLoadByToken(token: string): Promise<GameState | null> {
+    if (!token) return this.load();
+    const [local, cloud] = await Promise.all([
+      this.load(),
+      this.cloudLoadByToken(token),
+    ]);
+
+    if (cloud && local) {
+      const cloudDate = (cloud as any).lastDate || '';
+      const localDate = (local as any).lastDate || '';
+      if (localDate > cloudDate) {
+        // Local is newer (this device played most recently). Push to
+        // cloud, return local.
+        this.cloudSaveByToken(token, local);
+        return local;
+      }
+      // Cloud wins — cache locally for offline use + faster next boot.
+      this.save(cloud);
+      return cloud;
+    }
+
+    if (local && !cloud) {
+      // Existing local profile getting tagged with a token for the
+      // first time — migrate to cloud.
+      this.cloudSaveByToken(token, local);
+      return local;
+    }
+
+    if (cloud && !local) {
+      // New device that received the token via shared URL — pull
+      // cloud state down + cache locally.
+      this.save(cloud);
+      return cloud;
+    }
+
+    return null; // Brand-new token with no state anywhere
   },
 };
 
