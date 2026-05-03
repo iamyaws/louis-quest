@@ -25,12 +25,20 @@
  */
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { PageMeta } from '../components/PageMeta';
 import { PainterlyShell } from '../components/PainterlyShell';
 import { Footer } from '../components/Footer';
+import {
+  ProfileCardFront,
+  ProfileCardBack,
+  profileCardCss,
+  profileCardPreviewCss,
+  profileCardPrintCss,
+} from '../components/ProfileCard';
 import { trackEvent } from '../lib/analytics';
 import {
   createProfileOnSite,
@@ -262,22 +270,30 @@ export default function ProfilErstellen() {
               transition={{ duration: 0.4 }}
               className="rounded-3xl bg-cream/60 border border-teal-dark/10 p-6 sm:p-8 shadow-sm"
             >
-              <div className="flex flex-col items-center mb-6">
+              {/* Card preview — front face scaled down via .profile-
+                  preview-shell so the parent sees the actual artifact
+                  rather than a stripped-down "code box". The back face
+                  with the QR is print-only. */}
+              <div className="profile-preview-shell mb-6">
+                <ProfileCardFront
+                  childName={childName.trim()}
+                  tokenFragment={tokenDisplayFragment(phase.token)}
+                />
+              </div>
+
+              {/* Small inline QR — for the on-screen "scan from this
+                  laptop" workflow (kid points tablet at the parent's
+                  screen instead of waiting for print). */}
+              <div className="flex items-center gap-4 mb-6 px-2">
                 <canvas
                   ref={qrCanvasRef}
-                  className="rounded-2xl border border-teal-dark/10 bg-white p-3"
-                  style={{ width: 240, height: 240 }}
-                  aria-label="QR-Code zum Verbinden"
+                  className="rounded-xl border border-teal-dark/10 bg-white p-2 flex-shrink-0"
+                  style={{ width: 88, height: 88 }}
+                  aria-label="QR-Code zum direkten Scannen"
                 />
-                <p className="mt-5 text-xs uppercase tracking-[0.18em] text-teal font-medium">
-                  Profil-Code
-                </p>
-                <p className="mt-1 font-display font-bold text-2xl tracking-[0.18em] text-teal-dark">
-                  {tokenDisplayFragment(phase.token)}
-                </p>
-                <p className="mt-2 text-sm text-teal-dark/65">
-                  für {childName.trim()}
-                </p>
+                <div className="text-left text-sm text-teal-dark/75 leading-snug">
+                  Direkt scannbar — euer Kind kann die Kamera auch jetzt schon hierauf richten.
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2 mb-3">
@@ -286,7 +302,7 @@ export default function ProfilErstellen() {
                   onClick={handlePrint}
                   className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-display font-semibold text-sm bg-teal text-cream shadow-md hover:shadow-lg transition-shadow"
                 >
-                  <span aria-hidden>🖨</span> Drucken
+                  <span aria-hidden>🖨</span> Karte drucken
                 </button>
                 <button
                   type="button"
@@ -311,9 +327,9 @@ export default function ProfilErstellen() {
                 So geht's weiter
               </h2>
               <ol className="text-left text-base text-teal-dark/75 leading-relaxed space-y-2 max-w-sm mx-auto">
-                <li><strong>1.</strong> Druckt die Karte aus oder lasst sie auf dem Bildschirm.</li>
+                <li><strong>1.</strong> Druckt die Karte aus (zwei Seiten — Vorder &amp; Rückseite) oder lasst sie auf dem Bildschirm.</li>
                 <li><strong>2.</strong> Öffnet <a href="https://app.ronki.de" className="text-teal hover:underline">app.ronki.de</a> auf dem Tablet eures Kindes.</li>
-                <li><strong>3.</strong> Tippt auf „QR-Code scannen" und haltet die Kamera auf die Karte.</li>
+                <li><strong>3.</strong> Tippt auf „QR-Code scannen" und haltet die Kamera auf die Rückseite der Karte.</li>
                 <li><strong>4.</strong> Ronki begrüßt euer Kind beim Namen — fertig.</li>
               </ol>
             </div>
@@ -323,96 +339,26 @@ export default function ProfilErstellen() {
 
       <Footer />
 
-      {/* ── Print-only card. Hidden in normal viewport via the @media
-            print rule below; printed alone when the parent taps Drucken
-            (window.print()). A6 portrait. Card mirrors the dashboard
-            print layout so a parent who prints from either surface
-            ends up with the same artifact in hand. ── */}
-      {phase.kind === 'success' && (
-        <div id="ronki-card-print" aria-hidden="true">
-          <div className="ronki-card-inner">
-            <p className="ronki-card-eyebrow">Ronki</p>
-            <h2 className="ronki-card-name">{childName.trim()}</h2>
-            <canvas ref={qrPrintRef} className="ronki-card-canvas" />
-            <p className="ronki-card-code">{tokenDisplayFragment(phase.token)}</p>
-            <p className="ronki-card-hint">
-              Scannt den Code in der Ronki-App, um Ronki zu öffnen.
-            </p>
-            <p className="ronki-card-url">app.ronki.de</p>
-          </div>
-        </div>
+      {/* ── Print-only frame. Portaled to <body> so the print
+            stylesheet's `body > *:not(.profile-print-frame)` selector
+            isolates it on the printed page. Two A6 pages (front +
+            back) split via page-break-after. ── */}
+      {phase.kind === 'success' && typeof document !== 'undefined' && createPortal(
+        <div className="profile-print-frame" aria-hidden="true">
+          <ProfileCardFront
+            childName={childName.trim()}
+            tokenFragment={tokenDisplayFragment(phase.token)}
+          />
+          <ProfileCardBack
+            childName={childName.trim()}
+            tokenFragment={tokenDisplayFragment(phase.token)}
+            qrCanvasRef={qrPrintRef}
+          />
+        </div>,
+        document.body,
       )}
 
-      <style>{`
-        #ronki-card-print { display: none; }
-        @media print {
-          body > *:not(#ronki-card-print) { display: none !important; }
-          #ronki-card-print {
-            display: block !important;
-            position: fixed !important;
-            inset: 0 !important;
-            z-index: 99999 !important;
-            background: #ffffff !important;
-            color: #000000 !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-          }
-          .ronki-card-inner {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 12mm 10mm;
-            text-align: center;
-            font-family: 'Fredoka', system-ui, sans-serif;
-          }
-          .ronki-card-eyebrow {
-            font-size: 10pt;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #6b7280;
-            margin: 0 0 4mm 0;
-          }
-          .ronki-card-name {
-            font-size: 28pt;
-            font-weight: 700;
-            margin: 0 0 8mm 0;
-            color: #1a3c3f;
-            line-height: 1.1;
-          }
-          .ronki-card-canvas {
-            width: 70mm !important;
-            height: 70mm !important;
-            margin: 0 auto 8mm auto;
-            border: 1px solid #e5e7eb;
-            border-radius: 4mm;
-            background: #ffffff;
-          }
-          .ronki-card-code {
-            font-size: 22pt;
-            font-weight: 700;
-            letter-spacing: 0.20em;
-            color: #1a3c3f;
-            margin: 0 0 4mm 0;
-          }
-          .ronki-card-hint {
-            font-size: 10pt;
-            color: #4b5563;
-            line-height: 1.4;
-            margin: 0 0 8mm 0;
-            max-width: 80mm;
-          }
-          .ronki-card-url {
-            font-size: 9pt;
-            color: #9ca3af;
-            margin: 0;
-            letter-spacing: 0.06em;
-          }
-          @page { size: A6 portrait; margin: 0; }
-        }
-      `}</style>
+      <style>{profileCardCss + profileCardPreviewCss + profileCardPrintCss}</style>
     </PainterlyShell>
   );
 }
