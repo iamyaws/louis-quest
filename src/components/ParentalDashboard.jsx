@@ -1057,15 +1057,10 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
     VoiceAudio.setMuted(next);
     setVoiceMutedState(next);
   };
-  // ── Narrator mute toggle (Drachenmutter, Charlotte voice) ──
-  // Separate key so a parent can keep one on, the other off. In
-  // practice most parents will toggle both together; the UI groups
-  // them under "Stimmen" so the relationship is visible.
-  const [narratorMuted, setNarratorMutedState] = useState(VoiceAudio.isNarratorMuted());
-  const toggleNarratorMute = (next) => {
-    VoiceAudio.setNarratorMuted(next);
-    setNarratorMutedState(next);
-  };
+  // Drachenmutter narrator removed Apr 27 2026 (Marc: "Ronki's voice
+  // only"). The toggle + state hook are gone; readNarratorMuted is
+  // hard-true at the source. Audio files stay in public/audio/narrator/
+  // as historical assets; playNarrator(...) is a no-op everywhere.
   // ── Background music toggle ──
   // Off by default. When on, a soft cave-ambient pad plays under the
   // app and ducks during voicelines. Currently driven by an in-code
@@ -1567,13 +1562,13 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
           <div className="w-9 h-9 rounded-xl flex items-center justify-center"
                style={{ background: 'rgba(109,40,217,0.12)' }}>
             <span className="material-symbols-outlined text-lg" style={{ color: '#6d28d9', fontVariationSettings: "'FILL' 1" }}>
-              {(voiceMuted && narratorMuted) ? 'volume_off' : 'volume_up'}
+              {voiceMuted ? 'volume_off' : 'volume_up'}
             </span>
           </div>
           <p className="font-label font-bold text-sm text-on-surface">Stimmen</p>
         </div>
         <p className="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
-          Ronki spricht selten und kurz. Drachenmutter erzählt die Rahmen — beim Kennenlernen, vor dem Schlafen, bei Abenteuern. Beide einzeln stumm schaltbar.
+          Ronki spricht selten und kurz — beim Kennenlernen, bei Abenteuern, vor dem Schlafen.
         </p>
 
         {/* Ronki toggle */}
@@ -1599,28 +1594,8 @@ function SettingsTab({ lang, setLang, t, actions, state, onOpenFeedback }) {
           </button>
         </div>
 
-        {/* Drachenmutter toggle */}
-        <div className="flex items-center justify-between p-4 rounded-2xl mb-3"
-             style={{ background: 'rgba(180,83,9,0.06)', border: '1px solid rgba(180,83,9,0.18)' }}>
-          <div className="flex-1">
-            <p className="font-label font-bold text-sm text-on-surface">Drachenmutter</p>
-            <p className="font-label text-xs text-on-surface-variant mt-0.5">
-              {narratorMuted ? 'Stumm' : 'An — Erzählerin bei Abenteuern und Übergängen.'}
-            </p>
-          </div>
-          <button
-            onClick={() => toggleNarratorMute(!narratorMuted)}
-            className="relative w-14 h-8 rounded-full transition-all active:scale-95 shrink-0"
-            style={{
-              background: !narratorMuted ? '#b45309' : 'rgba(0,0,0,0.12)',
-              boxShadow: !narratorMuted ? '0 2px 8px rgba(180,83,9,0.35)' : 'none',
-            }}
-            aria-label={narratorMuted ? 'Drachenmutter einschalten' : 'Drachenmutter stumm schalten'}
-          >
-            <span className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
-                  style={{ transform: !narratorMuted ? 'translateX(24px)' : 'translateX(0)' }} />
-          </button>
-        </div>
+        {/* Drachenmutter toggle removed Apr 27 — Ronki is the only
+            voice now. */}
 
         {/* Hintergrundmusik toggle — soft cave-ambient pad. Currently
             an in-code synth placeholder; swaps to a real mp3 once Marc

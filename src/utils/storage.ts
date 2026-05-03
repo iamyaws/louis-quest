@@ -26,36 +26,80 @@ function openDB(): Promise<IDBDatabase> {
 const storage = {
   // ── Local (IndexedDB with localStorage fallback) ──
   async load(): Promise<GameState | null> {
+    // Apr 2026 fix: prefer IndexedDB, but treat localStorage as a
+    // continuous fallback (NOT a one-shot migration that wipes itself).
+    // Previous behaviour deleted the localStorage entry on first load
+    // after migrating it to IDB — which meant if a later save's IDB
+    // transaction failed to commit before tab-close (a real bug, see
+    // save() comments), there was nothing to fall back on. Result for
+    // Marc 27 Apr: Louis re-picks the egg every session.
+    const readFromLocalStorage = (): GameState | null => {
+      try {
+        const ls = localStorage.getItem(LS_KEY);
+        return ls ? (JSON.parse(ls) as GameState) : null;
+      } catch { return null; }
+    };
+
     try {
-      const ls = localStorage.getItem(LS_KEY);
-      if (ls) {
-        const data = JSON.parse(ls) as GameState;
-        await this.save(data);
-        localStorage.removeItem(LS_KEY);
-        return data;
-      }
       const db = await openDB();
-      return new Promise((resolve) => {
+      const idbResult = await new Promise<GameState | null>((resolve) => {
         const tx = db.transaction(STORE, "readonly");
         const req = tx.objectStore(STORE).get(KEY);
         req.onsuccess = () => resolve((req.result as GameState) || null);
         req.onerror = () => resolve(null);
       });
+      // If IDB has data, use it. Otherwise fall back to localStorage
+      // (which may have a more-recent state from a tab-close save that
+      // didn't make it to IDB).
+      return idbResult || readFromLocalStorage();
     } catch {
-      try {
-        const v = localStorage.getItem(LS_KEY);
-        return v ? (JSON.parse(v) as GameState) : null;
-      } catch { return null; }
+      return readFromLocalStorage();
     }
   },
 
   async save(state: GameState): Promise<void> {
+    // Apr 2026 fix: writes go to BOTH IndexedDB AND localStorage every
+    // time, and the IDB write awaits transaction commit before resolving.
+    //
+    // Previously the IDB write fired the .put(...) request but didn't
+    // await tx.oncomplete, so save() resolved before the transaction
+    // committed. Combined with React's autosave debounce (400ms),
+    // this meant: kid finishes onboarding → state changes → debounce
+    // schedules save → save() opens transaction → page close → tab
+    // unloads before the transaction commits → state lost. Next session
+    // loads empty state, kid re-onboards.
+    //
+    // Two-pronged fix:
+    //   1. Await tx.oncomplete on IDB write so save() doesn't resolve
+    //      until the data is actually persisted.
+    //   2. Mirror to localStorage synchronously every save. localStorage
+    //      writes are synchronous in browsers and survive tab close
+    //      reliably. So even if IDB commit gets cancelled by unload,
+    //      the localStorage copy is still there for next load to pick up.
+    //
+    // The double-write doubles the storage cost but state objects are
+    // small (~50KB peak) and writes happen on a 400ms debounce — total
+    // overhead is sub-millisecond per save.
+    let serialized: string | null = null;
+    try {
+      serialized = JSON.stringify(state);
+      // Synchronous localStorage write first — guaranteed-persisted
+      // before save() returns even if IDB later fails.
+      localStorage.setItem(LS_KEY, serialized);
+    } catch { /* storage full or quota exceeded — IDB still tried below */ }
+
     try {
       const db = await openDB();
-      const tx = db.transaction(STORE, "readwrite");
-      tx.objectStore(STORE).put(state, KEY);
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(STORE, "readwrite");
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+        tx.objectStore(STORE).put(state, KEY);
+      });
     } catch {
-      try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch { /* storage full */ }
+      // IDB unavailable / blocked. localStorage is the fallback,
+      // already written above.
     }
   },
 

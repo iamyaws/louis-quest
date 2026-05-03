@@ -25,16 +25,20 @@ let currentAudio: HTMLAudioElement | null = null;
 let delayTimer: ReturnType<typeof setTimeout> | null = null;
 
 function readNarratorMuted(): boolean {
-  if (typeof localStorage === 'undefined') return true;
-  // Default is UNMUTED as of 2026-04-27 — Eleonore's locked
-  // Drachenmutter catalogue (German-native, replaced Charlotte after
-  // recast — see basic-memory reference_voice_casting.md) + Harry's
-  // locked Ronki bank both shipped and are above quality bar.
-  // Explicit '1' = muted by parental choice (toggle in dashboard).
-  // Pre-flip users may have null / any-non-'1' value; treat anything
-  // that isn't a literal '1' as unmuted so they hear the new takes
-  // without re-onboarding.
-  return localStorage.getItem(NARRATOR_MUTE_KEY) === '1';
+  // Marc 27 Apr 2026: "remove the narrator and replace with Ronki's
+  // voice only as I feel it should be only him." The Drachenmutter
+  // narrator track is now hard-muted at the source — no localStorage
+  // override path. All playNarrator(...) calls in the codebase no-op.
+  // Audio files for narrator_meet_*, narrator_ritual_*, the arc beats
+  // stay in public/audio/narrator/ as historical assets but are never
+  // played. Re-enabling would require flipping this constant + bringing
+  // back the dashboard toggle.
+  //
+  // Tier 2 (next session): rewrite the Drachenmutter beats as Ronki
+  // lines (where Ronki is hatched) or as silent visual moments
+  // (pre-hatch in MeetRonki). For now the speech bubbles still render
+  // the German text on screen; the audio just doesn't play.
+  return true;
 }
 
 /**
